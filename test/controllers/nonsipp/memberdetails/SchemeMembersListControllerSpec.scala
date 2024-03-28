@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.memberdetails
 
-import config.Refined.OneTo300
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberdetails.SchemeMembersListController._
-import eu.timepit.refined._
-import forms.YesNoPageFormProvider
-import models.ManualOrUpload.{Manual, Upload}
-import models.NormalMode
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc.Call
+import models.ManualOrUpload.{Manual, Upload}
+import config.Refined.OneTo300
+import views.html.ListView
+import eu.timepit.refined._
+import forms.YesNoPageFormProvider
+import models.NormalMode
+import controllers.nonsipp.memberdetails.SchemeMembersListController._
 import viewmodels.models.MemberState
 import viewmodels.models.MemberState.Active
-import views.html.ListView
+import controllers.ControllerBaseSpec
 
 class SchemeMembersListControllerSpec extends ControllerBaseSpec {
 

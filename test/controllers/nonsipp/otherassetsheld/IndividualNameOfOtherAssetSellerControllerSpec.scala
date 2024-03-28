@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.otherassetsheld
 
+import pages.nonsipp.otherassetsheld.IndividualNameOfOtherAssetSellerPage
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsheld.IndividualNameOfOtherAssetSellerController._
+import views.html.TextInputView
 import eu.timepit.refined.refineMV
+import controllers.nonsipp.otherassetsheld.IndividualNameOfOtherAssetSellerController._
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.otherassetsheld.IndividualNameOfOtherAssetSellerPage
-import views.html.TextInputView
 
 class IndividualNameOfOtherAssetSellerControllerSpec extends ControllerBaseSpec {
 

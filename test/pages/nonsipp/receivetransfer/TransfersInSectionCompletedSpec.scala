@@ -18,8 +18,8 @@ package pages.nonsipp.receivetransfer
 
 import config.Refined._
 import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours
 import viewmodels.models.SectionCompleted
+import pages.behaviours.PageBehaviours
 
 class TransfersInSectionCompletedSpec extends PageBehaviours {
 

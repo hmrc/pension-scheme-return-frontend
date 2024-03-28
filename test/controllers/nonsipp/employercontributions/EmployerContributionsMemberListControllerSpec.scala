@@ -17,18 +17,18 @@
 package controllers.nonsipp.employercontributions
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController.{EmployerContributions, _}
+import play.api.inject.bind
+import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
-import forms.YesNoPageFormProvider
 import models.NormalMode
+import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.employercontributions.{EmployerContributionsMemberListPage, EmployerContributionsProgress}
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
-import viewmodels.models.SectionJourneyStatus
-import views.html.TwoColumnsTripleAction
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import forms.YesNoPageFormProvider
+import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController.{EmployerContributions, _}
 
 import scala.concurrent.Future
 

@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.bondsdisposal
 
+import controllers.nonsipp.bondsdisposal.HowWereBondsDisposedOfController._
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bondsdisposal.HowWereBondsDisposedOfController._
+import views.html.RadioListView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{HowDisposed, NormalMode}
 import pages.nonsipp.bondsdisposal.HowWereBondsDisposedOfPage
-import views.html.RadioListView
 
 class HowWereBondsDisposedOfControllerSpec extends ControllerBaseSpec {
 

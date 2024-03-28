@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalBuyerConnectedPartyController._
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalBuyerConnectedPartyController._
+import views.html.YesNoPageView
+import pages.nonsipp.landorpropertydisposal._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{IdentityType, NormalMode}
-import pages.nonsipp.landorpropertydisposal._
-import views.html.YesNoPageView
 
 class LandOrPropertyDisposalBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
 

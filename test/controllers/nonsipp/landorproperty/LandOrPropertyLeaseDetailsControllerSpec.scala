@@ -16,16 +16,16 @@
 
 package controllers.nonsipp.landorproperty
 
+import services.SchemeDateService
+import controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController._
+import play.api.inject.guice.GuiceableModule
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController._
-import eu.timepit.refined.refineMV
-import models.NormalMode
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyLeaseDetailsPage}
 import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.SchemeDateService
 import views.html.MultipleQuestionView
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyLeaseDetailsPage}
+import eu.timepit.refined.refineMV
+import models.{DateRange, NormalMode}
 
 class LandOrPropertyLeaseDetailsControllerSpec extends ControllerBaseSpec {
 
@@ -39,7 +39,7 @@ class LandOrPropertyLeaseDetailsControllerSpec extends ControllerBaseSpec {
     bind[SchemeDateService].toInstance(mockSchemeDateService)
   )
 
-  val taxYear = Some(Left(dateRange))
+  val taxYear: Some[Left[DateRange, Nothing]] = Some(Left(dateRange))
 
   private val dateTooEarlyForm = List(
     "value.1" -> "test",

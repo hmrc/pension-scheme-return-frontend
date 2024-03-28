@@ -18,17 +18,17 @@ package controllers.nonsipp.employercontributions
 
 import config.Refined.{Max300, Max50}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.employercontributions.ContributionsFromAnotherEmployerController.{form, viewModel}
+import play.api.inject.bind
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.NormalMode
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.employercontributions.ContributionsFromAnotherEmployerPage
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
-import views.html.YesNoPageView
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import models.NormalMode
+import controllers.nonsipp.employercontributions.ContributionsFromAnotherEmployerController.{form, viewModel}
 
 import scala.concurrent.Future
 

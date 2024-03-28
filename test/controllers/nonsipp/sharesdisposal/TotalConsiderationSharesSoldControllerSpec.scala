@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
+import views.html.MoneyView
 import eu.timepit.refined.refineMV
+import pages.nonsipp.sharesdisposal.{HowManySharesSoldPage, TotalConsiderationSharesSoldPage}
+import models.NormalMode
 import controllers.nonsipp.sharesdisposal.TotalConsiderationSharesSoldController._
 import forms.mappings.errors.MoneyFormErrorProvider
-import models.NormalMode
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import pages.nonsipp.sharesdisposal.{HowManySharesSoldPage, TotalConsiderationSharesSoldPage}
-import views.html.MoneyView
 
 class TotalConsiderationSharesSoldControllerSpec extends ControllerBaseSpec {
 

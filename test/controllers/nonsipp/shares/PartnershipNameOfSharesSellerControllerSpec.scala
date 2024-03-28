@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.shares
 
+import pages.nonsipp.shares.PartnershipShareSellerNamePage
 import config.Refined.Max5000
-import controllers.nonsipp.shares.PartnershipNameOfSharesSellerController._
 import controllers.ControllerBaseSpec
+import views.html.TextInputView
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
+import controllers.nonsipp.shares.PartnershipNameOfSharesSellerController._
 import models.NormalMode
-import pages.nonsipp.shares.PartnershipShareSellerNamePage
-import views.html.TextInputView
 
 class PartnershipNameOfSharesSellerControllerSpec extends ControllerBaseSpec {
 

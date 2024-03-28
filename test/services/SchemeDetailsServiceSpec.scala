@@ -16,15 +16,15 @@
 
 package services
 
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import utils.BaseSpec
 import connectors.SchemeDetailsConnector
 import models.SchemeId.Srn
-import org.mockito.ArgumentMatchers.{any, eq => meq}
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.BaseSpec
+import org.mockito.ArgumentMatchers.{any, eq => meq}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Random
 
 class SchemeDetailsServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {

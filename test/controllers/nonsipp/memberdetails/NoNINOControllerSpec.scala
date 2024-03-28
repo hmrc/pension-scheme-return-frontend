@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.memberdetails
 
-import NoNINOController._
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberdetails.routes
+import pages.nonsipp.memberdetails.{MemberDetailsPage, NoNINOPage}
+import views.html.TextAreaView
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.memberdetails.{MemberDetailsPage, NoNINOPage}
-import views.html.TextAreaView
+import controllers.nonsipp.memberdetails.NoNINOController._
+import controllers.nonsipp.memberdetails.routes
+import controllers.ControllerBaseSpec
 
 class NoNINOControllerSpec extends ControllerBaseSpec {
 

@@ -16,23 +16,23 @@
 
 package controllers.actions
 
-import config.{Constants, FrontendAppConfig}
-import connectors.cache.SessionDataCacheConnector
-import controllers.routes
-import models.cache.PensionSchemeUser.{Administrator, Practitioner}
-import models.cache.SessionData
-import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
-import org.mockito.ArgumentMatchers._
-import play.api.Application
-import play.api.http.Status.OK
-import play.api.libs.json.Json
-import play.api.mvc.Results.Ok
 import play.api.mvc.{Action, AnyContent}
-import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, redirectLocation, status}
+import controllers.routes
+import config.{Constants, FrontendAppConfig}
+import play.api.http.Status.OK
+import models.cache.PensionSchemeUser.{Administrator, Practitioner}
+import play.api.mvc.Results.Ok
+import org.mockito.ArgumentMatchers._
+import connectors.cache.SessionDataCacheConnector
 import play.api.test.{FakeRequest, StubPlayBodyParsersFactory}
-import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.~
 import utils.BaseSpec
+import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core._
+import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
+import uk.gov.hmrc.auth.core.retrieve.~
+import models.cache.SessionData
+import play.api.Application
+import play.api.libs.json.Json
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -59,7 +59,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
 
   def handler(implicit app: Application) = new Handler(appConfig)
 
-  def appConfig(implicit app: Application) = injected[FrontendAppConfig]
+  def appConfig(implicit app: Application): FrontendAppConfig = injected[FrontendAppConfig]
 
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
   val mockSessionDataCacheConnector: SessionDataCacheConnector = mock[SessionDataCacheConnector]

@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.landorproperty
 
+import services.SchemeDateService
+import play.api.inject.guice.GuiceableModule
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController._
+import play.api.inject.bind
+import views.html.DatePageView
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyWhenDidSchemeAcquirePage}
 import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
 import models.{NormalMode, UserAnswers}
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyWhenDidSchemeAcquirePage}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.SchemeDateService
-import views.html.DatePageView
+import controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController._
 
 import java.time.LocalDate
 

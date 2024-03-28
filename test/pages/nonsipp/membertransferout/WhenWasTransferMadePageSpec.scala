@@ -18,8 +18,8 @@ package pages.nonsipp.membertransferout
 
 import config.Refined.{Max300, Max5}
 import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours
 import pages.nonsipp.membertransferout.WhenWasTransferMadePage
+import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate
 

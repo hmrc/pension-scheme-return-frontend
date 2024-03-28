@@ -16,16 +16,16 @@
 
 package controllers.nonsipp.shares
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.shares.DidSchemeHoldAnySharesController._
+import play.api.inject.bind
+import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import controllers.nonsipp.shares.DidSchemeHoldAnySharesController._
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.YesNoPageView
 
 class DidSchemeHoldAnySharesControllerSpec extends ControllerBaseSpec {
 

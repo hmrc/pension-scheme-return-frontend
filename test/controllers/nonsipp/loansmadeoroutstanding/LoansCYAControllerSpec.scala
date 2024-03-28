@@ -16,28 +16,19 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import services.{PsrSubmissionService, SchemeDateService}
+import play.api.inject.guice.GuiceableModule
+import models.ConditionalYesNo._
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
+import play.api.inject.bind
+import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
-import models.ConditionalYesNo._
-import models.{
-  CheckOrChange,
-  ConditionalYesNo,
-  Crn,
-  IdentitySubject,
-  IdentityType,
-  Money,
-  Security,
-  SponsoringOrConnectedParty
-}
-import org.mockito.ArgumentMatchers.any
+import models._
 import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
 import pages.nonsipp.loansmadeoroutstanding._
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.{PsrSubmissionService, SchemeDateService}
-import views.html.CheckYourAnswersView
+import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
+import org.mockito.ArgumentMatchers.any
 
 class LoansCYAControllerSpec extends ControllerBaseSpec {
 

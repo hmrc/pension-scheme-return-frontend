@@ -16,19 +16,19 @@
 
 package controllers.nonsipp.otherassetsheld
 
+import controllers.nonsipp.otherassetsheld.OtherAssetsCYAController._
+import services.{PsrSubmissionService, SaveService, SchemeDateService}
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.otherassetsheld._
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsheld.OtherAssetsCYAController._
-import eu.timepit.refined.refineMV
-import models.{CheckMode, ConditionalYesNo, IdentitySubject, IdentityType, Mode, NormalMode, SchemeHoldAsset}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.common.IdentityTypePage
-import pages.nonsipp.otherassetsheld._
 import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.{PsrSubmissionService, SaveService, SchemeDateService}
-import uk.gov.hmrc.domain.Nino
 import views.html.CheckYourAnswersView
+import eu.timepit.refined.refineMV
+import uk.gov.hmrc.domain.Nino
+import models._
+import pages.nonsipp.common.IdentityTypePage
+import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 

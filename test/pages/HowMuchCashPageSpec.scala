@@ -16,9 +16,9 @@
 
 package pages
 
+import pages.nonsipp.schemedesignatory.HowMuchCashPage
 import models.{MoneyInPeriod, NormalMode}
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.schemedesignatory.HowMuchCashPage
 
 class HowMuchCashPageSpec extends PageBehaviours {
 

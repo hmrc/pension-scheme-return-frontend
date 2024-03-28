@@ -18,9 +18,9 @@ package pages.nonsipp.otherassetsdisposal
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
+import uk.gov.hmrc.domain.Nino
 import models.ConditionalYesNo
 import pages.behaviours.PageBehaviours
-import uk.gov.hmrc.domain.Nino
 
 class AssetIndividualBuyerNiNumberPageSpec extends PageBehaviours {
   private val srn = srnGen.sample.value

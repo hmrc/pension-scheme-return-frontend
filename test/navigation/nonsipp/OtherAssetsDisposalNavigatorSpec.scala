@@ -16,13 +16,13 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max50, Max5000}
-import eu.timepit.refined.refineMV
-import models.{HowDisposed, IdentityType, NormalMode}
-import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
 import pages.nonsipp.otherassetsdisposal._
 import utils.BaseSpec
+import config.Refined.{Max50, Max5000}
+import eu.timepit.refined.refineMV
+import org.scalacheck.Gen
+import navigation.{Navigator, NavigatorBehaviours}
+import models.{HowDisposed, IdentityType, NormalMode}
 
 class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

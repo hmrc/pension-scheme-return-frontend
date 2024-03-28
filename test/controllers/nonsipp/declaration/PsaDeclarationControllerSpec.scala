@@ -17,8 +17,8 @@
 package controllers.nonsipp.declaration
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.declaration.routes
 import views.html.ContentPageView
+import controllers.nonsipp.declaration.routes
 
 class PsaDeclarationControllerSpec extends ControllerBaseSpec {
 

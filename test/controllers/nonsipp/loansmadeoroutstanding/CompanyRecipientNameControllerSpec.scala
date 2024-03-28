@@ -18,12 +18,12 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController._
+import views.html.TextInputView
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
-import views.html.TextInputView
+import controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController._
 
 class CompanyRecipientNameControllerSpec extends ControllerBaseSpec {
 

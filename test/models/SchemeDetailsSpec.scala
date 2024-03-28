@@ -17,8 +17,8 @@
 package models
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.libs.json.{JsString, Json}
 import utils.BaseSpec
+import play.api.libs.json.{JsString, Json}
 
 class SchemeDetailsSpec extends BaseSpec with ScalaCheckPropertyChecks {
 

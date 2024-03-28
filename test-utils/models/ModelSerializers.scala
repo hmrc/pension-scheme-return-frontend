@@ -16,8 +16,8 @@
 
 package models
 
-import models.cache.PensionSchemeUser
 import play.api.libs.json.Json.JsValueWrapper
+import models.cache.PensionSchemeUser
 import play.api.libs.json._
 
 import java.time.LocalDate

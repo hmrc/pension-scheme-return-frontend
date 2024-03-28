@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.memberpayments
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.{form, viewModel}
+import play.api.inject.bind
+import views.html.YesNoPageView
+import play.api.libs.json.JsPath
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import play.api.libs.json.JsPath
-import services.PsrSubmissionService
-import views.html.YesNoPageView
+import controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.{form, viewModel}
+import org.mockito.ArgumentMatchers.any
 
 class UnallocatedEmployerContributionsControllerSpec extends ControllerBaseSpec {
 

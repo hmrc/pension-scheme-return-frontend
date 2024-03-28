@@ -18,9 +18,9 @@ package pages.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
+import uk.gov.hmrc.domain.Nino
 import models.ConditionalYesNo
 import pages.behaviours.PageBehaviours
-import uk.gov.hmrc.domain.Nino
 
 class IndividualRecipientNinoPageSpec extends PageBehaviours {
 

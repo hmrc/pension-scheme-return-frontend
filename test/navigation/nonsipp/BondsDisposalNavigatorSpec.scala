@@ -16,15 +16,15 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max50, Max5000}
-import eu.timepit.refined.refineMV
-import models.SchemeId.Srn
-import models.{CheckMode, HowDisposed, NormalMode, PointOfEntry, UserAnswers}
-import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
-import pages.nonsipp.bondsdisposal._
 import utils.BaseSpec
+import config.Refined.{Max50, Max5000}
+import models.SchemeId.Srn
+import eu.timepit.refined.refineMV
+import navigation.{Navigator, NavigatorBehaviours}
+import models._
+import pages.nonsipp.bondsdisposal._
 import utils.UserAnswersUtils.UserAnswersOps
+import org.scalacheck.Gen
 
 class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

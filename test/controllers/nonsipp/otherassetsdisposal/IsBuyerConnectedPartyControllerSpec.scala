@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
+import pages.nonsipp.otherassetsdisposal._
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsdisposal.IsBuyerConnectedPartyController._
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
+import controllers.nonsipp.otherassetsdisposal.IsBuyerConnectedPartyController._
 import forms.YesNoPageFormProvider
 import models.{IdentityType, NormalMode}
-import pages.nonsipp.otherassetsdisposal._
-import views.html.YesNoPageView
 
 class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
 

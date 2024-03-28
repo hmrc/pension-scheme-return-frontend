@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.shares
 
+import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesTotalIncomePage}
 import config.Refined._
 import controllers.ControllerBaseSpec
+import views.html.MoneyView
 import controllers.nonsipp.shares.SharesTotalIncomeController._
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
-import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesTotalIncomePage}
-import views.html.MoneyView
 
 class SharesTotalIncomeControllerSpec extends ControllerBaseSpec {
 

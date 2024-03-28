@@ -16,14 +16,15 @@
 
 package controllers.actions
 
-import generators.Generators
-import models.requests.{AllowedAccessRequest, IdentifierRequest}
-import models.{MinimalDetails, SchemeDetails, SchemeId}
-import org.scalatest.OptionValues
 import play.api.mvc._
+import generators.Generators
+import org.scalatest.OptionValues
+import models.{MinimalDetails, SchemeDetails, SchemeId}
+import models.requests.{AllowedAccessRequest, IdentifierRequest}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class FakeAllowAccessActionProvider @Inject()(schemeDetails: SchemeDetails, minimalDetails: MinimalDetails)
     extends AllowAccessActionProvider

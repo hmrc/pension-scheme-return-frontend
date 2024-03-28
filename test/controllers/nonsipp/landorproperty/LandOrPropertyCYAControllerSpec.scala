@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.landorproperty
 
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
-import eu.timepit.refined.refineMV
-import models.ConditionalYesNo._
-import models.SchemeHoldLandProperty.Transfer
-import models.{CheckMode, ConditionalYesNo, Mode, NormalMode}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.landorproperty._
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
+import models.ConditionalYesNo._
+import controllers.ControllerBaseSpec
+import play.api.inject.bind
 import views.html.CheckYourAnswersView
+import pages.nonsipp.landorproperty._
+import eu.timepit.refined.refineMV
+import models._
+import org.mockito.ArgumentMatchers.any
+import config.Refined.OneTo5000
+import models.SchemeHoldLandProperty.Transfer
 
 class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
 

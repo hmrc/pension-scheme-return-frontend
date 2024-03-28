@@ -16,19 +16,19 @@
 
 package controllers.nonsipp.receivetransfer
 
-import config.Refined.{Max300, Max5}
+import services.PsrSubmissionService
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.receivetransfer.ReportAnotherTransferInController.{form, viewModel}
+import play.api.inject.bind
+import views.html.YesNoPageView
+import pages.nonsipp.receivetransfer.ReportAnotherTransferInPage
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.ReportAnotherTransferInPage
-import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.YesNoPageView
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import controllers.nonsipp.receivetransfer.ReportAnotherTransferInController.{form, viewModel}
+import config.Refined.{Max300, Max5}
 
 import scala.concurrent.Future
 

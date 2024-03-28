@@ -16,10 +16,10 @@
 
 package pages
 
+import utils.UserAnswersUtils.UserAnswersOps
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import models.{DateRange, UserAnswers}
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
-import utils.UserAnswersUtils.UserAnswersOps
 
 class WhichTaxYearPageSpec extends PageBehaviours {
 

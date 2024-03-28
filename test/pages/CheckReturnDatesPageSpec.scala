@@ -17,11 +17,11 @@
 package pages
 
 import eu.timepit.refined.refineMV
-import models.{NormalMode, UserAnswers}
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriods}
 import utils.UserAnswersUtils.UserAnswersOps
+import pages.nonsipp.CheckReturnDatesPage
+import models.{NormalMode, UserAnswers}
+import pages.behaviours.PageBehaviours
 
 class CheckReturnDatesPageSpec extends PageBehaviours {
 

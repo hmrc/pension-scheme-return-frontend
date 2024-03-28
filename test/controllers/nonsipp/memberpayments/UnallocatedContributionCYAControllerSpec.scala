@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.memberpayments
 
-import controllers.ControllerBaseSpec
-import models.CheckOrChange
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
+import controllers.ControllerBaseSpec
+import play.api.inject.bind
 import views.html.CYAWithRemove
+import models.CheckOrChange
+import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
+import org.mockito.ArgumentMatchers.any
 
 class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
 

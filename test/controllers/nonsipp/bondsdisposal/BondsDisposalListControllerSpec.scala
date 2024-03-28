@@ -16,21 +16,15 @@
 
 package controllers.nonsipp.bondsdisposal
 
+import pages.nonsipp.bonds._
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bondsdisposal.BondsDisposalListController._
+import views.html.ListRadiosView
 import eu.timepit.refined.refineMV
+import controllers.nonsipp.bondsdisposal.BondsDisposalListController._
 import forms.RadioListFormProvider
 import models.{NormalMode, SchemeHoldBond}
-import pages.nonsipp.bonds.{
-  BondsCompleted,
-  CostOfBondsPage,
-  IncomeFromBondsPage,
-  NameOfBondsPage,
-  WhyDoesSchemeHoldBondsPage
-}
 import viewmodels.models.SectionCompleted
-import views.html.ListRadiosView
 
 class BondsDisposalListControllerSpec extends ControllerBaseSpec {
 

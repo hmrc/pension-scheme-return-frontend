@@ -16,26 +16,26 @@
 
 package controllers.nonsipp
 
-import cats.data.NonEmptyList
-import cats.implicits.toShow
+import play.api.test.FakeRequest
+import services.{PsrSubmissionService, SchemeDateService}
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage}
 import config.Refined.Max3
 import controllers.{nonsipp, ControllerBaseSpec}
-import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
-import eu.timepit.refined.refineMV
-import models.SchemeId.Srn
-import models.{CheckMode, DateRange, Mode, NormalMode, PensionSchemeId, SchemeDetails, SchemeMemberNumbers}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.WhichTaxYearPage
-import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage}
-import play.api.i18n.Messages
 import play.api.inject.bind
+import cats.implicits.toShow
+import eu.timepit.refined.refineMV
+import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
+import pages.nonsipp.WhichTaxYearPage
+import models._
+import play.api.i18n.Messages
+import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesApi
-import services.{PsrSubmissionService, SchemeDateService}
+import cats.data.NonEmptyList
+import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{CheckYourAnswersViewModel, FormPageViewModel}
-import views.html.CheckYourAnswersView
 
 class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
 

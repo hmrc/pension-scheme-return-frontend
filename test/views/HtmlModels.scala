@@ -16,8 +16,8 @@
 
 package views
 
-import org.jsoup.nodes.Element
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
+import org.jsoup.nodes.Element
 import viewmodels.DisplayMessage.LinkMessage
 
 trait HtmlModels {

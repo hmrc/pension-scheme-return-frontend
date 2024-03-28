@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.bondsdisposal
 
+import controllers.nonsipp.bondsdisposal.BondsStillHeldController._
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bondsdisposal.BondsStillHeldController._
+import views.html.IntView
 import eu.timepit.refined.refineMV
 import forms.IntFormProvider
 import models.NormalMode
 import pages.nonsipp.bondsdisposal.BondsStillHeldPage
-import views.html.IntView
 
 class BondsStillHeldControllerSpec extends ControllerBaseSpec {
 

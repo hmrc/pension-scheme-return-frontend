@@ -16,28 +16,19 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.shares._
+import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
 import config.Refined.{OneTo50, OneTo5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
-import eu.timepit.refined.refineMV
-import models.HowSharesDisposed
-import models.IdentityType
-import models.SchemeHoldShare
-import models.TypeOfShares
-import models.{CheckMode, ConditionalYesNo, Mode, NormalMode}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.shares.{
-  CompanyNameRelatedSharesPage,
-  TypeOfSharesHeldPage,
-  WhenDidSchemeAcquireSharesPage,
-  WhyDoesSchemeHoldSharesPage
-}
-import pages.nonsipp.sharesdisposal._
 import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import uk.gov.hmrc.domain.Nino
 import views.html.CheckYourAnswersView
+import eu.timepit.refined.refineMV
+import pages.nonsipp.sharesdisposal._
+import uk.gov.hmrc.domain.Nino
+import models._
+import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 

@@ -17,14 +17,14 @@
 package controllers.nonsipp.employercontributions
 
 import pages.nonsipp.employercontributions.{EmployerNamePage, TotalEmployerContributionPage}
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import controllers.nonsipp.employercontributions.TotalEmployerContributionController._
 import config.Refined._
+import controllers.ControllerBaseSpec
+import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import models.NormalMode
-import controllers.ControllerBaseSpec
 import forms.mappings.errors.MoneyFormErrorProvider
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import views.html.MoneyView
 
 class TotalEmployerContributionControllerSpec extends ControllerBaseSpec {
 

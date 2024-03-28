@@ -16,24 +16,19 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo5000
-import eu.timepit.refined.refineMV
-import models.CheckOrChange.Check
+import utils.BaseSpec
 import models.ConditionalYesNo._
 import models.IdentityType.UKCompany
+import config.Refined.OneTo5000
 import models.SchemeId.Srn
-import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, NormalMode, RecipientDetails, UserAnswers}
+import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
+import models._
+import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
-import utils.BaseSpec
+import models.CheckOrChange.Check
 import utils.UserAnswersUtils.UserAnswersOps
+import org.scalacheck.Gen
 
 class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

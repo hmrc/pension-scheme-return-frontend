@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.otherassetsheld
 
+import pages.nonsipp.otherassetsheld.IndependentValuationPage
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsheld.IndependentValuationController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.otherassetsheld.IndependentValuationPage
+import controllers.nonsipp.otherassetsheld.IndependentValuationController._
 import views.html.YesNoPageView
 
 class IndependentValuationControllerSpec extends ControllerBaseSpec {

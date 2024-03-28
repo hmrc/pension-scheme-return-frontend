@@ -17,17 +17,7 @@
 package utils
 
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{
-  CompoundMessage,
-  DownloadLinkMessage,
-  Empty,
-  Heading2,
-  LinkMessage,
-  ListMessage,
-  Message,
-  ParagraphMessage,
-  TableMessage
-}
+import viewmodels.DisplayMessage._
 
 trait DisplayMessageUtils {
 

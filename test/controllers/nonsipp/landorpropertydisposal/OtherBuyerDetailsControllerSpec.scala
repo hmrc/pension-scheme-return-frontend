@@ -18,12 +18,12 @@ package controllers.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import eu.timepit.refined.refineMV
-import forms.RecipientDetailsFormProvider
-import models.{NormalMode, RecipientDetails}
+import views.html.RecipientDetailsView
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.OtherBuyerDetailsPage
-import views.html.RecipientDetailsView
+import eu.timepit.refined.refineMV
+import forms.RecipientDetailsFormProvider
+import models.{NormalMode, RecipientDetails, UserAnswers}
 
 class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
 
@@ -37,7 +37,8 @@ class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
     controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
       .onSubmit(srn, index, disposalIndex, NormalMode)
 
-  val updatedUserAnswers = defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
+  val updatedUserAnswers: UserAnswers =
+    defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
 
   private val validForm = List(
     "name" -> "name",

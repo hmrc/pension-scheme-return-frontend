@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
+import services.PsrSubmissionService
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsController._
+import play.api.inject.bind
+import views.html.YesNoPageView
+import play.api.libs.json.JsPath
 import forms.YesNoPageFormProvider
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsPage
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsPage
 import play.api.inject.guice.GuiceableModule
-import play.api.libs.json.JsPath
-import views.html.YesNoPageView
-import play.api.inject.bind
-import services.PsrSubmissionService
+import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsController._
 
 import scala.concurrent.Future
 

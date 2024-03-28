@@ -16,16 +16,16 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController._
+import play.api.inject.bind
+import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.YesNoPageView
+import controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController._
+import org.mockito.ArgumentMatchers.any
 
 class LoansMadeOrOutstandingControllerSpec extends ControllerBaseSpec {
 

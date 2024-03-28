@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import controllers.nonsipp.landorpropertydisposal.TotalProceedsSaleLandPropertyController._
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorpropertydisposal.TotalProceedsSaleLandPropertyController._
+import views.html.MoneyView
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
+import pages.nonsipp.landorpropertydisposal.TotalProceedsSaleLandPropertyPage
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
-import pages.nonsipp.landorpropertydisposal.TotalProceedsSaleLandPropertyPage
-import views.html.MoneyView
 
 class TotalProceedsSaleLandPropertyControllerSpec extends ControllerBaseSpec {
 

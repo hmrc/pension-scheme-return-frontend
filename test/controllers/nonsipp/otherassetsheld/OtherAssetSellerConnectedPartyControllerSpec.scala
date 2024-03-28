@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.otherassetsheld
 
+import controllers.nonsipp.otherassetsheld.OtherAssetSellerConnectedPartyController._
+import pages.nonsipp.otherassetsheld.{IndividualNameOfOtherAssetSellerPage, OtherAssetSellerConnectedPartyPage}
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsheld.OtherAssetSellerConnectedPartyController._
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{IdentitySubject, IdentityType, NormalMode, UserAnswers}
+import models._
 import pages.nonsipp.common.IdentityTypePage
-import pages.nonsipp.otherassetsheld.{IndividualNameOfOtherAssetSellerPage, OtherAssetSellerConnectedPartyPage}
-import views.html.YesNoPageView
 
 class OtherAssetSellerConnectedPartyControllerSpec extends ControllerBaseSpec {
 

@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.shares
 
+import pages.nonsipp.shares.IndividualNameOfSharesSellerPage
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.shares.IndividualNameOfSharesSellerController._
+import views.html.TextInputView
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.shares.IndividualNameOfSharesSellerPage
-import views.html.TextInputView
+import controllers.nonsipp.shares.IndividualNameOfSharesSellerController._
 
 class IndividualNameOfSharesSellerControllerSpec extends ControllerBaseSpec {
 

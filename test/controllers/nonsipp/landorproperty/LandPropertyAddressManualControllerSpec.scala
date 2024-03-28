@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.landorproperty
 
+import controllers.nonsipp.landorproperty.LandPropertyAddressManualController._
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.LandPropertyAddressManualController._
+import views.html.MultipleQuestionView
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import eu.timepit.refined.refineMV
 import models.NormalMode
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
-import views.html.MultipleQuestionView
 
 class LandPropertyAddressManualControllerSpec extends ControllerBaseSpec {
 

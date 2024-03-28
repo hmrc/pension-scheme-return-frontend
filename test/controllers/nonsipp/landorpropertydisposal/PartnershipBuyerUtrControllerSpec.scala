@@ -18,12 +18,12 @@ package controllers.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorpropertydisposal.PartnershipBuyerUtrController._
+import views.html.ConditionalYesNoPageView
+import pages.nonsipp.landorpropertydisposal.{PartnershipBuyerNamePage, PartnershipBuyerUtrPage}
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, NormalMode, Utr}
-import pages.nonsipp.landorpropertydisposal.{PartnershipBuyerNamePage, PartnershipBuyerUtrPage}
-import views.html.ConditionalYesNoPageView
+import models._
+import controllers.nonsipp.landorpropertydisposal.PartnershipBuyerUtrController._
 
 class PartnershipBuyerUtrControllerSpec extends ControllerBaseSpec {
 
@@ -37,7 +37,7 @@ class PartnershipBuyerUtrControllerSpec extends ControllerBaseSpec {
     routes.PartnershipBuyerUtrController
       .onSubmit(srn, index, disposalIndex, NormalMode)
 
-  val userAnswersCompanyName =
+  val userAnswersCompanyName: UserAnswers =
     defaultUserAnswers.unsafeSet(PartnershipBuyerNamePage(srn, index, disposalIndex), companyName)
 
   val conditionalNo: ConditionalYesNo[String, Utr] = ConditionalYesNo.no("reason")

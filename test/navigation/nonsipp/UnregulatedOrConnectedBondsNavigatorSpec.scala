@@ -17,14 +17,14 @@
 package navigation.nonsipp
 
 import config.Refined.{Max5000, OneTo5000}
-import eu.timepit.refined.refineMV
 import models.SchemeId.Srn
-import models.{CheckMode, NormalMode, SchemeHoldBond, UserAnswers}
+import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
-import pages.nonsipp.bonds._
+import models._
 import utils.BaseSpec
+import pages.nonsipp.bonds._
 import utils.UserAnswersUtils.UserAnswersOps
+import org.scalacheck.Gen
 
 class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

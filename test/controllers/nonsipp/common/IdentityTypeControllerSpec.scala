@@ -16,20 +16,23 @@
 
 package controllers.nonsipp.common
 
+import play.api.test.FakeRequest
+import play.api.mvc.AnyContentAsEmpty
+import models.IdentityType._
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.common.IdentityTypeController._
+import views.html.RadioListView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
-import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
 import models.{IdentitySubject, NormalMode}
-import play.api.test.FakeRequest
-import views.html.RadioListView
+import controllers.nonsipp.common.IdentityTypeController._
+import models.requests.AllowedAccessRequest
 
 class IdentityTypeControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
-  val allowedAccessRequest = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequest
+    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
 
   "IdentityTypeController" - {
     IdentitySubject.values.foreach {

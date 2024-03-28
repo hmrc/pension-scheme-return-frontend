@@ -16,12 +16,12 @@
 
 package views
 
-import forms.mappings.Mappings
-import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
+import play.api.mvc.AnyContentAsEmpty
+import forms.mappings.Mappings
 import utils.FakeRequestCSRFSupport.CSRFFakeRequest
-import viewmodels.models.UploadViewModel
 import views.html.UploadView
+import viewmodels.models.UploadViewModel
 
 class UploadViewSpec extends ViewSpec with Mappings {
 

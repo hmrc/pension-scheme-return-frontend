@@ -16,12 +16,12 @@
 
 package views
 
-import forms.mappings.Mappings
-import play.api.data
-import play.api.data.FormError
 import play.api.test.FakeRequest
-import viewmodels.models.TextAreaViewModel
+import forms.mappings.Mappings
 import views.html.TextAreaView
+import play.api.data
+import viewmodels.models.TextAreaViewModel
+import play.api.data.FormError
 
 class TextAreaViewSpec extends ViewSpec with Mappings {
 

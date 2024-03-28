@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.bondsdisposal
 
+import services.PsrSubmissionService
+import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
 import config.Refined.{OneTo50, OneTo5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
-import eu.timepit.refined.refineMV
-import models.{CheckMode, HowDisposed, Mode, NormalMode, SchemeHoldBond}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.bondsdisposal._
-import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
 import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
 import views.html.CheckYourAnswersView
+import eu.timepit.refined.refineMV
+import models._
+import pages.nonsipp.bondsdisposal._
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
 
 import scala.concurrent.Future
 

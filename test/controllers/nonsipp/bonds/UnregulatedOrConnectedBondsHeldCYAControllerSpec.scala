@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.bonds
 
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController._
-import eu.timepit.refined.refineMV
-import models.SchemeHoldBond.Acquisition
-import models.{CheckMode, Mode, NormalMode}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.bonds._
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
+import config.Refined.OneTo5000
+import play.api.inject.bind
 import views.html.CheckYourAnswersView
+import eu.timepit.refined.refineMV
+import models.{CheckMode, Mode, NormalMode}
+import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController._
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.bonds._
+import controllers.ControllerBaseSpec
+import models.SchemeHoldBond.Acquisition
 
 class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpec {
 

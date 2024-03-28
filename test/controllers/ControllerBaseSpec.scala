@@ -16,31 +16,31 @@
 
 package controllers
 
-import cats.data.NonEmptyList
-import com.softwaremill.diffx.scalatest.DiffShouldMatcher
-import config.Refined.Max5000
-import controllers.actions._
-import generators.ModelGenerators._
-import models.PensionSchemeId.PsaId
-import models.SchemeId.Srn
-import models.UserAnswers.SensitiveJsObject
-import models._
-import org.scalatest.OptionValues
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
-import pages.nonsipp.moneyborrowed.LenderNamePage
-import play.api.Application
-import play.api.data.Form
-import play.api.http._
-import play.api.inject.bind
-import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
-import play.api.libs.json.{Json, Writes}
-import play.api.mvc.Call
 import play.api.test._
 import queries.Settable
-import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.time.TaxYear
+import config.Refined.Max5000
+import play.api.inject.bind
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
+import controllers.actions._
+import models.PensionSchemeId.PsaId
 import utils.UserAnswersUtils.UserAnswersOps
+import generators.ModelGenerators._
+import models._
+import uk.gov.hmrc.time.TaxYear
+import pages.nonsipp.moneyborrowed.LenderNamePage
+import play.api.data.Form
 import utils.{BaseSpec, DisplayMessageUtils}
+import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
+import play.api.mvc.Call
+import com.softwaremill.diffx.scalatest.DiffShouldMatcher
+import models.UserAnswers.SensitiveJsObject
+import play.api.http._
+import cats.data.NonEmptyList
+import models.SchemeId.Srn
+import org.scalatest.OptionValues
+import play.api.Application
+import uk.gov.hmrc.domain.Nino
+import play.api.libs.json.{Json, Writes}
 
 import java.time.{LocalDate, LocalDateTime}
 
@@ -64,7 +64,7 @@ trait ControllerBaseSpec
 
   val testOnwardRoute: Call = Call("GET", "/foo")
 
-  val defaultTaxYear = TaxYear(2022)
+  val defaultTaxYear: TaxYear = TaxYear(2022)
 
   protected def applicationBuilder(
     userAnswers: Option[UserAnswers] = None,
@@ -126,10 +126,10 @@ trait TestValues {
   val noCrnReason: String = "no crn reason"
   val recipientName = "testRecipientName"
   val employerName = "testEmployerName"
-  val individualRecipientName = "individual " + recipientName
-  val companyRecipientName = "company " + recipientName
-  val partnershipRecipientName = "partnership " + recipientName
-  val otherRecipientName = "other " + recipientName
+  val individualRecipientName: String = "individual " + recipientName
+  val companyRecipientName: String = "company " + recipientName
+  val partnershipRecipientName: String = "partnership " + recipientName
+  val otherRecipientName: String = "other " + recipientName
   val otherRecipientDescription = "other description"
   val pstr = "testPstr"
   val version = "001"
@@ -254,7 +254,7 @@ trait TestValues {
   def userAnswersWithNameAndAmount(srn: Srn, index: Max5000): UserAnswers =
     defaultUserAnswers.unsafeSet(LenderNamePage(srn, index), lenderName)
 
-  val accountingPeriods = NonEmptyList.of(
+  val accountingPeriods: NonEmptyList[(LocalDate, LocalDate)] = NonEmptyList.of(
     LocalDate.of(2020, 4, 6) ->
       LocalDate.of(2020, 5, 5),
     LocalDate.of(2020, 5, 6) ->

@@ -16,13 +16,13 @@
 
 package navigation.nonsipp
 
+import utils.BaseSpec
 import config.Refined.Max300
 import eu.timepit.refined.refineMV
-import models.NormalMode
-import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
+import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.membersurrenderedbenefits._
-import utils.BaseSpec
+import models.NormalMode
 
 class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

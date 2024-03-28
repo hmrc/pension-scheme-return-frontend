@@ -16,10 +16,10 @@
 
 package navigation.nonsipp
 
-import models.NormalMode
-import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
 import utils.BaseSpec
+import navigation.{Navigator, NavigatorBehaviours}
+import models.NormalMode
 
 class OtherAssetsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

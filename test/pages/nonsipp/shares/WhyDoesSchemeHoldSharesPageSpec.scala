@@ -18,11 +18,11 @@ package pages.nonsipp.shares
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models.{IdentitySubject, IdentityType, SchemeHoldShare, UserAnswers}
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.common
 import utils.UserAnswersUtils.UserAnswersOps
+import pages.nonsipp.common
+import models._
 import viewmodels.models.SectionCompleted
+import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate
 

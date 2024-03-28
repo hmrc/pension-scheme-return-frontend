@@ -16,13 +16,13 @@
 
 package navigation.nonsipp
 
+import utils.BaseSpec
+import pages.nonsipp.membercontributions._
 import config.Refined.Max300
 import eu.timepit.refined.refineMV
-import models.NormalMode
-import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.membercontributions._
-import utils.BaseSpec
+import navigation.{Navigator, NavigatorBehaviours}
+import models.NormalMode
 
 class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

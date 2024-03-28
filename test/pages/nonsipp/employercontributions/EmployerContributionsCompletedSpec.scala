@@ -18,8 +18,8 @@ package pages.nonsipp.employercontributions
 
 import config.Refined._
 import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours
 import viewmodels.models.SectionCompleted
+import pages.behaviours.PageBehaviours
 
 class EmployerContributionsCompletedSpec extends PageBehaviours {
 

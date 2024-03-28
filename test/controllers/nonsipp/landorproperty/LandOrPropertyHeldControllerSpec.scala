@@ -16,16 +16,16 @@
 
 package controllers.nonsipp.landorproperty
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.LandOrPropertyHeldController._
+import play.api.inject.bind
+import views.html.YesNoPageView
+import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import controllers.nonsipp.landorproperty.LandOrPropertyHeldController._
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.YesNoPageView
 
 class LandOrPropertyHeldControllerSpec extends ControllerBaseSpec {
 

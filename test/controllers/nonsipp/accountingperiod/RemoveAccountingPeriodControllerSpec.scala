@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.accountingperiod
 
-import RemoveAccountingPeriodController._
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController._
+import views.html.YesNoPageView
 import controllers.nonsipp.accountingperiod.routes
 import eu.timepit.refined._
+import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.accountingperiod.AccountingPeriodPage
-import views.html.YesNoPageView
 
 class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
 

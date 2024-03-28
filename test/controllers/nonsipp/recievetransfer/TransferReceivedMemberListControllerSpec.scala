@@ -16,20 +16,20 @@
 
 package controllers.nonsipp.recievetransfer
 
-import controllers.ControllerBaseSpec
+import services.PsrSubmissionService
 import controllers.nonsipp.receivetransfer.routes
-import controllers.nonsipp.receivetransfer.TransferReceivedMemberListController._
-import eu.timepit.refined.refineMV
+import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import views.html.TwoColumnsTripleAction
+import pages.nonsipp.receivetransfer.TransferReceivedMemberListPage
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.receivetransfer.TransferReceivedMemberListPage
+import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.TwoColumnsTripleAction
-import play.api.inject.bind
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import controllers.nonsipp.receivetransfer.TransferReceivedMemberListController._
+import eu.timepit.refined.refineMV
 
 import scala.concurrent.Future
 

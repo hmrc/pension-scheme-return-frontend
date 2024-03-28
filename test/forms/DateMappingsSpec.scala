@@ -16,18 +16,18 @@
 
 package forms
 
-import forms.behaviours.FieldBehaviours
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 import forms.mappings.Mappings
-import forms.mappings.errors.DateFormErrors
-
-import java.time.LocalDate
+import forms.behaviours.FieldBehaviours
 import generators.Generators
 import org.scalacheck.Gen
 import org.scalatest.OptionValues
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.data.{Form, FormError}
+import forms.mappings.errors.DateFormErrors
+
+import java.time.LocalDate
 
 class DateMappingsSpec
     extends AnyFreeSpec
@@ -38,10 +38,10 @@ class DateMappingsSpec
     with FieldBehaviours
     with Mappings {
 
-  val startDate = LocalDate.of(2000, 1, 1)
-  val endDate = LocalDate.of(3000, 1, 1)
+  val startDate: LocalDate = LocalDate.of(2000, 1, 1)
+  val endDate: LocalDate = LocalDate.of(3000, 1, 1)
 
-  val form = Form(
+  val form: Form[LocalDate] = Form(
     "value" -> localDate(
       DateFormErrors(
         required = "error.required.all",
@@ -59,7 +59,7 @@ class DateMappingsSpec
     )
   )
 
-  val validData = datesBetween(
+  val validData: Gen[LocalDate] = datesBetween(
     min = startDate,
     max = endDate
   )

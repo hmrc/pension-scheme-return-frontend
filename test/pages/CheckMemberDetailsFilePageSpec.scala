@@ -16,8 +16,8 @@
 
 package pages
 
-import pages.behaviours.PageBehaviours
 import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
+import pages.behaviours.PageBehaviours
 
 class CheckMemberDetailsFilePageSpec extends PageBehaviours {
 

@@ -27,6 +27,7 @@ import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, Mode, Security}
 import pages.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanPage
+import play.api.data.Form
 import controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController._
 import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
@@ -38,7 +39,6 @@ import viewmodels.models._
 import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import play.api.data.Form
 
 class SecurityGivenForLoanController @Inject()(
   override val messagesApi: MessagesApi,
@@ -83,7 +83,7 @@ class SecurityGivenForLoanController @Inject()(
 }
 
 object SecurityGivenForLoanController {
-  def form(formProvider: YesNoPageFormProvider): Form[Either[Unit,Security]] = formProvider.conditionalYes[Security](
+  def form(formProvider: YesNoPageFormProvider): Form[Either[Unit, Security]] = formProvider.conditionalYes[Security](
     "securityGivenForLoan.securityGiven.error.required",
     mappingYes = Mappings
       .security(

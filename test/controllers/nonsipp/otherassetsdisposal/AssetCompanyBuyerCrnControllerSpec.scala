@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
+import pages.nonsipp.otherassetsdisposal.{AssetCompanyBuyerCrnPage, CompanyNameOfAssetBuyerPage}
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
+import views.html.ConditionalYesNoPageView
 import controllers.nonsipp.otherassetsdisposal.AssetCompanyBuyerCrnController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, Crn, NormalMode}
-import pages.nonsipp.otherassetsdisposal.{AssetCompanyBuyerCrnPage, CompanyNameOfAssetBuyerPage}
-import views.html.ConditionalYesNoPageView
+import models._
 
 class AssetCompanyBuyerCrnControllerSpec extends ControllerBaseSpec {
 
@@ -38,7 +38,7 @@ class AssetCompanyBuyerCrnControllerSpec extends ControllerBaseSpec {
     routes.AssetCompanyBuyerCrnController
       .onSubmit(srn, assetIndex, disposalIndex, NormalMode)
 
-  val userAnswersCompanyName =
+  val userAnswersCompanyName: UserAnswers =
     defaultUserAnswers
       .unsafeSet(CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex), companyName)
 

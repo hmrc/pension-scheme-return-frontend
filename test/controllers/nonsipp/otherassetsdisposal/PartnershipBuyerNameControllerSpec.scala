@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
+import pages.nonsipp.otherassetsdisposal.PartnershipBuyerNamePage
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsdisposal.PartnershipBuyerNameController._
+import views.html.TextInputView
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.otherassetsdisposal.PartnershipBuyerNamePage
-import views.html.TextInputView
+import controllers.nonsipp.otherassetsdisposal.PartnershipBuyerNameController._
 
 class PartnershipBuyerNameControllerSpec extends ControllerBaseSpec {
 

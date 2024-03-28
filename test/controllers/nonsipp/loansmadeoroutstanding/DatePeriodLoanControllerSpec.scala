@@ -16,16 +16,16 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import play.api.inject.guice.GuiceableModule
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController._
+import play.api.inject.bind
+import views.html.MultipleQuestionView
 import eu.timepit.refined.refineMV
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.{CompanyRecipientNamePage, DatePeriodLoanPage}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService
-import views.html.MultipleQuestionView
+import controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController._
 
 import java.time.LocalDate
 

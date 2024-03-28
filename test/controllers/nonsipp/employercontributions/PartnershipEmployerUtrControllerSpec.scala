@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.employercontributions
 
+import pages.nonsipp.employercontributions.{EmployerNamePage, PartnershipEmployerUtrPage}
 import config.Refined.{Max300, Max50}
 import controllers.ControllerBaseSpec
+import views.html.ConditionalYesNoPageView
 import controllers.nonsipp.employercontributions.PartnershipEmployerUtrController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, NormalMode, Utr}
-import pages.nonsipp.employercontributions.{EmployerNamePage, PartnershipEmployerUtrPage}
-import views.html.ConditionalYesNoPageView
+import models._
 
 class PartnershipEmployerUtrControllerSpec extends ControllerBaseSpec {
 
@@ -37,7 +37,7 @@ class PartnershipEmployerUtrControllerSpec extends ControllerBaseSpec {
     controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
       .onSubmit(srn, index, secondaryIndex, NormalMode)
 
-  val userAnswersWithEmployerName =
+  val userAnswersWithEmployerName: UserAnswers =
     defaultUserAnswers.unsafeSet(EmployerNamePage(srn, index, secondaryIndex), employerName)
 
   val conditionalNo: ConditionalYesNo[String, Utr] = ConditionalYesNo.no("reason")

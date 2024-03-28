@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.membertransferout
 
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.membertransferout.WhichTransferOutRemoveController._
+import views.html.ListRadiosView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.NameDOB
-import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, WhenWasTransferMadePage}
-import views.html.ListRadiosView
+import controllers.nonsipp.membertransferout.WhichTransferOutRemoveController._
 
 import java.time.LocalDate
 

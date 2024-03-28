@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.memberdetails
 
-import DoesSchemeMemberHaveNINOController._
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberdetails.routes
+import controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController._
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage}
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage}
-import views.html.YesNoPageView
+import controllers.nonsipp.memberdetails.routes
+import controllers.ControllerBaseSpec
 
 class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
 

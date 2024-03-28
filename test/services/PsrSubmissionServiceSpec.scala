@@ -16,33 +16,34 @@
 
 package services
 
-import cats.data.NonEmptyList
 import connectors.PSRConnector
 import controllers.TestValues
-import models.requests.psr._
+import cats.data.NonEmptyList
+import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
+import transformations._
+import pages.nonsipp.sharesdisposal.SharesDisposalPage
+import utils.UserAnswersUtils.UserAnswersOps
+import pages.nonsipp.CheckReturnDatesPage
+import uk.gov.hmrc.http.HeaderCarrier
+import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
 import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.CheckReturnDatesPage
-import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
-import pages.nonsipp.bondsdisposal.BondsDisposalPage
-import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
-import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
-import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
-import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
-import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
-import pages.nonsipp.sharesdisposal.SharesDisposalPage
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
 import services.PsrSubmissionServiceSpec.{captor, minimalRequiredSubmission}
-import transformations._
-import uk.gov.hmrc.http.HeaderCarrier
+import play.api.test.FakeRequest
 import utils.BaseSpec
-import utils.UserAnswersUtils.UserAnswersOps
+import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
+import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
+import play.api.mvc.AnyContentAsEmpty
+import models.requests.psr._
+import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
+import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
+import pages.nonsipp.bondsdisposal.BondsDisposalPage
+
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import java.time.LocalDate
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 

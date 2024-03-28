@@ -18,11 +18,11 @@ package controllers.nonsipp.membertransferout
 
 import config.Refined.{OneTo300, OneTo5}
 import controllers.ControllerBaseSpec
+import views.html.TexInputViewWidth40
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
-import views.html.TexInputViewWidth40
 
 class ReceivingSchemeNameControllerSpec extends ControllerBaseSpec {
 

@@ -16,9 +16,9 @@
 
 package controllers.auth
 
-import controllers.ControllerBaseSpec
 import play.api.test.FakeRequest
 import views.html.auth.SignedOutView
+import controllers.ControllerBaseSpec
 
 class SignedOutControllerSpec extends ControllerBaseSpec {
 

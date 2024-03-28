@@ -16,9 +16,9 @@
 
 package utils
 
-import models.UserAnswers
-import play.api.libs.json.{JsPath, JsValue, Writes}
 import queries.Settable
+import play.api.libs.json.{JsPath, JsValue, Writes}
+import models.UserAnswers
 
 object UserAnswersUtils {
 

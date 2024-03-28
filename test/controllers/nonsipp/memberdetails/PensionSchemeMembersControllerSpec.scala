@@ -16,12 +16,12 @@
 
 package controllers.nonsipp.memberdetails
 
-import PensionSchemeMembersController._
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberdetails.routes
-import forms.RadioListFormProvider
 import models.ManualOrUpload.{Manual, Upload}
 import views.html.RadioListView
+import forms.RadioListFormProvider
+import controllers.nonsipp.memberdetails.PensionSchemeMembersController._
+import controllers.nonsipp.memberdetails.routes
+import controllers.ControllerBaseSpec
 
 class PensionSchemeMembersControllerSpec extends ControllerBaseSpec {
 

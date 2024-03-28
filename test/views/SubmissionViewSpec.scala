@@ -16,8 +16,8 @@
 
 package views
 
-import forms.mappings.Mappings
 import play.api.test.FakeRequest
+import forms.mappings.Mappings
 import views.html.SubmissionView
 
 class SubmissionViewSpec extends ViewSpec with Mappings {

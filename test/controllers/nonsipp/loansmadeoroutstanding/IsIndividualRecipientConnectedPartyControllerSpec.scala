@@ -16,21 +16,22 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import play.api.mvc.Call
+import controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController._
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController._
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NormalMode, UserAnswers}
 import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IsIndividualRecipientConnectedPartyPage}
-import views.html.YesNoPageView
 
 class IsIndividualRecipientConnectedPartyControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  lazy val onPageLoad = routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, NormalMode)
-  lazy val onSubmit = routes.IsIndividualRecipientConnectedPartyController.onSubmit(srn, index, NormalMode)
+  lazy val onPageLoad: Call = routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, NormalMode)
+  lazy val onSubmit: Call = routes.IsIndividualRecipientConnectedPartyController.onSubmit(srn, index, NormalMode)
   private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
 
   val userServicesWithIndividualName: UserAnswers =

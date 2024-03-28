@@ -16,13 +16,13 @@
 
 package views
 
-import org.jsoup.Jsoup
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.i18n.Messages
-import play.twirl.api.Html
 import utils.{BaseSpec, DisplayMessageUtils}
-import viewmodels.DisplayMessage
 import views.components.Components
+import play.twirl.api.Html
+import org.jsoup.Jsoup
+import play.api.i18n.Messages
+import viewmodels.DisplayMessage
 
 trait ViewSpec
     extends BaseSpec
@@ -31,7 +31,7 @@ trait ViewSpec
     with ViewBehaviours
     with DisplayMessageUtils {
 
-  def renderedErrorMessage(key: String) = s"Error: $key"
+  def renderedErrorMessage(key: String): String = s"Error: $key"
 
   def renderMessage(message: DisplayMessage)(implicit m: Messages): Html =
     Components.renderMessage(message)

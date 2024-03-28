@@ -16,16 +16,16 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max5000, OneTo5000}
-import eu.timepit.refined.refineMV
-import models.CheckOrChange.Check
-import models.SchemeId.Srn
-import models.{CheckOrChange, NormalMode, UserAnswers}
-import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
-import pages.nonsipp.moneyborrowed._
 import utils.BaseSpec
+import config.Refined.{Max5000, OneTo5000}
+import models.SchemeId.Srn
+import eu.timepit.refined.refineMV
+import navigation.{Navigator, NavigatorBehaviours}
+import models.{CheckOrChange, NormalMode, UserAnswers}
+import pages.nonsipp.moneyborrowed._
+import models.CheckOrChange.Check
 import utils.UserAnswersUtils.UserAnswersOps
+import org.scalacheck.Gen
 
 class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

@@ -16,16 +16,16 @@
 
 package controllers.nonsipp.bonds
 
+import services.PsrSubmissionService
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldController._
+import play.api.inject.bind
+import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
-import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.YesNoPageView
+import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
+import org.mockito.ArgumentMatchers.any
+import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldController._
 
 class UnregulatedOrConnectedBondsHeldControllerSpec extends ControllerBaseSpec {
 

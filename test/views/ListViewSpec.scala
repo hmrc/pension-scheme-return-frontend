@@ -16,13 +16,13 @@
 
 package views
 
-import forms.YesNoPageFormProvider
-import models.Pagination
 import play.api.test.FakeRequest
 import play.twirl.api.Html
+import views.html.ListView
+import forms.YesNoPageFormProvider
+import models.Pagination
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.PaginatedViewModel
-import views.html.ListView
 
 class ListViewSpec extends ViewSpec {
 

@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.membertransferout
 
-import config.Refined.{Max300, Max5}
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.membertransferout.ReportAnotherTransferOutController._
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.membertransferout.ReportAnotherTransferOutPage
-import views.html.YesNoPageView
+import config.Refined.{Max300, Max5}
+import controllers.nonsipp.membertransferout.ReportAnotherTransferOutController._
 
 class ReportAnotherTransferOutControllerSpec extends ControllerBaseSpec {
 

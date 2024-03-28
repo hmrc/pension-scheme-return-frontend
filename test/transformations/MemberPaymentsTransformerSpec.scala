@@ -16,36 +16,32 @@
 
 package transformations
 
-import cats.implicits.catsSyntaxEitherId
-import com.softwaremill.diffx.generic.AutoDerivation
+import pages.nonsipp.employercontributions._
+import org.scalatest.matchers.must.Matchers
 import com.softwaremill.diffx.scalatest.DiffShouldMatcher
 import config.Refined.{Max300, Max5, Max50}
 import controllers.TestValues
-import eu.timepit.refined.refineMV
 import models.requests.psr._
-import models.{ConditionalYesNo, IdentityType, Money, PensionCommencementLumpSum, PensionSchemeType}
-import org.scalatest.OptionValues
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
-import pages.nonsipp.employercontributions._
-import pages.nonsipp.membercontributions._
-import pages.nonsipp.memberdetails._
-import pages.nonsipp.memberpayments._
-import pages.nonsipp.memberpensionpayments.{
-  MemberPensionPaymentsListPage,
-  PensionPaymentsJourneyStatus,
-  PensionPaymentsReceivedPage,
-  TotalAmountPensionPaymentsPage
-}
-import pages.nonsipp.memberreceivedpcls._
-import pages.nonsipp.membersurrenderedbenefits._
-import pages.nonsipp.membertransferout._
-import pages.nonsipp.receivetransfer._
 import utils.UserAnswersUtils.UserAnswersOps
-import viewmodels.models.{MemberState, SectionCompleted, SectionJourneyStatus, SectionStatus}
+import org.scalatest.OptionValues
+import pages.nonsipp.membersurrenderedbenefits._
+import models._
+import pages.nonsipp.membertransferout._
+import pages.nonsipp.memberdetails._
+import org.scalatest.freespec.AnyFreeSpec
+import pages.nonsipp.membercontributions._
+import pages.nonsipp.memberreceivedpcls._
+import cats.implicits.catsSyntaxEitherId
+import pages.nonsipp.receivetransfer._
+import pages.nonsipp.memberpensionpayments._
+import eu.timepit.refined.refineMV
+import pages.nonsipp.memberpayments._
+import com.softwaremill.diffx.generic.AutoDerivation
+import viewmodels.models._
+
+import scala.util.Try
 
 import java.time.LocalDate
-import scala.util.Try
 
 class MemberPaymentsTransformerSpec
     extends AnyFreeSpec

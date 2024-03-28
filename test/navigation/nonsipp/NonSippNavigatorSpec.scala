@@ -16,20 +16,15 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp
-import controllers.nonsipp.{accountingperiod, declaration, routes, schemedesignatory}
-import eu.timepit.refined.refineMV
-import models.{NormalMode, SchemeMemberNumbers}
-import navigation.{Navigator, NavigatorBehaviours, UnknownPage}
-import org.scalacheck.Gen
-import pages.nonsipp.schemedesignatory.{
-  FinancialDetailsCheckYourAnswersPage,
-  HowManyMembersPage,
-  HowMuchCashPage,
-  ValueOfAssetsPage
-}
-import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
+import pages.nonsipp.schemedesignatory._
 import utils.BaseSpec
+import controllers.nonsipp
+import controllers.nonsipp._
+import eu.timepit.refined.refineMV
+import org.scalacheck.Gen
+import models.{NormalMode, SchemeMemberNumbers}
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
+import navigation.{Navigator, NavigatorBehaviours, UnknownPage}
 
 class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

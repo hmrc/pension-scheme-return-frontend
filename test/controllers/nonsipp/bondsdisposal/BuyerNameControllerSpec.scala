@@ -18,12 +18,12 @@ package controllers.nonsipp.bondsdisposal
 
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bondsdisposal.BuyerNameController._
+import views.html.TextInputView
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import pages.nonsipp.bondsdisposal.BuyerNamePage
-import views.html.TextInputView
+import controllers.nonsipp.bondsdisposal.BuyerNameController._
 
 class BuyerNameControllerSpec extends ControllerBaseSpec {
 

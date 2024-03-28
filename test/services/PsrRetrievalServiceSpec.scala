@@ -16,27 +16,28 @@
 
 package services
 
-import cats.data.NonEmptyList
+import utils.BaseSpec
+import play.api.mvc.{AnyContent, AnyContentAsEmpty}
 import connectors.PSRConnector
 import controllers.TestValues
-import models.UserAnswers
 import models.requests.psr._
+import transformations._
+import play.api.libs.json.JsObject
+import uk.gov.hmrc.http.HeaderCarrier
+import models.UserAnswers
 import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import play.api.libs.json.JsObject
-import play.api.mvc.{AnyContent, AnyContentAsEmpty}
-import play.api.test.FakeRequest
-import services.PsrRetrievalServiceSpec._
 import services.PsrSubmissionServiceSpec.minimalRequiredSubmission
-import transformations._
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.BaseSpec
+import play.api.test.FakeRequest
+import cats.data.NonEmptyList
+import services.PsrRetrievalServiceSpec._
+
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Try
 
 import java.time.LocalDate
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import scala.util.Try
 
 class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
 

@@ -16,16 +16,16 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalController._
-import forms.YesNoPageFormProvider
-import models.NormalMode
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
+import controllers.ControllerBaseSpec
+import play.api.inject.bind
 import views.html.YesNoPageView
+import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
+import forms.YesNoPageFormProvider
+import org.mockito.ArgumentMatchers.any
+import models.NormalMode
+import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalController._
 
 class LandOrPropertyDisposalControllerSpec extends ControllerBaseSpec {
 

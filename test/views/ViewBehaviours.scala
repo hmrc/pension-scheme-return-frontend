@@ -16,9 +16,9 @@
 
 package views
 
-import org.scalacheck.Gen
 import play.api.mvc.Call
 import play.twirl.api.Html
+import org.scalacheck.Gen
 import viewmodels.DisplayMessage
 
 trait ViewBehaviours {

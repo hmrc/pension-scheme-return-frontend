@@ -16,17 +16,17 @@
 
 package pages.nonsipp.otherassetsheld
 
-import controllers.TestValues
-import config.Refined.OneTo5000
-import eu.timepit.refined.refineMV
 import models.PointOfEntry._
-import models.SchemeHoldAsset._
-import models.{ConditionalYesNo, IdentitySubject, IdentityType, RecipientDetails, SchemeHoldAsset}
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
-import uk.gov.hmrc.domain.Nino
+import config.Refined.OneTo5000
+import controllers.TestValues
+import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
+import uk.gov.hmrc.domain.Nino
+import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 import viewmodels.models.SectionCompleted
+import pages.behaviours.PageBehaviours
+import models._
+import models.SchemeHoldAsset._
 
 class WhyDoesSchemeHoldAssetsPageSpec extends PageBehaviours with TestValues {
 

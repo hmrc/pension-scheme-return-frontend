@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.receivetransfer
 
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import controllers.nonsipp.receivetransfer.TotalValueTransferController._
 import config.Refined._
-import eu.timepit.refined.refineMV
-import models.NormalMode
 import controllers.ControllerBaseSpec
-import forms.MoneyFormProvider
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.{TotalValueTransferPage, TransferringSchemeNamePage}
 import views.html.MoneyView
+import pages.nonsipp.receivetransfer.{TotalValueTransferPage, TransferringSchemeNamePage}
+import eu.timepit.refined.refineMV
+import forms.MoneyFormProvider
+import models.NormalMode
 
 class TotalValueTransferControllerSpec extends ControllerBaseSpec {
 

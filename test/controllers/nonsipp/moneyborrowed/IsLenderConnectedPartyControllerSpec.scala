@@ -16,22 +16,23 @@
 
 package controllers.nonsipp.moneyborrowed
 
+import play.api.mvc.Call
+import controllers.nonsipp.moneyborrowed.IsLenderConnectedPartyController._
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.moneyborrowed.IsLenderConnectedPartyController._
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NormalMode, UserAnswers}
 import pages.nonsipp.moneyborrowed.{IsLenderConnectedPartyPage, LenderNamePage}
-import views.html.YesNoPageView
 
 class IsLenderConnectedPartyControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
   private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
 
-  lazy val onPageLoad = routes.IsLenderConnectedPartyController.onPageLoad(srn, index, NormalMode)
-  lazy val onSubmit = routes.IsLenderConnectedPartyController.onSubmit(srn, index, NormalMode)
+  lazy val onPageLoad: Call = routes.IsLenderConnectedPartyController.onPageLoad(srn, index, NormalMode)
+  lazy val onSubmit: Call = routes.IsLenderConnectedPartyController.onSubmit(srn, index, NormalMode)
 
   val userServicesWithLenderName: UserAnswers =
     defaultUserAnswers.unsafeSet(LenderNamePage(srn, index), lenderName)

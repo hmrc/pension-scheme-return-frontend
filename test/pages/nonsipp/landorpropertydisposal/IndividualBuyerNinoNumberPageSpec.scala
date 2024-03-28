@@ -18,9 +18,9 @@ package pages.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
+import uk.gov.hmrc.domain.Nino
 import models.ConditionalYesNo
 import pages.behaviours.PageBehaviours
-import uk.gov.hmrc.domain.Nino
 
 class IndividualBuyerNinoNumberPageSpec extends PageBehaviours {
 

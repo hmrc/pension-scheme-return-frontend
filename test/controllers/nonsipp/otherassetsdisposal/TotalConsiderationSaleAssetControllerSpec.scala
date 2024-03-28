@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
+import pages.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetPage
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetController._
-import eu.timepit.refined.refineMV
-import forms.mappings.errors.MoneyFormErrorProvider
-import models.NormalMode
-import pages.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetPage
 import views.html.MoneyView
+import eu.timepit.refined.refineMV
+import controllers.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetController._
+import models.NormalMode
+import forms.mappings.errors.MoneyFormErrorProvider
 
 class TotalConsiderationSaleAssetControllerSpec extends ControllerBaseSpec {
 

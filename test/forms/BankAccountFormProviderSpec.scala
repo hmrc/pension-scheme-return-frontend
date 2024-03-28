@@ -16,11 +16,11 @@
 
 package forms
 
-import forms.behaviours.FieldBehaviours
-import org.scalacheck.Gen
-import org.scalacheck.Gen._
-import play.api.data.FormError
 import utils.ListUtils._
+import forms.behaviours.FieldBehaviours
+import org.scalacheck.Gen._
+import org.scalacheck.Gen
+import play.api.data.FormError
 
 class BankAccountFormProviderSpec extends FieldBehaviours {
 
@@ -28,7 +28,7 @@ class BankAccountFormProviderSpec extends FieldBehaviours {
 
   import formProvider._
 
-  val usedAccountNumbers = List(
+  val usedAccountNumbers: List[String] = List(
     "12345678",
     "23456789",
     "34567890"

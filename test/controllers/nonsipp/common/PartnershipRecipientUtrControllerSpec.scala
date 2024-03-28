@@ -18,12 +18,12 @@ package controllers.nonsipp.common
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
+import views.html.ConditionalYesNoPageView
 import controllers.nonsipp.common.PartnershipRecipientUtrController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, IdentitySubject, NormalMode, Utr}
+import models._
 import pages.nonsipp.common.PartnershipRecipientUtrPage
-import views.html.ConditionalYesNoPageView
 
 class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
 

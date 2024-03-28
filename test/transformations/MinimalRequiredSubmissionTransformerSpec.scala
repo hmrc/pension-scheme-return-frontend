@@ -16,27 +16,27 @@
 
 package transformations
 
-import cats.data.NonEmptyList
-import controllers.TestValues
-import generators.ModelGenerators.allowedAccessRequestGen
-import models.SchemeMemberNumbers._
-import models.requests.psr.{MinimalRequiredSubmission, ReportDetails, SchemeDesignatory}
-import models.requests.{AllowedAccessRequest, DataRequest}
-import models.{DateRange, Money, MoneyInPeriod, NormalMode, SchemeMemberNumbers}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito
-import org.mockito.Mockito.{times, verify}
-import org.mockito.MockitoSugar.{mock, when}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
-import org.scalatest.{BeforeAndAfterEach, OptionValues}
-import pages.nonsipp.accountingperiod.AccountingPeriods
-import pages.nonsipp.schemedesignatory._
-import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
-import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import services.SchemeDateService
+import pages.nonsipp.schemedesignatory._
+import org.scalatest.matchers.must.Matchers
+import play.api.mvc.AnyContentAsEmpty
+import controllers.TestValues
+import cats.data.NonEmptyList
+import models.requests.psr.{MinimalRequiredSubmission, ReportDetails, SchemeDesignatory}
+import pages.nonsipp.accountingperiod.AccountingPeriods
 import utils.UserAnswersUtils.UserAnswersOps
+import generators.ModelGenerators.allowedAccessRequestGen
+import org.mockito.MockitoSugar.{mock, when}
+import models.requests.{AllowedAccessRequest, DataRequest}
+import org.mockito.Mockito
+import org.mockito.ArgumentMatchers.any
+import org.scalatest.freespec.AnyFreeSpec
+import org.mockito.Mockito.{times, verify}
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
+import org.scalatest.{BeforeAndAfterEach, OptionValues}
+import models._
+import models.SchemeMemberNumbers._
 
 class MinimalRequiredSubmissionTransformerSpec
     extends AnyFreeSpec

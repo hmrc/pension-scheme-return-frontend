@@ -16,20 +16,20 @@
 
 package controllers.nonsipp.employercontributions
 
-import config.Refined.Max50
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.employercontributions.WhichEmployerContributionRemoveController._
-import eu.timepit.refined.refineMV
-import forms.RadioListFormProvider
-import models.{Money, NameDOB}
 import pages.nonsipp.employercontributions.{
   EmployerContributionsProgress,
   EmployerNamePage,
   TotalEmployerContributionPage
 }
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import viewmodels.models.SectionJourneyStatus
+import controllers.nonsipp.employercontributions.WhichEmployerContributionRemoveController._
+import config.Refined.Max50
+import controllers.ControllerBaseSpec
 import views.html.ListRadiosView
+import eu.timepit.refined.refineMV
+import forms.RadioListFormProvider
+import models.{Money, NameDOB}
+import viewmodels.models.SectionJourneyStatus
 
 class WhichEmployerContributionRemoveControllerSpec extends ControllerBaseSpec {
 

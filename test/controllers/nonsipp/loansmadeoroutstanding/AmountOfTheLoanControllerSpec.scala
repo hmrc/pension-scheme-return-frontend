@@ -16,26 +16,27 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import services.SchemeDateService
+import play.api.inject.guice.GuiceableModule
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.{DateRange, NormalMode}
-import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.loansmadeoroutstanding.AmountOfTheLoanPage
-import play.api.inject.bind
-import services.SchemeDateService
-import views.html.MoneyView
+import org.mockito.ArgumentMatchers.any
 
 class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
   val schemeDatePeriod = dateRangeGen.sample.value
-  val mockSchemeDateService = mock[SchemeDateService]
+  val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   val maxAllowedAmount = 999999999.99
 
-  override val additionalBindings = List(
+  override val additionalBindings: List[GuiceableModule] = List(
     bind[SchemeDateService].toInstance(mockSchemeDateService)
   )
 

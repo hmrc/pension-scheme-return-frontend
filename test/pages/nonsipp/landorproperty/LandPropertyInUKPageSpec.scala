@@ -17,12 +17,12 @@
 package pages.nonsipp.landorproperty
 
 import config.Refined.{OneTo50, OneTo5000}
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.refineMV
-import models.{ConditionalYesNo, HowDisposed, Money, SchemeHoldLandProperty, SchemeId, UserAnswers}
-import pages.behaviours.PageBehaviours
 import pages.nonsipp.landorpropertydisposal.{HowWasPropertyDisposedOfPage, LandOrPropertyDisposalPage}
+import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
+import models._
+import eu.timepit.refined.api.Refined
+import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate
 

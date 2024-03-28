@@ -16,14 +16,15 @@
 
 package controllers.actions
 
+import play.api.mvc._
 import generators.Generators
 import models.PensionSchemeId.PsaId
-import models.requests.IdentifierRequest
 import org.scalatest.OptionValues
-import play.api.mvc._
+import models.requests.IdentifierRequest
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class FakeIdentifierAction @Inject()(
   val bodyParsers: PlayBodyParsers

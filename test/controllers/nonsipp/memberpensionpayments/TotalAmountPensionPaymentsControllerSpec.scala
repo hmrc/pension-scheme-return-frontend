@@ -16,19 +16,19 @@
 
 package controllers.nonsipp.memberpensionpayments
 
+import controllers.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsController._
+import services.PsrSubmissionService
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsController._
-import eu.timepit.refined.refineMV
+import play.api.inject.bind
+import views.html.MoneyView
 import forms.MoneyFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.MoneyView
+import eu.timepit.refined.refineMV
 
 import scala.concurrent.Future
 

@@ -16,16 +16,16 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max50, Max5000}
-import eu.timepit.refined.refineMV
-import models.{CheckMode, HowSharesDisposed, IdentityType, NormalMode, PointOfEntry, UserAnswers}
-import models.HowSharesDisposed._
-import models.SchemeId.Srn
-import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
-import pages.nonsipp.sharesdisposal._
 import utils.BaseSpec
+import config.Refined.{Max50, Max5000}
+import models.SchemeId.Srn
+import eu.timepit.refined.refineMV
+import pages.nonsipp.sharesdisposal._
+import models._
 import utils.UserAnswersUtils.UserAnswersOps
+import org.scalacheck.Gen
+import navigation.{Navigator, NavigatorBehaviours}
+import models.HowSharesDisposed._
 
 class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

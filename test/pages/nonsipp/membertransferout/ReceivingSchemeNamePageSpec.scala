@@ -18,8 +18,8 @@ package pages.nonsipp.membertransferout
 
 import config.Refined.{OneTo300, OneTo5}
 import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours
 import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
+import pages.behaviours.PageBehaviours
 
 class ReceivingSchemeNamePageSpec extends PageBehaviours {
 

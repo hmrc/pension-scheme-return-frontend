@@ -16,23 +16,23 @@
 
 package controllers.nonsipp
 
-import controllers.ControllerBaseSpec
-import forms.YesNoPageFormProvider
-import models.{MinimalSchemeDetails, NormalMode}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.stubbing.ScalaOngoingStubbing
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import play.api.mvc.Call
 import services.{FakeTaxYearService, SchemeDetailsService, TaxYearService}
-import uk.gov.hmrc.time.TaxYear
-import utils.DateTimeUtils
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import play.api.mvc.Call
+import controllers.ControllerBaseSpec
+import play.api.inject.bind
 import views.html.YesNoPageView
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
+import forms.YesNoPageFormProvider
+import org.mockito.stubbing.ScalaOngoingStubbing
+import models.{MinimalSchemeDetails, NormalMode}
+import uk.gov.hmrc.time.TaxYear
+import org.mockito.ArgumentMatchers.any
+import utils.DateTimeUtils
+import play.api.inject.guice.GuiceableModule
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
 import scala.concurrent.Future
 
@@ -49,11 +49,11 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
   private val userAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
 
-  def onwardRoute = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/foo")
 
-  lazy val checkReturnDatesRoute = routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
-  lazy val onPageLoad = routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
-  lazy val onSubmit = routes.CheckReturnDatesController.onSubmit(srn, NormalMode)
+  lazy val checkReturnDatesRoute: String = routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
+  lazy val onPageLoad: Call = routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
+  lazy val onSubmit: Call = routes.CheckReturnDatesController.onSubmit(srn, NormalMode)
 
   "CheckReturnDates.viewModel" - {
 

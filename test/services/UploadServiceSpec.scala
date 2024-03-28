@@ -16,22 +16,23 @@
 
 package services
 
-import akka.stream.scaladsl.Sink
-import akka.util.ByteString
 import connectors.UpscanConnector
 import controllers.TestValues
 import models._
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.http.Status.OK
-import repositories.UploadRepository
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import akka.util.ByteString
 import utils.BaseSpec
+import akka.stream.scaladsl.Sink
+import repositories.UploadRepository
+import play.api.http.Status.OK
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-import java.time.temporal.ChronoUnit
-import java.time.{Clock, Instant, ZoneId}
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+
+import java.time.{Clock, Instant, ZoneId}
+import java.time.temporal.ChronoUnit
 
 class UploadServiceSpec extends BaseSpec with ScalaCheckPropertyChecks with TestValues {
 

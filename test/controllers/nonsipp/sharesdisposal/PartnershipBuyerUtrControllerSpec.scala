@@ -18,12 +18,12 @@ package controllers.nonsipp.sharesdisposal
 
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.sharesdisposal.PartnershipBuyerUtrController._
-import eu.timepit.refined.refineMV
-import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, NormalMode, UserAnswers, Utr}
-import pages.nonsipp.sharesdisposal.{PartnershipBuyerNamePage, PartnershipBuyerUtrPage}
 import views.html.ConditionalYesNoPageView
+import eu.timepit.refined.refineMV
+import pages.nonsipp.sharesdisposal.{PartnershipBuyerNamePage, PartnershipBuyerUtrPage}
+import forms.YesNoPageFormProvider
+import controllers.nonsipp.sharesdisposal.PartnershipBuyerUtrController._
+import models._
 
 class PartnershipBuyerUtrControllerSpec extends ControllerBaseSpec {
 

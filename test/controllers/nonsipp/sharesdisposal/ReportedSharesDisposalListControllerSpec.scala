@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController._
+import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompleted, TypeOfSharesHeldPage}
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController._
 import eu.timepit.refined.refineMV
-import forms.YesNoPageFormProvider
-import models.HowSharesDisposed._
-import models.TypeOfShares._
-import models.NormalMode
-import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompleted, TypeOfSharesHeldPage}
 import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, SharesDisposalCompletedPage}
+import models.HowSharesDisposed._
+import forms.YesNoPageFormProvider
+import models.NormalMode
 import viewmodels.models.SectionCompleted
 import views.html.ListView
+import models.TypeOfShares._
 
 class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
 

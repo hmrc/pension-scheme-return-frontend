@@ -16,24 +16,24 @@
 
 package generators
 
-import config.Refined.OneTo5000
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.refineV
-import models.HowDisposed.HowDisposed
-import models.HowSharesDisposed.HowSharesDisposed
-import models.PensionSchemeId.{PsaId, PspId}
-import models.SchemeId.{Pstr, Srn}
-import models.SchemeStatus._
-import models.cache.PensionSchemeUser
-import models.cache.PensionSchemeUser.{Administrator, Practitioner}
-import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
-import models.requests.{AllowedAccessRequest, IdentifierRequest}
-import models.{ConditionalYesNo, _}
-import org.scalacheck.Gen
-import org.scalacheck.Gen.numChar
 import play.api.mvc.Request
-import uk.gov.hmrc.domain.Nino
+import models.HowDisposed.HowDisposed
+import config.Refined.OneTo5000
+import models.SchemeId.{Pstr, Srn}
+import models.PensionSchemeId.{PsaId, PspId}
+import models.{ConditionalYesNo, _}
 import viewmodels.models.SectionCompleted
+import eu.timepit.refined.api.Refined
+import org.scalacheck.Gen.numChar
+import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
+import models.cache.PensionSchemeUser
+import eu.timepit.refined.refineV
+import models.SchemeStatus._
+import org.scalacheck.Gen
+import uk.gov.hmrc.domain.Nino
+import models.HowSharesDisposed.HowSharesDisposed
+import models.requests.{AllowedAccessRequest, IdentifierRequest}
+import models.cache.PensionSchemeUser.{Administrator, Practitioner}
 
 import java.time.{LocalDate, LocalDateTime, ZoneOffset}
 

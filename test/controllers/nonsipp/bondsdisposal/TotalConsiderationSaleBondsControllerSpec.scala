@@ -18,12 +18,12 @@ package controllers.nonsipp.bondsdisposal
 
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
+import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.bondsdisposal.TotalConsiderationSaleBondsController._
-import forms.mappings.errors.MoneyFormErrorProvider
 import models.NormalMode
 import pages.nonsipp.bondsdisposal.TotalConsiderationSaleBondsPage
-import views.html.MoneyView
+import forms.mappings.errors.MoneyFormErrorProvider
 
 class TotalConsiderationSaleBondsControllerSpec extends ControllerBaseSpec {
 

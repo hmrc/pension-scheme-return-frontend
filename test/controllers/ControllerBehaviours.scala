@@ -16,20 +16,20 @@
 
 package controllers
 
+import play.api.test.FakeRequest
+import services.SaveService
+import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
+import queries.Settable
+import play.api.mvc.{Call, Request}
+import play.twirl.api.Html
+import play.api.inject.bind
 import models.UserAnswers
-import navigation.{FakeNavigator, Navigator}
+import play.api.test.CSRFTokenHelper.CSRFRequest
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import play.api.Application
-import play.api.inject.bind
-import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.libs.json.{JsPath, Writes}
-import play.api.mvc.{Call, Request}
-import play.api.test.CSRFTokenHelper.CSRFRequest
-import play.api.test.FakeRequest
-import play.twirl.api.Html
-import queries.Settable
-import services.SaveService
+import play.api.Application
+import navigation.{FakeNavigator, Navigator}
 
 import scala.concurrent.Future
 

@@ -18,12 +18,12 @@ package controllers.nonsipp.moneyborrowed
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.moneyborrowed.LenderNameController._
-import eu.timepit.refined.refineMV
+import views.html.TextInputView
 import forms.TextFormProvider
 import models.NormalMode
 import pages.nonsipp.moneyborrowed.LenderNamePage
-import views.html.TextInputView
+import controllers.nonsipp.moneyborrowed.LenderNameController._
+import eu.timepit.refined.refineMV
 
 class LenderNameControllerSpec extends ControllerBaseSpec {
 

@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.bonds
 
+import pages.nonsipp.bonds.AreBondsUnregulatedPage
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bonds.AreBondsUnregulatedController._
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.bonds.AreBondsUnregulatedPage
-import views.html.YesNoPageView
+import controllers.nonsipp.bonds.AreBondsUnregulatedController._
 
 class AreBondsUnregulatedControllerSpec extends ControllerBaseSpec {
 

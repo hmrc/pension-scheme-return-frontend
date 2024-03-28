@@ -16,18 +16,18 @@
 
 package forms
 
-import cats.implicits._
-import forms.mappings.Mappings
-import forms.mappings.errors.DateFormErrors
-import generators.Generators
-import models.DateRange
-import org.scalacheck.Gen
-import org.scalatest.OptionValues
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import forms.mappings.Mappings
+import generators.Generators
+import cats.implicits._
+import org.scalacheck.Gen
+import org.scalatest.OptionValues
 import play.api.data.{Form, FormError}
+import forms.mappings.errors.DateFormErrors
 import utils.DateTimeUtils.localDateShow
+import models.DateRange
 
 import java.time.LocalDate
 
@@ -39,12 +39,12 @@ class DateRangeMappingsSpec
     with OptionValues
     with Mappings {
 
-  val allowedRange = DateRange(
+  val allowedRange: DateRange = DateRange(
     LocalDate.of(2000, 1, 1),
     LocalDate.of(2400, 1, 1)
   )
 
-  val dateFormErrors = DateFormErrors(
+  val dateFormErrors: DateFormErrors = DateFormErrors(
     required = "error.required.all",
     requiredDay = "error.required.day",
     requiredMonth = "error.required.month",
@@ -54,9 +54,9 @@ class DateRangeMappingsSpec
     invalidCharacters = "error.invalid.characters"
   )
 
-  val form = formWithDuplicates(Nil)
+  val form: Form[DateRange] = formWithDuplicates(Nil)
 
-  def formWithDuplicates(duplicateRanges: List[DateRange]) = Form(
+  def formWithDuplicates(duplicateRanges: List[DateRange]): Form[DateRange] = Form(
     "value" -> dateRange(
       startDateErrors = dateFormErrors,
       endDateErrors = dateFormErrors,
@@ -69,16 +69,16 @@ class DateRangeMappingsSpec
     )
   )
 
-  val validDate = datesBetween(
+  val validDate: Gen[LocalDate] = datesBetween(
     min = allowedRange.from,
     max = allowedRange.to
   )
 
-  val invalidStartDate = datesBetween(earliestDate, allowedRange.from.minusDays(1))
-  val invalidEndDate = datesBetween(allowedRange.to.plusDays(1), latestDate)
-  val invalidDate = Gen.oneOf(invalidStartDate, invalidEndDate)
+  val invalidStartDate: Gen[LocalDate] = datesBetween(earliestDate, allowedRange.from.minusDays(1))
+  val invalidEndDate: Gen[LocalDate] = datesBetween(allowedRange.to.plusDays(1), latestDate)
+  val invalidDate: Gen[LocalDate] = Gen.oneOf(invalidStartDate, invalidEndDate)
 
-  def range(date: Gen[LocalDate]) =
+  def range(date: Gen[LocalDate]): Gen[DateRange] =
     for {
       startDate <- date
       endDate <- date

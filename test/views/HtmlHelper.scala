@@ -16,10 +16,10 @@
 
 package views
 
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
-import org.jsoup.select.Elements
 import play.twirl.api.Html
+import org.jsoup.Jsoup
+import org.jsoup.select.Elements
+import org.jsoup.nodes.Element
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 

@@ -17,11 +17,11 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._
+import views.html.ListRadiosView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
+import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
-import views.html.ListRadiosView
 
 class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec {
 

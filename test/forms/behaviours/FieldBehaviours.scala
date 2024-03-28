@@ -16,11 +16,11 @@
 
 package forms.behaviours
 
-import forms.FormSpec
-import generators.Generators
-import org.scalacheck.Gen
-import org.scalacheck.Gen._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import generators.Generators
+import org.scalacheck.Gen._
+import org.scalacheck.Gen
+import forms.FormSpec
 import play.api.data.{Form, FormError}
 
 import java.time.LocalDate

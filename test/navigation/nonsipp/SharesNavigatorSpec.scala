@@ -16,33 +16,17 @@
 
 package navigation.nonsipp
 
+import utils.BaseSpec
+import pages.nonsipp.shares._
 import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.refineMV
+import models._
+import pages.nonsipp.common._
 import models.IdentitySubject.SharesSeller
-import models.{
-  CheckMode,
-  ConditionalYesNo,
-  Crn,
-  IdentitySubject,
-  IdentityType,
-  NormalMode,
-  RecipientDetails,
-  SchemeHoldShare,
-  TypeOfShares,
-  Utr
-}
-import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
-import pages.nonsipp.shares._
-import uk.gov.hmrc.domain.Nino
-import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
+import org.scalacheck.Gen
+import navigation.{Navigator, NavigatorBehaviours}
+import uk.gov.hmrc.domain.Nino
 
 class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

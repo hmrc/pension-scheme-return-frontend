@@ -16,19 +16,19 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListController._
+import services.PsrSubmissionService
+import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{NameDOB, NormalMode, UserAnswers}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListPage
-import play.api.inject.bind
+import models.{NameDOB, NormalMode, UserAnswers}
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
+import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.TwoColumnsTripleAction
+import pages.nonsipp.memberdetails.MemberDetailsPage
 
 import scala.concurrent.Future
 

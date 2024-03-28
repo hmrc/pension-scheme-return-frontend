@@ -16,13 +16,13 @@
 
 package generators
 
+import pages.nonsipp.schemedesignatory.HowMuchCashPage
+import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 import eu.timepit.refined.refineMV
-import models.NormalMode
+import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import org.scalacheck.Arbitrary
 import pages.nonsipp.CheckReturnDatesPage
-import pages.nonsipp.accountingperiod.AccountingPeriodPage
-import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
-import pages.nonsipp.schemedesignatory.HowMuchCashPage
+import models.NormalMode
 
 trait PageGenerators {
 

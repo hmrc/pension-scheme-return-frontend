@@ -17,13 +17,13 @@
 package controllers.nonsipp.landorproperty
 
 import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController._
+import views.html.YesNoPageView
+import pages.nonsipp.landorproperty.{IsLesseeConnectedPartyPage, LandOrPropertyLeaseDetailsPage}
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.NormalMode
-import pages.nonsipp.landorproperty.{IsLesseeConnectedPartyPage, LandOrPropertyLeaseDetailsPage}
-import views.html.YesNoPageView
+import models.{NormalMode, UserAnswers}
+import controllers.ControllerBaseSpec
+import controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController._
 
 class IsLesseeConnectedPartyControllerSpec extends ControllerBaseSpec {
 
@@ -32,7 +32,7 @@ class IsLesseeConnectedPartyControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.IsLesseeConnectedPartyController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.IsLesseeConnectedPartyController.onSubmit(srn, index, NormalMode)
 
-  val userAnswersWithLeaseName =
+  val userAnswersWithLeaseName: UserAnswers =
     defaultUserAnswers.unsafeSet(LandOrPropertyLeaseDetailsPage(srn, index), (leaseName, money, localDate))
 
   "IsLesseeConnectedPartyController" - {

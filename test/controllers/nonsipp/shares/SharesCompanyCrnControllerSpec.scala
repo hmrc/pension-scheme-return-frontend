@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.shares
 
+import controllers.nonsipp.shares.SharesCompanyCrnController._
+import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompanyCrnPage}
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.shares.SharesCompanyCrnController._
+import views.html.ConditionalYesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, Crn, NormalMode}
-import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompanyCrnPage}
-import views.html.ConditionalYesNoPageView
+import models._
 
 class SharesCompanyCrnControllerSpec extends ControllerBaseSpec {
 
@@ -37,7 +37,7 @@ class SharesCompanyCrnControllerSpec extends ControllerBaseSpec {
     routes.SharesCompanyCrnController
       .onSubmit(srn, index, NormalMode)
 
-  val userAnswersCompanyName =
+  val userAnswersCompanyName: UserAnswers =
     defaultUserAnswers
       .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
 

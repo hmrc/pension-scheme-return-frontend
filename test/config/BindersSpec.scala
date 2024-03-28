@@ -16,11 +16,11 @@
 
 package config
 
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import utils.BaseSpec
 import models.SchemeId.Srn
 import org.scalacheck.Gen.alphaNumStr
 import org.scalatest.EitherValues
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import utils.BaseSpec
 
 class BindersSpec extends BaseSpec with ScalaCheckPropertyChecks with EitherValues {
 

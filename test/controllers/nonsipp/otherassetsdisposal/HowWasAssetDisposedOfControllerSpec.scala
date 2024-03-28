@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
+import pages.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfPage
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{HowDisposed, NormalMode}
-import pages.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfPage
 import views.html.RadioListView
+import controllers.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfController._
 
 class HowWasAssetDisposedOfControllerSpec extends ControllerBaseSpec {
 

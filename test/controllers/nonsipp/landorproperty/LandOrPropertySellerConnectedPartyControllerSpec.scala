@@ -18,13 +18,13 @@ package controllers.nonsipp.landorproperty
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController._
-import eu.timepit.refined.refineMV
-import forms.YesNoPageFormProvider
-import models.{IdentitySubject, IdentityType, NormalMode, UserAnswers}
-import pages.nonsipp.common.IdentityTypePage
-import pages.nonsipp.landorproperty.{LandOrPropertySellerConnectedPartyPage, LandPropertyIndividualSellersNamePage}
 import views.html.YesNoPageView
+import pages.nonsipp.landorproperty.{LandOrPropertySellerConnectedPartyPage, LandPropertyIndividualSellersNamePage}
+import eu.timepit.refined.refineMV
+import controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController._
+import forms.YesNoPageFormProvider
+import models._
+import pages.nonsipp.common.IdentityTypePage
 
 class LandOrPropertySellerConnectedPartyControllerSpec extends ControllerBaseSpec {
 

@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.otherassetsheld
 
+import pages.nonsipp.otherassetsheld.{IndividualNameOfOtherAssetSellerPage, OtherAssetIndividualSellerNINumberPage}
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsheld.OtherAssetIndividualSellerNINumberController._
-import eu.timepit.refined.refineMV
-import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, NormalMode}
-import pages.nonsipp.otherassetsheld.{IndividualNameOfOtherAssetSellerPage, OtherAssetIndividualSellerNINumberPage}
-import uk.gov.hmrc.domain.Nino
 import views.html.ConditionalYesNoPageView
+import eu.timepit.refined.refineMV
+import uk.gov.hmrc.domain.Nino
+import forms.YesNoPageFormProvider
+import models.{ConditionalYesNo, NormalMode, UserAnswers}
+import controllers.nonsipp.otherassetsheld.OtherAssetIndividualSellerNINumberController._
 
 class OtherAssetIndividualSellerNINumberControllerSpec extends ControllerBaseSpec {
 
@@ -38,7 +38,7 @@ class OtherAssetIndividualSellerNINumberControllerSpec extends ControllerBaseSpe
     controllers.nonsipp.otherassetsheld.routes.OtherAssetIndividualSellerNINumberController
       .onSubmit(srn, index, NormalMode)
 
-  val userAnswersWithIndividualName =
+  val userAnswersWithIndividualName: UserAnswers =
     defaultUserAnswers.unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, index), individualName)
 
   val conditionalNo: ConditionalYesNo[String, Nino] = ConditionalYesNo.no("reason")

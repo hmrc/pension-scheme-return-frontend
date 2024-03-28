@@ -16,11 +16,11 @@
 
 package views
 
-import forms.NameDOBFormProvider
-import forms.mappings.errors.DateFormErrors
 import play.api.test.FakeRequest
-import viewmodels.models.NameDOBViewModel
 import views.html.NameDOBView
+import forms.NameDOBFormProvider
+import viewmodels.models.NameDOBViewModel
+import forms.mappings.errors.DateFormErrors
 
 class NameDOBViewSpec extends ViewSpec {
 

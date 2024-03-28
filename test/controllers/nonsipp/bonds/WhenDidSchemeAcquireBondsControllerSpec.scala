@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.bonds
 
+import services.SchemeDateService
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bonds.WhenDidSchemeAcquireBondsController._
+import play.api.inject.bind
+import views.html.DatePageView
 import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
 import models.NormalMode
-import pages.nonsipp.bonds.WhenDidSchemeAcquireBondsPage
-import play.api.inject.bind
+import controllers.nonsipp.bonds.WhenDidSchemeAcquireBondsController._
 import play.api.inject.guice.GuiceableModule
-import services.SchemeDateService
-import views.html.DatePageView
+import pages.nonsipp.bonds.WhenDidSchemeAcquireBondsPage
 
 import java.time.LocalDate
 

@@ -16,8 +16,8 @@
 
 package models.backend.responses
 
-import play.api.libs.json.Json
 import utils.BaseSpec
+import play.api.libs.json.Json
 
 class PensionSchemeReturnSpec extends BaseSpec {
 

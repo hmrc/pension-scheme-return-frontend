@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.schemedesignatory
 
+import pages.nonsipp.schemedesignatory.WhyNoBankAccountPage
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.{form, viewModel}
+import views.html.TextAreaView
+import play.api.libs.json.JsPath
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.schemedesignatory.WhyNoBankAccountPage
-import play.api.libs.json.JsPath
-import views.html.TextAreaView
 
 class WhyNoBankAccountControllerSpec extends ControllerBaseSpec {
 

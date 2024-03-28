@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.bonds
 
+import pages.nonsipp.bonds.BondsFromConnectedPartyPage
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bonds.BondsFromConnectedPartyController._
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.bonds.BondsFromConnectedPartyPage
-import views.html.YesNoPageView
+import controllers.nonsipp.bonds.BondsFromConnectedPartyController._
 
 class BondsFromConnectedPartyControllerSpec extends ControllerBaseSpec {
 

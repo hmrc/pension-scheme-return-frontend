@@ -102,6 +102,8 @@ lazy val root = (project in file("."))
   )
 
 lazy val testSettings: Seq[Def.Setting[?]] = Seq(
+  scalafmtOnCompile := true,
+  scalafixOnCompile := true,
   fork := false,
   unmanagedSourceDirectories += baseDirectory.value / "test-utils"
 )

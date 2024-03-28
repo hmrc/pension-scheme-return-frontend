@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.receivetransfer
 
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.receivetransfer.DidTransferIncludeAssetController._
-import eu.timepit.refined.refineMV
+import views.html.YesNoPageView
+import pages.nonsipp.receivetransfer.{DidTransferIncludeAssetPage, TransferringSchemeNamePage}
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.{DidTransferIncludeAssetPage, TransferringSchemeNamePage}
-import views.html.YesNoPageView
+import eu.timepit.refined.refineMV
+import controllers.nonsipp.receivetransfer.DidTransferIncludeAssetController._
 
 class DidTransferIncludeAssetControllerSpec extends ControllerBaseSpec {
 

@@ -17,13 +17,13 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
-import controllers.nonsipp.landorpropertydisposal.PartnershipBuyerNameController._
 import controllers.ControllerBaseSpec
+import views.html.TextInputView
+import pages.nonsipp.landorpropertydisposal.PartnershipBuyerNamePage
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.landorpropertydisposal.PartnershipBuyerNamePage
-import views.html.TextInputView
+import controllers.nonsipp.landorpropertydisposal.PartnershipBuyerNameController._
 class PartnershipBuyerNameControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)

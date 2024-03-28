@@ -16,19 +16,19 @@
 
 package controllers.nonsipp.memberdetails
 
-import akka.stream.scaladsl.Source
+import services._
 import akka.util.ByteString
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
-import forms.YesNoPageFormProvider
-import models.UploadStatus.UploadStatus
-import models._
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.{AuditService, MemberDetailsUploadValidator, SchemeDateService, UploadService}
 import views.html.YesNoPageView
+import forms.YesNoPageFormProvider
+import models._
+import models.UploadStatus.UploadStatus
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import akka.stream.scaladsl.Source
+import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
+import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
 
 import scala.concurrent.Future
 

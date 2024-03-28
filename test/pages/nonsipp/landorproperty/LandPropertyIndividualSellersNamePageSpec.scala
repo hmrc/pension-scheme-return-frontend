@@ -17,9 +17,9 @@
 package pages
 
 import config.Refined.OneTo5000
+import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 
 class LandPropertyIndividualSellersNamePageSpec extends PageBehaviours {
   "LandPropertyIndividualSellersNamePage" - {

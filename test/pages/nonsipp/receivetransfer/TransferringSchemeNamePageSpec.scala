@@ -15,9 +15,9 @@
  */
 
 import config.Refined.{Max300, Max5}
+import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
 
 class TransferringSchemeNamePageSpec extends PageBehaviours {
 

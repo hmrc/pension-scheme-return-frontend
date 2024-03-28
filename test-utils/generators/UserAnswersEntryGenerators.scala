@@ -16,11 +16,11 @@
 
 package generators
 
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
-import pages.nonsipp.CheckReturnDatesPage
-import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
+import pages.nonsipp.accountingperiod.AccountingPeriodPage
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Arbitrary
+import pages.nonsipp.CheckReturnDatesPage
 import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators {

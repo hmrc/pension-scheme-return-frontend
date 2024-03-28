@@ -18,12 +18,12 @@ package controllers.nonsipp.landorproperty
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.LandOrPropertyTotalCostController._
+import views.html.MoneyView
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyTotalCostPage}
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyTotalCostPage}
-import views.html.MoneyView
+import controllers.nonsipp.landorproperty.LandOrPropertyTotalCostController._
 
 class LandOrPropertyTotalCostControllerSpec extends ControllerBaseSpec {
 

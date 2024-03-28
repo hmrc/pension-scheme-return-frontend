@@ -17,8 +17,8 @@
 package controllers
 
 import play.api.test.FakeRequest
-import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import views.html.{JourneyRecoveryContinueView, JourneyRecoveryStartAgainView}
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 class JourneyRecoveryControllerSpec extends ControllerBaseSpec {
 

@@ -16,16 +16,16 @@
 
 package controllers.nonsipp.landorproperty
 
-import config.Refined.OneTo5000
+import models.ConditionalYesNo._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.LandOrPropertyListController._
-import eu.timepit.refined.api.Refined
+import views.html.ListView
+import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.ConditionalYesNo._
 import models.{ConditionalYesNo, NormalMode, SchemeHoldLandProperty}
-import pages.nonsipp.landorproperty._
-import views.html.ListView
+import eu.timepit.refined.api.Refined
+import controllers.nonsipp.landorproperty.LandOrPropertyListController._
+import config.Refined.OneTo5000
 
 class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
 

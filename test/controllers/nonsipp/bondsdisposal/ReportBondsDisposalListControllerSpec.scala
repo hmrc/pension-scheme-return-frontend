@@ -16,16 +16,16 @@
 
 package controllers.nonsipp.bondsdisposal
 
+import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage}
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bondsdisposal.ReportBondsDisposalListController._
+import views.html.ListView
 import eu.timepit.refined.refineMV
-import forms.YesNoPageFormProvider
 import models.{HowDisposed, NormalMode}
-import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage}
 import pages.nonsipp.bondsdisposal.{BondsDisposalCompletedPage, HowWereBondsDisposedOfPage}
 import viewmodels.models.SectionCompleted
-import views.html.ListView
+import controllers.nonsipp.bondsdisposal.ReportBondsDisposalListController._
+import forms.YesNoPageFormProvider
 
 class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
 

@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import services.SchemeDateService
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
+import views.html.DatePageView
 import eu.timepit.refined.refineMV
-import forms.DatePageFormProvider
-import models.NormalMode
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import pages.nonsipp.sharesdisposal.WhenWereSharesSoldPage
 import play.api.inject
-import play.api.inject.guice.GuiceableModule
-import services.SchemeDateService
-import views.html.DatePageView
+import forms.DatePageFormProvider
+import models.NormalMode
 
 class WhenWereSharesSoldControllerSpec extends ControllerBaseSpec {
 

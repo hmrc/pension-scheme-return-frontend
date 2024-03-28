@@ -18,11 +18,11 @@ package pages.nonsipp.landorproperty
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models.IdentitySubject.writes
-import models.{IdentitySubject, IdentityType, SchemeHoldLandProperty, UserAnswers}
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.common.IdentityTypePage
 import utils.UserAnswersUtils.UserAnswersOps
+import models._
+import pages.nonsipp.common.IdentityTypePage
+import models.IdentitySubject.writes
+import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate
 

@@ -16,17 +16,17 @@
 
 package controllers.nonsipp
 
-import cats.data.NonEmptyList
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.ReturnSubmittedController.viewModel
-import models.DateRange
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.ReturnSubmittedPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService
+import play.api.inject.guice.GuiceableModule
+import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import pages.nonsipp.ReturnSubmittedPage
+import models.DateRange
 import viewmodels.models.SubmissionViewModel
+import cats.data.NonEmptyList
 import views.html.SubmissionView
+import controllers.nonsipp.ReturnSubmittedController.viewModel
+import org.mockito.ArgumentMatchers.any
 
 import java.time.LocalDateTime
 
