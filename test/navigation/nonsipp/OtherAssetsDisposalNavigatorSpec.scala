@@ -341,9 +341,24 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             IsBuyerConnectedPartyPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.otherassetsdisposal.routes.AssetSaleIndependentValuationController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+          )
+          .withName("go from IsBuyerConnectedPartyPage to AssetSaleIndependentValuation")
+      )
+    }
+
+    "AssetSaleIndependentValuationPage" - {
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            assetIndex,
+            disposalIndex,
+            AssetSaleIndependentValuationPage,
+            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
               controllers.routes.UnauthorisedController.onPageLoad()
           )
-          .withName("go from IsBuyerConnectedPartyPage to Unauthorised")
+          .withName("go from AssetSaleIndependentValuationPage to Unauthorised")
       )
     }
 

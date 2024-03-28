@@ -3233,3 +3233,7 @@ assetCompanyBuyerCrn.no.conditional.error.invalid =  The reason you cannot provi
 assetCompanyBuyerCrn.no.conditional.error.length = The reason you cannot provide the buyer’s CRN must be 160 characters or fewer
 assetCompanyBuyerCrn.error.required = Select yes if you know the buyer’s Company Registration Number (CRN)
 
+assetSaleIndependentValuation.title = Was the sale of this asset supported by an independent valuation?
+assetSaleIndependentValuation.heading = Was the sale of this asset supported by an independent valuation?
+assetSaleIndependentValuation.error.required = Select yes if the sale of this asset was supported by an independent valuation
+
