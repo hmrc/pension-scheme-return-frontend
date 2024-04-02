@@ -72,6 +72,10 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
     val pensionSchemeEnquiry: String = config.get[String]("urls.pensionSchemeEnquiry")
     val incomeTaxAct: String = config.get[String]("urls.incomeTaxAct")
     val tangibleMoveableProperty: String = config.get[String]("urls.tangibleMoveableProperty")
+    val sippBaseUrl: String = config.get[String]("urls.sippBaseUrl")
+    val sippStartJourney: String = config.get[String]("urls.sippStartJourney")
+    val sippContinueJourney: String = config.get[String]("urls.sippContinueJourney")
+    val sippViewAndChange: String = config.get[String]("urls.sippViewAndChange")
 
     object managePensionsSchemes {
       val baseUrl: String = config.get[String]("urls.manage-pension-schemes.baseUrl")

@@ -25,9 +25,6 @@ import play.api.inject.bind
 import views.html.ContentPageView
 import navigation.{FakeNavigator, Navigator}
 import models.{CheckMode, SchemeMemberNumbers}
-import org.mockito.ArgumentMatchers.any
-
-import scala.concurrent.Future
 
 class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
 
@@ -50,7 +47,6 @@ class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
     "return OK and the correct view for a GET" in runningApplication { implicit app =>
       val view = injected[ContentPageView]
       val request = FakeRequest(GET, onPageLoad)
-
       val result = route(app, request).value
       val expectedView = view(WhatYouWillNeedController.viewModel(srn, fbNumber, "", ""))(request, createMessages(app))
 
@@ -59,9 +55,6 @@ class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
     }
 
     "redirect to the next page" in {
-      when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any())(any(), any(), any())).thenReturn(
-        Future.successful(defaultUserAnswers)
-      )
       val fakeNavigatorApplication =
         applicationBuilder()
           .overrides(
@@ -79,15 +72,9 @@ class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
     }
     "redirect to the next page more than 100 members" in {
       val pensionSchemeId = pensionSchemeIdGen.sample.value
-
-      when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any())(any(), any(), any())).thenReturn(
-        Future.successful(
-          defaultUserAnswers
-            .unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(50, 60, 70))
-        )
-      )
+      val ua = defaultUserAnswers.unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(50, 60, 70))
       val fakeNavigatorApplication =
-        applicationBuilder()
+        applicationBuilder(userAnswers = Some(ua))
           .overrides(
             bind[Navigator].qualifiedWith("root").toInstance(new FakeNavigator(onwardRoute))
           )

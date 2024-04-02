@@ -49,10 +49,10 @@ class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             WhatYouWillNeedPage,
-            (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn),
+            (srn, _) => controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode),
             srn => defaultUserAnswers
           )
-          .withName("go from start page to task list page")
+          .withName("go from start page to check return dates page")
       )
     }
 
