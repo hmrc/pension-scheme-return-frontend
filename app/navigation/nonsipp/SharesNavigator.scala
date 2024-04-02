@@ -17,7 +17,6 @@
 package navigation.nonsipp
 
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
-import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
 import cats.implicits.toTraverseOps
 import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
@@ -28,6 +27,8 @@ import pages.nonsipp.shares._
 import play.api.mvc.Call
 import config.Refined.Max5000
 import pages.Page
+import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
+import models.SchemeId.Srn
 
 object SharesNavigator extends JourneyNavigator {
 
@@ -205,36 +206,138 @@ object SharesNavigator extends JourneyNavigator {
 
   }
 
-  val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ =>
+  val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = oldUserAnswers =>
     userAnswers => {
 
-      case TypeOfSharesHeldPage(srn, index) =>
-        userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
-          case Some(SponsoringEmployer) =>
-            controllers.nonsipp.shares.routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, CheckMode)
-          case Some(Unquoted) =>
-            controllers.nonsipp.shares.routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, CheckMode)
-          case Some(ConnectedParty) =>
+      case page @ TypeOfSharesHeldPage(srn, index) =>
+        (oldUserAnswers.get(page), userAnswers.get(page)) match {
+          // if unchanged answer is Unquoted, make sure shares from connected party is complete, otherwise go to CYA
+          case (Some(Unquoted), Some(Unquoted)) =>
+            if (userAnswers.get(SharesFromConnectedPartyPage(srn, index)).isEmpty) {
+              controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, CheckMode)
+            } else {
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+            }
+          // if unchanged answer is SponsoringEmployer and shares held type is Acquisition, make sure total asset value is complete, otherwise go to CYA
+          case (Some(SponsoringEmployer), Some(SponsoringEmployer)) =>
+            if (userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)).contains(Acquisition) &&
+              userAnswers.get(TotalAssetValuePage(srn, index)).isEmpty) {
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode)
+            } else {
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+            }
+          // if unchanged answers is ConnectedParty, go to CYA
+          case (Some(ConnectedParty), Some(ConnectedParty)) =>
+            controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+
+          // if changed to SponsoringEmployer, go to "total asset value" if Acquisition, otherwise go to CYA
+          case (Some(_), Some(SponsoringEmployer)) =>
+            if (userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)).contains(Acquisition)) {
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode)
+            } else {
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+            }
+          // if changed to Unquoted, go to "connected party"
+          case (Some(_), Some(Unquoted)) =>
+            controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, CheckMode)
+          // if changed to ConnectedParty, go to CYA
+          case (Some(_), Some(ConnectedParty)) =>
             controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
           case _ => controllers.routes.UnauthorisedController.onPageLoad()
         }
 
       case WhyDoesSchemeHoldSharesPage(srn, index) =>
-        userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)) match {
-          case Some(Acquisition) =>
-            controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, CheckMode)
-          case Some(Contribution) =>
-            controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, CheckMode)
-          case Some(Transfer) =>
+        (
+          oldUserAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)),
+          userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index))
+        ) match {
+          // if unchanged answer is Contribution, make sure when were shares acquired is complete, otherwise go to CYA
+          case (Some(Contribution), Some(Contribution)) =>
+            if (userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)).isEmpty) {
+              controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, CheckMode)
+            } else {
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+            }
+          // if unchanged answer is Acquisition, make sure
+          // - when were shares acquired is complete
+          // - a shares seller is complete
+          // - total value of assets is complete if share type is a SponsoringEmployer
+          // - connected party is complete if share type is Unquoted
+          // otherwise go to CYA
+          case (Some(Acquisition), Some(Acquisition)) =>
+            if (userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)).isEmpty) {
+              controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, CheckMode)
+            } else {
+              if (atLeastOneShareSellerComplete(srn, index, userAnswers)) {
+                userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+                  case Some(SponsoringEmployer) if userAnswers.get(TotalAssetValuePage(srn, index)).isEmpty =>
+                    controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode)
+                  case Some(Unquoted) if userAnswers.get(SharesFromConnectedPartyPage(srn, index)).isEmpty =>
+                    controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
+                      .onPageLoad(srn, index, CheckMode)
+                  case _ => controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+                }
+              } else {
+                controllers.nonsipp.common.routes.IdentityTypeController
+                  .onPageLoad(srn, index, CheckMode, IdentitySubject.SharesSeller)
+              }
+            }
+          // if unchanged answer is Transfer, go to CYA
+          case (Some(Transfer), Some(Transfer)) =>
             controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+
+          // if changed from Acquisition to Contribution, make sure "when were shares acquired" is complete
+          // then go to connected party if type of shares held is unquoted, otherwise go to CYA
+          case (Some(Acquisition), Some(Contribution)) =>
+            if (userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)).isEmpty) {
+              controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, CheckMode)
+            } else {
+              if (userAnswers.get(TypeOfSharesHeldPage(srn, index)).contains(Unquoted)) {
+                controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, CheckMode)
+              } else {
+                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+              }
+            }
+          // if changed from Acquisition to Transfer, go to "connected party" if type of shares held is unquoted, otherwise go to CYA
+          case (Some(Acquisition), Some(Transfer)) =>
+            if (userAnswers.get(TypeOfSharesHeldPage(srn, index)).contains(Unquoted)) {
+              controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, CheckMode)
+            } else {
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+            }
+          // if changed from Contribution to Acquisition, make sure when were shares acquired is complete, otherwise go to who were shares acquired from
+          case (Some(Contribution), Some(Acquisition)) =>
+            if (userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)).isEmpty) {
+              controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, CheckMode)
+            } else {
+              controllers.nonsipp.common.routes.IdentityTypeController
+                .onPageLoad(srn, index, CheckMode, IdentitySubject.SharesSeller)
+            }
+          // if changed from Contribution to Transfer, go to CYA
+          case (Some(Contribution), Some(Transfer)) =>
+            controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+          // if changed from Transfer to Acquisition or Contribution, go to when were shares acquired
+          case (Some(Transfer), Some(Acquisition) | Some(Contribution)) =>
+            controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, CheckMode)
           case _ => controllers.routes.UnauthorisedController.onPageLoad()
         }
 
+      // Go to CYA unless any of the intermediate pages are not complete
       case WhenDidSchemeAcquireSharesPage(srn, index) =>
         userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)) match {
           case Some(Acquisition) =>
-            controllers.nonsipp.common.routes.IdentityTypeController
-              .onPageLoad(srn, index, CheckMode, IdentitySubject.SharesSeller)
+            if (atLeastOneShareSellerComplete(srn, index, userAnswers)) {
+              if (userAnswers.get(TypeOfSharesHeldPage(srn, index)).contains(SponsoringEmployer) &&
+                userAnswers.get(TotalAssetValuePage(srn, index)).isEmpty) {
+                controllers.nonsipp.shares.routes.TotalAssetValueController
+                  .onPageLoad(srn, index, CheckMode)
+              } else {
+                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+              }
+            } else {
+              controllers.nonsipp.common.routes.IdentityTypeController
+                .onPageLoad(srn, index, CheckMode, IdentitySubject.SharesSeller)
+            }
           case _ =>
             userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
               case Some(Unquoted) =>
@@ -293,7 +396,13 @@ object SharesNavigator extends JourneyNavigator {
         userAnswers.get(SharesIndividualSellerNINumberPage(srn, index)) match {
           case None =>
             controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController.onPageLoad(srn, index, CheckMode)
-          case _ => controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+          case _ =>
+            userAnswers.get(SharesFromConnectedPartyPage(srn, index)) match {
+              case None =>
+                controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController
+                  .onPageLoad(srn, index, CheckMode)
+              case Some(_) => controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+            }
         }
 
       case CompanyNameOfSharesSellerPage(srn, index) =>
@@ -301,7 +410,13 @@ object SharesNavigator extends JourneyNavigator {
           case None =>
             controllers.nonsipp.common.routes.CompanyRecipientCrnController
               .onPageLoad(srn, index, CheckMode, SharesSeller)
-          case _ => controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+          case _ =>
+            userAnswers.get(SharesFromConnectedPartyPage(srn, index)) match {
+              case None =>
+                controllers.nonsipp.common.routes.CompanyRecipientCrnController
+                  .onPageLoad(srn, index, CheckMode, SharesSeller)
+              case Some(_) => controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+            }
         }
 
       case PartnershipShareSellerNamePage(srn, index) =>
@@ -309,20 +424,21 @@ object SharesNavigator extends JourneyNavigator {
           case None =>
             controllers.nonsipp.common.routes.PartnershipRecipientUtrController
               .onPageLoad(srn, index, CheckMode, SharesSeller)
-          case _ => controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+          case _ =>
+            userAnswers.get(SharesFromConnectedPartyPage(srn, index)) match {
+              case None =>
+                controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+                  .onPageLoad(srn, index, CheckMode, SharesSeller)
+              case Some(_) => controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+            }
         }
 
       case OtherRecipientDetailsPage(srn, index, IdentitySubject.SharesSeller) =>
         userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
-          case Some(Unquoted) =>
-            userAnswers.get(SharesFromConnectedPartyPage(srn, index)) match {
-              case Some(_) =>
-                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
-              case _ =>
-                controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
-                  .onPageLoad(srn, index, CheckMode)
-            }
-          case Some(SponsoringEmployer) =>
+          case Some(Unquoted) if userAnswers.get(SharesFromConnectedPartyPage(srn, index)).isEmpty =>
+            controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
+              .onPageLoad(srn, index, CheckMode)
+          case Some(SponsoringEmployer) if userAnswers.get(TotalAssetValuePage(srn, index)).isEmpty =>
             controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode)
           case _ =>
             controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
@@ -330,15 +446,10 @@ object SharesNavigator extends JourneyNavigator {
 
       case SharesIndividualSellerNINumberPage(srn, index) =>
         userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
-          case Some(Unquoted) =>
-            userAnswers.get(SharesFromConnectedPartyPage(srn, index)) match {
-              case Some(_) =>
-                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
-              case _ =>
-                controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
-                  .onPageLoad(srn, index, CheckMode)
-            }
-          case Some(SponsoringEmployer) =>
+          case Some(Unquoted) if userAnswers.get(SharesFromConnectedPartyPage(srn, index)).isEmpty =>
+            controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
+              .onPageLoad(srn, index, CheckMode)
+          case Some(SponsoringEmployer) if userAnswers.get(TotalAssetValuePage(srn, index)).isEmpty =>
             controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode)
           case _ =>
             controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
@@ -347,15 +458,10 @@ object SharesNavigator extends JourneyNavigator {
 
       case CompanyRecipientCrnPage(srn, index, IdentitySubject.SharesSeller) =>
         userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
-          case Some(Unquoted) =>
-            userAnswers.get(SharesFromConnectedPartyPage(srn, index)) match {
-              case Some(_) =>
-                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
-              case _ =>
-                controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
-                  .onPageLoad(srn, index, CheckMode)
-            }
-          case Some(SponsoringEmployer) =>
+          case Some(Unquoted) if userAnswers.get(SharesFromConnectedPartyPage(srn, index)).isEmpty =>
+            controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
+              .onPageLoad(srn, index, CheckMode)
+          case Some(SponsoringEmployer) if userAnswers.get(TotalAssetValuePage(srn, index)).isEmpty =>
             controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode)
           case _ =>
             controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
@@ -363,15 +469,10 @@ object SharesNavigator extends JourneyNavigator {
 
       case PartnershipRecipientUtrPage(srn, index, IdentitySubject.SharesSeller) =>
         userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
-          case Some(Unquoted) =>
-            userAnswers.get(SharesFromConnectedPartyPage(srn, index)) match {
-              case Some(_) =>
-                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
-              case _ =>
-                controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
-                  .onPageLoad(srn, index, CheckMode)
-            }
-          case Some(SponsoringEmployer) =>
+          case Some(Unquoted) if userAnswers.get(SharesFromConnectedPartyPage(srn, index)).isEmpty =>
+            controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
+              .onPageLoad(srn, index, CheckMode)
+          case Some(SponsoringEmployer) if userAnswers.get(TotalAssetValuePage(srn, index)).isEmpty =>
             controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode)
           case _ =>
             controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
@@ -381,7 +482,7 @@ object SharesNavigator extends JourneyNavigator {
         userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)) match {
           case Some(Acquisition) =>
             userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
-              case Some(SponsoringEmployer) =>
+              case Some(SponsoringEmployer) if userAnswers.get(TotalAssetValuePage(srn, index)).isEmpty =>
                 controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode)
               case _ =>
                 controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
@@ -395,17 +496,15 @@ object SharesNavigator extends JourneyNavigator {
         controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
 
       case SharesIndependentValuationPage(srn, index) =>
-        userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)) match {
-          case Some(Acquisition) =>
-            userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
-              case Some(SponsoringEmployer) =>
-                controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode)
-              case _ =>
-                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
-            }
-          case _ =>
-            controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+        val nextPageIsTotalAssets =
+          userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)).contains(Acquisition) &&
+            userAnswers.get(TypeOfSharesHeldPage(srn, index)).contains(SponsoringEmployer) &&
+            userAnswers.get(TotalAssetValuePage(srn, index)).isEmpty
 
+        if (nextPageIsTotalAssets) {
+          controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode)
+        } else {
+          controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
         }
 
       case TotalAssetValuePage(srn, index) =>
@@ -416,4 +515,22 @@ object SharesNavigator extends JourneyNavigator {
 
     }
 
+  def atLeastOneShareSellerComplete(srn: Srn, index: Max5000, userAnswers: UserAnswers): Boolean = {
+    val individualCompleted = userAnswers.get(IndividualNameOfSharesSellerPage(srn, index)).nonEmpty &&
+      userAnswers.get(SharesIndividualSellerNINumberPage(srn, index)).nonEmpty
+
+    lazy val partnershipCompleted = userAnswers.get(PartnershipShareSellerNamePage(srn, index)).nonEmpty &&
+      userAnswers.get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.SharesSeller)).nonEmpty
+
+    lazy val companyCompleted = userAnswers.get(CompanyNameOfSharesSellerPage(srn, index)).nonEmpty &&
+      userAnswers.get(CompanyRecipientCrnPage(srn, index, IdentitySubject.SharesSeller)).nonEmpty
+
+    lazy val otherCompleted =
+      userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.SharesSeller)).nonEmpty
+
+    individualCompleted ||
+    partnershipCompleted ||
+    companyCompleted ||
+    otherCompleted
+  }
 }

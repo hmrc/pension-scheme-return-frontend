@@ -17,11 +17,14 @@
 package pages.nonsipp.shares
 
 import utils.RefinedUtils.RefinedIntOps
-import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import models.TypeOfShares
+import models.{TypeOfShares, UserAnswers}
 import config.Refined.Max5000
 import pages.QuestionPage
+import models.TypeOfShares.{SponsoringEmployer, Unquoted}
+import models.SchemeId.Srn
+
+import scala.util.Try
 
 case class TypeOfSharesHeldPage(srn: Srn, index: Max5000) extends QuestionPage[TypeOfShares] {
 
@@ -29,6 +32,17 @@ case class TypeOfSharesHeldPage(srn: Srn, index: Max5000) extends QuestionPage[T
     Paths.shareTransactions \ toString \ index.arrayIndex.toString
 
   override def toString: String = "typeOfSharesHeld"
+
+  override def cleanup(value: Option[TypeOfShares], userAnswers: UserAnswers): Try[UserAnswers] =
+    (userAnswers.get(this), value) match {
+      // if unchanged, do nothing
+      case (Some(a), Some(b)) if a == b => Try(userAnswers)
+      // if changed from Unquoted to any other type of shares, remove connected party
+      case (Some(Unquoted), Some(_)) => userAnswers.remove(SharesFromConnectedPartyPage(srn, index))
+      // if changed from SponsoringEmployer to any other type of shares, remove total asset value
+      case (Some(SponsoringEmployer), Some(_)) => userAnswers.remove(TotalAssetValuePage(srn, index))
+      case _ => Try(userAnswers)
+    }
 }
 
 case class TypeOfSharesHeldPages(srn: Srn) extends QuestionPage[Map[String, TypeOfShares]] {
