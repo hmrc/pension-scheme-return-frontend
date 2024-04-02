@@ -117,6 +117,10 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
 
     case IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex) =>
+      controllers.nonsipp.otherassetsdisposal.routes.AssetSaleIndependentValuationController
+        .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+
+    case AssetSaleIndependentValuationPage(sr, assetIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }
