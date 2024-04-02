@@ -3158,6 +3158,7 @@ otherAssetsDisposal.startReportingAssetsDisposal.paragraph1 = Select one option 
 otherAssetsDisposal.startReportingAssetsDisposal.paragraph2 = You can report disposal of assets whose details you have already provided. If the asset does not appear here, add it using the ‘Change other assets’ section of this return.
 otherAssetsDisposal.startReportingAssetsDisposal.legend = Which asset was disposed of?
 otherAssetsDisposal.startReportingAssetsDisposal.error.required = Select the asset that was disposed of
+otherAssetsDisposal.pagination.label = Showing {0} - {1} of {2} assets
 
 howWasAssetDisposedOf.title = How was the asset disposed of?
 howWasAssetDisposedOf.heading = How was the asset disposed of
@@ -3236,4 +3237,8 @@ assetCompanyBuyerCrn.error.required = Select yes if you know the buyer’s Compa
 assetSaleIndependentValuation.title = Was the sale of this asset supported by an independent valuation?
 assetSaleIndependentValuation.heading = Was the sale of this asset supported by an independent valuation?
 assetSaleIndependentValuation.error.required = Select yes if the sale of this asset was supported by an independent valuation
+
+anyPartAssetStillHeld.title = Is any part of the asset still held by the scheme?
+anyPartAssetStillHeld.heading = Is any part of the asset still held by {0}?
+anyPartAssetStillHeld.error.required = Select yes if any part of the asset is still held by the scheme
 

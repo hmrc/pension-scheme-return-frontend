@@ -38,7 +38,7 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
     case WhatYouWillNeedOtherAssetsDisposalPage(srn) =>
       controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController.onPageLoad(srn, page = 1)
 
-    case OtherAssetsDisposalListPage(srn, assetIndex) =>
+    case OtherAssetsDisposalListPage(srn, assetIndex, _) =>
       (
         for {
           disposalIndexes <- userAnswers
@@ -59,7 +59,8 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
           controllers.nonsipp.otherassetsdisposal.routes.WhenWasAssetSoldController
             .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
         case Some(HowDisposed.Transferred) | Some(HowDisposed.Other(_)) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
+            .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
       }
 
     case WhenWasAssetSoldPage(srn, assetIndex, disposalIndex) =>
@@ -120,7 +121,11 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.otherassetsdisposal.routes.AssetSaleIndependentValuationController
         .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
 
-    case AssetSaleIndependentValuationPage(sr, assetIndex, disposalIndex) =>
+    case AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex) =>
+      controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
+        .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+
+    case AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }

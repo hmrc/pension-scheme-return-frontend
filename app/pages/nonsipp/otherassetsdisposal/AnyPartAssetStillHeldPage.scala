@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,17 @@
 
 package pages.nonsipp.otherassetsdisposal
 
+import utils.RefinedUtils._
 import models.SchemeId.Srn
+import play.api.libs.json.JsPath
 import config.Refined.{Max50, Max5000}
-import pages.Page
+import pages.QuestionPage
 
-case class OtherAssetsDisposalListPage(srn: Srn, assetIndex: Max5000, disposalIndex: Max50) extends Page
+case class AnyPartAssetStillHeldPage(srn: Srn, assetIndex: Max5000, disposalIndex: Max50)
+    extends QuestionPage[Boolean] {
+
+  override def path: JsPath =
+    Paths.assetsDisposed \ toString \ assetIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+
+  override def toString: String = "fullyDisposedOf"
+}
