@@ -20,10 +20,10 @@ import services.SaveService
 import play.api.mvc.MessagesControllerComponents
 import config.Refined.{Max50, Max5000}
 import models.SchemeId.Srn
-import pages.nonsipp.sharesdisposal.{HowManyDisposalSharesPage, HowWereSharesDisposedPage, SharesDisposalCompletedPage}
+import pages.nonsipp.sharesdisposal._
 import models.HowSharesDisposed._
 import shapeless.{::, HList, HNil}
-import viewmodels.models.SectionCompleted
+import viewmodels.models.SectionJourneyStatus
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.refineMV
 
@@ -39,7 +39,7 @@ class SharesDisposalMongoController @Inject()(
     extends TestDataDoubleIndexController[Max5000.Refined, Max50.Refined] {
 
   override type Pages =
-    PageWithValue[SectionCompleted] ::
+    PageWithValue[SectionJourneyStatus] ::
       PageWithValue[HowSharesDisposed] ::
       PageWithValue[Int] ::
       HNil
@@ -48,7 +48,7 @@ class SharesDisposalMongoController @Inject()(
 
   override def pages(srn: Srn, index: Max5000, secondaryIndex: Max50): Pages = HList(
     (
-      PageWithValue(SharesDisposalCompletedPage(srn, index, secondaryIndex), SectionCompleted),
+      PageWithValue(SharesDisposalProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed),
       PageWithValue(HowWereSharesDisposedPage(srn, index, secondaryIndex), Transferred),
       PageWithValue(HowManyDisposalSharesPage(srn, index, secondaryIndex), 3)
     )

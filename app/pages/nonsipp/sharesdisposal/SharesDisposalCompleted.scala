@@ -16,7 +16,14 @@
 
 package pages.nonsipp.sharesdisposal
 
-import pages.Page
+import pages.QuestionPage
 import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import viewmodels.models.SectionCompleted
 
-case class RemoveShareDisposalPage(srn: Srn) extends Page
+case class SharesDisposalCompleted(srn: Srn) extends QuestionPage[SectionCompleted] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "sharesDisposalJourneyCompleted"
+}

@@ -37,6 +37,7 @@ import utils.DateTimeUtils.localDateShow
 import models._
 import play.api.i18n.MessagesApi
 import viewmodels.Margin
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -201,15 +202,15 @@ class SharesDisposalCYAController @Inject()(
   def onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
-        updatedUserAnswers <- Future.fromTry(
-          request.userAnswers.set(SharesDisposalCompletedPage(srn, shareIndex, disposalIndex), SectionCompleted)
-        )
+        updatedUserAnswers <- request.userAnswers
+          .set(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.Completed)
+          .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
       } yield submissionResult.getOrRecoverJourney(
         _ =>
           Redirect(
-            navigator.nextPage(SharesDisposalCompletedPage(srn, shareIndex, disposalIndex), mode, request.userAnswers)
+            navigator.nextPage(SharesDisposalCYAPage(srn), mode, request.userAnswers)
           )
       )
     }

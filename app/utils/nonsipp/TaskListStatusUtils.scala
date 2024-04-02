@@ -26,14 +26,14 @@ import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
 import eu.timepit.refined.{refineMV, refineV}
-import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPages, SharesDisposalPage}
+import pages.nonsipp.sharesdisposal._
 import models._
 import pages.nonsipp.loansmadeoroutstanding._
 import viewmodels.models.{SectionStatus, TaskListStatus}
 import pages.nonsipp.bonds._
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import viewmodels.models.TaskListStatus._
+import viewmodels.models.TaskListStatus.{TaskListStatus, _}
 import pages.nonsipp.common.IdentityTypes
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
 import pages.nonsipp.bondsdisposal.{BondsDisposalCompletedPages, BondsDisposalPage}
@@ -401,6 +401,34 @@ object TaskListStatusUtils {
         }
     }
 
+  private def getDisposalIncompleteIndex[A, B](
+    firstPages: Option[Map[String, Map[String, A]]],
+    lastPages: Option[Map[String, Map[String, B]]]
+  ): (Int, Int) =
+    (firstPages, lastPages) match {
+      case (None, _) => (1, 1)
+      case (Some(_), None) => (1, 1)
+      case (Some(first), Some(last)) =>
+        if (first.isEmpty) {
+          (1, 1)
+        } else {
+          val firstPageIndexes = first.map(x => x._2.map(_._1.toInt)).zipWithIndex.toList
+          val lastPageIndexes = last.map(x => x._2.map(_._1.toInt)).zipWithIndex.toList
+          val filtered = firstPageIndexes.filter(lastPageIndexes.indexOf(_) < 0)
+
+          if (filtered.isEmpty) {
+            (0, 0)
+          } else {
+            // compare second index
+            val firstPageDisposalIndexes = filtered.head._1.toList
+            val firstPageIndex = filtered.head._2
+            val lastPageDisposalIndexes = lastPageIndexes(firstPageIndex)._1.toList
+            val diff = firstPageDisposalIndexes.filter(lastPageDisposalIndexes.indexOf(_) < 0)
+            (firstPageIndex + 1, diff.head + 1)
+          }
+        }
+    }
+
   def getSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val defaultLink =
       controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController
@@ -431,28 +459,34 @@ object TaskListStatusUtils {
   }
 
   def getSharesDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val atLeastOneCompleted =
-      userAnswers.get(SharesDisposalCompletedPages(srn)).exists(_.values.exists(_.values.nonEmpty))
-    val started = userAnswers.get(SharesDisposalPage(srn)).contains(true)
-    val completedNoDisposals = userAnswers.get(SharesDisposalPage(srn)).contains(false)
 
-    val initialDisposalUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
+    val didSchemeDisposePage = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
       .onPageLoad(srn, NormalMode)
       .url
 
-    val disposalListPage = controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
+    val sharesToDisposePage = controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
       .onPageLoad(srn, page = 1)
       .url
 
-    if (atLeastOneCompleted) {
-      (TaskListStatus.Completed, disposalListPage)
-    } else if (completedNoDisposals) {
-      (TaskListStatus.Completed, initialDisposalUrl)
-    } else if (started) {
-      (TaskListStatus.InProgress, initialDisposalUrl)
-    } else {
-      (TaskListStatus.NotStarted, initialDisposalUrl)
-    }
+    val reportedDisposalsPage = controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+      .onPageLoad(srn, page = 1)
+      .url
+
+    val anyJourneysCompleted = userAnswers
+      .map(SharesDisposalProgress.all(srn))
+      .values
+      .exists(_.values.exists(_.completed))
+
+    val (status, link) =
+      (userAnswers.get(SharesDisposalPage(srn)), userAnswers.get(SharesDisposalCompleted(srn))) match {
+        case (None, _) => (NotStarted, didSchemeDisposePage)
+        case (Some(true), Some(_)) => (TaskListStatus.Completed, reportedDisposalsPage)
+        case (Some(true), None) if anyJourneysCompleted => (TaskListStatus.Completed, reportedDisposalsPage)
+        case (Some(true), None) => (TaskListStatus.InProgress, sharesToDisposePage)
+        case (Some(false), _) => (TaskListStatus.Completed, didSchemeDisposePage)
+      }
+
+    (status, link)
   }
 
   def getQuotedSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {

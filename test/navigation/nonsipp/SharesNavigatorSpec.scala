@@ -17,13 +17,13 @@
 package navigation.nonsipp
 
 import utils.BaseSpec
-import pages.nonsipp.shares._
 import config.Refined.{Max5000, OneTo5000}
 import models.SchemeId.Srn
 import eu.timepit.refined.refineMV
 import models._
 import pages.nonsipp.common._
 import models.IdentitySubject.SharesSeller
+import pages.nonsipp.shares._
 import play.api.mvc.Call
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen

@@ -16,25 +16,21 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import services.{PsrSubmissionService, SaveService}
 import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController._
 import viewmodels.implicits._
 import com.google.inject.Inject
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
+import config.Constants
 import cats.implicits._
 import config.Constants.{maxDisposalsPerShare, maxSharesTransactions}
 import controllers.actions.IdentifyAndRequireData
-import pages.nonsipp.sharesdisposal.{
-  HowWereSharesDisposedPage,
-  ReportedSharesDisposalListPage,
-  SharesDisposalCompletedPages
-}
+import pages.nonsipp.sharesdisposal._
 import forms.YesNoPageFormProvider
 import models._
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompleted, TypeOfSharesHeldPage}
 import play.api.mvc._
-import utils.nonsipp.TaskListStatusUtils.getSharesDisposalsTaskListStatusWithLink
-import config.Constants
 import views.html.ListView
 import models.TypeOfShares._
 import models.SchemeId.Srn
@@ -42,10 +38,13 @@ import navigation.Navigator
 import models.HowSharesDisposed._
 import play.api.i18n.MessagesApi
 import viewmodels.DisplayMessage
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.models._
+import viewmodels.models.{SectionCompleted, _}
 import models.requests.DataRequest
 import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
 
@@ -55,108 +54,89 @@ class ReportedSharesDisposalListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
-  formProvider: YesNoPageFormProvider
-) extends PSRController {
+  formProvider: YesNoPageFormProvider,
+  psrSubmissionService: PsrSubmissionService,
+  saveService: SaveService
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   val form: Form[Boolean] = ReportedSharesDisposalListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val (status, incompleteDisposalUrl) = getSharesDisposalsTaskListStatusWithLink(request.userAnswers, srn)
+      getCompletedDisposals(srn).map { completedDisposals =>
+        if (completedDisposals.values.exists(_.nonEmpty)) {
+          Ok(view(form, viewModel(srn, page, completedDisposals, request.userAnswers)))
+        } else {
+          Redirect(routes.SharesDisposalController.onPageLoad(srn, NormalMode))
+        }
+      }.merge
+  }
 
-      if (status == TaskListStatus.Completed) {
-        getDisposals(srn).map { disposals =>
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      getCompletedDisposals(srn)
+        .map { disposals =>
           val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
           val numberOfSharesItems = request.userAnswers.map(SharesCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
-          getSharesDisposalsWithIndexes(srn, disposals)
-            .map(
-              sharesDisposalsWithIndexes =>
-                Ok(
-                  view(
-                    form,
-                    viewModel(
-                      srn,
-                      mode,
-                      page,
-                      sharesDisposalsWithIndexes,
-                      numberOfDisposals,
-                      maxPossibleNumberOfDisposals,
-                      request.userAnswers
-                    )
-                  )
-                )
-            )
-            .merge
-        }.merge
-      } else if (status == TaskListStatus.InProgress) {
-        Redirect(incompleteDisposalUrl)
-      } else {
-        Redirect(routes.SharesDisposalController.onPageLoad(srn, NormalMode))
-      }
-  }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    getDisposals(srn).map { disposals =>
-      val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-      val numberOfSharesItems = request.userAnswers.map(SharesCompleted.all(srn)).size
-      val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
-      if (numberOfDisposals == maxPossibleNumberOfDisposals) {
-        Redirect(
-          navigator.nextPage(ReportedSharesDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
-        )
-      } else {
-        form
-          .bindFromRequest()
-          .fold(
-            errors =>
-              getSharesDisposalsWithIndexes(srn, disposals)
-                .map(
-                  indexes =>
-                    BadRequest(
-                      view(
-                        errors,
-                        viewModel(
-                          srn,
+          if (numberOfDisposals == maxPossibleNumberOfDisposals) {
+            Redirect(
+              navigator.nextPage(ReportedSharesDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
+            ).pure[Future]
+          } else {
+            form
+              .bindFromRequest()
+              .fold(
+                errors => BadRequest(view(errors, viewModel(srn, page, disposals, request.userAnswers))).pure[Future],
+                reportAnotherDisposal =>
+                  for {
+                    updatedUserAnswers <- request.userAnswers
+                      .setWhen(!reportAnotherDisposal)(SharesDisposalCompleted(srn), SectionCompleted)
+                      .mapK[Future]
+                    _ <- saveService.save(updatedUserAnswers)
+                    submissionResult <- if (!reportAnotherDisposal) {
+                      psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+                    } else {
+                      Future.successful(Some(()))
+                    }
+                  } yield submissionResult.getOrRecoverJourney(
+                    _ =>
+                      Redirect(
+                        navigator.nextPage(
+                          ReportedSharesDisposalListPage(srn, reportAnotherDisposal),
                           mode,
-                          page,
-                          indexes,
-                          numberOfDisposals,
-                          maxPossibleNumberOfDisposals,
                           request.userAnswers
                         )
                       )
-                    )
-                )
-                .merge,
-            answer =>
-              Redirect(navigator.nextPage(ReportedSharesDisposalListPage(srn, answer), mode, request.userAnswers))
-          )
-      }
-    }.merge
+                  )
+              )
+          }
+        }
+        .leftMap(_.pure[Future])
+        .merge
   }
 
-  private def getDisposals(srn: Srn)(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
+  private def getCompletedDisposals(
+    srn: Srn
+  )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
     request.userAnswers
-      .map(SharesDisposalCompletedPages(srn))
-      .filter(_._2.nonEmpty)
+      .map(SharesDisposalProgress.all(srn))
       .map {
-        case (key, sectionCompleted) =>
-          val maybeSharesIndex: Either[Result, Max5000] =
-            refineStringIndex[Max5000.Refined](key).getOrRecoverJourney
-
-          val maybeDisposalIndexes: Either[Result, List[Max50]] =
-            sectionCompleted.keys.toList
-              .map(refineStringIndex[Max50.Refined])
-              .traverse(_.getOrRecoverJourney)
-
-          for {
-            sharesIndex <- maybeSharesIndex
-            disposalIndexes <- maybeDisposalIndexes
-          } yield (sharesIndex, disposalIndexes)
+        case (key, secondaryMap) =>
+          key -> secondaryMap.filter { case (_, status) => status.completed }
       }
       .toList
-      .sequence
+      .traverse {
+        case (key, sectionCompleted) =>
+          for {
+            sharesIndex <- refineStringIndex[Max5000.Refined](key).getOrRecoverJourney
+            disposalIndexes <- sectionCompleted.keys.toList
+              .map(refineStringIndex[Max50.Refined])
+              .traverse(_.getOrRecoverJourney)
+          } yield (sharesIndex, disposalIndexes)
+      }
       .map(_.toMap)
 
   private def getSharesDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(
@@ -182,12 +162,11 @@ object ReportedSharesDisposalListController {
 
   private def rows(
     srn: Srn,
-    mode: Mode,
-    sharesDisposalsWithIndexes: List[((Max5000, List[Max50]), SectionCompleted)],
+    disposals: Map[Max5000, List[Max50]],
     userAnswers: UserAnswers
   ): List[ListRow] =
-    sharesDisposalsWithIndexes.flatMap {
-      case ((shareIndex, disposalIndexes), sharesDisposal) =>
+    disposals.flatMap {
+      case (shareIndex, disposalIndexes) =>
         disposalIndexes.map { disposalIndex =>
           val sharesDisposalData = SharesDisposalData(
             shareIndex,
@@ -213,7 +192,7 @@ object ReportedSharesDisposalListController {
             )
           )
         }
-    }
+    }.toList
 
   private def buildMessage(messageString: String, sharesDisposalData: SharesDisposalData): Message =
     sharesDisposalData match {
@@ -234,13 +213,14 @@ object ReportedSharesDisposalListController {
 
   def viewModel(
     srn: Srn,
-    mode: Mode,
     page: Int,
-    sharesDisposalsWithIndexes: List[((Max5000, List[Max50]), SectionCompleted)],
-    numberOfDisposals: Int,
-    maxPossibleNumberOfDisposals: Int,
+    disposals: Map[Max5000, List[Max50]],
     userAnswers: UserAnswers
   ): FormPageViewModel[ListViewModel] = {
+
+    val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+    val numberOfSharesItems = userAnswers.map(SharesCompleted.all(srn)).size
+    val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
 
     val (title, heading) = if (numberOfDisposals == 1) {
       ("sharesDisposal.reportedSharesDisposalList.title", "sharesDisposal.reportedSharesDisposalList.heading")
@@ -279,7 +259,7 @@ object ReportedSharesDisposalListController {
       ),
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows(srn, mode, sharesDisposalsWithIndexes, userAnswers),
+        rows(srn, disposals, userAnswers),
         Message("sharesDisposal.reportedSharesDisposalList.radios"),
         showRadios =
           !((numberOfDisposals >= maxSharesTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),

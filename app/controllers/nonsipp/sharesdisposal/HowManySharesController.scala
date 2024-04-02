@@ -21,7 +21,7 @@ import utils.FormUtils._
 import controllers.PSRController
 import config.Constants.{maxShares, minSharesHeld}
 import controllers.actions._
-import pages.nonsipp.sharesdisposal.HowManyDisposalSharesPage
+import pages.nonsipp.sharesdisposal.{HowManyDisposalSharesPage, SharesDisposalProgress}
 import navigation.Navigator
 import forms.IntFormProvider
 import models.Mode
@@ -36,8 +36,9 @@ import controllers.nonsipp.sharesdisposal.HowManySharesController._
 import models.SchemeId.Srn
 import play.api.i18n.MessagesApi
 import viewmodels.InputWidth
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.{Empty, Message}
-import viewmodels.models.{FormPageViewModel, QuestionField}
+import viewmodels.models.{FormPageViewModel, QuestionField, SectionJourneyStatus}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -100,8 +101,10 @@ class HowManySharesController @Inject()(
               ),
             answer => {
               for {
-                updatedAnswers <- Future
-                  .fromTry(request.userAnswers.set(HowManyDisposalSharesPage(srn, index, disposalIndex), answer))
+                updatedAnswers <- request.userAnswers
+                  .set(HowManyDisposalSharesPage(srn, index, disposalIndex), answer)
+                  .set(SharesDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
+                  .mapK[Future]
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(
                 navigator.nextPage(HowManyDisposalSharesPage(srn, index, disposalIndex), mode, updatedAnswers)

@@ -37,6 +37,7 @@ import views.html.RadioListView
 import models.SchemeId.Srn
 import navigation.Navigator
 import models.HowSharesDisposed._
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -98,16 +99,18 @@ class HowWereSharesDisposedController @Inject()(
           value => {
             val page = HowWereSharesDisposedPage(srn, shareIndex, disposalIndex)
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+              updatedAnswers <- request.userAnswers
+                .set(page, value)
+                .mapK[Future]
               hasAnswerChanged = request.userAnswers.exists(page)(_ == value)
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
+              nextPage = navigator.nextPage(
                 HowWereSharesDisposedPage(srn, shareIndex, disposalIndex, hasAnswerChanged),
                 mode,
                 updatedAnswers
               )
-            )
+              updatedProgressAnswers <- saveProgress(srn, shareIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
     }

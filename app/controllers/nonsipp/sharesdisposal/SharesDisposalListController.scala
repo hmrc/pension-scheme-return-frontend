@@ -35,7 +35,7 @@ import controllers.nonsipp.shares.SharesListController.SharesData
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.{refineMV, refineV}
 import config.Refined.Max5000.enumerable
-import pages.nonsipp.sharesdisposal.{HowManyDisposalSharesPage, SharesDisposalCompletedPages, SharesDisposalListPage}
+import pages.nonsipp.sharesdisposal._
 import utils.DateTimeUtils.localDateShow
 import models._
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
@@ -121,7 +121,7 @@ object SharesDisposalListController {
     userAnswers: UserAnswers,
     isNextDisposal: Boolean
   ): Option[Max50] =
-    userAnswers.get(SharesDisposalCompletedPages(srn)) match {
+    userAnswers.get(SharesDisposalProgress.all(srn)) match {
       case None => Some(refineMV[Max50.Refined](1))
       case Some(completedDisposals) =>
         /**
