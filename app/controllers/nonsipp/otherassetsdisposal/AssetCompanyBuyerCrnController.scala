@@ -133,7 +133,11 @@ object AssetCompanyBuyerCrnController {
           .Conditional(Message("assetCompanyBuyerCrn.yes.conditional", companyName), FieldType.Input),
         no = YesNoViewModel
           .Conditional(Message("assetCompanyBuyerCrn.no.conditional", companyName), FieldType.Textarea)
-      ).withHint("assetCompanyBuyerCrn.hint"),
+      ).withHint(
+        Message("assetCompanyBuyerCrn.hint.part1") ++
+          Message("assetCompanyBuyerCrn.hint.crn").speakAs("assetCompanyBuyerCrn.hint.crn.speakAs") ++
+          Message("assetCompanyBuyerCrn.hint.part2")
+      ),
       routes.AssetCompanyBuyerCrnController.onSubmit(srn, assetIndex, disposalIndex, mode)
     )
 }

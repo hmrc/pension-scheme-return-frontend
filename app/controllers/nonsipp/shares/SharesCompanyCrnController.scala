@@ -131,7 +131,11 @@ object SharesCompanyCrnController {
           .Conditional(Message("sharesCompanyCrn.yes.conditional", companyName), FieldType.Input),
         no = YesNoViewModel
           .Conditional(Message("sharesCompanyCrn.no.conditional", companyName), FieldType.Textarea)
-      ).withHint("sharesCompanyCrn.hint"),
+      ).withHint(
+        Message("sharesCompanyCrn.hint.part1") ++
+          Message("sharesCompanyCrn.hint.crn").speakAs("sharesCompanyCrn.hint.crn.speakAs") ++
+          Message("sharesCompanyCrn.hint.part2")
+      ),
       routes.SharesCompanyCrnController.onSubmit(srn, index, mode)
     )
 }

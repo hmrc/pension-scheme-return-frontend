@@ -143,7 +143,12 @@ object CompanyRecipientCrnController {
           .Conditional(Message(s"${subject.key}.companyRecipientCrn.yes.conditional", companyName), FieldType.Input),
         no = YesNoViewModel
           .Conditional(Message(s"${subject.key}.companyRecipientCrn.no.conditional", companyName), FieldType.Textarea)
-      ).withHint(s"${subject.key}.companyRecipientCrn.hint"),
+      ).withHint(
+        Message(s"${subject.key}.companyRecipientCrn.hint.part1") ++
+          Message(s"${subject.key}.companyRecipientCrn.hint.crn")
+            .speakAs(s"${subject.key}.companyRecipientCrn.hint.crn.speakAs") ++
+          Message(s"${subject.key}.companyRecipientCrn.hint.part2")
+      ),
       controllers.nonsipp.common.routes.CompanyRecipientCrnController.onSubmit(srn, index, mode, subject)
     )
   }

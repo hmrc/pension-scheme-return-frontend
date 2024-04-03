@@ -92,6 +92,11 @@ object Components {
       s"""<p class="govuk-hint">${content.body}</p>"""
     )
 
+  private def speakAs(content: String, speakAs: String): Html =
+    HtmlFormat.raw(
+      s"""<span role="text"><span role="text" aria-hidden="true">$content</span><span role="text" aria-label="$speakAs"/></span>"""
+    )
+
   def renderMessage(message: DisplayMessage)(implicit messages: Messages): HtmlFormat.Appendable =
     message match {
       case Empty => Html("")
@@ -101,6 +106,7 @@ object Components {
       case ParagraphMessage(content) => paragraph(content.map(renderMessage).reduce(combine(_, _)))
       case ListMessage(content, Bullet) => unorderedList(content.map(renderMessage))
       case ListMessage(content, NewLine) => simpleList(content.map(renderMessage))
+      case ScreenReaderMessage(content, speakAsContent) => speakAs(content.toMessage, speakAsContent.toMessage)
       case TableMessage(content, heading) =>
         table(
           content.map { case (key, value) => renderMessage(key) -> renderMessage(value) },

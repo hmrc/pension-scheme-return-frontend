@@ -41,6 +41,10 @@ object DisplayMessage {
       Message(key, args.toList)
   }
 
+  implicit class MessageOps(m: Message) {
+    def speakAs(as: Message): ScreenReaderMessage = ScreenReaderMessage(m, as)
+  }
+
   case class CompoundMessage(message: DisplayMessage, next: DisplayMessage) extends InlineMessage
 
   implicit class DisplayMessageOps(message: DisplayMessage) {
@@ -74,6 +78,8 @@ object DisplayMessage {
     def apply(headContent: InlineMessage, tailContents: InlineMessage*): ParagraphMessage =
       ParagraphMessage(NonEmptyList(headContent, tailContents.toList))
   }
+
+  case class ScreenReaderMessage(content: Message, speakAs: Message) extends InlineMessage
 
   case class HintMessage(content: InlineMessage) extends BlockMessage
 

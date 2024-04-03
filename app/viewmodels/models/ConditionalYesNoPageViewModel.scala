@@ -21,13 +21,13 @@ import viewmodels.DisplayMessage.{InlineMessage, Message}
 
 case class ConditionalYesNoPageViewModel(
   legend: Option[Message] = None,
-  hint: Option[Message] = None,
+  hint: Option[InlineMessage] = None,
   yes: YesNoViewModel,
   no: YesNoViewModel,
   details: Option[FurtherDetailsViewModel] = None
 ) {
 
-  def withHint(message: Message): ConditionalYesNoPageViewModel =
+  def withHint(message: InlineMessage): ConditionalYesNoPageViewModel =
     copy(hint = Some(message))
 }
 
