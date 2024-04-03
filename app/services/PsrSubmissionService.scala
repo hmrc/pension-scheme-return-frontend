@@ -18,6 +18,7 @@ package services
 
 import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
+import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import connectors.PSRConnector
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
@@ -46,7 +47,8 @@ class PsrSubmissionService @Inject()(
   memberPaymentsTransformer: MemberPaymentsTransformer,
   moneyBorrowedTransformer: MoneyBorrowedTransformer,
   sharesTransformer: SharesTransformer,
-  bondTransactionsTransformer: BondTransactionsTransformer
+  bondTransactionsTransformer: BondTransactionsTransformer,
+  otherAssetTransactionsTransformer: OtherAssetTransactionsTransformer
 ) {
 
   def submitPsrDetails(
@@ -67,6 +69,7 @@ class PsrSubmissionService @Inject()(
     val optSharesDisposal = request.userAnswers.get(SharesDisposalPage(srn))
     val optUnregulatedOrConnectedBondsHeld = request.userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
     val optBondsDisposal = request.userAnswers.get(BondsDisposalPage(srn))
+    val optOtherAssetsHeld = request.userAnswers.get(OtherAssetsHeldPage(srn))
 
     (
       minimalRequiredSubmissionTransformer.transformToEtmp(srn),
@@ -82,7 +85,8 @@ class PsrSubmissionService @Inject()(
             optMoneyWasBorrowed,
             optDisposeAnyLandOrProperty,
             optUnregulatedOrConnectedBondsHeld,
-            optBondsDisposal
+            optBondsDisposal,
+            optOtherAssetsHeld
           ),
           membersPayments = memberPaymentsTransformer.transformToEtmp(srn, request.userAnswers),
           shares = buildShares(srn)(optDidSchemeHoldAnyShares, optSharesDisposal)
@@ -103,9 +107,12 @@ class PsrSubmissionService @Inject()(
     optMoneyWasBorrowed: Option[Boolean],
     optDisposeAnyLandOrProperty: Option[Boolean],
     optUnregulatedOrConnectedBondsHeld: Option[Boolean],
-    optBondsDisposal: Option[Boolean]
+    optBondsDisposal: Option[Boolean],
+    optOtherAssetsHeld: Option[Boolean]
   )(implicit request: DataRequest[_]): Option[Assets] =
-    Option.when(List(optLandOrPropertyHeld, optMoneyWasBorrowed, optUnregulatedOrConnectedBondsHeld).flatten.nonEmpty)(
+    Option.when(
+      List(optLandOrPropertyHeld, optMoneyWasBorrowed, optUnregulatedOrConnectedBondsHeld, optOtherAssetsHeld).flatten.nonEmpty
+    )(
       Assets(
         optLandOrProperty = optLandOrPropertyHeld.map(landOrPropertyHeld => {
           val disposeAnyLandOrProperty = optDisposeAnyLandOrProperty.getOrElse(false)
@@ -131,7 +138,15 @@ class PsrSubmissionService @Inject()(
               bondsWereDisposed = bondsDisposal,
               bondTransactions = bondTransactionsTransformer.transformToEtmp(srn, bondsDisposal)
             )
-        }
+        },
+        optOtherAssets = optOtherAssetsHeld.map(
+          otherAssetsHeld =>
+            OtherAssets(
+              otherAssetsWereHeld = otherAssetsHeld,
+              otherAssetsWereDisposed = false,
+              otherAssetTransactions = otherAssetTransactionsTransformer.transformToEtmp(srn)
+            )
+        )
       )
     )
 

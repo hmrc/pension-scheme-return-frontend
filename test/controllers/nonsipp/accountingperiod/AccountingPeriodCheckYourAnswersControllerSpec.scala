@@ -25,11 +25,9 @@ import eu.timepit.refined._
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import utils.DateTimeUtils.localDateShow
-import models.NormalMode
+import models.{NormalMode, UserAnswers}
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.SummaryAction
-import models.UserAnswers
-import viewmodels.models.{CheckYourAnswersViewModel, FormPageViewModel}
+import viewmodels.models.{CheckYourAnswersViewModel, FormPageViewModel, SummaryAction}
 
 class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec {
 

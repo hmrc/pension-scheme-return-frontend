@@ -36,7 +36,8 @@ class PsrRetrievalService @Inject()(
   moneyBorrowedTransformer: MoneyBorrowedTransformer,
   memberPaymentsTransformer: MemberPaymentsTransformer,
   sharesTransformer: SharesTransformer,
-  bondTransactionsTransformer: BondTransactionsTransformer
+  bondTransactionsTransformer: BondTransactionsTransformer,
+  otherAssetTransactionsTransformer: OtherAssetTransactionsTransformer
 ) {
 
   def getStandardPsrDetails(
@@ -131,12 +132,28 @@ class PsrRetrievalService @Inject()(
               }
               .getOrElse(Try(transformedMoneyBorrowingAssetsUa))
 
+            transformedOtherAssetsUa <- psrDetails.assets
+              .map { asset =>
+                asset.optOtherAssets
+                  .map(
+                    otherAssets =>
+                      otherAssetTransactionsTransformer
+                        .transformFromEtmp(
+                          transformedBondsAssetsUa,
+                          srn,
+                          otherAssets
+                        )
+                  )
+                  .getOrElse(Try(transformedBondsAssetsUa))
+              }
+              .getOrElse(Try(transformedBondsAssetsUa))
+
             transformedMemberDetailsUa <- psrDetails.membersPayments
               .map(
                 memberPayments =>
-                  memberPaymentsTransformer.transformFromEtmp(transformedBondsAssetsUa, srn, memberPayments)
+                  memberPaymentsTransformer.transformFromEtmp(transformedOtherAssetsUa, srn, memberPayments)
               )
-              .getOrElse(Try(transformedBondsAssetsUa))
+              .getOrElse(Try(transformedOtherAssetsUa))
 
             transformedSharesUa <- psrDetails.shares
               .map(sh => sharesTransformer.transformFromEtmp(transformedMemberDetailsUa, srn, sh))

@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
+package pages.nonsipp.receivetransfer
+
 import config.Refined.{Max300, Max5}
-import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
 import eu.timepit.refined.refineMV
+import eu.timepit.refined.api.Refined
 import pages.behaviours.PageBehaviours
 
 class TransferringSchemeNamePageSpec extends PageBehaviours {
 
   private val memberIndex = refineMV[Max300.Refined](1)
-  val index = refineMV[Max5.Refined](1)
+  val index: Refined[Int, Max5.Refined] = refineMV[Max5.Refined](1)
 
   "TransferringSchemeNamePage" - {
 

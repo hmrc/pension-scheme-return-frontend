@@ -191,8 +191,8 @@ class OtherAssetsCYAController @Inject()(
         )
         _ <- saveService.save(updatedUserAnswers)
         redirectTo <- psrSubmissionService.submitPsrDetails(srn).map {
-          case None => (controllers.routes.JourneyRecoveryController.onPageLoad())
-          case Some(_) => (navigator.nextPage(OtherAssetsCYAPage(srn), NormalMode, request.userAnswers))
+          case None => controllers.routes.JourneyRecoveryController.onPageLoad()
+          case Some(_) => navigator.nextPage(OtherAssetsCYAPage(srn), NormalMode, request.userAnswers)
         }
       } yield Redirect(redirectTo)
     }
