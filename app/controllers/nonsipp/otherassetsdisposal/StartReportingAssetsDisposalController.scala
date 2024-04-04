@@ -20,20 +20,21 @@ import pages.nonsipp.otherassetsdisposal._
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils._
-import config.Refined.Max5000
+import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import config.Constants
-import controllers.actions.IdentifyAndRequireData
 import config.Refined.Max5000.enumerable
 import navigation.Navigator
 import forms.RadioListFormProvider
-import models.{Mode, Pagination}
+import models.{Mode, Pagination, UserAnswers}
 import pages.nonsipp.otherassetsheld._
 import com.google.inject.Inject
 import views.html.ListRadiosView
 import models.SchemeId.Srn
 import cats.implicits.toTraverseOps
 import controllers.nonsipp.otherassetsdisposal.StartReportingAssetsDisposalController._
+import controllers.actions.IdentifyAndRequireData
+import eu.timepit.refined.refineV
 import play.api.i18n.MessagesApi
 import viewmodels.LegendSize
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
@@ -56,35 +57,43 @@ class StartReportingAssetsDisposalController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val indexes = request.userAnswers.map(OtherAssetsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+      val userAnswers = request.userAnswers
+      val indexes: List[Max5000] =
+        userAnswers.map(OtherAssetsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
 
       if (indexes.nonEmpty) {
-        assetsData(srn, indexes).map(assets => Ok(view(form, viewModel(srn, page, assets)))).merge
+        assetsData(srn, indexes).map(assets => Ok(view(form, viewModel(srn, page, assets, userAnswers)))).merge
       } else {
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    val userAnswers = request.userAnswers
     val indexes: List[Max5000] =
-      request.userAnswers.map(OtherAssetsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+      userAnswers.map(OtherAssetsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
 
     form
       .bindFromRequest()
       .fold(
         errors => {
           assetsData(srn, indexes).map { assets =>
-            BadRequest(view(errors, viewModel(srn, page, assets)))
+            BadRequest(view(errors, viewModel(srn, page, assets, userAnswers)))
           }.merge
         },
         answer =>
-          Redirect(
-            navigator.nextPage(
-              OtherAssetsDisposalListPage(srn, answer),
-              mode,
-              request.userAnswers
+          StartReportingAssetsDisposalController
+            .getDisposal(srn, answer, userAnswers, isNextDisposal = true)
+            .getOrRecoverJourney(
+              nextDisposal =>
+                Redirect(
+                  navigator.nextPage(
+                    OtherAssetsDisposalListPage(srn, answer, nextDisposal),
+                    mode,
+                    request.userAnswers
+                  )
+                )
             )
-          )
       )
   }
 
@@ -102,20 +111,76 @@ object StartReportingAssetsDisposalController {
   def form(formProvider: RadioListFormProvider): Form[Max5000] =
     formProvider("otherAssetsDisposal.startReportingAssetsDisposal.error.required")
 
-  private def buildRows(assets: List[AssetData]): List[ListRadiosRow] =
+  private def getDisposal(
+    srn: Srn,
+    assetIndex: Max5000,
+    userAnswers: UserAnswers,
+    isNextDisposal: Boolean
+  ): Option[Max50] =
+    userAnswers.get(OtherAssetsDisposalCompletedPages(srn)) match {
+      case None => refineV[Max50.Refined](1).toOption
+      case Some(completedDisposals) =>
+        /**
+         * Indexes of completed disposals sorted in ascending order.
+         * We -1 from the address choice as the refined indexes is 1-based (e.g. 1 to 5000)
+         * while we are trying to fetch a completed disposal from a Map which is 0-based.
+         * We then +1 when we re-refine the index
+         */
+        val completedDisposalsForAssets =
+          completedDisposals
+            .get((assetIndex.value - 1).toString)
+            .map(_.keys.toList)
+            .flatMap(_.traverse(_.toIntOption))
+            .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
+            .toList
+            .flatten
+            .sortBy(_.value)
+
+        completedDisposalsForAssets.lastOption match {
+          case None => refineV[Max50.Refined](1).toOption
+          case Some(lastCompletedDisposalForAssets) =>
+            if (isNextDisposal) {
+              refineV[Max50.Refined](lastCompletedDisposalForAssets.value + 1).toOption
+            } else {
+              refineV[Max50.Refined](lastCompletedDisposalForAssets.value).toOption
+            }
+        }
+    }
+
+  private def buildRows(srn: Srn, assets: List[AssetData], userAnswers: UserAnswers): List[ListRadiosRow] =
     assets.flatMap { asset =>
-      List(
-        ListRadiosRow(
-          asset.index.value,
-          Message(asset.nameOfAsset)
-        )
-      )
+      val disposalIndex = getDisposal(srn, asset.index, userAnswers, isNextDisposal = false).get
+      val isDisposed: Option[Boolean] = {
+        userAnswers.get(AnyPartAssetStillHeldPage(srn, asset.index, disposalIndex))
+      }
+      isDisposed match {
+        case Some(value) =>
+          if (value) {
+            List(
+              ListRadiosRow(
+                asset.index.value,
+                asset.nameOfAsset
+              )
+            )
+          } else {
+            val empty: List[ListRadiosRow] = List()
+            empty
+          }
+        case _ =>
+          List(
+            ListRadiosRow(
+              asset.index.value,
+              asset.nameOfAsset
+            )
+          )
+      }
     }
 
   def viewModel(
     srn: Srn,
     page: Int,
-    assets: List[AssetData]
+    assets: List[AssetData],
+    userAnswers: UserAnswers
   ): FormPageViewModel[ListRadiosViewModel] = {
 
     val sortedAssets = assets.sortBy(_.index.value)
@@ -137,7 +202,7 @@ object StartReportingAssetsDisposalController {
       page = ListRadiosViewModel(
         legend = Some("otherAssetsDisposal.startReportingAssetsDisposal.legend"),
         legendSize = Some(LegendSize.Medium),
-        rows = buildRows(sortedAssets),
+        rows = buildRows(srn, sortedAssets, userAnswers),
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

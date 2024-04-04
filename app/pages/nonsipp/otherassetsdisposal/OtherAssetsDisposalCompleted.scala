@@ -42,3 +42,9 @@ object OtherAssetsDisposalCompleted {
       override def toString: String = "otherAssetsDisposalCompleted"
     }
 }
+
+case class OtherAssetsDisposalCompletedPages(srn: Srn) extends IndexedQuestionPage[Map[String, SectionCompleted.type]] {
+  override def path: JsPath = Paths.otherAssetDisposalTransactions \ toString
+
+  override def toString: String = "otherAssetsDisposalCompleted"
+}

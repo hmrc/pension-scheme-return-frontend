@@ -40,7 +40,7 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
-  val userAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+  val userAnswers: UserAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)

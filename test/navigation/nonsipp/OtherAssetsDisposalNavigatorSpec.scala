@@ -85,7 +85,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
           .navigateToWithDoubleIndex(
             assetIndex,
             disposalIndex,
-            (srn, index: Max5000, _: Max50) => OtherAssetsDisposalListPage(srn, index),
+            (srn, index: Max5000, _: Max50) => OtherAssetsDisposalListPage(srn, index, disposalIndex),
             controllers.nonsipp.otherassetsdisposal.routes.HowWasAssetDisposedOfController.onPageLoad
           )
           .withName(
@@ -118,9 +118,10 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             HowWasAssetDisposedOfPage.apply,
             Gen.const(HowDisposed.Transferred),
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.routes.UnauthorisedController.onPageLoad()
+              controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
           )
-          .withName("go from HowWasAssetDisposedOfPage to Unauthorised page (Transferred)")
+          .withName("go from HowWasAssetDisposedOfPage to AnyPartAssetStillHeld page (Transferred)")
       )
 
       act.like(
@@ -131,9 +132,10 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             HowWasAssetDisposedOfPage.apply,
             Gen.const(HowDisposed.Other("test details")),
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.routes.UnauthorisedController.onPageLoad()
+              controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
           )
-          .withName("go from HowWasAssetDisposedOfPage to Unauthorised page (Other)")
+          .withName("go from HowWasAssetDisposedOfPage to AnyPartAssetStillHeld page (Other)")
       )
     }
 
@@ -356,9 +358,24 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             AssetSaleIndependentValuationPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+          )
+          .withName("go from AssetSaleIndependentValuationPage to AnyPartAssetStillHeldPage")
+      )
+    }
+
+    "AnyPartAssetStillHeldPage" - {
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            assetIndex,
+            disposalIndex,
+            AnyPartAssetStillHeldPage,
+            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
               controllers.routes.UnauthorisedController.onPageLoad()
           )
-          .withName("go from AssetSaleIndependentValuationPage to Unauthorised")
+          .withName("go from AnyPartAssetStillHeldPage to Unauthorised")
       )
     }
 

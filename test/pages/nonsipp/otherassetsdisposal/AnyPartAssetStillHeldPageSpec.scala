@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,21 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import models.SchemeId.Srn
 import config.Refined.{Max50, Max5000}
-import pages.Page
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-case class OtherAssetsDisposalListPage(srn: Srn, assetIndex: Max5000, disposalIndex: Max50) extends Page
+class AnyPartAssetStillHeldPageSpec extends PageBehaviours {
+
+  "AnyPartAssetStillHeldPage" - {
+
+    val assetIndex = refineMV[Max5000.Refined](1)
+    val disposalIndex = refineMV[Max50.Refined](1)
+
+    beRetrievable[Boolean](AnyPartAssetStillHeldPage(srnGen.sample.value, assetIndex, disposalIndex))
+
+    beSettable[Boolean](AnyPartAssetStillHeldPage(srnGen.sample.value, assetIndex, disposalIndex))
+
+    beRemovable[Boolean](AnyPartAssetStillHeldPage(srnGen.sample.value, assetIndex, disposalIndex))
+  }
+}
