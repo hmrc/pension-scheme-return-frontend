@@ -17,17 +17,25 @@
 package controllers.nonsipp.otherassetsheld
 
 import controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.{form, viewModel}
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
 import views.html.YesNoPageView
-import controllers.nonsipp.otherassetsheld.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
 
 class OtherAssetsHeldControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.OtherAssetsHeldController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.OtherAssetsHeldController.onSubmit(srn, NormalMode)
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
 
   "OtherAssetsHeldController" - {
 
@@ -40,8 +48,23 @@ class OtherAssetsHeldControllerSpec extends ControllerBaseSpec {
         .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, NormalMode))
     })
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
+
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

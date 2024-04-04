@@ -21,7 +21,12 @@ import models._
 
 import java.time.LocalDate
 
-case class Assets(optLandOrProperty: Option[LandOrProperty], optBorrowing: Option[Borrowing], optBonds: Option[Bonds])
+case class Assets(
+  optLandOrProperty: Option[LandOrProperty],
+  optBorrowing: Option[Borrowing],
+  optBonds: Option[Bonds],
+  optOtherAssets: Option[OtherAssets]
+)
 
 case class LandOrProperty(
   landOrPropertyHeld: Boolean,
@@ -114,7 +119,28 @@ case class BondDisposed(
   totalNowHeld: Int
 )
 
+case class OtherAssets(
+  otherAssetsWereHeld: Boolean,
+  otherAssetsWereDisposed: Boolean,
+  otherAssetTransactions: Seq[OtherAssetTransaction]
+)
+
+case class OtherAssetTransaction(
+  assetDescription: String,
+  methodOfHolding: SchemeHoldAsset,
+  optDateOfAcqOrContrib: Option[LocalDate],
+  costOfAsset: Double,
+  optPropertyAcquiredFromName: Option[String],
+  optPropertyAcquiredFrom: Option[PropertyAcquiredFrom],
+  optConnectedStatus: Option[Boolean],
+  optIndepValuationSupport: Option[Boolean],
+  movableSchedule29A: Boolean,
+  totalIncomeOrReceipts: Double
+)
+
 object Assets {
+  private implicit val formatOtherAssetTransaction: OFormat[OtherAssetTransaction] = Json.format[OtherAssetTransaction]
+  private implicit val formatOtherAssets: OFormat[OtherAssets] = Json.format[OtherAssets]
   private implicit val formatBondDisposed: OFormat[BondDisposed] = Json.format[BondDisposed]
   private implicit val formatBondTransactions: OFormat[BondTransactions] = Json.format[BondTransactions]
   private implicit val formatBonds: OFormat[Bonds] = Json.format[Bonds]

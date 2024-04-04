@@ -17,7 +17,7 @@
 package controllers.nonsipp.otherassetsheld
 
 import controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.viewModel
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
@@ -25,13 +25,14 @@ import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
-import play.api.data.Form
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,7 +45,8 @@ class OtherAssetsHeldController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView
+  view: YesNoPageView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -66,7 +68,20 @@ class OtherAssetsHeldController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(OtherAssetsHeldPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(OtherAssetsHeldPage(srn), mode, updatedAnswers))
+            redirectTo <- if (value) {
+              Future.successful(
+                Redirect(navigator.nextPage(OtherAssetsHeldPage(srn), mode, updatedAnswers))
+              )
+            } else {
+              psrSubmissionService
+                .submitPsrDetails(srn)(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                .map {
+                  case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                  case Some(_) =>
+                    Redirect(navigator.nextPage(OtherAssetsHeldPage(srn), mode, updatedAnswers))
+                }
+            }
+          } yield redirectTo
       )
   }
 }
