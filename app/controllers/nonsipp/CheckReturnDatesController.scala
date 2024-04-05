@@ -16,17 +16,16 @@
 
 package controllers.nonsipp
 
-import services.{SaveService, SchemeDetailsService, TaxYearService}
+import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
 import cats.implicits.toShow
 import controllers.actions._
+import forms.YesNoPageFormProvider
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import pages.nonsipp._
 import navigation.Navigator
-import forms.YesNoPageFormProvider
-import uk.gov.hmrc.http.HeaderCarrier
 import utils.DateTimeUtils.localDateShow
 import models._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -51,9 +50,7 @@ class CheckReturnDatesController @Inject()(
   requireData: DataRequiredAction,
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView,
-  taxYear: TaxYearService,
-  schemeDetailsService: SchemeDetailsService
+  view: YesNoPageView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -62,43 +59,31 @@ class CheckReturnDatesController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
-      getMinimalSchemeDetails(request.pensionSchemeId, srn) { details =>
-        val preparedForm = request.userAnswers.fillForm(CheckReturnDatesPage(srn), form)
+      val preparedForm = request.userAnswers.fillForm(CheckReturnDatesPage(srn), form)
 
-        getWhichTaxYear(srn) { taxYear =>
-          val viewModel = CheckReturnDatesController.viewModel(srn, mode, taxYear.from, taxYear.to, details)
-          Future.successful(Ok(view(preparedForm, viewModel)))
-        }
+      getWhichTaxYear(srn) { taxYear =>
+        val viewModel = CheckReturnDatesController.viewModel(srn, mode, taxYear.from, taxYear.to)
+        Future.successful(Ok(view(preparedForm, viewModel)))
       }
     }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
-      getMinimalSchemeDetails(request.pensionSchemeId, srn) { details =>
-        getWhichTaxYear(srn) { taxYear =>
-          val viewModel =
-            CheckReturnDatesController.viewModel(srn, mode, taxYear.from, taxYear.to, details)
+      getWhichTaxYear(srn) { taxYear =>
+        val viewModel =
+          CheckReturnDatesController.viewModel(srn, mode, taxYear.from, taxYear.to)
 
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckReturnDatesPage(srn), value))
-                  _ <- saveService.save(updatedAnswers)
-                } yield Redirect(navigator.nextPage(CheckReturnDatesPage(srn), mode, updatedAnswers))
-            )
-        }
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel))),
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckReturnDatesPage(srn), value))
+                _ <- saveService.save(updatedAnswers)
+              } yield Redirect(navigator.nextPage(CheckReturnDatesPage(srn), mode, updatedAnswers))
+          )
       }
-    }
-
-  private def getMinimalSchemeDetails(id: PensionSchemeId, srn: Srn)(
-    f: MinimalSchemeDetails => Future[Result]
-  )(implicit hc: HeaderCarrier): Future[Result] =
-    schemeDetailsService.getMinimalSchemeDetails(id, srn).flatMap {
-      case Some(schemeDetails) => f(schemeDetails)
-      case None => Future.successful(Redirect(controllers.routes.UnauthorisedController.onPageLoad()))
     }
 
   private def getWhichTaxYear(
@@ -115,18 +100,11 @@ object CheckReturnDatesController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] =
     formProvider("checkReturnDates.error.required", "checkReturnDates.error.invalid")
 
-  private def max(d1: LocalDate, d2: LocalDate): LocalDate =
-    if (d1.isAfter(d2)) d1 else d2
-
-  private def min(d1: LocalDate, d2: LocalDate): LocalDate =
-    if (d1.isAfter(d2)) d2 else d1
-
   def viewModel(
     srn: Srn,
     mode: Mode,
     fromDate: LocalDate,
-    toDate: LocalDate,
-    schemeDetails: MinimalSchemeDetails
+    toDate: LocalDate
   ): FormPageViewModel[YesNoPageViewModel] =
     FormPageViewModel(
       Message("checkReturnDates.title"),
@@ -139,8 +117,8 @@ object CheckReturnDatesController {
       ParagraphMessage(
         Message(
           "checkReturnDates.description",
-          max(schemeDetails.openDate.getOrElse(fromDate), fromDate).show,
-          min(schemeDetails.windUpDate.getOrElse(toDate), toDate).show
+          fromDate.show,
+          toDate.show
         )
       )
     )

@@ -426,8 +426,12 @@ POST        /:srn/remove-unallocated-employer-contributions                     
 GET         /:srn/change-remove-unallocated-employer-contributions                      controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-remove-unallocated-employer-contributions                      controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
+GET         /:srn/overview                                                              controllers.OverviewController.onPageLoad(srn: Srn)
+GET         /:srn/select-view-and-change                                                controllers.OverviewController.onSelectViewAndChange(srn: Srn, fbNumber: String, reportType: String)
+GET         /:srn/select-start                                                          controllers.OverviewController.onSelectStart(srn: Srn, taxYear: String, version: String, reportType: String)
+GET         /:srn/select-continue                                                       controllers.OverviewController.onSelectContinue(srn: Srn, taxYear: String, version: String, reportType: String)
 GET         /:srn/return-history                                                        controllers.ReturnHistoryController.onPageLoad(srn: Srn)
-GET         /:srn/select-return-history                                                 controllers.ReturnHistoryController.onSelect(srn: Srn, version: String)
+GET         /:srn/select-return-history                                                 controllers.ReturnHistoryController.onSelect(srn: Srn, fbNumber: String)
 
 
 

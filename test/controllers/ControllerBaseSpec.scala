@@ -67,7 +67,7 @@ trait ControllerBaseSpec
   val defaultTaxYear: TaxYear = TaxYear(2022)
 
   protected def applicationBuilder(
-    userAnswers: Option[UserAnswers] = None,
+    userAnswers: Option[UserAnswers] = Some(emptyUserAnswers),
     schemeDetails: SchemeDetails = defaultSchemeDetails,
     minimalDetails: MinimalDetails = defaultMinimalDetails
   ): GuiceApplicationBuilder =
@@ -146,6 +146,7 @@ trait TestValues {
   val totalShares = 5
   val reasonSurrenderedBenefits = "test reason surrendered benefits"
   val fbNumber = "123456785011"
+  val startDate = "2023-04-06"
   val otherDetails = "other details"
   val bondsStillHeld = 5
   val nameOfBonds = "name of bonds"

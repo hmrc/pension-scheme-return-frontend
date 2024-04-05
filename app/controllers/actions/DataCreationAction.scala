@@ -29,15 +29,11 @@ class DataCreationActionImpl @Inject()(sessionRepository: SessionRepository)(
   implicit val executionContext: ExecutionContext
 ) extends DataCreationAction {
 
-  override protected def transform[A](request: OptionalDataRequest[A]): Future[DataRequest[A]] =
-    request.userAnswers match {
-      case None =>
-        val userAnswersKey = request.getUserId + request.srn
-        val userAnswers = UserAnswers(userAnswersKey)
-        sessionRepository.set(userAnswers).map(_ => DataRequest(request.request, userAnswers))
-      case Some(data) =>
-        Future.successful(DataRequest(request.request, data))
-    }
+  override protected def transform[A](request: OptionalDataRequest[A]): Future[DataRequest[A]] = {
+    val userAnswersKey = request.getUserId + request.srn
+    val userAnswers = UserAnswers(userAnswersKey)
+    sessionRepository.set(userAnswers).map(_ => DataRequest(request.request, userAnswers))
+  }
 }
 
 trait DataCreationAction extends ActionTransformer[OptionalDataRequest, DataRequest]
