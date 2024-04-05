@@ -373,9 +373,10 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             AnyPartAssetStillHeldPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.routes.UnauthorisedController.onPageLoad()
+              controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
           )
-          .withName("go from AnyPartAssetStillHeldPage to Unauthorised")
+          .withName("go from AnyPartAssetStillHeldPage to AssetDisposalCYA")
       )
     }
 

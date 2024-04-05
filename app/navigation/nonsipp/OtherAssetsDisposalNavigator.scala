@@ -121,15 +121,110 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.otherassetsdisposal.routes.AssetSaleIndependentValuationController
         .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
 
+    case IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex) =>
+      if (userAnswers.get(TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex)).isEmpty ||
+        userAnswers.get(AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex)).isEmpty ||
+        userAnswers.get(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex)).isEmpty) {
+        controllers.nonsipp.otherassetsdisposal.routes.TotalConsiderationSaleAssetController
+          .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+      } else {
+        controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+          .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+      }
+
     case AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex) =>
       controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
         .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
 
     case AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex) =>
+      controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+        .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+
+    case OtherAssetsDisposalCompletedPage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }
 
-  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
+    _ =>
+      userAnswers => {
+
+        case page @ HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex, hasAnswerChanged) =>
+          userAnswers.get(page) match {
+            case None => controllers.routes.UnauthorisedController.onPageLoad()
+            case _ if hasAnswerChanged =>
+              controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            case Some(HowDisposed.Sold) =>
+              controllers.nonsipp.otherassetsdisposal.routes.WhenWasAssetSoldController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            case Some(HowDisposed.Transferred) | Some(HowDisposed.Other(_)) =>
+              controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+          }
+
+        case WhenWasAssetSoldPage(srn, assetIndex, disposalIndex) =>
+          controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+            .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
+
+        case AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex) =>
+          controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+            .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
+
+        case AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex) =>
+          controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+            .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
+
+        case TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex) =>
+          controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+            .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
+
+        case TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex) =>
+          userAnswers.get(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex)) match {
+            case Some(IdentityType.Individual) =>
+              controllers.nonsipp.otherassetsdisposal.routes.IndividualNameOfAssetBuyerController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            case Some(IdentityType.UKCompany) =>
+              controllers.nonsipp.otherassetsdisposal.routes.CompanyNameOfAssetBuyerController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            case Some(IdentityType.UKPartnership) =>
+              controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerNameController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            case Some(IdentityType.Other) =>
+              controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            case None =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
+          }
+
+        case CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex) =>
+          controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+            .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
+
+        case AssetCompanyBuyerCrnPage(srn, assetIndex, disposalIndex) =>
+          controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+            .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
+
+        case IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex) =>
+          controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+            .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
+
+        case AssetIndividualBuyerNiNumberPage(srn, assetIndex, disposalIndex) =>
+          controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+            .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
+
+        case PartnershipBuyerNamePage(srn, assetIndex, disposalIndex) =>
+          controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+            .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
+
+        case OtherBuyerDetailsPage(srn, assetIndex, disposalIndex) =>
+          controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+            .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
+
+        case PartnershipBuyerUtrPage(srn, assetIndex, disposalIndex) =>
+          controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+            .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
+
+      }
 
 }

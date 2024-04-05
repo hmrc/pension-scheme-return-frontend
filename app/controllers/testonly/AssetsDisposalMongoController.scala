@@ -45,7 +45,7 @@ class AssetsDisposalMongoController @Inject()(
   override def pages(srn: Srn, index: Max5000, secondaryIndex: Max50): Pages =
     HList(
       (
-        PageWithValue(OtherAssetsDisposalCompleted(srn, index, secondaryIndex), SectionCompleted),
+        PageWithValue(OtherAssetsDisposalCompletedPage(srn, index, secondaryIndex), SectionCompleted),
         PageWithValue(HowWasAssetDisposedOfPage(srn, index, secondaryIndex), HowDisposed.Transferred),
         PageWithValue(IsBuyerConnectedPartyPage(srn, index, secondaryIndex), false),
         PageWithValue(TotalConsiderationSaleAssetPage(srn, index, secondaryIndex), Money(12.34)),

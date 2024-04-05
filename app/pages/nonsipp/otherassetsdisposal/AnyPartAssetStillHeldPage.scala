@@ -28,5 +28,5 @@ case class AnyPartAssetStillHeldPage(srn: Srn, assetIndex: Max5000, disposalInde
   override def path: JsPath =
     Paths.assetsDisposed \ toString \ assetIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "fullyDisposedOf"
+  override def toString: String = "anyPartAssetStillHeld"
 }

@@ -23,7 +23,7 @@ import viewmodels.models.SectionCompleted
 import config.Refined.{Max50, Max5000}
 import pages.{IndexedQuestionPage, QuestionPage}
 
-case class OtherAssetsDisposalCompleted(srn: Srn, index: Max5000, disposalIndex: Max50)
+case class OtherAssetsDisposalCompletedPage(srn: Srn, index: Max5000, disposalIndex: Max50)
     extends QuestionPage[SectionCompleted] {
 
   override def path: JsPath =
