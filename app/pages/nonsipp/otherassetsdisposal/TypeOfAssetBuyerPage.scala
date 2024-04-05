@@ -36,7 +36,15 @@ case class TypeOfAssetBuyerPage(srn: Srn, assetIndex: Max5000, disposalIndex: Ma
   override def toString: String = "purchaserType"
 
   private def pages(srn: Srn): List[Removable[_]] = List(
-    )
+    IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex),
+    AssetIndividualBuyerNiNumberPage(srn, assetIndex, disposalIndex),
+    CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex),
+    AssetCompanyBuyerCrnPage(srn, assetIndex, disposalIndex),
+    PartnershipBuyerNamePage(srn, assetIndex, disposalIndex),
+    PartnershipBuyerUtrPage(srn, assetIndex, disposalIndex),
+    OtherBuyerDetailsPage(srn, assetIndex, disposalIndex),
+    IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex)
+  )
 
   override def cleanup(value: Option[IdentityType], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
