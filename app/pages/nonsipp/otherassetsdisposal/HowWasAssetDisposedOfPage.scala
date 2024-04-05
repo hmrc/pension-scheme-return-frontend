@@ -45,17 +45,38 @@ case class HowWasAssetDisposedOfPage(
       case (Some(HowDisposed.Sold), Some(HowDisposed.Sold)) => Try(userAnswers)
       case (Some(HowDisposed.Transferred), Some(HowDisposed.Transferred)) => Try(userAnswers)
       case (Some(HowDisposed.Other(_)), Some(HowDisposed.Other(_))) => Try(userAnswers)
-      case (Some(_), Some(_)) =>
+      case (Some(_), Some(_)) => removePages(userAnswers, pages(srn, assetIndex, disposalIndex, false))
+      case (None, _) =>
+        val completedPages = userAnswers.map(OtherAssetsDisposalCompletedPages(srn))
         removePages(
           userAnswers,
-          pages(srn)
+          pages(
+            srn,
+            assetIndex,
+            disposalIndex,
+            completedPages.flatten(_._2).size == 1
+          )
         )
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn): List[Removable[_]] =
-    List(
-      )
+  private def pages(
+    srn: Srn,
+    assetIndex: Max5000,
+    disposalIndex: Max50,
+    isLastRecord: Boolean
+  ): List[Removable[_]] = {
+    val list = List(
+      AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex),
+      TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex),
+      OtherAssetsDisposalCompletedPage(srn, assetIndex, disposalIndex),
+      WhenWasAssetSoldPage(srn, assetIndex, disposalIndex),
+      AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex),
+      TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex)
+    )
+    if (isLastRecord) list :+ OtherAssetsDisposalPage(srn) else list
+  }
+
 }
 
 object HowWasAssetDisposedOfPage {
