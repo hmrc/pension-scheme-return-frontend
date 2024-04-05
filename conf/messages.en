@@ -3242,8 +3242,7 @@ anyPartAssetStillHeld.title = Is any part of the asset still held by the scheme?
 anyPartAssetStillHeld.heading = Is any part of the asset still held by {0}?
 anyPartAssetStillHeld.error.required = Select yes if any part of the asset is still held by the scheme
 
-checkYourAnswers.title = Check your answers
-checkYourAnswers.heading = Check your answers
+
 assetDisposalCYA.section1.asset =  Which asset was disposed of?
 assetDisposalCYA.section1.assetDisposed = How was the asset disposed of?
 assetDisposalCYA.section1.assetDisposed.hidden = how the asset was disposed of

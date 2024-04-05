@@ -44,7 +44,7 @@ case class TypeOfAssetBuyerPage(srn: Srn, assetIndex: Max5000, disposalIndex: Ma
     PartnershipBuyerUtrPage(srn, assetIndex, disposalIndex),
     OtherBuyerDetailsPage(srn, assetIndex, disposalIndex),
     IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex)
-    )
+  )
 
   override def cleanup(value: Option[IdentityType], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {

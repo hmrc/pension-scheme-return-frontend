@@ -263,7 +263,6 @@ object AssetDisposalCYAController {
             disposalIndex,
             schemeName,
             whenWasAssetSold,
-            whatIsOtherAsset,
             assetDisposedType,
             recipientReasonNoDetails,
             assetDisposalBuyerConnectedParty,
