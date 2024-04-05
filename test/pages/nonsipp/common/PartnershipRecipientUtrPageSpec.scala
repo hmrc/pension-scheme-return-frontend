@@ -21,7 +21,6 @@ import eu.timepit.refined.refineMV
 import models.{ConditionalYesNo, IdentitySubject, Utr}
 import eu.timepit.refined.api.Refined
 import pages.behaviours.PageBehaviours
-import eu.timepit.refined.api.Refined
 
 class PartnershipRecipientUtrPageSpec extends PageBehaviours {
   val index: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)

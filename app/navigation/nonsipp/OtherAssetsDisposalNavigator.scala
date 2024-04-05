@@ -121,7 +121,7 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
       if (userAnswers.get(TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex)).isEmpty ||
         userAnswers.get(AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex)).isEmpty ||
         userAnswers.get(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex)).isEmpty) {
-        controllers.nonsipp.otherassetsdisposal.routes.TotalConsiderationSaleAssetController
+        controllers.nonsipp.otherassetsdisposal.routes.AssetSaleIndependentValuationController
           .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
       } else {
         controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
@@ -218,6 +218,10 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
             .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
 
         case PartnershipBuyerUtrPage(srn, assetIndex, disposalIndex) =>
+          controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+            .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
+
+        case IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex) =>
           controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
             .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
 

@@ -241,8 +241,13 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
           controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
 
+        case LandOrPropertyDisposalBuyerConnectedPartyPage(srn, landOrPropertyIndex, disposalIndex) =>
+          controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
+
         case LandOrPropertyDisposalAddressListPage(srn, addressChoice, disposalChoice) =>
           controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
             .onPageLoad(srn, addressChoice, disposalChoice, CheckMode)
+
       }
 }
