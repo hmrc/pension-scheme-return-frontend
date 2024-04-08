@@ -133,6 +133,13 @@ trait Constraints {
         Valid
     }
 
+  protected def isEqual(expectedValue: Option[String], errorKey: String): Constraint[String] =
+    Constraint {
+      case _ if expectedValue.isEmpty => Valid
+      case s if expectedValue.contains(s) => Valid
+      case _ => Invalid(errorKey)
+    }
+
   protected def nonEmptySet(errorKey: String): Constraint[Set[_]] =
     Constraint {
       case set if set.nonEmpty =>

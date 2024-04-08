@@ -35,7 +35,7 @@ class FakeIdentifierAction @Inject()(
     with OptionValues {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(administratorRequestGen(request).map(_.copy(userId = "id", psaId = PsaId("testPSAId"))).sample.value)
+    block(administratorRequestGen(request).map(_.copy(userId = "id", psaId = PsaId("A1234567"))).sample.value)
 
   override def parser: BodyParser[AnyContent] = bodyParsers.default
 }

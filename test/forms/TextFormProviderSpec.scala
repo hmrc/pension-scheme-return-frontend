@@ -99,4 +99,31 @@ class TextFormProviderSpec extends FieldBehaviours {
       behave.like(invalidField(form, "value", "invalid", "John324324"))
     }
   }
+  ".psaId" - {
+    val validId = "A" + numericStringLength(formProvider.psaIdMaxLength - 1).sample.value
+    val invalidId = "B" + numericStringLength(formProvider.psaIdMaxLength - 1).sample.value
+    val form: Form[String] = formProvider.psaId(
+      "required",
+      "tooLong",
+      "invalid",
+      "noMatch",
+      Some(validId)
+    )
+    val formInvalid: Form[String] = formProvider.psaId(
+      "required",
+      "tooLong",
+      "invalid",
+      "noMatch",
+      Some(invalidId)
+    )
+
+    behave.like(
+      fieldThatBindsValidData(form, "value", validId)
+    )
+    behave.like(
+      invalidField(formInvalid, "value", "invalid", invalidId)
+    )
+    behave.like(mandatoryField(formInvalid, "value", "required"))
+    behave.like(trimmedField(form, "value", s"     $validId  "))
+  }
 }

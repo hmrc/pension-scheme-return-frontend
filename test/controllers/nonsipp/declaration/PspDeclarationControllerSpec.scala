@@ -16,11 +16,16 @@
 
 package controllers.nonsipp.declaration
 
+import controllers.nonsipp.declaration.PspDeclarationController._
 import controllers.ControllerBaseSpec
-import views.html.ContentPageView
-import controllers.nonsipp.declaration.routes
+import views.html.PsaIdInputView
+import forms.TextFormProvider
+import pages.nonsipp.declaration.PspDeclarationPage
 
 class PspDeclarationControllerSpec extends ControllerBaseSpec {
+  private val populatedUserAnswers = {
+    defaultUserAnswers.unsafeSet(PspDeclarationPage(srn), psaId.value)
+  }
 
   "PspDeclarationController" - {
 
@@ -30,13 +35,13 @@ class PspDeclarationControllerSpec extends ControllerBaseSpec {
     lazy val onSubmit = routes.PspDeclarationController.onSubmit(srn)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      val view = injected[ContentPageView]
-      view(viewModel)
+      injected[PsaIdInputView]
+        .apply(form(injected[TextFormProvider], Some(psaId.value)), viewModel)
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(agreeAndContinue(onSubmit))
+    act.like(agreeAndContinue(onSubmit, populatedUserAnswers, "value" -> psaId.value))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 

@@ -17,11 +17,9 @@
 package controllers.nonsipp
 
 import services.SchemeDateService
-import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
 import pages.nonsipp.memberdetails._
 import play.api.mvc._
 import com.google.inject.Inject
-import config.Refined.OneTo300
 import utils.nonsipp.TaskListStatusUtils._
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import pages.nonsipp.CheckReturnDatesPage
@@ -29,9 +27,12 @@ import utils.nonsipp.TaskListStatusUtils
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsJourneyStatus
 import viewmodels.models.TaskListStatus._
 import models.requests.DataRequest
+import _root_.config.Refined.OneTo300
+import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
 import viewmodels.implicits._
 import pages.nonsipp.membercontributions.MemberContributionsListPage
-import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
+import pages.nonsipp.memberreceivedpcls.{PclsMemberListPage, PensionCommencementLumpSumPage}
 import views.html.TaskListView
 import models.SchemeId.Srn
 import cats.implicits.toShow
@@ -44,6 +45,7 @@ import models._
 import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import pages.nonsipp.bondsdisposal.BondsDisposalPage
 import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
 import viewmodels.DisplayMessage._
 import viewmodels.models.{TaskListStatus, _}
@@ -566,17 +568,21 @@ object TaskListController {
     )
 
     // TODO:
-    //  isUnallocatedEmployerAnsweredAsNo and isPensionPaymentsReceivedAnsweredAsNo must be removed once tasklist status logic implemented for them properly.
+    //  These pages must be removed once tasklist status logic implemented for them properly.
     //  Now we're just checking whether user selected no in the beginning of the journey (using shortcut).
-    val isUnallocatedEmployerAnsweredAsNo = userAnswers
-      .get(UnallocatedEmployerContributionsPage(srn))
-      .fold(0)(x => if (x) 0 else 1)
+    val unhandledStatusPages = List(
+      UnallocatedEmployerContributionsPage(srn),
+      PensionPaymentsReceivedPage(srn),
+      PensionCommencementLumpSumPage(srn),
+      BondsDisposalPage(srn),
+      OtherAssetsDisposalPage(srn)
+    ).map(
+        page => userAnswers.get(page).fold(0)(x => if (x) 0 else 1)
+      )
+      .sum
 
-    val isPensionPaymentsReceivedAnsweredAsNo = userAnswers
-      .get(PensionPaymentsReceivedPage(srn))
-      .fold(0)(x => if (x) 0 else 1)
+    val numberOfCompletedPages = numberOfCompletedWithoutDeclaration + unhandledStatusPages
 
-    val numberOfCompletedPages = numberOfCompletedWithoutDeclaration + isUnallocatedEmployerAnsweredAsNo + isPensionPaymentsReceivedAnsweredAsNo
     val isLinkActive = numberOfTotalWithoutDeclaration == numberOfCompletedPages
 
     val declarationSectionViewModel =

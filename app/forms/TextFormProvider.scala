@@ -27,6 +27,8 @@ class TextFormProvider @Inject()() {
   protected[forms] val nameRegex = "^[a-zA-Z\\-' ]+$"
   protected[forms] val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
   protected[forms] val textAreaMaxLength = 160
+  protected[forms] val psaIdRegex = "^(A[0-9]{7})$"
+  protected[forms] val psaIdMaxLength = 8
 
   val formKey = "value"
 
@@ -87,6 +89,25 @@ class TextFormProvider @Inject()() {
       List((textAreaRegex, invalidCharactersKey)),
       textAreaMaxLength,
       tooLongKey,
+      args: _*
+    )
+  )
+
+  def psaId(
+    requiredKey: String,
+    tooLongKey: String,
+    invalidCharactersKey: String,
+    invalidNoMatchKey: String,
+    authorisingPSAID: Option[String],
+    args: Any*
+  ): Form[String] = Form(
+    formKey -> Mappings.validatedPsaId(
+      requiredKey,
+      List((psaIdRegex, invalidCharactersKey)),
+      psaIdMaxLength,
+      tooLongKey,
+      authorisingPSAID: Option[String],
+      invalidNoMatchKey: String,
       args: _*
     )
   )

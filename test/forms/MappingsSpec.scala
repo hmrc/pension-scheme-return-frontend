@@ -374,4 +374,38 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
       result.errors must contain(FormError("value", "error.minmax"))
     }
   }
+
+  "validatedPsaId" - {
+    val testForm = Form(
+      "value" ->
+        validatedPsaId(
+          requiredKey = "error.required",
+          regexChecks = List(("^(A[0-9]{7})$", "error.invalid.characters")),
+          maxLength = 8,
+          maxLengthErrorKey = "error.tooLong",
+          authorisingPSAID = Some("A1234567"),
+          noMatchKey = "error.noMatch"
+        )
+    )
+
+    "must bind a valid value" in {
+      val result = testForm.bind(Map("value" -> "A1234567"))
+      result.get mustEqual "A1234567"
+    }
+
+    "must not bind an empty value" in {
+      val result = testForm.bind(Map("value" -> ""))
+      result.errors must contain(FormError("value", "error.required"))
+    }
+
+    "must not bind an invalid value" in {
+      val result = testForm.bind(Map("value" -> "*"))
+      result.errors must contain(FormError("value", "error.invalid.characters"))
+    }
+
+    "must not bind an non matching value" in {
+      val result = testForm.bind(Map("value" -> "A7654321"))
+      result.errors must contain(FormError("value", "error.noMatch"))
+    }
+  }
 }
