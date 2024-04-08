@@ -19,10 +19,12 @@ package navigation.nonsipp
 import utils.BaseSpec
 import pages.nonsipp.shares._
 import config.Refined.{Max5000, OneTo5000}
+import models.SchemeId.Srn
 import eu.timepit.refined.refineMV
 import models._
 import pages.nonsipp.common._
 import models.IdentitySubject.SharesSeller
+import play.api.mvc.Call
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
 import navigation.{Navigator, NavigatorBehaviours}
@@ -672,113 +674,154 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
     "TypeOfSharesHeldPage" - {
 
-      act.like(
-        checkmode
-          .navigateToWithIndex(
-            index,
-            TypeOfSharesHeldPage,
-            (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, CheckMode),
-            srn =>
-              defaultUserAnswers.unsafeSet(
-                TypeOfSharesHeldPage(srn, index),
-                TypeOfShares.SponsoringEmployer
-              )
-          )
-          .withName(
-            "go from TypeOfSharesHeldPage to WhyDoesSchemeHoldSharesPage page when holding is SponsoringEmployer"
-          )
+      def test(
+        testName: String,
+        nextPage: (Srn, Max5000, Mode) => Call,
+        oldUserAnswers: Srn => UserAnswers => UserAnswers,
+        newUserAnswers: Srn => UserAnswers => UserAnswers
+      ): Unit =
+        act.like(
+          checkmode
+            .navigateToWithIndex(
+              index,
+              TypeOfSharesHeldPage,
+              nextPage,
+              oldUserAnswers(_)(defaultUserAnswers),
+              newUserAnswers(_)(defaultUserAnswers)
+            )
+            .withName(testName)
+        )
+
+      test(
+        "go to CYA when unchanged answer is Unquoted and SharesFromConnectedPartyPage is complete",
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted),
+        newUserAnswers = srn =>
+          _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
+            .unsafeSet(SharesFromConnectedPartyPage(srn, index), true)
       )
 
-      act.like(
-        checkmode
-          .navigateToWithIndex(
-            index,
-            TypeOfSharesHeldPage,
-            (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, CheckMode),
-            srn =>
-              defaultUserAnswers.unsafeSet(
-                TypeOfSharesHeldPage(srn, index),
-                TypeOfShares.Unquoted
-              )
-          )
-          .withName(
-            "go from TypeOfSharesHeldPage to WhyDoesSchemeHoldSharesPage page when holding is Unquoted"
-          )
+      test(
+        "go to SharesFromConnectedParty when unchanged answer is Unquoted and SharesFromConnectedPartyPage is incomplete",
+        controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad,
+        oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted),
+        newUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
       )
 
-      act.like(
-        checkmode
-          .navigateToWithIndex(
-            index,
-            TypeOfSharesHeldPage,
-            (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
-            srn =>
-              defaultUserAnswers.unsafeSet(
-                TypeOfSharesHeldPage(srn, index),
-                TypeOfShares.ConnectedParty
-              )
-          )
-          .withName(
-            "go from TypeOfSharesHeldPage to WhyDoesSchemeHoldSharesPage page when holding is ConnectedParty"
-          )
+      test(
+        "go to CYA when unchanged answer is SponsoringEmployer and TotalAssetValuePage is complete",
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer),
+        newUserAnswers = srn =>
+          _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer)
+            .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition)
+            .unsafeSet(TotalAssetValuePage(srn, index), money)
+      )
+
+      test(
+        "go to TotalAssetValue when unchanged answer is SponsoringEmployer and TotalAssetValuePage is incomplete",
+        controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad,
+        oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer),
+        newUserAnswers = srn =>
+          _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer)
+            .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition)
+      )
+
+      test(
+        "go to CYA when unchanged answer is ConnectedParty",
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty),
+        newUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty)
+      )
+
+      test(
+        "go to CYA when answer is changed to SponsoringEmployer",
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty),
+        newUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer)
+      )
+
+      test(
+        "go to TotalAssetValue when answer is changed to SponsoringEmployer and WhyDoesSchemeHoldShares is Acquisition",
+        controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad,
+        oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty),
+        newUserAnswers = srn =>
+          _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer)
+            .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition)
+      )
+
+      test(
+        "go to SharesFromConnectedPartyPage when answer is changed to Unquoted",
+        controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad,
+        oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty),
+        newUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
+      )
+
+      test(
+        "go to CYA when answer is changed to ConnectedParty",
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer),
+        newUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty)
       )
     }
 
     "WhyDoesSchemeHoldSharesPage" - {
 
-      act.like(
-        checkmode
-          .navigateToWithIndex(
-            index,
-            WhyDoesSchemeHoldSharesPage,
-            (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, CheckMode),
-            srn =>
-              defaultUserAnswers.unsafeSet(
-                WhyDoesSchemeHoldSharesPage(srn, index),
-                SchemeHoldShare.Acquisition
-              )
-          )
-          .withName(
-            "go from WhyDoesSchemeHoldSharesPage to WhenDidSchemeAcquireShares page when holding is acquisition"
-          )
+      def test(
+        testName: String,
+        nextPage: (Srn, Max5000, Mode) => Call,
+        oldUserAnswers: Srn => UserAnswers => UserAnswers,
+        newUserAnswers: Srn => UserAnswers => UserAnswers
+      ): Unit =
+        act.like(
+          checkmode
+            .navigateToWithIndex(
+              index,
+              WhyDoesSchemeHoldSharesPage,
+              nextPage,
+              oldUserAnswers(_)(defaultUserAnswers),
+              newUserAnswers(_)(defaultUserAnswers)
+            )
+            .withName(testName)
+        )
+
+      test(
+        "go to CYA when unchanged answer is Contribution and WhenDidSchemeAcquireSharesPage is complete",
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        oldUserAnswers = srn => _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Contribution),
+        newUserAnswers = srn =>
+          _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Contribution)
+            .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index), localDate)
       )
 
-      act.like(
-        checkmode
-          .navigateToWithIndex(
-            index,
-            WhyDoesSchemeHoldSharesPage,
-            (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, CheckMode),
-            srn =>
-              defaultUserAnswers.unsafeSet(
-                WhyDoesSchemeHoldSharesPage(srn, index),
-                SchemeHoldShare.Contribution
-              )
-          )
-          .withName(
-            "go from WhyDoesSchemeHoldSharesPage to WhenDidSchemeAcquireShares page when holding is contribution"
-          )
+      test(
+        "go to WhenDidSchemeAcquireShares when unchanged answer is Contribution and WhenDidSchemeAcquireSharesPage is incomplete",
+        controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad,
+        oldUserAnswers = srn => _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Contribution),
+        newUserAnswers = srn => _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Contribution)
       )
 
-      act.like(
-        checkmode
-          .navigateToWithIndex(
-            index,
-            WhyDoesSchemeHoldSharesPage,
-            (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
-            srn =>
-              defaultUserAnswers.unsafeSet(
-                WhyDoesSchemeHoldSharesPage(srn, index),
-                SchemeHoldShare.Transfer
-              )
-          )
-          .withName("go from WhyDoesSchemeHoldSharesPage to SharesCYA Page when holding is transfer")
+      test(
+        "go to CYA when unchanged answer is Acquisition and WhenDidSchemeAcquireSharesPage, at least one share seller" +
+          "and TotalAssetValuePage are all complete when TypeOfSharesHeld is SponsoringEmployer",
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        oldUserAnswers = srn => _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition),
+        newUserAnswers = srn =>
+          _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition)
+            .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index), localDate)
+            .unsafeSet(CompanyNameOfSharesSellerPage(srn, index), companyName)
+            .unsafeSet(
+              CompanyRecipientCrnPage(srn, index, IdentitySubject.SharesSeller),
+              ConditionalYesNo.yes[String, Crn](crn)
+            )
+            .unsafeSet(TotalAssetValuePage(srn, index), money)
+      )
+
+      test(
+        "go to CYA when unchanged answer is Transfer",
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        oldUserAnswers = srn => _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Transfer),
+        newUserAnswers = srn => _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Transfer)
       )
     }
 
@@ -977,10 +1020,9 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               controllers.nonsipp.shares.routes.SharesCYAController
                 .onPageLoad(srn, index, CheckMode),
             srn =>
-              defaultUserAnswers.unsafeSet(
-                SharesIndividualSellerNINumberPage(srn, index),
-                ConditionalYesNo.no[String, Nino]("Reason")
-              )
+              defaultUserAnswers
+                .unsafeSet(SharesIndividualSellerNINumberPage(srn, index), ConditionalYesNo.no[String, Nino]("Reason"))
+                .unsafeSet(SharesFromConnectedPartyPage(srn, index), true)
           )
           .withName("go from individual name of shares seller page to Shares CYA page")
       )
@@ -1085,10 +1127,12 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               controllers.nonsipp.shares.routes.SharesCYAController
                 .onPageLoad(srn, index, CheckMode),
             srn =>
-              defaultUserAnswers.unsafeSet(
-                CompanyRecipientCrnPage(srn, index, SharesSeller),
-                ConditionalYesNo.no[String, Crn]("reason")
-              )
+              defaultUserAnswers
+                .unsafeSet(
+                  CompanyRecipientCrnPage(srn, index, SharesSeller),
+                  ConditionalYesNo.no[String, Crn]("reason")
+                )
+                .unsafeSet(SharesFromConnectedPartyPage(srn, index), true)
           )
           .withName("go from company name of shares seller page to Shares CYA page")
       )
@@ -1116,10 +1160,12 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               controllers.nonsipp.shares.routes.SharesCYAController
                 .onPageLoad(srn, index, CheckMode),
             srn =>
-              defaultUserAnswers.unsafeSet(
-                PartnershipRecipientUtrPage(srn, index, SharesSeller),
-                ConditionalYesNo.no[String, Utr]("reason")
-              )
+              defaultUserAnswers
+                .unsafeSet(
+                  PartnershipRecipientUtrPage(srn, index, SharesSeller),
+                  ConditionalYesNo.no[String, Utr]("reason")
+                )
+                .unsafeSet(SharesFromConnectedPartyPage(srn, index), true)
           )
           .withName("go from Partnership Share Seller Name Page to Shares CYA page")
       )
