@@ -22,7 +22,7 @@ import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models.HowSharesDisposed.HowSharesDisposed
 import models.{HowSharesDisposed, IdentityType, PointOfEntry}
-import viewmodels.models.SectionCompleted
+import viewmodels.models.SectionJourneyStatus
 import pages.behaviours.PageBehaviours
 
 class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
@@ -59,7 +59,7 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(IsBuyerConnectedPartyPage(srn, shareIndexOne, indexOne), true)
         .unsafeSet(IndependentValuationPage(srn, shareIndexOne, indexOne), true)
         .unsafeSet(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexOne), PointOfEntry.NoPointOfEntry)
-        .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne), SectionCompleted)
+        .unsafeSet(SharesDisposalProgress(srn, shareIndexOne, indexOne), SectionJourneyStatus.Completed)
 
       val result = userAnswers.remove(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne)).success.value
 
@@ -81,7 +81,6 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
 
       result.get(HowManyDisposalSharesPage(srn, shareIndexOne, indexOne)) must be(empty)
       result.get(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexOne)) must be(empty)
-      result.get(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne)) must be(empty)
 
     }
 
@@ -92,17 +91,15 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
         // Disposal 1
         .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne), HowSharesDisposed.Sold)
         .unsafeSet(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexOne), localDate)
-        .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne), SectionCompleted)
         .unsafeSet(HowManyDisposalSharesPage(srn, shareIndexOne, indexOne), 1)
         .unsafeSet(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexOne), PointOfEntry.NoPointOfEntry)
-        .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne), SectionCompleted)
+        .unsafeSet(SharesDisposalProgress(srn, shareIndexOne, indexOne), SectionJourneyStatus.Completed)
         // Disposal 2
         .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexOne, indexTwo), HowSharesDisposed.Sold)
         .unsafeSet(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexTwo), localDate)
-        .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, indexTwo), SectionCompleted)
         .unsafeSet(HowManyDisposalSharesPage(srn, shareIndexOne, indexTwo), 1)
         .unsafeSet(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexTwo), PointOfEntry.NoPointOfEntry)
-        .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, indexTwo), SectionCompleted)
+        .unsafeSet(SharesDisposalProgress(srn, shareIndexOne, indexTwo), SectionJourneyStatus.Completed)
 
       val result = userAnswers.remove(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne)).success.value
 
@@ -112,13 +109,11 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
       result.get(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexOne)) must be(empty)
       result.get(HowManyDisposalSharesPage(srn, shareIndexOne, indexOne)) must be(empty)
       result.get(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexOne)) must be(empty)
-      result.get(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne)) must be(empty)
       // Disposal 2
       result.get(HowWereSharesDisposedPage(srn, shareIndexOne, indexTwo)) must not be empty
       result.get(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexTwo)) must not be empty
       result.get(HowManyDisposalSharesPage(srn, shareIndexOne, indexTwo)) must not be empty
       result.get(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexTwo)) must not be empty
-      result.get(SharesDisposalCompletedPage(srn, shareIndexOne, indexTwo)) must not be empty
     }
 
     "cleanup other fields when removing a disposal but there are disposals for other shares" in {
@@ -126,10 +121,10 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(SharesDisposalPage(srn), true)
         .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne), HowSharesDisposed.Sold)
         .unsafeSet(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexOne), localDate)
-        .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne), SectionCompleted)
+        .unsafeSet(SharesDisposalProgress(srn, shareIndexOne, indexOne), SectionJourneyStatus.Completed)
         .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexTwo, indexOne), HowSharesDisposed.Sold)
         .unsafeSet(WhenWereSharesRedeemedPage(srn, shareIndexTwo, indexOne), localDate)
-        .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexTwo, indexOne), SectionCompleted)
+        .unsafeSet(SharesDisposalProgress(srn, shareIndexTwo, indexOne), SectionJourneyStatus.Completed)
 
       val result = userAnswers.remove(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne)).success.value
 
@@ -150,7 +145,7 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(TotalConsiderationSharesRedeemedPage(srn, shareIndexOne, indexOne), money)
         .unsafeSet(HowManyDisposalSharesPage(srn, shareIndexOne, indexOne), 1)
         .unsafeSet(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexOne), PointOfEntry.NoPointOfEntry)
-        .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne), SectionCompleted)
+        .unsafeSet(SharesDisposalProgress(srn, shareIndexOne, indexOne), SectionJourneyStatus.Completed)
 
       userAnswers.set(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne), HowSharesDisposed.Transferred)
 
@@ -158,7 +153,6 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
       userAnswers.get(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne)) must not be empty
       userAnswers.get(HowManyDisposalSharesPage(srn, shareIndexOne, indexOne)) must not be empty
       userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexOne)) must not be empty
-      userAnswers.get(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne)) must not be empty
 
       userAnswers.get(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexOne)) must not be empty
       userAnswers.get(HowManySharesRedeemedPage(srn, shareIndexOne, indexOne)) must not be empty

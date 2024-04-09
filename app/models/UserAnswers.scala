@@ -98,6 +98,9 @@ final case class UserAnswers(
   def setWhen[A](bool: Boolean)(page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] =
     if (bool) setOnly(page, value) else Try(this)
 
+  def removeWhen[A](bool: Boolean)(page: Removable[A]): Try[UserAnswers] =
+    if (bool) removeOnly(page) else Try(this)
+
   def setOnly[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
     val updatedData = data.decryptedValue.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(jsValue, _) =>

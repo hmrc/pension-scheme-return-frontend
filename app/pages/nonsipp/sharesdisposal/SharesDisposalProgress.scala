@@ -19,12 +19,12 @@ package pages.nonsipp.sharesdisposal
 import utils.RefinedUtils.RefinedIntOps
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import viewmodels.models.SectionCompleted
+import viewmodels.models.SectionJourneyStatus
 import config.Refined.{Max50, Max5000}
 import pages.{IndexedQuestionPage, QuestionPage}
 
-case class SharesDisposalCompletedPage(srn: Srn, shareIndex: Max5000, disposalIndex: Max50)
-    extends QuestionPage[SectionCompleted.type] {
+case class SharesDisposalProgress(srn: Srn, shareIndex: Max5000, disposalIndex: Max50)
+    extends QuestionPage[SectionJourneyStatus] {
 
   override def path: JsPath =
     Paths.disposedSharesTransaction \ toString \ shareIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
@@ -32,22 +32,24 @@ case class SharesDisposalCompletedPage(srn: Srn, shareIndex: Max5000, disposalIn
   override def toString: String = "sharesDisposalCompleted"
 }
 
-object SharesDisposalCompleted {
+object SharesDisposalProgress {
   def all(
     srn: Srn,
     shareIndex: Max5000
-  ): IndexedQuestionPage[SectionCompleted.type] = new IndexedQuestionPage[SectionCompleted.type] {
+  ): IndexedQuestionPage[SectionJourneyStatus] = new IndexedQuestionPage[SectionJourneyStatus] {
 
     override def path: JsPath =
       Paths.disposedSharesTransaction \ toString \ shareIndex.arrayIndex.toString
 
     override def toString: String = "sharesDisposalCompleted"
   }
-}
 
-case class SharesDisposalCompletedPages(srn: Srn) extends IndexedQuestionPage[Map[String, SectionCompleted.type]] {
+  def all(srn: Srn): IndexedQuestionPage[Map[String, SectionJourneyStatus]] =
+    new IndexedQuestionPage[Map[String, SectionJourneyStatus]] {
 
-  override def path: JsPath = Paths.disposedSharesTransaction \ toString
+      override def path: JsPath =
+        Paths.disposedSharesTransaction \ toString
 
-  override def toString: String = "sharesDisposalCompleted"
+      override def toString: String = "sharesDisposalCompleted"
+    }
 }

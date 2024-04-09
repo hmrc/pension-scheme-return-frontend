@@ -19,20 +19,20 @@ package controllers.nonsipp.sharesdisposal
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import controllers.nonsipp.sharesdisposal.SharesDisposalController._
 import controllers.actions.IdentifyAndRequireData
-import pages.nonsipp.sharesdisposal.SharesDisposalPage
+import pages.nonsipp.sharesdisposal.{SharesDisposalCompleted, SharesDisposalPage}
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
+import play.api.i18n.MessagesApi
+import play.api.data.Form
+import controllers.nonsipp.sharesdisposal.SharesDisposalController._
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
-import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
-import models.requests.DataRequest
-import play.api.data.Form
+import viewmodels.models.{FormPageViewModel, SectionCompleted, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -48,8 +48,7 @@ class SharesDisposalController @Inject()(
   view: YesNoPageView,
   psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends PSRController {
 
   private val form = SharesDisposalController.form(formProvider)
 
@@ -64,21 +63,26 @@ class SharesDisposalController @Inject()(
       .fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(SharesDisposalPage(srn), value))
-            _ <- saveService.save(updatedAnswers)
-            redirectTo <- if (value) {
-              Future.successful(Redirect(navigator.nextPage(SharesDisposalPage(srn), mode, updatedAnswers)))
-            } else {
-              psrSubmissionService
-                .submitPsrDetails(srn)(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
-                .map {
-                  case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                  case Some(_) => Redirect(navigator.nextPage(SharesDisposalPage(srn), mode, updatedAnswers))
-                }
-            }
-          } yield redirectTo
+        addDisposal =>
+          if (addDisposal) {
+            for {
+              updatedAnswers <- request.userAnswers
+                .set(SharesDisposalPage(srn), true)
+                .remove(SharesDisposalCompleted(srn))
+                .mapK[Future]
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(SharesDisposalPage(srn), mode, updatedAnswers))
+          } else {
+            for {
+              updatedAnswers <- request.userAnswers
+                .set(SharesDisposalPage(srn), false)
+                .set(SharesDisposalCompleted(srn), SectionCompleted)
+                .mapK[Future]
+              _ <- saveService.save(updatedAnswers)
+              submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+            } yield submissionResult
+              .getOrRecoverJourney(_ => Redirect(navigator.nextPage(SharesDisposalPage(srn), mode, updatedAnswers)))
+          }
       )
   }
 }

@@ -130,6 +130,8 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
 
   implicit class UserAnswersTryOps(userAnswers: Try[UserAnswers]) {
     def set[A: Writes](page: Settable[A], value: A): Try[UserAnswers] = userAnswers.flatMap(_.set(page, value))
+    def setWhen[A: Writes](bool: Boolean)(page: Settable[A], value: A): Try[UserAnswers] =
+      userAnswers.flatMap(_.setWhen(bool)(page, value))
     def compose(c: List[UserAnswers.Compose]): Try[UserAnswers] = userAnswers.flatMap(_.compose(c))
     def remove[A: Writes](page: Removable[A]): Try[UserAnswers] = userAnswers.flatMap(_.removePages(List(page)))
   }

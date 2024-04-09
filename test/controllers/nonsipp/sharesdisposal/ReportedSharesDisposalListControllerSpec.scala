@@ -21,11 +21,11 @@ import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompleted, Type
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
-import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, SharesDisposalCompletedPage}
+import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, SharesDisposalProgress}
 import models.HowSharesDisposed._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import views.html.ListView
 import models.TypeOfShares._
 
@@ -49,12 +49,9 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
   private val howSharesDisposedThree = Transferred
   private val howSharesDisposedFour = Other(otherDetails)
 
-  private val numberOfDisposals = 4
-  private val maxPossibleNumberOfDisposals = 100
-
   private val disposalIndexes = List(disposalIndexOne, disposalIndexTwo)
   private val sharesDisposalsWithIndexes =
-    List(((shareIndexOne, disposalIndexes), SectionCompleted), ((shareIndexTwo, disposalIndexes), SectionCompleted))
+    Map((shareIndexOne, disposalIndexes), (shareIndexTwo, disposalIndexes))
 
   private val completedUserAnswers = defaultUserAnswers
   // Shares #1
@@ -63,16 +60,16 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexOne, disposalIndexOne), howSharesDisposedOne)
     .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexOne, disposalIndexTwo), howSharesDisposedTwo)
     .unsafeSet(SharesCompleted(srn, shareIndexOne), SectionCompleted)
-    .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, disposalIndexOne), SectionCompleted)
-    .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, disposalIndexTwo), SectionCompleted)
+    .unsafeSet(SharesDisposalProgress(srn, shareIndexOne, disposalIndexOne), SectionJourneyStatus.Completed)
+    .unsafeSet(SharesDisposalProgress(srn, shareIndexOne, disposalIndexTwo), SectionJourneyStatus.Completed)
     // Shares #2
     .unsafeSet(TypeOfSharesHeldPage(srn, shareIndexTwo), sharesTypeTwo)
     .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndexTwo), companyName)
     .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexTwo, disposalIndexOne), howSharesDisposedThree)
     .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexTwo, disposalIndexTwo), howSharesDisposedFour)
     .unsafeSet(SharesCompleted(srn, shareIndexTwo), SectionCompleted)
-    .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexTwo, disposalIndexOne), SectionCompleted)
-    .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexTwo, disposalIndexTwo), SectionCompleted)
+    .unsafeSet(SharesDisposalProgress(srn, shareIndexTwo, disposalIndexOne), SectionJourneyStatus.Completed)
+    .unsafeSet(SharesDisposalProgress(srn, shareIndexTwo, disposalIndexTwo), SectionJourneyStatus.Completed)
 
   "ReportedSharesDisposalListController" - {
 
@@ -81,11 +78,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
         form(new YesNoPageFormProvider()),
         viewModel(
           srn,
-          NormalMode,
           page,
           sharesDisposalsWithIndexes,
-          numberOfDisposals,
-          maxPossibleNumberOfDisposals,
           completedUserAnswers
         )
       )

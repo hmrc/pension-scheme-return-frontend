@@ -19,4 +19,4 @@ package pages.nonsipp.sharesdisposal
 import pages.Page
 import models.SchemeId.Srn
 
-case class RemoveShareDisposalPage(srn: Srn) extends Page
+case class SharesDisposalCYAPage(srn: Srn) extends Page

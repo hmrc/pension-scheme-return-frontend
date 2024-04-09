@@ -18,10 +18,12 @@ package navigation.nonsipp
 
 import play.api.mvc.Call
 import models.PointOfEntry._
-import cats.implicits.toTraverseOps
+import cats.implicits.{catsSyntaxEitherId, toBifunctorOps, toTraverseOps}
+import eu.timepit.refined.refineV
 import pages.nonsipp.sharesdisposal._
 import navigation.JourneyNavigator
 import models._
+import viewmodels.models.SectionJourneyStatus
 import config.Refined.Max50
 import pages.Page
 
@@ -47,7 +49,7 @@ object SharesDisposalNavigator extends JourneyNavigator {
           controllers.routes.JourneyRecoveryController.onPageLoad()
       }
 
-    case RemoveShareDisposalPage(srn, index, disposalIndex) =>
+    case RemoveShareDisposalPage(srn) =>
       if (!userAnswers
           .map(HowWereSharesDisposedPages(srn))
           .exists(_._2.nonEmpty)) {
@@ -100,19 +102,36 @@ object SharesDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
         .onPageLoad(srn, page = 1)
 
-    case page @ SharesDisposalListPage(srn, shareIndex, disposalIndex) =>
-      (
-        for {
-          indexes <- userAnswers
-            .map(SharesDisposalCompleted.all(srn, shareIndex))
-            .keys
-            .toList
-            .traverse(_.toIntOption)
-            .getOrRecoverJourney
-          nextIndex <- findNextOpenIndex[Max50.Refined](indexes).getOrRecoverJourney
-        } yield controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
-          .onPageLoad(srn, shareIndex, nextIndex, NormalMode)
-      ).merge
+    case SharesDisposalListPage(srn, shareIndex, disposalIndex) => {
+      val inProgressIndex: Either[Call, Option[Max50]] = userAnswers
+        .map(SharesDisposalProgress.all(srn, shareIndex))
+        .find {
+          case (_, SectionJourneyStatus.InProgress(_)) => true
+          case _ => false
+        }
+        .flatTraverse {
+          case (index, _) => index.toIntOption.traverse(i => refineV[Max50.Refined](i + 1))
+        }
+        .leftMap(_ => controllers.routes.JourneyRecoveryController.onPageLoad())
+
+      inProgressIndex.flatMap {
+        case Some(nextIndex) =>
+          controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
+            .onPageLoad(srn, shareIndex, nextIndex, NormalMode)
+            .asRight
+        case None =>
+          for {
+            indexes <- userAnswers
+              .map(SharesDisposalProgress.all(srn, shareIndex))
+              .keys
+              .toList
+              .traverse(_.toIntOption)
+              .getOrRecoverJourney
+            nextIndex <- findNextOpenIndex[Max50.Refined](indexes).getOrRecoverJourney
+          } yield controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
+            .onPageLoad(srn, shareIndex, nextIndex, NormalMode)
+      }
+    }.merge
 
     case page @ HowWereSharesDisposedPage(srn, shareIndex, disposalIndex, _) =>
       userAnswers.get(page) match {
@@ -161,7 +180,7 @@ object SharesDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
         .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
-    case SharesDisposalCompletedPage(srn, shareIndex, disposalIndex) =>
+    case SharesDisposalCYAPage(srn) =>
       controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
         .onPageLoad(srn, page = 1)
 
@@ -378,7 +397,7 @@ object SharesDisposalNavigator extends JourneyNavigator {
           controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
             .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
-        case SharesDisposalCompletedPage(srn, shareIndex, disposalIndex) =>
+        case SharesDisposalCYAPage(srn) =>
           controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
             .onPageLoad(srn, page = 1)
       }

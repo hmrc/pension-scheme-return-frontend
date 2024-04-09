@@ -27,6 +27,8 @@ import org.mockito.ArgumentMatchers.any
 import controllers.nonsipp.sharesdisposal.SharesDisposalController._
 import controllers.ControllerBaseSpec
 
+import scala.concurrent.Future
+
 class SharesDisposalControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.SharesDisposalController.onPageLoad(srn, NormalMode)
@@ -36,6 +38,10 @@ class SharesDisposalControllerSpec extends ControllerBaseSpec {
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
+
+  override protected def beforeEach(): Unit =
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
 
   "SharesDisposalController" - {
 
@@ -51,18 +57,16 @@ class SharesDisposalControllerSpec extends ControllerBaseSpec {
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
-        .before(MockPSRSubmissionService.submitPsrDetails())
         .after({
-          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
-        .before(MockPSRSubmissionService.submitPsrDetails())
         .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )

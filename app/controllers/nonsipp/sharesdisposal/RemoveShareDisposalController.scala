@@ -21,7 +21,7 @@ import viewmodels.implicits._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions._
-import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, RemoveShareDisposalPage}
+import pages.nonsipp.sharesdisposal._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
@@ -32,7 +32,7 @@ import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
-import models.requests.DataRequest
+import controllers.nonsipp.sharesdisposal.RemoveShareDisposalController._
 import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -58,15 +58,7 @@ class RemoveShareDisposalController @Inject()(
       request.userAnswers.get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex)).getOrRecoverJourney { _ =>
         request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).getOrRecoverJourney {
           nameOfSharesCompany =>
-            val preparedForm =
-              request.userAnswers.fillForm(RemoveShareDisposalPage(srn, shareIndex, disposalIndex), form)
-            Ok(
-              view(
-                preparedForm,
-                RemoveShareDisposalController
-                  .viewModel(srn, shareIndex, disposalIndex, nameOfSharesCompany, mode)
-              )
-            )
+            Ok(view(form, viewModel(srn, shareIndex, disposalIndex, nameOfSharesCompany, mode)))
         }
       }
     }
@@ -92,45 +84,25 @@ class RemoveShareDisposalController @Inject()(
                     )
                 }
             },
-          value =>
-            if (value) {
+          removeDisposal =>
+            if (removeDisposal) {
               for {
                 removedUserAnswers <- Future
                   .fromTry(
                     request.userAnswers
                       .remove(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex))
+                      .remove(SharesDisposalCompleted(srn))
+                      .remove(SharesDisposalProgress(srn, shareIndex, disposalIndex))
                   )
-
                 _ <- saveService.save(removedUserAnswers)
-                redirectTo <- psrSubmissionService
-                  .submitPsrDetails(srn)(
-                    implicitly,
-                    implicitly,
-                    request = DataRequest(request.request, removedUserAnswers)
-                  )
-                  .map {
-                    case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                    case Some(_) =>
-                      Redirect(
-                        navigator.nextPage(
-                          RemoveShareDisposalPage(srn, shareIndex, disposalIndex),
-                          mode,
-                          removedUserAnswers
-                        )
-                      )
-                  }
-              } yield redirectTo
+                submissionResult <- psrSubmissionService.submitPsrDetails(srn, removedUserAnswers)
+              } yield submissionResult.getOrRecoverJourney(
+                _ => Redirect(navigator.nextPage(RemoveShareDisposalPage(srn), mode, removedUserAnswers))
+              )
             } else {
-              Future
-                .successful(
-                  Redirect(
-                    navigator.nextPage(
-                      RemoveShareDisposalPage(srn, shareIndex, disposalIndex),
-                      mode,
-                      request.userAnswers
-                    )
-                  )
-                )
+              Future.successful(
+                Redirect(navigator.nextPage(RemoveShareDisposalPage(srn), mode, request.userAnswers))
+              )
             }
         )
     }

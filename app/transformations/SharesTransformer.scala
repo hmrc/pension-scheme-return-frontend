@@ -27,7 +27,7 @@ import pages.nonsipp.sharesdisposal._
 import models._
 import pages.nonsipp.common._
 import models.IdentitySubject.SharesSeller
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import models.requests.DataRequest
 import eu.timepit.refined.api.Refined
 import models.TypeOfShares.{SponsoringEmployer, Unquoted}
@@ -714,7 +714,8 @@ class SharesTransformer @Inject() extends Transformer {
                 for {
                   disposalUA0 <- disposalUA
                   disposalUA1 <- disposalUA0
-                    .set(SharesDisposalCompletedPage(srn, index, disposalIndex), SectionCompleted)
+                    .set(SharesDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
+                    .set(SharesDisposalCompleted(srn), SectionCompleted)
                   disposalUA2 <- disposalUA1.set(howWereSharesDisposed._1, howWereSharesDisposed._2)
                   disposalUA3 <- disposalUA2.set(totalSharesNowHeld._1, totalSharesNowHeld._2)
                   disposalUA4 <- optDateOfRedemption

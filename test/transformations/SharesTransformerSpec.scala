@@ -29,7 +29,7 @@ import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
 import models._
 import pages.nonsipp.common.IdentityTypePage
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import models.requests.{AllowedAccessRequest, DataRequest}
 import org.scalatest.freespec.AnyFreeSpec
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
@@ -212,7 +212,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
       )
 
       result.fold(
-        ex => fail(ex.getMessage),
+        ex => fail(ex.getMessage + "\n" + ex.getStackTrace.mkString("\n")),
         userAnswers => {
           userAnswers.get(DidSchemeHoldAnySharesPage(srn)) mustBe Some(true)
 
@@ -238,7 +238,9 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           userAnswers.get(TotalAssetValuePage(srn, refineMV(1))) mustBe Some(money)
           userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe Some(money)
           // share-dispose-index-1-1
-          userAnswers.get(SharesDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(SectionCompleted)
+          userAnswers.get(SharesDisposalProgress(srn, refineMV(1), refineMV(1))) mustBe Some(
+            SectionJourneyStatus.Completed
+          )
           userAnswers.get(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
           userAnswers.get(HowManyDisposalSharesPage(srn, refineMV(1), refineMV(1))) mustBe Some(totalShares)
           userAnswers.get(WhenWereSharesSoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
@@ -252,7 +254,9 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           userAnswers.get(IsBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
           userAnswers.get(IndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(false)
           // share-dispose-index-1-2
-          userAnswers.get(SharesDisposalCompletedPage(srn, refineMV(1), refineMV(2))) mustBe Some(SectionCompleted)
+          userAnswers.get(SharesDisposalProgress(srn, refineMV(1), refineMV(2))) mustBe Some(
+            SectionJourneyStatus.Completed
+          )
           userAnswers.get(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(2))) mustBe Some(Redeemed)
           userAnswers.get(HowManyDisposalSharesPage(srn, refineMV(1), refineMV(2))) mustBe Some(totalShares)
           userAnswers.get(WhenWereSharesRedeemedPage(srn, refineMV(1), refineMV(2))) mustBe Some(localDate)
@@ -277,11 +281,15 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           userAnswers.get(TotalAssetValuePage(srn, refineMV(2))) mustBe None
           userAnswers.get(SharesTotalIncomePage(srn, refineMV(2))) mustBe Some(money)
           // share-dispose-index-2-1
-          userAnswers.get(SharesDisposalCompletedPage(srn, refineMV(2), refineMV(1))) mustBe Some(SectionCompleted)
+          userAnswers.get(SharesDisposalProgress(srn, refineMV(2), refineMV(1))) mustBe Some(
+            SectionJourneyStatus.Completed
+          )
           userAnswers.get(HowWereSharesDisposedPage(srn, refineMV(2), refineMV(1))) mustBe Some(Transferred)
           userAnswers.get(HowManyDisposalSharesPage(srn, refineMV(2), refineMV(1))) mustBe Some(totalShares)
           // share-dispose-index-2-2
-          userAnswers.get(SharesDisposalCompletedPage(srn, refineMV(2), refineMV(2))) mustBe Some(SectionCompleted)
+          userAnswers.get(SharesDisposalProgress(srn, refineMV(2), refineMV(2))) mustBe Some(
+            SectionJourneyStatus.Completed
+          )
           userAnswers.get(HowWereSharesDisposedPage(srn, refineMV(2), refineMV(2))) mustBe Some(Other("OtherMethod"))
           userAnswers.get(HowManyDisposalSharesPage(srn, refineMV(2), refineMV(2))) mustBe Some(totalShares)
 

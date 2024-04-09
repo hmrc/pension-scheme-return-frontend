@@ -24,11 +24,11 @@ import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import controllers.ControllerBaseSpec
 import views.html.TaskListView
 import eu.timepit.refined.refineMV
-import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPage, SharesDisposalPage}
+import pages.nonsipp.sharesdisposal.{SharesDisposalPage, SharesDisposalProgress}
 import models._
 import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage}
-import viewmodels.models.{SectionCompleted, TaskListStatus}
+import viewmodels.models.{SectionJourneyStatus, TaskListStatus}
 import models.SponsoringOrConnectedParty.Sponsoring
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberdetails._
@@ -607,8 +607,8 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           expectedStatus = TaskListStatus.InProgress,
           expectedTitleKey = "nonsipp.tasklist.shares.title",
           expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
-          expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
-            .onPageLoad(srn, NormalMode)
+          expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
+            .onPageLoad(srn, page = 1)
             .url
         )
       }
@@ -632,7 +632,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       "completed (with at least one completed shares disposal)" in {
         val userAnswersWithData = defaultUserAnswers
           .unsafeSet(SharesDisposalPage(srn), true)
-          .unsafeSet(SharesDisposalCompletedPage(srn, refineMV(1), refineMV(1)), SectionCompleted)
+          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
 
         testViewModel(
           userAnswersWithData,
@@ -641,8 +641,8 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           expectedStatus = TaskListStatus.Completed,
           expectedTitleKey = "nonsipp.tasklist.shares.title",
           expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
-          expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
-            .onPageLoad(srn, 1)
+          expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+            .onPageLoad(srn, page = 1)
             .url
         )
       }

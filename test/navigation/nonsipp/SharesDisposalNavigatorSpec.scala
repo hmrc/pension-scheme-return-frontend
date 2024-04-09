@@ -18,7 +18,6 @@ package navigation.nonsipp
 
 import utils.BaseSpec
 import config.Refined.{Max50, Max5000}
-import models.SchemeId.Srn
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal._
 import models._
@@ -94,56 +93,48 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       }
 
       "RemoveShareDisposalPage" - {
+
         "When there are no other share disposals" - {
           act.like(
             normalmode
-              .navigateToWithDoubleIndex(
-                shareIndex,
-                disposalIndex,
+              .navigateTo(
                 RemoveShareDisposalPage,
-                (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
-                  controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
-                    .onPageLoad(srn, NormalMode)
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalController.onPageLoad
               )
               .withName("go from RemoveShareDisposalPage to Shares Disposal page")
           )
         }
+
         "When there is a disposal for the same share" - {
-          val customUserAnswers: Srn => UserAnswers = srn =>
-            defaultUserAnswers.unsafeSet(
-              HowWereSharesDisposedPage(srn, shareIndex, disposalIndex),
-              HowSharesDisposed.Transferred
-            )
           act.like(
             normalmode
-              .navigateToWithDoubleIndex(
-                shareIndex,
-                disposalIndex,
+              .navigateTo(
                 RemoveShareDisposalPage,
-                (srn, index: Max5000, disposalIndex: Max50, _) =>
+                (srn, _) =>
                   controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
                     .onPageLoad(srn, page = 1),
-                customUserAnswers
+                srn =>
+                  defaultUserAnswers
+                    .unsafeSet(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex), HowSharesDisposed.Transferred)
               )
               .withName("go from RemoveShareDisposalPage to ReportedSharesDisposalList")
           )
         }
+
         "When there is a disposal for other share" - {
-          val customUserAnswers: Srn => UserAnswers = srn =>
-            defaultUserAnswers.unsafeSet(
-              HowWereSharesDisposedPage(srn, shareIndexTwo, disposalIndex),
-              HowSharesDisposed.Transferred
-            )
           act.like(
             normalmode
-              .navigateToWithDoubleIndex(
-                shareIndex,
-                disposalIndex,
+              .navigateTo(
                 RemoveShareDisposalPage,
-                (srn, index: Max5000, disposalIndex: Max50, _) =>
+                (srn, _) =>
                   controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
                     .onPageLoad(srn, page = 1),
-                customUserAnswers
+                srn =>
+                  defaultUserAnswers
+                    .unsafeSet(
+                      HowWereSharesDisposedPage(srn, shareIndexTwo, disposalIndex),
+                      HowSharesDisposed.Transferred
+                    )
               )
               .withName("go from RemoveShareDisposalPage to ReportedSharesDisposalList")
           )
@@ -516,15 +507,13 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
       }
 
-      "SharesDisposalCompletedPage" - {
+      "SharesDisposalCYAPage" - {
 
         act.like(
           normalmode
-            .navigateToWithDoubleIndex(
-              shareIndex,
-              disposalIndex,
-              SharesDisposalCompletedPage,
-              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+            .navigateTo(
+              SharesDisposalCYAPage,
+              (srn, _) =>
                 controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
                   .onPageLoad(srn, page = 1)
             )
@@ -1358,15 +1347,13 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
       }
 
-      "SharesDisposalCompletedPage" - {
+      "SharesDisposalCYAPage" - {
 
         act.like(
           checkmode
-            .navigateToWithDoubleIndex(
-              shareIndex,
-              disposalIndex,
-              SharesDisposalCompletedPage,
-              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+            .navigateTo(
+              SharesDisposalCYAPage,
+              (srn, _) =>
                 controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
                   .onPageLoad(srn, page = 1)
             )
