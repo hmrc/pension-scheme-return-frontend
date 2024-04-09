@@ -72,7 +72,8 @@ case class HowWasAssetDisposedOfPage(
       OtherAssetsDisposalCompletedPage(srn, assetIndex, disposalIndex),
       WhenWasAssetSoldPage(srn, assetIndex, disposalIndex),
       AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex),
-      TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex)
+      TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex),
+      RemoveAssetDisposalPage(srn, assetIndex, disposalIndex)
     )
     if (isLastRecord) list :+ OtherAssetsDisposalPage(srn) else list
   }
@@ -82,4 +83,11 @@ case class HowWasAssetDisposedOfPage(
 object HowWasAssetDisposedOfPage {
   def apply(srn: Srn, assetIndex: Max5000, disposalIndex: Max50): HowWasAssetDisposedOfPage =
     HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex, answerChanged = false)
+}
+
+case class HowWasAssetDisposedOfPages(srn: Srn) extends QuestionPage[Map[String, Map[String, HowDisposed]]] {
+
+  override def path: JsPath = Paths.assetsDisposed \ toString
+
+  override def toString: String = "methodOfDisposal"
 }

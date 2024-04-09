@@ -3325,3 +3325,7 @@ assetDisposal.reportedOtherAssetsDisposalList.radios.error.required = Select yes
 assetDisposal.reportedOtherAssetsDisposalList.methodOfDisposal.sold = sale
 assetDisposal.reportedOtherAssetsDisposalList.methodOfDisposal.transferred = transfer out
 assetDisposal.reportedOtherAssetsDisposalList.methodOfDisposal.other = another method
+
+removeAssetDisposal.title = Are you sure you want to remove details of the disposal of this asset?
+removeAssetDisposal.heading = Are you sure you want to remove details of the disposal of {0}?
+removeAssetDisposal.error.required = Select yes if you are sure you want to remove this asset disposal

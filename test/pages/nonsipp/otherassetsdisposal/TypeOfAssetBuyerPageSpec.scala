@@ -19,19 +19,106 @@ package pages.nonsipp.otherassetsdisposal
 import config.Refined.{Max50, Max5000}
 import controllers.TestValues
 import eu.timepit.refined.refineMV
-import models.IdentityType
+import utils.UserAnswersUtils.UserAnswersOps
+import models.{ConditionalYesNo, Crn, IdentityType}
 import pages.behaviours.PageBehaviours
 
 class TypeOfAssetBuyerPageSpec extends PageBehaviours with TestValues {
-  private val assetIndex = refineMV[Max5000.Refined](1)
+  private val index = refineMV[Max5000.Refined](1)
   private val disposalIndexOne = refineMV[Max50.Refined](1)
+  private val disposalIndexTwo = refineMV[Max50.Refined](2)
+
+  private val conditionalCrnYes: ConditionalYesNo[String, Crn] = ConditionalYesNo.yes(crn)
 
   "TypeOfAssetBuyerPage" - {
 
-    beRetrievable[IdentityType](TypeOfAssetBuyerPage(srn, assetIndex, disposalIndexOne))
+    beRetrievable[IdentityType](TypeOfAssetBuyerPage(srn, index, disposalIndexOne))
 
-    beSettable[IdentityType](TypeOfAssetBuyerPage(srn, assetIndex, disposalIndexOne))
+    beSettable[IdentityType](TypeOfAssetBuyerPage(srn, index, disposalIndexOne))
 
-    beRemovable[IdentityType](TypeOfAssetBuyerPage(srn, assetIndex, disposalIndexOne))
+    beRemovable[IdentityType](TypeOfAssetBuyerPage(srn, index, disposalIndexOne))
+
+    "cleanup with list size 1" - {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(TypeOfAssetBuyerPage(srn, index, disposalIndexOne), IdentityType.UKCompany)
+        .unsafeSet(CompanyNameOfAssetBuyerPage(srn, index, disposalIndexOne), companyName)
+        .unsafeSet(AssetCompanyBuyerCrnPage(srn, index, disposalIndexOne), conditionalCrnYes)
+        .unsafeSet(IsBuyerConnectedPartyPage(srn, index, disposalIndexOne), false)
+
+      s"remove dependant values when current answer is None (removal) and existing answers are present" in {
+
+        val result = TypeOfAssetBuyerPage(srn, index, disposalIndexOne)
+          .cleanup(None, userAnswers)
+          .toOption
+          .value
+
+        result.get(TypeOfAssetBuyerPage(srn, index, disposalIndexOne)) must not be None
+        result.get(CompanyNameOfAssetBuyerPage(srn, index, disposalIndexOne)) mustBe None
+        result.get(AssetCompanyBuyerCrnPage(srn, index, disposalIndexOne)) mustBe None
+        result.get(IsBuyerConnectedPartyPage(srn, index, disposalIndexOne)) mustBe None
+      }
+
+      s"remove dependant values when current answer is Partnership and existing answer is UKCompany (update)" in {
+
+        val result = TypeOfAssetBuyerPage(srn, index, disposalIndexOne)
+          .cleanup(Some(IdentityType.UKPartnership), userAnswers)
+          .toOption
+          .value
+
+        result.get(TypeOfAssetBuyerPage(srn, index, disposalIndexOne)) must not be None
+        result.get(CompanyNameOfAssetBuyerPage(srn, index, disposalIndexOne)) mustBe None
+        result.get(AssetCompanyBuyerCrnPage(srn, index, disposalIndexOne)) mustBe None
+        result.get(IsBuyerConnectedPartyPage(srn, index, disposalIndexOne)) mustBe None
+      }
+    }
+
+    "cleanup with list size more than 1" - {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(TypeOfAssetBuyerPage(srn, index, disposalIndexOne), IdentityType.UKCompany)
+        .unsafeSet(CompanyNameOfAssetBuyerPage(srn, index, disposalIndexOne), companyName)
+        .unsafeSet(AssetCompanyBuyerCrnPage(srn, index, disposalIndexOne), conditionalCrnYes)
+        .unsafeSet(IsBuyerConnectedPartyPage(srn, index, disposalIndexOne), false)
+        .unsafeSet(TypeOfAssetBuyerPage(srn, index, disposalIndexTwo), IdentityType.UKCompany)
+        .unsafeSet(CompanyNameOfAssetBuyerPage(srn, index, disposalIndexTwo), companyName)
+        .unsafeSet(AssetCompanyBuyerCrnPage(srn, index, disposalIndexTwo), conditionalCrnYes)
+        .unsafeSet(IsBuyerConnectedPartyPage(srn, index, disposalIndexTwo), false)
+
+      s"remove dependant values when current answer is None (removal) and existing answers are present" in {
+
+        val result = TypeOfAssetBuyerPage(srn, index, disposalIndexOne)
+          .cleanup(None, userAnswers)
+          .toOption
+          .value
+
+        result.get(TypeOfAssetBuyerPage(srn, index, disposalIndexOne)) must not be None
+        result.get(CompanyNameOfAssetBuyerPage(srn, index, disposalIndexOne)) mustBe None
+        result.get(AssetCompanyBuyerCrnPage(srn, index, disposalIndexOne)) mustBe None
+        result.get(IsBuyerConnectedPartyPage(srn, index, disposalIndexOne)) mustBe None
+
+        result.get(TypeOfAssetBuyerPage(srn, index, disposalIndexTwo)) must not be None
+        result.get(CompanyNameOfAssetBuyerPage(srn, index, disposalIndexTwo)) must not be None
+        result.get(AssetCompanyBuyerCrnPage(srn, index, disposalIndexTwo)) must not be None
+        result.get(IsBuyerConnectedPartyPage(srn, index, disposalIndexTwo)) must not be None
+      }
+
+      s"remove dependant values when current answer is Partnership and existing answer is UKCompany (update)" in {
+
+        val result = TypeOfAssetBuyerPage(srn, index, disposalIndexOne)
+          .cleanup(Some(IdentityType.UKPartnership), userAnswers)
+          .toOption
+          .value
+
+        result.get(TypeOfAssetBuyerPage(srn, index, disposalIndexOne)) must not be None
+        result.get(CompanyNameOfAssetBuyerPage(srn, index, disposalIndexOne)) mustBe None
+        result.get(AssetCompanyBuyerCrnPage(srn, index, disposalIndexOne)) mustBe None
+        result.get(IsBuyerConnectedPartyPage(srn, index, disposalIndexOne)) mustBe None
+
+        result.get(TypeOfAssetBuyerPage(srn, index, disposalIndexTwo)) must not be None
+        result.get(CompanyNameOfAssetBuyerPage(srn, index, disposalIndexTwo)) must not be None
+        result.get(AssetCompanyBuyerCrnPage(srn, index, disposalIndexTwo)) must not be None
+        result.get(IsBuyerConnectedPartyPage(srn, index, disposalIndexTwo)) must not be None
+
+      }
+    }
   }
 }
