@@ -18,33 +18,26 @@ package models.backend.responses
 
 import play.api.libs.json._
 
-sealed trait ReportStatus {
+sealed trait PsrReportType {
   val name: String
 }
-object ReportStatus {
-  case object NotStarted extends ReportStatus {
-    val name = "NotStarted"
+
+object PsrReportType {
+  case object Sipp extends PsrReportType {
+    val name = "SIPP"
   }
 
-  case object ReportStatusCompiled extends ReportStatus {
-    val name = "Compiled"
+  case object Standard extends PsrReportType {
+    val name = "Standard"
   }
 
-  case object SubmittedAndInProgress extends ReportStatus {
-    val name = "SubmittedAndInProgress"
-  }
+  private val values: List[PsrReportType] =
+    List(Sipp, Standard)
 
-  case object SubmittedAndSuccessfullyProcessed extends ReportStatus {
-    val name = "SubmittedAndSuccessfullyProcessed"
-  }
+  implicit val formats: Format[PsrReportType] = new Format[PsrReportType] {
+    override def writes(o: PsrReportType): JsValue = JsString(o.name)
 
-  private val values: List[ReportStatus] =
-    List(ReportStatusCompiled, SubmittedAndInProgress, SubmittedAndSuccessfullyProcessed)
-
-  implicit val formats: Format[ReportStatus] = new Format[ReportStatus] {
-    override def writes(o: ReportStatus): JsValue = JsString(o.name)
-
-    override def reads(json: JsValue): JsResult[ReportStatus] = {
+    override def reads(json: JsValue): JsResult[PsrReportType] = {
       val jsonAsString = json.as[String]
       values.find(_.name == jsonAsString) match {
         case Some(status) => JsSuccess(status)

@@ -19,9 +19,10 @@ package navigation
 import play.api.mvc.Call
 import pages._
 import controllers.nonsipp.routes
-import play.api.libs.json.JsObject
 import models._
 import models.requests.DataRequest
+import pages.nonsipp.CheckReturnDatesPage
+import play.api.libs.json.JsObject
 
 import javax.inject.{Inject, Singleton}
 
@@ -33,8 +34,11 @@ class RootNavigator @Inject()() extends Navigator {
       override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
         case WhatYouWillNeedPage(srn) => {
           val isDataEmpty = userAnswers.data.decryptedValue == JsObject.empty
+          val isCheckReturnDatesPage = userAnswers.get(CheckReturnDatesPage(srn))
           if (isDataEmpty) {
             routes.WhichTaxYearController.onPageLoad(srn, NormalMode)
+          } else if (isCheckReturnDatesPage.isEmpty) {
+            routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
           } else {
             controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
           }

@@ -16,7 +16,6 @@
 
 package controllers
 
-import services.{PsrRetrievalService, SaveService}
 import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -31,7 +30,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
@@ -41,35 +40,27 @@ class WhatYouWillNeedController @Inject()(
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
   getData: DataRetrievalAction,
-  createData: DataCreationAction,
+  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: ContentPageView,
-  psrRetrievalService: PsrRetrievalService,
-  saveService: SaveService
+  view: ContentPageView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(srn: Srn, fbNumber: String, taxYear: String, version: String): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)) { implicit request =>
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       Ok(view(WhatYouWillNeedController.viewModel(srn, fbNumber, taxYear, version)))
     }
 
   def onSubmit(srn: Srn, fbNumber: String, taxYear: String, version: String): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData).async { implicit request =>
-      for {
-        updatedUserAnswers <- fbNumber match {
-          case fb if !fb.isBlank => psrRetrievalService.getStandardPsrDetails(Some(fb), None, None)
-          case _ => psrRetrievalService.getStandardPsrDetails(None, Some(taxYear), Some(version))
-        }
-        _ <- saveService.save(updatedUserAnswers)
-      } yield {
-        val members = updatedUserAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
-        if (members.exists(_.total > 99)) { // as we cannot access pensionSchemeId in the navigator
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
+      val members = request.userAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
+      if (members.exists(_.total > 99)) { // as we cannot access pensionSchemeId in the navigator
+        Future.successful(
           Redirect(controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode))
-        } else {
-          Redirect(navigator.nextPage(WhatYouWillNeedPage(srn), NormalMode, updatedUserAnswers))
-        }
+        )
+      } else {
+        Future.successful(Redirect(navigator.nextPage(WhatYouWillNeedPage(srn), NormalMode, request.userAnswers)))
       }
     }
 }

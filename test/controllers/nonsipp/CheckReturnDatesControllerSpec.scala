@@ -16,7 +16,7 @@
 
 package controllers.nonsipp
 
-import services.{FakeTaxYearService, SchemeDetailsService, TaxYearService}
+import services.SchemeDetailsService
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import viewmodels.implicits._
 import play.api.mvc.Call
@@ -27,7 +27,6 @@ import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import forms.YesNoPageFormProvider
 import org.mockito.stubbing.ScalaOngoingStubbing
 import models.{MinimalSchemeDetails, NormalMode}
-import uk.gov.hmrc.time.TaxYear
 import org.mockito.ArgumentMatchers.any
 import utils.DateTimeUtils
 import play.api.inject.guice.GuiceableModule
@@ -39,12 +38,10 @@ import scala.concurrent.Future
 class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckPropertyChecks { self =>
 
   private val mockSchemeDetailsService = mock[SchemeDetailsService]
-  private val taxYear = TaxYear(date.sample.value.getYear)
 
   override val additionalBindings: List[GuiceableModule] =
     List(
-      bind[SchemeDetailsService].toInstance(mockSchemeDetailsService),
-      bind[TaxYearService].toInstance(new FakeTaxYearService(taxYear.starts))
+      bind[SchemeDetailsService].toInstance(mockSchemeDetailsService)
     )
 
   private val userAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
@@ -57,12 +54,10 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
   "CheckReturnDates.viewModel" - {
 
-    val minimalSchemeDetails = minimalSchemeDetailsGen.sample.value
-
     "contain correct title key" in {
 
       forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
-        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates, minimalSchemeDetails)
+        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates)
         viewModel.title mustBe Message("checkReturnDates.title")
       }
     }
@@ -70,17 +65,15 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
     "contain correct heading key" in {
 
       forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
-        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates, minimalSchemeDetails)
+        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates)
         viewModel.heading mustBe Message("checkReturnDates.heading")
       }
     }
 
-    "contain from date when it is after open date" in {
-
-      val updatedDetails = minimalSchemeDetails.copy(openDate = Some(earliestDate), windUpDate = None)
+    "contain from date" in {
 
       forAll(date, date) { (fromDate, toDate) =>
-        val viewModel = CheckReturnDatesController.viewModel(srn, NormalMode, fromDate, toDate, updatedDetails)
+        val viewModel = CheckReturnDatesController.viewModel(srn, NormalMode, fromDate, toDate)
         val formattedFromDate = DateTimeUtils.formatHtml(fromDate)
         val formattedToDate = DateTimeUtils.formatHtml(toDate)
 
@@ -90,44 +83,12 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
       }
     }
 
-    "contain open date when it is after from date" in {
-
-      val detailsGen = minimalSchemeDetailsGen.map(_.copy(windUpDate = None))
-
-      forAll(detailsGen, date) { (details, toDate) =>
-        val viewModel = CheckReturnDatesController.viewModel(srn, NormalMode, earliestDate, toDate, details)
-        val formattedFromDate = DateTimeUtils.formatHtml(details.openDate.getOrElse(earliestDate))
-        val formattedToDate = DateTimeUtils.formatHtml(toDate)
-
-        viewModel.description mustBe Some(
-          ParagraphMessage(Message("checkReturnDates.description", formattedFromDate, formattedToDate))
-        )
-      }
-    }
-
-    "contain to date when it is before wind up date" in {
-
-      val updatedDetails = minimalSchemeDetails.copy(openDate = None, windUpDate = Some(latestDate))
+    "contain to date" in {
 
       forAll(date, date) { (fromDate, toDate) =>
-        val viewModel = CheckReturnDatesController.viewModel(srn, NormalMode, fromDate, toDate, updatedDetails)
+        val viewModel = CheckReturnDatesController.viewModel(srn, NormalMode, fromDate, toDate)
         val formattedFromDate = DateTimeUtils.formatHtml(fromDate)
         val formattedToDate = DateTimeUtils.formatHtml(toDate)
-
-        viewModel.description mustBe Some(
-          ParagraphMessage(Message("checkReturnDates.description", formattedFromDate, formattedToDate))
-        )
-      }
-    }
-
-    "contain wind up date when it is before to date" in {
-
-      val detailsGen = minimalSchemeDetailsGen.map(_.copy(openDate = None))
-
-      forAll(detailsGen, date) { (details, fromDate) =>
-        val viewModel = CheckReturnDatesController.viewModel(srn, NormalMode, fromDate, latestDate, details)
-        val formattedFromDate = DateTimeUtils.formatHtml(fromDate)
-        val formattedToDate = DateTimeUtils.formatHtml(details.windUpDate.getOrElse(latestDate))
 
         viewModel.description mustBe Some(
           ParagraphMessage(Message("checkReturnDates.description", formattedFromDate, formattedToDate))
@@ -138,7 +99,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
     "contain correct legend key" in {
 
       forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
-        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates, minimalSchemeDetails)
+        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates)
         viewModel.page.legend.value mustBe Message("checkReturnDates.legend")
       }
     }
@@ -146,7 +107,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
     "populate the onSubmit with srn and mode" in {
 
       forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
-        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates, minimalSchemeDetails)
+        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates)
         viewModel.onSubmit mustBe routes.CheckReturnDatesController.onSubmit(srn, mode)
       }
     }
@@ -160,8 +121,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
         srn,
         NormalMode,
         dateRange.from,
-        dateRange.to,
-        minimalSchemeDetails
+        dateRange.to
       )
 
     val form = CheckReturnDatesController.form(new YesNoPageFormProvider())

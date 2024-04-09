@@ -55,6 +55,20 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues wit
         }
       }
 
+    protected def navigateToWithOldAndNewUserAnswers(mode: Mode)(
+      page: Srn => Page,
+      nextPage: (Srn, Mode) => Call,
+      userAnswers: Srn => UserAnswers,
+      oldUserAnswers: Srn => UserAnswers
+    ): BehaviourTest =
+      s"go from page to nextPage".hasBehaviour {
+        forAll(srnGen) { srn =>
+          navigator.nextPage(page(srn), mode, userAnswers(srn))(
+            DataRequest(allowedAccessRequestGen(FakeRequest()).sample.value, oldUserAnswers(srn))
+          ) mustBe nextPage(srn, mode)
+        }
+      }
+
     protected def navigateToWithData[A: Writes](
       mode: Mode
     )(
@@ -285,6 +299,20 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues wit
       userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
     ): Behaviours.BehaviourTest =
       super.navigateTo(CheckMode)(page(_, index), nextPage(_, index, _), userAnswers)
+
+    def navigateToWithIndex[A](
+      index: Refined[Int, A],
+      page: (Srn, Refined[Int, A]) => Page,
+      nextPage: (Srn, Refined[Int, A], Mode) => Call,
+      oldUserAnswers: Srn => UserAnswers,
+      userAnswers: Srn => UserAnswers
+    ): Behaviours.BehaviourTest =
+      super.navigateToWithOldAndNewUserAnswers(CheckMode)(
+        page(_, index),
+        nextPage(_, index, _),
+        userAnswers,
+        oldUserAnswers
+      )
 
     def navigateToWithDoubleIndex[A, B](
       index: Refined[Int, A],

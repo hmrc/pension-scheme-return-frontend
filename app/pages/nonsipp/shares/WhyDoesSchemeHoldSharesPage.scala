@@ -19,6 +19,7 @@ package pages.nonsipp.shares
 import utils.RefinedUtils.RefinedIntOps
 import utils.PageUtils.removePages
 import queries.Removable
+import models.SchemeHoldShare._
 import models.SchemeId.Srn
 import models.{IdentitySubject, SchemeHoldShare, UserAnswers}
 import config.Refined.Max5000
@@ -37,9 +38,22 @@ case class WhyDoesSchemeHoldSharesPage(srn: Srn, index: Max5000) extends Questio
 
   override def cleanup(value: Option[SchemeHoldShare], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
-      case (Some(SchemeHoldShare.Acquisition), Some(SchemeHoldShare.Acquisition)) => Try(userAnswers) // no change
-      case (Some(SchemeHoldShare.Contribution), Some(SchemeHoldShare.Contribution)) => Try(userAnswers) // no change
-      case (Some(SchemeHoldShare.Transfer), Some(SchemeHoldShare.Transfer)) => Try(userAnswers) // no change
+      // if unchanged, do nothing
+      case (Some(a), Some(b)) if a == b => Try(userAnswers)
+      // if changing between Acquisition and Contribution, don't delete "when did scheme acquire shares" but delete "connected party"
+      case (Some(Acquisition) | Some(Contribution), Some(Acquisition) | Some(Contribution)) =>
+        removePages(
+          userAnswers,
+          List(
+            common.IdentityTypePage(srn, index, IdentitySubject.SharesSeller),
+            TotalAssetValuePage(srn, index),
+            SharesCompleted(srn, index),
+            SharesFromConnectedPartyPage(srn, index)
+          )
+        )
+      // if changing between Acquisition and Transfer, delete pages and "connected party"
+      case (Some(Acquisition) | Some(Transfer), Some(Acquisition) | Some(Transfer)) =>
+        removePages(userAnswers, dependantPages(srn) :+ SharesFromConnectedPartyPage(srn, index))
       case (Some(_), Some(_)) => removePages(userAnswers, dependantPages(srn))
       case (None, _) => removePages(userAnswers, dependantPages(srn))
       case _ => Try(userAnswers)

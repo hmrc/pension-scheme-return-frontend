@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import models.requests.psr.PsrSubmission
 import play.api.Logger
 import play.api.libs.json._
-import models.backend.responses.PsrVersionsForYearsResponse
+import models.backend.responses.{OverviewResponse, PsrVersionsForYearsResponse}
 import play.api.http.Status.{NOT_FOUND, OK}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
@@ -33,12 +33,14 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
 
   private val baseUrl = appConfig.pensionSchemeReturn.baseUrl
   protected val logger: Logger = Logger(classOf[PSRConnector])
+  private def submitStandardUrl = s"$baseUrl/pension-scheme-return/psr/standard"
+  private def overviewUrl(pstr: String) = s"$baseUrl/pension-scheme-return/psr/overview/$pstr"
 
   def submitPsrDetails(
     psrSubmission: PsrSubmission
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http.POST[PsrSubmission, Unit](
-      s"$baseUrl/pension-scheme-return/psr/standard",
+      submitStandardUrl,
       psrSubmission
     )
 
@@ -104,4 +106,33 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
             Seq.empty[PsrVersionsForYearsResponse]
         }
       }
+
+  def getOverview(pstr: String, fromDate: String, toDate: String)(
+    implicit hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Option[Seq[OverviewResponse]]] = {
+
+    val queryParams =
+      Seq(
+        "fromDate" -> fromDate,
+        "toDate" -> toDate
+      )
+
+    http
+      .GET[HttpResponse](overviewUrl(pstr), queryParams)
+      .map { response =>
+        response.status match {
+          case OK =>
+            Json.parse(response.body).validate[Seq[OverviewResponse]] match {
+              case JsSuccess(data, _) => Some(data)
+              case JsError(errors) => throw JsResultException(errors)
+            }
+          case _ =>
+            logger.error(
+              s"getOverview for $pstr and $fromDate - $toDate returned http response $response.status - returning empty Seq"
+            )
+            None
+        }
+      }
+  }
 }

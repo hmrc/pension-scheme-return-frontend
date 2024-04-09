@@ -16,13 +16,13 @@
 
 package navigation.nonsipp
 
+import cats.implicits.toTraverseOps
+import config.Refined.Max50
+import models._
+import navigation.JourneyNavigator
+import pages.Page
 import pages.nonsipp.otherassetsdisposal._
 import play.api.mvc.Call
-import cats.implicits.toTraverseOps
-import navigation.JourneyNavigator
-import models._
-import config.Refined.Max50
-import pages.Page
 
 object OtherAssetsDisposalNavigator extends JourneyNavigator {
 
@@ -232,6 +232,7 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
 
         case OtherAssetsDisposalCompletedPage(srn, _, _) =>
           controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, 1)
+
       }
 
 }
