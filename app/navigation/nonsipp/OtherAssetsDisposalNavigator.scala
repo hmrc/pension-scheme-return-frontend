@@ -136,9 +136,14 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
         .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
 
-    case OtherAssetsDisposalCompletedPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+    case OtherAssetsDisposalCompletedPage(srn, _, _) =>
+      controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, 1)
 
+    case ReportedOtherAssetsDisposalListPage(srn, addDisposal @ true) =>
+      controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController.onPageLoad(srn, 1)
+
+    case ReportedOtherAssetsDisposalListPage(srn, addDisposal @ false) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
@@ -224,6 +229,9 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
         case IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex) =>
           controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
             .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
+
+        case OtherAssetsDisposalCompletedPage(srn, _, _) =>
+          controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, 1)
 
       }
 

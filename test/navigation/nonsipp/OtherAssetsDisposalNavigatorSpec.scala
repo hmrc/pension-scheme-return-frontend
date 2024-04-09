@@ -33,352 +33,419 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
 
   "OtherAssetsDisposalNavigator" - {
 
-    "OtherAssetsDisposalPage" - {
-      act.like(
-        normalmode
-          .navigateToWithData(
-            OtherAssetsDisposalPage,
-            Gen.const(true),
-            (srn, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.WhatYouWillNeedOtherAssetsDisposalController
-                .onPageLoad(srn)
-          )
-          .withName(
-            "go from Did the scheme dispose of any other assets page to WhatYouWillNeedOtherAssetsDisposal page" +
-              " when yes is selected"
-          )
-      )
+    "In NormalMode" - {
 
-      act.like(
-        normalmode
-          .navigateToWithData(
-            OtherAssetsDisposalPage,
-            Gen.const(false),
-            (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
-          )
-          .withName(
-            "go from Did the scheme dispose of any other assets page to taskList page" +
-              " when no is selected"
-          )
-      )
+      "OtherAssetsDisposalPage" - {
+        act.like(
+          normalmode
+            .navigateToWithData(
+              OtherAssetsDisposalPage,
+              Gen.const(true),
+              (srn, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.WhatYouWillNeedOtherAssetsDisposalController
+                  .onPageLoad(srn)
+            )
+            .withName(
+              "go from Did the scheme dispose of any other assets page to WhatYouWillNeedOtherAssetsDisposal page" +
+                " when yes is selected"
+            )
+        )
 
+        act.like(
+          normalmode
+            .navigateToWithData(
+              OtherAssetsDisposalPage,
+              Gen.const(false),
+              (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+            )
+            .withName(
+              "go from Did the scheme dispose of any other assets page to taskList page" +
+                " when no is selected"
+            )
+        )
+
+      }
+
+      "WhatYouWillNeedOtherAssetsDisposalPage" - {
+        act.like(
+          normalmode
+            .navigateTo(
+              WhatYouWillNeedOtherAssetsDisposalPage,
+              (srn, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController
+                  .onPageLoad(srn, page = 1)
+            )
+            .withName(
+              "go from WhatYouWillNeedOtherAssetsDisposal page to Start reporting a disposal page"
+            )
+        )
+      }
+
+      "Start reporting a disposal page" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              (srn, index: Max5000, _: Max50) => OtherAssetsDisposalListPage(srn, index, disposalIndex),
+              controllers.nonsipp.otherassetsdisposal.routes.HowWasAssetDisposedOfController.onPageLoad
+            )
+            .withName(
+              "go from start reporting a disposal page page to HowWasAssetDisposedOfPage page"
+            )
+        )
+      }
+
+      "HowWasAssetDisposedOfPage" - {
+
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndexAndData(
+              assetIndex,
+              disposalIndex,
+              HowWasAssetDisposedOfPage.apply,
+              Gen.const(HowDisposed.Sold),
+              (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.WhenWasAssetSoldController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from HowWasAssetDisposedOfPage to WhenWasAssetSold page")
+        )
+
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndexAndData(
+              assetIndex,
+              disposalIndex,
+              HowWasAssetDisposedOfPage.apply,
+              Gen.const(HowDisposed.Transferred),
+              (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from HowWasAssetDisposedOfPage to AnyPartAssetStillHeld page (Transferred)")
+        )
+
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndexAndData(
+              assetIndex,
+              disposalIndex,
+              HowWasAssetDisposedOfPage.apply,
+              Gen.const(HowDisposed.Other("test details")),
+              (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from HowWasAssetDisposedOfPage to AnyPartAssetStillHeld page (Other)")
+        )
+      }
+
+      "WhenWasAssetSoldPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              WhenWasAssetSoldPage,
+              (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.TotalConsiderationSaleAssetController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from when was asset sold page to TotalConsiderationSaleAsset page")
+        )
+
+      }
+
+      "TotalConsiderationSaleAssetPage" - {
+
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              TotalConsiderationSaleAssetPage,
+              (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.TypeOfAssetBuyerController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from when was asset sold page to type of asset buyer page")
+        )
+
+      }
+
+      "TypeOfAssetBuyerPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndexAndData(
+              assetIndex,
+              disposalIndex,
+              TypeOfAssetBuyerPage,
+              Gen.const(IdentityType.Individual),
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.IndividualNameOfAssetBuyerController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from type of asset buyer page to IndividualNameOfAssetBuyer page when Individual")
+        )
+
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndexAndData(
+              assetIndex,
+              disposalIndex,
+              TypeOfAssetBuyerPage,
+              Gen.const(IdentityType.UKCompany),
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.CompanyNameOfAssetBuyerController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from type of asset buyer page to IndividualNameOfAssetBuyer page when UKCompany")
+        )
+
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndexAndData(
+              assetIndex,
+              disposalIndex,
+              TypeOfAssetBuyerPage,
+              Gen.const(IdentityType.UKPartnership),
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerNameController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from type of asset buyer page to PartnershipBuyerNamePage page when UKPartnership")
+        )
+
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndexAndData(
+              assetIndex,
+              disposalIndex,
+              TypeOfAssetBuyerPage,
+              Gen.const(IdentityType.Other),
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from type of asset buyer page to OtherBuyerDetails page when other")
+        )
+      }
+
+      "IndividualNameOfAssetBuyerPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              IndividualNameOfAssetBuyerPage,
+              (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.AssetIndividualBuyerNiNumberController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from IndividualNameOfAssetBuyerPage to AssetIndividualBuyerNiNumber page")
+        )
+      }
+
+      "AssetIndividualBuyerNiNumberPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              AssetIndividualBuyerNiNumberPage,
+              (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from AssetIndividualBuyerNiNumber to IsBuyerConnectedParty page")
+        )
+      }
+
+      "PartnershipBuyerNamePage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              PartnershipBuyerNamePage,
+              (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerUtrController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from PartnershipBuyerNamePage to PartnershipBuyerUtrPage")
+        )
+      }
+
+      "PartnershipBuyerUtrPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              PartnershipBuyerUtrPage,
+              (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from PartnershipBuyerUtrPage to IsBuyerConnectedPartyPage")
+        )
+      }
+
+      "OtherBuyerDetailsPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              OtherBuyerDetailsPage,
+              (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from OtherBuyerDetailsPage to IsBuyerConnectedPartyPage")
+        )
+      }
+
+      "CompanyNameOfAssetBuyerPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              CompanyNameOfAssetBuyerPage,
+              (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.AssetCompanyBuyerCrnController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from CompanyNameOfAssetBuyerPage to AssetCompanyBuyerCrnController")
+        )
+      }
+
+      "AssetCompanyBuyerCrnPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              AssetCompanyBuyerCrnPage,
+              (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from AssetCompanyBuyerCrnPage to IsBuyerConnectedParty")
+        )
+      }
+
+      "IsBuyerConnectedPartyPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              IsBuyerConnectedPartyPage,
+              (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.AssetSaleIndependentValuationController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from IsBuyerConnectedPartyPage to AssetSaleIndependentValuation")
+        )
+      }
+
+      "AssetSaleIndependentValuationPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              AssetSaleIndependentValuationPage,
+              (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from AssetSaleIndependentValuationPage to AnyPartAssetStillHeldPage")
+        )
+      }
+
+      "AnyPartAssetStillHeldPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              AnyPartAssetStillHeldPage,
+              (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from AnyPartAssetStillHeldPage to AssetDisposalCYA")
+        )
+      }
+
+      "OtherAssetsDisposalCompletedPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              OtherAssetsDisposalCompletedPage,
+              (srn, _: Max5000, _: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+                  .onPageLoad(srn, page = 1)
+            )
+            .withName("go from Other Assets Disposal CYA page to Reported Other Assets Disposals page")
+        )
+      }
+
+      "OtherAssetsDisposalCompletedPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              (srn, _: Max5000, _: Max50) => ReportedOtherAssetsDisposalListPage(srn = srn, addDisposal = true),
+              (srn, _: Max5000, _: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController
+                  .onPageLoad(srn, page = 1)
+            )
+            .withName(
+              "go from Reported Other Assets Disposal List page to Start Reporting Assets Disposal page when addDisposal is true"
+            )
+        )
+      }
+
+      "OtherAssetsDisposalCompletedPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              (srn, _: Max5000, _: Max50) => ReportedOtherAssetsDisposalListPage(srn = srn, addDisposal = false),
+              (srn, _: Max5000, _: Max50, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+            )
+            .withName(
+              "go from Reported Other Assets Disposal List page to Start Reporting Assets Disposal page when addDisposal is false"
+            )
+        )
+      }
     }
 
-    "WhatYouWillNeedOtherAssetsDisposalPage" - {
-      act.like(
-        normalmode
-          .navigateTo(
-            WhatYouWillNeedOtherAssetsDisposalPage,
-            (srn, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController
-                .onPageLoad(srn, page = 1)
-          )
-          .withName(
-            "go from WhatYouWillNeedOtherAssetsDisposal page to Start reporting a disposal page"
-          )
-      )
+    "In CheckMode" - {
+
+      "OtherAssetsDisposalCompletedPage" - {
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              assetIndex,
+              disposalIndex,
+              OtherAssetsDisposalCompletedPage,
+              (srn, _: Max5000, _: Max50, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+                  .onPageLoad(srn, page = 1)
+            )
+            .withName("go from Other Assets Disposal CYA to Reported Other Assets Disposals page")
+        )
+      }
     }
-
-    "Start reporting a disposal page" - {
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndex(
-            assetIndex,
-            disposalIndex,
-            (srn, index: Max5000, _: Max50) => OtherAssetsDisposalListPage(srn, index, disposalIndex),
-            controllers.nonsipp.otherassetsdisposal.routes.HowWasAssetDisposedOfController.onPageLoad
-          )
-          .withName(
-            "go from start reporting a disposal page page to HowWasAssetDisposedOfPage page"
-          )
-      )
-    }
-
-    "HowWasAssetDisposedOfPage" - {
-
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndexAndData(
-            assetIndex,
-            disposalIndex,
-            HowWasAssetDisposedOfPage.apply,
-            Gen.const(HowDisposed.Sold),
-            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.WhenWasAssetSoldController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from HowWasAssetDisposedOfPage to WhenWasAssetSold page")
-      )
-
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndexAndData(
-            assetIndex,
-            disposalIndex,
-            HowWasAssetDisposedOfPage.apply,
-            Gen.const(HowDisposed.Transferred),
-            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from HowWasAssetDisposedOfPage to AnyPartAssetStillHeld page (Transferred)")
-      )
-
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndexAndData(
-            assetIndex,
-            disposalIndex,
-            HowWasAssetDisposedOfPage.apply,
-            Gen.const(HowDisposed.Other("test details")),
-            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from HowWasAssetDisposedOfPage to AnyPartAssetStillHeld page (Other)")
-      )
-    }
-
-    "WhenWasAssetSoldPage" - {
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndex(
-            assetIndex,
-            disposalIndex,
-            WhenWasAssetSoldPage,
-            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.TotalConsiderationSaleAssetController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from when was asset sold page to TotalConsiderationSaleAsset page")
-      )
-
-    }
-
-    "TotalConsiderationSaleAssetPage" - {
-
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndex(
-            assetIndex,
-            disposalIndex,
-            TotalConsiderationSaleAssetPage,
-            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.TypeOfAssetBuyerController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from when was asset sold page to type of asset buyer page")
-      )
-
-    }
-
-    "TypeOfAssetBuyerPage" - {
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndexAndData(
-            assetIndex,
-            disposalIndex,
-            TypeOfAssetBuyerPage,
-            Gen.const(IdentityType.Individual),
-            (srn, index: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.IndividualNameOfAssetBuyerController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from type of asset buyer page to IndividualNameOfAssetBuyer page when Individual")
-      )
-
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndexAndData(
-            assetIndex,
-            disposalIndex,
-            TypeOfAssetBuyerPage,
-            Gen.const(IdentityType.UKCompany),
-            (srn, index: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.CompanyNameOfAssetBuyerController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from type of asset buyer page to IndividualNameOfAssetBuyer page when UKCompany")
-      )
-
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndexAndData(
-            assetIndex,
-            disposalIndex,
-            TypeOfAssetBuyerPage,
-            Gen.const(IdentityType.UKPartnership),
-            (srn, index: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerNameController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from type of asset buyer page to PartnershipBuyerNamePage page when UKPartnership")
-      )
-
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndexAndData(
-            assetIndex,
-            disposalIndex,
-            TypeOfAssetBuyerPage,
-            Gen.const(IdentityType.Other),
-            (srn, index: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from type of asset buyer page to OtherBuyerDetails page when other")
-      )
-    }
-
-    "IndividualNameOfAssetBuyerPage" - {
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndex(
-            assetIndex,
-            disposalIndex,
-            IndividualNameOfAssetBuyerPage,
-            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.AssetIndividualBuyerNiNumberController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from IndividualNameOfAssetBuyerPage to AssetIndividualBuyerNiNumber page")
-      )
-    }
-
-    "AssetIndividualBuyerNiNumberPage" - {
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndex(
-            assetIndex,
-            disposalIndex,
-            AssetIndividualBuyerNiNumberPage,
-            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from AssetIndividualBuyerNiNumber to IsBuyerConnectedParty page")
-      )
-    }
-
-    "PartnershipBuyerNamePage" - {
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndex(
-            assetIndex,
-            disposalIndex,
-            PartnershipBuyerNamePage,
-            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerUtrController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from PartnershipBuyerNamePage to PartnershipBuyerUtrPage")
-      )
-    }
-
-    "PartnershipBuyerUtrPage" - {
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndex(
-            assetIndex,
-            disposalIndex,
-            PartnershipBuyerUtrPage,
-            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from PartnershipBuyerUtrPage to IsBuyerConnectedPartyPage")
-      )
-    }
-
-    "OtherBuyerDetailsPage" - {
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndex(
-            assetIndex,
-            disposalIndex,
-            OtherBuyerDetailsPage,
-            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from OtherBuyerDetailsPage to IsBuyerConnectedPartyPage")
-      )
-    }
-
-    "CompanyNameOfAssetBuyerPage" - {
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndex(
-            assetIndex,
-            disposalIndex,
-            CompanyNameOfAssetBuyerPage,
-            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.AssetCompanyBuyerCrnController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from CompanyNameOfAssetBuyerPage to AssetCompanyBuyerCrnController")
-      )
-    }
-
-    "AssetCompanyBuyerCrnPage" - {
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndex(
-            assetIndex,
-            disposalIndex,
-            AssetCompanyBuyerCrnPage,
-            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from AssetCompanyBuyerCrnPage to IsBuyerConnectedParty")
-      )
-    }
-
-    "IsBuyerConnectedPartyPage" - {
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndex(
-            assetIndex,
-            disposalIndex,
-            IsBuyerConnectedPartyPage,
-            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.AssetSaleIndependentValuationController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from IsBuyerConnectedPartyPage to AssetSaleIndependentValuation")
-      )
-    }
-
-    "AssetSaleIndependentValuationPage" - {
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndex(
-            assetIndex,
-            disposalIndex,
-            AssetSaleIndependentValuationPage,
-            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from AssetSaleIndependentValuationPage to AnyPartAssetStillHeldPage")
-      )
-    }
-
-    "AnyPartAssetStillHeldPage" - {
-      act.like(
-        normalmode
-          .navigateToWithDoubleIndex(
-            assetIndex,
-            disposalIndex,
-            AnyPartAssetStillHeldPage,
-            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
-          )
-          .withName("go from AnyPartAssetStillHeldPage to AssetDisposalCYA")
-      )
-    }
-
   }
 }

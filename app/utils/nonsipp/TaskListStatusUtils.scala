@@ -17,7 +17,6 @@
 package utils.nonsipp
 
 import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
-import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import models.ConditionalYesNo._
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
@@ -30,6 +29,8 @@ import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPages, SharesDisposa
 import models._
 import pages.nonsipp.loansmadeoroutstanding._
 import viewmodels.models.{SectionStatus, TaskListStatus}
+import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalCompletedPages, OtherAssetsDisposalPage}
+import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import pages.nonsipp.bonds._
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
@@ -538,6 +539,34 @@ object TaskListStatusUtils {
         } else {
           (InProgress, defaultLink)
         }
+    }
+  }
+
+  def getOtherAssetsDisposalTaskListStatusAndLink(
+    userAnswers: UserAnswers,
+    srn: Srn
+  ): (TaskListStatus, String) = {
+    val atLeastOneCompleted =
+      userAnswers.get(OtherAssetsDisposalCompletedPages(srn)).exists(_.values.exists(_.values.nonEmpty))
+    val started = userAnswers.get(OtherAssetsDisposalPage(srn)).contains(true)
+    val completedNoDisposals = userAnswers.get(OtherAssetsDisposalPage(srn)).contains(false)
+
+    val initialDisposalUrl = controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController
+      .onPageLoad(srn, NormalMode)
+      .url
+
+    val disposalListPage = controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController
+      .onPageLoad(srn, page = 1)
+      .url
+
+    if (atLeastOneCompleted) {
+      (TaskListStatus.Completed, disposalListPage)
+    } else if (completedNoDisposals) {
+      (TaskListStatus.Completed, initialDisposalUrl)
+    } else if (started) {
+      (TaskListStatus.InProgress, initialDisposalUrl)
+    } else {
+      (TaskListStatus.NotStarted, initialDisposalUrl)
     }
   }
 

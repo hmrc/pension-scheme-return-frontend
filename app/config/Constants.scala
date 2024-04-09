@@ -62,6 +62,7 @@ object Constants {
   val reportedSharesDisposalListSize = 25
   val bondsDisposalListSize = 10
   val reportingAssetsDisposalDisposalListSize = 10
+  val reportedOtherAssetsDisposalListSize = 25
 
   val maxLoans = 5000
   val maxCurrencyValue = 999999999.99
