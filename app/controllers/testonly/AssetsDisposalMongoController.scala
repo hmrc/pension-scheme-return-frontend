@@ -55,7 +55,8 @@ class AssetsDisposalMongoController @Inject()(
           OtherBuyerDetailsPage(srn, index, secondaryIndex),
           RecipientDetails("test name", "test description")
         ),
-        PageWithValue(OtherAssetsDisposalPage(srn), true)
+        PageWithValue(OtherAssetsDisposalPage(srn), true),
+        PageWithValue(AnyPartAssetStillHeldPage(srn, index, secondaryIndex), true)
       )
     )
 
@@ -67,6 +68,7 @@ class AssetsDisposalMongoController @Inject()(
       PageWithValue[LocalDate] ::
       PageWithValue[IdentityType] ::
       PageWithValue[RecipientDetails] ::
+      PageWithValue[Boolean] ::
       PageWithValue[Boolean] ::
       HNil
 }

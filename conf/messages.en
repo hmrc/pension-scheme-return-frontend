@@ -3306,3 +3306,22 @@ assetDisposalCYA.identityType.pageContent3 = Other
 
 assetDisposalCYA.change.title = Change details of asset disposal
 assetDisposalCYA.change.heading = Change details of asset disposal
+
+assetDisposal.reportedOtherAssetsDisposalList.title = You have reported {0} asset disposal
+assetDisposal.reportedOtherAssetsDisposalList.title.plural = You have reported {0} asset disposals
+assetDisposal.reportedOtherAssetsDisposalList.heading = You have reported {0} asset disposal
+assetDisposal.reportedOtherAssetsDisposalList.heading.plural = You have reported {0} asset disposals
+assetDisposal.reportedOtherAssetsDisposalList.row = Disposal of {0} by {1}
+assetDisposal.reportedOtherAssetsDisposalList.row.change.hidden = details of the disposal of {0} by {1}
+assetDisposal.reportedOtherAssetsDisposalList.row.remove.hidden = the disposal of {0} by {1} from the list
+assetDisposal.reportedOtherAssetsDisposalList.description = You must tell us about all other assets disposed of by the scheme during the period of this return. This does not include loans, shares, bonds, land or property. If your scheme disposed of any of these assets, report them in the relevant section of this pension scheme return.
+assetDisposal.reportedOtherAssetsDisposalList.radios = Do you need to report another asset disposal?
+assetDisposal.reportedOtherAssetsDisposalList.inset.maximumReached = You cannot add another asset disposal as you have entered the maximum of 5,000.
+assetDisposal.reportedOtherAssetsDisposalList.inset.allOtherAssetsDisposed.paragraph1 = You have reported disposal of all the other assets that you told us about.
+assetDisposal.reportedOtherAssetsDisposalList.inset.allOtherAssetsDisposed.paragraph2 = If you need to add more assets, go to the ‘Change other assets’ section of this return.
+assetDisposal.reportedOtherAssetsDisposalList.pagination.label = Showing {0} - {1} of {2} asset disposals
+assetDisposal.reportedOtherAssetsDisposalList.radios.error.required = Select yes if you need to report another asset disposal
+
+assetDisposal.reportedOtherAssetsDisposalList.methodOfDisposal.sold = sale
+assetDisposal.reportedOtherAssetsDisposalList.methodOfDisposal.transferred = transfer out
+assetDisposal.reportedOtherAssetsDisposalList.methodOfDisposal.other = another method
