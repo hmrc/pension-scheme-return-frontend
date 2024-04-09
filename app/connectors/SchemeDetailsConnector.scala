@@ -53,7 +53,7 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
       .GET[Option[SchemeDetails]](url("/pensions-scheme/scheme"), headers = headers)
       .tapError { t =>
         Future.successful(
-          logger.error(s"Failed to fetch scheme details $schemeId for psa $psaId with message ${t.getMessage}")
+          logger.error(s"Failed to fetch scheme details $schemeId for psa with message ${t.getMessage}")
         )
       }
   }
@@ -73,7 +73,7 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
       .GET[Option[SchemeDetails]](url("/pensions-scheme/psp-scheme"), headers = headers)
       .tapError { t =>
         Future.successful(
-          logger.error(s"Failed to fetch scheme details $schemeId for psp $pspId with message ${t.getMessage}")
+          logger.error(s"Failed to fetch scheme details $schemeId for psp with message ${t.getMessage}")
         )
       }
   }
@@ -105,7 +105,7 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
       .GET[Boolean](url("/pensions-scheme/is-psa-associated"), headers = headers)
       .tapError { t =>
         Future.successful(
-          logger.error(s"Failed check association for scheme $srn for $idType $idValue with message ${t.getMessage}")
+          logger.error(s"Failed check association for scheme $srn for $idType with message ${t.getMessage}")
         )
       }
   }
@@ -137,7 +137,7 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
         case WithStatusCode(NOT_FOUND) => None
       }
       .tapError { t =>
-        Future.successful(logger.error(s"Failed list scheme details for $idType $idValue with message ${t.getMessage}"))
+        Future.successful(logger.error(s"Failed list scheme details for $idType with message ${t.getMessage}"))
       }
   }
 }

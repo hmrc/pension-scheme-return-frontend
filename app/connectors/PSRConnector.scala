@@ -91,7 +91,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
                   .as[Seq[PsrVersionsForYearsResponse]]
               case JsError(errors) =>
                 logger.error(
-                  s"getVersions for $pstr and $startDates returned http response 200 but could not parse the body $response.body"
+                  s"getVersions for $pstr and $startDates returned http response 200 but could not parse the response body"
                 )
                 throw JsResultException(errors)
             }
