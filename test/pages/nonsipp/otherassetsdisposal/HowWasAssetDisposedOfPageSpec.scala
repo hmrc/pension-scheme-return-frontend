@@ -20,9 +20,17 @@ import models.HowDisposed._
 import config.Refined.{Max50, Max5000}
 import controllers.TestValues
 import eu.timepit.refined.refineMV
+import utils.UserAnswersUtils.UserAnswersOps
+import models.{HowDisposed, IdentityType}
+import viewmodels.models.SectionCompleted
 import pages.behaviours.PageBehaviours
 
 class HowWasAssetDisposedOfPageSpec extends PageBehaviours with TestValues {
+
+  private val assetIndexOne = refineMV[Max5000.Refined](1)
+  private val assetIndexTwo = refineMV[Max5000.Refined](2)
+  private val indexOne = refineMV[Max50.Refined](1)
+  private val indexTwo = refineMV[Max50.Refined](2)
 
   "HowWasAssetDisposedOfPage" - {
 
@@ -35,5 +43,73 @@ class HowWasAssetDisposedOfPageSpec extends PageBehaviours with TestValues {
     beSettable[HowDisposed](HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex))
 
     beRemovable[HowDisposed](HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex))
+
+    "cleanup other fields when removing the last disposal of all assets" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(OtherAssetsDisposalPage(srn), true)
+        .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndexOne, indexOne), HowDisposed.Sold)
+        .unsafeSet(TypeOfAssetBuyerPage(srn, assetIndexOne, indexOne), IdentityType.Individual)
+        .unsafeSet(IndividualNameOfAssetBuyerPage(srn, assetIndexOne, indexOne), individualName)
+        .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexOne), true)
+        .unsafeSet(RemoveAssetDisposalPage(srn, assetIndexOne, indexOne), true)
+        .unsafeSet(WhenWasAssetSoldPage(srn, assetIndexOne, indexOne), localDate)
+        .unsafeSet(AssetSaleIndependentValuationPage(srn, assetIndexOne, indexOne), true)
+        .unsafeSet(TotalConsiderationSaleAssetPage(srn, assetIndexOne, indexOne), money)
+        .unsafeSet(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexOne), SectionCompleted)
+
+      val result = userAnswers.remove(HowWasAssetDisposedOfPage(srn, assetIndexOne, indexOne)).success.value
+
+      result.get(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexOne)) must be(empty)
+      result.get(TypeOfAssetBuyerPage(srn, assetIndexOne, indexOne)) must be(empty)
+      result.get(IndividualNameOfAssetBuyerPage(srn, assetIndexOne, indexOne)) must be(empty)
+
+      result.get(RemoveAssetDisposalPage(srn, assetIndexOne, disposalIndex)) must be(empty)
+      result.get(WhenWasAssetSoldPage(srn, assetIndexOne, disposalIndex)) must be(empty)
+      result.get(AssetSaleIndependentValuationPage(srn, assetIndexOne, disposalIndex)) must be(empty)
+      result.get(TotalConsiderationSaleAssetPage(srn, assetIndexOne, disposalIndex)) must be(empty)
+      result.get(RemoveAssetDisposalPage(srn, assetIndexOne, disposalIndex)) must be(empty)
+
+      result.get(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexOne)) must be(empty)
+      result.get(OtherAssetsDisposalPage(srn)) must be(empty)
+
+    }
+
+    "cleanup other fields when removing a disposal but there are disposals for the same assets" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(OtherAssetsDisposalPage(srn), true)
+        .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndexOne, indexOne), HowDisposed.Sold)
+        .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexOne), true)
+        .unsafeSet(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexOne), SectionCompleted)
+        .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndexOne, indexTwo), HowDisposed.Sold)
+        .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexTwo), true)
+        .unsafeSet(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexTwo), SectionCompleted)
+
+      val result = userAnswers.remove(HowWasAssetDisposedOfPage(srn, assetIndexOne, indexOne)).success.value
+
+      result.get(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexOne)) must be(empty)
+      result.get(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexOne)) must be(empty)
+      result.get(OtherAssetsDisposalPage(srn)) must not be (empty)
+    }
+
+    "cleanup other fields when removing a disposal but there are disposals for other assets" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(OtherAssetsDisposalPage(srn), true)
+        .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndexOne, indexOne), HowDisposed.Sold)
+        .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexOne), true)
+        .unsafeSet(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexOne), SectionCompleted)
+        .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndexOne, indexTwo), HowDisposed.Sold)
+        .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexTwo), true)
+        .unsafeSet(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexTwo), SectionCompleted)
+        .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndexTwo, indexOne), HowDisposed.Sold)
+        .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndexTwo, indexOne), true)
+        .unsafeSet(OtherAssetsDisposalCompletedPage(srn, assetIndexTwo, indexOne), SectionCompleted)
+
+      val result = userAnswers.remove(HowWasAssetDisposedOfPage(srn, assetIndexOne, indexOne)).success.value
+
+      result.get(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexOne)) must be(empty)
+      result.get(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexOne)) must be(empty)
+      result.get(OtherAssetsDisposalPage(srn)) must not be (empty)
+    }
+
   }
 }

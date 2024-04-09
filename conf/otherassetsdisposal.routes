@@ -88,3 +88,6 @@ POST        /:srn/change-check-answers-asset-disposal/:assetIndex/:disposalIndex
 
 GET         /:srn/asset-disposal-list/:page                                                 controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
 POST        /:srn/asset-disposal-list/:page                                                 controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
+
+GET         /:srn/remove-asset-disposal/:assetIndex/:disposalIndex                                    controllers.nonsipp.otherassetsdisposal.RemoveAssetDisposalController.onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50)
+POST        /:srn/remove-asset-disposal/:assetIndex/:disposalIndex                                    controllers.nonsipp.otherassetsdisposal.RemoveAssetDisposalController.onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50)

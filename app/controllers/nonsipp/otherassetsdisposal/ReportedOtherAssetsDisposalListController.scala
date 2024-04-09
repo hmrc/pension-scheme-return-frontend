@@ -201,7 +201,9 @@ object ReportedOtherAssetsDisposalListController {
               "assetDisposal.reportedOtherAssetsDisposalList.row.change.hidden",
               otherAssetsDisposalData
             ),
-            removeUrl = "", // TODO: routes.RemoveOtherAssetsDisposalController.onPageLoad(srn, otherAssetsIndex, disposalIndex, NormalMode).url,
+            removeUrl = routes.RemoveAssetDisposalController
+              .onPageLoad(srn, otherAssetsIndex, disposalIndex)
+              .url,
             removeHiddenText = buildMessage(
               "assetDisposal.reportedOtherAssetsDisposalList.row.remove.hidden",
               otherAssetsDisposalData

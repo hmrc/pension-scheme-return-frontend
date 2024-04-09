@@ -23,6 +23,7 @@ import navigation.JourneyNavigator
 import models._
 import config.Refined.Max50
 import pages.Page
+import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPages
 
 object OtherAssetsDisposalNavigator extends JourneyNavigator {
 
@@ -138,6 +139,13 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
 
     case OtherAssetsDisposalCompletedPage(srn, _, _) =>
       controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, 1)
+
+    case RemoveAssetDisposalPage(srn, assetIndex, disposalIndex) =>
+      if (userAnswers.map(WhatIsOtherAssetPages(srn)).isEmpty) {
+        controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController.onPageLoad(srn, NormalMode)
+      } else {
+        controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, 1)
+      }
 
     case ReportedOtherAssetsDisposalListPage(srn, addDisposal @ true) =>
       controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController.onPageLoad(srn, 1)
