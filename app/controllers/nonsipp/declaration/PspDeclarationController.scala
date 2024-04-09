@@ -16,18 +16,24 @@
 
 package controllers.nonsipp.declaration
 
+import services.SaveService
 import viewmodels.implicits._
+import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
+import forms.TextFormProvider
 import models.NormalMode
-import views.html.ContentPageView
+import play.api.data.Form
+import views.html.PsaIdInputView
 import models.SchemeId.Srn
-import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import play.api.i18n.MessagesApi
 import pages.nonsipp.declaration.PspDeclarationPage
 import viewmodels.DisplayMessage._
-import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
+import viewmodels.models.{FormPageViewModel, TextInputViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
@@ -39,28 +45,63 @@ class PspDeclarationController @Inject()(
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: ContentPageView
-) extends FrontendBaseController
-    with I18nSupport {
+  saveService: SaveService,
+  formProvider: TextFormProvider,
+  view: PsaIdInputView
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      Ok(view(PspDeclarationController.viewModel(srn)))
+      def form = PspDeclarationController.form(formProvider, request.schemeDetails.authorisingPSAID)
+      Ok(
+        view(
+          form.fromUserAnswers(PspDeclarationPage(srn)),
+          PspDeclarationController.viewModel(srn)
+        )
+      )
     }
 
   def onSubmit(srn: Srn): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      Redirect(navigator.nextPage(PspDeclarationPage(srn), NormalMode, request.userAnswers))
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
+      PspDeclarationController
+        .form(formProvider, request.schemeDetails.authorisingPSAID)
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(
+              BadRequest(
+                view(
+                  formWithErrors,
+                  PspDeclarationController.viewModel(srn)
+                )
+              )
+            ),
+          answer => {
+            for {
+              updatedAnswers <- Future
+                .fromTry(request.userAnswers.set(PspDeclarationPage(srn), answer))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(PspDeclarationPage(srn), NormalMode, request.userAnswers))
+          }
+        )
     }
 }
 
 object PspDeclarationController {
+  def form(formProvider: TextFormProvider, authorisingPsaId: Option[String]): Form[String] = formProvider.psaId(
+    "pspDeclaration.psaId.error.required",
+    "pspDeclaration.psaId.error.invalid.characters",
+    "pspDeclaration.psaId.error.invalid.characters",
+    "pspDeclaration.psaId.error.invalid.noMatch",
+    authorisingPsaId
+  )
 
-  def viewModel(srn: Srn): FormPageViewModel[ContentPageViewModel] =
+  def viewModel(srn: Srn): FormPageViewModel[TextInputViewModel] =
     FormPageViewModel(
       Message("pspDeclaration.title"),
       Message("pspDeclaration.heading"),
-      ContentPageViewModel(),
+      TextInputViewModel(Some(Message("pspDeclaration.psaId.label")), true),
       routes.PspDeclarationController.onSubmit(srn)
     ).withButtonText(Message("site.agreeAndContinue"))
       .withDescription(

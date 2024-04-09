@@ -16,7 +16,13 @@
 
 package pages.nonsipp.declaration
 
-import pages.Page
+import pages.QuestionPage
 import models.SchemeId.Srn
+import play.api.libs.json.JsPath
 
-case class PspDeclarationPage(srn: Srn) extends Page
+case class PspDeclarationPage(srn: Srn) extends QuestionPage[String] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "pspDeclaration"
+}

@@ -99,7 +99,7 @@ GET         /:srn/psa-declaration                                               
 GET         /:srn/submit-psa-declaration                                                controllers.nonsipp.declaration.PsaDeclarationController.onSubmit(srn: Srn)
 
 GET         /:srn/psp-declaration                                                       controllers.nonsipp.declaration.PspDeclarationController.onPageLoad(srn: Srn)
-GET         /:srn/submit-psp-declaration                                                controllers.nonsipp.declaration.PspDeclarationController.onSubmit(srn: Srn)
+POST        /:srn/psp-declaration                                                       controllers.nonsipp.declaration.PspDeclarationController.onSubmit(srn: Srn)
 
 GET         /:srn/member-ni-number                                                      controllers.nonsipp.memberdetails.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
 GET         /:srn/member-ni-number/:index                                               controllers.nonsipp.memberdetails.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)

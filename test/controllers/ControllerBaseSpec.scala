@@ -105,7 +105,7 @@ trait TestValues {
   val uploadKey: UploadKey = UploadKey("test-userid", srn)
   val reference: Reference = Reference("test-ref")
   val uploadFileName = "test-file-name"
-  val psaId: PsaId = PsaId("testPSAId")
+  val psaId: PsaId = PsaId("A1234567")
   val pspId: PsaId = PsaId("testPSPId")
   val individualName = "testIndividualName"
   val nino: Nino = ninoGen.sample.get
@@ -193,7 +193,7 @@ trait TestValues {
     "testPSTR",
     SchemeStatus.Open,
     "testSchemeType",
-    Some("testAuthorisingPSAID"),
+    Some("A1234567"),
     List(Establisher("testFirstName testLastName", EstablisherKind.Individual))
   )
 
