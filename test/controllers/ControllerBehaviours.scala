@@ -18,7 +18,6 @@ package controllers
 
 import play.api.test.FakeRequest
 import services.SaveService
-import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import queries.Settable
 import play.api.mvc.{Call, Request}
 import play.twirl.api.Html
@@ -27,6 +26,8 @@ import models.UserAnswers
 import play.api.test.CSRFTokenHelper.CSRFRequest
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
+import org.mockito.Mockito._
 import play.api.libs.json.{JsPath, Writes}
 import play.api.Application
 import navigation.{FakeNavigator, Navigator}

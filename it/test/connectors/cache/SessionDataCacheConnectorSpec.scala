@@ -32,7 +32,7 @@ class SessionDataCacheConnectorSpec extends BaseConnectorSpec {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  implicit override lazy val applicationBuilder: GuiceApplicationBuilder =
+  override implicit lazy val applicationBuilder: GuiceApplicationBuilder =
     super.applicationBuilder.configure("microservice.services.pensionAdministrator.port" -> wireMockPort)
 
   val externalId = "test-id"
@@ -90,19 +90,19 @@ class SessionDataCacheConnectorSpec extends BaseConnectorSpec {
     "return unit for an ok response" in runningApplication { implicit app =>
       stubDelete(ok())
 
-      connector.remove(externalId).futureValue mustBe()
+      connector.remove(externalId).futureValue mustBe ()
     }
 
     "return unit for a not found response" in runningApplication { implicit app =>
       stubDelete(notFound)
 
-      connector.remove(externalId).futureValue mustBe()
+      connector.remove(externalId).futureValue mustBe ()
     }
 
     "return unit for external id that doesn't exist" in runningApplication { implicit app =>
       stubDelete(ok())
 
-      connector.remove("unknown-id").futureValue mustBe()
+      connector.remove("unknown-id").futureValue mustBe ()
     }
   }
 }

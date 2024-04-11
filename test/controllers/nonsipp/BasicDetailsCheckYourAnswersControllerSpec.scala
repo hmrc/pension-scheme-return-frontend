@@ -26,11 +26,13 @@ import cats.implicits.toShow
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import pages.nonsipp.WhichTaxYearPage
+import org.mockito.stubbing.OngoingStubbing
 import models._
 import play.api.i18n.Messages
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import play.api.test.Helpers.stubMessagesApi
+import org.mockito.Mockito.{times, verify, when}
 import cats.data.NonEmptyList
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
@@ -151,9 +153,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
 
       "should display the correct active bank account value" - {
         "when active bank account is true" in {
-          val vm = buildViewModel(
-            activeBankAccount = true
-          )
+          val vm = buildViewModel()
 
           vm.page.sections.flatMap(_.rows.map(_.key.key)) must contain(
             "basicDetailsCheckYourAnswersController.schemeDetails.bankAccount"
@@ -180,7 +180,6 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
         val reason = "test reason"
 
         val vm = buildViewModel(
-          activeBankAccount = true,
           whyNoBankAccount = Some(reason)
         )
 
@@ -246,6 +245,8 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
     pensionSchemeId.isPSP
   )
 
-  private def mockTaxYear(taxYear: DateRange) =
+  private def mockTaxYear(
+    taxYear: DateRange
+  ): OngoingStubbing[Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]] =
     when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(any())).thenReturn(Some(Left(taxYear)))
 }

@@ -17,7 +17,6 @@
 package controllers.nonsipp.memberreceivedpcls
 
 import services.PsrSubmissionService
-import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberreceivedpcls.{Paths, PensionCommencementLumpSumPage}
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
@@ -27,6 +26,8 @@ import models.NormalMode
 import controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.viewModel
 import play.api.data.Form
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito._
 
 import scala.concurrent.Future
 

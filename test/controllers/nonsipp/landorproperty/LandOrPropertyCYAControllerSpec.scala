@@ -17,7 +17,6 @@
 package controllers.nonsipp.landorproperty
 
 import services.PsrSubmissionService
-import play.api.inject.guice.GuiceableModule
 import models.ConditionalYesNo._
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
@@ -26,6 +25,8 @@ import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
 import models._
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, times, verify}
 import config.Refined.OneTo5000
 import models.SchemeHoldLandProperty.Transfer
 
@@ -97,19 +98,19 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
-          .withName(s"redirect to next page when in ${mode} mode")
+          .withName(s"redirect to next page when in $mode mode")
       )
 
       act.like(
         journeyRecoveryPage(onPageLoad(mode))
           .updateName("onPageLoad" + _)
-          .withName(s"redirect to journey recovery page on page load when in ${mode} mode")
+          .withName(s"redirect to journey recovery page on page load when in $mode mode")
       )
 
       act.like(
         journeyRecoveryPage(onSubmit(mode))
           .updateName("onSubmit" + _)
-          .withName(s"redirect to journey recovery page on submit when in ${mode} mode")
+          .withName(s"redirect to journey recovery page on submit when in $mode mode")
       )
     }
   }

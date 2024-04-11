@@ -18,7 +18,6 @@ package controllers.nonsipp.memberdetails
 
 import play.api.test.FakeRequest
 import services.{AuditService, SchemeDateService, UploadService}
-import play.api.inject.guice.GuiceableModule
 import play.api.mvc.Call
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
@@ -29,6 +28,8 @@ import play.api.test.CSRFTokenHelper.CSRFRequest
 import play.api.data.FormError
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito._
 
 import scala.concurrent.Future
 

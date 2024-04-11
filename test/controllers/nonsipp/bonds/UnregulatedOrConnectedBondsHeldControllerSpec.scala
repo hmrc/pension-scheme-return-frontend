@@ -22,6 +22,7 @@ import play.api.inject.bind
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import org.mockito.ArgumentMatchers.any

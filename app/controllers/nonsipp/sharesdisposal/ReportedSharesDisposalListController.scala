@@ -40,7 +40,7 @@ import play.api.i18n.MessagesApi
 import viewmodels.DisplayMessage
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.models.{SectionCompleted, _}
+import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
 
@@ -138,20 +138,6 @@ class ReportedSharesDisposalListController @Inject()(
           } yield (sharesIndex, disposalIndexes)
       }
       .map(_.toMap)
-
-  private def getSharesDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(
-    implicit request: DataRequest[_]
-  ): Either[Result, List[((Max5000, List[Max50]), SectionCompleted)]] =
-    disposals
-      .map {
-        case indexes @ (shareIndex, _) =>
-          request.userAnswers
-            .get(SharesCompleted(srn, shareIndex))
-            .getOrRecoverJourney
-            .map(sharesDisposal => (indexes, sharesDisposal))
-      }
-      .toList
-      .sequence
 }
 
 object ReportedSharesDisposalListController {

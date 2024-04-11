@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.memberdetails
 
+import services._
 import models.audit.{PSRFileValidationAuditEvent, PSRUpscanFileDownloadAuditEvent, PSRUpscanFileUploadAuditEvent}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import org.apache.pekko.stream.Materializer
 import controllers.PSRController
 import config.Constants.{PSA, PSP}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models._
-import akka.stream.Materializer
-import services._
 import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
 import views.html.YesNoPageView

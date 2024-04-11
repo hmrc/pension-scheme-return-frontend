@@ -18,7 +18,6 @@ package services
 
 import play.api.test.FakeRequest
 import models.audit.PSRStartAuditEvent
-import utils.BaseSpec
 import play.api.mvc.AnyContentAsEmpty
 import uk.gov.hmrc.play.audit.model.DataEvent
 import controllers.TestValues
@@ -27,6 +26,8 @@ import config.Constants.{PSA, PSP}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
+import utils.BaseSpec
+import org.mockito.Mockito.{reset, when}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global

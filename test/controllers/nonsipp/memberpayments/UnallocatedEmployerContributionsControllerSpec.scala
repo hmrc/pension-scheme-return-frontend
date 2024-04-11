@@ -17,7 +17,6 @@
 package controllers.nonsipp.memberpayments
 
 import services.PsrSubmissionService
-import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.YesNoPageView
@@ -27,6 +26,8 @@ import models.NormalMode
 import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
 import controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.{form, viewModel}
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito._
 
 class UnallocatedEmployerContributionsControllerSpec extends ControllerBaseSpec {
 

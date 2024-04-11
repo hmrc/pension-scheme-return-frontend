@@ -17,7 +17,6 @@
 package controllers.nonsipp.landorproperty
 
 import services.PsrSubmissionService
-import play.api.inject.guice.GuiceableModule
 import models.ConditionalYesNo._
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
@@ -28,6 +27,8 @@ import controllers.nonsipp.landorproperty.RemovePropertyController._
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode}
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito._
 import config.Refined.OneTo5000
 import models.SchemeHoldLandProperty.Transfer
 

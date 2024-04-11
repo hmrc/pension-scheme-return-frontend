@@ -17,7 +17,6 @@
 package controllers.nonsipp.shares
 
 import services.SchemeDateService
-import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.shares.{TypeOfSharesHeldPage, WhenDidSchemeAcquireSharesPage}
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
@@ -25,6 +24,8 @@ import play.api.inject.bind
 import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
 import models.{NormalMode, TypeOfShares}
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.reset
 import views.html.DatePageView
 import models.TypeOfShares.ConnectedParty
 import controllers.nonsipp.shares.WhenDidSchemeAcquireSharesController._

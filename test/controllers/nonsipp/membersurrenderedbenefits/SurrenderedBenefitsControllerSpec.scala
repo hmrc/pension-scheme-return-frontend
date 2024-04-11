@@ -26,6 +26,7 @@ import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsPage
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, when}
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsController._
 
 import scala.concurrent.Future

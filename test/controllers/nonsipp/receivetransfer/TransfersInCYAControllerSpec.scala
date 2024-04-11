@@ -27,6 +27,7 @@ import models.{NormalMode, PensionSchemeType}
 import viewmodels.models.SectionCompleted
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import org.mockito.Mockito.{reset, when}
 import controllers.nonsipp.receivetransfer.TransfersInCYAController._
 import org.mockito.ArgumentMatchers.any
 

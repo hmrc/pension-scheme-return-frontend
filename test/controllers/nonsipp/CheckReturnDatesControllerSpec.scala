@@ -25,9 +25,10 @@ import play.api.inject.bind
 import views.html.YesNoPageView
 import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import forms.YesNoPageFormProvider
-import org.mockito.stubbing.ScalaOngoingStubbing
+import org.mockito.stubbing.OngoingStubbing
 import models.{MinimalSchemeDetails, NormalMode}
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import utils.DateTimeUtils
 import play.api.inject.guice.GuiceableModule
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
@@ -171,7 +172,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
   def setSchemeDetails(
     schemeDetails: Option[MinimalSchemeDetails]
-  ): ScalaOngoingStubbing[Future[Option[MinimalSchemeDetails]]] =
+  ): OngoingStubbing[Future[Option[MinimalSchemeDetails]]] =
     when(mockSchemeDetailsService.getMinimalSchemeDetails(any(), any())(any(), any()))
       .thenReturn(Future.successful(schemeDetails))
 }

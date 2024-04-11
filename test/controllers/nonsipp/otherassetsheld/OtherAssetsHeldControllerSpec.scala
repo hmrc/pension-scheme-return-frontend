@@ -18,7 +18,6 @@ package controllers.nonsipp.otherassetsheld
 
 import controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.{form, viewModel}
 import services.PsrSubmissionService
-import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
@@ -26,6 +25,8 @@ import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito._
 
 class OtherAssetsHeldControllerSpec extends ControllerBaseSpec {
 

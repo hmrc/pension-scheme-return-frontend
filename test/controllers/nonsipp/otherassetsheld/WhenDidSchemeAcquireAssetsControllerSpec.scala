@@ -16,7 +16,6 @@
 
 package controllers.nonsipp.otherassetsheld
 
-import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.otherassetsheld.WhenDidSchemeAcquireAssetsPage
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
@@ -27,6 +26,8 @@ import forms.DatePageFormProvider
 import models.NormalMode
 import services.SchemeDateService
 import controllers.nonsipp.otherassetsheld.WhenDidSchemeAcquireAssetsController._
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.reset
 
 import java.time.LocalDate
 

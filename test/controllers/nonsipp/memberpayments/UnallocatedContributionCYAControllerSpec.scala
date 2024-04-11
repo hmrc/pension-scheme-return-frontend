@@ -17,13 +17,15 @@
 package controllers.nonsipp.memberpayments
 
 import services.PsrSubmissionService
-import play.api.inject.guice.GuiceableModule
+import play.api.mvc.Call
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CYAWithRemove
 import models.CheckOrChange
 import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, times, verify}
 
 class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
 
@@ -36,10 +38,10 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
   override protected def beforeAll(): Unit =
     reset(mockPsrSubmissionService)
 
-  private def onPageLoad(checkOrChange: CheckOrChange) =
+  private def onPageLoad(checkOrChange: CheckOrChange): Call =
     routes.UnallocatedContributionCYAController.onPageLoad(srn, checkOrChange)
 
-  private def onSubmit(checkOrChange: CheckOrChange) =
+  private def onSubmit(checkOrChange: CheckOrChange): Call =
     routes.UnallocatedContributionCYAController.onSubmit(srn, checkOrChange)
 
   private val filledUserAnswers = defaultUserAnswers

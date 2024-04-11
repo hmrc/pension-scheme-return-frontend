@@ -19,7 +19,7 @@ package controllers.nonsipp.bonds
 import services.PsrSubmissionService
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bonds.BondsListController.{BondsData, _}
+import controllers.nonsipp.bonds.BondsListController._
 import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import play.api.inject
@@ -27,6 +27,7 @@ import forms.YesNoPageFormProvider
 import models._
 import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{reset, when}
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds._
 

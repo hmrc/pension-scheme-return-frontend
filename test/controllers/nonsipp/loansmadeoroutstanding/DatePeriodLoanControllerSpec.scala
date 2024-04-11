@@ -16,7 +16,6 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import play.api.inject.guice.GuiceableModule
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
@@ -26,6 +25,8 @@ import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.{CompanyRecipientNamePage, DatePeriodLoanPage}
 import services.SchemeDateService
 import controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController._
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.reset
 
 import java.time.LocalDate
 

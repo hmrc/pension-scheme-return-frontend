@@ -17,7 +17,6 @@
 package controllers.nonsipp.memberpensionpayments
 
 import services.PsrSubmissionService
-import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import pages.nonsipp.memberpensionpayments.PensionPaymentsReceivedPage
@@ -25,6 +24,8 @@ import play.api.libs.json.JsPath
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, when}
 import controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController.{form, viewModel}
 import views.html.YesNoPageView
 

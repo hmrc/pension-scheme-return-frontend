@@ -23,13 +23,13 @@ import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import controllers.nonsipp.membertransferout.TransferOutMemberListController._
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import org.mockito.Mockito.{reset, when}
 import pages.nonsipp.membertransferout.TransferOutMemberListPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import controllers.nonsipp.membertransferout.routes
-import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 

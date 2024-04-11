@@ -17,11 +17,11 @@
 package controllers
 
 import services.{PsrSubmissionService, SchemeDateService}
+import org.mockito.Mockito.when
 import config.Refined.Max3
 import cats.data.NonEmptyList
-import org.mockito.stubbing.ScalaOngoingStubbing
+import org.mockito.stubbing.OngoingStubbing
 import models.DateRange
-import org.mockito.MockitoSugar.when
 import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
@@ -33,18 +33,18 @@ trait MockBehaviours {
       returns: Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]
     )(
       implicit mock: SchemeDateService
-    ): ScalaOngoingStubbing[Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]] =
+    ): OngoingStubbing[Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]] =
       when(mock.taxYearOrAccountingPeriods(any())(any())).thenReturn(returns)
 
     def returnPeriods(
       returns: Option[NonEmptyList[DateRange]]
-    )(implicit mock: SchemeDateService): ScalaOngoingStubbing[Option[NonEmptyList[DateRange]]] =
+    )(implicit mock: SchemeDateService): OngoingStubbing[Option[NonEmptyList[DateRange]]] =
       when(mock.returnPeriods(any())(any())).thenReturn(returns)
   }
 
   object MockPSRSubmissionService {
 
-    def submitPsrDetails()(implicit mock: PsrSubmissionService): ScalaOngoingStubbing[Future[Option[Unit]]] =
+    def submitPsrDetails()(implicit mock: PsrSubmissionService): OngoingStubbing[Future[Option[Unit]]] =
       when(mock.submitPsrDetails(any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(())))
   }

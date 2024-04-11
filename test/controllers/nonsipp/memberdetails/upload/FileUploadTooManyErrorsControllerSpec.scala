@@ -17,13 +17,14 @@
 package controllers.nonsipp.memberdetails.upload
 
 import services.UploadService
-import play.api.inject.guice.GuiceableModule
 import controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController._
 import controllers.ControllerBaseSpec
 import views.html.ContentPageView
 import play.api.inject
 import models.{NormalMode, Upload}
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.when
 
 import scala.concurrent.Future
 

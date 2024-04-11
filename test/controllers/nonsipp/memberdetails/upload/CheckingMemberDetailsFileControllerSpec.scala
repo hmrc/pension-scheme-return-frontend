@@ -17,11 +17,12 @@
 package controllers.nonsipp.memberdetails.upload
 
 import services.UploadService
-import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
 import views.html.ContentPageView
 import play.api.inject
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, when}
 import models.{NormalMode, Upload}
 import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController._
 

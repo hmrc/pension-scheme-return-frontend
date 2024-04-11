@@ -17,11 +17,12 @@
 package controllers.actions
 
 import play.api.test.FakeRequest
-import utils.BaseSpec
 import play.api.mvc.AnyContentAsEmpty
 import repositories.SessionRepository
 import models.UserAnswers
 import models.requests.{AllowedAccessRequest, OptionalDataRequest}
+import utils.BaseSpec
+import org.mockito.Mockito.when
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global

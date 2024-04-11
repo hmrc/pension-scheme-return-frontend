@@ -31,6 +31,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails._
+import org.mockito.Mockito.{reset, verify, when}
 import views.html.ContentPageView
 import models.SchemeId.Srn
 

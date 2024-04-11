@@ -17,7 +17,6 @@
 package controllers.nonsipp.sharesdisposal
 
 import services.SchemeDateService
-import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
@@ -27,6 +26,8 @@ import pages.nonsipp.sharesdisposal.WhenWereSharesRedeemedPage
 import play.api.inject
 import forms.DatePageFormProvider
 import models.NormalMode
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.reset
 
 class WhenWereSharesRedeemedControllerSpec extends ControllerBaseSpec {
 

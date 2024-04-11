@@ -22,11 +22,12 @@ import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesCYAController._
 import pages.nonsipp.WhichTaxYearPage
-import org.mockito.stubbing.ScalaOngoingStubbing
+import org.mockito.stubbing.OngoingStubbing
 import models.DateRange
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import org.mockito.Mockito.{times, verify, when}
 import cats.data.NonEmptyList
 import views.html.CheckYourAnswersView
 
@@ -78,6 +79,6 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
 
   private def mockTaxYear(
     taxYear: DateRange
-  ): ScalaOngoingStubbing[Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]] =
+  ): OngoingStubbing[Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]] =
     when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(any())).thenReturn(Some(Left(taxYear)))
 }

@@ -19,12 +19,13 @@ package controllers
 import play.api.test.FakeRequest
 import services.PsrRetrievalService
 import pages.nonsipp.schemedesignatory.HowManyMembersPage
-import play.api.inject.guice.GuiceableModule
 import play.api.mvc.Call
 import play.api.inject.bind
 import views.html.ContentPageView
 import navigation.{FakeNavigator, Navigator}
 import models.{CheckMode, SchemeMemberNumbers}
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.reset
 
 class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
 

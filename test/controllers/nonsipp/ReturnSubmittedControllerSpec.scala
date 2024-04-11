@@ -17,12 +17,13 @@
 package controllers.nonsipp
 
 import services.SchemeDateService
-import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import pages.nonsipp.ReturnSubmittedPage
 import models.DateRange
 import viewmodels.models.SubmissionViewModel
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, when}
 import cats.data.NonEmptyList
 import views.html.SubmissionView
 import controllers.nonsipp.ReturnSubmittedController.viewModel

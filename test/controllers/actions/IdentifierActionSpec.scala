@@ -27,6 +27,7 @@ import connectors.cache.SessionDataCacheConnector
 import play.api.test.{FakeRequest, StubPlayBodyParsersFactory}
 import utils.BaseSpec
 import play.api.test.Helpers._
+import org.mockito.Mockito.{reset, when}
 import uk.gov.hmrc.auth.core._
 import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
 import uk.gov.hmrc.auth.core.retrieve.~
@@ -72,8 +73,10 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
   val pspEnrolment: Enrolment =
     Enrolment(Constants.pspEnrolmentKey, Seq(EnrolmentIdentifier(Constants.pspIdKey, "A000001")), "Activated")
 
-  override def beforeEach(): Unit =
-    reset(mockAuthConnector, mockSessionDataCacheConnector)
+  override def beforeEach(): Unit = {
+    reset(mockAuthConnector)
+    reset(mockSessionDataCacheConnector)
+  }
 
   def setAuthValue(value: Option[String] ~ Option[String] ~ Enrolments): Unit =
     setAuthValue(Future.successful(value))

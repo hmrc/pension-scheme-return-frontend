@@ -17,7 +17,6 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import services.{PsrSubmissionService, SchemeDateService}
-import play.api.inject.guice.GuiceableModule
 import models.ConditionalYesNo._
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
@@ -29,6 +28,8 @@ import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
 import pages.nonsipp.loansmadeoroutstanding._
 import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, times, verify}
 
 class LoansCYAControllerSpec extends ControllerBaseSpec {
 
@@ -41,7 +42,8 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
   )
 
   override protected def beforeAll(): Unit =
-    reset(mockSchemeDateService, mockPsrSubmissionService)
+    reset(mockSchemeDateService)
+  reset(mockPsrSubmissionService)
 
   private val index = refineMV[OneTo5000](1)
   private val taxYear = Some(Left(dateRange))

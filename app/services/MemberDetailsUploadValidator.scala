@@ -16,21 +16,21 @@
 
 package services
 
-import akka.stream.Materializer
-import akka.util.ByteString
-import akka.stream.scaladsl.{Flow, Sink, Source}
-import akka.NotUsed
+import org.apache.pekko.util.ByteString
+import org.apache.pekko.stream.connectors.csv.scaladsl.CsvParsing
+import org.apache.pekko.stream.Materializer
 import config.Constants
-import akka.stream.alpakka.csv.scaladsl.CsvParsing
-import cats.implicits._
 import uk.gov.hmrc.domain.Nino
 import models._
+import org.apache.pekko.NotUsed
 import play.api.i18n.Messages
 import forms.mappings.errors.DateFormErrors
 import cats.data.Validated.{Invalid, Valid}
 import play.api.mvc.AnyContent
 import cats.data.{NonEmptyList, Validated, ValidatedNel}
 import models.SchemeId.Srn
+import cats.implicits._
+import org.apache.pekko.stream.scaladsl.{Flow, Sink, Source}
 import forms.{NameDOBFormProvider, TextFormProvider}
 import models.ValidationErrorType.ValidationErrorType
 import models.requests.DataRequest
@@ -364,7 +364,7 @@ class MemberDetailsUploadValidator @Inject()(
   private def indexToCsvKey(index: Int): String =
     if (index == 0) aToZ.head.toString
     else {
-      val (quotient, remainder) = index /% (aToZ.size)
+      val (quotient, remainder) = index /% aToZ.size
       if (quotient == 0) aToZ(remainder).toString
       else indexToCsvKey(quotient - 1) + indexToCsvKey(remainder)
     }

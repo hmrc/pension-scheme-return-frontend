@@ -18,14 +18,18 @@ package controllers.nonsipp.schemedesignatory
 
 import services.{PsrSubmissionService, SchemeDateService}
 import pages.nonsipp.schemedesignatory.HowManyMembersPage
-import play.api.inject.guice.GuiceableModule
+import config.Refined.Max3
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
-import views.html.CheckYourAnswersView
 import pages.nonsipp.WhichTaxYearPage
 import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
+import org.mockito.stubbing.OngoingStubbing
 import models.{DateRange, NormalMode}
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{times, verify, when}
+import cats.data.NonEmptyList
+import views.html.CheckYourAnswersView
 
 class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
 
@@ -76,6 +80,8 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
 
   }
 
-  private def mockTaxYear(taxYear: DateRange) =
+  private def mockTaxYear(
+    taxYear: DateRange
+  ): OngoingStubbing[Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]] =
     when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(any())).thenReturn(Some(Left(taxYear)))
 }

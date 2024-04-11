@@ -16,19 +16,23 @@
 
 package controllers.nonsipp.memberdetails
 
+import org.apache.pekko.util.ByteString
 import services._
-import akka.util.ByteString
+import config.Refined.Max3
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
-import views.html.YesNoPageView
+import org.apache.pekko.stream.scaladsl.Source
 import forms.YesNoPageFormProvider
+import org.mockito.stubbing.OngoingStubbing
 import models._
 import models.UploadStatus.UploadStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import akka.stream.scaladsl.Source
 import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
+import org.mockito.Mockito._
 import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
+import cats.data.NonEmptyList
+import views.html.YesNoPageView
 
 import scala.concurrent.Future
 
@@ -123,7 +127,9 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
   private def mockSaveValidatedUpload(): Unit =
     when(mockUploadService.saveValidatedUpload(any(), any())).thenReturn(Future.successful(()))
 
-  private def mockTaxYear(taxYear: DateRange) =
+  private def mockTaxYear(
+    taxYear: DateRange
+  ): OngoingStubbing[Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]] =
     when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(any())).thenReturn(Some(Left(taxYear)))
 
 }

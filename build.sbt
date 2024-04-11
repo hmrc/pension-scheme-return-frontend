@@ -1,27 +1,25 @@
 import play.sbt.routes.RoutesKeys
 import sbt.Def
-import scoverage.ScoverageKeys
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 import scala.sys.process.*
-import complete._
-import complete.DefaultParsers._
+import complete.*
+import complete.DefaultParsers.*
+import uk.gov.hmrc.DefaultBuildSettings
+
+ThisBuild / majorVersion := 0
+ThisBuild / scalaVersion := "2.13.12"
 
 lazy val appName: String = "pension-scheme-return-frontend"
 
 addCompilerPlugin(("org.typelevel" % "kind-projector" % "0.13.2").cross(CrossVersion.full))
 
-lazy val root = (project in file("."))
+lazy val root = Project(appName, file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(inConfig(Test)(testSettings) *)
-  .configs(IntegrationTest)
-  .settings(inConfig(IntegrationTest)(itSettings) *)
-  .settings(majorVersion := 0)
   .settings(ThisBuild / useSuperShell := false)
   .settings(
-    scalaVersion := "2.13.12",
-    name := appName,
     semanticdbEnabled := true,
     semanticdbVersion := scalafixSemanticdb.revision,
     scalafixScalaBinaryVersion := "2.13",
@@ -53,11 +51,6 @@ lazy val root = (project in file("."))
       "utils.ListUtils._"
     ),
     PlayKeys.playDefaultPort := 10701,
-    ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*handlers.*;.*components.*;" +
-      ".*Routes.*;.*viewmodels.govuk.*;",
-    ScoverageKeys.coverageMinimumStmtTotal := 78,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq(
       "-feature",
       "-rootdir",
@@ -66,8 +59,6 @@ lazy val root = (project in file("."))
     ),
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
-    update / evictionWarningOptions :=
-      EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     resolvers ++= Seq(
       Resolver.jcenterRepo,
       "HMRC-open-artefacts-maven".at("https://open.artefacts.tax.service.gov.uk/maven2")
@@ -100,25 +91,25 @@ lazy val root = (project in file("."))
     scalafixOnCompile := true,
     addCommandAlias("runLocal", "run -Dapplication.router=testOnlyDoNotUseInAppConf.Routes")
   )
+  .settings(CodeCoverageSettings.settings *)
 
 lazy val testSettings: Seq[Def.Setting[?]] = Seq(
   scalafmtOnCompile := true,
   scalafixOnCompile := true,
-  fork := false,
+  fork := true,
   unmanagedSourceDirectories += baseDirectory.value / "test-utils"
 )
 
-lazy val itSettings = Defaults.itSettings ++ Seq(
-  unmanagedSourceDirectories := Seq(
-    baseDirectory.value / "it",
-    baseDirectory.value / "test-utils"
-  ),
-  unmanagedResourceDirectories := Seq(
-    baseDirectory.value / "it" / "resources"
-  ),
-  parallelExecution := false,
-  fork := false
-)
+lazy val it = project.in(file("it"))
+  .enablePlugins(PlayScala)
+  .dependsOn(root % "test->test") // the "test->test" allows reusing test code and test dependencies
+  .settings(DefaultBuildSettings.itSettings())
+  .settings(
+    libraryDependencies ++= AppDependencies.test,
+    Test / fork := true,
+    Test / scalafmtOnCompile := true,
+    Test / unmanagedResourceDirectories += baseDirectory.value / "it" / "test" / "resources"
+  )
 
 lazy val scaffoldParser: Def.Initialize[State => Parser[(String, List[String])]] =
   Def.setting {

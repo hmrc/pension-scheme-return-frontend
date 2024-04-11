@@ -1,7 +1,24 @@
+/*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package repositories
 
 import config.{FakeCrypto, FrontendAppConfig}
 import models._
+import org.mockito.Mockito.when
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters
 import repositories.UploadRepository.MongoUpload
@@ -14,14 +31,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
 
   private val mockAppConfig = mock[FrontendAppConfig]
-  when(mockAppConfig.uploadTtl) thenReturn 1
+  when(mockAppConfig.uploadTtl).thenReturn(1)
 
   private val oldInstant = Instant.now.truncatedTo(ChronoUnit.MILLIS).minusMillis(1000)
   private val initialUploadDetails = UploadDetails(uploadKey, reference, UploadStatus.InProgress, oldInstant)
-  private val initialMongoUpload = MongoUpload(uploadKey, reference, SensitiveUploadStatus(UploadStatus.InProgress), oldInstant, None)
+  private val initialMongoUpload =
+    MongoUpload(uploadKey, reference, SensitiveUploadStatus(UploadStatus.InProgress), oldInstant, None)
   private val encryptedRegex = "^[A-Za-z0-9+/=]+$"
 
-  protected override val repository = new UploadRepository(
+  override protected val repository = new UploadRepository(
     mongoComponent,
     stubClock,
     mockAppConfig,
@@ -52,7 +70,10 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
       val findAfterUpdateResult = find(Filters.equal("id", uploadKey.value)).futureValue.headOption.value
 
       updateResult mustBe ()
-      findAfterUpdateResult mustBe initialMongoUpload.copy(status = SensitiveUploadStatus(failure), lastUpdated = instant)
+      findAfterUpdateResult mustBe initialMongoUpload.copy(
+        status = SensitiveUploadStatus(failure),
+        lastUpdated = instant
+      )
     }
 
     "successfully update the ttl and status to success" in {
@@ -62,8 +83,11 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
       val updateResult: Unit = repository.updateStatus(reference, uploadSuccessful).futureValue
       val findAfterUpdateResult = find(Filters.equal("id", uploadKey.value)).futureValue.headOption.value
 
-      updateResult mustBe()
-      findAfterUpdateResult mustBe initialMongoUpload.copy(status = SensitiveUploadStatus(uploadSuccessful), lastUpdated = instant)
+      updateResult mustBe ()
+      findAfterUpdateResult mustBe initialMongoUpload.copy(
+        status = SensitiveUploadStatus(uploadSuccessful),
+        lastUpdated = instant
+      )
     }
 
     "successfully encrypt status" in {
@@ -73,8 +97,7 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
       repository.updateStatus(reference, uploadSuccessful).futureValue
 
       val rawData =
-        repository
-          .collection
+        repository.collection
           .find[BsonDocument](Filters.equal("id", uploadKey.value))
           .toFuture()
           .futureValue
@@ -93,7 +116,7 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
       val updateResult: Unit = repository.setUploadResult(uploadKey, UploadFormatError).futureValue
       val findAfterUpdateResult = find(Filters.equal("id", uploadKey.value)).futureValue.headOption.value
 
-      updateResult mustBe()
+      updateResult mustBe ()
       findAfterUpdateResult.lastUpdated mustBe instant
       findAfterUpdateResult.result.value.decryptedValue mustBe UploadFormatError
     }
@@ -106,7 +129,7 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
       val updateResult: Unit = repository.setUploadResult(uploadKey, UploadFormatError).futureValue
       val getResult = repository.getUploadResult(uploadKey).futureValue
 
-      updateResult mustBe()
+      updateResult mustBe ()
       getResult mustBe Some(UploadFormatError)
     }
   }
@@ -118,7 +141,7 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
       val removeResult: Unit = repository.remove(uploadKey).futureValue
       val findAfterRemoveResult = find(Filters.equal("id", uploadKey.value)).futureValue.headOption
 
-      removeResult mustBe()
+      removeResult mustBe ()
       findAfterRemoveResult mustBe None
     }
   }
@@ -128,8 +151,7 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
 
     repository.setUploadResult(uploadKey, UploadFormatError).futureValue
     val rawData =
-      repository
-        .collection
+      repository.collection
         .find[BsonDocument](Filters.equal("id", uploadKey.value))
         .toFuture()
         .futureValue
@@ -143,7 +165,7 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
     val insertResult: Unit = repository.insert(initialUploadDetails).futureValue
     val findResult = find(Filters.equal("id", uploadKey.value)).futureValue.headOption.value
 
-    insertResult mustBe()
+    insertResult mustBe ()
     findResult mustBe initialMongoUpload
   }
 }

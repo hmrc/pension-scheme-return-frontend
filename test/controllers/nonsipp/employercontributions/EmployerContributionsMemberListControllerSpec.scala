@@ -27,8 +27,9 @@ import pages.nonsipp.employercontributions.{EmployerContributionsMemberListPage,
 import services.PsrSubmissionService
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import org.mockito.Mockito.{reset, when}
 import forms.YesNoPageFormProvider
-import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController.{EmployerContributions, _}
+import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
 
 import scala.concurrent.Future
 

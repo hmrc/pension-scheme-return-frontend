@@ -17,15 +17,15 @@
 package utils
 
 import play.api.test.FakeRequest
-import akka.stream.Materializer
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
+import org.apache.pekko.stream.Materializer
 import org.scalatest.verbs.BehaveWord
-import akka.actor.ActorSystem
 import generators.Generators
+import org.apache.pekko.actor.ActorSystem
 import models.ModelSerializers
 import play.api.i18n.{Messages, MessagesApi}
-import org.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import org.scalatest.freespec.AnyFreeSpec

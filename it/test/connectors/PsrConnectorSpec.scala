@@ -34,20 +34,19 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  implicit override lazy val applicationBuilder: GuiceApplicationBuilder =
+  override implicit lazy val applicationBuilder: GuiceApplicationBuilder =
     super.applicationBuilder.configure("microservice.services.pensionSchemeReturn.port" -> wireMockPort)
 
-  implicit private val queryParamsToJava: Map[String, String] => java.util.Map[String, StringValuePattern] = _.map {
+  private implicit val queryParamsToJava: Map[String, String] => java.util.Map[String, StringValuePattern] = _.map {
     case (k, v) => k -> equalTo(v)
   }.asJava
 
-  def stubGet(url: String, queryParams: Map[String, String], response: ResponseDefinitionBuilder): StubMapping = {
+  def stubGet(url: String, queryParams: Map[String, String], response: ResponseDefinitionBuilder): StubMapping =
     wireMockServer.stubFor(
       get(urlPathTemplate(url))
         .withQueryParams(queryParams)
         .willReturn(response)
     )
-  }
 
   def stubPost(url: String, response: ResponseDefinitionBuilder): StubMapping =
     wireMockServer
@@ -66,22 +65,29 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
   "getStandardPsrDetails" - {
 
     "return standard Psr for start date and version" in runningApplication { implicit app =>
+      stubGet(
+        getStandardPsrDetailsUrl,
+        Map(
+          "periodStartDate" -> commonStartDate,
+          "psrVersion" -> commonVersion
+        ),
+        ok(Json.stringify(minimalSubmissionJson))
+      )
 
-      stubGet(getStandardPsrDetailsUrl, Map(
-        "periodStartDate" -> commonStartDate,
-        "psrVersion" -> commonVersion
-      ), ok(Json.stringify(minimalSubmissionJson)))
-
-      val result = connector.getStandardPsrDetails(commonPstr, None, Some(commonStartDate), Some(commonVersion)).futureValue
+      val result =
+        connector.getStandardPsrDetails(commonPstr, None, Some(commonStartDate), Some(commonVersion)).futureValue
 
       result mustBe Some(minimalSubmissionData)
     }
 
     "return standard Psr for fb number" in runningApplication { implicit app =>
-
-      stubGet(getStandardPsrDetailsUrl, Map(
-        "fbNumber" -> commonFbNumber
-      ), ok(Json.stringify(minimalSubmissionJson)))
+      stubGet(
+        getStandardPsrDetailsUrl,
+        Map(
+          "fbNumber" -> commonFbNumber
+        ),
+        ok(Json.stringify(minimalSubmissionJson))
+      )
 
       val result = connector.getStandardPsrDetails(commonPstr, Some(commonFbNumber), None, None).futureValue
 
@@ -89,11 +95,14 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
     }
 
     "return a details not found when 404 returned" in runningApplication { implicit app =>
-
-      stubGet(getStandardPsrDetailsUrl, Map(
-        "periodStartDate" -> commonStartDate,
-        "psrVersion" -> commonVersion
-      ), notFound())
+      stubGet(
+        getStandardPsrDetailsUrl,
+        Map(
+          "periodStartDate" -> commonStartDate,
+          "psrVersion" -> commonVersion
+        ),
+        notFound()
+      )
 
       val result = connector.getStandardPsrDetails(commonPstr, Some(commonFbNumber), None, None).futureValue
 
@@ -104,10 +113,9 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
   "submitStandardPsrDetails" - {
 
     "submit standard Psr" in runningApplication { implicit app =>
-
       stubPost(submitStandardUrl, noContent())
 
-      val result = connector.submitPsrDetails(minimalSubmissionData).futureValue
+      val result: Unit = connector.submitPsrDetails(minimalSubmissionData).futureValue
 
       result mustBe ()
     }
@@ -118,23 +126,29 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
   "get overview" - {
 
     "return overview details for start date and end date" in runningApplication { implicit app =>
+      stubGet(
+        getOverviewUrl,
+        Map(
+          "fromDate" -> commonStartDate,
+          "toDate" -> commonEndDate
+        ),
+        ok(Json.stringify(overviewJson))
+      )
 
-      stubGet(getOverviewUrl, Map(
-        "fromDate" -> commonStartDate,
-        "toDate" -> commonEndDate
-      ), ok(Json.stringify(overviewJson)))
-
-      val result = connector.getOverview(commonPstr,commonStartDate, commonEndDate).futureValue
+      val result = connector.getOverview(commonPstr, commonStartDate, commonEndDate).futureValue
 
       result mustBe Some(overviewResponse)
     }
 
     "return no overview details when 403" in runningApplication { implicit app =>
-
-      stubGet(getOverviewUrl, Map(
-        "fromDate" -> commonEndDate,
-        "toDate" -> commonStartDate
-      ), forbidden().withBody(Json.stringify(overviewJson)))
+      stubGet(
+        getOverviewUrl,
+        Map(
+          "fromDate" -> commonEndDate,
+          "toDate" -> commonStartDate
+        ),
+        forbidden().withBody(Json.stringify(overviewJson))
+      )
 
       val result = connector.getOverview(commonPstr, commonEndDate, commonStartDate).futureValue
 
@@ -142,4 +156,3 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
     }
   }
 }
-

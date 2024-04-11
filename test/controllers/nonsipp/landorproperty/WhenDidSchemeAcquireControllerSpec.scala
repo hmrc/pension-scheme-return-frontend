@@ -17,7 +17,6 @@
 package controllers.nonsipp.landorproperty
 
 import services.SchemeDateService
-import play.api.inject.guice.GuiceableModule
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
@@ -25,6 +24,8 @@ import views.html.DatePageView
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyWhenDidSchemeAcquirePage}
 import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.reset
 import models.{NormalMode, UserAnswers}
 import controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController._
 

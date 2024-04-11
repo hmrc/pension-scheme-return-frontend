@@ -17,7 +17,6 @@
 package controllers.nonsipp.shares
 
 import services.PsrSubmissionService
-import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
@@ -26,6 +25,8 @@ import forms.YesNoPageFormProvider
 import models.NormalMode
 import controllers.nonsipp.shares.DidSchemeHoldAnySharesController._
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito._
 
 class DidSchemeHoldAnySharesControllerSpec extends ControllerBaseSpec {
 

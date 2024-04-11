@@ -18,7 +18,6 @@ package controllers.nonsipp.schemedesignatory
 
 import services.SchemeDateService
 import pages.nonsipp.schemedesignatory.ValueOfAssetsPage
-import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.MoneyView
@@ -27,10 +26,12 @@ import play.api.libs.json.JsPath
 import forms.MoneyFormProvider
 import models._
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, when}
 
 class ValueOfAssetsControllerSpec extends ControllerBaseSpec {
 
-  val schemeDatePeriod = dateRangeGen.sample.value
+  val schemeDatePeriod: DateRange = dateRangeGen.sample.value
   val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   val maxAllowedAmount = 999999999.99
 
