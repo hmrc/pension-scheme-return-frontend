@@ -490,18 +490,18 @@ object TaskListController {
     )
   }
 
-  private def otherAssetsSection(srn: Srn, userAnswers: UserAnswers) = {
+  private def otherAssetsSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.otherassets"
-    val statusAndLink = getOtherAssetsTaskListStatusAndLink(userAnswers, srn)
+    val (assetsStatus, assetsLink) = getOtherAssetsTaskListStatusAndLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "title", statusAndLink._1),
-          statusAndLink._2
+          messageKey(prefix, "title", assetsStatus),
+          assetsLink
         ),
-        statusAndLink._1
+        assetsStatus
       ),
       TaskListItemViewModel(
         LinkMessage(

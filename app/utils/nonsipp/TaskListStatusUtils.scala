@@ -19,7 +19,7 @@ package utils.nonsipp
 import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
 import models.ConditionalYesNo._
 import pages.nonsipp.shares._
-import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
+import pages.nonsipp.otherassetsheld._
 import config.Refined.{Max5000, OneTo5000}
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
@@ -560,19 +560,32 @@ object TaskListStatusUtils {
   }
 
   def getOtherAssetsTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val hadAssetsPage = userAnswers.get(OtherAssetsHeldPage(srn))
     val defaultLink =
       controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController
         .onPageLoad(srn, NormalMode)
         .url
-    hadAssetsPage match {
-      case None => (NotStarted, defaultLink)
-      case Some(hadAssets) =>
-        if (!hadAssets) {
-          (Completed, defaultLink)
-        } else {
-          (InProgress, defaultLink)
-        }
+    val assetsListPageUrl =
+      controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
+
+    val hadAssetsPage = userAnswers.get(OtherAssetsHeldPage(srn))
+    val assetsStatusPage = userAnswers.get(OtherAssetsJourneyStatus(srn))
+    val firstPages = userAnswers.get(WhatIsOtherAssetPages(srn))
+    val lastPages = userAnswers.map(OtherAssetsCompleted.all(srn))
+    val incompleteIndex: Int = getIncompleteIndex(firstPages, Some(lastPages))
+    val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+      _ => assetsListPageUrl,
+      index =>
+        controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController.onPageLoad(srn, index, NormalMode).url
+    )
+
+    (hadAssetsPage, assetsStatusPage) match {
+      case (None, _) => (NotStarted, defaultLink)
+      case (Some(false), _) => (Completed, defaultLink)
+      case (Some(true), None) => (InProgress, inProgressCalculatedUrl)
+      case (Some(true), Some(SectionStatus.Completed)) => (Completed, assetsListPageUrl)
+      case (Some(true), Some(SectionStatus.InProgress)) => (InProgress, inProgressCalculatedUrl)
     }
   }
 

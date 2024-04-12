@@ -18,7 +18,7 @@ package utils.nonsipp
 
 import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
 import pages.nonsipp.shares._
-import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
+import pages.nonsipp.otherassetsheld._
 import config.Refined.Max5000
 import controllers.TestValues
 import pages.nonsipp.landorproperty._
@@ -575,18 +575,96 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         .onPageLoad(srn, NormalMode)
         .url
 
+    val assetsListPageUrl =
+      controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
+
+    val whatIsAssetUrlIndexOne =
+      controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController
+        .onPageLoad(srn, refineMV(1), NormalMode)
+        .url
+
+    val whatIsAssetUrlIndexTwo =
+      controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController
+        .onPageLoad(srn, refineMV(2), NormalMode)
+        .url
+
     "should be Not Started" - {
       "when default data" in {
         val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(defaultUserAnswers, srn)
         result mustBe (NotStarted, hadAssetsPageUrl)
       }
     }
+
     "should be Complete" - {
-      "when only OtherAssetsHeldPage false is present" in {
+      "when OtherAssetsHeldPage is false" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(OtherAssetsHeldPage(srn), false)
         val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn)
         result mustBe (Completed, hadAssetsPageUrl)
+      }
+
+      "when OtherAssetsHeldPage is true and JourneyStatus is Completed" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(OtherAssetsJourneyStatus(srn), SectionStatus.Completed)
+        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (Completed, assetsListPageUrl)
+      }
+    }
+
+    "should be InProgress" - {
+      "when only OtherAssetsHeldPage is true" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, whatIsAssetUrlIndexOne)
+      }
+
+      "when OtherAssetsHeldPage is true and JourneyStatus is InProgress" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(OtherAssetsJourneyStatus(srn), SectionStatus.InProgress)
+        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, whatIsAssetUrlIndexOne)
+      }
+
+      "when OtherAssetsHeldPage is true and JourneyStatus is InProgress - first asset incomplete" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(OtherAssetsJourneyStatus(srn), SectionStatus.InProgress)
+          // first asset:
+          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(1)), "asset one")
+          // second asset:
+          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "asset two")
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(2)), SectionCompleted)
+        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, whatIsAssetUrlIndexOne)
+      }
+
+      "when OtherAssetsHeldPage is true and JourneyStatus is InProgress - second asset incomplete" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(OtherAssetsJourneyStatus(srn), SectionStatus.InProgress)
+          // first asset:
+          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(1)), "asset one")
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
+          // second asset:
+          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "asset two")
+        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, whatIsAssetUrlIndexTwo)
+      }
+
+      "when OtherAssetsHeldPage is true and JourneyStatus is InProgress - first asset removed" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(OtherAssetsJourneyStatus(srn), SectionStatus.InProgress)
+          // nothing for the first asset:
+          // second asset:
+          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "asset two")
+        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, whatIsAssetUrlIndexTwo)
       }
     }
   }
