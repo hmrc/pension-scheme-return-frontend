@@ -16,17 +16,16 @@
 
 package controllers.nonsipp
 
-import services.SchemeDateService
+import services.{PsrVersionsService, SchemeDateService}
 import pages.nonsipp.memberdetails._
 import play.api.mvc._
 import com.google.inject.Inject
+import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils._
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import pages.nonsipp.CheckReturnDatesPage
-import utils.nonsipp.TaskListStatusUtils
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsJourneyStatus
 import viewmodels.models.TaskListStatus._
-import models.requests.DataRequest
 import _root_.config.Refined.OneTo300
 import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
@@ -40,15 +39,18 @@ import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import pages.nonsipp.memberpensionpayments.{PensionPaymentsJourneyStatus, PensionPaymentsReceivedPage}
 import controllers.actions._
 import eu.timepit.refined.refineV
+import utils.nonsipp.TaskListStatusUtils
+import models.backend.responses.ReportStatus
 import utils.DateTimeUtils.localDateShow
 import models._
 import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
-import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import play.api.i18n.MessagesApi
 import pages.nonsipp.bondsdisposal.BondsDisposalPage
 import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
 import viewmodels.DisplayMessage._
 import viewmodels.models.{TaskListStatus, _}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 
@@ -57,29 +59,37 @@ class TaskListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: TaskListView,
-  schemeDateService: SchemeDateService
-) extends FrontendBaseController
-    with I18nSupport {
+  schemeDateService: SchemeDateService,
+  psrVersionsService: PsrVersionsService
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
-  def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    withSchemeDate(srn) { dates =>
-      val viewModel = TaskListController.viewModel(
-        srn,
-        request.schemeDetails.schemeName,
-        dates.from,
-        dates.to,
-        request.userAnswers,
-        request.pensionSchemeId
-      )
-      Ok(view(viewModel))
+  def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    schemeDateService.schemeDate(srn) match {
+      case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      case Some(dates) =>
+        for {
+          response <- psrVersionsService.getVersions(request.schemeDetails.pstr, formatDateForApi(dates.from))
+          hasHistory = response
+            .filter(
+              psrVersionsService =>
+                psrVersionsService.reportStatus == ReportStatus.SubmittedAndInProgress
+                  || psrVersionsService.reportStatus == ReportStatus.SubmittedAndSuccessfullyProcessed
+            )
+            .toList
+            .nonEmpty
+          viewModel = TaskListController.viewModel(
+            srn,
+            request.schemeDetails.schemeName,
+            dates.from,
+            dates.to,
+            request.userAnswers,
+            request.pensionSchemeId,
+            hasHistory
+          )
+        } yield Ok(view(viewModel))
     }
   }
-
-  private def withSchemeDate(srn: Srn)(body: DateRange => Result)(implicit request: DataRequest[_]): Result =
-    schemeDateService.schemeDate(srn) match {
-      case Some(dates) => body(dates)
-      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-    }
 }
 
 object TaskListController {
@@ -549,7 +559,8 @@ object TaskListController {
     startDate: LocalDate,
     endDate: LocalDate,
     userAnswers: UserAnswers,
-    pensionSchemeId: PensionSchemeId
+    pensionSchemeId: PensionSchemeId,
+    hasHistory: Boolean = false
   ): PageViewModel[TaskListViewModel] = {
 
     val sectionListWithoutDeclaration = List(
@@ -592,7 +603,20 @@ object TaskListController {
         isLinkActive
       )
 
+    val historyLink = if (hasHistory) {
+      Some(
+        LinkMessage(
+          Message("nonsipp.tasklist.history"),
+          controllers.routes.ReturnsSubmittedController.onPageLoad(srn, 1).url
+        )
+      )
+    } else {
+      None
+    }
+
     val viewModel = TaskListViewModel(
+      hasHistory,
+      historyLink,
       sectionListWithoutDeclaration.head,
       sectionListWithoutDeclaration.tail :+ declarationSectionViewModel: _*
     )

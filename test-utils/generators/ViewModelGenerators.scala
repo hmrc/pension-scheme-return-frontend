@@ -341,5 +341,5 @@ trait ViewModelGenerators extends BasicGenerators {
     Gen
       .nonEmptyListOf(taskListSectionViewModelGen)
       .map(NonEmptyList.fromList(_).get)
-      .map(TaskListViewModel(_))
+      .map(TaskListViewModel(false, None, _))
 }

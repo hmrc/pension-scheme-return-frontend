@@ -49,15 +49,21 @@ object TaskListSectionViewModel {
     TaskListSectionViewModel(title, Left(item), Some(postActionLink))
 }
 
-case class TaskListViewModel(sections: NonEmptyList[TaskListSectionViewModel])
+case class TaskListViewModel(
+  hasHistory: Boolean,
+  historyLink: Option[LinkMessage],
+  sections: NonEmptyList[TaskListSectionViewModel]
+)
 
 object TaskListViewModel {
 
   def apply(
+    hasHistory: Boolean,
+    historyLink: Option[LinkMessage],
     headItem: TaskListSectionViewModel,
     tailItems: TaskListSectionViewModel*
   ): TaskListViewModel =
-    TaskListViewModel(NonEmptyList(headItem, tailItems.toList))
+    TaskListViewModel(hasHistory, historyLink, NonEmptyList(headItem, tailItems.toList))
 }
 
 object TaskListStatus {

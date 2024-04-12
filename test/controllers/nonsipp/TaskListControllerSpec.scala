@@ -16,7 +16,7 @@
 
 package controllers.nonsipp
 
-import services.SchemeDateService
+import services.{PsrVersionsService, SchemeDateService}
 import pages.nonsipp.schemedesignatory._
 import models.ConditionalYesNo._
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
@@ -41,19 +41,26 @@ import play.api.inject
 import viewmodels.models.TaskListStatus.TaskListStatus
 import pages.nonsipp.common.IdentityTypePage
 
+import scala.concurrent.Future
+
 class TaskListControllerSpec extends ControllerBaseSpec {
 
   val schemeDateRange: DateRange = dateRangeGen.sample.value
   val pensionSchemeId: PensionSchemeId = pensionSchemeIdGen.sample.value
 
   private val mockSchemeDateService = mock[SchemeDateService]
+  private val mockPsrVersionsService = mock[PsrVersionsService]
 
   override val additionalBindings: List[GuiceableModule] =
-    List(inject.bind[SchemeDateService].toInstance(mockSchemeDateService))
+    List(
+      inject.bind[SchemeDateService].toInstance(mockSchemeDateService),
+      inject.bind[PsrVersionsService].toInstance(mockPsrVersionsService)
+    )
 
   override def beforeEach(): Unit = {
     super.beforeEach()
     when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(schemeDateRange))
+    when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(Future.successful(Seq()))
   }
 
   "TaskListController" - {

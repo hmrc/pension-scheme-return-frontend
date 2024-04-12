@@ -11,7 +11,7 @@ site.yes = Yes
 site.next = Next
 site.previous = Previous
 site.view = View
-site.viewOrChange = View or change
+site.viewOrChange = View or change
 site.start = Start
 
 site.continue = Continue
@@ -984,6 +984,7 @@ membersUploaded.error.required = Select yes if you want to upload a member detai
 nonsipp.tasklist.title = Pension scheme return for {0} to {1}
 nonsipp.tasklist.heading = Pension scheme return for {0} to {1}
 nonsipp.tasklist.subheading = Return incomplete
+nonsipp.tasklist.history = View all versions of this return
 nonsipp.tasklist.description = You have completed {0} of {1} sections.
 nonsipp.tasklist.schemedetails.title = Scheme details
 nonsipp.tasklist.schemedetails.details.title = Change {0}’s basic details
@@ -2711,13 +2712,13 @@ overview.status.ReportStatusCompiled = In progress
 overview.status.SubmittedAndInProgress = Submitted
 overview.status.SubmittedAndSuccessfullyProcessed = Submitted
 
-returnHistory.title = Pension scheme returns submitted
-returnHistory.heading = Pension scheme returns submitted
-returnHistory.table.header1 = TaxYearStart
-returnHistory.table.header2 = Version
-returnHistory.table.header3 = FormBundleNumber
-returnHistory.table.header4 = Status
-returnHistory.table.header5 = SubmittedBy
+returnsSubmitted.title = Pension scheme returns submitted for {0} to {1}
+returnsSubmitted.heading = Pension scheme returns submitted for {0} to {1}
+returnsSubmitted.table.header1 = Submission
+returnsSubmitted.table.header2 = Submitted on
+returnsSubmitted.table.header3 = Submitted by
+returnsSubmitted.table.header4 = Action
+returnsSubmitted.link = Return to latest pension scheme return for {0}
 
 removeShares.title = Are you sure you want to remove this share transaction?
 removeShares.heading = Are you sure you want to remove the share transaction for {0}?

@@ -147,6 +147,8 @@ trait TestValues {
   val reasonSurrenderedBenefits = "test reason surrendered benefits"
   val fbNumber = "123456785011"
   val startDate = "2023-04-06"
+  val fromYearUi = "6 April 2020"
+  val toYearUi = "5 April 2021"
   val otherDetails = "other details"
   val bondsStillHeld = 5
   val nameOfBonds = "name of bonds"

@@ -18,11 +18,10 @@ package viewmodels
 
 import uk.gov.hmrc.govukfrontend.views.Aliases.Actions
 
-case class ReturnHistorySummary(
+case class ReturnsSubmittedSummary(
   key: String,
   firstValue: String,
   secondValue: String,
   thirdValue: String,
-  fourthValue: String,
   actions: Option[Actions]
 )

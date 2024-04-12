@@ -59,6 +59,10 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
   private val getStandardPsrDetailsUrl = s"/pension-scheme-return/psr/standard/$commonPstr"
   private val submitStandardUrl = s"/pension-scheme-return/psr/standard"
   private val getOverviewUrl = s"/pension-scheme-return/psr/overview/$commonPstr"
+  private val startDates = Seq(commonStartDate)
+  private val getVersionsForYearsUrl =
+    s"/pension-scheme-return/psr/versions/years/$commonPstr?startDates=${startDates.mkString("&startDates=")}"
+  private val getVersionsUrl = s"/pension-scheme-return/psr/versions/$commonPstr?startDate=$commonStartDate"
 
   def connector(implicit app: Application): PSRConnector = injected[PSRConnector]
 
@@ -121,7 +125,81 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
     }
   }
 
-  // TODO getVersionsForYears
+  "get getVersionsForYears" - {
+
+    "return getVersionsForYears for start date and end date" in runningApplication { implicit app =>
+      stubGet(
+        getVersionsForYearsUrl,
+        ok(Json.stringify(getVersionsForYearsJson))
+      )
+
+      val result = connector
+        .getVersionsForYears(commonPstr, Seq(commonStartDate))
+        .futureValue
+
+      result mustBe versionsForYearsResponse
+    }
+
+    "return empty list when getVersionsForYears called and 403 returned" in runningApplication { implicit app =>
+      stubGet(
+        getVersionsForYearsUrl,
+        forbidden().withBody(Json.stringify(getVersionsForYears403Json))
+      )
+
+      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate)).futureValue
+
+      result mustBe List()
+    }
+
+    "return empty list when getVersionsForYears called and data not found" in runningApplication { implicit app =>
+      stubGet(
+        getVersionsForYearsUrl,
+        forbidden().withBody(Json.stringify(getVersionsForYearsNotFoundJson))
+      )
+
+      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate)).futureValue
+
+      result mustBe List()
+    }
+  }
+
+  "get getVersions" - {
+
+    "return getVersions data for a start date" in runningApplication { implicit app =>
+      stubGet(
+        getVersionsUrl,
+        ok(Json.stringify(getVersionsJson))
+      )
+
+      val result = connector
+        .getVersions(commonPstr, commonStartDate)
+        .futureValue
+
+      result mustBe versionsResponse
+    }
+
+    "return empty list when getVersionsForYears called and 403 returned" in runningApplication { implicit app =>
+      stubGet(
+        getVersionsUrl,
+        forbidden().withBody(Json.stringify(getVersionsForYears403Json))
+      )
+
+      val result = connector.getVersions(commonPstr, commonStartDate).futureValue
+
+      result mustBe List()
+    }
+
+    "return empty list when getVersions called and data not found" in runningApplication { implicit app =>
+      stubGet(
+        getVersionsUrl,
+        forbidden().withBody(Json.stringify(getVersionsForYearsNotFoundJson))
+      )
+
+      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate)).futureValue
+
+      result mustBe List()
+    }
+  }
 
   "get overview" - {
 

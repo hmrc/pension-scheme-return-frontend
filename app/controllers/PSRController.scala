@@ -24,6 +24,7 @@ import cats.data.{EitherT, NonEmptyList}
 import cats.implicits.toTraverseOps
 import cats.syntax.applicative._
 import play.api.libs.json.{Reads, Writes}
+import models.backend.responses.{IndividualDetails, PsrVersionsResponse}
 import models.{DateRange, UserAnswers}
 import cats.Applicative
 import models.requests.DataRequest
@@ -35,6 +36,9 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
+
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 abstract class PSRController extends FrontendBaseController with I18nSupport {
 
@@ -70,6 +74,25 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
 
   def refineIndex[A](index: Int)(implicit ev: Validate[Int, A]): Option[Refined[Int, A]] =
     refineV[A](index + 1).toOption
+
+  def formatDateForApi(date: LocalDate): String =
+    date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
+  def getSubmitter(response: PsrVersionsResponse): String = {
+    val emptySubmitterName = ""
+    response.reportSubmitterDetails.fold(emptySubmitterName)(
+      submitter =>
+        submitter.individualDetails match {
+          case Some(individualDetails: IndividualDetails) =>
+            individualDetails.firstName + " " + individualDetails.lastName
+          case None =>
+            submitter.organisationOrPartnershipDetails match {
+              case Some(orgDetails) => orgDetails.organisationOrPartnershipName
+              case None => emptySubmitterName
+            }
+        }
+    )
+  }
 
   implicit class OptionOps[A](maybe: Option[A]) {
     def getOrRecoverJourney[F[_]: Applicative](f: A => F[Result]): F[Result] = maybe match {

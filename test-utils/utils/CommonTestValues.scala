@@ -85,7 +85,7 @@ trait CommonTestValues {
   val versionsResponse: Seq[PsrVersionsResponse] = {
     Seq(
       PsrVersionsResponse(
-        startDate = Some(LocalDate.parse("2020-04-06")),
+        startDate = None,
         reportFormBundleNumber = commonFbNumber,
         reportVersion = commonVersion.toInt,
         reportStatus = ReportStatus.SubmittedAndSuccessfullyProcessed,
@@ -95,7 +95,7 @@ trait CommonTestValues {
             reportSubmittedBy = "PSP",
             organisationOrPartnershipDetails = Some(
               OrganisationOrPartnershipDetails(
-                "psaOrgName"
+                "pspOrgName"
               )
             ),
             individualDetails = None
@@ -179,6 +179,75 @@ trait CommonTestValues {
       |        "ntfDateOfIssue": "2021-12-06",
       |        "psrDueDate": "2022-03-31",
       |        "psrReportType": "SIPP"
+      |    }
+      |]
+      |""".stripMargin
+  )
+
+  val getVersionsForYearsJson: JsValue = Json.parse(
+    """
+      |[
+      |    {
+      |        "startDate": "2020-04-06",
+      |        "data": [
+      |            {
+      |                "reportFormBundleNumber": "123456785011",
+      |                "reportVersion": 1,
+      |                "reportStatus": "SubmittedAndSuccessfullyProcessed",
+      |                "compilationOrSubmissionDate": "2020-04-06T12:00:00",
+      |                "reportSubmitterDetails": {
+      |                    "reportSubmittedBy": "PSP",
+      |                    "organisationOrPartnershipDetails": {
+      |                        "organisationOrPartnershipName": "pspOrgName"
+      |                    }
+      |                },
+      |                "psaDetails": {
+      |                    "psaOrganisationOrPartnershipDetails": {
+      |                        "organisationOrPartnershipName": "psaOrgName"
+      |                    }
+      |                }
+      |            }
+      |        ]
+      |    }
+      |]
+      |""".stripMargin
+  )
+  val getVersionsForYears403Json: JsValue = Json.parse(
+    """
+      |{
+      |    "statusCode": 403,
+      |    "message": "returned 403. Response body: '{\"failures\":[{\"code\":\"PERIOD_START_DATE_NOT_IN_RANGE\",\"reason\":\"The remote endpoint has indicated that Period Start Date cannot be in the future.\"}]}'"
+      |}
+      |""".stripMargin
+  )
+
+  val getVersionsForYearsNotFoundJson: JsValue = Json.parse(
+    """
+      |    {
+      |        "startDate": "2020-04-06",
+      |        "data": []
+      |    }
+      |""".stripMargin
+  )
+  val getVersionsJson: JsValue = Json.parse(
+    """
+      |[
+      |    {
+      |        "reportFormBundleNumber": "123456785011",
+      |        "reportVersion": 1,
+      |        "reportStatus": "SubmittedAndSuccessfullyProcessed",
+      |        "compilationOrSubmissionDate": "2020-04-06T12:00:00",
+      |        "reportSubmitterDetails": {
+      |            "reportSubmittedBy": "PSP",
+      |            "organisationOrPartnershipDetails": {
+      |                "organisationOrPartnershipName": "pspOrgName"
+      |            }
+      |        },
+      |        "psaDetails": {
+      |            "psaOrganisationOrPartnershipDetails": {
+      |                "organisationOrPartnershipName": "psaOrgName"
+      |            }
+      |        }
       |    }
       |]
       |""".stripMargin

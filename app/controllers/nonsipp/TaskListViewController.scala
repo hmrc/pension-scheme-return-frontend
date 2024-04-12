@@ -128,6 +128,8 @@ object TaskListViewController {
       )
 
     val viewModel = TaskListViewModel(
+      false,
+      None,
       sectionListWithoutDeclaration.head,
       sectionListWithoutDeclaration.tail :+ declarationSectionViewModel: _*
     )

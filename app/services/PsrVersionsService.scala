@@ -17,7 +17,7 @@
 package services
 
 import connectors.PSRConnector
-import models.backend.responses.PsrVersionsForYearsResponse
+import models.backend.responses.{PsrVersionsForYearsResponse, PsrVersionsResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,4 +31,9 @@ class PsrVersionsService @Inject()(psrConnector: PSRConnector) {
   ): Future[Seq[PsrVersionsForYearsResponse]] =
     psrConnector.getVersionsForYears(pstr, startDates)
 
+  def getVersions(pstr: String, startDate: String)(
+    implicit hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Seq[PsrVersionsResponse]] =
+    psrConnector.getVersions(pstr, startDate)
 }

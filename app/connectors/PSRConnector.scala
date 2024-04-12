@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import models.requests.psr.PsrSubmission
 import play.api.Logger
 import play.api.libs.json._
-import models.backend.responses.{OverviewResponse, PsrVersionsForYearsResponse}
+import models.backend.responses.{OverviewResponse, PsrVersionsForYearsResponse, PsrVersionsResponse}
 import play.api.http.Status.{NOT_FOUND, OK}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
@@ -35,6 +35,10 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
   protected val logger: Logger = Logger(classOf[PSRConnector])
   private def submitStandardUrl = s"$baseUrl/pension-scheme-return/psr/standard"
   private def overviewUrl(pstr: String) = s"$baseUrl/pension-scheme-return/psr/overview/$pstr"
+  private def versionsForYearsUrl(pstr: String, startDates: Seq[String]) =
+    s"$baseUrl/pension-scheme-return/psr/versions/years/$pstr?startDates=${startDates.mkString("&startDates=")}"
+  private def versionsUrl(pstr: String, startDate: String) =
+    s"$baseUrl/pension-scheme-return/psr/versions/$pstr?startDate=$startDate"
 
   def submitPsrDetails(
     psrSubmission: PsrSubmission
@@ -80,7 +84,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
   ): Future[Seq[PsrVersionsForYearsResponse]] =
     http
       .GET[HttpResponse](
-        s"$baseUrl/pension-scheme-return/psr/versions/years/$pstr?startDates=${startDates.mkString("&startDates=")}"
+        versionsForYearsUrl(pstr, startDates)
       )
       .map { response =>
         response.status match {
@@ -91,19 +95,56 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
                   .as[Seq[PsrVersionsForYearsResponse]]
               case JsError(errors) =>
                 logger.error(
-                  s"getVersions for $pstr and $startDates returned http response 200 but could not parse the response body"
+                  s"getVersions for $pstr and years $startDates returned http response 200 but could not parse the response body"
                 )
                 throw JsResultException(errors)
             }
           case NOT_FOUND =>
-            logger.error(s"getVersions for $pstr and $startDates returned http response 404 - returning empty Seq")
-            Seq.empty[PsrVersionsForYearsResponse]
-          case _ =>
-            // just logging errors to be able to continue on QA env
             logger.error(
-              s"getVersions for $pstr and $startDates returned http response $response.status - returning empty Seq"
+              s"getVersions for $pstr and years $startDates returned http response 404 - returning empty Seq"
             )
             Seq.empty[PsrVersionsForYearsResponse]
+          case _ =>
+            // TODO verify if there are still 503 returned on QA
+            // just logging errors to be able to continue on QA env
+            logger.error(
+              s"getVersions for $pstr and years $startDates returned http response $response.status - returning empty Seq"
+            )
+            Seq.empty[PsrVersionsForYearsResponse]
+        }
+      }
+
+  def getVersions(pstr: String, startDate: String)(
+    implicit hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Seq[PsrVersionsResponse]] =
+    http
+      .GET[HttpResponse](
+        versionsUrl(pstr, startDate)
+      )
+      .map { response =>
+        response.status match {
+          case OK =>
+            Json.parse(response.body).validate[Seq[PsrVersionsResponse]] match {
+              case JsSuccess(_, _) =>
+                response.json
+                  .as[Seq[PsrVersionsResponse]]
+              case JsError(errors) =>
+                logger.error(
+                  s"getVersions for $pstr and $startDate returned http response 200 but could not parse the response body"
+                )
+                throw JsResultException(errors)
+            }
+          case NOT_FOUND =>
+            logger.error(s"getVersions for $pstr and $startDate returned http response 404 - returning empty Seq")
+            Seq.empty[PsrVersionsResponse]
+          case _ =>
+            // TODO verify if there are still 503 returned on QA
+            // just logging errors to be able to continue on QA env
+            logger.error(
+              s"getVersions for $pstr and $startDate returned http response $response.status - returning empty Seq"
+            )
+            Seq.empty[PsrVersionsResponse]
         }
       }
 
