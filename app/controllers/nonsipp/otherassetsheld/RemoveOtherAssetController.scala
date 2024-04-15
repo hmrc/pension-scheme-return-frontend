@@ -19,7 +19,7 @@ package controllers.nonsipp.otherassetsheld
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.otherassetsheld.{RemoveOtherAssetPage, WhatIsOtherAssetPage}
+import pages.nonsipp.otherassetsheld.{OtherAssetsJourneyStatus, RemoveOtherAssetPage, WhatIsOtherAssetPage}
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
@@ -30,7 +30,7 @@ import play.api.i18n.MessagesApi
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
 import models.requests.DataRequest
 import play.api.data.Form
 
@@ -90,7 +90,9 @@ class RemoveOtherAssetController @Inject()(
                 removedUserAnswers <- Future
                   .fromTry(
                     // Remove the first page in the journey only
-                    request.userAnswers.remove(WhatIsOtherAssetPage(srn, index))
+                    request.userAnswers
+                      .remove(WhatIsOtherAssetPage(srn, index))
+                      .set(OtherAssetsJourneyStatus(srn), SectionStatus.InProgress)
                   )
 
                 _ <- saveService.save(removedUserAnswers)

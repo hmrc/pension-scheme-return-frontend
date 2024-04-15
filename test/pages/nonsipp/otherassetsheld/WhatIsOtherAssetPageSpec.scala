@@ -44,12 +44,14 @@ class WhatIsOtherAssetPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(WhatIsOtherAssetPage(srn, index), otherName)
         .unsafeSet(IncomeFromAssetPage(srn, index), money)
         .unsafeSet(OtherAssetsHeldPage(srn), true)
+        .unsafeSet(OtherAssetsListPage(srn), true)
 
     s"remove index" in {
       val result =
         WhatIsOtherAssetPage(srn, index).cleanup(None, userAnswers).toOption.value
       result.get(IncomeFromAssetPage(srn, index)) mustBe None
       result.get(OtherAssetsHeldPage(srn)) mustBe None
+      result.get(OtherAssetsListPage(srn)) mustBe None
     }
   }
 
@@ -62,6 +64,7 @@ class WhatIsOtherAssetPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(WhatIsOtherAssetPage(srn, index2), otherName)
         .unsafeSet(IncomeFromAssetPage(srn, index2), money)
         .unsafeSet(OtherAssetsHeldPage(srn), true)
+        .unsafeSet(OtherAssetsListPage(srn), true)
 
     s"remove index" in {
       val result =
@@ -69,6 +72,7 @@ class WhatIsOtherAssetPageSpec extends PageBehaviours with TestValues {
       result.get(IncomeFromAssetPage(srn, index)) mustBe None
       result.get(IncomeFromAssetPage(srn, index2)) must not be None
       result.get(OtherAssetsHeldPage(srn)) must not be None
+      result.get(OtherAssetsListPage(srn)) must not be None
     }
   }
 }

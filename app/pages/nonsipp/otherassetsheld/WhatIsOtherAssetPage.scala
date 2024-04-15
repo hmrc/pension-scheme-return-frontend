@@ -54,7 +54,7 @@ case class WhatIsOtherAssetPage(srn: Srn, index: Max5000) extends QuestionPage[S
       OtherAssetsCYAPointOfEntry(srn, index),
       OtherAssetsCompleted(srn, index)
     )
-    if (isLastRecord) list :+ OtherAssetsHeldPage(srn) else list
+    if (isLastRecord) list :+ OtherAssetsHeldPage(srn) :+ OtherAssetsListPage(srn) else list
   }
 }
 
