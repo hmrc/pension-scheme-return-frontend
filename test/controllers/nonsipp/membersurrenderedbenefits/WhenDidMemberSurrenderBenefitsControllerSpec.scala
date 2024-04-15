@@ -27,6 +27,7 @@ import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, W
 import models.{NormalMode, UserAnswers}
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import org.mockito.Mockito.reset
 
 class WhenDidMemberSurrenderBenefitsControllerSpec extends ControllerBaseSpec {
 

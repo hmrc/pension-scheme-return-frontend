@@ -18,12 +18,12 @@ package navigation.nonsipp
 
 import pages.nonsipp.otherassetsdisposal._
 import play.api.mvc.Call
+import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPages
 import cats.implicits.toTraverseOps
 import navigation.JourneyNavigator
 import models._
 import config.Refined.Max50
 import pages.Page
-import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPages
 
 object OtherAssetsDisposalNavigator extends JourneyNavigator {
 

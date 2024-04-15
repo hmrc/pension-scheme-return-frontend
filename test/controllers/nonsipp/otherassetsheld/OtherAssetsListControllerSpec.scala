@@ -17,7 +17,6 @@
 package controllers.nonsipp.otherassetsheld
 
 import services.PsrSubmissionService
-import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.otherassetsheld._
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
@@ -29,6 +28,8 @@ import controllers.nonsipp.otherassetsheld.OtherAssetsListController._
 import models._
 import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, when}
 
 import scala.concurrent.Future
 

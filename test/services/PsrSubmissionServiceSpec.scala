@@ -32,6 +32,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import services.PsrSubmissionServiceSpec.{captor, minimalRequiredSubmission}
 import play.api.test.FakeRequest
+import org.mockito.Mockito._
 import utils.BaseSpec
 import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
@@ -504,7 +505,8 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     )
 
     "shouldn't submitPsrDetails request when userAnswer is empty" in {
-
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+        .thenReturn(Some(minimalRequiredSubmission))
       whenReady(service.submitPsrDetails(srn)) { result: Option[Unit] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
         verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())

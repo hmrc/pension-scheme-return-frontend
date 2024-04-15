@@ -24,17 +24,15 @@ import utils.BaseSpec
 
 abstract class BaseConnectorSpec extends BaseSpec with WireMockSupport {
 
-  def stubGet(url: String, response: ResponseDefinitionBuilder): StubMapping = {
+  def stubGet(url: String, response: ResponseDefinitionBuilder): StubMapping =
     wireMockServer.stubFor(
       get(urlEqualTo(url))
         .willReturn(response)
     )
-  }
 
-  def stubDelete(url: String, response: ResponseDefinitionBuilder): StubMapping = {
+  def stubDelete(url: String, response: ResponseDefinitionBuilder): StubMapping =
     wireMockServer.stubFor(
       delete(urlEqualTo(url))
         .willReturn(response)
     )
-  }
 }

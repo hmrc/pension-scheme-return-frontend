@@ -27,6 +27,7 @@ import forms.DatePageFormProvider
 import models.{NormalMode, UserAnswers}
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import org.mockito.Mockito.reset
 import controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController._
 
 class WhenWasTransferReceivedControllerSpec extends ControllerBaseSpec {

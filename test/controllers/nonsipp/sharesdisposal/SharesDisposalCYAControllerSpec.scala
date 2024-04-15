@@ -17,7 +17,6 @@
 package controllers.nonsipp.sharesdisposal
 
 import services.PsrSubmissionService
-import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.shares._
 import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
 import config.Refined.{OneTo50, OneTo5000}
@@ -29,6 +28,8 @@ import pages.nonsipp.sharesdisposal._
 import uk.gov.hmrc.domain.Nino
 import models._
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito._
 
 import scala.concurrent.Future
 

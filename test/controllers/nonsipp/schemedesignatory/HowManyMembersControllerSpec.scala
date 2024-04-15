@@ -18,7 +18,6 @@ package controllers.nonsipp.schemedesignatory
 
 import services.SchemeDateService
 import pages.nonsipp.schemedesignatory.HowManyMembersPage
-import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.IntView
@@ -26,6 +25,8 @@ import controllers.nonsipp.schemedesignatory.HowManyMembersController._
 import forms.IntFormProvider
 import models.{NormalMode, SchemeMemberNumbers}
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.when
 
 import java.time.LocalDate
 

@@ -16,9 +16,9 @@
 
 package services
 
-import akka.util.ByteString
-import akka.stream.scaladsl.Source
+import org.apache.pekko.util.ByteString
 import connectors.UpscanConnector
+import org.apache.pekko.stream.scaladsl.Source
 import models._
 import models.UploadStatus.UploadStatus
 import repositories.UploadRepository

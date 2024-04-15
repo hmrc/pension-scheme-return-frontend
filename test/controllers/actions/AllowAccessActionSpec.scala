@@ -33,6 +33,7 @@ import play.api.mvc.Results.Ok
 import org.mockito.ArgumentMatchers.{any, eq => meq}
 import utils.BaseSpec
 import play.api.test.Helpers._
+import org.mockito.Mockito.{reset, when}
 import play.api.Application
 import play.api.libs.json.Json
 
@@ -87,7 +88,8 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       .thenReturn(result)
 
   override def beforeEach(): Unit = {
-    reset(mockSchemeDetailsConnector, mockMinimalDetailsConnector)
+    reset(mockSchemeDetailsConnector)
+    reset(mockMinimalDetailsConnector)
 
     // setup green path
     setupSchemeDetails(psaId, srn, Future.successful(Some(schemeDetails)))
@@ -99,12 +101,12 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
     setupMinimalDetails(pspId, Future.successful(Right(minimalDetails)))
   }
 
-  val psaId = psaIdGen.sample.value
-  val pspId = pspIdGen.sample.value
+  val psaId: PsaId = psaIdGen.sample.value
+  val pspId: PspId = pspIdGen.sample.value
   val schemeDetails: SchemeDetails =
     schemeDetailsGen.sample.value.copy(schemeStatus = validSchemeStatusGen.sample.value)
   val minimalDetails: MinimalDetails = minimalDetailsGen.sample.value.copy(rlsFlag = false, deceasedFlag = false)
-  val srn = srnGen.sample.value
+  val srn: Srn = srnGen.sample.value
   val administratorRequest: AdministratorRequest[AnyContentAsEmpty.type] =
     AdministratorRequest("", "", FakeRequest(), psaId)
   val practitionerRequest: PractitionerRequest[AnyContentAsEmpty.type] =

@@ -17,9 +17,10 @@
 package services
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import utils.BaseSpec
 import models.UserAnswers
 import org.mockito.ArgumentMatchers.{any, eq => meq}
+import utils.BaseSpec
+import org.mockito.Mockito._
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 

@@ -16,14 +16,15 @@
 
 package services
 
+import org.apache.pekko.util.ByteString
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import connectors.UpscanConnector
 import controllers.TestValues
+import org.apache.pekko.stream.scaladsl.Sink
 import models._
 import org.mockito.ArgumentMatchers.any
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import akka.util.ByteString
 import utils.BaseSpec
-import akka.stream.scaladsl.Sink
+import org.mockito.Mockito.{reset, when}
 import repositories.UploadRepository
 import play.api.http.Status.OK
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -68,13 +69,13 @@ class UploadServiceSpec extends BaseSpec with ScalaCheckPropertyChecks with Test
       when(mockUploadRepository.insert(any())).thenReturn(Future.successful((): Unit))
       val result =
         service.registerUploadRequest(uploadKey, reference)
-      result.futureValue mustBe (())
+      result.futureValue mustBe ()
     }
 
     "registerUploadResult should call updateStatus and return unit" in {
       when(mockUploadRepository.updateStatus(any(), any())).thenReturn(Future.successful(UploadStatus.Failed))
       val result = service.registerUploadResult(reference, failure)
-      result.futureValue mustBe (())
+      result.futureValue mustBe ()
     }
 
     "getUploadStatus return the status from the connector" in {

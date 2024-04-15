@@ -19,6 +19,7 @@ package controllers.nonsipp.employercontributions
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.ListUtils.ListOps
 import config.Refined._
 import controllers.PSRController
 import config.Constants
@@ -30,8 +31,6 @@ import play.api.i18n.MessagesApi
 import models.requests.DataRequest
 import pages.nonsipp.employercontributions._
 import services.{PsrSubmissionService, SaveService}
-import utils.ListUtils.ListOps
-import org.slf4j.LoggerFactory
 import cats.data.EitherT
 import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
 import views.html.CheckYourAnswersView
@@ -54,8 +53,6 @@ class EmployerContributionsCYAController @Inject()(
   psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends PSRController {
-
-  private val logger = LoggerFactory.getLogger(this.getClass.getSimpleName)
 
   def onPageLoad(srn: Srn, index: Max300, page: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>

@@ -18,7 +18,7 @@ package controllers.nonsipp.schemedesignatory
 
 import services.SchemeDateService
 import pages.nonsipp.schemedesignatory.HowMuchCashPage
-import play.api.inject.guice.GuiceableModule
+import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.MoneyView
 import utils.Transform._
@@ -26,12 +26,12 @@ import play.api.libs.json.JsPath
 import forms.MoneyFormProvider
 import models.{DateRange, Money, NormalMode}
 import org.mockito.ArgumentMatchers.any
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.schemedesignatory.routes
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, when}
 
 class HowMuchCashControllerSpec extends ControllerBaseSpec {
 
-  val schemeDatePeriod = dateRangeGen.sample.value
+  val schemeDatePeriod: DateRange = dateRangeGen.sample.value
   val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   val maxAllowedAmount = 999999999.99
 

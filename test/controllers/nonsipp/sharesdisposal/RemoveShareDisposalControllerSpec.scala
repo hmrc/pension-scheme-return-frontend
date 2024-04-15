@@ -17,7 +17,6 @@
 package controllers.nonsipp.sharesdisposal
 
 import services.PsrSubmissionService
-import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
@@ -29,6 +28,8 @@ import forms.YesNoPageFormProvider
 import models.{HowSharesDisposed, NormalMode}
 import controllers.nonsipp.sharesdisposal.RemoveShareDisposalController._
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito._
 
 import scala.concurrent.Future
 

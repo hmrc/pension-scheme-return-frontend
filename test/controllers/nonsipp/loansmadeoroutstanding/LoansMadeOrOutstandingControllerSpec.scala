@@ -17,7 +17,6 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import services.PsrSubmissionService
-import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.YesNoPageView
@@ -26,6 +25,8 @@ import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
 import controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController._
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito._
 
 class LoansMadeOrOutstandingControllerSpec extends ControllerBaseSpec {
 

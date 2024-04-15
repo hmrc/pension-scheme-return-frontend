@@ -16,7 +16,6 @@
 
 package controllers.nonsipp.employercontributions
 
-import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.YesNoPageView
@@ -28,6 +27,8 @@ import play.api.data.Form
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.employercontributions.EmployerContributionsPage
 import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, when}
 
 import scala.concurrent.Future
 

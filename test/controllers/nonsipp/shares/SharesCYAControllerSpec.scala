@@ -17,9 +17,7 @@
 package controllers.nonsipp.shares
 
 import services.{PsrSubmissionService, SaveService, SchemeDateService}
-import play.api.inject.guice.GuiceableModule
 import models.ConditionalYesNo._
-import pages.nonsipp.shares._
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
@@ -27,6 +25,10 @@ import controllers.nonsipp.shares.SharesCYAController._
 import models._
 import pages.nonsipp.common.IdentityTypePage
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito._
+import pages.nonsipp.shares._
+import play.api.mvc.Call
 import play.api.inject.bind
 import models.SchemeHoldShare.Contribution
 import views.html.CheckYourAnswersView
@@ -46,14 +48,16 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
     bind[SaveService].toInstance(mockSaveService)
   )
 
-  override protected def beforeAll(): Unit =
-    reset(mockSchemeDateService, mockPsrSubmissionService)
+  override protected def beforeAll(): Unit = {
+    reset(mockSchemeDateService)
+    reset(mockPsrSubmissionService)
+  }
 
   private val index = refineMV[OneTo5000](1)
   private val taxYear = Some(Left(dateRange))
   private val subject = IdentitySubject.SharesSeller
 
-  private def onPageLoad(mode: Mode) =
+  private def onPageLoad(mode: Mode): Call =
     routes.SharesCYAController.onPageLoad(srn, index, mode)
   private def onSubmit(mode: Mode) = routes.SharesCYAController.onSubmit(srn, index, mode)
 
@@ -118,17 +122,17 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
             reset(mockPsrSubmissionService)
             reset(mockSaveService)
           })
-          .withName(s"redirect to next page when in ${mode} mode")
+          .withName(s"redirect to next page when in $mode mode")
       )
       act.like(
         journeyRecoveryPage(onPageLoad(mode))
           .updateName("onPageLoad" + _)
-          .withName(s"redirect to journey recovery page on page load when in ${mode} mode")
+          .withName(s"redirect to journey recovery page on page load when in $mode mode")
       )
       act.like(
         journeyRecoveryPage(onSubmit(mode))
           .updateName("onSubmit" + _)
-          .withName(s"redirect to journey recovery page on submit when in ${mode} mode")
+          .withName(s"redirect to journey recovery page on submit when in $mode mode")
       )
     }
   }

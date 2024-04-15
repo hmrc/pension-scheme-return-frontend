@@ -17,7 +17,6 @@
 package controllers.nonsipp.bondsdisposal
 
 import services.SchemeDateService
-import play.api.inject.guice.GuiceableModule
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
 import views.html.DatePageView
@@ -26,6 +25,8 @@ import play.api.inject
 import forms.DatePageFormProvider
 import models.NormalMode
 import pages.nonsipp.bondsdisposal.WhenWereBondsSoldPage
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.reset
 
 class WhenWereBondsSoldControllerSpec extends ControllerBaseSpec {
 

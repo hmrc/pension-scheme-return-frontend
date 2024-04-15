@@ -17,7 +17,6 @@
 package controllers.nonsipp.moneyborrowed
 
 import services.PsrSubmissionService
-import play.api.inject.guice.GuiceableModule
 import controllers.nonsipp.moneyborrowed.MoneyBorrowedController._
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
@@ -26,6 +25,8 @@ import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito._
 
 class MoneyBorrowedControllerSpec extends ControllerBaseSpec {
 

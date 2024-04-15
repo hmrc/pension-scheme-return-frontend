@@ -17,11 +17,13 @@
 package controllers.actions
 
 import play.api.test.FakeRequest
-import utils.BaseSpec
 import play.api.mvc.AnyContentAsEmpty
 import repositories.SessionRepository
+import models.UserAnswers
 import models.requests.{AllowedAccessRequest, DataRequest, OptionalDataRequest}
 import org.mockito.ArgumentMatchers.any
+import utils.BaseSpec
+import org.mockito.Mockito.{times, verify, when}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -36,7 +38,7 @@ class DataCreationActionSpec extends BaseSpec {
   }
 
   val request: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
-  val userAnswers = arbitraryUserData.arbitrary.sample.value
+  val userAnswers: UserAnswers = arbitraryUserData.arbitrary.sample.value
 
   "Data Creation Action" - {
 

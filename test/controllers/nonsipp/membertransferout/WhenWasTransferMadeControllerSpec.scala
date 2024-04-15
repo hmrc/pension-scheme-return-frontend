@@ -27,6 +27,7 @@ import models.{NormalMode, UserAnswers}
 import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, WhenWasTransferMadePage}
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import org.mockito.Mockito.reset
 
 class WhenWasTransferMadeControllerSpec extends ControllerBaseSpec {
 

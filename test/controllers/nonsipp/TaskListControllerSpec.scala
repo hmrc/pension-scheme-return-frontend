@@ -33,6 +33,7 @@ import models.SponsoringOrConnectedParty.Sponsoring
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import pages.nonsipp.CheckReturnDatesPage

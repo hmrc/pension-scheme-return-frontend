@@ -21,6 +21,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import config.Constants
 import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
+import models.PensionSchemeId
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -32,7 +33,7 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  implicit override lazy val applicationBuilder: GuiceApplicationBuilder =
+  override implicit lazy val applicationBuilder: GuiceApplicationBuilder =
     super.applicationBuilder.configure("microservice.services.pensionAdministrator.port" -> wireMockPort)
 
   val url = "/pension-administrator/get-minimal-psa"
@@ -44,15 +45,14 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
         .willReturn(response)
     )
 
-  val psaId = psaIdGen.sample.value
-  val pspId = pspIdGen.sample.value
+  val psaId: PensionSchemeId.PsaId = psaIdGen.sample.value
+  val pspId: PensionSchemeId.PspId = pspIdGen.sample.value
 
   def connector(implicit app: Application): MinimalDetailsConnector = injected[MinimalDetailsConnector]
 
   "fetch" - {
 
     "return psa minimal details" in runningApplication { implicit app =>
-
       val md = minimalDetailsGen.sample.value
       stubGet("psaId", psaId.value, ok(Json.stringify(Json.toJson(md))))
 
@@ -62,7 +62,6 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
     }
 
     "return psp minimal details" in runningApplication { implicit app =>
-
       val md = minimalDetailsGen.sample.value
       stubGet("pspId", pspId.value, ok(Json.stringify(Json.toJson(md))))
 
@@ -72,7 +71,6 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
     }
 
     "return a details not found when 404 returned with message" in runningApplication { implicit app =>
-
       stubGet("psaId", psaId.value, notFound.withBody(Constants.detailsNotFound))
 
       val result = connector.fetch(psaId).futureValue
@@ -80,15 +78,15 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
       result mustBe Left(DetailsNotFound)
     }
 
-    "return a delimited admin error when forbidden with delimited admin error returned" in runningApplication { implicit app =>
+    "return a delimited admin error when forbidden with delimited admin error returned" in runningApplication {
+      implicit app =>
+        val body = stringContains(Constants.delimitedPSA).sample.value
 
-      val body = stringContains(Constants.delimitedPSA).sample.value
+        stubGet("psaId", psaId.value, forbidden.withBody(body))
 
-      stubGet("psaId", psaId.value, forbidden.withBody(body))
+        val result = connector.fetch(psaId).futureValue
 
-      val result = connector.fetch(psaId).futureValue
-
-      result mustBe Left(DelimitedAdmin)
+        result mustBe Left(DelimitedAdmin)
     }
 
     "fail future when a 404 returned" in runningApplication { implicit app =>

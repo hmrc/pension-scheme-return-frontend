@@ -17,11 +17,12 @@
 package services
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import utils.BaseSpec
 import connectors.SchemeDetailsConnector
 import models.SchemeId.Srn
 import uk.gov.hmrc.http.HeaderCarrier
 import org.mockito.ArgumentMatchers.{any, eq => meq}
+import utils.BaseSpec
+import org.mockito.Mockito.{reset, when}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global

@@ -27,16 +27,16 @@ import models.requests.psr.{MinimalRequiredSubmission, ReportDetails, SchemeDesi
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
-import org.mockito.MockitoSugar.{mock, when}
 import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.Mockito
-import org.mockito.ArgumentMatchers.any
 import org.scalatest.freespec.AnyFreeSpec
-import org.mockito.Mockito.{times, verify}
+import org.mockito.Mockito.{times, verify, when}
 import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import models._
 import models.SchemeMemberNumbers._
+import org.mockito.ArgumentMatchers.any
+import org.scalatestplus.mockito.MockitoSugar.mock
 
 class MinimalRequiredSubmissionTransformerSpec
     extends AnyFreeSpec
@@ -143,7 +143,7 @@ class MinimalRequiredSubmissionTransformerSpec
         minimalRequiredSubmission
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(WhichTaxYearPage(srn)) mustBe Some(DateRange(dateRange.from, dateRange.to))
           userAnswers.get(CheckReturnDatesPage(srn)) mustBe Some(false)
@@ -188,7 +188,7 @@ class MinimalRequiredSubmissionTransformerSpec
         minimalRequiredSubmission
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(WhichTaxYearPage(srn)) mustBe Some(DateRange(dateRange.from, dateRange.to))
           userAnswers.get(CheckReturnDatesPage(srn)) mustBe Some(false)

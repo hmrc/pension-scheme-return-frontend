@@ -26,10 +26,11 @@ import models.DateRange
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import org.mockito.Mockito.{reset, when}
 
 class TotalValueQuotedSharesControllerSpec extends ControllerBaseSpec {
 
-  val schemeDatePeriod = dateRangeGen.sample.value
+  val schemeDatePeriod: DateRange = dateRangeGen.sample.value
   val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   val maxAllowedAmount = 999999999.99
 

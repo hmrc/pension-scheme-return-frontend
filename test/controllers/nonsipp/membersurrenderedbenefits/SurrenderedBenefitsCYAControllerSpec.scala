@@ -28,6 +28,7 @@ import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCYAContr
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import org.mockito.Mockito._
 
 import scala.concurrent.Future
 
@@ -73,7 +74,7 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
               mode
             )
           )
-        }.withName(s"render correct ${mode} view")
+        }.withName(s"render correct $mode view")
       )
 
       act.like(
@@ -83,19 +84,19 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
-          .withName(s"redirect to next page when in ${mode} mode")
+          .withName(s"redirect to next page when in $mode mode")
       )
 
       act.like(
         journeyRecoveryPage(onPageLoad(mode))
           .updateName("onPageLoad" + _)
-          .withName(s"redirect to journey recovery page on page load when in ${mode} mode")
+          .withName(s"redirect to journey recovery page on page load when in $mode mode")
       )
 
       act.like(
         journeyRecoveryPage(onSubmit(mode))
           .updateName("onSubmit" + _)
-          .withName(s"redirect to journey recovery page on submit when in ${mode} mode")
+          .withName(s"redirect to journey recovery page on submit when in $mode mode")
       )
     }
   }

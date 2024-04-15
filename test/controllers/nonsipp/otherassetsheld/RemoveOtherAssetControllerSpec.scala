@@ -17,7 +17,6 @@
 package controllers.nonsipp.otherassetsheld
 
 import services.PsrSubmissionService
-import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import controllers.nonsipp.otherassetsheld.RemoveOtherAssetController._
 import config.Refined.Max5000
@@ -28,6 +27,8 @@ import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito._
 
 import scala.concurrent.Future
 

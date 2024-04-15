@@ -16,7 +16,6 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import play.api.inject.guice.GuiceableModule
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
@@ -27,6 +26,8 @@ import forms.DatePageFormProvider
 import models.NormalMode
 import services.SchemeDateService
 import controllers.nonsipp.landorpropertydisposal.WhenWasPropertySoldController._
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.reset
 
 import java.time.LocalDate
 

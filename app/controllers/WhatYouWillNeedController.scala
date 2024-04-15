@@ -30,7 +30,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 import javax.inject.{Inject, Named}
 
@@ -43,8 +43,7 @@ class WhatYouWillNeedController @Inject()(
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: ContentPageView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(srn: Srn, fbNumber: String, taxYear: String, version: String): Action[AnyContent] =
@@ -71,7 +70,7 @@ object WhatYouWillNeedController {
     FormPageViewModel(
       Message("whatYouWillNeed.title"),
       Message("whatYouWillNeed.heading"),
-      ContentPageViewModel(isStartButton = true, isLargeHeading = false),
+      ContentPageViewModel(isStartButton = true),
       routes.WhatYouWillNeedController.onSubmit(srn, fbNumber, taxYear, version)
     ).withButtonText(Message("site.continue"))
       .withDescription(

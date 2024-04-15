@@ -16,7 +16,6 @@
 
 package services
 
-import utils.BaseSpec
 import play.api.mvc.{AnyContent, AnyContentAsEmpty}
 import connectors.PSRConnector
 import controllers.TestValues
@@ -30,6 +29,8 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import services.PsrSubmissionServiceSpec.minimalRequiredSubmission
 import play.api.test.FakeRequest
+import utils.BaseSpec
+import org.mockito.Mockito._
 import cats.data.NonEmptyList
 import services.PsrRetrievalServiceSpec._
 

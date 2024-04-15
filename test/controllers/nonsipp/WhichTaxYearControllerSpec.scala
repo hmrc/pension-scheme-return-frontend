@@ -17,13 +17,14 @@
 package controllers.nonsipp
 
 import services.TaxYearService
-import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.RadioListView
 import org.scalacheck.Gen
 import forms.RadioListFormProvider
 import models.{DateRange, Enumerable, NormalMode}
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, when}
 import pages.nonsipp.WhichTaxYearPage
 import play.api.libs.json.JsPath
 

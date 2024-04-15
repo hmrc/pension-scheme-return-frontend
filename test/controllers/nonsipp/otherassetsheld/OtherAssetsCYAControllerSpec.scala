@@ -18,7 +18,6 @@ package controllers.nonsipp.otherassetsheld
 
 import controllers.nonsipp.otherassetsheld.OtherAssetsCYAController._
 import services.{PsrSubmissionService, SaveService, SchemeDateService}
-import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.otherassetsheld._
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
@@ -29,6 +28,8 @@ import uk.gov.hmrc.domain.Nino
 import models._
 import pages.nonsipp.common.IdentityTypePage
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito._
 
 import scala.concurrent.Future
 
@@ -44,8 +45,10 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
     bind[SaveService].toInstance(mockSaveService)
   )
 
-  override protected def beforeAll(): Unit =
-    reset(mockSchemeDateService, mockPsrSubmissionService)
+  override protected def beforeAll(): Unit = {
+    reset(mockSchemeDateService)
+    reset(mockPsrSubmissionService)
+  }
 
   private val index = refineMV[OneTo5000](1)
   private val taxYear = Some(Left(dateRange))
