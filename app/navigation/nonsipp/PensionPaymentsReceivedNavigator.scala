@@ -27,14 +27,11 @@ object PensionPaymentsReceivedNavigator extends JourneyNavigator {
   val normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ PensionPaymentsReceivedPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.memberpensionpayments.routes.WhatYouWillNeedPensionPaymentsController.onPageLoad(srn)
+        controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+          .onPageLoad(srn, page = 1, NormalMode)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
-
-    case WhatYouWillNeedPensionPaymentsPage(srn) =>
-      controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
-        .onPageLoad(srn, page = 1, NormalMode)
 
     case MemberPensionPaymentsListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
@@ -58,7 +55,8 @@ object PensionPaymentsReceivedNavigator extends JourneyNavigator {
 
       case page @ PensionPaymentsReceivedPage(srn) =>
         if (userAnswers.get(page).contains(true)) {
-          controllers.nonsipp.memberpensionpayments.routes.WhatYouWillNeedPensionPaymentsController.onPageLoad(srn)
+          controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+            .onPageLoad(srn, page = 1, NormalMode)
         } else {
           controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         }

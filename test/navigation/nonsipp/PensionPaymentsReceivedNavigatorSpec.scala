@@ -38,9 +38,10 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
           PensionPaymentsReceivedPage,
           Gen.const(true),
           (srn, _) =>
-            controllers.nonsipp.memberpensionpayments.routes.WhatYouWillNeedPensionPaymentsController.onPageLoad(srn)
+            controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+              .onPageLoad(srn, page = 1, NormalMode)
         )
-        .withName("go from pension payments received page to what you will need pension payments page on yes selected")
+        .withName("go from pension payments received page to member pension payments list page on yes selected")
     )
 
     act.like(
@@ -52,21 +53,6 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
         )
         .withName("go from pension payments received page to task list page son no selected")
     )
-  }
-
-  "WhatYouWillNeedPensionPaymentsPage" - {
-
-    act.like(
-      normalmode
-        .navigateTo(
-          WhatYouWillNeedPensionPaymentsPage,
-          (srn, _) =>
-            controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
-              .onPageLoad(srn, page = 1, NormalMode)
-        )
-        .withName("go from what you will need pension payments page to member pension payments list page")
-    )
-
   }
 
   "MemberPensionPaymentsListPage" - {
