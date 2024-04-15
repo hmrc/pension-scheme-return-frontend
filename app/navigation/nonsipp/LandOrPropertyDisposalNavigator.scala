@@ -56,6 +56,10 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
     case WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.nonsipp.landorpropertydisposal.routes.TotalProceedsSaleLandPropertyController
+        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
+    case TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.nonsipp.landorpropertydisposal.routes.WhoPurchasedLandOrPropertyController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
@@ -125,16 +129,12 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       if (userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, index, disposalIndex)).isEmpty ||
         userAnswers.get(DisposalIndependentValuationPage(srn, index, disposalIndex)).isEmpty ||
         userAnswers.get(LandOrPropertyStillHeldPage(srn, index, disposalIndex)).isEmpty) {
-        controllers.nonsipp.landorpropertydisposal.routes.TotalProceedsSaleLandPropertyController
+        controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController
           .onPageLoad(srn, index, disposalIndex, NormalMode)
       } else {
         controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
           .onPageLoad(srn, index, disposalIndex, NormalMode)
       }
-
-    case TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController
-        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
     case DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyStillHeldController

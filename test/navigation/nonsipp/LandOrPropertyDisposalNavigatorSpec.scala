@@ -80,10 +80,25 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           disposalIndex,
           WhenWasPropertySoldPage,
           (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.TotalProceedsSaleLandPropertyController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
+        )
+        .withName("go from when was property sold page to total proceeds sale page")
+    )
+  }
+
+  "TotalProceedsSaleLandPropertyPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          TotalProceedsSaleLandPropertyPage,
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.WhoPurchasedLandOrPropertyController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
-        .withName("go from when was property sold page to who purchased land or property page")
+        .withName("go from total proceeds sale page to who purchased page")
     )
   }
 
@@ -224,28 +239,12 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           disposalIndex,
           LandOrPropertyDisposalBuyerConnectedPartyPage,
           (srn, index: Max5000, disposalIndex: Max50, _) =>
-            controllers.nonsipp.landorpropertydisposal.routes.TotalProceedsSaleLandPropertyController
-              .onPageLoad(srn, index, disposalIndex, NormalMode)
-        )
-        .withName(
-          "go from land or property disposal buyer connected party Page to total proceeds sale land property"
-        )
-    )
-  }
-
-  "TotalProceedsSaleLandPropertyPage" - {
-
-    act.like(
-      normalmode
-        .navigateToWithDoubleIndex(
-          index,
-          disposalIndex,
-          TotalProceedsSaleLandPropertyPage,
-          (srn, index: Max5000, disposalIndex: Max50, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
-        .withName("go from total proceeds sale land property page to independent valuation page")
+        .withName(
+          "go from land or property disposal buyer connected party Page to independent valuation page"
+        )
     )
   }
 
