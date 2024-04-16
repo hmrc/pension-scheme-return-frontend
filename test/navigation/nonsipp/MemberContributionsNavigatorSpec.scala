@@ -38,9 +38,10 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
           MemberContributionsPage,
           Gen.const(true),
           (srn, _) =>
-            controllers.nonsipp.membercontributions.routes.WhatYouWillNeedMemberContributionsController.onPageLoad(srn)
+            controllers.nonsipp.membercontributions.routes.MemberContributionListController
+              .onPageLoad(srn, page = 1, NormalMode)
         )
-        .withName("go from member contribution page to what you will need member contributions page when yes select ")
+        .withName("go from member contribution page to member contribution list when yes select ")
     )
 
     act.like(
@@ -50,21 +51,7 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
           Gen.const(false),
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
-        .withName("go from member contributions page to receive transfer page")
-    )
-  }
-
-  "WhatYouWillNeedMemberContributions" - {
-
-    act.like(
-      normalmode
-        .navigateTo(
-          WhatYouWillNeedMemberContributionsPage,
-          (srn, _) =>
-            controllers.nonsipp.membercontributions.routes.MemberContributionListController
-              .onPageLoad(srn, page = 1, NormalMode)
-        )
-        .withName("go from what you will need member contributions page to total member contribution")
+        .withName("go from member contributions page to task list page")
     )
   }
 
