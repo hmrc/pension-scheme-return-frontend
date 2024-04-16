@@ -28,14 +28,11 @@ object MemberContributionsNavigator extends JourneyNavigator {
 
     case page @ MemberContributionsPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.membercontributions.routes.WhatYouWillNeedMemberContributionsController.onPageLoad(srn)
+        controllers.nonsipp.membercontributions.routes.MemberContributionListController
+          .onPageLoad(srn, page = 1, NormalMode)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
-
-    case WhatYouWillNeedMemberContributionsPage(srn) =>
-      controllers.nonsipp.membercontributions.routes.MemberContributionListController
-        .onPageLoad(srn, page = 1, NormalMode)
 
     case MemberContributionsListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
