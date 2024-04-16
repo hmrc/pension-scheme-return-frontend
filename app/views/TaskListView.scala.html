@@ -35,6 +35,16 @@
 
   <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)</h1>
 
+  @if(viewmodel.page.hasHistory && viewmodel.page.historyLink.nonEmpty) {
+    <p class="govuk-body">
+        <p class="govuk-body">
+            <a href=@viewmodel.page.historyLink.get.url
+               class="govuk-link" >@renderMessage(viewmodel.page.historyLink.get.content)</a>
+        </p>
+
+    </p>
+  }
+
   @viewmodel.description.map(renderMessage)
 
   <ol class="app-task-list">

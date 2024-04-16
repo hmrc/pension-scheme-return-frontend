@@ -33,8 +33,19 @@ class SchemeDateServiceImpl @Inject()() extends SchemeDateService {
 
   def now(): LocalDateTime = LocalDateTime.now(ZoneId.of("Europe/London"))
 
-  def schemeDate(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange] =
-    accountingPeriod(srn).orElse(whichTaxYear(srn))
+  def schemeDate(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange] = {
+    val accountingPeriods = request.userAnswers.list(AccountingPeriods(srn))
+    if (accountingPeriods.isEmpty) {
+      whichTaxYear(srn)
+    } else {
+      Some(
+        DateRange(
+          accountingPeriods.sorted.reverse.headOption.get.from,
+          accountingPeriods.sorted.headOption.get.to
+        )
+      )
+    }
+  }
 
   def returnPeriods(srn: Srn)(implicit request: DataRequest[_]): Option[NonEmptyList[DateRange]] = {
     val accountingPeriods = request.userAnswers.list(AccountingPeriods(srn))

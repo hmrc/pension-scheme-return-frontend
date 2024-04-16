@@ -17,6 +17,7 @@
 package controllers
 
 import services._
+import utils.DateTimeUtils
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.FrontendAppConfig
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions}
@@ -32,13 +33,11 @@ import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import utils.DateTimeUtils.localDateShow
 import models.{DateRange, Enumerable}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.OverviewSummary
 
 import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class OverviewController @Inject()(
@@ -56,16 +55,10 @@ class OverviewController @Inject()(
   view: OverviewView,
   taxYearService: TaxYearService
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+    extends PSRController
     with I18nSupport {
 
   private val allDates = OverviewController.options(taxYearService.current)
-
-  private def formatDateForApi(date: LocalDate): String =
-    date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-
-  private def formatDateForUi(date: LocalDate): String =
-    date.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
 
   private def outstandingData(
     srn: Srn,
@@ -114,7 +107,7 @@ class OverviewController @Inject()(
             OverviewSummary(
               key = Message("site.to", Message(yearFrom.show), Message(yearTo.show)),
               firstValue = Message(s"overview.status.$status"),
-              secondValue = overviewResponse.psrDueDate.fold("")(dt => formatDateForUi(dt)),
+              secondValue = overviewResponse.psrDueDate.fold("")(dt => DateTimeUtils.formatHtml(dt)),
               actions = Some(
                 Actions(
                   items = Seq(
@@ -129,21 +122,7 @@ class OverviewController @Inject()(
             )
           }
     )
-  private def getSubmitter(response: PsrVersionsResponse): String = {
-    val emptySubmitterName = ""
-    response.reportSubmitterDetails.fold(emptySubmitterName)(
-      submitter =>
-        submitter.individualDetails match {
-          case Some(individualDetails: IndividualDetails) =>
-            individualDetails.firstName + " " + individualDetails.lastName
-          case None =>
-            submitter.organisationOrPartnershipDetails match {
-              case Some(orgDetails) => orgDetails.organisationOrPartnershipName
-              case None => emptySubmitterName
-            }
-        }
-    )
-  }
+
   private def previousData(
     srn: Srn,
     response: Seq[PsrVersionsForYearsResponse],

@@ -52,56 +52,92 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
       DateRange(LocalDate.of(2011, 1, 1), LocalDate.of(2020, 1, 1))
     )
 
+  def schemeDateCommonTest[A](
+    name: String,
+    action: DataRequest[_] => A,
+    expected: NonEmptyList[DateRange] => A
+  ): List[BehaviourTest] =
+    List(
+      "return None when nothing is in cache".hasBehaviour {
+
+        val request = DataRequest(allowedAccessRequest, defaultUserAnswers)
+        action(request) mustBe None
+      },
+      s"choose the date from WhichTaxYearPage answer when no accounting periods exist".hasBehaviour {
+
+        forAll(dateRangeGen) { range =>
+          val userAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), range)
+          val request = DataRequest(allowedAccessRequest, userAnswers)
+
+          action(request) mustBe Some(expected(NonEmptyList.one(range)))
+        }
+      },
+      s"choose $name from AccountingPeriodPage answer when 1 period present".hasBehaviour {
+
+        forAll(dateRangeGen, dateRangeGen) { (whichTaxYearPage, accountingPeriod) =>
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(WhichTaxYearPage(srn), whichTaxYearPage)
+            .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), accountingPeriod)
+
+          val request = DataRequest(allowedAccessRequest, userAnswers)
+
+          action(request) mustBe Some(expected(NonEmptyList.one(accountingPeriod)))
+        }
+      }
+    )
+  def schemeDateRangeTest[A](
+    name: String,
+    action: DataRequest[_] => A,
+    expected: NonEmptyList[DateRange] => A
+  ): Behaviours =
+    MultipleBehaviourTests(
+      s"SchemeDateService.$name",
+      schemeDateCommonTest(name, action, expected) ++
+        List(
+          s"choose $name from AccountingPeriodPage answer when multiple exist".hasBehaviour {
+
+            forAll(dateRangeGen, oldestDateRange, newestDateRange) {
+
+              (whichTaxYearPage, oldestAccountingPeriod, newestAccountingPeriod) =>
+                val userAnswers = defaultUserAnswers
+                  .unsafeSet(WhichTaxYearPage(srn), whichTaxYearPage)
+                  .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), newestAccountingPeriod)
+                  .unsafeSet(AccountingPeriodPage(srn, refineMV(2), NormalMode), oldestAccountingPeriod)
+
+                val request = DataRequest(allowedAccessRequest, userAnswers)
+
+                action(request) mustBe Some(expected(NonEmptyList.of(newestAccountingPeriod, oldestAccountingPeriod)))
+            }
+          }
+        )
+    )
+
   def schemeDateTest[A](name: String, action: DataRequest[_] => A, expected: NonEmptyList[DateRange] => A): Behaviours =
     MultipleBehaviourTests(
       s"SchemeDateService.$name",
-      List(
-        "return None when nothing is in cache".hasBehaviour {
+      schemeDateCommonTest(name, action, expected) ++
+        List(
+          s"choose $name from AccountingPeriodPage answer when multiple exist".hasBehaviour {
 
-          val request = DataRequest(allowedAccessRequest, defaultUserAnswers)
-          action(request) mustBe None
-        },
-        s"choose the date from WhichTaxYearPage answer when no accounting periods exist".hasBehaviour {
+            forAll(dateRangeGen, oldestDateRange, newestDateRange) {
 
-          forAll(dateRangeGen) { range =>
-            val userAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), range)
-            val request = DataRequest(allowedAccessRequest, userAnswers)
+              (whichTaxYearPage, oldestAccountingPeriod, newestAccountingPeriod) =>
+                val userAnswers = defaultUserAnswers
+                  .unsafeSet(WhichTaxYearPage(srn), whichTaxYearPage)
+                  .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), newestAccountingPeriod)
+                  .unsafeSet(AccountingPeriodPage(srn, refineMV(2), NormalMode), oldestAccountingPeriod)
 
-            action(request) mustBe Some(expected(NonEmptyList.one(range)))
+                val request = DataRequest(allowedAccessRequest, userAnswers)
+
+                action(request) mustBe Some(
+                  expected(NonEmptyList.of(DateRange(oldestAccountingPeriod.from, newestAccountingPeriod.to)))
+                )
+            }
           }
-        },
-        s"choose $name from AccountingPeriodPage answer when 1 period present".hasBehaviour {
-
-          forAll(dateRangeGen, dateRangeGen) { (whichTaxYearPage, accountingPeriod) =>
-            val userAnswers = defaultUserAnswers
-              .unsafeSet(WhichTaxYearPage(srn), whichTaxYearPage)
-              .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), accountingPeriod)
-
-            val request = DataRequest(allowedAccessRequest, userAnswers)
-
-            action(request) mustBe Some(expected(NonEmptyList.one(accountingPeriod)))
-          }
-        },
-        s"choose $name from AccountingPeriodPage answer when multiple exist".hasBehaviour {
-
-          forAll(dateRangeGen, oldestDateRange, newestDateRange) {
-
-            (whichTaxYearPage, oldestAccountingPeriod, newestAccountingPeriod) =>
-              val userAnswers = defaultUserAnswers
-                .unsafeSet(WhichTaxYearPage(srn), whichTaxYearPage)
-                .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), newestAccountingPeriod)
-                .unsafeSet(AccountingPeriodPage(srn, refineMV(2), NormalMode), oldestAccountingPeriod)
-
-              val request = DataRequest(allowedAccessRequest, userAnswers)
-
-              action(request) mustBe Some(expected(NonEmptyList.of(newestAccountingPeriod, oldestAccountingPeriod)))
-          }
-        }
-      )
+        )
     )
-
   act.like(schemeDateTest("schemeDate", service.schemeDate(srn)(_), _.head))
   act.like(schemeDateTest("schemeStartDate", service.schemeStartDate(srn)(_), _.head.from))
   act.like(schemeDateTest("schemeEndDate", service.schemeEndDate(srn)(_), _.head.to))
-  act.like(schemeDateTest("returnPeriods", service.returnPeriods(srn)(_), identity))
+  act.like(schemeDateRangeTest("returnPeriods", service.returnPeriods(srn)(_), identity))
 }
