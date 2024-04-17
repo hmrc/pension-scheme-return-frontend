@@ -117,7 +117,7 @@ object StartReportingAssetsDisposalController {
     userAnswers: UserAnswers,
     isNextDisposal: Boolean
   ): Option[Max50] =
-    userAnswers.get(OtherAssetsDisposalCompletedPages(srn)) match {
+    userAnswers.get(OtherAssetsDisposalProgress.all(srn)) match {
       case None => refineV[Max50.Refined](1).toOption
       case Some(completedDisposals) =>
         /**

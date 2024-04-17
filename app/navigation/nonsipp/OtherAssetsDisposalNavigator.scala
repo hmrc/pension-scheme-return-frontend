@@ -18,10 +18,11 @@ package navigation.nonsipp
 
 import pages.nonsipp.otherassetsdisposal._
 import play.api.mvc.Call
-import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPages
-import cats.implicits.toTraverseOps
+import cats.implicits.{catsSyntaxEitherId, toBifunctorOps, toTraverseOps}
+import eu.timepit.refined.refineV
 import navigation.JourneyNavigator
 import models._
+import viewmodels.models.SectionJourneyStatus
 import config.Refined.Max50
 import pages.Page
 
@@ -39,19 +40,36 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
     case WhatYouWillNeedOtherAssetsDisposalPage(srn) =>
       controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController.onPageLoad(srn, page = 1)
 
-    case OtherAssetsDisposalListPage(srn, assetIndex, _) =>
-      (
-        for {
-          disposalIndexes <- userAnswers
-            .map(OtherAssetsDisposalCompleted.all(srn, assetIndex))
-            .keys
-            .toList
-            .traverse(_.toIntOption)
-            .getOrRecoverJourney
-          nextIndex <- findNextOpenIndex[Max50.Refined](disposalIndexes).getOrRecoverJourney
-        } yield controllers.nonsipp.otherassetsdisposal.routes.HowWasAssetDisposedOfController
-          .onPageLoad(srn, assetIndex, nextIndex, NormalMode)
-      ).merge
+    case OtherAssetsDisposalListPage(srn, assetIndex, disposalIndex) => {
+      val inProgressIndex: Either[Call, Option[Max50]] = userAnswers
+        .map(OtherAssetsDisposalProgress.all(srn, assetIndex))
+        .find {
+          case (_, SectionJourneyStatus.InProgress(_)) => true
+          case _ => false
+        }
+        .flatTraverse {
+          case (index, _) => index.toIntOption.traverse(i => refineV[Max50.Refined](i + 1))
+        }
+        .leftMap(_ => controllers.routes.JourneyRecoveryController.onPageLoad())
+
+      inProgressIndex.flatMap {
+        case Some(nextIndex) =>
+          controllers.nonsipp.otherassetsdisposal.routes.HowWasAssetDisposedOfController
+            .onPageLoad(srn, assetIndex, nextIndex, NormalMode)
+            .asRight
+        case None =>
+          for {
+            indexes <- userAnswers
+              .map(OtherAssetsDisposalProgress.all(srn, assetIndex))
+              .keys
+              .toList
+              .traverse(_.toIntOption)
+              .getOrRecoverJourney
+            nextIndex <- findNextOpenIndex[Max50.Refined](indexes).getOrRecoverJourney
+          } yield controllers.nonsipp.otherassetsdisposal.routes.HowWasAssetDisposedOfController
+            .onPageLoad(srn, assetIndex, nextIndex, NormalMode)
+      }
+    }.merge
 
     case page @ HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex, _) =>
       userAnswers.get(page) match {
@@ -137,14 +155,17 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
         .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
 
-    case OtherAssetsDisposalCompletedPage(srn, _, _) =>
+    case OtherAssetsDisposalCYAPage(srn) =>
       controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, 1)
 
-    case RemoveAssetDisposalPage(srn, assetIndex, disposalIndex) =>
-      if (userAnswers.map(WhatIsOtherAssetPages(srn)).isEmpty) {
+    case RemoveAssetDisposalPage(srn) =>
+      if (!userAnswers
+          .map(HowWasAssetDisposedOfPages(srn))
+          .exists(_._2.nonEmpty)) {
         controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController.onPageLoad(srn, NormalMode)
       } else {
-        controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, 1)
+        controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+          .onPageLoad(srn, page = 1)
       }
 
     case ReportedOtherAssetsDisposalListPage(srn, addDisposal @ true) =>
@@ -238,7 +259,7 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
           controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
             .onPageLoad(srn, assetIndex, disposalIndex, CheckMode)
 
-        case OtherAssetsDisposalCompletedPage(srn, _, _) =>
+        case OtherAssetsDisposalCYAPage(srn) =>
           controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, 1)
 
       }

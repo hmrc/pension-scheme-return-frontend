@@ -22,7 +22,7 @@ import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models.{HowDisposed, IdentityType}
-import viewmodels.models.SectionCompleted
+import viewmodels.models.SectionJourneyStatus
 import pages.behaviours.PageBehaviours
 
 class HowWasAssetDisposedOfPageSpec extends PageBehaviours with TestValues {
@@ -51,11 +51,10 @@ class HowWasAssetDisposedOfPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(TypeOfAssetBuyerPage(srn, assetIndexOne, indexOne), IdentityType.Individual)
         .unsafeSet(IndividualNameOfAssetBuyerPage(srn, assetIndexOne, indexOne), individualName)
         .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexOne), true)
-        .unsafeSet(RemoveAssetDisposalPage(srn, assetIndexOne, indexOne), true)
         .unsafeSet(WhenWasAssetSoldPage(srn, assetIndexOne, indexOne), localDate)
         .unsafeSet(AssetSaleIndependentValuationPage(srn, assetIndexOne, indexOne), true)
         .unsafeSet(TotalConsiderationSaleAssetPage(srn, assetIndexOne, indexOne), money)
-        .unsafeSet(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexOne), SectionCompleted)
+        .unsafeSet(OtherAssetsDisposalProgress(srn, assetIndexOne, indexOne), SectionJourneyStatus.Completed)
 
       val result = userAnswers.remove(HowWasAssetDisposedOfPage(srn, assetIndexOne, indexOne)).success.value
 
@@ -63,15 +62,12 @@ class HowWasAssetDisposedOfPageSpec extends PageBehaviours with TestValues {
       result.get(TypeOfAssetBuyerPage(srn, assetIndexOne, indexOne)) must be(empty)
       result.get(IndividualNameOfAssetBuyerPage(srn, assetIndexOne, indexOne)) must be(empty)
 
-      result.get(RemoveAssetDisposalPage(srn, assetIndexOne, disposalIndex)) must be(empty)
       result.get(WhenWasAssetSoldPage(srn, assetIndexOne, disposalIndex)) must be(empty)
       result.get(AssetSaleIndependentValuationPage(srn, assetIndexOne, disposalIndex)) must be(empty)
       result.get(TotalConsiderationSaleAssetPage(srn, assetIndexOne, disposalIndex)) must be(empty)
-      result.get(RemoveAssetDisposalPage(srn, assetIndexOne, disposalIndex)) must be(empty)
 
-      result.get(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexOne)) must be(empty)
+      result.get(OtherAssetsDisposalProgress(srn, assetIndexOne, indexOne)) must be(empty)
       result.get(OtherAssetsDisposalPage(srn)) must be(empty)
-
     }
 
     "cleanup other fields when removing a disposal but there are disposals for the same assets" in {
@@ -79,15 +75,15 @@ class HowWasAssetDisposedOfPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(OtherAssetsDisposalPage(srn), true)
         .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndexOne, indexOne), HowDisposed.Sold)
         .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexOne), true)
-        .unsafeSet(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexOne), SectionCompleted)
+        .unsafeSet(OtherAssetsDisposalProgress(srn, assetIndexOne, indexOne), SectionJourneyStatus.Completed)
         .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndexOne, indexTwo), HowDisposed.Sold)
         .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexTwo), true)
-        .unsafeSet(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexTwo), SectionCompleted)
+        .unsafeSet(OtherAssetsDisposalProgress(srn, assetIndexOne, indexTwo), SectionJourneyStatus.Completed)
 
       val result = userAnswers.remove(HowWasAssetDisposedOfPage(srn, assetIndexOne, indexOne)).success.value
 
       result.get(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexOne)) must be(empty)
-      result.get(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexOne)) must be(empty)
+      result.get(OtherAssetsDisposalProgress(srn, assetIndexOne, indexOne)) must be(empty)
       result.get(OtherAssetsDisposalPage(srn)) must not be (empty)
     }
 
@@ -96,20 +92,19 @@ class HowWasAssetDisposedOfPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(OtherAssetsDisposalPage(srn), true)
         .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndexOne, indexOne), HowDisposed.Sold)
         .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexOne), true)
-        .unsafeSet(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexOne), SectionCompleted)
+        .unsafeSet(OtherAssetsDisposalProgress(srn, assetIndexOne, indexOne), SectionJourneyStatus.Completed)
         .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndexOne, indexTwo), HowDisposed.Sold)
         .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexTwo), true)
-        .unsafeSet(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexTwo), SectionCompleted)
+        .unsafeSet(OtherAssetsDisposalProgress(srn, assetIndexOne, indexTwo), SectionJourneyStatus.Completed)
         .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndexTwo, indexOne), HowDisposed.Sold)
         .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndexTwo, indexOne), true)
-        .unsafeSet(OtherAssetsDisposalCompletedPage(srn, assetIndexTwo, indexOne), SectionCompleted)
+        .unsafeSet(OtherAssetsDisposalProgress(srn, assetIndexTwo, indexOne), SectionJourneyStatus.Completed)
 
       val result = userAnswers.remove(HowWasAssetDisposedOfPage(srn, assetIndexOne, indexOne)).success.value
 
       result.get(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexOne)) must be(empty)
-      result.get(OtherAssetsDisposalCompletedPage(srn, assetIndexOne, indexOne)) must be(empty)
+      result.get(OtherAssetsDisposalProgress(srn, assetIndexOne, indexOne)) must be(empty)
       result.get(OtherAssetsDisposalPage(srn)) must not be (empty)
     }
-
   }
 }

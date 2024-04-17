@@ -24,7 +24,7 @@ import config.Refined.{Max50, Max5000}
 import models.SchemeId.Srn
 import models._
 import shapeless._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.SectionJourneyStatus
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 
@@ -45,7 +45,7 @@ class AssetsDisposalMongoController @Inject()(
   override def pages(srn: Srn, index: Max5000, secondaryIndex: Max50): Pages =
     HList(
       (
-        PageWithValue(OtherAssetsDisposalCompletedPage(srn, index, secondaryIndex), SectionCompleted),
+        PageWithValue(OtherAssetsDisposalProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed),
         PageWithValue(HowWasAssetDisposedOfPage(srn, index, secondaryIndex), HowDisposed.Transferred),
         PageWithValue(IsBuyerConnectedPartyPage(srn, index, secondaryIndex), false),
         PageWithValue(TotalConsiderationSaleAssetPage(srn, index, secondaryIndex), Money(12.34)),
@@ -61,7 +61,7 @@ class AssetsDisposalMongoController @Inject()(
     )
 
   override type Pages =
-    PageWithValue[SectionCompleted] ::
+    PageWithValue[SectionJourneyStatus] ::
       PageWithValue[HowDisposed] ::
       PageWithValue[Boolean] ::
       PageWithValue[Money] ::

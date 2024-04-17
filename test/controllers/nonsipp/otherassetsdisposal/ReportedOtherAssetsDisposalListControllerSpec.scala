@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
-import pages.nonsipp.otherassetsdisposal.{HowWasAssetDisposedOfPage, OtherAssetsDisposalCompletedPage}
+import pages.nonsipp.otherassetsdisposal.{HowWasAssetDisposedOfPage, OtherAssetsDisposalProgress}
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
 import views.html.ListView
@@ -24,7 +24,7 @@ import eu.timepit.refined.refineMV
 import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, WhatIsOtherAssetPage}
 import models.HowDisposed.{Other, Sold, Transferred}
 
@@ -44,15 +44,9 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
   private val howOtherAssetsDisposedTwo = Transferred
   private val howOtherAssetsDisposedThree = Other(otherDetails)
 
-  private val numberOfDisposals = 4
-  private val maxPossibleNumberOfDisposals = 100
-
   private val disposalIndexes = List(disposalIndexOne, disposalIndexTwo)
   private val otherAssetsDisposalsWithIndexes =
-    List(
-      ((otherAssetIndexOne, disposalIndexes), SectionCompleted),
-      ((otherAssetIndexTwo, disposalIndexes), SectionCompleted)
-    )
+    Map((otherAssetIndexOne, disposalIndexes), (otherAssetIndexTwo, disposalIndexes))
 
   private val completedUserAnswers = defaultUserAnswers
   // Other Assets #1
@@ -60,15 +54,15 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(HowWasAssetDisposedOfPage(srn, otherAssetIndexOne, disposalIndexOne), howOtherAssetsDisposedOne)
     .unsafeSet(HowWasAssetDisposedOfPage(srn, otherAssetIndexOne, disposalIndexTwo), howOtherAssetsDisposedTwo)
     .unsafeSet(OtherAssetsCompleted(srn, otherAssetIndexOne), SectionCompleted)
-    .unsafeSet(OtherAssetsDisposalCompletedPage(srn, otherAssetIndexOne, disposalIndexOne), SectionCompleted)
-    .unsafeSet(OtherAssetsDisposalCompletedPage(srn, otherAssetIndexOne, disposalIndexTwo), SectionCompleted)
+    .unsafeSet(OtherAssetsDisposalProgress(srn, otherAssetIndexOne, disposalIndexOne), SectionJourneyStatus.Completed)
+    .unsafeSet(OtherAssetsDisposalProgress(srn, otherAssetIndexOne, disposalIndexTwo), SectionJourneyStatus.Completed)
     // Other Assets #2
     .unsafeSet(WhatIsOtherAssetPage(srn, otherAssetIndexTwo), nameOfAsset)
     .unsafeSet(HowWasAssetDisposedOfPage(srn, otherAssetIndexTwo, disposalIndexOne), howOtherAssetsDisposedTwo)
     .unsafeSet(HowWasAssetDisposedOfPage(srn, otherAssetIndexTwo, disposalIndexTwo), howOtherAssetsDisposedThree)
     .unsafeSet(OtherAssetsCompleted(srn, otherAssetIndexTwo), SectionCompleted)
-    .unsafeSet(OtherAssetsDisposalCompletedPage(srn, otherAssetIndexTwo, disposalIndexOne), SectionCompleted)
-    .unsafeSet(OtherAssetsDisposalCompletedPage(srn, otherAssetIndexTwo, disposalIndexTwo), SectionCompleted)
+    .unsafeSet(OtherAssetsDisposalProgress(srn, otherAssetIndexTwo, disposalIndexOne), SectionJourneyStatus.Completed)
+    .unsafeSet(OtherAssetsDisposalProgress(srn, otherAssetIndexTwo, disposalIndexTwo), SectionJourneyStatus.Completed)
 
   "ReportedOtherAssetsDisposalListController" - {
 
@@ -79,8 +73,6 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
           srn,
           page,
           otherAssetsDisposalsWithIndexes,
-          numberOfDisposals,
-          maxPossibleNumberOfDisposals,
           completedUserAnswers
         )
       )

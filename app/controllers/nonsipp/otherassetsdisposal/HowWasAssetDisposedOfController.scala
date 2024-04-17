@@ -35,6 +35,7 @@ import models.HowDisposed._
 import views.html.RadioListView
 import controllers.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfController._
 import models.SchemeId.Srn
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -80,16 +81,18 @@ class HowWasAssetDisposedOfController @Inject()(
           value => {
             val page = HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex)
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+              updatedAnswers <- request.userAnswers
+                .set(page, value)
+                .mapK[Future]
               hasAnswerChanged = request.userAnswers.exists(page)(_ == value)
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
+              nextPage = navigator.nextPage(
                 HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex, hasAnswerChanged),
                 mode,
                 updatedAnswers
               )
-            )
+              updatedProgressAnswers <- saveProgress(srn, assetIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
     }

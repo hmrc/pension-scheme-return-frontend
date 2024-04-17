@@ -31,6 +31,8 @@ import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage}
 import viewmodels.models.{SectionJourneyStatus, TaskListStatus}
 import models.SponsoringOrConnectedParty.Sponsoring
 import org.mockito.ArgumentMatchers.any
+import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalPage, OtherAssetsDisposalProgress}
+import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import org.mockito.Mockito.when
@@ -757,6 +759,71 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       }
     }
 
+    "otherAssetsDisposalSection" - {
+      "notStarted" in {
+        testViewModel(
+          defaultUserAnswers,
+          7,
+          1,
+          expectedStatus = TaskListStatus.NotStarted,
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.add.title",
+          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      }
+
+      "inProgress" in {
+        val userAnswersWithData = defaultUserAnswers.unsafeSet(OtherAssetsDisposalPage(srn), true)
+
+        testViewModel(
+          userAnswersWithData,
+          7,
+          1,
+          expectedStatus = TaskListStatus.InProgress,
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.change.title",
+          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController
+            .onPageLoad(srn, page = 1)
+            .url
+        )
+      }
+
+      "completed (with no other asset disposals)" in {
+        val userAnswersWithData = defaultUserAnswers.unsafeSet(OtherAssetsDisposalPage(srn), false)
+
+        testViewModel(
+          userAnswersWithData,
+          7,
+          1,
+          expectedStatus = TaskListStatus.Completed,
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.change.title",
+          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      }
+
+      "completed (with at least one completed other assets disposal)" in {
+        val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+
+        testViewModel(
+          userAnswersWithData,
+          7,
+          1,
+          expectedStatus = TaskListStatus.Completed,
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.change.title",
+          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+            .onPageLoad(srn, page = 1)
+            .url
+        )
+      }
+    }
   }
 
   private def testViewModel(

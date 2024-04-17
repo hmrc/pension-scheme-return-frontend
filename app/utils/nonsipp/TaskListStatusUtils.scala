@@ -29,7 +29,11 @@ import pages.nonsipp.sharesdisposal._
 import models._
 import pages.nonsipp.loansmadeoroutstanding._
 import viewmodels.models.{SectionStatus, TaskListStatus}
-import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalCompletedPages, OtherAssetsDisposalPage}
+import pages.nonsipp.otherassetsdisposal.{
+  OtherAssetsDisposalCompleted,
+  OtherAssetsDisposalPage,
+  OtherAssetsDisposalProgress
+}
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import pages.nonsipp.bonds._
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
@@ -593,28 +597,33 @@ object TaskListStatusUtils {
     userAnswers: UserAnswers,
     srn: Srn
   ): (TaskListStatus, String) = {
-    val atLeastOneCompleted =
-      userAnswers.get(OtherAssetsDisposalCompletedPages(srn)).exists(_.values.exists(_.values.nonEmpty))
-    val started = userAnswers.get(OtherAssetsDisposalPage(srn)).contains(true)
-    val completedNoDisposals = userAnswers.get(OtherAssetsDisposalPage(srn)).contains(false)
 
-    val initialDisposalUrl = controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController
+    val didSchemeDisposePage = controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController
       .onPageLoad(srn, NormalMode)
       .url
 
-    val disposalListPage = controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController
+    val assetsToDisposePage = controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController
       .onPageLoad(srn, page = 1)
       .url
 
-    if (atLeastOneCompleted) {
-      (TaskListStatus.Completed, disposalListPage)
-    } else if (completedNoDisposals) {
-      (TaskListStatus.Completed, initialDisposalUrl)
-    } else if (started) {
-      (TaskListStatus.InProgress, initialDisposalUrl)
-    } else {
-      (TaskListStatus.NotStarted, initialDisposalUrl)
-    }
-  }
+    val reportedDisposalsPage = controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+      .onPageLoad(srn, page = 1)
+      .url
 
+    val anyJourneysCompleted = userAnswers
+      .map(OtherAssetsDisposalProgress.all(srn))
+      .values
+      .exists(_.values.exists(_.completed))
+
+    val (status, link) =
+      (userAnswers.get(OtherAssetsDisposalPage(srn)), userAnswers.get(OtherAssetsDisposalCompleted(srn))) match {
+        case (None, _) => (NotStarted, didSchemeDisposePage)
+        case (Some(true), Some(_)) => (TaskListStatus.Completed, reportedDisposalsPage)
+        case (Some(true), None) if anyJourneysCompleted => (TaskListStatus.Completed, reportedDisposalsPage)
+        case (Some(true), None) => (TaskListStatus.InProgress, assetsToDisposePage)
+        case (Some(false), _) => (TaskListStatus.Completed, didSchemeDisposePage)
+      }
+
+    (status, link)
+  }
 }

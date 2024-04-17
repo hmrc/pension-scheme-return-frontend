@@ -16,18 +16,33 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
-import controllers.nonsipp.otherassetsdisposal.routes
+import services.PsrSubmissionService
 import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.otherassetsdisposal.OtherAssetsDisposalController.{form, viewModel}
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito._
+
+import scala.concurrent.Future
 
 class OtherAssetsDisposalControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.OtherAssetsDisposalController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.OtherAssetsDisposalController.onSubmit(srn, NormalMode)
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit =
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
 
   "OtherAssetsDisposalController" - {
 
@@ -40,14 +55,28 @@ class OtherAssetsDisposalControllerSpec extends ControllerBaseSpec {
         .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, NormalMode))
     })
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .after({
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
+
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
     act.like(saveAndContinue(onSubmit, "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
+
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

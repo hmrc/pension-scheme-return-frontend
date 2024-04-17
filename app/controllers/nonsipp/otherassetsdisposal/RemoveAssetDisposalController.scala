@@ -17,8 +17,7 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.otherassetsdisposal.{HowWasAssetDisposedOfPage, RemoveAssetDisposalPage}
-import viewmodels.implicits._
+import pages.nonsipp.otherassetsdisposal._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import config.Refined.{Max50, Max5000}
@@ -28,12 +27,13 @@ import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import play.api.i18n.MessagesApi
+import play.api.data.Form
+import viewmodels.implicits._
+import controllers.nonsipp.otherassetsdisposal.RemoveAssetDisposalController._
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
-import models.requests.DataRequest
-import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -56,15 +56,7 @@ class RemoveAssetDisposalController @Inject()(
   def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.userAnswers.get(WhatIsOtherAssetPage(srn, assetIndex)).getOrRecoverJourney { otherAsset =>
-        val preparedForm =
-          request.userAnswers.fillForm(RemoveAssetDisposalPage(srn, assetIndex, disposalIndex), form)
-        Ok(
-          view(
-            preparedForm,
-            RemoveAssetDisposalController
-              .viewModel(srn, assetIndex, disposalIndex, otherAsset)
-          )
-        )
+        Ok(view(form, viewModel(srn, assetIndex, disposalIndex, otherAsset)))
       }
     }
 
@@ -75,55 +67,27 @@ class RemoveAssetDisposalController @Inject()(
         .fold(
           errors =>
             request.userAnswers.get(WhatIsOtherAssetPage(srn, assetIndex)).getOrRecoverJourney { otherAsset =>
-              Future.successful(
-                BadRequest(
-                  view(
-                    errors,
-                    RemoveAssetDisposalController
-                      .viewModel(srn, assetIndex, disposalIndex, otherAsset)
-                  )
-                )
-              )
+              Future.successful(BadRequest(view(errors, viewModel(srn, assetIndex, disposalIndex, otherAsset))))
             },
-          value =>
-            if (value) {
+          removeDisposal =>
+            if (removeDisposal) {
               for {
                 removedUserAnswers <- Future
                   .fromTry(
-                    // remove the first page in the journey only
-                    request.userAnswers.remove(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex))
+                    request.userAnswers
+                      .remove(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex))
+                      .remove(OtherAssetsDisposalCompleted(srn))
+                      .remove(OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex))
                   )
-
                 _ <- saveService.save(removedUserAnswers)
-                redirectTo <- psrSubmissionService
-                  .submitPsrDetails(srn)(
-                    implicitly,
-                    implicitly,
-                    request = DataRequest(request.request, removedUserAnswers)
-                  )
-                  .map {
-                    case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                    case Some(_) =>
-                      Redirect(
-                        navigator.nextPage(
-                          RemoveAssetDisposalPage(srn, assetIndex, disposalIndex),
-                          NormalMode,
-                          removedUserAnswers
-                        )
-                      )
-                  }
-              } yield redirectTo
+                submissionResult <- psrSubmissionService.submitPsrDetails(srn, removedUserAnswers)
+              } yield submissionResult.getOrRecoverJourney(
+                _ => Redirect(navigator.nextPage(RemoveAssetDisposalPage(srn), NormalMode, removedUserAnswers))
+              )
             } else {
-              Future
-                .successful(
-                  Redirect(
-                    navigator.nextPage(
-                      RemoveAssetDisposalPage(srn, assetIndex, disposalIndex),
-                      NormalMode,
-                      request.userAnswers
-                    )
-                  )
-                )
+              Future.successful(
+                Redirect(navigator.nextPage(RemoveAssetDisposalPage(srn), NormalMode, request.userAnswers))
+              )
             }
         )
     }

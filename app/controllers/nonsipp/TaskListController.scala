@@ -17,6 +17,7 @@
 package controllers.nonsipp
 
 import services.{PsrVersionsService, SchemeDateService}
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
 import pages.nonsipp.memberdetails._
 import play.api.mvc._
 import com.google.inject.Inject
@@ -27,8 +28,6 @@ import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsJourneyStatus
 import viewmodels.models.TaskListStatus._
 import _root_.config.Refined.OneTo300
-import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
-import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
 import viewmodels.implicits._
 import pages.nonsipp.membercontributions.MemberContributionsListPage
 import pages.nonsipp.memberreceivedpcls.{PclsMemberListPage, PensionCommencementLumpSumPage}
@@ -502,23 +501,25 @@ object TaskListController {
 
   private def otherAssetsSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.otherassets"
-    val (assetsStatus, assetsLink) = getOtherAssetsTaskListStatusAndLink(userAnswers, srn)
+    val (otherAssetsStatus, otherAssetsLink) = getOtherAssetsTaskListStatusAndLink(userAnswers, srn)
+    val (otherAssetsDisposalsStatus, otherAssetsDisposalsLinkUrl) =
+      TaskListStatusUtils.getOtherAssetsDisposalTaskListStatusAndLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "title", assetsStatus),
-          assetsLink
+          messageKey(prefix, "title", otherAssetsStatus),
+          otherAssetsLink
         ),
-        assetsStatus
+        otherAssetsStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
-          messageKey("nonsipp.tasklist.otherassetsdisposal", "title", NotStarted),
-          controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController.onPageLoad(srn, NormalMode).url
+          messageKey("nonsipp.tasklist.otherassetsdisposal", "title", otherAssetsDisposalsStatus),
+          otherAssetsDisposalsLinkUrl
         ),
-        NotStarted
+        otherAssetsDisposalsStatus
       )
     )
   }
@@ -585,8 +586,7 @@ object TaskListController {
       UnallocatedEmployerContributionsPage(srn),
       PensionPaymentsReceivedPage(srn),
       PensionCommencementLumpSumPage(srn),
-      BondsDisposalPage(srn),
-      OtherAssetsDisposalPage(srn)
+      BondsDisposalPage(srn)
     ).map(
         page => userAnswers.get(page).fold(0)(x => if (x) 0 else 1)
       )
