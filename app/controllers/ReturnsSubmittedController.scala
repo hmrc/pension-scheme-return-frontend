@@ -59,6 +59,8 @@ class ReturnsSubmittedController @Inject()(
                   psrVersionsService.reportStatus == ReportStatus.SubmittedAndInProgress
                     || psrVersionsService.reportStatus == ReportStatus.SubmittedAndSuccessfullyProcessed
               )
+              .sortBy(_.reportVersion)
+              .reverse
               .map { psrVersionsResponse =>
                 val maxReportVersion = reportVersions.max
                 List(

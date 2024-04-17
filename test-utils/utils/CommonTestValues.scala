@@ -86,6 +86,30 @@ trait CommonTestValues {
     Seq(
       PsrVersionsResponse(
         startDate = None,
+        reportFormBundleNumber = commonFbNumber.replace('1', '2'),
+        reportVersion = commonVersion.toInt + 1,
+        reportStatus = ReportStatus.SubmittedAndSuccessfullyProcessed,
+        compilationOrSubmissionDate = LocalDateTime.parse("2020-04-07T12:00:00.000"),
+        reportSubmitterDetails = Some(
+          ReportSubmitterDetails(
+            reportSubmittedBy = "PSP",
+            organisationOrPartnershipDetails = None,
+            individualDetails = Some(IndividualDetails("first", None, "last"))
+          )
+        ),
+        psaDetails = Some(
+          PsaDetails(
+            psaOrganisationOrPartnershipDetails = Some(
+              PsaOrganisationOrPartnershipDetails(
+                "psaOrgName"
+              )
+            ),
+            psaIndividualDetails = None
+          )
+        )
+      ),
+      PsrVersionsResponse(
+        startDate = None,
         reportFormBundleNumber = commonFbNumber,
         reportVersion = commonVersion.toInt,
         reportStatus = ReportStatus.SubmittedAndSuccessfullyProcessed,
@@ -190,6 +214,24 @@ trait CommonTestValues {
       |    {
       |        "startDate": "2020-04-06",
       |        "data": [
+      |           {
+      |                "reportFormBundleNumber": "223456785022",
+      |                "reportVersion": 2,
+      |                "reportStatus": "SubmittedAndSuccessfullyProcessed",
+      |                "compilationOrSubmissionDate": "2020-04-07T12:00:00",
+      |                "reportSubmitterDetails": {
+      |                    "reportSubmittedBy": "PSP",
+      |                    "individualDetails": {
+      |                        "firstName": "first",
+      |                        "lastName": "last"
+      |                    }
+      |                },
+      |                "psaDetails": {
+      |                    "psaOrganisationOrPartnershipDetails": {
+      |                        "organisationOrPartnershipName": "psaOrgName"
+      |                    }
+      |                }
+      |            },
       |            {
       |                "reportFormBundleNumber": "123456785011",
       |                "reportVersion": 1,
@@ -232,6 +274,24 @@ trait CommonTestValues {
   val getVersionsJson: JsValue = Json.parse(
     """
       |[
+      |{
+      |        "reportFormBundleNumber": "223456785022",
+      |        "reportVersion": 2,
+      |        "reportStatus": "SubmittedAndSuccessfullyProcessed",
+      |        "compilationOrSubmissionDate": "2020-04-07T12:00:00",
+      |        "reportSubmitterDetails": {
+      |            "reportSubmittedBy": "PSP",
+      |            "individualDetails": {
+      |                "firstName": "first",
+      |                "lastName": "last"
+      |            }
+      |        },
+      |        "psaDetails": {
+      |            "psaOrganisationOrPartnershipDetails": {
+      |                "organisationOrPartnershipName": "psaOrgName"
+      |            }
+      |        }
+      |    },
       |    {
       |        "reportFormBundleNumber": "123456785011",
       |        "reportVersion": 1,
