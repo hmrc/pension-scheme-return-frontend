@@ -24,10 +24,13 @@ import eu.timepit.refined.refineMV
 import play.api.inject
 import forms.DatePageFormProvider
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, WhenDidMemberSurrenderBenefitsPage}
-import models.{NormalMode, UserAnswers}
+import models.{DateRange, NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import org.mockito.Mockito.reset
+import org.mockito.Mockito.{reset, when}
+
+import java.time.LocalDate
 
 class WhenDidMemberSurrenderBenefitsControllerSpec extends ControllerBaseSpec {
 
@@ -36,6 +39,7 @@ class WhenDidMemberSurrenderBenefitsControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.WhenDidMemberSurrenderBenefitsController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.WhenDidMemberSurrenderBenefitsController.onSubmit(srn, index, NormalMode)
 
+  val schemeDatePeriod: DateRange = DateRange(LocalDate.parse("2020-04-06"), LocalDate.parse("2021-04-05"))
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 
   override val additionalBindings: List[GuiceableModule] =
@@ -43,8 +47,11 @@ class WhenDidMemberSurrenderBenefitsControllerSpec extends ControllerBaseSpec {
 
   override def beforeEach(): Unit = {
     reset(mockSchemeDateService)
-    MockSchemeDateService.taxYearOrAccountingPeriods(Some(Left(dateRange)))
+    setSchemeDate(Some(schemeDatePeriod))
   }
+
+  def setSchemeDate(date: Option[DateRange]): Unit =
+    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(date)
 
   val userAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)

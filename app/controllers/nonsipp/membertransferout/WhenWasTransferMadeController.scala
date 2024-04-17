@@ -19,14 +19,14 @@ package controllers.nonsipp.membertransferout
 import services.{SaveService, SchemeDateService}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import config.Refined.{Max300, Max5}
 import controllers.PSRController
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.DatePageFormProvider
-import play.api.data.Form
+import cats.{Id, Monad}
 import forms.mappings.errors.DateFormErrors
 import views.html.DatePageView
 import models.SchemeId.Srn
@@ -36,6 +36,8 @@ import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, TransfersOutCom
 import play.api.i18n.{Messages, MessagesApi}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{DatePageViewModel, FormPageViewModel, SectionCompleted}
+import models.requests.DataRequest
+import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -59,30 +61,31 @@ class WhenWasTransferMadeController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
-          member <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
-          date <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
-          schemeName <- request.userAnswers
-            .get(ReceivingSchemeNamePage(srn, index, secondaryIndex))
-            .getOrRecoverJourney
-        } yield {
-          val preparedForm = request.userAnswers
-            .get(WhenWasTransferMadePage(srn, index, secondaryIndex))
-            .fold(form(date))(form(date).fill)
-          Ok(
-            view(
-              preparedForm,
-              WhenWasTransferMadeController.viewModel(srn, index, secondaryIndex, schemeName, member.fullName, mode)
+      usingSchemeDate[Id](srn) { date =>
+        (
+          for {
+            member <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
+            schemeName <- request.userAnswers
+              .get(ReceivingSchemeNamePage(srn, index, secondaryIndex))
+              .getOrRecoverJourney
+          } yield {
+            val preparedForm = request.userAnswers
+              .get(WhenWasTransferMadePage(srn, index, secondaryIndex))
+              .fold(form(date))(form(date).fill)
+            Ok(
+              view(
+                preparedForm,
+                WhenWasTransferMadeController.viewModel(srn, index, secondaryIndex, schemeName, member.fullName, mode)
+              )
             )
-          )
-        }
-      ).merge
+          }
+        ).merge
+      }
     }
 
   def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
+      usingSchemeDate(srn) { date =>
         form(date)
           .bindFromRequest()
           .fold(
@@ -120,6 +123,14 @@ class WhenWasTransferMadeController @Inject()(
               )
           )
       }
+    }
+
+  private def usingSchemeDate[F[_]: Monad](
+    srn: Srn
+  )(body: DateRange => F[Result])(implicit request: DataRequest[_]): F[Result] =
+    schemeDateService.schemeDate(srn) match {
+      case Some(period) => body(period)
+      case None => Monad[F].pure(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 }
 

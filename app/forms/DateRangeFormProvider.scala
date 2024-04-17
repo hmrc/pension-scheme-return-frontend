@@ -16,8 +16,10 @@
 
 package forms
 
+import config.Refined.Max3
 import play.api.data.Forms.mapping
 import models.DateRange
+import uk.gov.hmrc.time.TaxYear
 import play.api.data.Form
 import forms.mappings.errors.DateFormErrors
 import forms.mappings.Mappings
@@ -33,7 +35,11 @@ class DateRangeFormProvider @Inject()() extends Mappings {
     startDateAllowedDateRangeError: Option[String],
     endDateAllowedDateRangeError: Option[String],
     duplicateRangeError: Option[String],
-    duplicateRanges: List[DateRange]
+    duplicateRanges: List[DateRange],
+    previousDateRangeError: Option[String],
+    index: Max3,
+    taxYear: TaxYear,
+    errorTaxYear: Option[String]
   ): Form[DateRange] =
     Form(
       mapping(
@@ -45,7 +51,11 @@ class DateRangeFormProvider @Inject()() extends Mappings {
           startDateAllowedDateRangeError,
           endDateAllowedDateRangeError,
           duplicateRangeError,
-          duplicateRanges
+          duplicateRanges,
+          previousDateRangeError,
+          index,
+          taxYear,
+          errorTaxYear
         )
       )(identity)(Some(_))
     )

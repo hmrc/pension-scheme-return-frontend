@@ -60,8 +60,8 @@ class AccountingPeriodController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private def form(usedAccountingPeriods: List[DateRange] = List(), taxYear: TaxYear = TaxYear.current) =
-    AccountingPeriodController.form(formProvider, taxYear, usedAccountingPeriods)
+  private def form(usedAccountingPeriods: List[DateRange] = List(), taxYear: TaxYear = TaxYear.current, index: Max3) =
+    AccountingPeriodController.form(formProvider, taxYear, usedAccountingPeriods, index)
 
   private val viewModel = AccountingPeriodController.viewModel _
 
@@ -70,7 +70,7 @@ class AccountingPeriodController @Inject()(
       getWhichTaxYear(srn) { taxYear =>
         Ok(
           view(
-            form(taxYear = taxYear).fromUserAnswers(AccountingPeriodPage(srn, index, mode)),
+            form(taxYear = taxYear, index = index).fromUserAnswers(AccountingPeriodPage(srn, index, mode)),
             viewModel(srn, index, mode)
           )
         )
@@ -82,7 +82,7 @@ class AccountingPeriodController @Inject()(
       val usedAccountingPeriods = duplicateAccountingPeriods(srn, index)
       request.userAnswers.get(WhichTaxYearPage(srn)) match {
         case Some(dateRange: DateRange) =>
-          form(usedAccountingPeriods, TaxYear(dateRange.from.getYear))
+          form(usedAccountingPeriods, TaxYear(dateRange.from.getYear), index)
             .bindFromRequest()
             .fold(
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
@@ -114,7 +114,8 @@ object AccountingPeriodController {
   def form(
     formProvider: DateRangeFormProvider,
     taxYear: TaxYear,
-    usedAccountingPeriods: List[DateRange]
+    usedAccountingPeriods: List[DateRange],
+    index: Max3
   ): Form[DateRange] = formProvider(
     DateFormErrors(
       "accountingPeriod.startDate.error.required.all",
@@ -139,7 +140,11 @@ object AccountingPeriodController {
     Some("accountingPeriod.startDate.error.outsideTaxYear"),
     Some("accountingPeriod.endDate.error.outsideTaxYear"),
     Some("accountingPeriod.startDate.error.duplicate"),
-    usedAccountingPeriods
+    usedAccountingPeriods,
+    Some("accountingPeriod.startDate.error.previousDateError"),
+    index,
+    taxYear,
+    Some("accountingPeriod.before.error.beforeEndOFTaxYear")
   )
 
   def viewModel(srn: Srn, index: Max3, mode: Mode): FormPageViewModel[DateRangeViewModel] = DateRangeViewModel(
