@@ -16,16 +16,26 @@
 
 package controllers.nonsipp.declaration
 
+import services.PsrSubmissionService
 import controllers.nonsipp.declaration.PspDeclarationController._
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
 import views.html.PsaIdInputView
 import forms.TextFormProvider
 import pages.nonsipp.declaration.PspDeclarationPage
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, times, verify}
 
 class PspDeclarationControllerSpec extends ControllerBaseSpec {
   private val populatedUserAnswers = {
     defaultUserAnswers.unsafeSet(PspDeclarationPage(srn), psaId.value)
   }
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
 
   "PspDeclarationController" - {
 
@@ -41,7 +51,14 @@ class PspDeclarationControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(agreeAndContinue(onSubmit, populatedUserAnswers, "value" -> psaId.value))
+    act.like(
+      agreeAndContinue(onSubmit, populatedUserAnswers, "value" -> psaId.value)
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 

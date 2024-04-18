@@ -30,8 +30,6 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 
-import scala.concurrent.Future
-
 class RemoveOtherAssetControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
@@ -48,11 +46,8 @@ class RemoveOtherAssetControllerSpec extends ControllerBaseSpec {
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
-  override protected def beforeEach(): Unit = {
+  override protected def beforeEach(): Unit =
     reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(())))
-  }
 
   "RemoveOtherAssetController" - {
 
@@ -73,7 +68,7 @@ class RemoveOtherAssetControllerSpec extends ControllerBaseSpec {
       saveAndContinue(onSubmit, userAnswers, "value" -> "true")
         .before(MockPSRSubmissionService.submitPsrDetails())
         .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )

@@ -46,7 +46,7 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetails(any())(any(), any(), any()))
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
   }
 
@@ -66,7 +66,7 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
 
     act.like(
       redirectNextPage(onSubmit)
-        .after(verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any()))
+        .after(verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any()))
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
