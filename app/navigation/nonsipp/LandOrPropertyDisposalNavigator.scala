@@ -99,7 +99,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.landorpropertydisposal.routes.IndividualBuyerNinoNumberController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
-    case page @ LandOrPropertyDisposalAddressListPage(srn, addressChoice, _) =>
+    case page @ LandOrPropertyDisposalAddressListPage(srn, addressChoice) =>
       (
         for {
           indexes <- userAnswers
@@ -244,10 +244,6 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         case LandOrPropertyDisposalBuyerConnectedPartyPage(srn, landOrPropertyIndex, disposalIndex) =>
           controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
-
-        case LandOrPropertyDisposalAddressListPage(srn, addressChoice, disposalChoice) =>
-          controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-            .onPageLoad(srn, addressChoice, disposalChoice, CheckMode)
 
       }
 }

@@ -19,31 +19,28 @@ package controllers.nonsipp.landorpropertydisposal
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
-import config.Refined.{Max5000, _}
+import utils.ListUtils.ListOps
 import controllers.PSRController
-import config.Constants
 import cats.implicits._
-import pages.nonsipp.landorpropertydisposal.{
-  LandOrPropertyDisposalAddressListPage,
-  LandOrPropertyStillHeldPage,
-  LandPropertyDisposalCompletedPages
-}
-import config.Refined.Max5000._
+import _root_.config.Refined.Max5000.enumerable
+import _root_.config.Constants.maxLandOrPropertyDisposals
 import navigation.Navigator
 import forms.RadioListFormProvider
 import models._
 import play.api.i18n.MessagesApi
-import play.api.data.Form
+import _root_.config.Refined.{Max50, Max5000}
 import views.html.ListRadiosView
 import models.SchemeId.Srn
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPages
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyCompleted}
+import _root_.config.Constants
+import pages.nonsipp.landorpropertydisposal._
 import controllers.actions._
 import eu.timepit.refined.refineV
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.models._
-
-import scala.collection.immutable.SortedMap
+import models.requests.DataRequest
+import play.api.data.Form
 
 import javax.inject.Named
 
@@ -60,52 +57,48 @@ class LandOrPropertyDisposalAddressListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val userAnswers = request.userAnswers
-      val addresses = userAnswers.map(LandOrPropertyAddressLookupPages(srn))
-      withIndexedAddress(addresses) { sortedAddresses =>
-        Ok(view(form, viewModel(srn, page, sortedAddresses, userAnswers)))
+      val completedLandOrProperties = request.userAnswers.map(LandOrPropertyCompleted.all(srn))
+
+      if (completedLandOrProperties.nonEmpty) {
+        landOrPropertyData(srn, completedLandOrProperties.keys.toList.refine[Max5000.Refined]).map { data =>
+          Ok(view(form, viewModel(srn, page, data, request.userAnswers)))
+        }.merge
+      } else {
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val userAnswers = request.userAnswers
-    val addresses = userAnswers.map(LandOrPropertyAddressLookupPages(srn))
     form
       .bindFromRequest()
       .fold(
-        errors =>
-          withIndexedAddress(addresses)(
-            sortedAddresses => BadRequest(view(errors, viewModel(srn, page, sortedAddresses, userAnswers)))
-          ),
+        errors => {
+          val completedLandOrPropertyIndexes: List[Max5000] =
+            request.userAnswers.map(LandOrPropertyCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+          landOrPropertyData(srn, completedLandOrPropertyIndexes).map { data =>
+            BadRequest(view(errors, viewModel(srn, page, data, request.userAnswers)))
+
+          }.merge
+        },
         answer =>
-          LandOrPropertyDisposalAddressListController
-            .getDisposal(srn, answer, userAnswers, isNextDisposal = true)
-            .getOrRecoverJourney(
-              nextDisposal =>
-                Redirect(
-                  navigator.nextPage(
-                    LandOrPropertyDisposalAddressListPage(srn, answer, nextDisposal),
-                    mode,
-                    request.userAnswers
-                  )
-                )
+          Redirect(
+            navigator.nextPage(
+              LandOrPropertyDisposalAddressListPage(srn, answer),
+              mode,
+              request.userAnswers
             )
+          )
       )
   }
 
-  private def withIndexedAddress(addresses: Map[String, Address])(
-    f: Map[Int, Address] => Result
-  ): Result = {
-    val maybeIndexedAddresses: Option[List[(Int, Address)]] = addresses.toList
-      .traverse { case (key, value) => key.toIntOption.map(_ -> value) }
-
-    maybeIndexedAddresses match {
-      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case Some(indexedAddresses) =>
-        val sortedMap = SortedMap.from(indexedAddresses)
-        f(sortedMap)
-    }
-  }
+  private def landOrPropertyData(srn: Srn, indexes: List[Max5000])(
+    implicit req: DataRequest[_]
+  ): Either[Result, List[LandOrPropertyData]] =
+    indexes.map { index =>
+      for {
+        address <- requiredPage(LandOrPropertyChosenAddressPage(srn, index))
+      } yield LandOrPropertyData(index, address)
+    }.sequence
 }
 
 object LandOrPropertyDisposalAddressListController {
@@ -114,81 +107,48 @@ object LandOrPropertyDisposalAddressListController {
       "landOrPropertyDisposalAddressList.radios.error.required"
     )
 
-  private def getDisposal(
+  private def buildRows(
     srn: Srn,
-    addressChoice: Max5000,
-    userAnswers: UserAnswers,
-    isNextDisposal: Boolean
-  ): Option[Max50] =
-    userAnswers.get(LandPropertyDisposalCompletedPages(srn)) match {
-      case None => refineV[Max50.Refined](1).toOption
-      case Some(completedDisposals) =>
-        /**
-         * Indexes of completed disposals sorted in ascending order.
-         * We -1 from the address choice as the refined indexes is 1-based (e.g. 1 to 5000)
-         * while we are trying to fetch a completed disposal from a Map which is 0-based.
-         * We then +1 when we re-refine the index
-         */
-        val completedDisposalsForAddress =
-          completedDisposals
-            .get((addressChoice.value - 1).toString)
-            .map(_.keys.toList)
-            .flatMap(_.traverse(_.toIntOption))
-            .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
-            .toList
-            .flatten
-            .sortBy(_.value)
+    landOrPropertyList: List[LandOrPropertyData],
+    userAnswers: UserAnswers
+  ): List[ListRadiosRow] =
+    landOrPropertyList.flatMap { landOrPropertyData =>
+      val completedDisposalsPerBondKeys = userAnswers
+        .map(LandPropertyDisposalCompleted.all(srn, landOrPropertyData.index))
+        .keys
 
-        completedDisposalsForAddress.lastOption match {
-          case None => refineV[Max50.Refined](1).toOption
-          case Some(lastCompletedDisposalForAddress) =>
-            if (isNextDisposal) {
-              refineV[Max50.Refined](lastCompletedDisposalForAddress.value + 1).toOption
-            } else {
-              refineV[Max50.Refined](lastCompletedDisposalForAddress.value).toOption
-            }
+      if (maxLandOrPropertyDisposals == completedDisposalsPerBondKeys.size) {
+        List[ListRadiosRow]().empty
+      } else {
+
+        val isLandOrPropertyShouldBeRemovedFromList = completedDisposalsPerBondKeys.toList
+          .map(_.toIntOption)
+          .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
+          .flatMap(
+            _.map(
+              disposalIndex =>
+                userAnswers.get(LandOrPropertyStillHeldPage(srn, landOrPropertyData.index, disposalIndex))
+            )
+          )
+          .exists(optValue => optValue.fold(false)(value => !value))
+
+        if (isLandOrPropertyShouldBeRemovedFromList) {
+          List[ListRadiosRow]().empty
+        } else {
+          List(
+            ListRadiosRow(
+              landOrPropertyData.index.value,
+              landOrPropertyData.address.addressLine1
+            )
+          )
         }
+      }
     }
-
-  private def buildRows(srn: Srn, addresses: Map[Int, Address], userAnswers: UserAnswers): List[ListRadiosRow] =
-    addresses.flatMap {
-      case (index, address) =>
-        refineV[Max5000.Refined](index + 1).fold(
-          _ => Nil,
-          nextIndex => {
-            val disposalIndex = getDisposal(srn, nextIndex, userAnswers, isNextDisposal = false).get
-            val isDisposed: Option[Boolean] = {
-              userAnswers.get(LandOrPropertyStillHeldPage(srn, nextIndex, disposalIndex))
-            }
-            isDisposed match {
-              case Some(value) =>
-                if (value) {
-                  List(
-                    ListRadiosRow(
-                      nextIndex.value,
-                      address.addressLine1
-                    )
-                  )
-                } else {
-                  val empty: List[ListRadiosRow] = List()
-                  empty
-                }
-              case _ =>
-                List(
-                  ListRadiosRow(
-                    nextIndex.value,
-                    address.addressLine1
-                  )
-                )
-            }
-          }
-        )
-    }.toList
 
   def viewModel(
     srn: Srn,
     page: Int,
-    addresses: Map[Int, Address],
+    addresses: List[LandOrPropertyData],
     userAnswers: UserAnswers
   ): FormPageViewModel[ListRadiosViewModel] = {
     val rows = buildRows(srn, addresses, userAnswers)
@@ -228,4 +188,9 @@ object LandOrPropertyDisposalAddressListController {
       routes.LandOrPropertyDisposalAddressListController.onSubmit(srn, page)
     )
   }
+
+  case class LandOrPropertyData(
+    index: Max5000,
+    address: Address
+  )
 }

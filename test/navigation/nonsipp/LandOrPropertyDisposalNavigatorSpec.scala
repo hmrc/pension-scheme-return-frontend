@@ -269,7 +269,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
       act.like(
         normalmode
           .navigateTo(
-            srn => LandOrPropertyDisposalAddressListPage(srn, refineMV(1), refineMV(1)),
+            srn => LandOrPropertyDisposalAddressListPage(srn, refineMV(1)),
             (srn, mode) =>
               controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
                 .onPageLoad(srn, refineMV(1), refineMV(2), mode),
@@ -285,7 +285,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
       act.like(
         normalmode
           .navigateTo(
-            srn => LandOrPropertyDisposalAddressListPage(srn, refineMV(1), refineMV(2)),
+            srn => LandOrPropertyDisposalAddressListPage(srn, refineMV(1)),
             (srn, mode) =>
               controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
                 .onPageLoad(srn, refineMV(1), refineMV(1), mode),
@@ -301,7 +301,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
       act.like(
         normalmode
           .navigateTo(
-            srn => LandOrPropertyDisposalAddressListPage(srn, refineMV(1), refineMV(1)),
+            srn => LandOrPropertyDisposalAddressListPage(srn, refineMV(1)),
             (srn, mode) =>
               controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
                 .onPageLoad(srn, refineMV(1), refineMV(1), mode)
