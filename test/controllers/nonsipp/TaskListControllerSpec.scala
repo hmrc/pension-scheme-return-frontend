@@ -17,21 +17,20 @@
 package controllers.nonsipp
 
 import services.{PsrVersionsService, SchemeDateService}
-import pages.nonsipp.schemedesignatory._
 import models.ConditionalYesNo._
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import controllers.ControllerBaseSpec
 import views.html.TaskListView
 import eu.timepit.refined.refineMV
-import pages.nonsipp.sharesdisposal.{SharesDisposalPage, SharesDisposalProgress}
+import pages.nonsipp.sharesdisposal._
 import models._
 import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage}
-import viewmodels.models.{SectionJourneyStatus, TaskListStatus}
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus, TaskListStatus}
 import models.SponsoringOrConnectedParty.Sponsoring
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalPage, OtherAssetsDisposalProgress}
+import pages.nonsipp.otherassetsdisposal._
 import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
@@ -504,6 +503,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
     }
+
     "borrowingSection" - {
       "notStarted" in {
         testViewModel(
@@ -593,6 +593,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
     }
 
     "sharesDisposalSection" - {
+
       "notStarted" in {
         testViewModel(
           defaultUserAnswers,
@@ -607,24 +608,10 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "inProgress" in {
-        val userAnswersWithData = defaultUserAnswers.unsafeSet(SharesDisposalPage(srn), true)
-
-        testViewModel(
-          userAnswersWithData,
-          4,
-          1,
-          expectedStatus = TaskListStatus.InProgress,
-          expectedTitleKey = "nonsipp.tasklist.shares.title",
-          expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
-          expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
-            .onPageLoad(srn, page = 1)
-            .url
-        )
-      }
-
-      "completed (with no shares disposals)" in {
-        val userAnswersWithData = defaultUserAnswers.unsafeSet(SharesDisposalPage(srn), false)
+      "completed (with 'No' selection on first page)" in {
+        val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(SharesDisposalPage(srn), false)
+          .unsafeSet(SharesDisposalCompleted(srn), SectionCompleted)
 
         testViewModel(
           userAnswersWithData,
@@ -639,9 +626,58 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "completed (with at least one completed shares disposal)" in {
+      "inProgress (with only 1 incomplete disposal)" in {
         val userAnswersWithData = defaultUserAnswers
           .unsafeSet(SharesDisposalPage(srn), true)
+          // Shares 1 - Disposal 1 - Incomplete journey:
+          .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Sold)
+          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
+
+        testViewModel(
+          userAnswersWithData,
+          4,
+          1,
+          expectedStatus = TaskListStatus.InProgress,
+          expectedTitleKey = "nonsipp.tasklist.shares.title",
+          expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
+          expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
+            .onPageLoad(srn, page = 1)
+            .url
+        )
+      }
+
+      "inProgress (with 1 complete and 1 incomplete disposal)" in {
+        val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(SharesDisposalPage(srn), true)
+          // Shares 1 - Disposal 1 - Complete journey:
+          .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Transferred)
+          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(HowManyDisposalSharesPage(srn, refineMV(1), refineMV(1)), 1)
+          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+          // Shares 1 - Disposal 2 - Incomplete journey:
+          .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(2)), HowSharesDisposed.Sold)
+          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(2)), SectionJourneyStatus.InProgress("x"))
+
+        testViewModel(
+          userAnswersWithData,
+          4,
+          1,
+          expectedStatus = TaskListStatus.InProgress,
+          expectedTitleKey = "nonsipp.tasklist.shares.title",
+          expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
+          expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+            .onPageLoad(srn, page = 1)
+            .url
+        )
+      }
+
+      "completed (with only 1 complete disposal)" in {
+        val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(SharesDisposalPage(srn), true)
+          // Shares 1 - Disposal 1 - Complete journey:
+          .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Transferred)
+          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(HowManyDisposalSharesPage(srn, refineMV(1), refineMV(1)), 1)
           .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
 
         testViewModel(
@@ -653,6 +689,32 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
           expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
             .onPageLoad(srn, page = 1)
+            .url
+        )
+      }
+
+      "notStarted (with removal of only complete disposal)" in {
+        val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(SharesDisposalPage(srn), true)
+          // Shares 1 - Disposal 1 - Complete journey:
+          .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Transferred)
+          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(HowManyDisposalSharesPage(srn, refineMV(1), refineMV(1)), 1)
+          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+          // Shares 1 - Disposal 1 - Removal:
+          .unsafeRemove(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)))
+          .unsafeRemove(SharesDisposalCompleted(srn))
+          .unsafeRemove(SharesDisposalProgress(srn, refineMV(1), refineMV(1)))
+
+        testViewModel(
+          userAnswersWithData,
+          4,
+          1,
+          expectedStatus = TaskListStatus.NotStarted,
+          expectedTitleKey = "nonsipp.tasklist.shares.title",
+          expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.add.title",
+          expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
+            .onPageLoad(srn, NormalMode)
             .url
         )
       }
@@ -725,6 +787,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
     }
+
     "other assets section" - {
       "notStarted" in {
         testViewModel(
@@ -760,6 +823,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
     }
 
     "otherAssetsDisposalSection" - {
+
       "notStarted" in {
         testViewModel(
           defaultUserAnswers,
@@ -774,24 +838,10 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "inProgress" in {
-        val userAnswersWithData = defaultUserAnswers.unsafeSet(OtherAssetsDisposalPage(srn), true)
-
-        testViewModel(
-          userAnswersWithData,
-          7,
-          1,
-          expectedStatus = TaskListStatus.InProgress,
-          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
-          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.change.title",
-          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController
-            .onPageLoad(srn, page = 1)
-            .url
-        )
-      }
-
-      "completed (with no other asset disposals)" in {
-        val userAnswersWithData = defaultUserAnswers.unsafeSet(OtherAssetsDisposalPage(srn), false)
+      "completed (with 'No' selection on first page)" in {
+        val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsDisposalPage(srn), false)
+          .unsafeSet(OtherAssetsDisposalCompleted(srn), SectionCompleted)
 
         testViewModel(
           userAnswersWithData,
@@ -806,9 +856,58 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "completed (with at least one completed other assets disposal)" in {
+      "inProgress (with only 1 incomplete disposal)" in {
         val userAnswersWithData = defaultUserAnswers
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          // Other Assets 1 - Disposal 1 - Incomplete journey:
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Sold)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
+
+        testViewModel(
+          userAnswersWithData,
+          7,
+          1,
+          expectedStatus = TaskListStatus.InProgress,
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.change.title",
+          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController
+            .onPageLoad(srn, page = 1)
+            .url
+        )
+      }
+
+      "inProgress (with 1 complete and 1 incomplete disposal)" in {
+        val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          // Other Asset 1 - Disposal 1 - Complete journey:
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(1), refineMV(1)), true)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+          // Other Assets 1 - Disposal 2 - Incomplete journey:
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(2)), HowDisposed.Sold)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(2)), SectionJourneyStatus.InProgress("x"))
+
+        testViewModel(
+          userAnswersWithData,
+          7,
+          1,
+          expectedStatus = TaskListStatus.InProgress,
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.change.title",
+          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+            .onPageLoad(srn, page = 1)
+            .url
+        )
+      }
+
+      "completed (with only 1 complete disposal)" in {
+        val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          // Other Asset 1 - Disposal 1 - Complete journey:
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(1), refineMV(1)), true)
           .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
 
         testViewModel(
@@ -820,6 +919,32 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.change.title",
           expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
             .onPageLoad(srn, page = 1)
+            .url
+        )
+      }
+
+      "notStarted (with removal of only complete disposal)" in {
+        val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          // Other Asset 1 - Disposal 1 - Complete journey:
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(1), refineMV(1)), true)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+          // Other Asset 1 - Disposal 1 - Removal:
+          .unsafeRemove(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)))
+          .unsafeRemove(OtherAssetsDisposalCompleted(srn))
+          .unsafeRemove(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)))
+
+        testViewModel(
+          userAnswersWithData,
+          7,
+          1,
+          expectedStatus = TaskListStatus.NotStarted,
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.add.title",
+          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController
+            .onPageLoad(srn, NormalMode)
             .url
         )
       }

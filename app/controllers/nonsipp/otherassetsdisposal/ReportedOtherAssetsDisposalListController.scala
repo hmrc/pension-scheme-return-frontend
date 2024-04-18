@@ -131,11 +131,11 @@ class ReportedOtherAssetsDisposalListController @Inject()(
       .traverse {
         case (key, sectionCompleted) =>
           for {
-            sharesIndex <- refineStringIndex[Max5000.Refined](key).getOrRecoverJourney
+            otherAssetsIndex <- refineStringIndex[Max5000.Refined](key).getOrRecoverJourney
             disposalIndexes <- sectionCompleted.keys.toList
               .map(refineStringIndex[Max50.Refined])
               .traverse(_.getOrRecoverJourney)
-          } yield (sharesIndex, disposalIndexes)
+          } yield (otherAssetsIndex, disposalIndexes)
       }
       .map(_.toMap)
 }

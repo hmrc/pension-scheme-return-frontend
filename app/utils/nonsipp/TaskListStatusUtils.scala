@@ -482,13 +482,32 @@ object TaskListStatusUtils {
       .values
       .exists(_.values.exists(_.completed))
 
+    val allJourneysCompleted = userAnswers
+      .map(SharesDisposalProgress.all(srn))
+      .values
+      .forall(_.values.forall(_.completed))
+
     val (status, link) =
       (userAnswers.get(SharesDisposalPage(srn)), userAnswers.get(SharesDisposalCompleted(srn))) match {
+        // No user answers provided for this section
         case (None, _) => (NotStarted, didSchemeDisposePage)
-        case (Some(true), Some(_)) => (TaskListStatus.Completed, reportedDisposalsPage)
-        case (Some(true), None) if anyJourneysCompleted => (TaskListStatus.Completed, reportedDisposalsPage)
-        case (Some(true), None) => (TaskListStatus.InProgress, sharesToDisposePage)
+        // User answered "No" for "Did scheme dispose of any shares...?"
         case (Some(false), _) => (TaskListStatus.Completed, didSchemeDisposePage)
+        // No complete journeys & 1 incomplete journey
+        case (Some(true), None) if !anyJourneysCompleted => (TaskListStatus.InProgress, sharesToDisposePage)
+        // 1 or more complete journeys & 1 or more incomplete journeys
+        case (Some(true), None) if !allJourneysCompleted => (TaskListStatus.InProgress, reportedDisposalsPage)
+        // 1 or more complete journeys & 0 incomplete journeys
+        case (Some(true), None) if allJourneysCompleted => (TaskListStatus.Completed, reportedDisposalsPage)
+        // User answered "No" for "Do you need to report another shares disposal?"
+        case (Some(true), Some(_)) => (TaskListStatus.Completed, reportedDisposalsPage)
+
+        /*
+        // The case shown below is logically equivalent to the last 2 cases shown above, and could replace them,
+        // resulting in less code, but also less clarity, which I think is the most important thing right now. As such,
+        // I've shown both options, but commented this one out for now.
+        case (Some(true), _) => (TaskListStatus.Completed, reportedDisposalsPage)
+       */
       }
 
     (status, link)
@@ -615,13 +634,32 @@ object TaskListStatusUtils {
       .values
       .exists(_.values.exists(_.completed))
 
+    val allJourneysCompleted = userAnswers
+      .map(OtherAssetsDisposalProgress.all(srn))
+      .values
+      .forall(_.values.forall(_.completed))
+
     val (status, link) =
       (userAnswers.get(OtherAssetsDisposalPage(srn)), userAnswers.get(OtherAssetsDisposalCompleted(srn))) match {
+        // No user answers provided for this section
         case (None, _) => (NotStarted, didSchemeDisposePage)
-        case (Some(true), Some(_)) => (TaskListStatus.Completed, reportedDisposalsPage)
-        case (Some(true), None) if anyJourneysCompleted => (TaskListStatus.Completed, reportedDisposalsPage)
-        case (Some(true), None) => (TaskListStatus.InProgress, assetsToDisposePage)
+        // User answered "No" for "Did scheme dispose of any other assets...?"
         case (Some(false), _) => (TaskListStatus.Completed, didSchemeDisposePage)
+        // No complete journeys & 1 incomplete journey
+        case (Some(true), None) if !anyJourneysCompleted => (TaskListStatus.InProgress, assetsToDisposePage)
+        // 1 or more complete journeys & 1 or more incomplete journeys
+        case (Some(true), None) if !allJourneysCompleted => (TaskListStatus.InProgress, reportedDisposalsPage)
+        // 1 or more complete journeys & 0 incomplete journeys
+        case (Some(true), None) if allJourneysCompleted => (TaskListStatus.Completed, reportedDisposalsPage)
+        // User answered "No" for "Do you need to report another asset disposal?"
+        case (Some(true), Some(_)) => (TaskListStatus.Completed, reportedDisposalsPage)
+
+        /*
+        // The case shown below is logically equivalent to the last 2 cases shown above, and could replace them,
+        // resulting in less code, but also less clarity, which I think is the most important thing right now. As such,
+        // I've shown both options, but commented this one out for now.
+        case (Some(true), _) => (TaskListStatus.Completed, reportedDisposalsPage)
+       */
       }
 
     (status, link)
