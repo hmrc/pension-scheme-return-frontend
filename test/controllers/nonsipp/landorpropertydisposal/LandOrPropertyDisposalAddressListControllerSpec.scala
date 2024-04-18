@@ -21,7 +21,8 @@ import views.html.ListRadiosView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyCompleted}
+import viewmodels.models.SectionCompleted
 
 class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec {
 
@@ -31,11 +32,13 @@ class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec
   private val address1 = addressGen.sample.value
   private val address2 = addressGen.sample.value
 
-  private val addresses = Map(0 -> address1, 1 -> address2)
+  private val addresses = List(LandOrPropertyData(refineMV(1), address1), LandOrPropertyData(refineMV(2), address2))
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(1)), address1)
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(2)), address2)
+    .unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(LandOrPropertyCompleted(srn, refineMV(2)), SectionCompleted)
 
   "LandOrPropertyDisposalAddressListController" - {
 

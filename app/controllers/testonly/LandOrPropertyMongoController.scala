@@ -23,6 +23,7 @@ import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import models._
 import shapeless._
+import viewmodels.models.SectionCompleted
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 
@@ -41,7 +42,7 @@ class LandOrPropertyMongoController @Inject()(
 
   override def pages(srn: Srn, index: Max5000): Pages = HList(
     (
-      PageWithValue(LandOrPropertyHeldPage(srn), false),
+      PageWithValue(LandOrPropertyHeldPage(srn), true),
       PageWithValue(LandPropertyInUKPage(srn, index), true),
       PageWithValue(LandRegistryTitleNumberPage(srn, index), ConditionalYesNo.yes[String, String]("title number")),
       PageWithValue(LandOrPropertyChosenAddressPage(srn, index), address(index.value)),
@@ -49,7 +50,8 @@ class LandOrPropertyMongoController @Inject()(
       PageWithValue(LandOrPropertyTotalCostPage(srn, index), Money(12.34)),
       PageWithValue(LandOrPropertyTotalIncomePage(srn, index), Money(12.34)),
       PageWithValue(IsLandOrPropertyResidentialPage(srn, index), true),
-      PageWithValue(IsLandPropertyLeasedPage(srn, index), false)
+      PageWithValue(IsLandPropertyLeasedPage(srn, index), false),
+      PageWithValue(LandOrPropertyCompleted(srn, index), SectionCompleted)
     )
   )
 
@@ -63,6 +65,7 @@ class LandOrPropertyMongoController @Inject()(
       PageWithValue[Money] ::
       PageWithValue[Boolean] ::
       PageWithValue[Boolean] ::
+      PageWithValue[SectionCompleted] ::
       HNil
 
   private def address(index: Int) = Address(

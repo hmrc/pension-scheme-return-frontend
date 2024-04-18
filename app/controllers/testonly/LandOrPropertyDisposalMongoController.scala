@@ -41,7 +41,8 @@ class LandOrPropertyDisposalMongoController @Inject()(
     extends TestDataDoubleIndexController[Max5000.Refined, Max50.Refined] {
 
   override type Pages =
-    PageWithValue[RecipientDetails] ::
+    PageWithValue[Boolean] ::
+      PageWithValue[RecipientDetails] ::
       PageWithValue[Boolean] ::
       PageWithValue[HowDisposed] ::
       PageWithValue[Boolean] ::
@@ -56,6 +57,7 @@ class LandOrPropertyDisposalMongoController @Inject()(
 
   override def pages(srn: Srn, index: Max5000, secondaryIndex: Max50): Pages = HList(
     (
+      PageWithValue(LandOrPropertyDisposalPage(srn), true),
       PageWithValue(
         OtherBuyerDetailsPage(srn, index, secondaryIndex),
         RecipientDetails("test recipient", "test description")
