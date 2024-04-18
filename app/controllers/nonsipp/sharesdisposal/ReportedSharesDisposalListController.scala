@@ -97,7 +97,7 @@ class ReportedSharesDisposalListController @Inject()(
                       .mapK[Future]
                     _ <- saveService.save(updatedUserAnswers)
                     submissionResult <- if (!reportAnotherDisposal) {
-                      psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+                      psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
                     } else {
                       Future.successful(Some(()))
                     }

@@ -126,7 +126,7 @@ class EmployerContributionsMemberListController @Inject()(
                 )
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (value) {
-                  psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+                  psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
                 } else {
                   Future.successful(Some(()))
                 }

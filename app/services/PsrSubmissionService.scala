@@ -48,17 +48,19 @@ class PsrSubmissionService @Inject()(
   moneyBorrowedTransformer: MoneyBorrowedTransformer,
   sharesTransformer: SharesTransformer,
   bondTransactionsTransformer: BondTransactionsTransformer,
-  otherAssetTransactionsTransformer: OtherAssetTransactionsTransformer
+  otherAssetTransactionsTransformer: OtherAssetTransactionsTransformer,
+  declarationTransformer: DeclarationTransformer
 ) {
 
-  def submitPsrDetails(
+  def submitPsrDetailsWithUA(
     srn: Srn,
     userAnswers: UserAnswers
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
     submitPsrDetails(srn)(implicitly, implicitly, DataRequest(request.request, userAnswers))
 
   def submitPsrDetails(
-    srn: Srn
+    srn: Srn,
+    isSubmitted: Boolean = false
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] = {
 
     val optSchemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn))
@@ -89,7 +91,8 @@ class PsrSubmissionService @Inject()(
             optOtherAssetsHeld
           ),
           membersPayments = memberPaymentsTransformer.transformToEtmp(srn, request.userAnswers),
-          shares = buildShares(srn)(optDidSchemeHoldAnyShares, optSharesDisposal)
+          shares = buildShares(srn)(optDidSchemeHoldAnyShares, optSharesDisposal),
+          psrDeclaration = Option.when(isSubmitted)(declarationTransformer.transformToEtmp)
         )
       )
     }.sequence

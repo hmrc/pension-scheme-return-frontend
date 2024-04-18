@@ -82,7 +82,7 @@ class PensionPaymentsReceivedController @Inject()(
                 request.userAnswers.set(PensionPaymentsReceivedPage(srn), value).compose(pensionPaymentsPages)
               )
               _ <- saveService.save(updatedAnswers)
-              submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+              submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
             } yield submissionResult.getOrRecoverJourney(
               _ => Redirect(navigator.nextPage(PensionPaymentsReceivedPage(srn), mode, updatedAnswers))
             )

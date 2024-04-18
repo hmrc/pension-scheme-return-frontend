@@ -46,7 +46,14 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
       request.userAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
     ).mapN { (returnPeriods, schemeMemberNumbers) =>
       MinimalRequiredSubmission(
-        ReportDetails(request.schemeDetails.pstr, taxYear.get.from, taxYear.get.to),
+        ReportDetails(
+          fbVersion = None,
+          fbstatus = None,
+          pstr = request.schemeDetails.pstr,
+          periodStart = taxYear.get.from,
+          periodEnd = taxYear.get.to,
+          compilationOrSubmissionDate = None
+        ),
         returnPeriods.map(range => range.from -> range.to),
         SchemeDesignatory(
           openBankAccount = reasonForNoBankAccount.isEmpty,

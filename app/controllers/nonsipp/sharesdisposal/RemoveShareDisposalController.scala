@@ -95,7 +95,7 @@ class RemoveShareDisposalController @Inject()(
                       .remove(SharesDisposalProgress(srn, shareIndex, disposalIndex))
                   )
                 _ <- saveService.save(removedUserAnswers)
-                submissionResult <- psrSubmissionService.submitPsrDetails(srn, removedUserAnswers)
+                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, removedUserAnswers)
               } yield submissionResult.getOrRecoverJourney(
                 _ => Redirect(navigator.nextPage(RemoveShareDisposalPage(srn), mode, removedUserAnswers))
               )

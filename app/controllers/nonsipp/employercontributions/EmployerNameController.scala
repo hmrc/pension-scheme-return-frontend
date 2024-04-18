@@ -51,8 +51,6 @@ class EmployerNameController @Inject()(
 
   private val form = EmployerNameController.form(formProvider)
 
-  private val currentPage: (Srn, Max300, Max50, Mode) => Call = routes.EmployerNameController.onSubmit
-
   def onPageLoad(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm = request.userAnswers.fillForm(EmployerNamePage(srn, memberIndex, index), form)

@@ -66,7 +66,7 @@ class SurrenderedBenefitsController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(SurrenderedBenefitsPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-            submissionResult <- if (!value) psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+            submissionResult <- if (!value) psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
             else Future.successful(Some(()))
           } yield submissionResult
             .getOrRecoverJourney(_ => Redirect(navigator.nextPage(SurrenderedBenefitsPage(srn), mode, updatedAnswers)))

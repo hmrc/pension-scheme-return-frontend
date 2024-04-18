@@ -37,7 +37,8 @@ class PsrRetrievalService @Inject()(
   memberPaymentsTransformer: MemberPaymentsTransformer,
   sharesTransformer: SharesTransformer,
   bondTransactionsTransformer: BondTransactionsTransformer,
-  otherAssetTransactionsTransformer: OtherAssetTransactionsTransformer
+  otherAssetTransactionsTransformer: OtherAssetTransactionsTransformer,
+  declarationTransformer: DeclarationTransformer
 ) {
 
   def getStandardPsrDetails(
@@ -159,8 +160,12 @@ class PsrRetrievalService @Inject()(
               .map(sh => sharesTransformer.transformFromEtmp(transformedMemberDetailsUa, srn, sh))
               .getOrElse(Try(transformedMemberDetailsUa))
 
+            transformedPsrDeclarationUa <- psrDetails.psrDeclaration
+              .map(pd => declarationTransformer.transformFromEtmp(transformedSharesUa, srn, pd))
+              .getOrElse(Try(transformedSharesUa))
+
           } yield {
-            transformedSharesUa
+            transformedPsrDeclarationUa
           }
           Future.fromTry(result)
         case _ => Future(emptyUserAnswers)

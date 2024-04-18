@@ -86,7 +86,7 @@ class TotalAmountPensionPaymentsController @Inject()(
                   request.userAnswers.transformAndSet(TotalAmountPensionPaymentsPage(srn, index), value)
                 )
               _ <- saveService.save(updatedAnswers)
-              submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+              submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
             } yield submissionResult.getOrRecoverJourney(
               _ =>
                 Redirect(

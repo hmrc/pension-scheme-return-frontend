@@ -109,7 +109,7 @@ class SchemeMembersListController @Inject()(
             } else {
               for {
                 _ <- if (!value) {
-                  psrSubmissionService.submitPsrDetails(srn, request.userAnswers)
+                  psrSubmissionService.submitPsrDetailsWithUA(srn, request.userAnswers)
                 } else {
                   Future.successful(Some(()))
                 }

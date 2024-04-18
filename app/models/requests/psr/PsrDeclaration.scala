@@ -18,16 +18,14 @@ package models.requests.psr
 
 import play.api.libs.json.{Json, OFormat}
 
-case class PsrSubmission(
-  minimalRequiredSubmission: MinimalRequiredSubmission,
-  checkReturnDates: Boolean,
-  loans: Option[Loans],
-  assets: Option[Assets],
-  membersPayments: Option[MemberPayments],
-  shares: Option[Shares],
-  psrDeclaration: Option[PsrDeclaration]
+case class PsrDeclaration(
+  submittedBy: String,
+  submitterId: String,
+  optAuthorisingPSAID: Option[String],
+  declaration1: Boolean,
+  declaration2: Boolean
 )
 
-object PsrSubmission {
-  implicit val format: OFormat[PsrSubmission] = Json.format[PsrSubmission]
+object PsrDeclaration {
+  implicit val formats: OFormat[PsrDeclaration] = Json.format[PsrDeclaration]
 }

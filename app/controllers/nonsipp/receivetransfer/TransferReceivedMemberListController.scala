@@ -102,7 +102,7 @@ class TransferReceivedMemberListController @Inject()(
                       .set(TransferReceivedMemberListPage(srn), finishedAddingTransfers)
                   )
                 _ <- saveService.save(updatedUserAnswers)
-                _ <- if (finishedAddingTransfers) psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+                _ <- if (finishedAddingTransfers) psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
                 else Future.successful(Some(()))
               } yield Redirect(
                 navigator

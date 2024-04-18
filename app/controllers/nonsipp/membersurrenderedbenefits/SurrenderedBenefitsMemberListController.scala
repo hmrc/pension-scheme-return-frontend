@@ -111,7 +111,7 @@ class SurrenderedBenefitsMemberListController @Inject()(
                   )
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (finishedAddingSurrenderedBenefits) {
-                  psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+                  psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
                 } else {
                   Future.successful(Some(()))
                 }
