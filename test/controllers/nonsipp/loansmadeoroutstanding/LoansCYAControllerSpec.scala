@@ -41,9 +41,10 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
-  override protected def beforeAll(): Unit =
+  override protected def beforeAll(): Unit = {
     reset(mockSchemeDateService)
-  reset(mockPsrSubmissionService)
+    reset(mockPsrSubmissionService)
+  }
 
   private val index = refineMV[OneTo5000](1)
   private val taxYear = Some(Left(dateRange))
@@ -99,7 +100,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
         redirectNextPage(onSubmit(checkOrChange))
           .before(MockPSRSubmissionService.submitPsrDetails())
           .after({
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
           .withName(s"redirect to next page when in ${checkOrChange.name} mode")

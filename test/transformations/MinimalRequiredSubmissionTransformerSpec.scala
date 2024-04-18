@@ -95,7 +95,14 @@ class MinimalRequiredSubmissionTransformerSpec
       verify(mockSchemeDateService, times(1)).returnPeriods(any())(any())
       result mustBe Some(
         MinimalRequiredSubmission(
-          ReportDetails(request.schemeDetails.pstr, dateRange.from, dateRange.to),
+          ReportDetails(
+            fbVersion = None,
+            fbstatus = None,
+            pstr = request.schemeDetails.pstr,
+            periodStart = dateRange.from,
+            periodEnd = dateRange.to,
+            compilationOrSubmissionDate = None
+          ),
           NonEmptyList.of(dateRange.from -> dateRange.to),
           SchemeDesignatory(
             openBankAccount = false,
@@ -120,7 +127,14 @@ class MinimalRequiredSubmissionTransformerSpec
 
       val userAnswers = emptyUserAnswers
       val minimalRequiredSubmission = MinimalRequiredSubmission(
-        ReportDetails(request.schemeDetails.pstr, dateRange.from, dateRange.to),
+        ReportDetails(
+          fbVersion = None,
+          fbstatus = None,
+          pstr = request.schemeDetails.pstr,
+          periodStart = dateRange.from,
+          periodEnd = dateRange.to,
+          compilationOrSubmissionDate = None
+        ),
         accountingPeriods,
         SchemeDesignatory(
           openBankAccount = false,
@@ -165,7 +179,14 @@ class MinimalRequiredSubmissionTransformerSpec
 
       val userAnswers = emptyUserAnswers
       val minimalRequiredSubmission = MinimalRequiredSubmission(
-        ReportDetails(request.schemeDetails.pstr, dateRange.from, dateRange.to),
+        ReportDetails(
+          fbVersion = None,
+          fbstatus = None,
+          pstr = request.schemeDetails.pstr,
+          periodStart = dateRange.from,
+          periodEnd = dateRange.to,
+          compilationOrSubmissionDate = None
+        ),
         accountingPeriods,
         SchemeDesignatory(
           openBankAccount = true,

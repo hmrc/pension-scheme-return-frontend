@@ -41,7 +41,7 @@ class SharesDisposalControllerSpec extends ControllerBaseSpec {
   )
 
   override protected def beforeEach(): Unit =
-    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
 
   "SharesDisposalController" - {
@@ -59,7 +59,7 @@ class SharesDisposalControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
         .after({
-          verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )
@@ -67,7 +67,7 @@ class SharesDisposalControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
         .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )

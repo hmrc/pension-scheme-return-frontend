@@ -16,41 +16,47 @@
 
 package controllers.nonsipp.declaration
 
+import services.PsrSubmissionService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import models.NormalMode
 import views.html.ContentPageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import pages.nonsipp.declaration.PsaDeclarationPage
 import viewmodels.DisplayMessage._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
+
+import scala.concurrent.ExecutionContext
 
 import javax.inject.{Inject, Named}
 
 class PsaDeclarationController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
-  identify: IdentifierAction,
-  allowAccess: AllowAccessActionProvider,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
+  identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: ContentPageView
-) extends FrontendBaseController
+  view: ContentPageView,
+  psrSubmissionService: PsrSubmissionService
+)(implicit ec: ExecutionContext)
+    extends PSRController
     with I18nSupport {
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
+    identifyAndRequireData(srn) { implicit request =>
       Ok(view(PsaDeclarationController.viewModel(srn)))
     }
 
   def onSubmit(srn: Srn): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      Redirect(navigator.nextPage(PsaDeclarationPage(srn), NormalMode, request.userAnswers))
+    identifyAndRequireData(srn).async { implicit request =>
+      for {
+        submissionResult <- psrSubmissionService.submitPsrDetails(srn = srn, isSubmitted = true)
+      } yield submissionResult.getOrRecoverJourney(
+        _ => Redirect(navigator.nextPage(PsaDeclarationPage(srn), NormalMode, request.userAnswers))
+      )
     }
 }
 

@@ -92,7 +92,7 @@ class RemoveSharesController @Inject()(
                       .set(SharesJourneyStatus(srn), SectionStatus.InProgress)
                   )
                 _ <- saveService.save(updatedAnswers)
-                submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
               } yield submissionResult.getOrRecoverJourney(
                 _ =>
                   Redirect(

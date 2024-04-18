@@ -102,7 +102,7 @@ class TransferOutMemberListController @Inject()(
                   )
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (finishedAddingTransfers)
-                  psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+                  psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
                 else Future.successful(Some(()))
               } yield submissionResult.getOrRecoverJourney(
                 _ =>

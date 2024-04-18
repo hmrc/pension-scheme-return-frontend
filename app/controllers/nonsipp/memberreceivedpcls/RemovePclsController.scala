@@ -106,7 +106,7 @@ class RemovePclsController @Inject()(
                   request.userAnswers.remove(PensionCommencementLumpSumAmountPage(srn, memberIndex))
                 )
                 _ <- saveService.save(updatedAnswers)
-                submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
               } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
                 _ =>
                   Redirect(

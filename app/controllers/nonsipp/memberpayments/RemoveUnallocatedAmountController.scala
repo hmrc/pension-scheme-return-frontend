@@ -93,7 +93,7 @@ class RemoveUnallocatedAmountController @Inject()(
               updatedAnswers <- Future
                 .fromTry(removeUnallocatedAmountPage(srn, request.userAnswers))
               _ <- saveService.save(updatedAnswers)
-              submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+              submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
             } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
               _ =>
                 Redirect(

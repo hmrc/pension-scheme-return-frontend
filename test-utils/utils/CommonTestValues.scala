@@ -32,7 +32,14 @@ trait CommonTestValues {
 
   val minimalSubmissionData: PsrSubmission = PsrSubmission(
     MinimalRequiredSubmission(
-      reportDetails = ReportDetails("00000042IN", LocalDate.parse("2023-04-06"), LocalDate.parse("2024-04-05")),
+      reportDetails = ReportDetails(
+        fbVersion = None,
+        fbstatus = None,
+        pstr = "00000042IN",
+        periodStart = LocalDate.parse("2023-04-06"),
+        periodEnd = LocalDate.parse("2024-04-05"),
+        compilationOrSubmissionDate = None
+      ),
       accountingPeriods = NonEmptyList((LocalDate.parse("2023-04-06"), LocalDate.parse("2024-04-05")), List()),
       schemeDesignatory = SchemeDesignatory(
         openBankAccount = true,
@@ -51,7 +58,8 @@ trait CommonTestValues {
     loans = None,
     assets = None,
     membersPayments = None,
-    shares = None
+    shares = None,
+    psrDeclaration = None
   )
 
   val minimalSubmissionJson: JsValue = Json.parse(

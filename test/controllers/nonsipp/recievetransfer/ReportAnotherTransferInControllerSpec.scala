@@ -54,7 +54,7 @@ class ReportAnotherTransferInControllerSpec extends ControllerBaseSpec {
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
   }
 

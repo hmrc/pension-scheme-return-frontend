@@ -109,7 +109,7 @@ class TransfersInCYAController @Inject()(
             .remove(TransferReceivedMemberListPage(srn))
         )
         _ <- saveService.save(updatedUserAnswers)
-        submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+        submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
       } yield submissionResult.getOrRecoverJourney(
         _ => Redirect(navigator.nextPage(TransfersInCYAPage(srn), mode, updatedUserAnswers))
       )

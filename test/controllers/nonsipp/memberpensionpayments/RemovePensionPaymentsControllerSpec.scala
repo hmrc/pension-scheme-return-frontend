@@ -51,7 +51,7 @@ class RemovePensionPaymentsControllerSpec extends ControllerBaseSpec {
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
   }
 
@@ -70,12 +70,12 @@ class RemovePensionPaymentsControllerSpec extends ControllerBaseSpec {
 
     act.like(
       continueNoSave(onSubmit, userAnswers, "value" -> "false")
-        .after(verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any())(any(), any(), any()))
+        .after(verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any())(any(), any(), any()))
     )
 
     act.like(
       saveAndContinue(onSubmit, userAnswers, "value" -> "true")
-        .after(verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any()))
+        .after(verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any())(any(), any(), any()))
     )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

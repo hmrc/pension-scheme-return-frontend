@@ -16,11 +16,21 @@
 
 package controllers.nonsipp.declaration
 
+import services.PsrSubmissionService
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
 import views.html.ContentPageView
-import controllers.nonsipp.declaration.routes
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, times, verify}
 
 class PsaDeclarationControllerSpec extends ControllerBaseSpec {
+
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
 
   "PsaDeclarationController" - {
 
@@ -36,7 +46,14 @@ class PsaDeclarationControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(agreeAndContinue(onSubmit))
+    act.like(
+      agreeAndContinue(onSubmit)
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 

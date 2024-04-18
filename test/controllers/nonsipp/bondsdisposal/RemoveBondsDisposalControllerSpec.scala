@@ -29,8 +29,6 @@ import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.NameOfBondsPage
 
-import scala.concurrent.Future
-
 class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec {
 
   private val bondIndex = refineMV[Max5000.Refined](1)
@@ -49,11 +47,8 @@ class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec {
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
-  override protected def beforeEach(): Unit = {
+  override protected def beforeEach(): Unit =
     reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(())))
-  }
 
   "RemoveBondsDisposalController" - {
 
@@ -73,7 +68,7 @@ class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec {
       saveAndContinue(onSubmit, userAnswers, "value" -> "true")
         .before(MockPSRSubmissionService.submitPsrDetails())
         .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )

@@ -109,7 +109,7 @@ class OtherAssetsListController @Inject()(
                   )
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (!addAnother) {
-                  psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+                  psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
                 } else {
                   Future.successful(Some(()))
                 }

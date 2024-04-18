@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package models.requests.psr
+package viewmodels.models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class PsrSubmission(
-  minimalRequiredSubmission: MinimalRequiredSubmission,
-  checkReturnDates: Boolean,
-  loans: Option[Loans],
-  assets: Option[Assets],
-  membersPayments: Option[MemberPayments],
-  shares: Option[Shares],
-  psrDeclaration: Option[PsrDeclaration]
+case class DeclarationViewModel(
+  submitterType: String,
+  submitterId: String,
+  optAuthorisingPSAID: Option[String]
 )
 
-object PsrSubmission {
-  implicit val format: OFormat[PsrSubmission] = Json.format[PsrSubmission]
+case object DeclarationViewModel {
+  implicit val format: OFormat[DeclarationViewModel] = Json.format[DeclarationViewModel]
 }

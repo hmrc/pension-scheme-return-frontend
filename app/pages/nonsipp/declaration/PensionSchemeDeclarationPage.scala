@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package models.requests.psr
+package pages.nonsipp.declaration
 
-import play.api.libs.json.{Json, OFormat}
+import pages.QuestionPage
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import viewmodels.models.DeclarationViewModel
 
-case class PsrSubmission(
-  minimalRequiredSubmission: MinimalRequiredSubmission,
-  checkReturnDates: Boolean,
-  loans: Option[Loans],
-  assets: Option[Assets],
-  membersPayments: Option[MemberPayments],
-  shares: Option[Shares],
-  psrDeclaration: Option[PsrDeclaration]
-)
+case class PensionSchemeDeclarationPage(srn: Srn) extends QuestionPage[DeclarationViewModel] {
 
-object PsrSubmission {
-  implicit val format: OFormat[PsrSubmission] = Json.format[PsrSubmission]
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "pensionSchemeDeclaration"
 }

@@ -69,7 +69,7 @@ class EmployerContributionsController @Inject()(
             )
             _ <- saveService.save(updatedAnswers)
             submissionResult <- if (value) Future.successful(Some(()))
-            else psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+            else psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
           } yield submissionResult.getOrRecoverJourney(
             _ => Redirect(navigator.nextPage(EmployerContributionsPage(srn), mode, updatedAnswers))
           )

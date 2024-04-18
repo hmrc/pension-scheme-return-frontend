@@ -106,7 +106,7 @@ class RemoveMemberContributionController @Inject()(
                 updatedAnswers <- Future
                   .fromTry(request.userAnswers.remove(TotalMemberContributionPage(srn, index)))
                 _ <- saveService.save(updatedAnswers)
-                submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
               } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
                 _ =>
                   Redirect(

@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.declaration
 
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -40,20 +40,18 @@ import javax.inject.{Inject, Named}
 class PspDeclarationController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
-  identify: IdentifierAction,
-  allowAccess: AllowAccessActionProvider,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
+  identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   saveService: SaveService,
+  psrSubmissionService: PsrSubmissionService,
   formProvider: TextFormProvider,
   view: PsaIdInputView
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      def form = PspDeclarationController.form(formProvider, request.schemeDetails.authorisingPSAID)
+    identifyAndRequireData(srn) { implicit request =>
+      def form: Form[String] = PspDeclarationController.form(formProvider, request.schemeDetails.authorisingPSAID)
       Ok(
         view(
           form.fromUserAnswers(PspDeclarationPage(srn)),
@@ -63,7 +61,7 @@ class PspDeclarationController @Inject()(
     }
 
   def onSubmit(srn: Srn): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
+    identifyAndRequireData(srn).async { implicit request =>
       PspDeclarationController
         .form(formProvider, request.schemeDetails.authorisingPSAID)
         .bindFromRequest()
@@ -80,9 +78,15 @@ class PspDeclarationController @Inject()(
           answer => {
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(PspDeclarationPage(srn), answer))
+                .fromTry(
+                  request.userAnswers
+                    .set(PspDeclarationPage(srn), answer)
+                )
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(PspDeclarationPage(srn), NormalMode, request.userAnswers))
+              submissionResult <- psrSubmissionService.submitPsrDetails(srn = srn, isSubmitted = true)
+            } yield submissionResult.getOrRecoverJourney(
+              _ => Redirect(navigator.nextPage(PspDeclarationPage(srn), NormalMode, request.userAnswers))
+            )
           }
         )
     }
@@ -101,7 +105,7 @@ object PspDeclarationController {
     FormPageViewModel(
       Message("pspDeclaration.title"),
       Message("pspDeclaration.heading"),
-      TextInputViewModel(Some(Message("pspDeclaration.psaId.label")), true),
+      TextInputViewModel(Some(Message("pspDeclaration.psaId.label")), isFixedLength = true),
       routes.PspDeclarationController.onSubmit(srn)
     ).withButtonText(Message("site.agreeAndContinue"))
       .withDescription(
