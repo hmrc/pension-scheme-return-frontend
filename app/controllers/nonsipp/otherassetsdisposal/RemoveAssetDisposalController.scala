@@ -80,7 +80,7 @@ class RemoveAssetDisposalController @Inject()(
                       .remove(OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex))
                   )
                 _ <- saveService.save(removedUserAnswers)
-                submissionResult <- psrSubmissionService.submitPsrDetails(srn, removedUserAnswers)
+                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, removedUserAnswers)
               } yield submissionResult.getOrRecoverJourney(
                 _ => Redirect(navigator.nextPage(RemoveAssetDisposalPage(srn), NormalMode, removedUserAnswers))
               )

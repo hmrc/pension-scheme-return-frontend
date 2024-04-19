@@ -29,6 +29,8 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 
+import scala.concurrent.Future
+
 class RemoveAssetDisposalControllerSpec extends ControllerBaseSpec {
 
   private val assetIndex = refineMV[Max5000.Refined](1)
@@ -66,9 +68,12 @@ class RemoveAssetDisposalControllerSpec extends ControllerBaseSpec {
 
     act.like(
       saveAndContinue(onSubmit, userAnswers, "value" -> "true")
-        .before(MockPSRSubmissionService.submitPsrDetails())
+        .before(
+          when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(())))
+        )
         .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )

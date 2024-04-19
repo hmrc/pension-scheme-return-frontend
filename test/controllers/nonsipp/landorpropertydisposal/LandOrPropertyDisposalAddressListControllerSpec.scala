@@ -20,9 +20,9 @@ import controllers.ControllerBaseSpec
 import views.html.ListRadiosView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
+import viewmodels.models.SectionCompleted
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyCompleted}
-import viewmodels.models.SectionCompleted
 
 class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec {
 
