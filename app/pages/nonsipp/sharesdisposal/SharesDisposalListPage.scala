@@ -17,7 +17,7 @@
 package pages.nonsipp.sharesdisposal
 
 import models.SchemeId.Srn
-import config.Refined.{Max50, Max5000}
+import config.Refined.Max5000
 import pages.Page
 
-case class SharesDisposalListPage(srn: Srn, shareIndex: Max5000, disposalIndex: Max50) extends Page
+case class SharesDisposalListPage(srn: Srn, shareIndex: Max5000) extends Page
