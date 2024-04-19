@@ -17,6 +17,7 @@
 package pages.nonsipp.memberdetails
 
 import utils.RefinedUtils.RefinedIntOps
+import utils.PageUtils.removePages
 import queries.{Gettable, Removable}
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
@@ -29,15 +30,26 @@ import scala.util.Try
 case class MemberDetailsPage(srn: Srn, index: Max300) extends QuestionPage[NameDOB] {
 
   // won't work with a get all pages as Map as the arrayIndex must be a string
-  override def path: JsPath = Paths.personalDetails \ toString \ index.arrayIndex
+  override def path: JsPath = Paths.personalDetails \ toString \ index.arrayIndex.toString
 
   override def cleanup(value: Option[NameDOB], userAnswers: UserAnswers): Try[UserAnswers] =
-    value.fold(userAnswers.remove(DoesMemberHaveNinoPage(srn, index)))(_ => Try(userAnswers))
+    (value, userAnswers.get(this)) match {
+      case (None, _) =>
+        //deletion
+        removePages(userAnswers, pages(srn))
+      case _ => Try(userAnswers)
+    }
+
+  private def pages(srn: Srn): List[Removable[_]] =
+    List(
+      DoesMemberHaveNinoPage(srn, index),
+      MemberStatus(srn, index)
+    )
 
   override def toString: String = "nameDob"
 }
 
-case class MembersDetailsPages(srn: Srn) extends Gettable[List[NameDOB]] with Removable[List[NameDOB]] {
+case class MembersDetailsPages(srn: Srn) extends Gettable[Map[String, NameDOB]] with Removable[Map[String, NameDOB]] {
 
   override def path: JsPath = Paths.personalDetails \ toString
 
@@ -46,6 +58,6 @@ case class MembersDetailsPages(srn: Srn) extends Gettable[List[NameDOB]] with Re
 
 object MembersDetailsPages {
   implicit class MembersDetailsOps(ua: UserAnswers) {
-    def membersDetails(srn: Srn): List[NameDOB] = ua.list(MembersDetailsPages(srn))
+    def membersDetails(srn: Srn): Map[String, NameDOB] = ua.map(MembersDetailsPages(srn))
   }
 }

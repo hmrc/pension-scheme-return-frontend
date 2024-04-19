@@ -47,6 +47,8 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
           .unsafeSet(MemberStatus(srn, refineV[OneTo300](i).value), MemberState.Active)
     )
 
+  private val index = 1
+
   "SchemeMembersListController" - {
     "on Manual" - {
       act.like(
@@ -55,7 +57,13 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
             implicit request =>
               injected[ListView].apply(
                 form(injected[YesNoPageFormProvider], Manual),
-                viewModel(srn, 1, Manual, NormalMode, List((refineMV(1), memberDetails.fullName, Active)))
+                viewModel(
+                  srn,
+                  1,
+                  Manual,
+                  NormalMode,
+                  List((refineMV(1), ((index - 1).toString, memberDetails.fullName), Active))
+                )
               )
         )
       )
@@ -102,7 +110,13 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
             implicit request =>
               injected[ListView].apply(
                 form(injected[YesNoPageFormProvider], Upload),
-                viewModel(srn, 1, Upload, NormalMode, List((refineMV(1), memberDetails.fullName, Active)))
+                viewModel(
+                  srn,
+                  1,
+                  Upload,
+                  NormalMode,
+                  List((refineMV(1), ((index - 1).toString, memberDetails.fullName), Active))
+                )
               )
         )
       )

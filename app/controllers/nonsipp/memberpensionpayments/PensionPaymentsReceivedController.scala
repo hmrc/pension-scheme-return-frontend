@@ -17,21 +17,21 @@
 package controllers.nonsipp.memberpensionpayments
 
 import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails.MembersDetailsPages
 import viewmodels.implicits._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import config.Refined.Max300
 import controllers.PSRController
 import navigation.Navigator
 import forms.YesNoPageFormProvider
-import models.{Mode, Money, UserAnswers}
+import models._
+import play.api.i18n.MessagesApi
 import play.api.data.Form
 import controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController._
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import controllers.actions._
-import play.api.i18n.MessagesApi
-import pages.nonsipp.memberdetails.MembersDetailsPages._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
@@ -71,12 +71,34 @@ class PensionPaymentsReceivedController @Inject()(
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(navigator.nextPage(PensionPaymentsReceivedPage(srn), mode, updatedAnswers))
           } else {
-            val pensionPaymentsPages: List[UserAnswers.Compose] = request.userAnswers
-              .membersDetails(srn)
+            val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
+            val maxIndex: Either[Result, Int] = memberMap.keys
+              .map(_.toInt)
+              .maxOption
+              .map(Right(_))
+              .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+
+            val optionList: List[Option[NameDOB]] = maxIndex match {
+              case Right(index) =>
+                (0 to index).toList.map { index =>
+                  val memberOption = memberMap.get(index.toString)
+                  memberOption match {
+                    case Some(member) => Some(member)
+                    case None => None
+                  }
+                }
+              case Left(_) => List.empty
+            }
+
+            val zippedOptionList: List[(Max300, Option[NameDOB])] = optionList
               .zipWithRefinedIndexToList[Max300.Refined]
-              .map {
-                case (index, _) => _.set(TotalAmountPensionPaymentsPage(srn, index), Money(0))
+
+            val pensionPaymentsPages: List[UserAnswers.Compose] = zippedOptionList
+              .flatMap {
+                case (index, Some(_)) => List(_.set(TotalAmountPensionPaymentsPage(srn, index), Money(0)))
+                case _ => Nil
               }
+
             for {
               updatedAnswers <- Future.fromTry(
                 request.userAnswers.set(PensionPaymentsReceivedPage(srn), value).compose(pensionPaymentsPages)

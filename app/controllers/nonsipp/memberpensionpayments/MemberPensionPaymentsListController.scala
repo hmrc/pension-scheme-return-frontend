@@ -17,8 +17,9 @@
 package controllers.nonsipp.memberpensionpayments
 
 import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails.MembersDetailsPages
 import viewmodels.implicits._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import com.google.inject.Inject
 import config.Refined.OneTo300
 import controllers.PSRController
@@ -28,13 +29,12 @@ import config.Constants.maxNotRelevant
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models._
+import play.api.i18n.MessagesApi
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
 import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, TotalAmountPensionPaymentsPage}
 import controllers.actions._
 import eu.timepit.refined.refineV
-import play.api.i18n.MessagesApi
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
@@ -61,11 +61,28 @@ class MemberPensionPaymentsListController @Inject()(
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       val userAnswers = request.userAnswers
-      val memberList = userAnswers.membersDetails(srn)
+      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
+      val maxIndex: Either[Result, Int] = memberMap.keys
+        .map(_.toInt)
+        .maxOption
+        .map(Right(_))
+        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 
-      if (memberList.nonEmpty) {
+      val optionList: List[Option[NameDOB]] = maxIndex match {
+        case Right(index) =>
+          (0 to index).toList.map { index =>
+            val memberOption = memberMap.get(index.toString)
+            memberOption match {
+              case Some(member) => Some(member)
+              case None => None
+            }
+          }
+        case Left(_) => List.empty
+      }
+
+      if (optionList.flatten.nonEmpty) {
         val viewModel = MemberPensionPaymentsListController
-          .viewModel(srn, page, mode, memberList, userAnswers)
+          .viewModel(srn, page, mode, optionList, userAnswers)
         val filledForm =
           request.userAnswers.get(MemberPensionPaymentsListPage(srn)).fold(form)(form.fill)
         Ok(view(filledForm, viewModel))
@@ -79,10 +96,26 @@ class MemberPensionPaymentsListController @Inject()(
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val userAnswers = request.userAnswers
-      val memberList = userAnswers.membersDetails(srn)
-      val memberListSize = memberList.size
+      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
+      val maxIndex: Either[Result, Int] = memberMap.keys
+        .map(_.toInt)
+        .maxOption
+        .map(Right(_))
+        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 
-      if (memberListSize > Constants.maxSchemeMembers) {
+      val optionList: List[Option[NameDOB]] = maxIndex match {
+        case Right(index) =>
+          (0 to index).toList.map { index =>
+            val memberOption = memberMap.get(index.toString)
+            memberOption match {
+              case Some(member) => Some(member)
+              case None => None
+            }
+          }
+        case Left(_) => List.empty
+      }
+
+      if (optionList.flatten.size > Constants.maxSchemeMembers) {
         Future.successful(
           Redirect(
             navigator.nextPage(MemberPensionPaymentsListPage(srn), mode, request.userAnswers)
@@ -98,13 +131,13 @@ class MemberPensionPaymentsListController @Inject()(
                 BadRequest(
                   view(
                     errors,
-                    MemberPensionPaymentsListController.viewModel(srn, page, mode, memberList, userAnswers)
+                    MemberPensionPaymentsListController.viewModel(srn, page, mode, optionList, userAnswers)
                   )
                 )
               ),
             value =>
               for {
-                updatedUserAnswers <- buildUserAnswerBySelection(srn, value, memberListSize)
+                updatedUserAnswers <- buildUserAnswerBySelection(srn, value, optionList.flatten.size)
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (value) {
                   psrSubmissionService.submitPsrDetails(srn)(
@@ -168,60 +201,63 @@ object MemberPensionPaymentsListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    memberList: List[NameDOB],
+    memberList: List[Option[NameDOB]],
     userAnswers: UserAnswers
   ): List[List[TableElem]] =
-    memberList.zipWithIndex.map {
-      case (memberName, index) =>
-        refineV[OneTo300](index + 1) match {
-          case Left(_) => Nil
-          case Right(nextIndex) =>
-            val pensionPayments = userAnswers.get(TotalAmountPensionPaymentsPage(srn, nextIndex))
-            if (pensionPayments.nonEmpty && !pensionPayments.exists(_.isZero)) {
-              List(
-                TableElem(
-                  memberName.fullName
-                ),
-                TableElem(
-                  "memberPensionPayments.memberList.pensionPaymentsReported"
-                ),
-                TableElem.change(
-                  controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-                    .onPageLoad(srn, nextIndex, CheckMode)
-                ),
-                TableElem.remove(
-                  controllers.nonsipp.memberpensionpayments.routes.RemovePensionPaymentsController
-                    .onPageLoad(srn, nextIndex)
+    memberList.zipWithIndex
+      .map {
+        case (Some(memberName), index) =>
+          refineV[OneTo300](index + 1) match {
+            case Left(_) => Nil
+            case Right(nextIndex) =>
+              val pensionPayments = userAnswers.get(TotalAmountPensionPaymentsPage(srn, nextIndex))
+              if (pensionPayments.nonEmpty && !pensionPayments.exists(_.isZero)) {
+                List(
+                  TableElem(
+                    memberName.fullName
+                  ),
+                  TableElem(
+                    "memberPensionPayments.memberList.pensionPaymentsReported"
+                  ),
+                  TableElem.change(
+                    controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
+                      .onPageLoad(srn, nextIndex, CheckMode)
+                  ),
+                  TableElem.remove(
+                    controllers.nonsipp.memberpensionpayments.routes.RemovePensionPaymentsController
+                      .onPageLoad(srn, nextIndex)
+                  )
                 )
-              )
-            } else {
-              List(
-                TableElem(
-                  memberName.fullName
-                ),
-                TableElem(
-                  "memberPensionPayments.memberList.noPensionPayments"
-                ),
-                TableElem.add(
-                  controllers.nonsipp.memberpensionpayments.routes.TotalAmountPensionPaymentsController
-                    .onSubmit(srn, nextIndex, mode)
-                ),
-                TableElem.empty
-              )
-            }
-        }
-    }
+              } else {
+                List(
+                  TableElem(
+                    memberName.fullName
+                  ),
+                  TableElem(
+                    "memberPensionPayments.memberList.noPensionPayments"
+                  ),
+                  TableElem.add(
+                    controllers.nonsipp.memberpensionpayments.routes.TotalAmountPensionPaymentsController
+                      .onSubmit(srn, nextIndex, mode)
+                  ),
+                  TableElem.empty
+                )
+              }
+          }
+        case _ => List.empty
+      }
+      .sortBy(_.headOption.map(_.text.toString))
 
   def viewModel(
     srn: Srn,
     page: Int,
     mode: Mode,
-    memberList: List[NameDOB],
+    memberList: List[Option[NameDOB]],
     userAnswers: UserAnswers
   ): FormPageViewModel[ActionTableViewModel] = {
 
     val (title, heading) =
-      if (memberList.size == 1) {
+      if (memberList.flatten.size == 1) {
         ("memberPensionPayments.memberList.title", "memberPensionPayments.memberList.heading")
       } else {
         ("memberPensionPayments.memberList.title.plural", "memberPensionPayments.memberList.heading.plural")
@@ -230,14 +266,14 @@ object MemberPensionPaymentsListController {
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.memberPensionPayments,
-      memberList.size,
+      memberList.flatten.size,
       controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
         .onPageLoad(srn, _, NormalMode)
     )
 
     FormPageViewModel(
-      title = Message(title, memberList.size),
-      heading = Message(heading, memberList.size),
+      title = Message(title, memberList.flatten.size),
+      heading = Message(heading, memberList.flatten.size),
       description = None,
       page = ActionTableViewModel(
         inset = ParagraphMessage(

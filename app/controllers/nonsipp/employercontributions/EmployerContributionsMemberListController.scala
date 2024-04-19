@@ -18,7 +18,7 @@ package controllers.nonsipp.employercontributions
 
 import pages.nonsipp.memberdetails.MembersDetailsPages
 import viewmodels.implicits._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import com.google.inject.Inject
 import config.Refined.{Max300, Max50}
 import controllers.PSRController
@@ -26,6 +26,7 @@ import config.Constants
 import cats.implicits.catsSyntaxApplicativeId
 import navigation.Navigator
 import models._
+import play.api.i18n.MessagesApi
 import pages.nonsipp.employercontributions.EmployerContributionsProgress.EmployerContributionsUserAnswersOps
 import pages.nonsipp.employercontributions.{EmployerContributionsMemberListPage, EmployerContributionsSectionStatus}
 import services.{PsrSubmissionService, SaveService}
@@ -35,8 +36,6 @@ import controllers.actions._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
-import play.api.i18n.MessagesApi
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.models.SectionJourneyStatus.InProgress
 import viewmodels.models._
@@ -63,10 +62,27 @@ class EmployerContributionsMemberListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val memberList = request.userAnswers.list(MembersDetailsPages(srn))
+      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
+      val maxIndex: Either[Result, Int] = memberMap.keys
+        .map(_.toInt)
+        .maxOption
+        .map(Right(_))
+        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 
-      if (memberList.nonEmpty) {
-        memberList
+      val optionList: List[Option[NameDOB]] = maxIndex match {
+        case Right(index) =>
+          (0 to index).toList.map { index =>
+            val memberOption = memberMap.get(index.toString)
+            memberOption match {
+              case Some(member) => Some(member)
+              case None => None
+            }
+          }
+        case Left(_) => List.empty
+      }
+
+      if (memberMap.nonEmpty) {
+        optionList
           .zipWithRefinedIndex[Max300.Refined]
           .map { indexes =>
             val employerContributions = buildEmployerContributions(srn, indexes)
@@ -81,21 +97,37 @@ class EmployerContributionsMemberListController @Inject()(
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      val memberList = request.userAnswers.membersDetails(srn)
+      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
+      val maxIndex: Either[Result, Int] = memberMap.keys
+        .map(_.toInt)
+        .maxOption
+        .map(Right(_))
+        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 
-      if (memberList.size > Constants.maxSchemeMembers) {
+      val optionList: List[Option[NameDOB]] = maxIndex match {
+        case Right(index) =>
+          (0 to index).toList.map { index =>
+            val memberOption = memberMap.get(index.toString)
+            memberOption match {
+              case Some(member) => Some(member)
+              case None => None
+            }
+          }
+        case Left(_) => List.empty
+      }
+
+      if (memberMap.size > Constants.maxSchemeMembers) {
         Future.successful(
           Redirect(
             navigator.nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
           )
         )
       } else {
-
         form
           .bindFromRequest()
           .fold(
             errors => {
-              memberList
+              optionList
                 .zipWithRefinedIndex[Max300.Refined]
                 .map { indexes =>
                   val employerContributions = buildEmployerContributions(srn, indexes)
@@ -141,20 +173,23 @@ class EmployerContributionsMemberListController @Inject()(
       }
   }
 
-  private def buildEmployerContributions(srn: Srn, indexes: List[(Max300, NameDOB)])(
+  private def buildEmployerContributions(srn: Srn, indexes: List[(Max300, Option[NameDOB])])(
     implicit request: DataRequest[_]
-  ): List[EmployerContributions] = indexes.map {
-    case (index, nameDOB) =>
-      EmployerContributions(
-        memberIndex = index,
-        employerFullName = nameDOB.fullName,
-        contributions = request.userAnswers
-          .employerContributionsProgress(srn, index)
-          .map {
-            case (secondaryIndex, status) =>
-              Contributions(secondaryIndex, status)
-          }
+  ): List[EmployerContributions] = indexes.flatMap {
+    case (index, Some(nameDOB)) =>
+      Some(
+        EmployerContributions(
+          memberIndex = index,
+          employerFullName = nameDOB.fullName,
+          contributions = request.userAnswers
+            .employerContributionsProgress(srn, index)
+            .map {
+              case (secondaryIndex, status) =>
+                Contributions(secondaryIndex, status)
+            }
+        )
       )
+    case _ => None
   }
 }
 
@@ -262,7 +297,7 @@ object EmployerContributionsMemberListController {
             TableElem.empty
           )
         ),
-        rows = rows(srn, mode, employerContributions),
+        rows = rows(srn, mode, employerContributions.sortBy(_.employerFullName)),
         radioText = Message("employerContributions.MemberList.radios"),
         showInsetWithRadios = true,
         paginatedViewModel = Some(

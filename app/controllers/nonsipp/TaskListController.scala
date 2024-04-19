@@ -238,7 +238,7 @@ object TaskListController {
         if (memberDetails.isEmpty) {
           1
         } else {
-          val memberDetailsIndexes = memberDetails.indices.toList
+          val memberDetailsIndexes = memberDetails.map(_._1.toInt).toList
           val ninoIndexes = ninos.getOrElse(List.empty).map(_._1.toInt).toList
           val noninoIndexes = noNinos.getOrElse(List.empty).map(_._1.toInt).toList
           val finishedIndexes = ninoIndexes ++ noninoIndexes
