@@ -23,7 +23,7 @@ import config.Refined.Max5000
 import models.SchemeId.Srn
 import models.{Money, SchemeHoldAsset}
 import shapeless._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionStatus}
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 
@@ -44,20 +44,26 @@ class OtherAssetsMongoController @Inject()(
   override def pages(srn: Srn, index: Max5000): Pages =
     HList(
       (
+        PageWithValue(OtherAssetsHeldPage(srn), true),
         PageWithValue(OtherAssetsCompleted(srn, index), SectionCompleted),
+        PageWithValue(OtherAssetsJourneyStatus(srn), SectionStatus.Completed),
+        PageWithValue(OtherAssetsListPage(srn), false),
         PageWithValue(IncomeFromAssetPage(srn, index), Money(34.56)),
         PageWithValue(IndependentValuationPage(srn, index), false),
         PageWithValue(CostOfOtherAssetPage(srn, index), Money(12.34)),
         PageWithValue(WhenDidSchemeAcquireAssetsPage(srn, index), LocalDate.of(2023, 12, 12)),
         PageWithValue(WhyDoesSchemeHoldAssetsPage(srn, index), SchemeHoldAsset.Contribution),
         PageWithValue(IsAssetTangibleMoveablePropertyPage(srn, index), false),
-        PageWithValue(WhatIsOtherAssetPage(srn, index), "Test asset"),
+        PageWithValue(WhatIsOtherAssetPage(srn, index), s"Test asset ${index.value}"),
         PageWithValue(OtherAssetsHeldPage(srn), true)
       )
     )
 
   override type Pages =
-    PageWithValue[SectionCompleted] ::
+    PageWithValue[Boolean] ::
+      PageWithValue[SectionCompleted] ::
+      PageWithValue[SectionStatus] ::
+      PageWithValue[Boolean] ::
       PageWithValue[Money] ::
       PageWithValue[Boolean] ::
       PageWithValue[Money] ::

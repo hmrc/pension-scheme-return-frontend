@@ -151,12 +151,12 @@ object ReturnsSubmittedController {
           )
         ),
         rows = data,
-        radioText = Message("otherAssets.list.radios"),
+        radioText = Message(""),
         showRadios = false,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
-              "otherAssets.list.pagination.label",
+              "returnsSubmitted.list.pagination.label",
               pagination.pageStart,
               pagination.pageEnd,
               pagination.totalSize
@@ -168,7 +168,7 @@ object ReturnsSubmittedController {
       refresh = None,
       buttonText = Message("returnsSubmitted.link", schemeName),
       details = None,
-      onSubmit = controllers.nonsipp.routes.TaskListController.onPageLoad(srn) //TODO remove
+      onSubmit = controllers.nonsipp.routes.TaskListController.onPageLoad(srn) //not used
     )
   }
 }

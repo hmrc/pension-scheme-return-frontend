@@ -151,7 +151,7 @@ object LandOrPropertyDisposalAddressListController {
     addresses: List[LandOrPropertyData],
     userAnswers: UserAnswers
   ): FormPageViewModel[ListRadiosViewModel] = {
-    val rows = buildRows(srn, addresses, userAnswers)
+    val rows = buildRows(srn, addresses.sortBy(_.index.value), userAnswers)
 
     val pagination = Pagination(
       currentPage = page,

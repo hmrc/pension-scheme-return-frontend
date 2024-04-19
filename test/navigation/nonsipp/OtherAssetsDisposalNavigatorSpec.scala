@@ -86,11 +86,12 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       "Start reporting a disposal page" - {
         act.like(
           normalmode
-            .navigateToWithDoubleIndex(
+            .navigateToWithIndex(
               assetIndexOne,
-              disposalIndex,
-              (srn, index: Max5000, _: Max50) => OtherAssetsDisposalListPage(srn, index, disposalIndex),
-              controllers.nonsipp.otherassetsdisposal.routes.HowWasAssetDisposedOfController.onPageLoad
+              OtherAssetsDisposalListPage,
+              (srn, index: Max5000, _) =>
+                controllers.nonsipp.otherassetsdisposal.routes.HowWasAssetDisposedOfController
+                  .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
             )
             .withName(
               "go from start reporting a disposal page page to HowWasAssetDisposedOfPage page"
