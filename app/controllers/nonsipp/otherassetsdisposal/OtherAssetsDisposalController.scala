@@ -16,22 +16,23 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
-import services.SaveService
-import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
+import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalCompleted, OtherAssetsDisposalPage}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.otherassetsdisposal.OtherAssetsDisposalController.viewModel
 import models.Mode
+import play.api.i18n.MessagesApi
 import play.api.data.Form
 import views.html.YesNoPageView
 import models.SchemeId.Srn
-import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, SectionCompleted, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,10 +45,10 @@ class OtherAssetsDisposalController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView
+  view: YesNoPageView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends PSRController {
 
   private val form = OtherAssetsDisposalController.form(formProvider)
 
@@ -62,14 +63,32 @@ class OtherAssetsDisposalController @Inject()(
       .fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(OtherAssetsDisposalPage(srn), value))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(OtherAssetsDisposalPage(srn), mode, updatedAnswers))
+        addDisposal =>
+          if (addDisposal) {
+            for {
+              updatedAnswers <- request.userAnswers
+                .set(OtherAssetsDisposalPage(srn), true)
+                .remove(OtherAssetsDisposalCompleted(srn))
+                .mapK[Future]
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(OtherAssetsDisposalPage(srn), mode, updatedAnswers))
+          } else {
+            for {
+              updatedAnswers <- request.userAnswers
+                .set(OtherAssetsDisposalPage(srn), false)
+                .set(OtherAssetsDisposalCompleted(srn), SectionCompleted)
+                .mapK[Future]
+              _ <- saveService.save(updatedAnswers)
+              submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+            } yield submissionResult
+              .getOrRecoverJourney(
+                _ => Redirect(navigator.nextPage(OtherAssetsDisposalPage(srn), mode, updatedAnswers))
+              )
+          }
       )
   }
 }
+
 object OtherAssetsDisposalController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
     "otherAssetsDisposal.error.required"

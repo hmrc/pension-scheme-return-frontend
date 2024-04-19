@@ -17,7 +17,7 @@
 package controllers
 
 import play.api.test._
-import queries.Settable
+import queries.{Removable, Settable}
 import config.Refined.Max5000
 import play.api.inject.bind
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
@@ -40,7 +40,7 @@ import models.SchemeId.Srn
 import org.scalatest.OptionValues
 import play.api.Application
 import uk.gov.hmrc.domain.Nino
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{Json, Reads, Writes}
 
 import java.time.{LocalDate, LocalDateTime}
 
@@ -92,6 +92,8 @@ trait ControllerBaseSpec
 
   implicit class UserAnswersOps(ua: UserAnswers) {
     def unsafeSet[A: Writes](page: Settable[A], value: A): UserAnswers = ua.set(page, value).get
+
+    def unsafeRemove[A: Reads](page: Removable[A]): UserAnswers = ua.remove(page).get
   }
 }
 

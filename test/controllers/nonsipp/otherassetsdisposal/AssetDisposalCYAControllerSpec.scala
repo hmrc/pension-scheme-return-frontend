@@ -28,7 +28,9 @@ import controllers.nonsipp.otherassetsdisposal.AssetDisposalCYAController._
 import models._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import org.mockito.Mockito.{reset, times, verify}
+import org.mockito.Mockito._
+
+import scala.concurrent.Future
 
 class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
 
@@ -37,8 +39,11 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
   override protected val additionalBindings: List[GuiceableModule] =
     List(bind[PsrSubmissionService].toInstance(mockPsrSubmissionService))
 
-  override protected def beforeEach(): Unit =
+  override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   private def onPageLoad(mode: Mode) =
     routes.AssetDisposalCYAController.onPageLoad(srn, assetIndex, disposalIndex, mode)

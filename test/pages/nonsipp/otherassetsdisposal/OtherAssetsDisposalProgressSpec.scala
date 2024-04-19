@@ -16,22 +16,23 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import config.Refined.{OneTo50, OneTo5000}
+import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
+import viewmodels.models.SectionJourneyStatus
 import pages.behaviours.PageBehaviours
 
-class RemoveAssetDisposalPageSpec extends PageBehaviours {
+class OtherAssetsDisposalProgressSpec extends PageBehaviours {
 
-  "RemoveAssetDisposalPage" - {
+  "OtherAssetsDisposalProgress" - {
 
     val srn = srnGen.sample.value
-    val assetIndex = refineMV[OneTo5000](1)
-    val disposalIndex = refineMV[OneTo50](1)
+    val assetIndex = refineMV[Max5000.Refined](1)
+    val disposalIndex = refineMV[Max50.Refined](1)
 
-    beRetrievable[Boolean](RemoveAssetDisposalPage(srn, assetIndex, disposalIndex))
+    beRetrievable[SectionJourneyStatus](OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex))
 
-    beSettable[Boolean](RemoveAssetDisposalPage(srn, assetIndex, disposalIndex))
+    beSettable[SectionJourneyStatus](OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex))
 
-    beRemovable[Boolean](RemoveAssetDisposalPage(srn, assetIndex, disposalIndex))
+    beRemovable[SectionJourneyStatus](OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex))
   }
 }

@@ -26,7 +26,6 @@ import controllers.PSRController
 import cats.implicits.toShow
 import controllers.actions._
 import play.api.i18n._
-import models.requests.DataRequest
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import models.HowDisposed._
 import views.html.CheckYourAnswersView
@@ -35,6 +34,7 @@ import controllers.nonsipp.otherassetsdisposal.AssetDisposalCYAController._
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
@@ -160,25 +160,17 @@ class AssetDisposalCYAController @Inject()(
   def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
-        updatedUserAnswers <- Future.fromTry(
-          request.userAnswers.set(OtherAssetsDisposalCompletedPage(srn, index, disposalIndex), SectionCompleted)
-        )
+        updatedUserAnswers <- request.userAnswers
+          .set(OtherAssetsDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
+          .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
-        redirectTo <- psrSubmissionService
-          .submitPsrDetails(srn)(implicitly, implicitly, request = DataRequest(request.request, updatedUserAnswers))
-          .map {
-            case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            case Some(_) =>
-              Redirect(
-                navigator
-                  .nextPage(
-                    OtherAssetsDisposalCompletedPage(srn, index, disposalIndex),
-                    NormalMode,
-                    updatedUserAnswers
-                  )
-              )
-          }
-      } yield redirectTo
+        submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+      } yield submissionResult.getOrRecoverJourney(
+        _ =>
+          Redirect(
+            navigator.nextPage(OtherAssetsDisposalCYAPage(srn), mode, request.userAnswers)
+          )
+      )
     }
 }
 

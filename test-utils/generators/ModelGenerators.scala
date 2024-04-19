@@ -22,7 +22,7 @@ import config.Refined.OneTo5000
 import models.SchemeId.{Pstr, Srn}
 import models.PensionSchemeId.{PsaId, PspId}
 import models.{ConditionalYesNo, _}
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import eu.timepit.refined.api.Refined
 import org.scalacheck.Gen.numChar
 import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
@@ -353,6 +353,12 @@ trait ModelGenerators extends BasicGenerators {
     name <- nonEmptyString
     description <- nonEmptyString
   } yield RecipientDetails(name, description)
+
+  implicit val sectionJourneyStatusGen: Gen[SectionJourneyStatus] =
+    Gen.oneOf(
+      SectionJourneyStatus.InProgress("test url"),
+      SectionJourneyStatus.Completed
+    )
 }
 
 object ModelGenerators extends ModelGenerators

@@ -17,7 +17,11 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import services.SaveService
-import pages.nonsipp.otherassetsdisposal.{AnyPartAssetStillHeldPage, HowWasAssetDisposedOfPage}
+import pages.nonsipp.otherassetsdisposal.{
+  AnyPartAssetStillHeldPage,
+  HowWasAssetDisposedOfPage,
+  OtherAssetsDisposalProgress
+}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
@@ -31,8 +35,9 @@ import viewmodels.implicits._
 import controllers.nonsipp.otherassetsdisposal.AnyPartAssetStillHeldController._
 import views.html.YesNoPageView
 import models.SchemeId.Srn
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, SectionJourneyStatus, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -89,11 +94,12 @@ class AnyPartAssetStillHeldController @Inject()(
                 )
               )
             ),
-          value =>
+          answer =>
             for {
-              updatedAnswers <- Future.fromTry(
-                request.userAnswers.set(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex), value)
-              )
+              updatedAnswers <- request.userAnswers
+                .set(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex), answer)
+                .set(OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex), SectionJourneyStatus.Completed)
+                .mapK[Future]
               _ <- saveService.save(updatedAnswers)
             } yield {
               updatedAnswers.get(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex)) match {

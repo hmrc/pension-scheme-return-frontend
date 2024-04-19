@@ -16,35 +16,14 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import viewmodels.models.SectionCompleted
-import config.Refined.{Max50, Max5000}
-import pages.{IndexedQuestionPage, QuestionPage}
 
-case class OtherAssetsDisposalCompletedPage(srn: Srn, index: Max5000, disposalIndex: Max50)
-    extends QuestionPage[SectionCompleted] {
+case class OtherAssetsDisposalCompleted(srn: Srn) extends QuestionPage[SectionCompleted] {
 
-  override def path: JsPath =
-    Paths.otherAssetDisposalTransactions \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+  override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "otherAssetsDisposalCompleted"
-}
-
-object OtherAssetsDisposalCompleted {
-  def all(srn: Srn, index: Max5000): IndexedQuestionPage[SectionCompleted] =
-    new IndexedQuestionPage[SectionCompleted] {
-
-      override def path: JsPath =
-        Paths.otherAssetDisposalTransactions \ toString \ index.arrayIndex.toString
-
-      override def toString: String = "otherAssetsDisposalCompleted"
-    }
-}
-
-case class OtherAssetsDisposalCompletedPages(srn: Srn) extends IndexedQuestionPage[Map[String, SectionCompleted.type]] {
-  override def path: JsPath = Paths.otherAssetDisposalTransactions \ toString
-
-  override def toString: String = "otherAssetsDisposalCompleted"
+  override def toString: String = "otherAssetsDisposalJourneyCompleted"
 }

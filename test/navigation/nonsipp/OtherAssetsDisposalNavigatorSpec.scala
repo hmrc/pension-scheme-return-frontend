@@ -20,15 +20,17 @@ import pages.nonsipp.otherassetsdisposal._
 import utils.BaseSpec
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
-import org.scalacheck.Gen
 import navigation.{Navigator, NavigatorBehaviours}
 import models._
+import utils.UserAnswersUtils.UserAnswersOps
+import org.scalacheck.Gen
 
 class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   override val navigator: Navigator = new NonSippNavigator
 
-  private val assetIndex = refineMV[Max5000.Refined](1)
+  private val assetIndexOne = refineMV[Max5000.Refined](1)
+  private val assetIndexTwo = refineMV[Max5000.Refined](2)
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   "OtherAssetsDisposalNavigator" - {
@@ -85,7 +87,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               (srn, index: Max5000, _: Max50) => OtherAssetsDisposalListPage(srn, index, disposalIndex),
               controllers.nonsipp.otherassetsdisposal.routes.HowWasAssetDisposedOfController.onPageLoad
@@ -101,7 +103,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndexAndData(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               HowWasAssetDisposedOfPage.apply,
               Gen.const(HowDisposed.Sold),
@@ -115,7 +117,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndexAndData(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               HowWasAssetDisposedOfPage.apply,
               Gen.const(HowDisposed.Transferred),
@@ -129,7 +131,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndexAndData(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               HowWasAssetDisposedOfPage.apply,
               Gen.const(HowDisposed.Other("test details")),
@@ -145,7 +147,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               WhenWasAssetSoldPage,
               (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -162,7 +164,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               TotalConsiderationSaleAssetPage,
               (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -178,13 +180,13 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndexAndData(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               TypeOfAssetBuyerPage,
               Gen.const(IdentityType.Individual),
               (srn, index: Max5000, disposalIndex: Max50, _) =>
                 controllers.nonsipp.otherassetsdisposal.routes.IndividualNameOfAssetBuyerController
-                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+                  .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
             )
             .withName("go from type of asset buyer page to IndividualNameOfAssetBuyer page when Individual")
         )
@@ -192,13 +194,13 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndexAndData(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               TypeOfAssetBuyerPage,
               Gen.const(IdentityType.UKCompany),
               (srn, index: Max5000, disposalIndex: Max50, _) =>
                 controllers.nonsipp.otherassetsdisposal.routes.CompanyNameOfAssetBuyerController
-                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+                  .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
             )
             .withName("go from type of asset buyer page to IndividualNameOfAssetBuyer page when UKCompany")
         )
@@ -206,13 +208,13 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndexAndData(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               TypeOfAssetBuyerPage,
               Gen.const(IdentityType.UKPartnership),
               (srn, index: Max5000, disposalIndex: Max50, _) =>
                 controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerNameController
-                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+                  .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
             )
             .withName("go from type of asset buyer page to PartnershipBuyerNamePage page when UKPartnership")
         )
@@ -220,13 +222,13 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndexAndData(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               TypeOfAssetBuyerPage,
               Gen.const(IdentityType.Other),
               (srn, index: Max5000, disposalIndex: Max50, _) =>
                 controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
-                  .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+                  .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
             )
             .withName("go from type of asset buyer page to OtherBuyerDetails page when other")
         )
@@ -236,7 +238,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               IndividualNameOfAssetBuyerPage,
               (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -251,7 +253,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               AssetIndividualBuyerNiNumberPage,
               (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -266,7 +268,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               PartnershipBuyerNamePage,
               (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -281,7 +283,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               PartnershipBuyerUtrPage,
               (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -296,7 +298,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               OtherBuyerDetailsPage,
               (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -311,7 +313,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               CompanyNameOfAssetBuyerPage,
               (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -326,7 +328,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               AssetCompanyBuyerCrnPage,
               (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -341,7 +343,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               IsBuyerConnectedPartyPage,
               (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -356,7 +358,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               AssetSaleIndependentValuationPage,
               (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -371,7 +373,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               AnyPartAssetStillHeldPage,
               (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -382,14 +384,12 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         )
       }
 
-      "OtherAssetsDisposalCompletedPage" - {
+      "OtherAssetsDisposalCYAPage" - {
         act.like(
           normalmode
-            .navigateToWithDoubleIndex(
-              assetIndex,
-              disposalIndex,
-              OtherAssetsDisposalCompletedPage,
-              (srn, _: Max5000, _: Max50, _) =>
+            .navigateTo(
+              OtherAssetsDisposalCYAPage,
+              (srn, _) =>
                 controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
                   .onPageLoad(srn, page = 1)
             )
@@ -397,11 +397,11 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         )
       }
 
-      "OtherAssetsDisposalCompletedPage" - {
+      "ReportedOtherAssetsDisposalListPage" - {
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               (srn, _: Max5000, _: Max50) => ReportedOtherAssetsDisposalListPage(srn = srn, addDisposal = true),
               (srn, _: Max5000, _: Max50, _) =>
@@ -414,11 +414,11 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         )
       }
 
-      "OtherAssetsDisposalCompletedPage" - {
+      "ReportedOtherAssetsDisposalListPage" - {
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              assetIndex,
+              assetIndexOne,
               disposalIndex,
               (srn, _: Max5000, _: Max50) => ReportedOtherAssetsDisposalListPage(srn = srn, addDisposal = false),
               (srn, _: Max5000, _: Max50, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
@@ -428,18 +428,64 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             )
         )
       }
+
+      "RemoveAssetDisposalPage" - {
+
+        "When there are no other asset disposals" - {
+          act.like(
+            normalmode
+              .navigateTo(
+                RemoveAssetDisposalPage,
+                (srn, mode) =>
+                  controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController
+                    .onPageLoad(srn, mode)
+              )
+              .withName("go from RemoveAssetDisposal to OtherAssetsDisposal")
+          )
+        }
+
+        "When there is a disposal for the same asset" - {
+          act.like(
+            normalmode
+              .navigateTo(
+                RemoveAssetDisposalPage,
+                (srn, _) =>
+                  controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+                    .onPageLoad(srn, page = 1),
+                srn =>
+                  defaultUserAnswers
+                    .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndexOne, disposalIndex), HowDisposed.Transferred)
+              )
+              .withName("go from RemoveAssetDisposalPage to ReportedOtherAssetsDisposalList")
+          )
+        }
+
+        "When there is a disposal for a different asset" - {
+          act.like(
+            normalmode
+              .navigateTo(
+                RemoveAssetDisposalPage,
+                (srn, _) =>
+                  controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+                    .onPageLoad(srn, page = 1),
+                srn =>
+                  defaultUserAnswers
+                    .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndexTwo, disposalIndex), HowDisposed.Transferred)
+              )
+              .withName("go from RemoveAssetDisposalPage to ReportedOtherAssetsDisposalList")
+          )
+        }
+      }
     }
 
     "In CheckMode" - {
 
-      "OtherAssetsDisposalCompletedPage" - {
+      "OtherAssetsDisposalCYAPage" - {
         act.like(
           checkmode
-            .navigateToWithDoubleIndex(
-              assetIndex,
-              disposalIndex,
-              OtherAssetsDisposalCompletedPage,
-              (srn, _: Max5000, _: Max50, _) =>
+            .navigateTo(
+              OtherAssetsDisposalCYAPage,
+              (srn, _) =>
                 controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
                   .onPageLoad(srn, page = 1)
             )
@@ -456,13 +502,13 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         checkmode
           .navigateToWithDoubleIndexAndData(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             HowWasAssetDisposedOfPage.apply,
             Gen.const(HowDisposed.Sold),
             (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
               controllers.nonsipp.otherassetsdisposal.routes.WhenWasAssetSoldController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+                .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
           )
           .withName("go from HowWasAssetDisposedOfPage to WhenWasAssetSold")
       )
@@ -470,13 +516,13 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         checkmode
           .navigateToWithDoubleIndexAndData(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             HowWasAssetDisposedOfPage.apply,
             Gen.const(HowDisposed.Transferred),
             (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
               controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+                .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
           )
           .withName("go from HowWasAssetDisposedOfPage to AnyPartAssetStillHeld (Transferred)")
       )
@@ -484,13 +530,13 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         checkmode
           .navigateToWithDoubleIndexAndData(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             HowWasAssetDisposedOfPage.apply,
             Gen.const(HowDisposed.Other("test details")),
             (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
               controllers.nonsipp.otherassetsdisposal.routes.AnyPartAssetStillHeldController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+                .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
           )
           .withName("ggo from HowWasAssetDisposedOfPage to AnyPartAssetStillHeld (Other)")
       )
@@ -500,7 +546,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         checkmode
           .navigateToWithDoubleIndex(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             WhenWasAssetSoldPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -515,7 +561,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         checkmode
           .navigateToWithDoubleIndex(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             AnyPartAssetStillHeldPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -530,7 +576,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         checkmode
           .navigateToWithDoubleIndex(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             AssetSaleIndependentValuationPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -545,7 +591,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         checkmode
           .navigateToWithDoubleIndex(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             TotalConsiderationSaleAssetPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -561,13 +607,13 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         normalmode
           .navigateToWithDoubleIndexAndData(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             TypeOfAssetBuyerPage,
             Gen.const(IdentityType.Individual),
             (srn, index: Max5000, disposalIndex: Max50, _) =>
               controllers.nonsipp.otherassetsdisposal.routes.IndividualNameOfAssetBuyerController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+                .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
           )
           .withName("go from type of asset buyer page to IndividualNameOfAssetBuyer page when Individual")
       )
@@ -575,13 +621,13 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         normalmode
           .navigateToWithDoubleIndexAndData(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             TypeOfAssetBuyerPage,
             Gen.const(IdentityType.UKCompany),
             (srn, index: Max5000, disposalIndex: Max50, _) =>
               controllers.nonsipp.otherassetsdisposal.routes.CompanyNameOfAssetBuyerController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+                .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
           )
           .withName("go from type of asset buyer page to IndividualNameOfAssetBuyer page when UKCompany")
       )
@@ -589,13 +635,13 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         normalmode
           .navigateToWithDoubleIndexAndData(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             TypeOfAssetBuyerPage,
             Gen.const(IdentityType.UKPartnership),
             (srn, index: Max5000, disposalIndex: Max50, _) =>
               controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerNameController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+                .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
           )
           .withName("go from type of asset buyer page to PartnershipBuyerNamePage page when UKPartnership")
       )
@@ -603,13 +649,13 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         normalmode
           .navigateToWithDoubleIndexAndData(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             TypeOfAssetBuyerPage,
             Gen.const(IdentityType.Other),
             (srn, index: Max5000, disposalIndex: Max50, _) =>
               controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
-                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+                .onPageLoad(srn, assetIndexOne, disposalIndex, NormalMode)
           )
           .withName("go from type of asset buyer page to OtherBuyerDetails page when other")
       )
@@ -619,7 +665,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         checkmode
           .navigateToWithDoubleIndex(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             IndividualNameOfAssetBuyerPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -634,7 +680,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         checkmode
           .navigateToWithDoubleIndex(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             AssetIndividualBuyerNiNumberPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -649,7 +695,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         checkmode
           .navigateToWithDoubleIndex(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             PartnershipBuyerNamePage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -664,7 +710,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         checkmode
           .navigateToWithDoubleIndex(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             PartnershipBuyerUtrPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -679,7 +725,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         checkmode
           .navigateToWithDoubleIndex(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             OtherBuyerDetailsPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -694,7 +740,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         checkmode
           .navigateToWithDoubleIndex(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             CompanyNameOfAssetBuyerPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -709,7 +755,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         checkmode
           .navigateToWithDoubleIndex(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             AssetCompanyBuyerCrnPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
@@ -724,7 +770,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
       act.like(
         checkmode
           .navigateToWithDoubleIndex(
-            assetIndex,
+            assetIndexOne,
             disposalIndex,
             IsBuyerConnectedPartyPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
