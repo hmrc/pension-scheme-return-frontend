@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.bondsdisposal
 
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.DatePageFormProvider
-import play.api.data.Form
+import cats.{Id, Monad}
 import forms.mappings.errors.DateFormErrors
 import services.{SaveService, SchemeDateService}
 import controllers.nonsipp.bondsdisposal.WhenWereBondsSoldController._
@@ -35,6 +35,8 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import pages.nonsipp.bondsdisposal.WhenWereBondsSoldPage
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{DatePageViewModel, FormPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -59,7 +61,7 @@ class WhenWereBondsSoldController @Inject()(
 
   def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
+      usingSchemeDate[Id](srn) { date =>
         val preparedForm = request.userAnswers
           .get(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex))
           .fold(form(date))(form(date).fill)
@@ -74,7 +76,7 @@ class WhenWereBondsSoldController @Inject()(
 
   def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
+      usingSchemeDate(srn) { date =>
         form(date)
           .bindFromRequest()
           .fold(
@@ -98,6 +100,15 @@ class WhenWereBondsSoldController @Inject()(
           )
       }
     }
+
+  private def usingSchemeDate[F[_]: Monad](
+    srn: Srn
+  )(body: DateRange => F[Result])(implicit request: DataRequest[_]): F[Result] =
+    schemeDateService.schemeDate(srn) match {
+      case Some(period) => body(period)
+      case None => Monad[F].pure(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
+
 }
 
 object WhenWereBondsSoldController {

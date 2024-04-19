@@ -24,9 +24,12 @@ import views.html.DatePageView
 import eu.timepit.refined.refineMV
 import play.api.inject
 import forms.DatePageFormProvider
-import models.NormalMode
+import models.{DateRange, NormalMode}
+import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import org.mockito.Mockito.reset
+import org.mockito.Mockito.{reset, when}
+
+import java.time.LocalDate
 
 class WhenWasAssetSoldControllerSpec extends ControllerBaseSpec {
 
@@ -38,6 +41,7 @@ class WhenWasAssetSoldControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit =
     routes.WhenWasAssetSoldController.onSubmit(srn, assetIndex, disposalIndex, NormalMode)
 
+  val schemeDatePeriod: DateRange = DateRange(LocalDate.parse("2020-04-06"), LocalDate.parse("2021-04-05"))
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 
   override val additionalBindings: List[GuiceableModule] =
@@ -45,8 +49,11 @@ class WhenWasAssetSoldControllerSpec extends ControllerBaseSpec {
 
   override def beforeEach(): Unit = {
     reset(mockSchemeDateService)
-    MockSchemeDateService.taxYearOrAccountingPeriods(Some(Left(dateRange)))
+    setSchemeDate(Some(schemeDatePeriod))
   }
+
+  def setSchemeDate(date: Option[DateRange]): Unit =
+    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(date)
 
   "WhenWasAssetSoldController" - {
 

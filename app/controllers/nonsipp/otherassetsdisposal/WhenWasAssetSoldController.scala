@@ -18,7 +18,7 @@ package controllers.nonsipp.otherassetsdisposal
 
 import services.{SaveService, SchemeDateService}
 import pages.nonsipp.otherassetsdisposal.WhenWasAssetSoldPage
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import controllers.nonsipp.otherassetsdisposal.WhenWasAssetSoldController._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
@@ -26,8 +26,8 @@ import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.DatePageFormProvider
+import cats.{Id, Monad}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.data.Form
 import forms.mappings.errors.DateFormErrors
 import views.html.DatePageView
 import models.SchemeId.Srn
@@ -35,6 +35,8 @@ import utils.DateTimeUtils.localDateShow
 import models.{DateRange, Mode}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{DatePageViewModel, FormPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -59,7 +61,7 @@ class WhenWasAssetSoldController @Inject()(
 
   def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
+      usingSchemeDate[Id](srn) { date =>
         val preparedForm = request.userAnswers
           .get(WhenWasAssetSoldPage(srn, assetIndex, disposalIndex))
           .fold(form(date))(form(date).fill)
@@ -74,7 +76,7 @@ class WhenWasAssetSoldController @Inject()(
 
   def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
+      usingSchemeDate(srn) { date =>
         form(date)
           .bindFromRequest()
           .fold(
@@ -97,6 +99,14 @@ class WhenWasAssetSoldController @Inject()(
               )
           )
       }
+    }
+
+  private def usingSchemeDate[F[_]: Monad](
+    srn: Srn
+  )(body: DateRange => F[Result])(implicit request: DataRequest[_]): F[Result] =
+    schemeDateService.schemeDate(srn) match {
+      case Some(period) => body(period)
+      case None => Monad[F].pure(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 }
 

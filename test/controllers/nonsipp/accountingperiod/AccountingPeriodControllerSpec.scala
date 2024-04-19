@@ -36,7 +36,7 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
 
   "AccountingPeriodController" - {
 
-    val form = AccountingPeriodController.form(new DateRangeFormProvider(), defaultTaxYear, List())
+    val form = AccountingPeriodController.form(new DateRangeFormProvider(), defaultTaxYear, List(), refineMV(1))
     lazy val viewModel = AccountingPeriodController.viewModel(srn, refineMV(1), NormalMode)
 
     val rangeGen = dateRangeWithinRangeGen(dateRange)

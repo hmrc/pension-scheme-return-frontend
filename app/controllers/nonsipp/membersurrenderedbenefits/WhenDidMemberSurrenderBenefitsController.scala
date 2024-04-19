@@ -19,15 +19,15 @@ package controllers.nonsipp.membersurrenderedbenefits
 import services.{SaveService, SchemeDateService}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import config.Refined.Max300
 import controllers.PSRController
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, WhenDidMemberSurrenderBenefitsPage}
+import cats.{Id, Monad}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.data.Form
 import forms.mappings.errors.DateFormErrors
 import views.html.DatePageView
 import models.SchemeId.Srn
@@ -37,6 +37,8 @@ import utils.DateTimeUtils.localDateShow
 import models.{DateRange, Mode}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{DatePageViewModel, FormPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -61,7 +63,7 @@ class WhenDidMemberSurrenderBenefitsController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
+      usingSchemeDate[Id](srn) { date =>
         request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { member =>
           request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, index)).getOrRecoverJourney {
             surrenderedBenefitsAmount =>
@@ -81,7 +83,7 @@ class WhenDidMemberSurrenderBenefitsController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
+      usingSchemeDate(srn) { date =>
         request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { member =>
           request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, index)).getOrRecoverJourney {
             surrenderedBenefitsAmount =>
@@ -110,6 +112,15 @@ class WhenDidMemberSurrenderBenefitsController @Inject()(
         }
       }
     }
+
+  private def usingSchemeDate[F[_]: Monad](
+    srn: Srn
+  )(body: DateRange => F[Result])(implicit request: DataRequest[_]): F[Result] =
+    schemeDateService.schemeDate(srn) match {
+      case Some(period) => body(period)
+      case None => Monad[F].pure(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
+
 }
 
 object WhenDidMemberSurrenderBenefitsController {

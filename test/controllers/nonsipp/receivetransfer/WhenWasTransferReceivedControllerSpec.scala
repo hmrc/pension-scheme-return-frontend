@@ -24,11 +24,14 @@ import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, WhenWasTransfe
 import eu.timepit.refined.refineMV
 import play.api.inject
 import forms.DatePageFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{DateRange, NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import org.mockito.Mockito.reset
+import org.mockito.Mockito.{reset, when}
 import controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController._
+
+import java.time.LocalDate
 
 class WhenWasTransferReceivedControllerSpec extends ControllerBaseSpec {
 
@@ -38,6 +41,7 @@ class WhenWasTransferReceivedControllerSpec extends ControllerBaseSpec {
     routes.WhenWasTransferReceivedController.onPageLoad(srn, index, secondaryIndex, NormalMode)
   private lazy val onSubmit = routes.WhenWasTransferReceivedController.onSubmit(srn, index, secondaryIndex, NormalMode)
 
+  val schemeDatePeriod: DateRange = DateRange(LocalDate.parse("2020-04-06"), LocalDate.parse("2021-04-05"))
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 
   override val additionalBindings: List[GuiceableModule] =
@@ -45,8 +49,11 @@ class WhenWasTransferReceivedControllerSpec extends ControllerBaseSpec {
 
   override def beforeEach(): Unit = {
     reset(mockSchemeDateService)
-    MockSchemeDateService.taxYearOrAccountingPeriods(Some(Left(dateRange)))
+    setSchemeDate(Some(schemeDatePeriod))
   }
+
+  def setSchemeDate(date: Option[DateRange]): Unit =
+    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(date)
 
   val userAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)

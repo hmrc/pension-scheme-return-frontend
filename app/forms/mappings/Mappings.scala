@@ -16,9 +16,11 @@
 
 package forms.mappings
 
+import config.Refined.Max3
 import play.api.data.Forms.{of, optional}
 import uk.gov.voa.play.form.Condition
 import models._
+import uk.gov.hmrc.time.TaxYear
 import play.api.data.{FieldMapping, Mapping}
 import forms.mappings.errors._
 import play.api.data.validation.{Constraint, Invalid, Valid}
@@ -138,7 +140,11 @@ trait Mappings extends Formatters with Constraints {
     startDateAllowedDateRangeError: Option[String],
     endDateAllowedDateRangeError: Option[String],
     duplicateRangeError: Option[String],
-    duplicateRanges: List[DateRange]
+    duplicateRanges: List[DateRange],
+    previousDateRangeError: Option[String],
+    index: Max3,
+    taxYear: TaxYear,
+    errorTaxYear: Option[String]
   ): FieldMapping[DateRange] =
     of(
       new DateRangeFormatter(
@@ -149,7 +155,11 @@ trait Mappings extends Formatters with Constraints {
         startDateAllowedDateRangeError,
         endDateAllowedDateRangeError,
         duplicateRangeError,
-        duplicateRanges
+        duplicateRanges,
+        previousDateRangeError,
+        index,
+        taxYear,
+        errorTaxYear
       )
     )
 

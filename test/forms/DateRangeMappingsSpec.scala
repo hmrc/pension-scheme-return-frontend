@@ -22,8 +22,10 @@ import org.scalatest.matchers.must.Matchers
 import forms.mappings.Mappings
 import generators.Generators
 import cats.implicits._
+import eu.timepit.refined.refineMV
 import org.scalacheck.Gen
 import org.scalatest.OptionValues
+import uk.gov.hmrc.time.TaxYear
 import play.api.data.{Form, FormError}
 import forms.mappings.errors.DateFormErrors
 import utils.DateTimeUtils.localDateShow
@@ -54,6 +56,8 @@ class DateRangeMappingsSpec
     invalidCharacters = "error.invalid.characters"
   )
 
+  val defaultTaxYear: TaxYear = TaxYear(2022)
+
   val form: Form[DateRange] = formWithDuplicates(Nil)
 
   def formWithDuplicates(duplicateRanges: List[DateRange]): Form[DateRange] = Form(
@@ -65,7 +69,11 @@ class DateRangeMappingsSpec
       startDateAllowedDateRangeError = Some("error.startDate.outsideRange"),
       endDateAllowedDateRangeError = Some("error.endDate.outsideRange"),
       duplicateRangeError = Some("error.duplicate"),
-      duplicateRanges = duplicateRanges
+      duplicateRanges = duplicateRanges,
+      previousDateRangeError = Some("error.previousStartDate"),
+      index = refineMV(1),
+      taxYear = TaxYear(3000),
+      errorTaxYear = Some("error.beforeTaxYear")
     )
   )
 
