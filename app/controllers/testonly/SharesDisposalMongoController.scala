@@ -23,7 +23,7 @@ import models.SchemeId.Srn
 import pages.nonsipp.sharesdisposal._
 import models.HowSharesDisposed._
 import shapeless.{::, HList, HNil}
-import viewmodels.models.SectionJourneyStatus
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.refineMV
 
@@ -39,18 +39,22 @@ class SharesDisposalMongoController @Inject()(
     extends TestDataDoubleIndexController[Max5000.Refined, Max50.Refined] {
 
   override type Pages =
-    PageWithValue[SectionJourneyStatus] ::
+    PageWithValue[Boolean] ::
+      PageWithValue[SectionJourneyStatus] ::
       PageWithValue[HowSharesDisposed] ::
       PageWithValue[Int] ::
+      PageWithValue[SectionCompleted] ::
       HNil
 
   override val max: Max50 = refineMV(50)
 
   override def pages(srn: Srn, index: Max5000, secondaryIndex: Max50): Pages = HList(
     (
+      PageWithValue(SharesDisposalPage(srn), true),
       PageWithValue(SharesDisposalProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed),
       PageWithValue(HowWereSharesDisposedPage(srn, index, secondaryIndex), Transferred),
-      PageWithValue(HowManyDisposalSharesPage(srn, index, secondaryIndex), 3)
+      PageWithValue(HowManyDisposalSharesPage(srn, index, secondaryIndex), 3),
+      PageWithValue(SharesDisposalCompleted(srn), SectionCompleted)
     )
   )
 }

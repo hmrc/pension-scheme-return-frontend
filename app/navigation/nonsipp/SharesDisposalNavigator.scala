@@ -102,7 +102,7 @@ object SharesDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
         .onPageLoad(srn, page = 1)
 
-    case SharesDisposalListPage(srn, shareIndex, disposalIndex) => {
+    case SharesDisposalListPage(srn, shareIndex) => {
       val inProgressIndex: Either[Call, Option[Max50]] = userAnswers
         .map(SharesDisposalProgress.all(srn, shareIndex))
         .find {

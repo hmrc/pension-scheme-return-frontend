@@ -80,11 +80,10 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
         act.like(
           normalmode
-            .navigateToWithDoubleIndex(
+            .navigateToWithIndex(
               shareIndex,
-              disposalIndex,
               SharesDisposalListPage,
-              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, shareIndex: Max5000, _) =>
                 controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )

@@ -21,7 +21,7 @@ import config.Refined.Max5000
 import models.SchemeId.Srn
 import models._
 import shapeless._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionStatus}
 import pages.nonsipp.shares._
 import play.api.mvc.MessagesControllerComponents
 import controllers.actions.IdentifyAndRequireData
@@ -44,16 +44,20 @@ class SharesMongoController @Inject()(
   override def pages(srn: Srn, index: Max5000): Pages =
     HList(
       (
+        PageWithValue(DidSchemeHoldAnySharesPage(srn), true),
+        PageWithValue(SharesJourneyStatus(srn), SectionStatus.Completed),
         PageWithValue(SharesCompleted(srn, index), SectionCompleted),
         PageWithValue(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted),
-        PageWithValue(CompanyNameRelatedSharesPage(srn, index), "test ltd"),
+        PageWithValue(CompanyNameRelatedSharesPage(srn, index), s"test${index.value} ltd"),
         PageWithValue(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition),
         PageWithValue(WhenDidSchemeAcquireSharesPage(srn, index), LocalDate.of(2022, 12, 12))
       )
     )
 
   override type Pages =
-    PageWithValue[SectionCompleted] ::
+    PageWithValue[Boolean] ::
+      PageWithValue[SectionStatus] ::
+      PageWithValue[SectionCompleted] ::
       PageWithValue[TypeOfShares] ::
       PageWithValue[String] ::
       PageWithValue[SchemeHoldShare] ::

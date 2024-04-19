@@ -33,7 +33,7 @@ import models.SchemeId.Srn
 import cats.implicits.{toShow, toTraverseOps}
 import controllers.nonsipp.shares.SharesListController.SharesData
 import controllers.actions.IdentifyAndRequireData
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import config.Refined.Max5000.enumerable
 import pages.nonsipp.sharesdisposal._
 import utils.DateTimeUtils.localDateShow
@@ -81,18 +81,13 @@ class SharesDisposalListController @Inject()(
           }.merge
         },
         answer =>
-          SharesDisposalListController
-            .getDisposal(srn, answer, request.userAnswers, isNextDisposal = true)
-            .getOrRecoverJourney(
-              nextDisposal =>
-                Redirect(
-                  navigator.nextPage(
-                    SharesDisposalListPage(srn, answer, nextDisposal),
-                    mode,
-                    request.userAnswers
-                  )
-                )
+          Redirect(
+            navigator.nextPage(
+              SharesDisposalListPage(srn, answer),
+              mode,
+              request.userAnswers
             )
+          )
       )
   }
 
@@ -115,66 +110,36 @@ object SharesDisposalListController {
       "sharesDisposal.sharesDisposalList.radios.error.required"
     )
 
-  private def getDisposal(
-    srn: Srn,
-    shareIndex: Max5000,
-    userAnswers: UserAnswers,
-    isNextDisposal: Boolean
-  ): Option[Max50] =
-    userAnswers.get(SharesDisposalProgress.all(srn)) match {
-      case None => Some(refineMV[Max50.Refined](1))
-      case Some(completedDisposals) =>
-        /**
-         * Indexes of completed disposals sorted in ascending order.
-         * We -1 from the share index as the refined indexes is 1-based (e.g. 1 to 5000)
-         * while we are trying to fetch a completed disposal from a Map which is 0-based.
-         * We then +1 when we re-refine the index
-         */
-        val completedDisposalsForShares: List[Max50] =
-          completedDisposals
-            .get((shareIndex.value - 1).toString)
-            .map(_.keys.toList)
-            .flatMap(_.traverse(_.toIntOption))
-            .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
-            .toList
-            .flatten
-            .sortBy(_.value)
-
-        completedDisposalsForShares.lastOption match {
-          case None => Some(refineMV[Max50.Refined](1))
-          case Some(lastCompletedDisposalForShares) =>
-            if (isNextDisposal) {
-              refineV[Max50.Refined](lastCompletedDisposalForShares.value + 1).toOption
-            } else {
-              Some(lastCompletedDisposalForShares)
-            }
-        }
-    }
-
   private def buildRows(srn: Srn, shares: List[SharesData], userAnswers: UserAnswers): List[ListRadiosRow] =
     shares.flatMap { sharesData =>
-      val disposalIndex = getDisposal(srn, sharesData.index, userAnswers, isNextDisposal = false).get
-      val totalSharesNowHeld: Option[Int] =
-        userAnswers.get(HowManyDisposalSharesPage(srn, sharesData.index, disposalIndex))
-      totalSharesNowHeld match {
-        case Some(sharesRemaining) =>
-          if (sharesRemaining > 0) {
-            List(
-              ListRadiosRow(
-                sharesData.index.value,
-                buildMessage(sharesData)
-              )
-            )
-          } else {
-            Nil
-          }
-        case _ =>
+      val completedDisposalsPerShareKeys = userAnswers
+        .map(SharesDisposalProgress.all(srn, sharesData.index))
+        .toList
+        .filter(progress => progress._2.completed)
+        .map(_._1)
+
+      if (Constants.maxDisposalsPerShare == completedDisposalsPerShareKeys.size) {
+        List[ListRadiosRow]().empty
+      } else {
+
+        val isShareShouldBeRemovedFromList = completedDisposalsPerShareKeys.toList
+          .map(_.toIntOption)
+          .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
+          .flatMap(
+            _.map(disposalIndex => userAnswers.get(HowManyDisposalSharesPage(srn, sharesData.index, disposalIndex)))
+          )
+          .exists(optValue => optValue.fold(false)(value => value == 0))
+
+        if (isShareShouldBeRemovedFromList) {
+          List[ListRadiosRow]().empty
+        } else {
           List(
             ListRadiosRow(
               sharesData.index.value,
               buildMessage(sharesData)
             )
           )
+        }
       }
     }
 
