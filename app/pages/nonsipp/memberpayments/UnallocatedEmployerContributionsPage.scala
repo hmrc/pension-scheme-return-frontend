@@ -16,14 +16,28 @@
 
 package pages.nonsipp.memberpayments
 
+import utils.PageUtils
+import queries.Removable
 import pages.QuestionPage
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import models.UserAnswers
+
+import scala.util.Try
 
 case class UnallocatedEmployerContributionsPage(srn: Srn) extends QuestionPage[Boolean] {
 
   override def path: JsPath = MemberPaymentsPage.path \ toString
 
   override def toString: String = "unallocatedContribsMade"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value, userAnswers.get(this)) match {
+      case (Some(false), Some(true)) => PageUtils.removePages(userAnswers, pages(srn))
+      case _ => Try(userAnswers)
+    }
+
+  private def pages(srn: Srn): List[Removable[_]] =
+    List(UnallocatedEmployerAmountPage(srn))
 
 }

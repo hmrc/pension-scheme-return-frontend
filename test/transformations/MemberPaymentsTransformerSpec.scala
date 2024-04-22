@@ -192,5 +192,20 @@ class MemberPaymentsTransformerSpec
       val result = memberPaymentsTransformer.transformFromEtmp(defaultUserAnswers, srn, memberPayments)
       result shouldMatchTo Try(userAnswers)
     }
+
+    "should return employer contributions Completed if no contribution are added" in {
+      val memberPaymentsNoContributions =
+        memberPayments.copy(employerContributionsDetails = SectionDetails(false, false))
+      val userAnswersNoContributions = userAnswers
+        .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
+        .unsafeSet(EmployerContributionsPage(srn), false)
+        .unsafeSet(EmployerContributionsMemberListPage(srn), false)
+        .removeOnly(AllEmployerContributionsProgress(srn))
+        .get
+
+      val result = memberPaymentsTransformer.transformFromEtmp(defaultUserAnswers, srn, memberPaymentsNoContributions)
+      result shouldMatchTo Try(userAnswersNoContributions)
+    }
+
   }
 }

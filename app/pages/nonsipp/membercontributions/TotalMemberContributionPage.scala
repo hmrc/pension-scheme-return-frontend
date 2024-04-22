@@ -21,12 +21,21 @@ import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.Money
 import config.Refined.Max300
-import pages.QuestionPage
+import pages.{IndexedQuestionPage, QuestionPage}
 
 case class TotalMemberContributionPage(srn: Srn, index: Max300) extends QuestionPage[Money] {
 
   override def path: JsPath =
     Paths.memberDetails \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "totalMemberContribution"
+
+}
+
+case class AllTotalMemberContributionPages(srn: Srn) extends IndexedQuestionPage[QuestionPage[Money]] {
+
+  override def path: JsPath =
+    Paths.memberDetails \ toString
 
   override def toString: String = "totalMemberContribution"
 

@@ -21,13 +21,21 @@ import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.PensionCommencementLumpSum
 import config.Refined.Max300
-import pages.QuestionPage
+import pages.{IndexedQuestionPage, QuestionPage}
 import pages.nonsipp.memberreceivedpcls.Paths.memberDetails
 
 case class PensionCommencementLumpSumAmountPage(srn: Srn, index: Max300)
     extends QuestionPage[PensionCommencementLumpSum] {
 
   override def path: JsPath = memberDetails \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "memberLumpSumReceived"
+}
+
+case class AllPensionCommencementLumpSumAmountPages(srn: Srn)
+    extends IndexedQuestionPage[QuestionPage[PensionCommencementLumpSum]] {
+
+  override def path: JsPath = memberDetails \ toString
 
   override def toString: String = "memberLumpSumReceived"
 }

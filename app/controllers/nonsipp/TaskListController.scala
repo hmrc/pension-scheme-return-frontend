@@ -19,35 +19,28 @@ package controllers.nonsipp
 import services.{PsrVersionsService, SchemeDateService}
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
 import pages.nonsipp.memberdetails._
+import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils._
+import cats.implicits.toShow
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import pages.nonsipp.CheckReturnDatesPage
-import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsJourneyStatus
 import viewmodels.models.TaskListStatus._
 import _root_.config.Refined.OneTo300
-import viewmodels.implicits._
-import pages.nonsipp.membercontributions.MemberContributionsListPage
-import pages.nonsipp.memberreceivedpcls.{PclsMemberListPage, PensionCommencementLumpSumPage}
 import views.html.TaskListView
 import models.SchemeId.Srn
-import cats.implicits.toShow
-import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
-import pages.nonsipp.memberpensionpayments.{PensionPaymentsJourneyStatus, PensionPaymentsReceivedPage}
 import controllers.actions._
 import eu.timepit.refined.refineV
 import utils.nonsipp.TaskListStatusUtils
 import models.backend.responses.ReportStatus
 import utils.DateTimeUtils.localDateShow
 import models._
-import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
 import play.api.i18n.MessagesApi
 import pages.nonsipp.bondsdisposal.BondsDisposalPage
-import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
 import viewmodels.DisplayMessage._
-import viewmodels.models.{TaskListStatus, _}
+import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -265,52 +258,17 @@ object TaskListController {
     // change to check if members section is complete to start
     val (employerContributionStatus, employerContributionLink) = getEmployerContributionStatusAndLink(userAnswers, srn)
 
-    val transferInStatus: TaskListStatus =
-      userAnswers
-        .get(TransfersInJourneyStatus(srn))
-        .fold[TaskListStatus](TaskListStatus.NotStarted) {
-          case SectionStatus.InProgress => TaskListStatus.InProgress
-          case SectionStatus.Completed => TaskListStatus.Completed
-        }
+    val (transferInStatus, transferInLink) = getTransferInStatusAndLink(userAnswers, srn)
+    val (transferOutStatus, transferOutLink) = getTransferOutStatusAndLink(userAnswers, srn)
 
-    val transferOutStatus: TaskListStatus =
-      userAnswers
-        .get(TransfersOutJourneyStatus(srn))
-        .fold[TaskListStatus](TaskListStatus.NotStarted) {
-          case SectionStatus.InProgress => TaskListStatus.InProgress
-          case SectionStatus.Completed => TaskListStatus.Completed
-        }
+    val (memberContributionStatus, memberContributionLink) = getMemberContributionStatusAndLink(userAnswers, srn)
+    val (pclsMemberStatus, pclsMemberLink) = getPclsStatusAndLink(userAnswers, srn)
 
-    val memberContributionStatus: TaskListStatus =
-      userAnswers
-        .get(MemberContributionsListPage(srn))
-        .fold[TaskListStatus](TaskListStatus.NotStarted) {
-          case false => TaskListStatus.InProgress
-          case true => TaskListStatus.Completed
-        }
+    val (surrenderedBenefitsStatus, surrenderedBenefitsLink) = getSurrenderedBenefitsStatusAndLink(userAnswers, srn)
 
-    val pclsMemberStatus: TaskListStatus =
-      userAnswers
-        .get(PclsMemberListPage(srn))
-        .fold[TaskListStatus](TaskListStatus.NotStarted) {
-          case false => TaskListStatus.InProgress
-          case true => TaskListStatus.Completed
-        }
-    val surrenderedBenefitsStatus: TaskListStatus =
-      userAnswers
-        .get(SurrenderedBenefitsJourneyStatus(srn))
-        .fold[TaskListStatus](TaskListStatus.NotStarted) {
-          case SectionStatus.InProgress => TaskListStatus.InProgress
-          case SectionStatus.Completed => TaskListStatus.Completed
-        }
-
-    val pensionPaymentsStatus: TaskListStatus =
-      userAnswers
-        .get(PensionPaymentsJourneyStatus(srn))
-        .fold[TaskListStatus](TaskListStatus.NotStarted) {
-          case SectionStatus.InProgress => TaskListStatus.InProgress
-          case SectionStatus.Completed => TaskListStatus.Completed
-        }
+    val (pensionPaymentsStatus, pensionPaymentsLink) = getPensionPaymentsStatusAndLink(userAnswers, srn)
+    val (unallocatedContributionsStatus, unallocatedContributionsLink) =
+      getUnallocatedContributionsStatusAndLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -323,60 +281,50 @@ object TaskListController {
       ),
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "unallocatedcontributions.title", UnableToStart),
-          controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
-            .onPageLoad(srn, NormalMode)
-            .url
+          messageKey(prefix, "unallocatedcontributions.title", unallocatedContributionsStatus),
+          unallocatedContributionsLink
         ),
-        NotStarted
+        unallocatedContributionsStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "memberContributions.title", memberContributionStatus),
-          controllers.nonsipp.membercontributions.routes.MemberContributionsController
-            .onPageLoad(srn, NormalMode)
-            .url
+          memberContributionLink
         ),
         memberContributionStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "transfersreceived.title", transferInStatus),
-          controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode).url
+          transferInLink
         ),
         transferInStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "transfersout.title", transferOutStatus),
-          controllers.nonsipp.membertransferout.routes.SchemeTransferOutController.onPageLoad(srn, NormalMode).url
+          transferOutLink
         ),
         transferOutStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "pcls.title", pclsMemberStatus),
-          controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
-            .onPageLoad(srn, NormalMode)
-            .url
+          pclsMemberLink
         ),
         pclsMemberStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "payments.title", pensionPaymentsStatus),
-          controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
-            .onPageLoad(srn, NormalMode)
-            .url
+          pensionPaymentsLink
         ),
         pensionPaymentsStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "surrenderedbenefits.title", surrenderedBenefitsStatus),
-          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsController
-            .onPageLoad(srn, NormalMode)
-            .url
+          surrenderedBenefitsLink
         ),
         surrenderedBenefitsStatus
       )
@@ -583,9 +531,6 @@ object TaskListController {
     //  These pages must be removed once tasklist status logic implemented for them properly.
     //  Now we're just checking whether user selected no in the beginning of the journey (using shortcut).
     val unhandledStatusPages = List(
-      UnallocatedEmployerContributionsPage(srn),
-      PensionPaymentsReceivedPage(srn),
-      PensionCommencementLumpSumPage(srn),
       BondsDisposalPage(srn)
     ).map(
         page => userAnswers.get(page).fold(0)(x => if (x) 0 else 1)

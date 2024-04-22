@@ -16,7 +16,9 @@
 
 package pages
 
-import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
+import utils.UserAnswersUtils.UserAnswersOps
+import models.UserAnswers
+import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
 import pages.behaviours.PageBehaviours
 
 class UnallocatedEmployerContributionsPageSpec extends PageBehaviours {
@@ -30,5 +32,30 @@ class UnallocatedEmployerContributionsPageSpec extends PageBehaviours {
     beSettable[Boolean](UnallocatedEmployerContributionsPage(srn))
 
     beRemovable[Boolean](UnallocatedEmployerContributionsPage(srn))
+
+    "cleanup" - {
+
+      val userAnswers =
+        UserAnswers("id")
+          .unsafeSet(UnallocatedEmployerContributionsPage(srn), true)
+          .unsafeSet(UnallocatedEmployerAmountPage(srn), moneyGen.sample.value)
+
+      List(Some(true), None).foreach { answer =>
+        s"retain unallocated amount value when answer is $answer" in {
+
+          val result = UnallocatedEmployerContributionsPage(srn).cleanup(answer, userAnswers).toOption.value
+
+          result.get(UnallocatedEmployerAmountPage(srn)) must not be None
+        }
+      }
+
+      "remove unallocated amount value when answer is Some(false)" in {
+
+        val result = UnallocatedEmployerContributionsPage(srn).cleanup(Some(false), userAnswers).toOption.value
+
+        result.get(UnallocatedEmployerAmountPage(srn)) mustBe None
+      }
+    }
+
   }
 }

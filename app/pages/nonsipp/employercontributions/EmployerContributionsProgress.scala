@@ -47,3 +47,10 @@ object EmployerContributionsProgress {
       userAnswers.map(EmployerContributionsProgress.all(srn, memberIndex)).toList.refine_1[Max50.Refined]
   }
 }
+
+case class AllEmployerContributionsProgress(srn: Srn) extends IndexedQuestionPage[QuestionPage[SectionJourneyStatus]] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "employerContributionsProgress"
+}
