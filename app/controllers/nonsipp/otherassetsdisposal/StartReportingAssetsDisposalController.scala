@@ -70,30 +70,25 @@ class StartReportingAssetsDisposalController @Inject()(
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val userAnswers = request.userAnswers
-    val indexes: List[Max5000] =
+    val assetsCompletedIndexes: List[Max5000] =
       userAnswers.map(OtherAssetsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
 
     form
       .bindFromRequest()
       .fold(
         errors => {
-          assetsData(srn, indexes).map { assets =>
+          assetsData(srn, assetsCompletedIndexes).map { assets =>
             BadRequest(view(errors, viewModel(srn, page, assets, userAnswers)))
           }.merge
         },
         answer =>
-          StartReportingAssetsDisposalController
-            .getDisposal(srn, answer, userAnswers, isNextDisposal = true)
-            .getOrRecoverJourney(
-              nextDisposal =>
-                Redirect(
-                  navigator.nextPage(
-                    OtherAssetsDisposalListPage(srn, answer, nextDisposal),
-                    mode,
-                    request.userAnswers
-                  )
-                )
+          Redirect(
+            navigator.nextPage(
+              OtherAssetsDisposalListPage(srn, answer),
+              mode,
+              request.userAnswers
             )
+          )
       )
   }
 
@@ -111,68 +106,34 @@ object StartReportingAssetsDisposalController {
   def form(formProvider: RadioListFormProvider): Form[Max5000] =
     formProvider("otherAssetsDisposal.startReportingAssetsDisposal.error.required")
 
-  private def getDisposal(
-    srn: Srn,
-    assetIndex: Max5000,
-    userAnswers: UserAnswers,
-    isNextDisposal: Boolean
-  ): Option[Max50] =
-    userAnswers.get(OtherAssetsDisposalProgress.all(srn)) match {
-      case None => refineV[Max50.Refined](1).toOption
-      case Some(completedDisposals) =>
-        /**
-         * Indexes of completed disposals sorted in ascending order.
-         * We -1 from the address choice as the refined indexes is 1-based (e.g. 1 to 5000)
-         * while we are trying to fetch a completed disposal from a Map which is 0-based.
-         * We then +1 when we re-refine the index
-         */
-        val completedDisposalsForAssets =
-          completedDisposals
-            .get((assetIndex.value - 1).toString)
-            .map(_.keys.toList)
-            .flatMap(_.traverse(_.toIntOption))
-            .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
-            .toList
-            .flatten
-            .sortBy(_.value)
-
-        completedDisposalsForAssets.lastOption match {
-          case None => refineV[Max50.Refined](1).toOption
-          case Some(lastCompletedDisposalForAssets) =>
-            if (isNextDisposal) {
-              refineV[Max50.Refined](lastCompletedDisposalForAssets.value + 1).toOption
-            } else {
-              refineV[Max50.Refined](lastCompletedDisposalForAssets.value).toOption
-            }
-        }
-    }
-
   private def buildRows(srn: Srn, assets: List[AssetData], userAnswers: UserAnswers): List[ListRadiosRow] =
-    assets.flatMap { asset =>
-      val disposalIndex = getDisposal(srn, asset.index, userAnswers, isNextDisposal = false).get
-      val isDisposed: Option[Boolean] = {
-        userAnswers.get(AnyPartAssetStillHeldPage(srn, asset.index, disposalIndex))
-      }
-      isDisposed match {
-        case Some(value) =>
-          if (value) {
-            List(
-              ListRadiosRow(
-                asset.index.value,
-                asset.nameOfAsset
-              )
-            )
-          } else {
-            val empty: List[ListRadiosRow] = List()
-            empty
-          }
-        case _ =>
+    assets.flatMap { assetData =>
+      val completedDisposalsPerAssetKeys = userAnswers
+        .map(OtherAssetsDisposalProgress.all(srn, assetData.index))
+        .keys
+
+      if (Constants.maxDisposalPerOtherAsset == completedDisposalsPerAssetKeys.size) {
+        List[ListRadiosRow]().empty
+      } else {
+
+        val isAssetShouldBeRemovedFromList = completedDisposalsPerAssetKeys.toList
+          .map(_.toIntOption)
+          .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
+          .flatMap(
+            _.map(disposalIndex => userAnswers.get(AnyPartAssetStillHeldPage(srn, assetData.index, disposalIndex)))
+          )
+          .exists(optValue => optValue.fold(false)(value => !value))
+
+        if (isAssetShouldBeRemovedFromList) {
+          List[ListRadiosRow]().empty
+        } else {
           List(
             ListRadiosRow(
-              asset.index.value,
-              asset.nameOfAsset
+              assetData.index.value,
+              assetData.nameOfAsset
             )
           )
+        }
       }
     }
 

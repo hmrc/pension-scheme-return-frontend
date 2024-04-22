@@ -40,7 +40,7 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
     case WhatYouWillNeedOtherAssetsDisposalPage(srn) =>
       controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController.onPageLoad(srn, page = 1)
 
-    case OtherAssetsDisposalListPage(srn, assetIndex, disposalIndex) => {
+    case OtherAssetsDisposalListPage(srn, assetIndex) => {
       val inProgressIndex: Either[Call, Option[Max50]] = userAnswers
         .map(OtherAssetsDisposalProgress.all(srn, assetIndex))
         .find {
