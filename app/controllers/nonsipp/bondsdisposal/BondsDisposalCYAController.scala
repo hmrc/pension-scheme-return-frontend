@@ -127,14 +127,14 @@ class BondsDisposalCYAController @Inject()(
     identifyAndRequireData(srn).async { implicit request =>
       for {
         updatedUserAnswers <- Future.fromTry(
-          request.userAnswers.set(BondsDisposalCompletedPage(srn, bondIndex, disposalIndex), SectionCompleted)
+          request.userAnswers.set(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionCompleted)
         )
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
       } yield submissionResult.getOrRecoverJourney(
         _ =>
           Redirect(
-            navigator.nextPage(BondsDisposalCompletedPage(srn, bondIndex, disposalIndex), mode, request.userAnswers)
+            navigator.nextPage(BondsDisposalCYAPage(srn), mode, request.userAnswers)
           )
       )
     }

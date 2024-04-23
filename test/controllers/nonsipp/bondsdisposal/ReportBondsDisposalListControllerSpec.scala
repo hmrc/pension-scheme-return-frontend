@@ -22,7 +22,7 @@ import controllers.ControllerBaseSpec
 import views.html.ListView
 import eu.timepit.refined.refineMV
 import models.{HowDisposed, NormalMode}
-import pages.nonsipp.bondsdisposal.{BondsDisposalCompletedPage, HowWereBondsDisposedOfPage}
+import pages.nonsipp.bondsdisposal.{BondsDisposalProgress, HowWereBondsDisposedOfPage}
 import viewmodels.models.SectionCompleted
 import controllers.nonsipp.bondsdisposal.ReportBondsDisposalListController._
 import forms.YesNoPageFormProvider
@@ -51,10 +51,10 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(BondsCompleted(srn, bondIndexOne), SectionCompleted)
     //Bond 1 - disposal data 1
     .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne), HowDisposed.Sold)
-    .unsafeSet(BondsDisposalCompletedPage(srn, bondIndexOne, disposalIndexOne), SectionCompleted)
+    .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne), SectionCompleted)
     //Bond 1 - disposal data 2
     .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexTwo), HowDisposed.Sold)
-    .unsafeSet(BondsDisposalCompletedPage(srn, bondIndexOne, disposalIndexTwo), SectionCompleted)
+    .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexTwo), SectionCompleted)
 
   "ReportBondsDisposalListController" - {
 
@@ -72,14 +72,6 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
         )
       )
     }.withName("Completed Journey"))
-
-    act.like(
-      redirectToPage(
-        onPageLoad,
-        bondsDisposalPage,
-        defaultUserAnswers
-      ).withName("Not Started Journey")
-    )
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
 

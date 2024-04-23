@@ -96,9 +96,9 @@ object TaskListViewController {
 //      membersSection(srn, schemeName, currentUA),
 //      memberPaymentsSection(srn, currentUA),
       loansSection(srn, schemeName, currentUA, previousUA),
-      sharesSection(srn, currentUA, previousUA)
+      sharesSection(srn, currentUA, previousUA),
 //      landOrPropertySection(srn, currentUA),
-//      bondsSection(srn, currentUA),
+      bondsSection(srn, currentUA)
 //      otherAssetsSection(srn, currentUA)
     )
 
@@ -563,6 +563,7 @@ object TaskListViewController {
     // TODO[
     val prefix = "nonsipp.tasklist.bonds"
     val statusAndLink = getBondsTaskListStatusAndLink(userAnswers, srn)
+    val disposalStatusAndLink = getBondsDisposalsTaskListStatusWithLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -575,10 +576,10 @@ object TaskListViewController {
       ),
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "bondsdisposal.title", NotStarted),
-          controllers.nonsipp.bondsdisposal.routes.BondsDisposalController.onPageLoad(srn, NormalMode).url
+          messageKey(prefix, "bondsdisposal.title", disposalStatusAndLink._1),
+          disposalStatusAndLink._2
         ),
-        NotStarted
+        disposalStatusAndLink._1
       )
     )
   }

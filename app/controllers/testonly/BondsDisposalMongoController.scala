@@ -50,7 +50,7 @@ class BondsDisposalMongoController @Inject()(
   override def pages(srn: Srn, index: Max5000, secondaryIndex: Max50): Pages = HList(
     (
       PageWithValue(BondsDisposalPage(srn), true),
-      PageWithValue(BondsDisposalCompletedPage(srn, index, secondaryIndex), SectionCompleted),
+      PageWithValue(BondsDisposalProgress(srn, index, secondaryIndex), SectionCompleted),
       PageWithValue(HowWereBondsDisposedOfPage(srn, index, secondaryIndex), Transferred),
       PageWithValue(BondsStillHeldPage(srn, index, secondaryIndex), 3)
     )

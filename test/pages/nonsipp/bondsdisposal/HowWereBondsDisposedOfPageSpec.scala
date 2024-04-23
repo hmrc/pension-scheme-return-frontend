@@ -52,7 +52,7 @@ class HowWereBondsDisposedOfPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(IsBuyerConnectedPartyPage(srn, bondIndexOne, disposalIndexOne), true)
         .unsafeSet(BondsStillHeldPage(srn, bondIndexOne, disposalIndexOne), bondsStillHeld)
         .unsafeSet(BondsDisposalCYAPointOfEntry(srn, bondIndexOne, disposalIndexOne), NoPointOfEntry)
-        .unsafeSet(BondsDisposalCompletedPage(srn, bondIndexOne, disposalIndexOne), SectionCompleted)
+        .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne), SectionCompleted)
 
       val result = userAnswers.remove(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne)).success.value
 
@@ -64,7 +64,7 @@ class HowWereBondsDisposedOfPageSpec extends PageBehaviours with TestValues {
       result.get(IsBuyerConnectedPartyPage(srn, bondIndexOne, disposalIndexOne)) must be(empty)
       result.get(BondsStillHeldPage(srn, bondIndexOne, disposalIndexOne)) must be(empty)
       result.get(BondsDisposalCYAPointOfEntry(srn, bondIndexOne, disposalIndexOne)) must be(empty)
-      result.get(BondsDisposalCompletedPage(srn, bondIndexOne, disposalIndexOne)) must be(empty)
+      result.get(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne)) must be(empty)
     }
 
     "cleanup other fields when removing a disposal but there are disposals of the same bond" in {
@@ -75,12 +75,12 @@ class HowWereBondsDisposedOfPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne), Transferred)
         .unsafeSet(BondsStillHeldPage(srn, bondIndexOne, disposalIndexOne), bondsStillHeld)
         .unsafeSet(BondsDisposalCYAPointOfEntry(srn, bondIndexOne, disposalIndexOne), NoPointOfEntry)
-        .unsafeSet(BondsDisposalCompletedPage(srn, bondIndexOne, disposalIndexOne), SectionCompleted)
+        .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne), SectionCompleted)
         // Disposal 2
         .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexTwo), Other(otherDetails))
         .unsafeSet(BondsStillHeldPage(srn, bondIndexOne, disposalIndexTwo), bondsStillHeld)
         .unsafeSet(BondsDisposalCYAPointOfEntry(srn, bondIndexOne, disposalIndexTwo), NoPointOfEntry)
-        .unsafeSet(BondsDisposalCompletedPage(srn, bondIndexOne, disposalIndexTwo), SectionCompleted)
+        .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexTwo), SectionCompleted)
 
       val result = userAnswers.remove(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne)).success.value
 
@@ -89,12 +89,12 @@ class HowWereBondsDisposedOfPageSpec extends PageBehaviours with TestValues {
       result.get(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne)) must be(empty)
       result.get(BondsStillHeldPage(srn, bondIndexOne, disposalIndexOne)) must be(empty)
       result.get(BondsDisposalCYAPointOfEntry(srn, bondIndexOne, disposalIndexOne)) must be(empty)
-      result.get(BondsDisposalCompletedPage(srn, bondIndexOne, disposalIndexOne)) must be(empty)
+      result.get(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne)) must be(empty)
       // Disposal 2 - retained
       result.get(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexTwo)) must be(Some(Other(otherDetails)))
       result.get(BondsStillHeldPage(srn, bondIndexOne, disposalIndexTwo)) must be(Some(bondsStillHeld))
       result.get(BondsDisposalCYAPointOfEntry(srn, bondIndexOne, disposalIndexTwo)) must be(Some(NoPointOfEntry))
-      result.get(BondsDisposalCompletedPage(srn, bondIndexOne, disposalIndexTwo)) must be(Some(SectionCompleted))
+      result.get(BondsDisposalProgress(srn, bondIndexOne, disposalIndexTwo)) must be(Some(SectionCompleted))
     }
 
     "cleanup other fields when removing a disposal but there are disposals for other bonds" in {
@@ -104,12 +104,12 @@ class HowWereBondsDisposedOfPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne), Transferred)
         .unsafeSet(BondsStillHeldPage(srn, bondIndexOne, disposalIndexOne), bondsStillHeld)
         .unsafeSet(BondsDisposalCYAPointOfEntry(srn, bondIndexOne, disposalIndexOne), NoPointOfEntry)
-        .unsafeSet(BondsDisposalCompletedPage(srn, bondIndexOne, disposalIndexOne), SectionCompleted)
+        .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne), SectionCompleted)
         // Disposal for Bond 2
         .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexTwo, disposalIndexOne), Other(otherDetails))
         .unsafeSet(BondsStillHeldPage(srn, bondIndexTwo, disposalIndexOne), bondsStillHeld)
         .unsafeSet(BondsDisposalCYAPointOfEntry(srn, bondIndexTwo, disposalIndexOne), NoPointOfEntry)
-        .unsafeSet(BondsDisposalCompletedPage(srn, bondIndexTwo, disposalIndexOne), SectionCompleted)
+        .unsafeSet(BondsDisposalProgress(srn, bondIndexTwo, disposalIndexOne), SectionCompleted)
 
       val result = userAnswers.remove(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne)).success.value
 
@@ -118,12 +118,12 @@ class HowWereBondsDisposedOfPageSpec extends PageBehaviours with TestValues {
       result.get(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne)) must be(empty)
       result.get(BondsStillHeldPage(srn, bondIndexOne, disposalIndexOne)) must be(empty)
       result.get(BondsDisposalCYAPointOfEntry(srn, bondIndexOne, disposalIndexOne)) must be(empty)
-      result.get(BondsDisposalCompletedPage(srn, bondIndexOne, disposalIndexOne)) must be(empty)
+      result.get(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne)) must be(empty)
       // Disposal for Bond 2
       result.get(HowWereBondsDisposedOfPage(srn, bondIndexTwo, disposalIndexOne)) must be(Some(Other(otherDetails)))
       result.get(BondsStillHeldPage(srn, bondIndexTwo, disposalIndexOne)) must be(Some(bondsStillHeld))
       result.get(BondsDisposalCYAPointOfEntry(srn, bondIndexTwo, disposalIndexOne)) must be(Some(NoPointOfEntry))
-      result.get(BondsDisposalCompletedPage(srn, bondIndexTwo, disposalIndexOne)) must be(Some(SectionCompleted))
+      result.get(BondsDisposalProgress(srn, bondIndexTwo, disposalIndexOne)) must be(Some(SectionCompleted))
     }
 
     "cleanup relevant fields when changing the answer on this page in CheckMode" in {
@@ -137,7 +137,7 @@ class HowWereBondsDisposedOfPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(IsBuyerConnectedPartyPage(srn, bondIndexOne, disposalIndexOne), true)
         .unsafeSet(BondsStillHeldPage(srn, bondIndexOne, disposalIndexOne), bondsStillHeld)
         .unsafeSet(BondsDisposalCYAPointOfEntry(srn, bondIndexOne, disposalIndexOne), NoPointOfEntry)
-        .unsafeSet(BondsDisposalCompletedPage(srn, bondIndexOne, disposalIndexOne), SectionCompleted)
+        .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne), SectionCompleted)
 
       val result = userAnswers
         .set(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne), Transferred)
@@ -154,7 +154,7 @@ class HowWereBondsDisposedOfPageSpec extends PageBehaviours with TestValues {
       result.get(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne)) must be(Some(Transferred))
       result.get(BondsStillHeldPage(srn, bondIndexOne, disposalIndexOne)) must be(Some(bondsStillHeld))
       result.get(BondsDisposalCYAPointOfEntry(srn, bondIndexOne, disposalIndexOne)) must be(Some(NoPointOfEntry))
-      result.get(BondsDisposalCompletedPage(srn, bondIndexOne, disposalIndexOne)) must be(Some(SectionCompleted))
+      result.get(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne)) must be(Some(SectionCompleted))
     }
   }
 }

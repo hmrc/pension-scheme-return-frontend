@@ -14,30 +14,9 @@
  * limitations under the License.
  */
 
-package models
+package pages.nonsipp.bondsdisposal
 
-import play.api.mvc.JavascriptLiteral
+import pages.Page
+import models.SchemeId.Srn
 
-sealed trait Mode {
-
-  val isNormalMode: Boolean
-  def fold[A](normal: => A, check: => A): A = this match {
-    case CheckMode => check
-    case NormalMode => normal
-  }
-}
-
-case object CheckMode extends Mode {
-  val isNormalMode: Boolean = false
-}
-case object NormalMode extends Mode {
-  val isNormalMode: Boolean = true
-}
-
-object Mode {
-
-  implicit val jsLiteral: JavascriptLiteral[Mode] = {
-    case NormalMode => "NormalMode"
-    case CheckMode => "CheckMode"
-  }
-}
+case class BondsDisposalCYAPage(srn: Srn) extends Page

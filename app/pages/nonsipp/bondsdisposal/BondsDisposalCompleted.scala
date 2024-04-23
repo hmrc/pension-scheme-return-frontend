@@ -14,30 +14,16 @@
  * limitations under the License.
  */
 
-package models
+package pages.nonsipp.bondsdisposal
 
-import play.api.mvc.JavascriptLiteral
+import pages.QuestionPage
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import viewmodels.models.SectionCompleted
 
-sealed trait Mode {
+case class BondsDisposalCompleted(srn: Srn) extends QuestionPage[SectionCompleted] {
 
-  val isNormalMode: Boolean
-  def fold[A](normal: => A, check: => A): A = this match {
-    case CheckMode => check
-    case NormalMode => normal
-  }
-}
+  override def path: JsPath = JsPath \ toString
 
-case object CheckMode extends Mode {
-  val isNormalMode: Boolean = false
-}
-case object NormalMode extends Mode {
-  val isNormalMode: Boolean = true
-}
-
-object Mode {
-
-  implicit val jsLiteral: JavascriptLiteral[Mode] = {
-    case NormalMode => "NormalMode"
-    case CheckMode => "CheckMode"
-  }
+  override def toString: String = "bondsDisposalJourneyCompleted"
 }

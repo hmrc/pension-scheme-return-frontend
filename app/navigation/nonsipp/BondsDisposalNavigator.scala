@@ -43,7 +43,7 @@ object BondsDisposalNavigator extends JourneyNavigator {
       (
         for {
           indexes <- userAnswers
-            .map(BondsDisposalCompleted.all(srn, bondIndex))
+            .map(BondsDisposalProgress.all(srn, bondIndex))
             .keys
             .toList
             .traverse(_.toIntOption)
@@ -83,7 +83,7 @@ object BondsDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
         .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
 
-    case BondsDisposalCompletedPage(srn, _, _) =>
+    case BondsDisposalCYAPage(srn) =>
       controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
         .onPageLoad(srn, page = 1)
 
@@ -164,7 +164,7 @@ object BondsDisposalNavigator extends JourneyNavigator {
           controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
             .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
 
-        case BondsDisposalCompletedPage(srn, _, _) =>
+        case BondsDisposalCYAPage(srn) =>
           controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
             .onPageLoad(srn, page = 1)
 

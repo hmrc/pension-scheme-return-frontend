@@ -35,7 +35,8 @@ import models.HowDisposed._
 import views.html.RadioListView
 import models.SchemeId.Srn
 import play.api.i18n.MessagesApi
-import pages.nonsipp.bondsdisposal.{BondsDisposalCYAPointOfEntry, HowWereBondsDisposedOfPage}
+import pages.nonsipp.bondsdisposal.{BondsDisposalCYAPointOfEntry, BondsDisposalCompleted, HowWereBondsDisposedOfPage}
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -93,7 +94,11 @@ class HowWereBondsDisposedOfController @Inject()(
           value => {
             val page = HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex)
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+              updatedAnswers <- request.userAnswers
+                .set(page, value)
+                // remove completed flag in NormalMode as we assume a new journey has started
+                .removeWhen(mode.isNormalMode)(BondsDisposalCompleted(srn))
+                .mapK[Future]
               hasAnswerChanged = request.userAnswers.exists(page)(_ == value)
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(

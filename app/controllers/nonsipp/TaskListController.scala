@@ -427,6 +427,7 @@ object TaskListController {
   private def bondsSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.bonds"
     val (bondStatus, bondLink) = getBondsTaskListStatusAndLink(userAnswers, srn)
+    val (disposalStatus, disposalLink) = getBondsDisposalsTaskListStatusWithLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -439,10 +440,10 @@ object TaskListController {
       ),
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "bondsdisposal.title", NotStarted),
-          controllers.nonsipp.bondsdisposal.routes.BondsDisposalController.onPageLoad(srn, NormalMode).url
+          messageKey(prefix, "bondsdisposal.title", disposalStatus),
+          disposalLink
         ),
-        NotStarted
+        disposalStatus
       )
     )
   }

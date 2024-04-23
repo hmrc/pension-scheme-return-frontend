@@ -229,7 +229,7 @@ class BondTransactionsTransformer @Inject() extends Transformer {
 
               for {
                 disposalUA0 <- disposalUA
-                disposalUA1 <- disposalUA0.set(BondsDisposalCompletedPage(srn, index, disposalIndex), SectionCompleted)
+                disposalUA1 <- disposalUA0.set(BondsDisposalProgress(srn, index, disposalIndex), SectionCompleted)
                 disposalUA2 <- disposalUA1.set(howWereBondsDisposed._1, howWereBondsDisposed._2)
                 disposalUA3 <- disposalUA2.set(totalNowHeld._1, totalNowHeld._2)
                 disposalUA4 <- optWhenWereBondsSoldPage
