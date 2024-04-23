@@ -16,14 +16,29 @@
 
 package pages.nonsipp.memberreceivedpcls
 
+import utils.PageUtils
+import queries.Removable
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import models.UserAnswers
 import pages.QuestionPage
 import pages.nonsipp.memberreceivedpcls.Paths.memberDetails
+
+import scala.util.Try
 
 case class PensionCommencementLumpSumPage(srn: Srn) extends QuestionPage[Boolean] {
 
   override def path: JsPath = memberDetails \ toString
 
   override def toString: String = "lumpSumReceived"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value, userAnswers.get(this)) match {
+      case (Some(false), Some(true)) => PageUtils.removePages(userAnswers, pages(srn))
+      case _ => Try(userAnswers)
+    }
+
+  private def pages(srn: Srn): List[Removable[_]] =
+    List(AllPensionCommencementLumpSumAmountPages(srn))
+
 }

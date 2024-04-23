@@ -16,7 +16,10 @@
 
 package pages
 
-import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumPage
+import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
+import eu.timepit.refined.refineMV
+import utils.UserAnswersUtils.UserAnswersOps
+import models.{PensionCommencementLumpSum, UserAnswers}
 import pages.behaviours.PageBehaviours
 
 class PensionCommencementLumpSumPageSpec extends PageBehaviours {
@@ -30,5 +33,38 @@ class PensionCommencementLumpSumPageSpec extends PageBehaviours {
     beSettable[Boolean](PensionCommencementLumpSumPage(srn))
 
     beRemovable[Boolean](PensionCommencementLumpSumPage(srn))
+
+    "cleanup" - {
+
+      val userAnswers =
+        UserAnswers("id")
+          .unsafeSet(PensionCommencementLumpSumPage(srn), true)
+          .unsafeSet(
+            PensionCommencementLumpSumAmountPage(srn, refineMV(1)),
+            PensionCommencementLumpSum(moneyGen.sample.value, moneyGen.sample.value)
+          )
+          .unsafeSet(
+            PensionCommencementLumpSumAmountPage(srn, refineMV(2)),
+            PensionCommencementLumpSum(moneyGen.sample.value, moneyGen.sample.value)
+          )
+
+      List(Some(true), None).foreach { answer =>
+        s"retain pcls amount values when answer is $answer" in {
+
+          val result = PensionCommencementLumpSumPage(srn).cleanup(answer, userAnswers).toOption.value
+
+          result.get(PensionCommencementLumpSumAmountPage(srn, refineMV(1))) must not be None
+          result.get(PensionCommencementLumpSumAmountPage(srn, refineMV(2))) must not be None
+        }
+      }
+
+      "remove all pcl amount values when answer is Some(false)" in {
+
+        val result = PensionCommencementLumpSumPage(srn).cleanup(Some(false), userAnswers).toOption.value
+
+        result.get(PensionCommencementLumpSumAmountPage(srn, refineMV(1))) mustBe None
+        result.get(PensionCommencementLumpSumAmountPage(srn, refineMV(2))) mustBe None
+      }
+    }
   }
 }

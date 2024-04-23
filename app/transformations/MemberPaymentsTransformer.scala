@@ -166,14 +166,11 @@ class MemberPaymentsTransformer @Inject()(
                 index,
                 memberPayments.lumpSumReceived,
                 memberDetails.memberLumpSumReceived
-              ) ++ memberDetails.benefitsSurrendered.fold(noUpdate)(
-                benefitsSurrendered =>
-                  pensionSurrenderTransformer.transformFromEtmp(
-                    srn,
-                    index,
-                    benefitsSurrendered,
-                    memberPayments.benefitsSurrenderedDetails
-                  )
+              ) ++ pensionSurrenderTransformer.transformFromEtmp(
+                srn,
+                index,
+                memberDetails.benefitsSurrendered,
+                memberPayments.benefitsSurrenderedDetails
               ) ++ memberDetails.pensionAmountReceived.fold(noUpdate)(
                 pensionAmountReceivedPages(srn, index, _)
               )
@@ -322,7 +319,11 @@ class MemberPaymentsTransformer @Inject()(
       _.set(EmployerContributionsMemberListPage(srn), employerContributionsDetails.completed),
       _.set(
         EmployerContributionsSectionStatus(srn),
-        if (employerContributionsDetails.completed) SectionStatus.Completed else SectionStatus.InProgress
+        (employerContributionsDetails.made, employerContributionsDetails.completed) match {
+          case (false, _) => SectionStatus.Completed
+          case (true, _) if employerContributionsDetails.completed => SectionStatus.Completed
+          case (true, _) if !employerContributionsDetails.completed => SectionStatus.InProgress
+        }
       )
     )
   }

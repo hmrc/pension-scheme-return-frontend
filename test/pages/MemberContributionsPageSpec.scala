@@ -16,7 +16,10 @@
 
 package pages
 
-import pages.nonsipp.membercontributions.MemberContributionsPage
+import pages.nonsipp.membercontributions.{MemberContributionsPage, TotalMemberContributionPage}
+import eu.timepit.refined.refineMV
+import utils.UserAnswersUtils.UserAnswersOps
+import models.UserAnswers
 import pages.behaviours.PageBehaviours
 
 class MemberContributionsPageSpec extends PageBehaviours {
@@ -30,5 +33,33 @@ class MemberContributionsPageSpec extends PageBehaviours {
     beSettable[Boolean](MemberContributionsPage(srn))
 
     beRemovable[Boolean](MemberContributionsPage(srn))
+
+    "cleanup" - {
+
+      val userAnswers =
+        UserAnswers("id")
+          .unsafeSet(MemberContributionsPage(srn), true)
+          .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), moneyGen.sample.value)
+          .unsafeSet(TotalMemberContributionPage(srn, refineMV(2)), moneyGen.sample.value)
+
+      List(Some(true), None).foreach { answer =>
+        s"retain total member contributions when answer is $answer" in {
+
+          val result = MemberContributionsPage(srn).cleanup(answer, userAnswers).toOption.value
+
+          result.get(TotalMemberContributionPage(srn, refineMV(1))) must not be None
+          result.get(TotalMemberContributionPage(srn, refineMV(2))) must not be None
+        }
+      }
+
+      "remove all total member contributions when answer is Some(false)" in {
+
+        val result = MemberContributionsPage(srn).cleanup(Some(false), userAnswers).toOption.value
+
+        result.get(TotalMemberContributionPage(srn, refineMV(1))) mustBe None
+        result.get(TotalMemberContributionPage(srn, refineMV(2))) mustBe None
+      }
+    }
+
   }
 }

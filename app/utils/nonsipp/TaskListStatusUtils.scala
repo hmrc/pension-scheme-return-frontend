@@ -23,12 +23,12 @@ import pages.nonsipp.otherassetsheld._
 import config.Refined.{Max5000, OneTo5000}
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
+import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInJourneyStatus}
 import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
-import eu.timepit.refined.{refineMV, refineV}
 import pages.nonsipp.sharesdisposal._
+import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
 import models._
 import pages.nonsipp.loansmadeoroutstanding._
-import viewmodels.models.{SectionStatus, TaskListStatus}
 import pages.nonsipp.otherassetsdisposal.{
   OtherAssetsDisposalCompleted,
   OtherAssetsDisposalPage,
@@ -38,10 +38,17 @@ import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowMan
 import pages.nonsipp.bonds._
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import pages.nonsipp.membercontributions._
+import pages.nonsipp.memberreceivedpcls.{PclsMemberListPage, PensionCommencementLumpSumPage}
+import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, PensionPaymentsReceivedPage}
+import eu.timepit.refined.{refineMV, refineV}
 import viewmodels.models.TaskListStatus.{TaskListStatus, _}
 import pages.nonsipp.common.IdentityTypes
+import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutJourneyStatus}
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
 import pages.nonsipp.bondsdisposal.{BondsDisposalCompletedPages, BondsDisposalPage}
+import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
+import viewmodels.models.{SectionStatus, TaskListStatus}
 
 object TaskListStatusUtils {
 
@@ -201,6 +208,279 @@ object TaskListStatusUtils {
 
     }
     (status, link)
+  }
+
+  def getTransferInStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val status = userAnswers.get(TransfersInJourneyStatus(srn))
+    val wereTransfersIn = userAnswers.get(DidSchemeReceiveTransferPage(srn))
+    (wereTransfersIn, status) match {
+      case (None, None) =>
+        (
+          getNotStartedOrCannotStartYetStatus(userAnswers, srn),
+          controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      case (Some(false), _) =>
+        (
+          Completed,
+          controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      case (Some(true), None) =>
+        (
+          InProgress,
+          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+      case (Some(true), Some(SectionStatus.InProgress)) =>
+        (
+          InProgress,
+          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+      case (Some(true), Some(SectionStatus.Completed)) =>
+        (
+          Completed,
+          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+    }
+  }
+
+  def getTransferOutStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val status = userAnswers.get(TransfersOutJourneyStatus(srn))
+    val wereTransfersIn = userAnswers.get(SchemeTransferOutPage(srn))
+    (wereTransfersIn, status) match {
+      case (None, None) =>
+        (
+          getNotStartedOrCannotStartYetStatus(userAnswers, srn),
+          controllers.nonsipp.membertransferout.routes.SchemeTransferOutController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      case (Some(false), _) =>
+        (
+          Completed,
+          controllers.nonsipp.membertransferout.routes.SchemeTransferOutController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      case (Some(true), None) =>
+        (
+          InProgress,
+          controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+      case (Some(true), Some(SectionStatus.InProgress)) =>
+        (
+          InProgress,
+          controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+      case (Some(true), Some(SectionStatus.Completed)) =>
+        (
+          Completed,
+          controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+    }
+  }
+
+  def getSurrenderedBenefitsStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val status = userAnswers.get(SurrenderedBenefitsJourneyStatus(srn))
+    val wereSurrenderedBenefits = userAnswers.get(SurrenderedBenefitsPage(srn))
+    (wereSurrenderedBenefits, status) match {
+      case (None, None) =>
+        (
+          getNotStartedOrCannotStartYetStatus(userAnswers, srn),
+          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      case (Some(false), _) =>
+        (
+          Completed,
+          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      case (Some(true), None) =>
+        (
+          InProgress,
+          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+      case (Some(true), Some(SectionStatus.InProgress)) =>
+        (
+          InProgress,
+          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+      case (Some(true), Some(SectionStatus.Completed)) =>
+        (
+          Completed,
+          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+    }
+  }
+
+  def getMemberContributionStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val wereContributions = userAnswers.get(MemberContributionsPage(srn))
+    val memberContributionsListPage = userAnswers.get(MemberContributionsListPage(srn))
+
+    (wereContributions, memberContributionsListPage) match {
+      case (None, None) =>
+        (
+          getNotStartedOrCannotStartYetStatus(userAnswers, srn),
+          controllers.nonsipp.membercontributions.routes.MemberContributionsController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      case (Some(false), _) =>
+        (
+          Completed,
+          controllers.nonsipp.membercontributions.routes.MemberContributionsController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      case (Some(true), Some(true)) =>
+        (
+          Completed,
+          controllers.nonsipp.membercontributions.routes.MemberContributionListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+      case (Some(true), _) =>
+        (
+          InProgress,
+          controllers.nonsipp.membercontributions.routes.MemberContributionListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+    }
+  }
+
+  def getPclsStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val wereContributions = userAnswers.get(PensionCommencementLumpSumPage(srn))
+    val listPage = userAnswers.get(PclsMemberListPage(srn))
+
+    (wereContributions, listPage) match {
+      case (None, None) =>
+        (
+          getNotStartedOrCannotStartYetStatus(userAnswers, srn),
+          controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      case (Some(false), _) =>
+        (
+          Completed,
+          controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      case (Some(true), Some(true)) =>
+        (
+          Completed,
+          controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+      case (Some(true), _) =>
+        (
+          InProgress,
+          controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+    }
+  }
+
+  def getPensionPaymentsStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val werePensionPayments = userAnswers.get(PensionPaymentsReceivedPage(srn))
+    val listPage = userAnswers.get(MemberPensionPaymentsListPage(srn))
+
+    (werePensionPayments, listPage) match {
+      case (None, None) =>
+        (
+          getNotStartedOrCannotStartYetStatus(userAnswers, srn),
+          controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      case (Some(false), _) =>
+        (
+          Completed,
+          controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      case (Some(true), Some(true)) =>
+        (
+          Completed,
+          controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+      case (Some(true), _) =>
+        (
+          InProgress,
+          controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+    }
+  }
+
+  def getUnallocatedContributionsStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
+      .onPageLoad(srn, NormalMode)
+      .url
+    val wereUnallocatedContributions = userAnswers.get(UnallocatedEmployerContributionsPage(srn))
+    val amount = userAnswers.get(UnallocatedEmployerAmountPage(srn))
+
+    (wereUnallocatedContributions, amount) match {
+      case (None, None) =>
+        (
+          getNotStartedOrCannotStartYetStatus(userAnswers, srn),
+          controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      case (Some(false), _) =>
+        (
+          Completed,
+          controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      case (Some(true), Some(_)) =>
+        (
+          Completed,
+          controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+            .onPageLoad(srn, CheckOrChange.Check)
+            .url
+        )
+      case (Some(true), None) =>
+        (
+          InProgress,
+          controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+            .onPageLoad(srn, CheckOrChange.Check)
+            .url
+        )
+    }
   }
   def getLandOrPropertyTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val heldPageUrl =

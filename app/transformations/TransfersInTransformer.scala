@@ -70,19 +70,20 @@ class TransfersInTransformer @Inject() extends Transformer {
                 TransfersInSectionCompleted(srn, index, secondaryIndex),
                 SectionCompleted
               ),
-              _.set(DidSchemeReceiveTransferPage(srn), transfersIn.nonEmpty),
-              _.set(TransferReceivedMemberListPage(srn), transfersInCompleted),
               _.set(TransferringSchemeNamePage(srn, index, secondaryIndex), transferIn.schemeName),
               _.set(WhenWasTransferReceivedPage(srn, index, secondaryIndex), transferIn.dateOfTransfer),
               _.set(TotalValueTransferPage(srn, index, secondaryIndex), Money(transferIn.transferValue)),
               _.set(DidTransferIncludeAssetPage(srn, index, secondaryIndex), transferIn.transferIncludedAsset),
               _.set(TransferringSchemeTypePage(srn, index, secondaryIndex), transferIn.transferSchemeType),
-              _.set(ReportAnotherTransferInPage(srn, index, secondaryIndex), false),
-              _.set(
-                TransfersInJourneyStatus(srn),
-                if (transfersInCompleted) SectionStatus.Completed else SectionStatus.InProgress
-              )
+              _.set(ReportAnotherTransferInPage(srn, index, secondaryIndex), false)
             )
         }
-    }
+    } ++ List(
+      _.set(DidSchemeReceiveTransferPage(srn), transfersIn.nonEmpty),
+      _.set(TransferReceivedMemberListPage(srn), transfersInCompleted),
+      _.set(
+        TransfersInJourneyStatus(srn),
+        if (transfersInCompleted) SectionStatus.Completed else SectionStatus.InProgress
+      )
+    )
 }

@@ -46,19 +46,38 @@ class PensionSurrenderTransformer @Inject() extends Transformer {
   def transformFromEtmp(
     srn: Srn,
     index: Max300,
-    pensionSurrender: PensionSurrender,
+    optPensionSurrender: Option[PensionSurrender],
     pensionSurrenderDetails: SectionDetails
   ): List[Try[UserAnswers] => Try[UserAnswers]] =
-    List[Try[UserAnswers] => Try[UserAnswers]](
-      _.set(SurrenderedBenefitsCompletedPage(srn, index), SectionCompleted),
-      _.set(
-        SurrenderedBenefitsJourneyStatus(srn),
-        if (pensionSurrenderDetails.completed) SectionStatus.Completed else SectionStatus.InProgress
-      ),
-      _.set(SurrenderedBenefitsMemberListPage(srn), pensionSurrenderDetails.completed),
-      _.set(SurrenderedBenefitsPage(srn), pensionSurrenderDetails.made),
-      _.set(SurrenderedBenefitsAmountPage(srn, index), Money(pensionSurrender.totalSurrendered)),
-      _.set(WhenDidMemberSurrenderBenefitsPage(srn, index), pensionSurrender.dateOfSurrender),
-      _.set(WhyDidMemberSurrenderBenefitsPage(srn, index), pensionSurrender.surrenderReason)
-    )
+    optPensionSurrender.fold(
+      List[Try[UserAnswers] => Try[UserAnswers]](
+        _.set(SurrenderedBenefitsPage(srn), pensionSurrenderDetails.made),
+        _.set(SurrenderedBenefitsCompletedPage(srn, index), SectionCompleted),
+        _.set(
+          SurrenderedBenefitsJourneyStatus(srn),
+          (pensionSurrenderDetails.made, pensionSurrenderDetails.completed) match {
+            case (false, _) => SectionStatus.Completed
+            case (true, _) if pensionSurrenderDetails.completed => SectionStatus.Completed
+            case (true, _) if !pensionSurrenderDetails.completed => SectionStatus.InProgress
+          }
+        )
+      )
+    ) { pensionSurrender =>
+      List[Try[UserAnswers] => Try[UserAnswers]](
+        _.set(SurrenderedBenefitsCompletedPage(srn, index), SectionCompleted),
+        _.set(
+          SurrenderedBenefitsJourneyStatus(srn),
+          (pensionSurrenderDetails.made, pensionSurrenderDetails.completed) match {
+            case (false, _) => SectionStatus.Completed
+            case (true, _) if pensionSurrenderDetails.completed => SectionStatus.Completed
+            case (true, _) if !pensionSurrenderDetails.completed => SectionStatus.InProgress
+          }
+        ),
+        _.set(SurrenderedBenefitsMemberListPage(srn), pensionSurrenderDetails.completed),
+        _.set(SurrenderedBenefitsPage(srn), pensionSurrenderDetails.made),
+        _.set(SurrenderedBenefitsAmountPage(srn, index), Money(pensionSurrender.totalSurrendered)),
+        _.set(WhenDidMemberSurrenderBenefitsPage(srn, index), pensionSurrender.dateOfSurrender),
+        _.set(WhyDidMemberSurrenderBenefitsPage(srn, index), pensionSurrender.surrenderReason)
+      )
+    }
 }
