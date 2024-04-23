@@ -16,15 +16,14 @@
 
 package controllers.nonsipp
 
-import play.api.libs.json.Writes._
-import services.{SaveService, SchemeDateService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.FrontendAppConfig
-import cats.implicits.toShow
+import cats.implicits.{catsSyntaxTuple2Semigroupal, toShow}
+import config.Constants.{RETURN_PERIODS, SUBMISSION_DATE}
 import controllers.actions._
-import pages.nonsipp.ReturnSubmittedPage
-import models.requests.DataRequest
+import play.api.libs.json.Json
+import models.requests.psr.MinimalRequiredSubmission.nonEmptyListFormat
 import controllers.nonsipp.ReturnSubmittedController._
 import cats.data.NonEmptyList
 import views.html.SubmissionView
@@ -40,51 +39,41 @@ import viewmodels.models.SubmissionViewModel
 import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class ReturnSubmittedController @Inject()(
   override val messagesApi: MessagesApi,
-  identifyAndRequireData: IdentifyAndRequireData,
-  saveService: SaveService,
+  identify: IdentifierAction,
+  allowAccess: AllowAccessActionProvider,
   view: SubmissionView,
-  dateService: SchemeDateService,
   config: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    dateService.returnPeriods(srn) match {
-      case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      case Some(returnPeriods) =>
-        getOrSaveSubmissionDate(srn).map { submissionDate =>
+  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identify.andThen(allowAccess(srn)).async {
+    implicit request =>
+      (request.session.get(RETURN_PERIODS), request.session.get(SUBMISSION_DATE))
+        .mapN { (returnPeriods, submissionDate) =>
           Ok(
             view(
               viewModel(
                 request.schemeDetails.schemeName,
                 request.minimalDetails.email,
-                returnPeriods,
-                submissionDate,
+                Json.parse(returnPeriods).as[NonEmptyList[DateRange]],
+                LocalDateTime.parse(submissionDate, DateTimeFormatter.ISO_DATE_TIME),
                 config.urls.pensionSchemeEnquiry,
                 config.urls.managePensionsSchemes.dashboard
               )
             )
           )
         }
-    }
+        .fold(
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        )(res => Future(res))
   }
-
-  private def getOrSaveSubmissionDate(srn: Srn)(implicit request: DataRequest[_]): Future[LocalDateTime] =
-    request.userAnswers.get(ReturnSubmittedPage(srn)) match {
-      case Some(submissionDate) => Future.successful(submissionDate)
-      case None =>
-        val submissionDate = dateService.now()
-        for {
-          updatedUserAnswers <- Future.fromTry(request.userAnswers.set(ReturnSubmittedPage(srn), submissionDate))
-          _ <- saveService.save(updatedUserAnswers)
-        } yield submissionDate
-    }
 }
 
 object ReturnSubmittedController {

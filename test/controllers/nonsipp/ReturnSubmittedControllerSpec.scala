@@ -16,24 +16,23 @@
 
 package controllers.nonsipp
 
-import services.SchemeDateService
-import controllers.ControllerBaseSpec
-import play.api.inject.bind
-import pages.nonsipp.ReturnSubmittedPage
-import models.DateRange
-import viewmodels.models.SubmissionViewModel
-import play.api.inject.guice.GuiceableModule
-import org.mockito.Mockito.{reset, when}
 import cats.data.NonEmptyList
-import views.html.SubmissionView
+import config.Constants.{RETURN_PERIODS, SUBMISSION_DATE}
+import controllers.ControllerBaseSpec
 import controllers.nonsipp.ReturnSubmittedController.viewModel
-import org.mockito.ArgumentMatchers.any
+import models.DateRange
+import models.requests.psr.MinimalRequiredSubmission.nonEmptyListFormat
+import play.api.libs.json.Json
+import play.api.test.FakeRequest
+import viewmodels.models.SubmissionViewModel
+import views.html.SubmissionView
 
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class ReturnSubmittedControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.ReturnSubmittedController.onPageLoad(srn)
+  private lazy val onPageLoad = routes.ReturnSubmittedController.onPageLoad(srn).url
 
   private val returnPeriod1 = dateRangeGen.sample.value
   private val returnPeriod2 = dateRangeGen.sample.value
@@ -44,19 +43,34 @@ class ReturnSubmittedControllerSpec extends ControllerBaseSpec {
     "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/pension-scheme-enquiries"
   private val mpsDashboardUrl = "http://localhost:8204/manage-pension-schemes/overview"
 
-  private val mockDateService = mock[SchemeDateService]
-
-  override val additionalBindings: List[GuiceableModule] =
-    List(
-      bind[SchemeDateService].toInstance(mockDateService)
-    )
-
-  override def beforeEach(): Unit = {
-    reset(mockDateService)
-    when(mockDateService.now()).thenReturn(submissionDateTime)
-  }
-
   "ReturnSubmittedController" - {
+
+    "onPageLoads redirects when both required data not found in session" in runningApplication { implicit app =>
+      val request = FakeRequest(GET, onPageLoad)
+
+      val result = route(app, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+    }
+
+    "onPageLoads redirects when SUBMISSION_DATE data not found in session" in runningApplication { implicit app =>
+      val request = FakeRequest(GET, onPageLoad).withSession((RETURN_PERIODS, "stub-return-periods"))
+
+      val result = route(app, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+    }
+
+    "onPageLoads redirects when RETURN_PERIODS data not found in session" in runningApplication { implicit app =>
+      val request = FakeRequest(GET, onPageLoad).withSession((SUBMISSION_DATE, "stub-submission-date"))
+
+      val result = route(app, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+    }
 
     List(
       ("tax year return period", NonEmptyList.one(returnPeriod1)),
@@ -64,29 +78,24 @@ class ReturnSubmittedControllerSpec extends ControllerBaseSpec {
       ("multiple accounting periods", NonEmptyList.of(returnPeriod1, returnPeriod2, returnPeriod3))
     ).foreach {
       case (testName, returnPeriods) =>
-        s"on arriving to page but tax year or accounting periods are not set - $testName" - {
-          act.like(
-            redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad())
-              .before(setReturnPeriods(None))
+        s"on arriving to page for the first time - $testName" in runningApplication { implicit app =>
+          val view = injected[SubmissionView]
+          val request = FakeRequest(GET, onPageLoad)
+            .withSession((RETURN_PERIODS, Json.prettyPrint(Json.toJson(returnPeriods))))
+            .withSession((SUBMISSION_DATE, submissionDateTime.format(DateTimeFormatter.ISO_DATE_TIME)))
+
+          val result = route(app, request).value
+          val expectedView = view(buildViewModel(returnPeriods, submissionDateTime))(
+            request,
+            createMessages(app)
           )
-        }
 
-        s"on arriving to page for the first time - $testName" - {
-          act.like(renderView(onPageLoad) { implicit app => implicit request =>
-            injected[SubmissionView].apply(buildViewModel(returnPeriods, submissionDateTime))
-          }.before(setReturnPeriods(Some(returnPeriods))))
-        }
-
-        s"on return to page, showing initial submission date - $testName" - {
-          val initialSubmissionDateTime = localDateTimeGen.sample.value
-          act.like(renderPrePopView(onPageLoad, ReturnSubmittedPage(srn), initialSubmissionDateTime) {
-            implicit app => implicit request =>
-              injected[SubmissionView].apply(buildViewModel(returnPeriods, initialSubmissionDateTime))
-          }.before(setReturnPeriods(Some(returnPeriods))))
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual expectedView.toString
         }
     }
 
-    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
+    act.like(journeyRecoveryPage(routes.ReturnSubmittedController.onPageLoad(srn)).updateName("onPageLoad" + _))
   }
 
   private def buildViewModel(
@@ -101,7 +110,4 @@ class ReturnSubmittedControllerSpec extends ControllerBaseSpec {
       pensionSchemeEnquiriesUrl,
       mpsDashboardUrl
     )
-
-  private def setReturnPeriods(periods: Option[NonEmptyList[DateRange]]) =
-    when(mockDateService.returnPeriods(any())(any())).thenReturn(periods)
 }

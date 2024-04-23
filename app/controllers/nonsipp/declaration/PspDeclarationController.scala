@@ -16,15 +16,16 @@
 
 package controllers.nonsipp.declaration
 
-import services.{PsrSubmissionService, SaveService}
+import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
+import config.Constants.{RETURN_PERIODS, SUBMISSION_DATE}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
-import models.NormalMode
+import models.{NormalMode, UserAnswers}
 import play.api.data.Form
 import views.html.PsaIdInputView
 import models.SchemeId.Srn
@@ -43,6 +44,7 @@ class PspDeclarationController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   saveService: SaveService,
+  schemeDateService: SchemeDateService,
   psrSubmissionService: PsrSubmissionService,
   formProvider: TextFormProvider,
   view: PsaIdInputView
@@ -78,15 +80,15 @@ class PspDeclarationController @Inject()(
           answer => {
             for {
               updatedAnswers <- Future
-                .fromTry(
-                  request.userAnswers
-                    .set(PspDeclarationPage(srn), answer)
-                )
+                .fromTry(request.userAnswers.set(PspDeclarationPage(srn), answer))
               _ <- saveService.save(updatedAnswers)
-              submissionResult <- psrSubmissionService.submitPsrDetails(srn = srn, isSubmitted = true)
-            } yield submissionResult.getOrRecoverJourney(
-              _ => Redirect(navigator.nextPage(PspDeclarationPage(srn), NormalMode, request.userAnswers))
-            )
+              _ <- psrSubmissionService.submitPsrDetails(srn = srn, isSubmitted = true)
+              _ <- saveService.save(UserAnswers(request.userAnswers.id))
+            } yield {
+              Redirect(navigator.nextPage(PspDeclarationPage(srn), NormalMode, request.userAnswers))
+                .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
+                .addingToSession((SUBMISSION_DATE, schemeDateService.submissionDateAsString(schemeDateService.now())))
+            }
           }
         )
     }

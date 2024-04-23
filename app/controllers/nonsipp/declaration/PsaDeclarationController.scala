@@ -16,13 +16,14 @@
 
 package controllers.nonsipp.declaration
 
-import services.PsrSubmissionService
+import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import viewmodels.implicits._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import controllers.PSRController
+import config.Constants.{RETURN_PERIODS, SUBMISSION_DATE}
 import controllers.actions._
 import navigation.Navigator
-import models.NormalMode
+import models.{NormalMode, UserAnswers}
 import views.html.ContentPageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -39,8 +40,10 @@ class PsaDeclarationController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
+  schemeDateService: SchemeDateService,
   view: ContentPageView,
-  psrSubmissionService: PsrSubmissionService
+  psrSubmissionService: PsrSubmissionService,
+  saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController
     with I18nSupport {
@@ -53,10 +56,13 @@ class PsaDeclarationController @Inject()(
   def onSubmit(srn: Srn): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
-        submissionResult <- psrSubmissionService.submitPsrDetails(srn = srn, isSubmitted = true)
-      } yield submissionResult.getOrRecoverJourney(
-        _ => Redirect(navigator.nextPage(PsaDeclarationPage(srn), NormalMode, request.userAnswers))
-      )
+        _ <- psrSubmissionService.submitPsrDetails(srn = srn, isSubmitted = true)
+        _ <- saveService.save(UserAnswers(request.userAnswers.id))
+      } yield {
+        Redirect(navigator.nextPage(PsaDeclarationPage(srn), NormalMode, request.userAnswers))
+          .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
+          .addingToSession((SUBMISSION_DATE, schemeDateService.submissionDateAsString(schemeDateService.now())))
+      }
     }
 }
 
