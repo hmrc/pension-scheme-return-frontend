@@ -23,7 +23,6 @@ import play.api.mvc.{Call, Request}
 import play.twirl.api.Html
 import play.api.inject.bind
 import models.UserAnswers
-import play.api.test.CSRFTokenHelper.CSRFRequest
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
@@ -110,7 +109,7 @@ trait ControllerBehaviours {
     view: Application => Request[_] => Html
   ): Unit =
     running(_ => appBuilder) { app =>
-      val request = FakeRequest(call).withCSRFToken
+      val request = FakeRequest(call)
       val result = route(app, request).value
       val expectedView = view(app)(request)
 
