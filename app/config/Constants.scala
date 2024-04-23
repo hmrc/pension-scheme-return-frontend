@@ -23,6 +23,9 @@ object Constants {
   val psaEnrolmentKey = "HMRC-PODS-ORG"
   val pspEnrolmentKey = "HMRC-PODSPP-ORG"
 
+  val RETURN_PERIODS = "RETURN_PERIODS"
+  val SUBMISSION_DATE = "SUBMISSION_DATE"
+
   val psaIdKey = "PSAID"
   val pspIdKey = "PSPID"
 
@@ -70,9 +73,9 @@ object Constants {
   val maxCashInBank = 999999999.99
   val maxAssetValue = 999999999.99
   val maxPCLSAmount = 999999999.99
-  val minAssetValue = -999999999.99
+  val minAssetValue: Double = -999999999.99
   val maxMoneyValue = 999999999.99
-  val minMoneyValue = -999999999.99
+  val minMoneyValue: Double = -999999999.99
   val minPosMoneyValue = 0.01
   val zeroMoneyValue = 0.00
 
@@ -93,7 +96,7 @@ object Constants {
 
   val maxLoanPeriod = 999
   val minLoanPeriod = 1
-  val minPercentage = -999.99
+  val minPercentage: Double = -999.99
   val maxPercentage = 999.99
 
   val borrowMinPercentage = 0

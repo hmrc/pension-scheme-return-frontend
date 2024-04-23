@@ -20,16 +20,19 @@ import com.google.inject.ImplementedBy
 import config.Refined.{Max3, OneToThree}
 import eu.timepit.refined.refineV
 import pages.nonsipp.accountingperiod.AccountingPeriods
-import pages.nonsipp.WhichTaxYearPage
 import models.DateRange
+import models.requests.psr.MinimalRequiredSubmission.nonEmptyListFormat
 import models.requests.DataRequest
 import cats.data.NonEmptyList
 import models.SchemeId.Srn
+import pages.nonsipp.WhichTaxYearPage
+import play.api.libs.json.Json
 
 import java.time.{LocalDate, LocalDateTime, ZoneId}
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-class SchemeDateServiceImpl @Inject()() extends SchemeDateService {
+class SchemeDateServiceImpl @Inject() extends SchemeDateService {
 
   def now(): LocalDateTime = LocalDateTime.now(ZoneId.of("Europe/London"))
 
@@ -71,12 +74,15 @@ class SchemeDateServiceImpl @Inject()() extends SchemeDateService {
           }
           .map(Right(_))
     }
+  def returnPeriodsAsJsonString(srn: Srn)(implicit request: DataRequest[_]): String =
+    Json.prettyPrint(Json.toJson(returnPeriods(srn)))
 
-  private def accountingPeriod(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange] =
-    request.userAnswers.get(AccountingPeriods(srn)).flatMap(_.sorted.headOption)
+  def submissionDateAsString(localDateTime: LocalDateTime): String =
+    localDateTime.format(DateTimeFormatter.ISO_DATE_TIME)
 
   private def whichTaxYear(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange] =
     request.userAnswers.get(WhichTaxYearPage(srn))
+
 }
 
 @ImplementedBy(classOf[SchemeDateServiceImpl])
@@ -97,4 +103,8 @@ trait SchemeDateService {
   def taxYearOrAccountingPeriods(
     srn: Srn
   )(implicit request: DataRequest[_]): Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]
+
+  def returnPeriodsAsJsonString(srn: Srn)(implicit request: DataRequest[_]): String
+
+  def submissionDateAsString(localDateTime: LocalDateTime): String
 }

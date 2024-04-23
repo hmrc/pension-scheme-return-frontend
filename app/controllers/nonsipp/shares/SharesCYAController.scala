@@ -179,8 +179,8 @@ class SharesCYAController @Inject()(
           )
         _ <- saveService.save(updatedAnswers)
         redirectTo <- psrSubmissionService.submitPsrDetails(srn).map {
-          case None => (controllers.routes.JourneyRecoveryController.onPageLoad())
-          case Some(_) => (navigator.nextPage(SharesCYAPage(srn), NormalMode, request.userAnswers))
+          case None => controllers.routes.JourneyRecoveryController.onPageLoad()
+          case Some(_) => navigator.nextPage(SharesCYAPage(srn), NormalMode, request.userAnswers)
         }
       } yield Redirect(redirectTo)
     }

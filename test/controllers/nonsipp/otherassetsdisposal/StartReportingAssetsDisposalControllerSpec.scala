@@ -16,15 +16,14 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
+import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, WhatIsOtherAssetPage}
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsdisposal.StartReportingAssetsDisposalController.AssetData
-import controllers.nonsipp.otherassetsdisposal.StartReportingAssetsDisposalController._
+import views.html.ListRadiosView
+import controllers.nonsipp.otherassetsdisposal.StartReportingAssetsDisposalController.{AssetData, _}
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
-import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, WhatIsOtherAssetPage}
 import viewmodels.models.SectionCompleted
-import views.html.ListRadiosView
 
 class StartReportingAssetsDisposalControllerSpec extends ControllerBaseSpec {
 
