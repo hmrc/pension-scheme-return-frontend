@@ -24,7 +24,6 @@ import play.api.inject.bind
 import views.html.UploadView
 import controllers.nonsipp.memberdetails.UploadMemberDetailsController.viewModel
 import models.{DateRange, UpscanFileReference, UpscanInitiateResponse}
-import play.api.test.CSRFTokenHelper.CSRFRequest
 import play.api.data.FormError
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -71,7 +70,7 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
 
       val successCaptor: ArgumentCaptor[String] = ArgumentCaptor.forClass(classOf[String])
       val failureCaptor: ArgumentCaptor[String] = ArgumentCaptor.forClass(classOf[String])
-      val request = FakeRequest(onPageLoad).withCSRFToken
+      val request = FakeRequest(onPageLoad)
       route(app, request).value.futureValue
 
       verify(mockUploadService).initiateUpscan(any(), successCaptor.capture(), failureCaptor.capture())(any())
