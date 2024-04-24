@@ -55,7 +55,7 @@ object ValidationError {
   implicit val format: Format[ValidationError] = Json.format[ValidationError]
 
   def fromCell(cell: String, row: Int, errorType: ValidationErrorType, errorMessage: String): ValidationError =
-    ValidationError(cell + row, errorType: ValidationErrorType, errorMessage)
+    ValidationError(cell + (row + 1), errorType: ValidationErrorType, errorMessage)
 }
 
 case class UploadState(row: Int, previousNinos: List[Nino]) {

@@ -206,12 +206,12 @@ class MemberDetailsUploadValidator @Inject()(
             "memberDetails.lastName.upload.error.length",
             DateFormErrors(
               "memberDetails.dateOfBirth.upload.error.required.all",
-              "memberDetails.dateOfBirth.upload.error.required.day",
-              "memberDetails.dateOfBirth.upload.error.required.month",
-              "memberDetails.dateOfBirth.upload.error.required.year",
-              "memberDetails.dateOfBirth.upload.error.required.two",
+              "memberDetails.dateOfBirth.upload.error.format",
+              "memberDetails.dateOfBirth.upload.error.format",
+              "memberDetails.dateOfBirth.upload.error.format",
+              "memberDetails.dateOfBirth.upload.error.format",
               "memberDetails.dateOfBirth.upload.error.invalid.date",
-              "memberDetails.dateOfBirth.upload.error.invalid.characters",
+              "memberDetails.dateOfBirth.upload.error.format",
               List(
                 DateFormErrors
                   .failIfDateAfter(
@@ -269,7 +269,7 @@ class MemberDetailsUploadValidator @Inject()(
               dob.key.cell,
               row,
               ValidationErrorType.DateOfBirth,
-              messages("memberDetails.dateOfBirth.error.format")
+              messages("memberDetails.dateOfBirth.upload.error.format")
             )
             .invalidNel
         )
