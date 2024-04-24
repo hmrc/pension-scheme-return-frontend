@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.bondsdisposal
 
+import services.SaveService
 import pages.nonsipp.bonds._
 import viewmodels.implicits._
 import play.api.mvc._
@@ -36,12 +37,14 @@ import models.SchemeId.Srn
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.refineV
 import play.api.i18n.MessagesApi
-import pages.nonsipp.bondsdisposal.{BondsDisposalCompleted, BondsDisposalListPage, BondsStillHeldPage}
+import pages.nonsipp.bondsdisposal._
 import viewmodels.LegendSize
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
+
+import scala.concurrent.ExecutionContext
 
 import javax.inject.Named
 
@@ -51,8 +54,10 @@ class BondsDisposalListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: ListRadiosView,
-  formProvider: RadioListFormProvider
-) extends PSRController {
+  formProvider: RadioListFormProvider,
+  saveService: SaveService
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   val form: Form[Max5000] = BondsDisposalListController.form(formProvider)
 
@@ -74,12 +79,10 @@ class BondsDisposalListController @Inject()(
       .bindFromRequest()
       .fold(
         errors => {
-
           val completedBondIndexes: List[Max5000] =
             request.userAnswers.map(BondsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
           bondsData(srn, completedBondIndexes).map { bondsList =>
             BadRequest(view(errors, viewModel(srn, page, bondsList, mode, request.userAnswers)))
-
           }.merge
         },
         answer =>
@@ -112,7 +115,7 @@ object BondsDisposalListController {
   private def buildRows(srn: Srn, bondsList: List[BondsData], userAnswers: UserAnswers): List[ListRadiosRow] =
     bondsList.flatMap { bondsData =>
       val completedDisposalsPerBondKeys = userAnswers
-        .map(BondsDisposalCompleted.all(srn, bondsData.index))
+        .map(BondsDisposalProgress.all(srn, bondsData.index))
         .keys
 
       if (maxDisposalPerBond == completedDisposalsPerBondKeys.size) {

@@ -157,5 +157,8 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
       userAnswers.flatMap(_.setWhen(bool)(page, value))
     def compose(c: List[UserAnswers.Compose]): Try[UserAnswers] = userAnswers.flatMap(_.compose(c))
     def remove[A: Writes](page: Removable[A]): Try[UserAnswers] = userAnswers.flatMap(_.removePages(List(page)))
+
+    def removeWhen[A: Writes](bool: Boolean)(page: Removable[A]): Try[UserAnswers] =
+      userAnswers.flatMap(_.removeWhen(bool)(page))
   }
 }

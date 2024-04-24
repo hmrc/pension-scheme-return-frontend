@@ -23,8 +23,8 @@ import viewmodels.models.SectionCompleted
 import config.Refined.{Max50, Max5000}
 import pages.{IndexedQuestionPage, QuestionPage}
 
-case class BondsDisposalCompletedPage(srn: Srn, bondIndex: Max5000, disposalIndex: Max50)
-    extends QuestionPage[SectionCompleted.type] {
+case class BondsDisposalProgress(srn: Srn, bondIndex: Max5000, disposalIndex: Max50)
+    extends QuestionPage[SectionCompleted] {
 
   override def path: JsPath =
     Paths.bondsDisposed \ toString \ bondIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
@@ -32,22 +32,24 @@ case class BondsDisposalCompletedPage(srn: Srn, bondIndex: Max5000, disposalInde
   override def toString: String = "bondsDisposalCompleted"
 }
 
-object BondsDisposalCompleted {
+object BondsDisposalProgress {
   def all(
     srn: Srn,
     bondIndex: Max5000
-  ): IndexedQuestionPage[SectionCompleted.type] = new IndexedQuestionPage[SectionCompleted.type] {
+  ): IndexedQuestionPage[SectionCompleted] = new IndexedQuestionPage[SectionCompleted] {
 
     override def path: JsPath =
       Paths.bondsDisposed \ toString \ bondIndex.arrayIndex.toString
 
     override def toString: String = "bondsDisposalCompleted"
   }
-}
 
-case class BondsDisposalCompletedPages(srn: Srn) extends IndexedQuestionPage[Map[String, SectionCompleted.type]] {
+  def all(
+    srn: Srn
+  ): IndexedQuestionPage[Map[String, SectionCompleted]] = new IndexedQuestionPage[Map[String, SectionCompleted]] {
 
-  override def path: JsPath = Paths.bondsDisposed \ toString
+    override def path: JsPath = Paths.bondsDisposed \ toString
 
-  override def toString: String = "bondsDisposalCompleted"
+    override def toString: String = "bondsDisposalCompleted"
+  }
 }

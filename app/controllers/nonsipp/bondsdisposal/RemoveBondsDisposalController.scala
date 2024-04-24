@@ -30,7 +30,7 @@ import models.SchemeId.Srn
 import controllers.nonsipp.bondsdisposal.RemoveBondsDisposalController._
 import navigation.Navigator
 import play.api.i18n.MessagesApi
-import pages.nonsipp.bondsdisposal.{HowWereBondsDisposedOfPage, RemoveBondsDisposalPage}
+import pages.nonsipp.bondsdisposal._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import models.requests.DataRequest
@@ -91,6 +91,8 @@ class RemoveBondsDisposalController @Inject()(
                   .fromTry(
                     request.userAnswers
                       .remove(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex))
+                      .remove(BondsDisposalProgress(srn, bondIndex, disposalIndex))
+                      .remove(BondsDisposalCompleted(srn))
                   )
 
                 _ <- saveService.save(removedUserAnswers)

@@ -42,11 +42,11 @@ import pages.nonsipp.membercontributions._
 import pages.nonsipp.memberreceivedpcls.{PclsMemberListPage, PensionCommencementLumpSumPage}
 import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, PensionPaymentsReceivedPage}
 import eu.timepit.refined.{refineMV, refineV}
-import viewmodels.models.TaskListStatus.{TaskListStatus, _}
+import viewmodels.models.TaskListStatus._
 import pages.nonsipp.common.IdentityTypes
 import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutJourneyStatus}
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
-import pages.nonsipp.bondsdisposal.{BondsDisposalCompletedPages, BondsDisposalPage}
+import pages.nonsipp.bondsdisposal.{BondsDisposalCompleted, BondsDisposalPage, BondsDisposalProgress}
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
 import viewmodels.models.{SectionStatus, TaskListStatus}
 
@@ -833,32 +833,36 @@ object TaskListStatusUtils {
     }
   }
 
-  def getBondsDisposalsTaskListStatusWithLink(
-    userAnswers: UserAnswers,
-    srn: Srn,
-    mode: Mode
-  ): (TaskListStatus, String) = {
-    val atLeastOneCompleted =
-      userAnswers.get(BondsDisposalCompletedPages(srn)).exists(_.values.exists(_.values.nonEmpty))
-    val started = userAnswers.get(BondsDisposalPage(srn)).contains(true)
-    val completedNoDisposals = userAnswers.get(BondsDisposalPage(srn)).contains(false)
+  def getBondsDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+
+    val didSchemeDisposeBonds = userAnswers.get(BondsDisposalPage(srn))
+
+    val anyJourneysCompleted =
+      userAnswers
+        .map(BondsDisposalProgress.all(srn))
+        .values
+        .exists(_.values.nonEmpty)
+
+    val sectionCompleted: Boolean = userAnswers.get(BondsDisposalCompleted(srn)).fold(false)(_ => true)
 
     val initialDisposalUrl = controllers.nonsipp.bondsdisposal.routes.BondsDisposalController
       .onPageLoad(srn, NormalMode)
       .url
 
     val disposalListPage = controllers.nonsipp.bondsdisposal.routes.BondsDisposalListController
-      .onPageLoad(srn, page = 1, mode)
+      .onPageLoad(srn, page = 1, NormalMode)
       .url
 
-    if (atLeastOneCompleted) {
-      (TaskListStatus.Completed, disposalListPage)
-    } else if (completedNoDisposals) {
-      (TaskListStatus.Completed, initialDisposalUrl)
-    } else if (started) {
-      (TaskListStatus.InProgress, initialDisposalUrl)
-    } else {
-      (TaskListStatus.NotStarted, initialDisposalUrl)
+    val disposalCompletedListPage = controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
+      .onPageLoad(srn, page = 1)
+      .url
+
+    didSchemeDisposeBonds match {
+      case None => (TaskListStatus.NotStarted, initialDisposalUrl)
+      case Some(false) => (TaskListStatus.Completed, initialDisposalUrl)
+      case Some(true) if sectionCompleted => (TaskListStatus.Completed, disposalCompletedListPage)
+      case Some(true) if anyJourneysCompleted => (TaskListStatus.InProgress, disposalCompletedListPage)
+      case Some(true) => (TaskListStatus.InProgress, disposalListPage)
     }
   }
 

@@ -16,11 +16,13 @@
 
 package controllers.nonsipp.bondsdisposal
 
+import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage}
 import viewmodels.implicits._
 import play.api.mvc._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
+import config.Constants
 import cats.implicits._
 import config.Constants.{maxBondsTransactions, maxDisposalPerBond}
 import controllers.actions.IdentifyAndRequireData
@@ -28,23 +30,20 @@ import navigation.Navigator
 import models._
 import models.HowDisposed.HowDisposed
 import com.google.inject.Inject
-import utils.nonsipp.TaskListStatusUtils.getBondsDisposalsTaskListStatusWithLink
-import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
 import controllers.nonsipp.bondsdisposal.ReportBondsDisposalListController._
 import forms.YesNoPageFormProvider
 import play.api.i18n.MessagesApi
-import pages.nonsipp.bondsdisposal.{
-  BondsDisposalCompletedPages,
-  HowWereBondsDisposedOfPage,
-  ReportBondsDisposalListPage
-}
+import pages.nonsipp.bondsdisposal._
 import viewmodels.DisplayMessage
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
 
@@ -54,89 +53,108 @@ class ReportBondsDisposalListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
-  formProvider: YesNoPageFormProvider
-) extends PSRController {
+  formProvider: YesNoPageFormProvider,
+  psrSubmissionService: PsrSubmissionService,
+  saveService: SaveService
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   val form: Form[Boolean] = ReportBondsDisposalListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val (status, incompleteDisposalUrl) = getBondsDisposalsTaskListStatusWithLink(request.userAnswers, srn, mode)
+      getDisposals(srn).map { disposals =>
+        val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+        val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
+        val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
+        getBondsDisposalsWithIndexes(srn, disposals)
+          .map(
+            bondsDisposalsWithIndexes =>
+              Ok(
+                view(
+                  form,
+                  viewModel(
+                    srn,
+                    mode,
+                    page,
+                    bondsDisposalsWithIndexes,
+                    numberOfDisposals,
+                    maxPossibleNumberOfDisposals,
+                    request.userAnswers
+                  )
+                )
+              )
+          )
+          .merge
+      }.merge
+  }
 
-      if (status == TaskListStatus.Completed) {
-        getDisposals(srn).map { disposals =>
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      getDisposals(srn)
+        .traverse { disposals =>
           val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
           val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
-          getBondsDisposalsWithIndexes(srn, disposals)
-            .map(
-              bondsDisposalsWithIndexes =>
-                Ok(
-                  view(
-                    form,
-                    viewModel(
-                      srn,
-                      mode,
-                      page,
-                      bondsDisposalsWithIndexes,
-                      numberOfDisposals,
-                      maxPossibleNumberOfDisposals,
-                      request.userAnswers
-                    )
-                  )
-                )
-            )
-            .merge
-        }.merge
-      } else if (status == TaskListStatus.InProgress) {
-        Redirect(incompleteDisposalUrl)
-      } else {
-        Redirect(routes.BondsDisposalController.onPageLoad(srn, NormalMode))
-      }
-  }
-
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    getDisposals(srn).map { disposals =>
-      val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-      val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
-      val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
-      if (numberOfDisposals == maxPossibleNumberOfDisposals) {
-        Redirect(
-          navigator.nextPage(ReportBondsDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
-        )
-      } else {
-        form
-          .bindFromRequest()
-          .fold(
-            errors =>
-              getBondsDisposalsWithIndexes(srn, disposals)
-                .map(
-                  indexes =>
-                    BadRequest(
-                      view(
-                        errors,
-                        viewModel(
-                          srn,
-                          mode,
-                          page,
-                          indexes,
-                          numberOfDisposals,
-                          maxPossibleNumberOfDisposals,
-                          request.userAnswers
+          if (numberOfDisposals == maxPossibleNumberOfDisposals) {
+            Redirect(
+              navigator.nextPage(ReportBondsDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
+            ).pure[Future]
+          } else {
+            form
+              .bindFromRequest()
+              .fold(
+                errors =>
+                  getBondsDisposalsWithIndexes(srn, disposals)
+                    .map(
+                      indexes =>
+                        BadRequest(
+                          view(
+                            errors,
+                            viewModel(
+                              srn,
+                              mode,
+                              page,
+                              indexes,
+                              numberOfDisposals,
+                              maxPossibleNumberOfDisposals,
+                              request.userAnswers
+                            )
+                          )
                         )
-                      )
                     )
-                )
-                .merge,
-            answer => Redirect(navigator.nextPage(ReportBondsDisposalListPage(srn, answer), mode, request.userAnswers))
-          )
-      }
-    }.merge
+                    .merge
+                    .pure[Future],
+                addAnotherDisposal =>
+                  if (addAnotherDisposal) {
+                    Redirect(
+                      navigator
+                        .nextPage(ReportBondsDisposalListPage(srn, addAnotherDisposal), mode, request.userAnswers)
+                    ).pure[Future]
+                  } else {
+                    for {
+                      updatedUserAnswers <- request.userAnswers
+                        .set(BondsDisposalCompleted(srn), SectionCompleted)
+                        .mapK[Future]
+                      _ <- saveService.save(updatedUserAnswers)
+                      submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+                    } yield submissionResult.getOrRecoverJourney(
+                      _ =>
+                        Redirect(
+                          navigator
+                            .nextPage(ReportBondsDisposalListPage(srn, addAnotherDisposal), mode, request.userAnswers)
+                        )
+                    )
+                  }
+              )
+          }
+        }
+        .map(_.merge)
   }
 
   private def getDisposals(srn: Srn)(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
     request.userAnswers
-      .map(BondsDisposalCompletedPages(srn))
+      .map(BondsDisposalProgress.all(srn))
       .filter(_._2.nonEmpty)
       .map {
         case (key, sectionCompleted) =>

@@ -211,15 +211,13 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
       }
 
-      "BondsDisposalCompletedPage" - {
+      "BondsDisposalCYAPage" - {
 
         act.like(
           normalmode
-            .navigateToWithDoubleIndex(
-              bondIndexOne,
-              disposalIndex,
-              BondsDisposalCompletedPage,
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+            .navigateTo(
+              BondsDisposalCYAPage,
+              (srn, _) =>
                 controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
                   .onPageLoad(srn, page = 1)
             )
@@ -490,11 +488,9 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
       act.like(
         checkmode
-          .navigateToWithDoubleIndex(
-            bondIndexOne,
-            disposalIndex,
-            BondsDisposalCompletedPage,
-            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+          .navigateTo(
+            BondsDisposalCYAPage,
+            (srn, _) =>
               controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
                 .onPageLoad(srn, page = 1)
           )
