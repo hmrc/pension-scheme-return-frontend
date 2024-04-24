@@ -241,7 +241,7 @@ trait Formatters {
 
       private val baseFormatter =
         doubleFormatter(errors.requiredKey, errors.nonNumericKey, errors.max, errors.min, args)
-      private val decimalRegex = "^-?\\d+(\\.\\d{1,2})?$"
+      private val decimalRegex = """^-?\d+(\.\d{1,2})?(?:[eE][-+]?\d+)?$"""
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Money] =
         baseFormatter
