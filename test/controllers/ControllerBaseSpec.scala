@@ -117,6 +117,7 @@ trait TestValues {
   val leaseName = "testLeaseName"
   val money: Money = Money(123456)
   val moneyNegative: Money = Money(1123456)
+  val moneyInPeriod: MoneyInPeriod = MoneyInPeriod(money, Money(1))
   val security: Security = Security("securityGivenForLoan")
   val double: Double = 7.7
   val percentage: Percentage = Percentage(7.7)
@@ -133,6 +134,7 @@ trait TestValues {
   val partnershipRecipientName: String = "partnership " + recipientName
   val otherRecipientName: String = "other " + recipientName
   val otherRecipientDescription = "other description"
+  val otherRecipientDetails: RecipientDetails = RecipientDetails(otherRecipientName, otherRecipientDescription)
   val pstr = "testPstr"
   val version = "001"
   val titleNumber = "AB123456"
@@ -158,6 +160,8 @@ trait TestValues {
   val otherAssetDescription = "other asset description"
   val fallbackUrl = "fallbackUrl"
   val fallbackCall: Call = Call("GET", fallbackUrl)
+  val currentReportNumber = 2
+  val previousReportNumber = 1
 
   val address: Address = Address(
     "test-id",

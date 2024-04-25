@@ -473,7 +473,12 @@ object TaskListController {
     )
   }
 
-  private def declarationSection(srn: Srn, isPsp: Boolean, isLinkActive: Boolean): TaskListSectionViewModel = {
+  private def declarationSection(
+    srn: Srn,
+    isPsp: Boolean,
+    isLinkActive: Boolean,
+    schemeName: String
+  ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.declaration"
 
     TaskListSectionViewModel(
@@ -492,7 +497,10 @@ object TaskListController {
       } else {
         Message(s"$prefix.incomplete")
       },
-      LinkMessage(s"$prefix.saveandreturn", controllers.routes.UnauthorisedController.onPageLoad().url)
+      LinkMessage(
+        Message(s"$prefix.saveandreturn", schemeName),
+        controllers.routes.OverviewController.onPageLoad(srn).url
+      )
     )
   }
 
@@ -546,7 +554,8 @@ object TaskListController {
       declarationSection(
         srn,
         pensionSchemeId.isPSP,
-        isLinkActive
+        isLinkActive,
+        schemeName
       )
 
     val historyLink = if (hasHistory) {
@@ -574,7 +583,7 @@ object TaskListController {
       Message("nonsipp.tasklist.heading", startDate.show, endDate.show),
       viewModel
     ).withDescription(
-      Heading2("nonsipp.tasklist.subheading") ++
+      Heading2("nonsipp.tasklist.subheading.incomplete") ++
         ParagraphMessage(Message("nonsipp.tasklist.description", numberOfCompleted, numberOfTotal))
     )
   }
