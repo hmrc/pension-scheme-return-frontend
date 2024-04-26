@@ -83,12 +83,14 @@ changeYourAnswers.title = Change your answers
 checkYourAnswers.heading = Check your answers
 changeYourAnswers.heading = Change your answers
 
-journeyRecovery.continue.title = Sorry, there is a problem with the service
-journeyRecovery.continue.heading = Sorry, there is a problem with the service
-journeyRecovery.continue.guidance = [Add content to explain how to proceed.]
-journeyRecovery.startAgain.title = Sorry, there is a problem with the service
-journeyRecovery.startAgain.heading = Sorry, there is a problem with the service
-journeyRecovery.startAgain.guidance = [Add content to explain why the user needs to start again.]
+journeyRecovery.title = Sorry there is a problem with the service
+journeyRecovery.heading = Sorry, there is a problem with the service
+journeyRecovery.guidance1 = Try again in a few minutes.
+journeyRecovery.guidance2.version1 = We have saved your answers.
+journeyRecovery.guidance2.version2 = We have saved your answers in this section until you are signed out.
+journeyRecovery.guidance3 = If the problem continues,
+journeyRecovery.guidance3.link = report a problem with this page
+journeyRecovery.guidance4 = We will fix the problem as soon as possible.
 
 signedOut.title = For your security, we signed you out
 signedOut.heading = For your security, we signed you out

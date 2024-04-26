@@ -178,10 +178,18 @@ class SharesCYAController @Inject()(
               .set(SharesCompleted(srn, index), SectionCompleted)
           )
         _ <- saveService.save(updatedAnswers)
-        redirectTo <- psrSubmissionService.submitPsrDetails(srn).map {
-          case None => controllers.routes.JourneyRecoveryController.onPageLoad()
-          case Some(_) => navigator.nextPage(SharesCYAPage(srn), NormalMode, request.userAnswers)
-        }
+        redirectTo <- psrSubmissionService
+          .submitPsrDetails(
+            srn,
+            optFallbackCall = Some(
+              controllers.nonsipp.shares.routes.SharesCYAController
+                .onPageLoad(srn, index, mode)
+            )
+          )
+          .map {
+            case None => controllers.routes.JourneyRecoveryController.onPageLoad()
+            case Some(_) => navigator.nextPage(SharesCYAPage(srn), NormalMode, request.userAnswers)
+          }
       } yield Redirect(redirectTo)
     }
 }

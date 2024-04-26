@@ -109,7 +109,13 @@ class SharesListController @Inject()(
                   )
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (!addAnother) {
-                  psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+                  psrSubmissionService.submitPsrDetailsWithUA(
+                    srn,
+                    updatedUserAnswers,
+                    optFallbackCall = Some(
+                      controllers.nonsipp.shares.routes.SharesListController.onPageLoad(srn, page, mode)
+                    )
+                  )
                 } else {
                   Future.successful(Some(()))
                 }

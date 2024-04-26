@@ -145,7 +145,14 @@ class SurrenderedBenefitsMemberListController @Inject()(
                   )
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (finishedAddingSurrenderedBenefits) {
-                  psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+                  psrSubmissionService.submitPsrDetailsWithUA(
+                    srn,
+                    updatedUserAnswers,
+                    optFallbackCall = Some(
+                      controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+                        .onPageLoad(srn, page, mode)
+                    )
+                  )
                 } else {
                   Future.successful(Some(()))
                 }

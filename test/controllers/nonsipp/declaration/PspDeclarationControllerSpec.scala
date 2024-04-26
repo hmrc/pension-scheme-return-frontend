@@ -55,7 +55,7 @@ class PspDeclarationControllerSpec extends ControllerBaseSpec {
       agreeAndContinue(onSubmit, populatedUserAnswers, "value" -> psaId.value)
         .before(MockPSRSubmissionService.submitPsrDetails())
         .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )

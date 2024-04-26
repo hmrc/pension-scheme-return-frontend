@@ -104,7 +104,14 @@ class PensionPaymentsReceivedController @Inject()(
                 request.userAnswers.set(PensionPaymentsReceivedPage(srn), value).compose(pensionPaymentsPages)
               )
               _ <- saveService.save(updatedAnswers)
-              submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
+              submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+                srn,
+                updatedAnswers,
+                optFallbackCall = Some(
+                  controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
+                    .onPageLoad(srn, mode)
+                )
+              )
             } yield submissionResult.getOrRecoverJourney(
               _ => Redirect(navigator.nextPage(PensionPaymentsReceivedPage(srn), mode, updatedAnswers))
             )

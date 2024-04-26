@@ -18,7 +18,6 @@ package services
 
 import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
 import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
-import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import connectors.PSRConnector
 import models.SchemeId.Srn
@@ -31,6 +30,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import models.UserAnswers
 import pages.nonsipp.loansmadeoroutstanding._
 import models.requests.DataRequest
+import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
+import play.api.mvc.Call
 import models.requests.psr._
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
@@ -55,13 +56,19 @@ class PsrSubmissionService @Inject()(
 
   def submitPsrDetailsWithUA(
     srn: Srn,
-    userAnswers: UserAnswers
+    userAnswers: UserAnswers,
+    optFallbackCall: Option[Call] = None
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
-    submitPsrDetails(srn)(implicitly, implicitly, DataRequest(request.request, userAnswers))
+    submitPsrDetails(srn, optFallbackCall = optFallbackCall)(
+      implicitly,
+      implicitly,
+      DataRequest(request.request, userAnswers)
+    )
 
   def submitPsrDetails(
     srn: Srn,
-    isSubmitted: Boolean = false
+    isSubmitted: Boolean = false,
+    optFallbackCall: Option[Call] = None
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] = {
 
     val optSchemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn))
@@ -96,7 +103,8 @@ class PsrSubmissionService @Inject()(
           membersPayments = memberPaymentsTransformer.transformToEtmp(srn, request.userAnswers),
           shares = buildShares(srn)(optDidSchemeHoldAnyShares, optSharesDisposal),
           psrDeclaration = Option.when(isSubmitted)(declarationTransformer.transformToEtmp)
-        )
+        ),
+        optFallbackCall
       )
     }.sequence
   }

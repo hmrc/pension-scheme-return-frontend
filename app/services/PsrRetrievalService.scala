@@ -16,7 +16,7 @@
 
 package services
 
-import play.api.mvc.AnyContent
+import play.api.mvc.{AnyContent, Call}
 import connectors.PSRConnector
 import transformations._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -44,7 +44,8 @@ class PsrRetrievalService @Inject()(
   def getStandardPsrDetails(
     optFbNumber: Option[String],
     optPeriodStartDate: Option[String],
-    optPsrVersion: Option[String]
+    optPsrVersion: Option[String],
+    fallBackCall: Call
   )(
     implicit request: DataRequest[AnyContent],
     hc: HeaderCarrier,
@@ -60,7 +61,8 @@ class PsrRetrievalService @Inject()(
         request.schemeDetails.pstr,
         optFbNumber,
         optPeriodStartDate,
-        optPsrVersion
+        optPsrVersion,
+        fallBackCall
       )
       .flatMap {
         case Some(psrDetails) =>

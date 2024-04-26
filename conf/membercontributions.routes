@@ -15,10 +15,10 @@ POST        /:srn/total-member-contribution/:index                      controll
 GET         /:srn/change-total-member-contribution/:index               controllers.nonsipp.membercontributions.TotalMemberContributionController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
 POST        /:srn/change-total-member-contribution/:index               controllers.nonsipp.membercontributions.TotalMemberContributionController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
-GET         /:srn/check-answers-member-contributions/:index             controllers.nonsipp.membercontributions.MemberContributionsCYAController.onPageLoad(srn: Srn,index: Max300, mode: Mode = NormalMode)
-POST        /:srn/submit-check-answers-member-contributions             controllers.nonsipp.membercontributions.MemberContributionsCYAController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-member-contributions/:index                    controllers.nonsipp.membercontributions.MemberContributionsCYAController.onPageLoad(srn: Srn,index: Max300, mode: Mode = CheckMode)
-POST        /:srn/submit-change-member-contributions                    controllers.nonsipp.membercontributions.MemberContributionsCYAController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/check-answers-member-contributions/:index             controllers.nonsipp.membercontributions.MemberContributionsCYAController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/submit-check-answers-member-contributions/:index      controllers.nonsipp.membercontributions.MemberContributionsCYAController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
+GET         /:srn/change-member-contributions/:index                    controllers.nonsipp.membercontributions.MemberContributionsCYAController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST        /:srn/submit-change-member-contributions/:index             controllers.nonsipp.membercontributions.MemberContributionsCYAController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
 GET         /:srn/remove-member-contributions/:index                    controllers.nonsipp.membercontributions.RemoveMemberContributionController.onPageLoad(srn: Srn, index: Max300)
 POST        /:srn/remove-member-contributions/:index                    controllers.nonsipp.membercontributions.RemoveMemberContributionController.onSubmit(srn: Srn, index: Max300)

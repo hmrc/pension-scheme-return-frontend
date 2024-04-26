@@ -72,10 +72,19 @@ class TotalValueQuotedSharesCYAController @Inject()(
   }
 
   def onSubmit(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    psrSubmissionService.submitPsrDetails(srn).map {
-      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case Some(_) => Redirect(navigator.nextPage(TotalValueQuotedSharesCYAPage(srn), NormalMode, request.userAnswers))
-    }
+    psrSubmissionService
+      .submitPsrDetails(
+        srn,
+        optFallbackCall = Some(
+          controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
+            .onPageLoad(srn)
+        )
+      )
+      .map {
+        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        case Some(_) =>
+          Redirect(navigator.nextPage(TotalValueQuotedSharesCYAPage(srn), NormalMode, request.userAnswers))
+      }
   }
 }
 

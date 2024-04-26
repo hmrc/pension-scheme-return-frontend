@@ -103,7 +103,14 @@ class RemoveTransferOutController @Inject()(
                       .set(TransfersOutJourneyStatus(srn), SectionStatus.InProgress)
                   )
                 _ <- saveService.save(updatedAnswers)
-                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
+                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+                  srn,
+                  updatedAnswers,
+                  optFallbackCall = Some(
+                    controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
+                      .onPageLoad(srn, 1, NormalMode)
+                  )
+                )
               } yield submissionResult.getOrRecoverJourney(
                 _ =>
                   Redirect(

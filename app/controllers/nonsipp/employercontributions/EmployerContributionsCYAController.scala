@@ -83,7 +83,16 @@ class EmployerContributionsCYAController @Inject()(
           userAnswers <- EitherT(userAnswersWithSectionCompleted.pure[Future])
           updatedAnswers <- Future.fromTry(userAnswers).liftF
           _ <- saveService.save(updatedAnswers).liftF
-          submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers).liftF
+          submissionResult <- psrSubmissionService
+            .submitPsrDetailsWithUA(
+              srn,
+              updatedAnswers,
+              optFallbackCall = Some(
+                controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                  .onPageLoad(srn, index, page, mode)
+              )
+            )
+            .liftF
         } yield submissionResult.getOrRecoverJourney(
           _ => Redirect(navigator.nextPage(EmployerContributionsCYAPage(srn), mode, updatedAnswers))
         )

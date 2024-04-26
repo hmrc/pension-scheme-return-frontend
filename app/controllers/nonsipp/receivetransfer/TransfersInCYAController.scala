@@ -109,7 +109,13 @@ class TransfersInCYAController @Inject()(
             .remove(TransferReceivedMemberListPage(srn))
         )
         _ <- saveService.save(updatedUserAnswers)
-        submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+        submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+          srn,
+          updatedUserAnswers,
+          optFallbackCall = Some(
+            controllers.nonsipp.receivetransfer.routes.TransfersInCYAController.onPageLoad(srn, index, mode)
+          )
+        )
       } yield submissionResult.getOrRecoverJourney(
         _ => Redirect(navigator.nextPage(TransfersInCYAPage(srn), mode, updatedUserAnswers))
       )

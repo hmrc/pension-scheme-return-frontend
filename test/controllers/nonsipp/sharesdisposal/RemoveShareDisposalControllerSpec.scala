@@ -53,7 +53,7 @@ class RemoveShareDisposalControllerSpec extends ControllerBaseSpec {
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any())(any(), any(), any()))
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
   }
 
@@ -75,7 +75,7 @@ class RemoveShareDisposalControllerSpec extends ControllerBaseSpec {
     act.like(
       saveAndContinue(onSubmit, userAnswers, "value" -> "true")
         .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )

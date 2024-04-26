@@ -69,7 +69,14 @@ class SchemeMemberDetailsAnswersController @Inject()(
       for {
         updatedUserAnswers <- Future.fromTry(request.userAnswers.set(MemberStatus(srn, index), MemberState.Active))
         _ <- saveService.save(updatedUserAnswers)
-        submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+        submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+          srn,
+          updatedUserAnswers,
+          optFallbackCall = Some(
+            controllers.nonsipp.memberdetails.routes.SchemeMemberDetailsAnswersController
+              .onPageLoad(srn, index, checkOrChange)
+          )
+        )
       } yield submissionResult.fold(
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       )(_ => Redirect(navigator.nextPage(SchemeMemberDetailsAnswersPage(srn), NormalMode, request.userAnswers)))

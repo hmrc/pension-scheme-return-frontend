@@ -25,6 +25,7 @@ object Constants {
 
   val RETURN_PERIODS = "RETURN_PERIODS"
   val SUBMISSION_DATE = "SUBMISSION_DATE"
+  val SRN = "SRN"
 
   val psaIdKey = "PSAID"
   val pspIdKey = "PSPID"

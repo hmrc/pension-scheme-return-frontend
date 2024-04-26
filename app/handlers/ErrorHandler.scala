@@ -16,11 +16,16 @@
 
 package handlers
 
-import play.api.mvc.Request
+import play.api.mvc.{Request, RequestHeader, Result}
 import play.twirl.api.Html
 import views.html.ErrorTemplate
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
+import play.api.{Logger, PlayException}
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.Results.Redirect
+
+import scala.concurrent.Future
 
 import javax.inject.{Inject, Singleton}
 
@@ -31,8 +36,50 @@ class ErrorHandler @Inject()(
 ) extends FrontendErrorHandler
     with I18nSupport {
 
+  private val logger = Logger(getClass)
+
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(
     implicit rh: Request[_]
   ): Html =
     view(pageTitle, heading, message)
+
+  private def logError(request: RequestHeader, ex: Throwable): Unit =
+    logger.error(
+      """
+        |
+        |! %sInternal PSR server error, for (%s) [%s] ->
+        | """.stripMargin.format(ex match {
+        case p: PlayException => "@" + p.id + " - "
+        case _ => ""
+      }, request.method, request.uri),
+      ex
+    )
+
+  override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
+    logError(request, exception)
+    exception match {
+      case GetPsrException(_, continueUrl, answersSavedDisplayVersion) =>
+        Future.successful(
+          Redirect(
+            controllers.routes.JourneyRecoveryController
+              .onPageLoad(
+                continueUrl = Some(RedirectUrl(continueUrl)),
+                answersSavedDisplayVersion.key.toInt
+              )
+          )
+        )
+      case PostPsrException(_, continueUrl) =>
+        Future.successful(
+          Redirect(
+            controllers.routes.JourneyRecoveryController
+              .onPageLoad(
+                continueUrl = Some(RedirectUrl(continueUrl)),
+                2
+              )
+          )
+        )
+
+      case _ => super.onServerError(request, exception)
+    }
+  }
 }

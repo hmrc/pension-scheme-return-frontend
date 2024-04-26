@@ -106,7 +106,14 @@ class RemovePensionPaymentsController @Inject()(
                 updatedAnswers <- Future
                   .fromTry(request.userAnswers.remove(TotalAmountPensionPaymentsPage(srn, index)))
                 _ <- saveService.save(updatedAnswers)
-                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
+                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+                  srn,
+                  updatedAnswers,
+                  optFallbackCall = Some(
+                    controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+                      .onPageLoad(srn, 1, NormalMode)
+                  )
+                )
               } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
                 _ =>
                   Redirect(

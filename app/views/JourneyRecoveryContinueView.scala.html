@@ -19,13 +19,27 @@
     govukButton: GovukButton
 )
 
-@(continueUrl: String)(implicit request: Request[_], messages: Messages)
+@(continueUrl: String, reportAProblemUrl: String, answersSavedDisplayVersion: Int = 0)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("journeyRecovery.continue.title"))) {
+@layout(pageTitle = titleNoForm(messages("journeyRecovery.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("journeyRecovery.continue.heading")</h1>
+    <h1 class="govuk-heading-xl">@messages("journeyRecovery.heading")</h1>
 
-    <p class="govuk-body">@messages("journeyRecovery.continue.guidance")</p>
+    <p class="govuk-body">@messages("journeyRecovery.guidance1")</p>
+
+    @if(answersSavedDisplayVersion == 1) {
+        <p class="govuk-body">@messages("journeyRecovery.guidance2.version1")</p>
+    }
+    @if(answersSavedDisplayVersion == 2) {
+        <p class="govuk-body">@messages("journeyRecovery.guidance2.version2")</p>
+    }
+
+    <p class="govuk-body">@messages("journeyRecovery.guidance3")
+        <a href=@reportAProblemUrl
+           class="govuk-link" >@messages("journeyRecovery.guidance3.link")</a>.
+    </p>
+
+    <p class="govuk-body">@messages("journeyRecovery.guidance4")</p>
 
     <p class="govuk-body">
         @govukButton(

@@ -28,7 +28,7 @@ GET         /language/:lang                                                     
 
 GET         /refresh-session                                                            controllers.KeepAliveController.keepAlive()
 
-GET         /there-is-a-problem                                                         controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET         /problem-with-service                                                       controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None, answersSavedDisplayVersion: Int ?= 0)
 
 GET         /account/sign-out-survey                                                    controllers.auth.AuthController.signOut()
 GET         /account/sign-out                                                           controllers.auth.AuthController.signOutNoSurvey()
@@ -370,10 +370,10 @@ POST        /:srn/change-amount-of-loan-payments/:index                         
 
 GET         /:srn/check-answers-loan                                                    controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Check)
 GET         /:srn/check-answers-loan/:index                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Check)
-POST        /:srn/submit-check-answers-loan                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Check)
+POST        /:srn/submit-check-answers-loan/:index                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Check)
 GET         /:srn/change-check-answers-loan                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Change)
 GET         /:srn/change-check-answers-loan/:index                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Change)
-POST        /:srn/change-submit-check-answers-loan                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Change)
+POST        /:srn/change-submit-check-answers-loan/:index                               controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Change)
 
 GET         /:srn/outstanding-arrears-on-loan                                           controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
 GET         /:srn/outstanding-arrears-on-loan/:index                                    controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)

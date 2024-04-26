@@ -92,7 +92,7 @@ class BasicDetailsCheckYourAnswersController @Inject()(
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     psrSubmissionService
-      .submitPsrDetails(srn)
+      .submitPsrDetails(srn, optFallbackCall = Some(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
       .map {
         case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         case Some(_) =>

@@ -136,7 +136,14 @@ class TransferOutMemberListController @Inject()(
                   )
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (finishedAddingTransfers)
-                  psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+                  psrSubmissionService.submitPsrDetailsWithUA(
+                    srn,
+                    updatedUserAnswers,
+                    optFallbackCall = Some(
+                      controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
+                        .onPageLoad(srn, 1, NormalMode)
+                    )
+                  )
                 else Future.successful(Some(()))
               } yield submissionResult.getOrRecoverJourney(
                 _ =>

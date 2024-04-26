@@ -72,11 +72,19 @@ class UnallocatedContributionCYAController @Inject()(
 
   def onSubmit(srn: Srn, checkOrChange: CheckOrChange): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      psrSubmissionService.submitPsrDetails(srn).map {
-        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        case Some(_) =>
-          Redirect(navigator.nextPage(UnallocatedContributionCYAPage(srn), NormalMode, request.userAnswers))
-      }
+      psrSubmissionService
+        .submitPsrDetails(
+          srn,
+          optFallbackCall = Some(
+            controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+              .onPageLoad(srn, checkOrChange)
+          )
+        )
+        .map {
+          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          case Some(_) =>
+            Redirect(navigator.nextPage(UnallocatedContributionCYAPage(srn), NormalMode, request.userAnswers))
+        }
     }
 }
 

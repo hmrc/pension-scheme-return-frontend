@@ -97,7 +97,14 @@ class RemoveTransferInController @Inject()(
                       .set(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
                   )
                 _ <- saveService.save(updatedAnswers)
-                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
+                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+                  srn,
+                  updatedAnswers,
+                  optFallbackCall = Some(
+                    controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+                      .onPageLoad(srn, 1, NormalMode)
+                  )
+                )
               } yield submissionResult.getOrRecoverJourney(
                 _ =>
                   Redirect(

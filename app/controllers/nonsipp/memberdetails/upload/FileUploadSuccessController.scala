@@ -66,7 +66,13 @@ class FileUploadSuccessController @Inject()(
         for {
           updatedUserAnswers <- Future.fromTry(memberDetailsToUserAnswers(srn, sortAlphabetically(memberDetails)))
           _ <- saveService.save(updatedUserAnswers)
-          submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+          submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+            srn,
+            updatedUserAnswers,
+            optFallbackCall = Some(
+              controllers.nonsipp.memberdetails.upload.routes.FileUploadSuccessController.onPageLoad(srn, mode)
+            )
+          )
         } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
           _ => Redirect(navigator.nextPage(FileUploadSuccessPage(srn), mode, updatedUserAnswers))
         )

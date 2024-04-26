@@ -16,14 +16,18 @@
 
 package connectors
 
-import uk.gov.hmrc.http.HttpReads.Implicits._
 import config.FrontendAppConfig
+import handlers.{GetPsrException, PostPsrException}
 import models.requests.psr.PsrSubmission
+import models.AnswersSavedDisplayVersion
+import play.api.mvc.Results.NoContent
+import uk.gov.hmrc.http.HttpReads.Implicits._
+import play.api.mvc.Call
 import play.api.Logger
 import play.api.libs.json._
 import models.backend.responses.{OverviewResponse, PsrVersionsForYearsResponse, PsrVersionsResponse}
-import play.api.http.Status.{NOT_FOUND, OK}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import play.api.http.Status._
+import uk.gov.hmrc.http._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,18 +45,31 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
     s"$baseUrl/pension-scheme-return/psr/versions/$pstr?startDate=$startDate"
 
   def submitPsrDetails(
-    psrSubmission: PsrSubmission
+    psrSubmission: PsrSubmission,
+    optFallbackCall: Option[Call] = None
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
-    http.POST[PsrSubmission, Unit](
-      submitStandardUrl,
-      psrSubmission
-    )
+    http
+      .POST[PsrSubmission, HttpResponse](
+        submitStandardUrl,
+        psrSubmission
+      )
+      .map { response =>
+        response.status match {
+          case NO_CONTENT => NoContent
+          case _ =>
+            val url = optFallbackCall.fold(appConfig.urls.managePensionsSchemes.dashboard) { fallbackCall =>
+              fallbackCall.url
+            }
+            throw PostPsrException(s"{${response.status}, ${response.json}}", url)
+        }
+      }
 
   def getStandardPsrDetails(
     pstr: String,
     optFbNumber: Option[String],
     optPeriodStartDate: Option[String],
-    optPsrVersion: Option[String]
+    optPsrVersion: Option[String],
+    fallBackCall: Call
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[PsrSubmission]] = {
     val queryParams = (optPeriodStartDate, optPsrVersion, optFbNumber) match {
       case (Some(startDate), Some(version), _) =>
@@ -74,6 +91,8 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
               case JsError(errors) => throw JsResultException(errors)
             }
           case NOT_FOUND => None
+          case _ =>
+            throw GetPsrException(s"${response.body}", fallBackCall.url, AnswersSavedDisplayVersion.NoDisplay)
         }
       }
   }

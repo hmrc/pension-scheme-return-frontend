@@ -136,7 +136,15 @@ class TransferReceivedMemberListController @Inject()(
                       .set(TransferReceivedMemberListPage(srn), finishedAddingTransfers)
                   )
                 _ <- saveService.save(updatedUserAnswers)
-                _ <- if (finishedAddingTransfers) psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+                _ <- if (finishedAddingTransfers)
+                  psrSubmissionService.submitPsrDetailsWithUA(
+                    srn,
+                    updatedUserAnswers,
+                    optFallbackCall = Some(
+                      controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+                        .onPageLoad(srn, page, mode)
+                    )
+                  )
                 else Future.successful(Some(()))
               } yield Redirect(
                 navigator

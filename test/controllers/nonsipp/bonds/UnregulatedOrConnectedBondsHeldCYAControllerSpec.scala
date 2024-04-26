@@ -46,7 +46,7 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
   private def onPageLoad(mode: Mode) =
     routes.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn, index, mode)
 
-  private def onSubmit(mode: Mode) = routes.UnregulatedOrConnectedBondsHeldCYAController.onSubmit(srn, mode)
+  private def onSubmit(mode: Mode) = routes.UnregulatedOrConnectedBondsHeldCYAController.onSubmit(srn, index, mode)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(NameOfBondsPage(srn, index), otherName)
@@ -85,7 +85,7 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
         redirectNextPage(onSubmit(mode))
           .before(MockPSRSubmissionService.submitPsrDetails())
           .after({
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
           .withName(s"redirect to next page when in $mode mode")

@@ -38,6 +38,8 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=$redirectUrl"
   }
 
+  val reportAProblemUrl: String = s"$contactHost/contact/report-technical-problem?service=$contactFormServiceIdentifier"
+
   def languageMap: Map[String, Lang] = Map(
     "en" -> Lang("en"),
     "cy" -> Lang("cy")

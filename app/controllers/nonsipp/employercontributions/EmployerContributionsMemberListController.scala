@@ -158,7 +158,14 @@ class EmployerContributionsMemberListController @Inject()(
                 )
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (value) {
-                  psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+                  psrSubmissionService.submitPsrDetailsWithUA(
+                    srn,
+                    updatedUserAnswers,
+                    optFallbackCall = Some(
+                      controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+                        .onPageLoad(srn, page, mode)
+                    )
+                  )
                 } else {
                   Future.successful(Some(()))
                 }

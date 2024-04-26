@@ -67,7 +67,7 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
           MockPSRSubmissionService.submitPsrDetails()
         )
         .after(
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )
     )
 

@@ -19,18 +19,25 @@
     govukButton: GovukButton
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(url: String, reportAProblemUrl: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("journeyRecovery.startAgain.title"))) {
+@layout(pageTitle = titleNoForm(messages("journeyRecovery.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("journeyRecovery.startAgain.heading")</h1>
+    <h1 class="govuk-heading-xl">@messages("journeyRecovery.heading")</h1>
 
-    <p class="govuk-body">@messages("journeyRecovery.startAgain.guidance")</p>
+    <p class="govuk-body">@messages("journeyRecovery.guidance1")</p>
+
+    <p class="govuk-body">@messages("journeyRecovery.guidance3")
+        <a href=@reportAProblemUrl
+           class="govuk-link" >@messages("journeyRecovery.guidance3.link")</a>.
+    </p>
+
+    <p class="govuk-body">@messages("journeyRecovery.guidance4")</p>
 
     <p class="govuk-body">
         @govukButton(
-            ButtonViewModel(messages("site.startAgain"))
-                .asLink(routes.IndexController.onPageLoad().url)
+            ButtonViewModel(messages("site.continue"))
+                .asLink(url)
         )
     </p>
 }

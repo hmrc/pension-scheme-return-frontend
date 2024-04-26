@@ -79,7 +79,9 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
       )
 
       val result =
-        connector.getStandardPsrDetails(commonPstr, None, Some(commonStartDate), Some(commonVersion)).futureValue
+        connector
+          .getStandardPsrDetails(commonPstr, None, Some(commonStartDate), Some(commonVersion), commonFallbackCall)
+          .futureValue
 
       result mustBe Some(minimalSubmissionData)
     }
@@ -93,7 +95,8 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
         ok(Json.stringify(minimalSubmissionJson))
       )
 
-      val result = connector.getStandardPsrDetails(commonPstr, Some(commonFbNumber), None, None).futureValue
+      val result =
+        connector.getStandardPsrDetails(commonPstr, Some(commonFbNumber), None, None, commonFallbackCall).futureValue
 
       result mustBe Some(minimalSubmissionData)
     }
@@ -108,7 +111,8 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
         notFound()
       )
 
-      val result = connector.getStandardPsrDetails(commonPstr, Some(commonFbNumber), None, None).futureValue
+      val result =
+        connector.getStandardPsrDetails(commonPstr, Some(commonFbNumber), None, None, commonFallbackCall).futureValue
 
       result mustBe None
     }

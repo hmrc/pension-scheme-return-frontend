@@ -112,7 +112,14 @@ class RemoveSurrenderedBenefitsController @Inject()(
                       .set(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.InProgress)
                   )
                 _ <- saveService.save(updatedAnswers)
-                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
+                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+                  srn,
+                  updatedAnswers,
+                  optFallbackCall = Some(
+                    controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+                      .onPageLoad(srn, 1, NormalMode)
+                  )
+                )
               } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
                 _ =>
                   Redirect(

@@ -56,7 +56,13 @@ class PsaDeclarationController @Inject()(
   def onSubmit(srn: Srn): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
-        _ <- psrSubmissionService.submitPsrDetails(srn = srn, isSubmitted = true)
+        _ <- psrSubmissionService.submitPsrDetails(
+          srn = srn,
+          isSubmitted = true,
+          optFallbackCall = Some(
+            controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
+          )
+        )
         _ <- saveService.save(UserAnswers(request.userAnswers.id))
       } yield {
         Redirect(navigator.nextPage(PsaDeclarationPage(srn), NormalMode, request.userAnswers))
