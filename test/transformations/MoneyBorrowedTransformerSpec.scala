@@ -111,7 +111,7 @@ class MoneyBorrowedTransformerSpec
       )
 
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(MoneyBorrowedPage(srn)) mustBe Some(true)
           userAnswers.get(WhenBorrowedPage(srn, refineMV(1))) mustBe Some(localDate)

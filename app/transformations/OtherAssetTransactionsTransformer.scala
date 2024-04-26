@@ -16,19 +16,22 @@
 
 package transformations
 
-import config.Refined.OneTo5000
+import pages.nonsipp.otherassetsdisposal._
+import config.Refined.{Max5000, OneTo50, OneTo5000}
 import models.SchemeId.Srn
 import cats.implicits.catsSyntaxTuple2Semigroupal
-import models.requests.psr.{OtherAssetTransaction, OtherAssets}
 import eu.timepit.refined.refineV
 import uk.gov.hmrc.domain.Nino
 import pages.nonsipp.common._
 import models.IdentitySubject.OtherAssetSeller
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import models.requests.DataRequest
 import eu.timepit.refined.api.Refined
 import pages.nonsipp.otherassetsheld._
+import models.HowDisposed.{HowDisposed, Other, Sold}
 import com.google.inject.Singleton
+import models.requests.psr.{OtherAssetDisposed, OtherAssetTransaction, OtherAssets}
+import models.UserAnswers.implicits.UserAnswersTryOps
 import models._
 import models.SchemeHoldAsset.{Acquisition, Transfer}
 
@@ -40,7 +43,7 @@ import javax.inject.Inject
 @Singleton()
 class OtherAssetTransactionsTransformer @Inject() extends Transformer {
 
-  def transformToEtmp(srn: Srn)(
+  def transformToEtmp(srn: Srn, otherAssetDisposed: Boolean)(
     implicit request: DataRequest[_]
   ): List[OtherAssetTransaction] =
     request.userAnswers
@@ -72,7 +75,8 @@ class OtherAssetTransactionsTransformer @Inject() extends Transformer {
                 optConnectedStatus = optAcquisitionRelatedDetails.map(_._2),
                 optIndepValuationSupport = optNoneTransferRelatedDetails.map(_._1),
                 movableSchedule29A = movableSchedule29A,
-                totalIncomeOrReceipts = totalIncomeOrReceipts.value
+                totalIncomeOrReceipts = totalIncomeOrReceipts.value,
+                optOtherAssetDisposed = Option.when(otherAssetDisposed)(buildOptOtherAssetsDisposed(srn, index))
               )
             }
         }
@@ -216,6 +220,194 @@ class OtherAssetTransactionsTransformer @Inject() extends Transformer {
     )
   }
 
+  private def buildOptOtherAssetsDisposed(
+    srn: Srn,
+    otherAssetIndex: Refined[Int, OneTo5000]
+  )(
+    implicit request: DataRequest[_]
+  ): Seq[OtherAssetDisposed] =
+    request.userAnswers
+      .map(
+        HowWasAssetDisposedOfPagesForEachAsset(srn, otherAssetIndex)
+      )
+      .keys
+      .toList
+      .flatMap { key =>
+        key.toIntOption.flatMap(i => refineV[OneTo50](i + 1).toOption) match {
+          case None => None
+          case Some(index) =>
+            for {
+              howWasAssetDisposed <- request.userAnswers.get(
+                HowWasAssetDisposedOfPage(srn, otherAssetIndex, index)
+              )
+              anyPartAssetStillHeld <- request.userAnswers.get(
+                AnyPartAssetStillHeldPage(srn, otherAssetIndex, index)
+              )
+
+            } yield {
+
+              val optPurchaseRelatedDetails =
+                buildOptPurchaseRelatedDetails(howWasAssetDisposed, srn, otherAssetIndex, index)
+
+              OtherAssetDisposed(
+                methodOfDisposal = howWasAssetDisposed.name,
+                optOtherMethod = howWasAssetDisposed match {
+                  case Other(details) => Some(details)
+                  case _ => None
+                },
+                optDateSold = Option.when(howWasAssetDisposed == Sold)(
+                  request.userAnswers
+                    .get(
+                      WhenWasAssetSoldPage(srn, otherAssetIndex, index)
+                    )
+                    .get
+                ),
+                optPurchaserName = optPurchaseRelatedDetails.map(_._1),
+                optPropertyAcquiredFrom = optPurchaseRelatedDetails.map(_._2),
+                optTotalAmountReceived = Option.when(howWasAssetDisposed == Sold)(
+                  request.userAnswers
+                    .get(
+                      TotalConsiderationSaleAssetPage(srn, otherAssetIndex, index)
+                    )
+                    .get
+                    .value
+                ),
+                optConnectedStatus = Option.when(howWasAssetDisposed == Sold)(
+                  request.userAnswers
+                    .get(
+                      IsBuyerConnectedPartyPage(srn, otherAssetIndex, index)
+                    )
+                    .get
+                ),
+                optSupportedByIndepValuation = Option.when(howWasAssetDisposed == Sold)(
+                  request.userAnswers
+                    .get(
+                      AssetSaleIndependentValuationPage(srn, otherAssetIndex, index)
+                    )
+                    .get
+                ),
+                anyPartAssetStillHeld = anyPartAssetStillHeld
+              )
+            }
+        }
+      }
+
+  private def buildOptPurchaseRelatedDetails(
+    howWasAssetDisposed: HowDisposed,
+    srn: Srn,
+    otherAssetIndex: Refined[Int, OneTo5000],
+    disposalIndex: Refined[Int, OneTo50]
+  )(implicit request: DataRequest[_]): Option[(String, PropertyAcquiredFrom)] = {
+
+    Option
+      .when(howWasAssetDisposed == Sold) {
+        val purchaserType = request.userAnswers.get(TypeOfAssetBuyerPage(srn, otherAssetIndex, disposalIndex)).get
+        purchaserType match {
+          case IdentityType.Individual =>
+            (
+              request.userAnswers.get(IndividualNameOfAssetBuyerPage(srn, otherAssetIndex, disposalIndex)),
+              request.userAnswers
+                .get(AssetIndividualBuyerNiNumberPage(srn, otherAssetIndex, disposalIndex))
+                .map(_.value)
+            ).mapN {
+              case (name, Right(nino)) =>
+                (
+                  name,
+                  PropertyAcquiredFrom(
+                    identityType = purchaserType,
+                    idNumber = Some(nino.value),
+                    reasonNoIdNumber = None,
+                    otherDescription = None
+                  )
+                )
+              case (name, Left(noNinoReason)) =>
+                (
+                  name,
+                  PropertyAcquiredFrom(
+                    identityType = purchaserType,
+                    idNumber = None,
+                    reasonNoIdNumber = Some(noNinoReason),
+                    otherDescription = None
+                  )
+                )
+            }
+          case IdentityType.UKCompany =>
+            (
+              request.userAnswers.get(CompanyNameOfAssetBuyerPage(srn, otherAssetIndex, disposalIndex)),
+              request.userAnswers
+                .get(AssetCompanyBuyerCrnPage(srn, otherAssetIndex, disposalIndex))
+                .map(_.value)
+            ).mapN {
+              case (name, Right(crn)) =>
+                (
+                  name,
+                  PropertyAcquiredFrom(
+                    identityType = purchaserType,
+                    idNumber = Some(crn.value),
+                    reasonNoIdNumber = None,
+                    otherDescription = None
+                  )
+                )
+              case (name, Left(noCrnReason)) =>
+                (
+                  name,
+                  PropertyAcquiredFrom(
+                    identityType = purchaserType,
+                    idNumber = None,
+                    reasonNoIdNumber = Some(noCrnReason),
+                    otherDescription = None
+                  )
+                )
+            }
+
+          case IdentityType.UKPartnership =>
+            (
+              request.userAnswers.get(PartnershipBuyerNamePage(srn, otherAssetIndex, disposalIndex)),
+              request.userAnswers
+                .get(PartnershipBuyerUtrPage(srn, otherAssetIndex, disposalIndex))
+                .map(_.value)
+            ).mapN {
+              case (name, Right(utr)) =>
+                (
+                  name,
+                  PropertyAcquiredFrom(
+                    identityType = purchaserType,
+                    idNumber = Some(utr.value.filterNot(_.isWhitespace)),
+                    reasonNoIdNumber = None,
+                    otherDescription = None
+                  )
+                )
+              case (name, Left(noUtrReason)) =>
+                (
+                  name,
+                  PropertyAcquiredFrom(
+                    identityType = purchaserType,
+                    idNumber = None,
+                    reasonNoIdNumber = Some(noUtrReason),
+                    otherDescription = None
+                  )
+                )
+            }
+          case IdentityType.Other =>
+            request.userAnswers
+              .get(OtherBuyerDetailsPage(srn, otherAssetIndex, disposalIndex))
+              .map(
+                other =>
+                  (
+                    other.name,
+                    PropertyAcquiredFrom(
+                      identityType = purchaserType,
+                      idNumber = None,
+                      reasonNoIdNumber = None,
+                      otherDescription = Some(other.description)
+                    )
+                  )
+              )
+        }
+      }
+      .flatten
+  }
+
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, otherAssets: OtherAssets): Try[UserAnswers] = {
     val otherAssetTransactions = otherAssets.otherAssetTransactions
     for {
@@ -331,10 +523,171 @@ class OtherAssetTransactionsTransformer @Inject() extends Transformer {
             ua16 <- optOther.map(t => ua15.set(t._1, t._2)).getOrElse(Try(ua15))
             ua17 <- ua16.set(otherAssetsCompleted._1, otherAssetsCompleted._2)
           } yield {
-            ua17
+            buildOptDisposedOtherAssetsUA(
+              index,
+              srn,
+              ua17,
+              otherAssetTransaction.optOtherAssetDisposed
+            )
           }
-          triedUA
+          triedUA.flatten
       }
     } yield resultUA
+  }
+
+  private def buildOptDisposedOtherAssetsUA(
+    index: Max5000,
+    srn: Srn,
+    userAnswers: UserAnswers,
+    optOtherAssetDisposed: Option[Seq[OtherAssetDisposed]]
+  ): Try[UserAnswers] = {
+    val initialUserAnswersOfDisposal = userAnswers.set(OtherAssetsDisposalPage(srn), optOtherAssetDisposed.isDefined)
+
+    optOtherAssetDisposed
+      .map(
+        otherAssetDisposedList => {
+          for {
+            disposalIndexes <- buildIndexesForMax50(otherAssetDisposedList.size)
+            resultDisposalUA <- disposalIndexes.foldLeft(initialUserAnswersOfDisposal) {
+              case (disposalUA, disposalIndex) =>
+                val otherAssetDisposed = otherAssetDisposedList(disposalIndex.value - 1)
+
+                val methodOfDisposal = otherAssetDisposed.methodOfDisposal match {
+                  case HowDisposed.Sold.name => HowDisposed.Sold
+                  case HowDisposed.Transferred.name => HowDisposed.Transferred
+                  case HowDisposed.Other.name =>
+                    HowDisposed.Other(otherAssetDisposed.optOtherMethod.get)
+                }
+
+                val howWasAssetDisposed = HowWasAssetDisposedOfPage(srn, index, disposalIndex) -> methodOfDisposal
+                val anyPartAssetStillHeld = AnyPartAssetStillHeldPage(srn, index, disposalIndex) -> otherAssetDisposed.anyPartAssetStillHeld
+
+                val optDateSold = otherAssetDisposed.optDateSold.map(
+                  dateSold => WhenWasAssetSoldPage(srn, index, disposalIndex) -> dateSold
+                )
+                val optTotalAmountReceived = otherAssetDisposed.optTotalAmountReceived.map(
+                  totalAmountReceived =>
+                    TotalConsiderationSaleAssetPage(srn, index, disposalIndex) -> Money(totalAmountReceived)
+                )
+
+                val optConnectedStatus = otherAssetDisposed.optConnectedStatus.map(
+                  connectedStatus => {
+                    IsBuyerConnectedPartyPage(srn, index, disposalIndex) -> connectedStatus
+                  }
+                )
+                val optSupportedByIndepValuation = otherAssetDisposed.optSupportedByIndepValuation.map(
+                  supportedByIndepValuation => {
+                    AssetSaleIndependentValuationPage(srn, index, disposalIndex) -> supportedByIndepValuation
+                  }
+                )
+
+                val optPurchaserTyped = otherAssetDisposed.optPropertyAcquiredFrom.map(
+                  propertyAcquiredFrom => {
+                    TypeOfAssetBuyerPage(srn, index, disposalIndex) -> propertyAcquiredFrom.identityType
+                  }
+                )
+
+                val optIndividualTuple = otherAssetDisposed.optPropertyAcquiredFrom
+                  .filter(prop => prop.identityType == IdentityType.Individual)
+                  .map(prop => {
+                    val name = IndividualNameOfAssetBuyerPage(srn, index, disposalIndex) -> otherAssetDisposed.optPurchaserName.get
+                    val yesNoValue = prop.idNumber
+                      .map(id => ConditionalYesNo.yes[String, Nino](Nino(id)))
+                      .getOrElse(
+                        ConditionalYesNo.no[String, Nino](
+                          prop.reasonNoIdNumber.get
+                        )
+                      )
+
+                    (name, AssetIndividualBuyerNiNumberPage(srn, index, disposalIndex) -> yesNoValue)
+                  })
+
+                val optUKCompanyTuple = otherAssetDisposed.optPropertyAcquiredFrom
+                  .filter(prop => prop.identityType == IdentityType.UKCompany)
+                  .map(prop => {
+                    val name = CompanyNameOfAssetBuyerPage(srn, index, disposalIndex) -> otherAssetDisposed.optPurchaserName.get
+                    val yesNoValue = prop.idNumber
+                      .map(id => ConditionalYesNo.yes[String, Crn](Crn(id)))
+                      .getOrElse(
+                        ConditionalYesNo.no[String, Crn](
+                          prop.reasonNoIdNumber.get
+                        )
+                      )
+
+                    (name, AssetCompanyBuyerCrnPage(srn, index, disposalIndex) -> yesNoValue)
+                  })
+
+                val optUKPartnershipTuple = otherAssetDisposed.optPropertyAcquiredFrom
+                  .filter(prop => prop.identityType == IdentityType.UKPartnership)
+                  .map(prop => {
+                    val name = PartnershipBuyerNamePage(srn, index, disposalIndex) -> otherAssetDisposed.optPurchaserName.get
+                    val yesNoValue = prop.idNumber
+                      .map(id => ConditionalYesNo.yes[String, Utr](Utr(id)))
+                      .getOrElse(
+                        ConditionalYesNo.no[String, Utr](
+                          prop.reasonNoIdNumber.get
+                        )
+                      )
+
+                    (name, PartnershipBuyerUtrPage(srn, index, disposalIndex) -> yesNoValue)
+                  })
+
+                val optOther = otherAssetDisposed.optPropertyAcquiredFrom
+                  .filter(prop => prop.identityType == IdentityType.Other)
+                  .map(prop => {
+                    OtherBuyerDetailsPage(srn, index, disposalIndex) -> RecipientDetails(
+                      otherAssetDisposed.optPurchaserName.get,
+                      prop.otherDescription.get
+                    )
+                  })
+
+                for {
+                  disposalUA0 <- disposalUA
+                  disposalUA1 <- disposalUA0
+                    .set(OtherAssetsDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
+                    .set(OtherAssetsDisposalCompleted(srn), SectionCompleted)
+                  disposalUA2 <- disposalUA1.set(howWasAssetDisposed._1, howWasAssetDisposed._2)
+                  disposalUA3 <- disposalUA2.set(anyPartAssetStillHeld._1, anyPartAssetStillHeld._2)
+                  disposalUA4 <- optPurchaserTyped
+                    .map(t => disposalUA3.set(t._1, t._2))
+                    .getOrElse(Try(disposalUA3))
+                  disposalUA5 <- optDateSold
+                    .map(t => disposalUA4.set(t._1, t._2))
+                    .getOrElse(Try(disposalUA4))
+                  disposalUA6 <- optTotalAmountReceived
+                    .map(t => disposalUA5.set(t._1, t._2))
+                    .getOrElse(Try(disposalUA5))
+                  disposalUA7 <- optConnectedStatus
+                    .map(t => disposalUA6.set(t._1, t._2))
+                    .getOrElse(Try(disposalUA6))
+                  disposalUA8 <- optSupportedByIndepValuation
+                    .map(t => disposalUA7.set(t._1, t._2))
+                    .getOrElse(Try(disposalUA7))
+                  disposalUA9 <- optIndividualTuple
+                    .map(t => disposalUA8.set(t._1._1, t._1._2))
+                    .getOrElse(Try(disposalUA8))
+                  disposalUA10 <- optIndividualTuple
+                    .map(t => disposalUA9.set(t._2._1, t._2._2))
+                    .getOrElse(Try(disposalUA9))
+                  disposalUA11 <- optUKCompanyTuple
+                    .map(t => disposalUA10.set(t._1._1, t._1._2))
+                    .getOrElse(Try(disposalUA10))
+                  disposalUA12 <- optUKCompanyTuple
+                    .map(t => disposalUA11.set(t._2._1, t._2._2))
+                    .getOrElse(Try(disposalUA11))
+                  disposalUA13 <- optUKPartnershipTuple
+                    .map(t => disposalUA12.set(t._1._1, t._1._2))
+                    .getOrElse(Try(disposalUA12))
+                  disposalUA14 <- optUKPartnershipTuple
+                    .map(t => disposalUA13.set(t._2._1, t._2._2))
+                    .getOrElse(Try(disposalUA13))
+                  disposalUA15 <- optOther.map(t => disposalUA14.set(t._1, t._2)).getOrElse(Try(disposalUA14))
+
+                } yield disposalUA15
+            }
+          } yield resultDisposalUA
+        }
+      )
+      .getOrElse(initialUserAnswersOfDisposal)
   }
 }

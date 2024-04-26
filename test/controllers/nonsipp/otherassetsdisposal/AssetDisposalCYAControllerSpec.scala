@@ -101,10 +101,6 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
 
       act.like(
         redirectNextPage(onSubmit(mode))
-          .before(
-            when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(())))
-          )
           .after({
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any())(any(), any(), any())
           })

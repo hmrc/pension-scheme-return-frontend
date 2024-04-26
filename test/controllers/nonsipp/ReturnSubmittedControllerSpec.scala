@@ -16,15 +16,15 @@
 
 package controllers.nonsipp
 
-import cats.data.NonEmptyList
-import config.Constants.{RETURN_PERIODS, SUBMISSION_DATE}
+import play.api.test.FakeRequest
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.ReturnSubmittedController.viewModel
+import config.Constants.{RETURN_PERIODS, SUBMISSION_DATE}
+import play.api.libs.json.Json
 import models.DateRange
 import models.requests.psr.MinimalRequiredSubmission.nonEmptyListFormat
-import play.api.libs.json.Json
-import play.api.test.FakeRequest
 import viewmodels.models.SubmissionViewModel
+import controllers.nonsipp.ReturnSubmittedController.viewModel
+import cats.data.NonEmptyList
 import views.html.SubmissionView
 
 import java.time.LocalDateTime
