@@ -909,12 +909,12 @@ surrenderedBenefits.change.heading = Change details of surrendered benefits for 
 otherAssetsHeld.title = Did the scheme hold any other assets during the period of this return?
 otherAssetsHeld.heading = Did {0} hold any other assets during the period of this return?
 otherAssetsHeld.error.required = Select yes if the scheme held any other assets during the period of this return
-otherAssetsHeld.hint = This does not include shares, bonds, land or property. If your scheme holds any of these assets, report them in the relevant section of this pension scheme return.
+otherAssetsHeld.hint = This does not include loans, shares held in a sponsoring employer, unquoted shares, unregulated bonds, bonds and shares acquired from a connected party and land or property. If your scheme holds any of these assets, report them in the relevant section of this pension scheme return.
 
 otherAssetsDisposal.title = Did the scheme dispose of any other assets during the period of this return?
 otherAssetsDisposal.heading = Did {0} dispose of any other assets during the period of this return?
 otherAssetsDisposal.error.required = Select yes if the scheme disposed of any other assets during the period of this return
-otherAssetsDisposal.hint = This does not include loans, shares, third party managed funds, bonds, land or property. If your scheme disposed of any of these assets, report them in the relevant section of this pension scheme return.
+otherAssetsDisposal.hint = This does not include loans, shares held in a sponsoring employer, unquoted shares, unregulated bonds, bonds and shares acquired from a connected party and land or property. If your scheme disposed of any of these assets, report them in the relevant section of this pension scheme return.
 
 
 returnSubmitted.title = Return submitted
@@ -1053,8 +1053,8 @@ totalValueQuotedShares.error.required = Enter the total value of all quoted shar
 totalValueQuotedShares.error.invalid = Total value of all quoted shares and third party managed funds must be an amount of money, like 123.45 or 156
 totalValueQuotedShares.error.tooLarge = Total value of all quoted shares and third party managed funds must be 999999999.99 or less
 
-totalValueQuotedSharesCYA.section.totalCost = Total value of all quoted shares held by {0} on {1}
-totalValueQuotedSharesCYA.section.totalCost.hidden = total value of all quoted shares held by {0} on {1}
+totalValueQuotedSharesCYA.section.totalCost = Total value of all quoted shares and third party managed funds held by {0} on {1}
+totalValueQuotedSharesCYA.section.totalCost.hidden = total value of all quoted shares and third party managed funds held by {0} on {1}
 
 fileUploadErrorMissingInformation.title = Your member details file is missing information or incorrectly formatted
 fileUploadErrorMissingInformation.heading = Your member details file is missing information or incorrectly formatted
@@ -2990,7 +2990,7 @@ otherAssets.list.title.plural = You have added {0} other assets
 otherAssets.list.heading = You have added {0} other asset
 otherAssets.list.heading.plural = You have added {0} other assets
 otherAssets.list.row = {0}
-otherAssets.list.description = You must tell us about all other assets the scheme held at any point during the period of this return. This does not include loans, shares, third party managed funds, bonds, land or property. If your scheme holds any of these assets, report them in the relevant section of this pension scheme return.
+otherAssets.list.description = You must tell us about all other assets the scheme held at any point during the period of this return. This does not include loans, shares held in a sponsoring employer, unquoted shares, unregulated bonds, bonds and shares acquired from a connected party and land or property. If your scheme holds any of these assets, report them in the relevant section of this pension scheme return.
 otherAssets.list.radios = Do you need to add another asset?
 otherAssets.list.inset = You cannot add another asset as you have entered the maximum of 5,000.
 otherAssets.list.error.required = Select yes if you need to add another asset
@@ -3313,7 +3313,7 @@ assetDisposal.reportedOtherAssetsDisposalList.heading.plural = You have reported
 assetDisposal.reportedOtherAssetsDisposalList.row = Disposal of {0} by {1}
 assetDisposal.reportedOtherAssetsDisposalList.row.change.hidden = details of the disposal of {0} by {1}
 assetDisposal.reportedOtherAssetsDisposalList.row.remove.hidden = the disposal of {0} by {1} from the list
-assetDisposal.reportedOtherAssetsDisposalList.description = You must tell us about all other assets disposed of by the scheme during the period of this return. This does not include loans, shares, bonds, land or property. If your scheme disposed of any of these assets, report them in the relevant section of this pension scheme return.
+assetDisposal.reportedOtherAssetsDisposalList.description = You must tell us about all other assets disposed of by the scheme during the period of this return. This does not include loans, shares held in a sponsoring employer, unquoted shares, unregulated bonds, bonds and shares acquired from a connected party and land or property. If your scheme disposed of any of these assets, report them in the relevant section of this pension scheme return.
 assetDisposal.reportedOtherAssetsDisposalList.radios = Do you need to report another asset disposal?
 assetDisposal.reportedOtherAssetsDisposalList.inset.maximumReached = You cannot add another asset disposal as you have entered the maximum of 5,000.
 assetDisposal.reportedOtherAssetsDisposalList.inset.allOtherAssetsDisposed.paragraph1 = You have reported disposal of all the other assets that you told us about.
