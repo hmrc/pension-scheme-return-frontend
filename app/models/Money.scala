@@ -19,6 +19,8 @@ package models
 import utils.Transform
 import play.api.libs.json.{Format, Json}
 
+import java.text.DecimalFormat
+
 case class Money(value: Double, displayAs: String) {
   val isZero: Boolean = value == 0d
 }
@@ -26,7 +28,7 @@ case class Money(value: Double, displayAs: String) {
 object Money {
 
   def apply(value: Double): Money =
-    Money(value, f"$value%2.2f")
+    Money(value, new DecimalFormat("#,##0.00").format(value))
 
   implicit val formats: Format[Money] = Json.format[Money]
 }
