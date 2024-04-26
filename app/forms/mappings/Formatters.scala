@@ -25,8 +25,6 @@ import forms.mappings.errors._
 
 import scala.util.control.Exception.nonFatalCatch
 
-import java.text.DecimalFormat
-
 trait Formatters {
 
   private[mappings] def stringFormatter(errorKey: String, args: Seq[Any] = Seq.empty): Formatter[String] =
@@ -241,14 +239,14 @@ trait Formatters {
 
       private val baseFormatter =
         doubleFormatter(errors.requiredKey, errors.nonNumericKey, errors.max, errors.min, args)
-      private val decimalRegex = "^-?\\d+(\\.\\d{1,2})?$"
+      private val decimalRegex = """^-?\d{1,9}(?:\.\d{1,2})?$"""
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Money] =
         baseFormatter
           .bind(key, data.view.mapValues(_.replace("£", "")).toMap)
           .flatMap { double =>
-            if (BigDecimal(double).toString().matches(decimalRegex)) {
-              Right(Money(double, new DecimalFormat("#,##0.00").format(double)))
+            if (BigDecimal(double).bigDecimal.toPlainString.matches(decimalRegex)) {
+              Right(Money(double))
             } else {
               Left(Seq(FormError(key, errors.nonNumericKey, args)))
             }
