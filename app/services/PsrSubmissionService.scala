@@ -16,6 +16,7 @@
 
 package services
 
+import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
 import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
@@ -72,6 +73,7 @@ class PsrSubmissionService @Inject()(
     val optUnregulatedOrConnectedBondsHeld = request.userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
     val optBondsDisposal = request.userAnswers.get(BondsDisposalPage(srn))
     val optOtherAssetsHeld = request.userAnswers.get(OtherAssetsHeldPage(srn))
+    val optOtherAssetsDisposal = request.userAnswers.get(OtherAssetsDisposalPage(srn))
 
     (
       minimalRequiredSubmissionTransformer.transformToEtmp(srn),
@@ -88,7 +90,8 @@ class PsrSubmissionService @Inject()(
             optDisposeAnyLandOrProperty,
             optUnregulatedOrConnectedBondsHeld,
             optBondsDisposal,
-            optOtherAssetsHeld
+            optOtherAssetsHeld,
+            optOtherAssetsDisposal
           ),
           membersPayments = memberPaymentsTransformer.transformToEtmp(srn, request.userAnswers),
           shares = buildShares(srn)(optDidSchemeHoldAnyShares, optSharesDisposal),
@@ -111,7 +114,8 @@ class PsrSubmissionService @Inject()(
     optDisposeAnyLandOrProperty: Option[Boolean],
     optUnregulatedOrConnectedBondsHeld: Option[Boolean],
     optBondsDisposal: Option[Boolean],
-    optOtherAssetsHeld: Option[Boolean]
+    optOtherAssetsHeld: Option[Boolean],
+    optOtherAssetsDisposal: Option[Boolean]
   )(implicit request: DataRequest[_]): Option[Assets] =
     Option.when(
       List(optLandOrPropertyHeld, optMoneyWasBorrowed, optUnregulatedOrConnectedBondsHeld, optOtherAssetsHeld).flatten.nonEmpty
@@ -142,14 +146,15 @@ class PsrSubmissionService @Inject()(
               bondTransactions = bondTransactionsTransformer.transformToEtmp(srn, bondsDisposal)
             )
         },
-        optOtherAssets = optOtherAssetsHeld.map(
+        optOtherAssets = optOtherAssetsHeld.map {
+          val otherAssetsDisposal = optOtherAssetsDisposal.getOrElse(false)
           otherAssetsHeld =>
             OtherAssets(
               otherAssetsWereHeld = otherAssetsHeld,
-              otherAssetsWereDisposed = false,
-              otherAssetTransactions = otherAssetTransactionsTransformer.transformToEtmp(srn)
+              otherAssetsWereDisposed = otherAssetsDisposal,
+              otherAssetTransactions = otherAssetTransactionsTransformer.transformToEtmp(srn, otherAssetsDisposal)
             )
-        )
+        }
       )
     )
 

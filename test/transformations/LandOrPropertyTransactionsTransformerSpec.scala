@@ -77,7 +77,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         )
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
@@ -139,7 +139,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         )
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
@@ -202,7 +202,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         )
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
@@ -266,7 +266,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         )
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
@@ -330,7 +330,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         )
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
@@ -395,7 +395,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         )
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
@@ -460,7 +460,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         )
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)

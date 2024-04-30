@@ -84,6 +84,17 @@ object HowWasAssetDisposedOfPage {
     HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex, answerChanged = false)
 }
 
+case class HowWasAssetDisposedOfPagesForEachAsset(
+  srn: Srn,
+  assetIndex: Max5000
+) extends QuestionPage[Map[String, HowDisposed]] {
+
+  override def path: JsPath =
+    Paths.assetsDisposed \ toString \ assetIndex.arrayIndex.toString
+
+  override def toString: String = "methodOfDisposal"
+}
+
 case class HowWasAssetDisposedOfPages(srn: Srn) extends QuestionPage[Map[String, Map[String, HowDisposed]]] {
 
   override def path: JsPath = Paths.assetsDisposed \ toString
