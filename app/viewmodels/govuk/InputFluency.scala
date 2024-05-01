@@ -18,6 +18,7 @@ package viewmodels.govuk
 
 import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+import uk.gov.hmrc.govukfrontend.views.viewmodels.FormGroup
 import uk.gov.hmrc.govukfrontend.views.viewmodels.input.{Input, PrefixOrSuffix}
 import play.api.data.Field
 import play.api.i18n.Messages
@@ -73,8 +74,8 @@ trait InputFluency {
     def withHint(hint: Option[Hint]): Input =
       input.copy(hint = hint)
 
-    def withFormGroupClasses(classes: String): Input =
-      input.copy(formGroupClasses = classes)
+    def withFormGroupClasses(formGroup: FormGroup): Input =
+      input.copy(formGroup = formGroup)
 
     def withCssClass(newClass: String): Input =
       input.copy(classes = s"${input.classes} $newClass")

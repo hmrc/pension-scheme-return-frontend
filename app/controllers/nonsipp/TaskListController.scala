@@ -583,7 +583,7 @@ object TaskListController {
       Message("nonsipp.tasklist.heading", startDate.show, endDate.show),
       viewModel
     ).withDescription(
-      Heading2("nonsipp.tasklist.subheading.incomplete") ++
+      Heading2.small("nonsipp.tasklist.subheading.incomplete") ++
         ParagraphMessage(Message("nonsipp.tasklist.description", numberOfCompleted, numberOfTotal))
     )
   }

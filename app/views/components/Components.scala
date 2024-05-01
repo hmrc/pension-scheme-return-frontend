@@ -107,7 +107,7 @@ object Components {
           heading.map { case (key, value) => renderMessage(key) -> renderMessage(value) }
         )
       case CompoundMessage(first, second) => combine(renderMessage(first), renderMessage(second))
-      case Heading2(content, labelSize) => h2(renderMessage(content), labelSize.toString)
+      case Heading2(content, headingSize) => h2(renderMessage(content), headingSize.toString)
       case HintMessage(content) => hint(renderMessage(content))
     }
 }

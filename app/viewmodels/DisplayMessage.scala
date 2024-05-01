@@ -61,10 +61,11 @@ object DisplayMessage {
 
   case class DownloadLinkMessage(content: Message, url: String) extends InlineMessage
 
-  case class Heading2(content: InlineMessage, headingSize: LabelSize = LabelSize.Small) extends BlockMessage
+  case class Heading2(content: InlineMessage, headingSize: HeadingSize = HeadingSize.Small) extends BlockMessage
 
   object Heading2 {
-    def medium(content: InlineMessage): Heading2 = Heading2(content, LabelSize.Medium)
+    def medium(content: InlineMessage): Heading2 = Heading2(content, HeadingSize.Medium)
+    def small(content: InlineMessage): Heading2 = Heading2(content, HeadingSize.Small)
   }
 
   case class ParagraphMessage(content: NonEmptyList[InlineMessage]) extends BlockMessage

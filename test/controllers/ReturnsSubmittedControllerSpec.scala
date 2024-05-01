@@ -58,7 +58,7 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
         TableElem(
           LinkMessage(
             Message("View", List()),
-            s"/pension-scheme-return/${srn.value}/pension-scheme-return-task-list-view/2020-04-06/1/0"
+            s"/pension-scheme-return/${srn.value}/pension-scheme-return-view-only-task-list/2020-04-06/1/0"
           ),
           None
         )

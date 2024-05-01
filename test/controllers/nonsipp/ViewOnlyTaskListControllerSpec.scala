@@ -268,7 +268,19 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     act.like(renderView(onPageLoad, currentUA) { implicit app => implicit request =>
       val view = injected[TaskListView]
       view(viewModel)
-    }.withName("onPageLoad renders ok"))
+    }.withName("onPageLoad renders ok with indexes /2/1"))
+
+    lazy val onPageLoadWithZero = routes.ViewOnlyTaskListController.onPageLoad(
+      srn,
+      yearString,
+      1,
+      0
+    )
+
+    act.like(renderView(onPageLoadWithZero, currentUA) { implicit app => implicit request =>
+      val view = injected[TaskListView]
+      view(viewModel)
+    }.withName("onPageLoad renders ok with indexes /1/0"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 

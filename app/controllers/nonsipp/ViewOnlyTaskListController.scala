@@ -54,10 +54,11 @@ class ViewOnlyTaskListController @Inject()(
       request.userAnswers.get(WhichTaxYearPage(srn)) match {
         case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         case Some(dateRange: DateRange) =>
+          val other: Int = if (previous == 0) current else previous
           for {
             currentReturn <- psrRetrievalService.getStandardPsrDetails(None, Some(year), Some("%03d".format(current)))
             _ <- saveService.save(currentReturn)
-            previousReturn <- psrRetrievalService.getStandardPsrDetails(None, Some(year), Some("%03d".format(previous)))
+            previousReturn <- psrRetrievalService.getStandardPsrDetails(None, Some(year), Some("%03d".format(other)))
             viewModel = ViewOnlyTaskListController.viewModel(
               srn,
               request.schemeDetails.schemeName,
@@ -117,7 +118,7 @@ object ViewOnlyTaskListController {
       Message("nonsipp.tasklist.heading", startDate.show, endDate.show),
       viewModel
     ).withDescription(
-      Heading2("nonsipp.tasklist.subheading.completed") ++
+      Heading2.small("nonsipp.tasklist.subheading.completed") ++
         ParagraphMessage(Message("nonsipp.tasklist.description", numberOfCompleted, numberOfTotal))
     )
   }
