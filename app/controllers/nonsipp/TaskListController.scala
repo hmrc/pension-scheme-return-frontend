@@ -16,23 +16,26 @@
 
 package controllers.nonsipp
 
-import services.{PsrVersionsService, SchemeDateService}
-import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
+import services.{AuditService, PsrVersionsService, SchemeDateService}
 import pages.nonsipp.memberdetails._
-import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils._
 import cats.implicits.toShow
 import pages.nonsipp.accountingperiod.AccountingPeriods
-import pages.nonsipp.CheckReturnDatesPage
 import viewmodels.models.TaskListStatus._
 import _root_.config.Refined.OneTo300
+import models.audit.TaskListAuditEvent
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
+import viewmodels.implicits._
+import controllers.nonsipp.TaskListController.getJson
 import views.html.TaskListView
 import models.SchemeId.Srn
 import controllers.actions._
 import eu.timepit.refined.refineV
+import pages.nonsipp.CheckReturnDatesPage
+import play.api.libs.json.Json
 import utils.nonsipp.TaskListStatusUtils
 import models.backend.responses.ReportStatus
 import utils.DateTimeUtils.localDateShow
@@ -52,6 +55,7 @@ class TaskListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: TaskListView,
   schemeDateService: SchemeDateService,
+  auditService: AuditService,
   psrVersionsService: PsrVersionsService
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -62,6 +66,7 @@ class TaskListController @Inject()(
       case Some(dates) =>
         for {
           response <- psrVersionsService.getVersions(request.schemeDetails.pstr, formatDateForApi(dates.from))
+          _ = auditService.sendEvent(TaskListAuditEvent(getJson(srn, request.userAnswers, request.pensionSchemeId)))
           hasHistory = response
             .filter(
               psrVersionsService =>
@@ -144,6 +149,268 @@ object TaskListController {
         }
       ),
       taskListStatus
+    )
+  }
+
+  private def getJson(srn: Srn, userAnswers: UserAnswers, pensionSchemeId: PensionSchemeId) = {
+
+    val activeBankAccount = userAnswers.get(ActiveBankAccountPage(srn))
+    val whyNoBankAccountPage = userAnswers.get(WhyNoBankAccountPage(srn))
+
+    val taskListStatus: TaskListStatus =
+      getBasicSchemeDetailsTaskListStatus(srn, userAnswers, pensionSchemeId, activeBankAccount, whyNoBankAccountPage)
+    val basicSchemeDetailsStatus = taskListStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val memberSection = Json.obj(
+      "name" -> "schemeDetails",
+      "subMenuItems" -> Json.arr(
+        Json.obj("name" -> "basic", "status" -> basicSchemeDetailsStatus)
+      )
+    )
+
+    val getFinancialDetails: TaskListStatus = getFinancialDetailsTaskListStatus(userAnswers, srn)
+    val getFinancialDetailsTaskList = getFinancialDetails match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val financialDetails = Json.obj(
+      "name" -> "financialDetails",
+      "subMenuItems" -> Json.arr(
+        Json.obj("name" -> "basic", "status" -> getFinancialDetailsTaskList)
+      )
+    )
+
+    val getMembersTaskList = getMembersTaskListStatus(userAnswers, srn)
+    val getMembersList = getMembersTaskList match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val membersList = Json.obj(
+      "name" -> "memberDetails",
+      "subMenuItems" -> Json.arr(
+        Json.obj("name" -> "basic", "status" -> getMembersList)
+      )
+    )
+
+    val (employerContributionStatus, employerContributionLink) = getEmployerContributionStatusAndLink(userAnswers, srn)
+
+    val (transferInStatus, transferInLink) = getTransferInStatusAndLink(userAnswers, srn)
+    val (transferOutStatus, transferOutLink) = getTransferOutStatusAndLink(userAnswers, srn)
+
+    val (memberContributionStatus, memberContributionLink) = getMemberContributionStatusAndLink(userAnswers, srn)
+    val (pclsMemberStatus, pclsMemberLink) = getPclsStatusAndLink(userAnswers, srn)
+
+    val (surrenderedBenefitsStatus, surrenderedBenefitsLink) = getSurrenderedBenefitsStatusAndLink(userAnswers, srn)
+
+    val (pensionPaymentsStatus, pensionPaymentsLink) = getPensionPaymentsStatusAndLink(userAnswers, srn)
+    val (unallocatedContributionsStatus, unallocatedContributionsLink) =
+      getUnallocatedContributionsStatusAndLink(userAnswers, srn)
+
+    val employerContribution = employerContributionStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val transferIn = transferInStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val transferOut = transferOutStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val memberContribution = memberContributionStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val pclsMember = pclsMemberStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val surrenderedBenefits = surrenderedBenefitsStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val pensionPayments = pensionPaymentsStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val unallocatedContributions = unallocatedContributionsStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val memberPaymentSection = Json.obj(
+      "name" -> "memberPaymentDetails",
+      "subMenuItems" -> Json.arr(
+        Json.obj("name" -> "basic", "status" -> employerContribution),
+        Json.obj("name" -> "basic", "status" -> transferIn),
+        Json.obj("name" -> "basic", "status" -> transferOut),
+        Json.obj("name" -> "basic", "status" -> memberContribution),
+        Json.obj("name" -> "basic", "status" -> pclsMember),
+        Json.obj("name" -> "basic", "status" -> surrenderedBenefits),
+        Json.obj("name" -> "basic", "status" -> pensionPayments),
+        Json.obj("name" -> "basic", "status" -> unallocatedContributions)
+      )
+    )
+
+    val taskListSta: TaskListStatus = getLoansTaskListStatus(userAnswers, srn)
+    val (borrowingStatus, borrowingLink) = getBorrowingTaskListStatusAndLink(userAnswers, srn)
+
+    val taskList = taskListSta match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val borrowing = borrowingStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val loanSection = Json.obj(
+      "name" -> "loanDetails",
+      "subMenuItems" -> Json
+        .arr(Json.obj("name" -> "basic", "status" -> taskList), Json.obj("name" -> "basic", "status" -> borrowing))
+    )
+
+    val (sharesStatus, sharesLink) = getSharesTaskListStatusAndLink(userAnswers, srn)
+    val (quotedSharesStatus, quotedSharesStatusAndLink) = getQuotedSharesTaskListStatusAndLink(userAnswers, srn)
+    val (sharesDisposalsStatus, sharesDisposalsLinkUrl) =
+      TaskListStatusUtils.getSharesDisposalsTaskListStatusWithLink(userAnswers, srn)
+
+    val shares = sharesStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val quotedShares = quotedSharesStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val sharesDisposals = sharesDisposalsStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val sharesSection = Json.obj(
+      "name" -> "shareDetails",
+      "subMenuItems" -> Json.arr(
+        Json.obj("name" -> "basic", "status" -> shares),
+        Json.obj("name" -> "basic", "status" -> quotedShares),
+        Json.obj("name" -> "basic", "status" -> sharesDisposals)
+      )
+    )
+
+    val (landOrPropertyStatus, landOrPropertyStatusLink) =
+      TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(userAnswers, srn)
+    val (landOrPropertyDisposalsStatus, landOrPropertyDisposalsLinkUrl) =
+      TaskListStatusUtils.getLandOrPropertyDisposalsTaskListStatusWithLink(userAnswers, srn)
+
+    val landOrProperty = landOrPropertyStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val landOrPropertyDisposals = landOrPropertyDisposalsStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val landOrPropertySection = Json.obj(
+      "name" -> "landOrPropertyDetails",
+      "subMenuItems" -> Json.arr(
+        Json.obj("name" -> "basic", "status" -> landOrProperty),
+        Json.obj("name" -> "basic", "status" -> landOrPropertyDisposals)
+      )
+    )
+
+    val (bondStatus, bondLink) = getBondsTaskListStatusAndLink(userAnswers, srn)
+    val (disposalStatus, disposalLink) = getBondsDisposalsTaskListStatusWithLink(userAnswers, srn)
+
+    val bond = bondStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val bondDisposal = disposalStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val bondSection = Json.obj(
+      "name" -> "bondDetails",
+      "subMenuItems" -> Json
+        .arr(Json.obj("name" -> "basic", "status" -> bond), Json.obj("name" -> "basic", "status" -> bondDisposal))
+    )
+
+    val (otherAssetsStatus, otherAssetsLink) = getOtherAssetsTaskListStatusAndLink(userAnswers, srn)
+    val (otherAssetsDisposalsStatus, otherAssetsDisposalsLinkUrl) =
+      TaskListStatusUtils.getOtherAssetsDisposalTaskListStatusAndLink(userAnswers, srn)
+
+    val otherAssets = otherAssetsStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val otherAssetsDisposals = otherAssetsDisposalsStatus match {
+      case Completed => "Completed"
+      case InProgress => "In progress"
+      case NotStarted => "Not started"
+      case _ => "Not available"
+    }
+    val otherAssetSection = Json.obj(
+      "name" -> "otherAssetDetails",
+      "subMenuItems" -> Json.arr(
+        Json.obj("name" -> "basic", "status" -> otherAssets),
+        Json.obj("name" -> "basic", "status" -> otherAssetsDisposals)
+      )
+    )
+
+    Json.obj(
+      "taskListStatus" -> Json.arr(
+        memberSection,
+        financialDetails,
+        membersList,
+        memberPaymentSection,
+        loanSection,
+        sharesSection,
+        landOrPropertySection,
+        bondSection,
+        otherAssetSection
+      )
     )
   }
 
