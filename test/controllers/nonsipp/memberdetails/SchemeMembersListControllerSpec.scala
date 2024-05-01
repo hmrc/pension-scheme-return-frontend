@@ -20,14 +20,13 @@ import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc.Call
 import models.ManualOrUpload.{Manual, Upload}
 import config.Refined.OneTo300
+import controllers.ControllerBaseSpec
 import views.html.ListView
 import eu.timepit.refined._
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import controllers.nonsipp.memberdetails.SchemeMembersListController._
 import viewmodels.models.MemberState
-import viewmodels.models.MemberState.Active
-import controllers.ControllerBaseSpec
 
 class SchemeMembersListControllerSpec extends ControllerBaseSpec {
 
@@ -62,7 +61,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
                   1,
                   Manual,
                   NormalMode,
-                  List((refineMV(1), ((index - 1).toString, memberDetails.fullName), Active))
+                  List((refineMV(1), ((index - 1).toString, memberDetails.fullName)))
                 )
               )
         )
@@ -115,7 +114,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
                   1,
                   Upload,
                   NormalMode,
-                  List((refineMV(1), ((index - 1).toString, memberDetails.fullName), Active))
+                  List((refineMV(1), ((index - 1).toString, memberDetails.fullName)))
                 )
               )
         )

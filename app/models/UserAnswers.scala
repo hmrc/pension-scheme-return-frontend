@@ -17,7 +17,7 @@
 package models
 
 import utils.Transform
-import queries.{Gettable, Removable, Settable}
+import queries._
 import models.UserAnswers.SensitiveJsObject
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive}
 import play.api.libs.json._
@@ -93,13 +93,16 @@ final case class UserAnswers(
     pages.foldLeft(Try(this))((ua, page) => ua.transform(_.removeOnly(page), _ => removeOnly(page)))
 
   def remove(pages: List[Removable[_]]): Try[UserAnswers] =
-    pages.foldLeft(Try(this))((ua, page) => ua.flatMap(_.remove(page)))
+    pages.foldLeft(Try(this))((ua, page) => ua.flatMap(_.removeOnly(page)))
 
   def setWhen[A](bool: Boolean)(page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] =
     if (bool) setOnly(page, value) else Try(this)
 
-  def removeWhen[A](bool: Boolean)(page: Removable[A]): Try[UserAnswers] =
-    if (bool) removeOnly(page) else Try(this)
+  def removeWhen(bool: Boolean)(page: Removable[_]*): Try[UserAnswers] =
+    if (bool) page.foldLeft(Try(this))((ua, next) => ua.flatMap(_.removeOnly(next))) else Try(this)
+
+  def removeWhen(bool: UserAnswers => Boolean)(page: Removable[_]*): Try[UserAnswers] =
+    if (bool(this)) page.foldLeft(Try(this))((ua, next) => ua.flatMap(_.removeOnly(next))) else Try(this)
 
   def setOnly[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
     val updatedData = data.decryptedValue.setObject(page.path, Json.toJson(value)) match {
@@ -123,6 +126,18 @@ final case class UserAnswers(
 
     updatedData.map(d => copy(data = SensitiveJsObject(d)))
   }
+
+  /**
+   * - When soft deleting pages, the cleanup function is not called to stop accidentally hard deleting associated pages
+   *   as cleanup pages use remove rather than softRemove.
+   * */
+  def softRemove[A: Reads: Writes](page: Gettable[A] with Settable[A] with Removable[A]): Try[UserAnswers] =
+    get(page).fold(Try(this)) { value =>
+      for {
+        updated <- set(SoftRemovable.path ++ page.path, Json.toJson(value))
+        removed <- updated.removeOnly(page)
+      } yield removed
+    }
 }
 
 object UserAnswers {
@@ -141,9 +156,13 @@ object UserAnswers {
     }
   }
 
+  def get[A: Reads](page: Gettable[A]): UserAnswers => Option[A] = _.get(page)
+
   def set[A: Writes](page: Settable[A], value: A): UserAnswers => Try[UserAnswers] = _.set(page, value)
 
   def remove[A](page: Removable[A]): UserAnswers => Try[UserAnswers] = _.remove(page)
+
+  def softRemove[A: Reads: Writes](page: SoftRemovable[A]): UserAnswers => Try[UserAnswers] = _.softRemove(page)
 
   case class SensitiveJsObject(override val decryptedValue: JsObject) extends Sensitive[JsObject]
 

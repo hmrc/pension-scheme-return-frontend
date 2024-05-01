@@ -16,7 +16,6 @@
 
 package transformations
 
-import pages.nonsipp.employercontributions._
 import org.scalatest.matchers.must.Matchers
 import com.softwaremill.diffx.scalatest.DiffShouldMatcher
 import config.Refined.{Max300, Max5, Max50}
@@ -27,6 +26,8 @@ import org.scalatest.OptionValues
 import pages.nonsipp.membersurrenderedbenefits._
 import models._
 import pages.nonsipp.membertransferout._
+import models.softdelete.SoftDeletedMember
+import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberdetails._
 import org.scalatest.freespec.AnyFreeSpec
 import pages.nonsipp.membercontributions._
@@ -60,6 +61,7 @@ class MemberPaymentsTransformerSpec
   private val memberPayments = MemberPayments(
     memberDetails = List(
       MemberDetails(
+        state = MemberState.Active,
         personalDetails = MemberPersonalDetails(
           firstName = memberDetails.firstName,
           lastName = memberDetails.lastName,
@@ -93,7 +95,50 @@ class MemberPaymentsTransformerSpec
           )
         ),
         benefitsSurrendered = Some(
-          PensionSurrender(
+          SurrenderedBenefits(
+            totalSurrendered = 12.34,
+            dateOfSurrender = LocalDate.of(2022, 12, 12),
+            surrenderReason = "some reason"
+          )
+        ),
+        pensionAmountReceived = Some(12.34)
+      ),
+      MemberDetails(
+        state = MemberState.Deleted,
+        personalDetails = MemberPersonalDetails(
+          firstName = memberDetails.firstName,
+          lastName = memberDetails.lastName,
+          nino = Some(nino.value),
+          reasonNoNINO = None,
+          dateOfBirth = memberDetails.dob
+        ),
+        employerContributions = List(
+          EmployerContributions(
+            employerName = employerName,
+            employerType = EmployerType.UKCompany(Right(crn.value)),
+            totalTransferValue = money.value
+          )
+        ),
+        transfersIn = List(
+          TransfersIn(
+            schemeName = schemeName,
+            dateOfTransfer = localDate,
+            transferSchemeType = PensionSchemeType.RegisteredPS("123"),
+            transferValue = money.value,
+            transferIncludedAsset = true
+          )
+        ),
+        totalContributions = Some(money.value),
+        memberLumpSumReceived = Some(MemberLumpSumReceived(money.value, money.value)),
+        transfersOut = List(
+          TransfersOut(
+            schemeName = schemeName,
+            dateOfTransfer = localDate,
+            transferSchemeType = PensionSchemeType.RegisteredPS("456")
+          )
+        ),
+        benefitsSurrendered = Some(
+          SurrenderedBenefits(
             totalSurrendered = 12.34,
             dateOfSurrender = LocalDate.of(2022, 12, 12),
             surrenderReason = "some reason"
@@ -111,6 +156,49 @@ class MemberPaymentsTransformerSpec
     lumpSumReceived = true,
     benefitsSurrenderedDetails = SectionDetails(made = true, completed = true),
     pensionReceived = true
+  )
+
+  private val softDeletedMember = SoftDeletedMember(
+    memberDetails = MemberPersonalDetails(
+      firstName = memberDetails.firstName,
+      lastName = memberDetails.lastName,
+      nino = Some(nino.value),
+      reasonNoNINO = None,
+      dateOfBirth = memberDetails.dob
+    ),
+    employerContributions = List(
+      EmployerContributions(
+        employerName = employerName,
+        employerType = EmployerType.UKCompany(Right(crn.value)),
+        totalTransferValue = money.value
+      )
+    ),
+    transfersIn = List(
+      TransfersIn(
+        schemeName = schemeName,
+        dateOfTransfer = localDate,
+        transferSchemeType = PensionSchemeType.RegisteredPS("123"),
+        transferValue = money.value,
+        transferIncludedAsset = true
+      )
+    ),
+    totalMemberContribution = Some(money),
+    memberLumpSumReceived = Some(MemberLumpSumReceived(money.value, money.value)),
+    transfersOut = List(
+      TransfersOut(
+        schemeName = schemeName,
+        dateOfTransfer = localDate,
+        transferSchemeType = PensionSchemeType.RegisteredPS("456")
+      )
+    ),
+    pensionSurrendered = Some(
+      SurrenderedBenefits(
+        totalSurrendered = 12.34,
+        dateOfSurrender = LocalDate.of(2022, 12, 12),
+        surrenderReason = "some reason"
+      )
+    ),
+    totalAmountPensionPaymentsPage = Some(Money(12.34))
   )
 
   private val index = refineMV[Max300.Refined](1)
@@ -157,7 +245,7 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(SchemeTransferOutPage(srn), true)
     .unsafeSet(TransferOutMemberListPage(srn), false)
     .unsafeSet(TransfersOutJourneyStatus(srn), SectionStatus.InProgress)
-    .unsafeSet(TransfersOutCompletedPage(srn, index, transfersOutIndex), SectionCompleted)
+    .unsafeSet(TransfersOutSectionCompleted(srn, index, transfersOutIndex), SectionCompleted)
     .unsafeSet(ReceivingSchemeNamePage(srn, index, transfersOutIndex), schemeName)
     .unsafeSet(WhenWasTransferMadePage(srn, index, transfersOutIndex), localDate)
     .unsafeSet(ReceivingSchemeTypePage(srn, index, transfersOutIndex), PensionSchemeType.RegisteredPS("456"))
@@ -174,6 +262,8 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(TotalAmountPensionPaymentsPage(srn, index), Money(12.34))
     .unsafeSet(PensionPaymentsJourneyStatus(srn), SectionStatus.Completed)
     .unsafeSet(MemberPensionPaymentsListPage(srn), true)
+    // soft deleted
+    .unsafeSet(SoftDeletedMembers(srn), List(softDeletedMember))
 
   "MemberPaymentsTransformer - To Etmp" - {
     "should return empty List when userAnswer is empty" in {
@@ -200,7 +290,7 @@ class MemberPaymentsTransformerSpec
         .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
         .unsafeSet(EmployerContributionsPage(srn), false)
         .unsafeSet(EmployerContributionsMemberListPage(srn), false)
-        .removeOnly(AllEmployerContributionsProgress(srn))
+        .removeOnly(EmployerContributionsProgress.all(srn))
         .get
 
       val result = memberPaymentsTransformer.transformFromEtmp(defaultUserAnswers, srn, memberPaymentsNoContributions)

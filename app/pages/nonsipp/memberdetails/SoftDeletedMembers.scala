@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package models.requests.psr
+package pages.nonsipp.memberdetails
 
-import play.api.libs.json.{Format, Json}
+import models.softdelete.SoftDeletedMember
+import queries.{Gettable, Settable, SoftRemovable}
+import pages.Page
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
 
-import java.time.LocalDate
+case class SoftDeletedMembers(srn: Srn)
+    extends Page
+    with Gettable[List[SoftDeletedMember]]
+    with Settable[List[SoftDeletedMember]] {
 
-case class PensionSurrender(
-  totalSurrendered: Double,
-  dateOfSurrender: LocalDate,
-  surrenderReason: String
-)
-
-object PensionSurrender {
-  implicit val formats: Format[PensionSurrender] = Json.format[PensionSurrender]
+  override def path: JsPath = SoftRemovable.path
 }

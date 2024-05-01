@@ -134,10 +134,6 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
     def liftF(implicit ec: ExecutionContext): EitherT[Future, Result, A] = EitherT.liftF(f)
   }
 
-  implicit class TryOps[A](t: Try[A]) {
-    def toFuture: Future[A] = Future.fromTry(t)
-  }
-
   implicit class ListIndexOps[A](l: List[A]) {
     def zipWithIndexToMap: Map[String, A] =
       l.zipWithIndex
@@ -166,9 +162,17 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
     def setWhen[A: Writes](bool: Boolean)(page: Settable[A], value: A): Try[UserAnswers] =
       userAnswers.flatMap(_.setWhen(bool)(page, value))
     def compose(c: List[UserAnswers.Compose]): Try[UserAnswers] = userAnswers.flatMap(_.compose(c))
-    def remove[A: Writes](page: Removable[A]): Try[UserAnswers] = userAnswers.flatMap(_.removePages(List(page)))
+    def remove[A](page: Removable[A]): Try[UserAnswers] = userAnswers.flatMap(_.removePages(List(page)))
 
-    def removeWhen[A: Writes](bool: Boolean)(page: Removable[A]): Try[UserAnswers] =
-      userAnswers.flatMap(_.removeWhen(bool)(page))
+    def remove(pages: List[Removable[_]]): Try[UserAnswers] = userAnswers.flatMap(_.removePages(pages))
+
+    def softRemove[A: Reads: Writes](page: Gettable[A] with Settable[A] with Removable[A]): Try[UserAnswers] =
+      userAnswers.flatMap(_.softRemove(page))
+
+    def removeWhen(bool: Boolean)(page: Removable[_]*): Try[UserAnswers] =
+      userAnswers.flatMap(_.removeWhen(bool)(page: _*))
+
+    def removeWhen(bool: UserAnswers => Boolean)(page: Removable[_]*): Try[UserAnswers] =
+      userAnswers.flatMap(ua => ua.removeWhen(bool(ua))(page: _*))
   }
 }

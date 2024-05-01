@@ -16,19 +16,21 @@
 
 package controllers.nonsipp.memberdetails
 
-import services.SaveService
-import pages.nonsipp.memberdetails.{MemberDetailsPage, RemoveMemberDetailsPage}
+import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails._
 import viewmodels.implicits._
 import play.api.mvc._
 import config.Refined.Max300
+import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
-import forms.YesNoPageFormProvider
-import models.{Mode, NameDOB}
+import models._
+import play.api.i18n.MessagesApi
 import views.html.YesNoPageView
 import models.SchemeId.Srn
-import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.nonsipp.SoftDelete
+import forms.YesNoPageFormProvider
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import controllers.nonsipp.memberdetails.RemoveMemberDetailsController._
@@ -46,10 +48,11 @@ class RemoveMemberDetailsController @Inject()(
   formProvider: YesNoPageFormProvider,
   saveService: SaveService,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView
+  view: YesNoPageView,
+  submissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends PSRController
+    with SoftDelete {
 
   private val form = RemoveMemberDetailsController.form(formProvider)
 
@@ -72,11 +75,16 @@ class RemoveMemberDetailsController @Inject()(
           removeMemberDetails => {
             if (removeMemberDetails) {
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.remove(MemberDetailsPage(srn, index)))
+                updatedAnswers <- softDeleteMember(srn, index).mapK[Future]
                 _ <- saveService.save(updatedAnswers)
-              } yield Redirect(
-                navigator
-                  .nextPage(RemoveMemberDetailsPage(srn), mode, updatedAnswers)
+                result <- submissionService
+                  .submitPsrDetailsWithUA(srn, updatedAnswers, routes.PensionSchemeMembersController.onPageLoad(srn))
+              } yield result.getOrRecoverJourney(
+                _ =>
+                  Redirect(
+                    navigator
+                      .nextPage(RemoveMemberDetailsPage(srn), mode, updatedAnswers)
+                  )
               )
             } else {
               Future

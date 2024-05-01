@@ -18,6 +18,7 @@ package transformations
 
 import pages.nonsipp.memberdetails._
 import com.google.inject.Singleton
+import pages.nonsipp.memberdetails.MembersDetailsPage._
 import config.Refined.{Max300, Max50}
 import models.SchemeId.Srn
 import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
@@ -25,6 +26,8 @@ import pages.nonsipp.memberpensionpayments._
 import uk.gov.hmrc.domain.Nino
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
 import models._
+import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
+import models.softdelete.SoftDeletedMember
 import cats.syntax.traverse._
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.membercontributions.{
@@ -39,11 +42,10 @@ import pages.nonsipp.memberreceivedpcls.{
 }
 import models.requests.psr._
 import models.UserAnswers.implicits._
-import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
-import pages.nonsipp.memberdetails.MembersDetailsPages._
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
 import viewmodels.models._
 
+import scala.collection.immutable.Nil
 import scala.util.Try
 
 import javax.inject.Inject
@@ -61,13 +63,8 @@ class MemberPaymentsTransformer @Inject()(
 
     val refinedMemberDetails: List[(Max300, NameDOB)] = userAnswers
       .membersDetails(srn)
-      .values
+      .flatMap { case (index, value) => refineIndex[Max300.Refined](index).map(_ -> value) }
       .toList
-      .zipWithIndex
-      .flatMap {
-        case (details, index) =>
-          refineIndex[Max300.Refined](index).map(_ -> details).toList
-      }
 
     val memberDetails: List[MemberDetails] = refinedMemberDetails.flatMap {
       case (index, memberDetails) =>
@@ -77,6 +74,7 @@ class MemberPaymentsTransformer @Inject()(
           transfersOut <- transfersOutTransformer.transformToEtmp(srn, index, userAnswers)
           benefitsSurrendered = pensionSurrenderTransformer.transformToEtmp(srn, index, userAnswers)
         } yield MemberDetails(
+          state = MemberState.Active,
           personalDetails = buildMemberPersonalDetails(srn, index, memberDetails, userAnswers),
           employerContributions = employerContributions,
           transfersIn = transfersIn,
@@ -85,6 +83,21 @@ class MemberPaymentsTransformer @Inject()(
           transfersOut = transfersOut,
           benefitsSurrendered = benefitsSurrendered,
           pensionAmountReceived = userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)).map(_.value)
+        )
+    }
+
+    val softDeletedMembers: List[MemberDetails] = userAnswers.get(SoftDeletedMembers(srn)).toList.flatten.map {
+      softDeletedMember =>
+        MemberDetails(
+          state = MemberState.Deleted,
+          personalDetails = softDeletedMember.memberDetails,
+          employerContributions = softDeletedMember.employerContributions,
+          transfersIn = softDeletedMember.transfersIn,
+          transfersOut = softDeletedMember.transfersOut,
+          totalContributions = softDeletedMember.totalMemberContribution.map(_.value),
+          memberLumpSumReceived = softDeletedMember.memberLumpSumReceived,
+          benefitsSurrendered = softDeletedMember.pensionSurrendered,
+          pensionAmountReceived = softDeletedMember.totalAmountPensionPaymentsPage.map(_.value)
         )
     }
 
@@ -97,12 +110,12 @@ class MemberPaymentsTransformer @Inject()(
         }
       )
 
-    memberDetails match {
-      case Nil => None
-      case list =>
+    (memberDetails, softDeletedMembers) match {
+      case (Nil, Nil) => None
+      case _ =>
         Some(
           MemberPayments(
-            memberDetails = list,
+            memberDetails = memberDetails ++ softDeletedMembers,
             employerContributionsDetails = SectionDetails(
               made = userAnswers.get(EmployerContributionsPage(srn)).getOrElse(false),
               completed = userAnswers.get(EmployerContributionsSectionStatus(srn)).exists {
@@ -136,7 +149,9 @@ class MemberPaymentsTransformer @Inject()(
         case Some(value) => ua1.set(UnallocatedEmployerAmountPage(srn), Money(value))
         case None => Try(ua1)
       }
-      ua3 <- memberPayments.memberDetails.zipWithIndex
+      ua3 <- memberPayments.memberDetails
+        .filter(_.state == MemberState.Active)
+        .zipWithIndex
         .traverse { case (memberDetails, index) => refineIndex[Max300.Refined](index).map(memberDetails -> _) }
         .getOrElse(Nil)
         .foldLeft(Try(ua2)) {
@@ -195,7 +210,25 @@ class MemberPaymentsTransformer @Inject()(
       pensionPaymentsReceived = !memberPayments.memberDetails.forall(_.pensionAmountReceived.contains(0))
 
       ua7 <- ua6.set(PensionPaymentsReceivedPage(srn), pensionPaymentsReceived)
-    } yield ua7
+      ua8 <- ua7.set(
+        SoftDeletedMembers(srn),
+        memberPayments.memberDetails
+          .filter(_.state == MemberState.Deleted)
+          .map(
+            memberDetails =>
+              SoftDeletedMember(
+                memberDetails = memberDetails.personalDetails,
+                employerContributions = memberDetails.employerContributions,
+                transfersIn = memberDetails.transfersIn,
+                transfersOut = memberDetails.transfersOut,
+                pensionSurrendered = memberDetails.benefitsSurrendered,
+                memberLumpSumReceived = memberDetails.memberLumpSumReceived,
+                totalMemberContribution = memberDetails.totalContributions.map(Money(_)),
+                totalAmountPensionPaymentsPage = memberDetails.pensionAmountReceived.map(Money(_))
+              )
+          )
+      )
+    } yield ua8
 
   private def buildMemberPersonalDetails(
     srn: Srn,

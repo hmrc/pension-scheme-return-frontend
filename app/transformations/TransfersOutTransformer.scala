@@ -63,7 +63,7 @@ class TransfersOutTransformer @Inject() extends Transformer {
           secondaryIndex =>
             List[Try[UserAnswers] => Try[UserAnswers]](
               _.set(
-                TransfersOutCompletedPage(srn, index, secondaryIndex),
+                TransfersOutSectionCompleted(srn, index, secondaryIndex),
                 SectionCompleted
               ),
               _.set(ReceivingSchemeNamePage(srn, index, secondaryIndex), transferIn.schemeName),

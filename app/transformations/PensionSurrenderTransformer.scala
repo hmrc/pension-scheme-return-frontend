@@ -32,12 +32,12 @@ import javax.inject.Inject
 @Singleton()
 class PensionSurrenderTransformer @Inject() extends Transformer {
 
-  def transformToEtmp(srn: Srn, index: Max300, userAnswers: UserAnswers): Option[PensionSurrender] =
+  def transformToEtmp(srn: Srn, index: Max300, userAnswers: UserAnswers): Option[SurrenderedBenefits] =
     for {
       totalSurrendered <- userAnswers.get(SurrenderedBenefitsAmountPage(srn, index))
       dateOfSurrender <- userAnswers.get(WhenDidMemberSurrenderBenefitsPage(srn, index))
       surrenderReason <- userAnswers.get(WhyDidMemberSurrenderBenefitsPage(srn, index))
-    } yield PensionSurrender(
+    } yield SurrenderedBenefits(
       totalSurrendered = totalSurrendered.value,
       dateOfSurrender = dateOfSurrender,
       surrenderReason = surrenderReason
@@ -46,7 +46,7 @@ class PensionSurrenderTransformer @Inject() extends Transformer {
   def transformFromEtmp(
     srn: Srn,
     index: Max300,
-    optPensionSurrender: Option[PensionSurrender],
+    optPensionSurrender: Option[SurrenderedBenefits],
     pensionSurrenderDetails: SectionDetails
   ): List[Try[UserAnswers] => Try[UserAnswers]] =
     optPensionSurrender.fold(

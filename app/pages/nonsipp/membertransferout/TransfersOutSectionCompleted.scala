@@ -17,13 +17,15 @@
 package pages.nonsipp.membertransferout
 
 import utils.RefinedUtils._
+import utils.ListUtils.ListOps
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import models.UserAnswers
 import viewmodels.models.SectionCompleted
 import config.Refined._
 import pages.{IndexedQuestionPage, QuestionPage}
 
-case class TransfersOutCompletedPage(srn: Srn, index: Max300, secondaryIndex: Max5)
+case class TransfersOutSectionCompleted(srn: Srn, index: Max300, secondaryIndex: Max5)
     extends QuestionPage[SectionCompleted.type] {
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
@@ -36,4 +38,24 @@ case class TransfersOutCompletedPages(srn: Srn, index: Max300) extends IndexedQu
   override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 
   override def toString: String = "transfersOutCYA"
+}
+
+object TransfersOutSectionCompleted {
+
+  def all(srn: Srn): IndexedQuestionPage[Map[String, SectionCompleted.type]] =
+    new IndexedQuestionPage[Map[String, SectionCompleted.type]] {
+
+      override def path: JsPath = JsPath \ toString
+
+      override def toString: String = "transfersOutCYA"
+    }
+  implicit class TransfersOutSectionCompletedUserAnswersOps(ua: UserAnswers) {
+    def transfersOutSectionCompleted(srn: Srn, index: Max300): List[Max5] =
+      ua.map(TransfersOutCompletedPages(srn, index))
+        .toList
+        .collect {
+          case (index, _) => index
+        }
+        .refine[Max5.Refined]
+  }
 }

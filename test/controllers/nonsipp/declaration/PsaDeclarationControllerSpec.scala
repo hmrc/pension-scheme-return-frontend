@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.declaration
 
+import services.{AuditService, PsrSubmissionService, SchemeDateService}
 import connectors.EmailConnector
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import views.html.ContentPageView
+import org.scalatest.BeforeAndAfterEach
+import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import models.DateRange
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, times, verify, when}
-import org.scalatest.BeforeAndAfterEach
-import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
-import services.{AuditService, PsrSubmissionService, SchemeDateService}
-import uk.gov.hmrc.play.audit.http.connector.AuditResult
-import views.html.ContentPageView
+import org.mockito.Mockito._
 
 import scala.concurrent.Future
 

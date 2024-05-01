@@ -17,19 +17,19 @@
 package controllers.nonsipp.declaration
 
 import services.{AuditService, PsrSubmissionService, SchemeDateService}
-import play.api.inject.guice.GuiceableModule
 import controllers.nonsipp.declaration.PspDeclarationController._
 import connectors.EmailConnector
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.PsaIdInputView
-import forms.TextFormProvider
-import models.DateRange
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
-import pages.nonsipp.declaration.PspDeclarationPage
+import forms.TextFormProvider
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
+import models.DateRange
+import pages.nonsipp.declaration.PspDeclarationPage
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito._
 
 import scala.concurrent.Future
 

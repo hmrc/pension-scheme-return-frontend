@@ -17,11 +17,10 @@
 package pages.nonsipp.memberdetails
 
 import utils.RefinedUtils.RefinedIntOps
-import queries.{Gettable, Removable}
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import config.Refined.Max300
-import pages.QuestionPage
+import pages.{IndexedQuestionPage, QuestionPage}
 
 case class NoNINOPage(srn: Srn, index: Max300) extends QuestionPage[String] {
 
@@ -30,7 +29,7 @@ case class NoNINOPage(srn: Srn, index: Max300) extends QuestionPage[String] {
   override def toString: String = "noNINO"
 }
 
-case class NoNinoPages(srn: Srn) extends Gettable[Map[String, String]] with Removable[Map[String, String]] {
+case class NoNinoPages(srn: Srn) extends IndexedQuestionPage[String] {
 
   override def path: JsPath = Paths.personalDetails \ toString
 

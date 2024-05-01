@@ -17,10 +17,9 @@
 package pages.nonsipp.memberdetails
 
 import utils.RefinedUtils.RefinedIntOps
-import queries.{Gettable, Removable}
 import models.SchemeId.Srn
 import config.Refined.Max300
-import pages.QuestionPage
+import pages.{IndexedQuestionPage, QuestionPage}
 import uk.gov.hmrc.domain.Nino
 import play.api.libs.json.JsPath
 
@@ -31,7 +30,7 @@ case class MemberDetailsNinoPage(srn: Srn, index: Max300) extends QuestionPage[N
   override def toString: String = "nino"
 }
 
-case class MemberDetailsNinoPages(srn: Srn) extends Gettable[Map[String, Nino]] with Removable[Map[String, Nino]] {
+case class MemberDetailsNinoPages(srn: Srn) extends IndexedQuestionPage[Nino] {
 
   override def path: JsPath = Paths.personalDetails \ toString
 

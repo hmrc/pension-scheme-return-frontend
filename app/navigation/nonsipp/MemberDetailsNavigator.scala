@@ -19,11 +19,11 @@ package navigation.nonsipp
 import pages.nonsipp.memberdetails._
 import play.api.mvc.Call
 import models.ManualOrUpload.{Manual, Upload}
+import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.refineV
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
 import models._
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import models.CheckOrChange.Check
 import config.Refined.{Max300, OneTo300}
 import pages._

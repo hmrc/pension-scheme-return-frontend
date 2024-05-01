@@ -16,35 +16,27 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import pages.nonsipp.memberdetails._
-import play.api.mvc._
-import config.Refined.OneTo300
-import pages.nonsipp.receivetransfer._
-import navigation.Navigator
-import pages.nonsipp.memberdetails.upload.FileUploadSuccessPage
-import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsMemberListPage}
-import models._
-import pages.nonsipp.employercontributions.{
-  AllEmployerContributionsProgress,
-  EmployerContributionsMemberListPage,
-  EmployerContributionsSectionStatus
-}
 import services.{PsrSubmissionService, SaveService, UploadService}
+import pages.nonsipp.memberdetails._
 import viewmodels.implicits._
-import pages.nonsipp.membercontributions.MemberContributionsListPage
+import play.api.mvc._
+import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
+import config.Refined.{Max300, OneTo300}
+import controllers.PSRController
+import navigation.Navigator
+import models._
+import play.api.i18n._
 import views.html.ContentPageView
 import models.SchemeId.Srn
-import pages.nonsipp.memberpensionpayments.MemberPensionPaymentsListPage
 import controllers.actions._
 import eu.timepit.refined.refineV
-import pages.nonsipp.membertransferout.{TransferOutMemberListPage, TransfersOutJourneyStatus}
-import play.api.i18n._
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import pages.nonsipp.memberpayments.MemberPaymentsPage
+import utils.nonsipp.SoftDelete
+import pages.nonsipp.memberdetails.upload.FileUploadSuccessPage
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel, MemberState}
 import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
-import models.requests.DataRequest
+import utils.MapUtils.UserAnswersMapOps
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -61,8 +53,8 @@ class FileUploadSuccessController @Inject()(
   view: ContentPageView,
   psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends PSRController
+    with SoftDelete {
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     uploadService.getUploadStatus(UploadKey.fromRequest(srn)).map {
@@ -74,18 +66,30 @@ class FileUploadSuccessController @Inject()(
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     uploadService.getUploadResult(UploadKey.fromRequest(srn)).flatMap {
       case Some(UploadSuccess(memberDetails)) if memberDetails.nonEmpty =>
-        for {
-          updatedUserAnswers <- Future.fromTry(memberDetailsToUserAnswers(srn, sortAlphabetically(memberDetails)))
-          _ <- saveService.save(updatedUserAnswers)
-          submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
-            srn,
-            updatedUserAnswers,
-            fallbackCall =
-              controllers.nonsipp.memberdetails.upload.routes.FileUploadSuccessController.onPageLoad(srn, mode)
+        (
+          for {
+            indexes <- request.userAnswers.membersDetails(srn).refine[Max300.Refined].getOrRecoverJourneyT
+            softDeletedMembers <- indexes
+              .foldLeft(Try(request.userAnswers))((ua, index) => ua.flatMap(softDeleteMember(srn, index, _)))
+              .mapK[Future]
+              .liftF
+            updatedUserAnswers <- memberDetailsToUserAnswers(srn, sortAlphabetically(memberDetails), softDeletedMembers)
+              .mapK[Future]
+              .liftF
+            _ <- saveService.save(updatedUserAnswers).liftF
+            submissionResult <- psrSubmissionService
+              .submitPsrDetailsWithUA(
+                srn,
+                updatedUserAnswers,
+                fallbackCall =
+                  controllers.nonsipp.memberdetails.upload.routes.FileUploadSuccessController.onPageLoad(srn, mode)
+              )
+              .liftF
+          } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
+            _ => Redirect(navigator.nextPage(FileUploadSuccessPage(srn), mode, updatedUserAnswers))
           )
-        } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
-          _ => Redirect(navigator.nextPage(FileUploadSuccessPage(srn), mode, updatedUserAnswers))
-        )
+        ).merge
+
       case _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
   }
@@ -95,31 +99,11 @@ class FileUploadSuccessController @Inject()(
     sortedMemberDetails.zipWithIndex.map { case (details, index) => details.copy(row = index + 1) }
   }
 
-  private def memberDetailsToUserAnswers(srn: Srn, memberDetails: List[UploadMemberDetails])(
-    implicit request: DataRequest[_]
+  private def memberDetailsToUserAnswers(
+    srn: Srn,
+    memberDetails: List[UploadMemberDetails],
+    userAnswers: UserAnswers
   ): Try[UserAnswers] = {
-
-    val removals = List(
-      UserAnswers.remove(MembersDetailsPages(srn)),
-      UserAnswers.remove(DoesMemberHaveNinoPages(srn)),
-      UserAnswers.remove(MemberDetailsNinoPages(srn)),
-      UserAnswers.remove(NoNinoPages(srn)),
-      UserAnswers.remove(MemberStatuses(srn)),
-      UserAnswers.remove(MemberPaymentsPage),
-      UserAnswers.remove(AllWhenWasTransferMadePages(srn)),
-      UserAnswers.remove(AllDidTransferIncludeAssetPages(srn)),
-      UserAnswers.remove(EmployerContributionsSectionStatus(srn)),
-      UserAnswers.remove(AllEmployerContributionsProgress(srn)),
-      UserAnswers.remove(EmployerContributionsMemberListPage(srn)),
-      UserAnswers.remove(MemberContributionsListPage(srn)),
-      UserAnswers.remove(TransfersInJourneyStatus(srn)),
-      UserAnswers.remove(TransferReceivedMemberListPage(srn)),
-      UserAnswers.remove(TransfersOutJourneyStatus(srn)),
-      UserAnswers.remove(TransferOutMemberListPage(srn)),
-      UserAnswers.remove(MemberPensionPaymentsListPage(srn)),
-      UserAnswers.remove(SurrenderedBenefitsJourneyStatus(srn)),
-      UserAnswers.remove(SurrenderedBenefitsMemberListPage(srn))
-    )
 
     val insertions = memberDetails.flatMap { details =>
       refineV[OneTo300](details.row).toOption.map { index =>
@@ -135,7 +119,7 @@ class FileUploadSuccessController @Inject()(
       }
     }.flatten
 
-    UserAnswers.compose(removals ++ insertions: _*)(request.userAnswers)
+    UserAnswers.compose(insertions: _*)(userAnswers)
   }
 }
 

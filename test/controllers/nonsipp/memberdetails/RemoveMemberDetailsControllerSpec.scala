@@ -16,25 +16,44 @@
 
 package controllers.nonsipp.memberdetails
 
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import services.PsrSubmissionService
+import play.api.inject.bind
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode}
 import controllers.nonsipp.memberdetails.RemoveMemberDetailsController.{form, viewModel}
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import org.mockito.Mockito.{reset, when}
 import controllers.nonsipp.memberdetails.routes
 import controllers.ControllerBaseSpec
+
+import scala.concurrent.Future
 
 class RemoveMemberDetailsControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.RemoveMemberDetailsController.onPageLoad(srn, refineMV(1), NormalMode)
   private lazy val onSubmit = routes.RemoveMemberDetailsController.onSubmit(srn, refineMV(1), NormalMode)
 
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
+
   override val memberDetails: NameDOB = nameDobGen.sample.value
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   "RemoveMemberDetailsController" - {
 

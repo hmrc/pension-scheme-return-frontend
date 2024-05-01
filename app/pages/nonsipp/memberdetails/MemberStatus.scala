@@ -24,6 +24,7 @@ import viewmodels.models.MemberState
 import config.Refined.Max300
 import pages.QuestionPage
 
+// todo remove in favour of soft deletion
 case class MemberStatus(srn: Srn, index: Max300) extends QuestionPage[MemberState] {
 
   override def path: JsPath = Paths.personalDetails \ toString \ index.arrayIndex.toString

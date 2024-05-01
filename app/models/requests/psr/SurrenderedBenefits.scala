@@ -14,31 +14,18 @@
  * limitations under the License.
  */
 
-package queries
+package models.requests.psr
 
-import play.api.libs.json.{__, JsPath}
-import models.UserAnswers
+import play.api.libs.json.{Format, Json}
 
-import scala.util.{Success, Try}
+import java.time.LocalDate
 
-sealed trait Query {
+case class SurrenderedBenefits(
+  totalSurrendered: Double,
+  dateOfSurrender: LocalDate,
+  surrenderReason: String
+)
 
-  def path: JsPath
-}
-
-trait Gettable[A] extends Query
-
-trait Removable[A] extends Query with Cleanup[A]
-
-trait SoftRemovable[A] extends Gettable[A] with Settable[A] with Removable[A]
-
-object SoftRemovable {
-  val path: JsPath = __ \ "soft-deleted"
-}
-
-trait Settable[A] extends Query with Cleanup[A]
-
-trait Cleanup[A] {
-  def cleanup(value: Option[A], userAnswers: UserAnswers): Try[UserAnswers] =
-    Success(userAnswers)
+object SurrenderedBenefits {
+  implicit val formats: Format[SurrenderedBenefits] = Json.format[SurrenderedBenefits]
 }

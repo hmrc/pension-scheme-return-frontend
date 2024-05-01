@@ -118,7 +118,8 @@ object LandOrPropertyListController {
 
     val title = if (addresses.size == 1) "landOrPropertyList.title" else "landOrPropertyList.title.plural"
     val heading = if (addresses.size == 1) "landOrPropertyList.heading" else "landOrPropertyList.heading.plural"
-    val paragraph = if (addresses.size < maxLandOrProperties) Some(ParagraphMessage("landOrPropertyList.paragraph")) else None
+    val paragraph =
+      if (addresses.size < maxLandOrProperties) Some(ParagraphMessage("landOrPropertyList.paragraph")) else None
 
     val pagination = Pagination(
       currentPage = page,

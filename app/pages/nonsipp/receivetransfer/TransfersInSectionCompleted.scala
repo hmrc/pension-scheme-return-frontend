@@ -17,24 +17,45 @@
 package pages.nonsipp.receivetransfer
 
 import utils.RefinedUtils._
+import utils.ListUtils.ListOps
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import models.UserAnswers
 import viewmodels.models.SectionCompleted
 import config.Refined._
 import pages.{IndexedQuestionPage, QuestionPage}
 
 case class TransfersInSectionCompleted(srn: Srn, index: Max300, secondaryIndex: Max5)
-    extends QuestionPage[SectionCompleted.type] {
+    extends QuestionPage[SectionCompleted] {
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
   override def toString: String = "transfersInCYA"
 }
 
-case class TransfersInSectionCompletedForMember(srn: Srn, index: Max300)
-    extends IndexedQuestionPage[SectionCompleted.type] {
+case class TransfersInSectionCompletedForMember(srn: Srn, index: Max300) extends IndexedQuestionPage[SectionCompleted] {
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 
   override def toString: String = "transfersInCYA"
+}
+
+object TransfersInSectionCompleted {
+
+  def all(srn: Srn): IndexedQuestionPage[Map[String, SectionCompleted]] =
+    new IndexedQuestionPage[Map[String, SectionCompleted]] {
+
+      override def path: JsPath = JsPath \ toString
+
+      override def toString: String = "transfersInCYA"
+    }
+  implicit class TransfersInSectionCompletedUserAnswersOps(ua: UserAnswers) {
+    def transfersInSectionCompleted(srn: Srn, index: Max300): List[Max5] =
+      ua.map(TransfersInSectionCompletedForMember(srn, index))
+        .toList
+        .collect {
+          case (index, _) => index
+        }
+        .refine[Max5.Refined]
+  }
 }

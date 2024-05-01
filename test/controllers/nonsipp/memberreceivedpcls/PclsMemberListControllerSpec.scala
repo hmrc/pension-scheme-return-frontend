@@ -18,6 +18,7 @@ package controllers.nonsipp.memberreceivedpcls
 
 import services.PsrSubmissionService
 import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
+import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.TwoColumnsTripleAction
@@ -25,7 +26,6 @@ import eu.timepit.refined.refineMV
 import controllers.nonsipp.memberreceivedpcls.PclsMemberListController._
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
