@@ -25,7 +25,7 @@ import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSucces
 import models._
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import models.CheckOrChange.Check
-import config.Refined.OneTo300
+import config.Refined.{Max300, OneTo300}
 import pages._
 import pages.nonsipp.BasicDetailsCheckYourAnswersPage
 import navigation.JourneyNavigator
@@ -62,7 +62,7 @@ object MemberDetailsNavigator extends JourneyNavigator {
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
     case SchemeMembersListPage(srn, true, Manual) =>
-      refineV[OneTo300](userAnswers.membersDetails(srn).length + 1).fold(
+      refineV[OneTo300](userAnswers.membersDetails(srn).values.toList.length + 1).fold(
         _ => controllers.nonsipp.routes.TaskListController.onPageLoad(srn),
         _ => routes.PensionSchemeMembersController.onPageLoad(srn)
       )
@@ -124,9 +124,9 @@ object MemberDetailsNavigator extends JourneyNavigator {
   }
 
   private def routeMemberDetailsFirstManualPage(userAnswers: UserAnswers, srn: SchemeId.Srn) =
-    refineV[OneTo300](userAnswers.membersDetails(srn).length + 1) match {
-      case Left(_) => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
-      case Right(nextIndex) => routes.MemberDetailsController.onPageLoad(srn, nextIndex, NormalMode)
+    findNextOpenIndex[Max300.Refined](userAnswers.membersDetails(srn).keys.toList.map(_.toInt)) match {
+      case None => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
+      case Some(nextIndex) => routes.MemberDetailsController.onPageLoad(srn, nextIndex, NormalMode)
     }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =

@@ -45,7 +45,21 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
   "MemberPensionPaymentsListController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      val memberList = userAnswers.membersDetails(srn)
+      val memberMap = userAnswers.membersDetails(srn)
+
+      val maxIndex: Int = memberMap.keys
+        .map(_.toInt)
+        .maxOption
+        .get
+
+      val memberList: List[Option[NameDOB]] =
+        (0 to maxIndex).toList.map { index =>
+          val memberOption = memberMap.get(index.toString)
+          memberOption match {
+            case Some(member) => Some(member)
+            case None => None
+          }
+        }
 
       injected[TwoColumnsTripleAction].apply(
         MemberPensionPaymentsListController.form(injected[YesNoPageFormProvider]),
@@ -53,7 +67,7 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
           srn,
           page = 1,
           NormalMode,
-          memberList: List[NameDOB],
+          memberList: List[Option[NameDOB]],
           userAnswers
         )
       )
@@ -61,7 +75,21 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
 
     act.like(renderPrePopView(onPageLoad, MemberPensionPaymentsListPage(srn), true, userAnswers) {
       implicit app => implicit request =>
-        val memberList = userAnswers.membersDetails(srn)
+        val memberMap = userAnswers.membersDetails(srn)
+
+        val maxIndex: Int = memberMap.keys
+          .map(_.toInt)
+          .maxOption
+          .get
+
+        val memberList: List[Option[NameDOB]] =
+          (0 to maxIndex).toList.map { index =>
+            val memberOption = memberMap.get(index.toString)
+            memberOption match {
+              case Some(member) => Some(member)
+              case None => None
+            }
+          }
 
         injected[TwoColumnsTripleAction]
           .apply(
@@ -70,7 +98,7 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
               srn,
               page = 1,
               NormalMode,
-              memberList: List[NameDOB],
+              memberList: List[Option[NameDOB]],
               userAnswers
             )
           )

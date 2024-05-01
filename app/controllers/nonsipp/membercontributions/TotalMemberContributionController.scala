@@ -17,24 +17,24 @@
 package controllers.nonsipp.membercontributions
 
 import services.SaveService
+import pages.nonsipp.memberdetails.MembersDetailsPages
 import controllers.PSRController
 import config.Constants
 import controllers.actions._
 import navigation.Navigator
 import forms.MoneyFormProvider
-import models.{Mode, Money}
+import models.{Mode, Money, NameDOB}
+import play.api.i18n.MessagesApi
 import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
 import viewmodels.implicits._
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
 import controllers.nonsipp.membercontributions.TotalMemberContributionController._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import config.Refined.Max300
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import views.html.MoneyView
 import models.SchemeId.Srn
-import play.api.i18n.MessagesApi
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.models.{FormPageViewModel, QuestionField}
 
@@ -57,25 +57,73 @@ class TotalMemberContributionController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val memberNames = request.userAnswers.membersDetails(srn)
+      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
+      val maxIndex: Either[Result, Int] = memberMap.keys
+        .map(_.toInt)
+        .maxOption
+        .map(Right(_))
+        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+
+      val optionList: List[Option[NameDOB]] = maxIndex match {
+        case Right(index) =>
+          (0 to index).toList.map { index =>
+            val memberOption = memberMap.get(index.toString)
+            memberOption match {
+              case Some(member) => Some(member)
+              case None => None
+            }
+          }
+        case Left(_) => List.empty
+      }
+
       val preparedForm =
         request.userAnswers
           .get(TotalMemberContributionPage(srn, index))
           .fold(form)(value => if (value.isZero) form else form.fill(value))
-      Ok(view(viewModel(srn, index, memberNames(index.value - 1).fullName, preparedForm, mode)))
+
+      optionList(index.value - 1)
+        .map(_.fullName)
+        .getOrRecoverJourney
+        .map(memberName => Ok(view(viewModel(srn, index, memberName, preparedForm, mode))))
+        .merge
     }
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val memberNames = request.userAnswers.membersDetails(srn)
+      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
+      val maxIndex: Either[Result, Int] = memberMap.keys
+        .map(_.toInt)
+        .maxOption
+        .map(Right(_))
+        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+
+      val optionList: List[Option[NameDOB]] = maxIndex match {
+        case Right(index) =>
+          (0 to index).toList.map { index =>
+            val memberOption = memberMap.get(index.toString)
+            memberOption match {
+              case Some(member) => Some(member)
+              case None => None
+            }
+          }
+        case Left(_) => List.empty
+      }
+
       form
         .bindFromRequest()
         .fold(
           formWithErrors => {
             Future.successful(
-              BadRequest(
-                view(viewModel(srn, index, memberNames(index.value - 1).fullName, formWithErrors, mode))
-              )
+              optionList(index.value - 1)
+                .map(_.fullName)
+                .getOrRecoverJourney
+                .map(
+                  memberName =>
+                    BadRequest(
+                      view(viewModel(srn, index, memberName, formWithErrors, mode))
+                    )
+                )
+                .merge
             )
           },
           value =>

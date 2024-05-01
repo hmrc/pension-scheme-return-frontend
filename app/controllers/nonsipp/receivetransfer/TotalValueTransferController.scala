@@ -17,24 +17,24 @@
 package controllers.nonsipp.receivetransfer
 
 import services.SaveService
+import pages.nonsipp.memberdetails.MembersDetailsPages
 import viewmodels.implicits._
 import controllers.nonsipp.receivetransfer.TotalValueTransferController._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import controllers.PSRController
 import config.Constants
 import pages.nonsipp.receivetransfer.{TotalValueTransferPage, TransferringSchemeNamePage}
 import controllers.actions._
 import navigation.Navigator
 import forms.MoneyFormProvider
-import models.{Mode, Money}
+import models.{Mode, Money, NameDOB}
+import play.api.i18n.MessagesApi
 import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
 import config.Refined.{Max300, Max5}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import views.html.MoneyView
 import models.SchemeId.Srn
-import play.api.i18n.MessagesApi
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.models.{FormPageViewModel, QuestionField}
 
@@ -57,48 +57,88 @@ class TotalValueTransferController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val memberNames = request.userAnswers.membersDetails(srn)
+      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
+      val maxIndex: Either[Result, Int] = memberMap.keys
+        .map(_.toInt)
+        .maxOption
+        .map(Right(_))
+        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+
+      val optionList: List[Option[NameDOB]] = maxIndex match {
+        case Right(index) =>
+          (0 to index).toList.map { index =>
+            val memberOption = memberMap.get(index.toString)
+            memberOption match {
+              case Some(member) => Some(member)
+              case None => None
+            }
+          }
+        case Left(_) => List.empty
+      }
+
       val transferSchemeName = request.userAnswers.get(TransferringSchemeNamePage(srn, index, secondaryIndex))
       val preparedForm = {
         request.userAnswers.get(TotalValueTransferPage(srn, index, secondaryIndex)).fold(form)(form.fill)
       }
-      Ok(
-        view(
-          viewModel(
-            srn,
-            index,
-            secondaryIndex,
-            memberNames(index.value - 1).fullName,
-            transferSchemeName.get,
-            preparedForm,
-            mode
-          )
+
+      optionList(index.value - 1)
+        .map(_.fullName)
+        .getOrRecoverJourney
+        .map(
+          memberName =>
+            Ok(view(viewModel(srn, index, secondaryIndex, memberName, transferSchemeName.get, preparedForm, mode)))
         )
-      )
+        .merge
+
     }
 
   def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val memberNames = request.userAnswers.membersDetails(srn)
+      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
+      val maxIndex: Either[Result, Int] = memberMap.keys
+        .map(_.toInt)
+        .maxOption
+        .map(Right(_))
+        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+
+      val optionList: List[Option[NameDOB]] = maxIndex match {
+        case Right(index) =>
+          (0 to index).toList.map { index =>
+            val memberOption = memberMap.get(index.toString)
+            memberOption match {
+              case Some(member) => Some(member)
+              case None => None
+            }
+          }
+        case Left(_) => List.empty
+      }
+
       val transferSchemeName = request.userAnswers.get(TransferringSchemeNamePage(srn, index, secondaryIndex))
       form
         .bindFromRequest()
         .fold(
           formWithErrors => {
             Future.successful(
-              BadRequest(
-                view(
-                  viewModel(
-                    srn,
-                    index,
-                    secondaryIndex,
-                    memberNames(index.value - 1).fullName,
-                    transferSchemeName.get,
-                    formWithErrors,
-                    mode
-                  )
+              optionList(index.value - 1)
+                .map(_.fullName)
+                .getOrRecoverJourney
+                .map(
+                  memberName =>
+                    BadRequest(
+                      view(
+                        viewModel(
+                          srn,
+                          index,
+                          secondaryIndex,
+                          memberName,
+                          transferSchemeName.get,
+                          formWithErrors,
+                          mode
+                        )
+                      )
+                    )
                 )
-              )
+                .merge
             )
           },
           value =>

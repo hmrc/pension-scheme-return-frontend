@@ -17,8 +17,9 @@
 package controllers.nonsipp.membertransferout
 
 import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails.MembersDetailsPages
 import viewmodels.implicits._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import com.google.inject.Inject
 import config.Refined.OneTo300
 import controllers.PSRController
@@ -34,7 +35,6 @@ import controllers.actions._
 import eu.timepit.refined.{refineMV, refineV}
 import pages.nonsipp.membertransferout.{ReceivingSchemeNamePages, TransferOutMemberListPage, TransfersOutJourneyStatus}
 import play.api.i18n.MessagesApi
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
 
@@ -58,11 +58,28 @@ class TransferOutMemberListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val memberList = request.userAnswers.membersDetails(srn)
+      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
+      val maxIndex: Either[Result, Int] = memberMap.keys
+        .map(_.toInt)
+        .maxOption
+        .map(Right(_))
+        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 
-      if (memberList.nonEmpty) {
+      val optionList: List[Option[NameDOB]] = maxIndex match {
+        case Right(index) =>
+          (0 to index).toList.map { index =>
+            val memberOption = memberMap.get(index.toString)
+            memberOption match {
+              case Some(member) => Some(member)
+              case None => None
+            }
+          }
+        case Left(_) => List.empty
+      }
+
+      if (optionList.flatten.nonEmpty) {
         val viewModel = TransferOutMemberListController
-          .viewModel(srn, page, mode, memberList, request.userAnswers)
+          .viewModel(srn, page, mode, optionList, request.userAnswers)
         val filledForm = request.userAnswers.fillForm(TransferOutMemberListPage(srn), form)
         Ok(view(filledForm, viewModel))
       } else {
@@ -72,9 +89,26 @@ class TransferOutMemberListController @Inject()(
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      val memberList = request.userAnswers.membersDetails(srn)
+      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
+      val maxIndex: Either[Result, Int] = memberMap.keys
+        .map(_.toInt)
+        .maxOption
+        .map(Right(_))
+        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 
-      if (memberList.size > Constants.maxSchemeMembers) {
+      val optionList: List[Option[NameDOB]] = maxIndex match {
+        case Right(index) =>
+          (0 to index).toList.map { index =>
+            val memberOption = memberMap.get(index.toString)
+            memberOption match {
+              case Some(member) => Some(member)
+              case None => None
+            }
+          }
+        case Left(_) => List.empty
+      }
+
+      if (optionList.flatten.size > Constants.maxSchemeMembers) {
         Future.successful(
           Redirect(
             navigator.nextPage(TransferOutMemberListPage(srn), mode, request.userAnswers)
@@ -82,7 +116,7 @@ class TransferOutMemberListController @Inject()(
         )
       } else {
         val viewModel =
-          TransferOutMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers)
+          TransferOutMemberListController.viewModel(srn, page, mode, optionList, request.userAnswers)
 
         form
           .bindFromRequest()
@@ -125,91 +159,94 @@ object TransferOutMemberListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    memberList: List[NameDOB],
+    memberList: List[Option[NameDOB]],
     userAnswers: UserAnswers
   ): List[List[TableElem]] =
-    memberList.zipWithIndex.map {
-      case (memberName, index) =>
-        refineV[OneTo300](index + 1) match {
-          case Left(_) => Nil
-          case Right(nextIndex) =>
-            val contributions = userAnswers.map(ReceivingSchemeNamePages(srn, nextIndex))
-            if (contributions.isEmpty) {
-              List(
-                TableElem(
-                  memberName.fullName
-                ),
-                TableElem(
-                  Message("transferOut.memberList.status.no.contributions")
-                ),
-                TableElem(
-                  LinkMessage(
-                    Message("site.add"),
-                    controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
-                      .onSubmit(srn, nextIndex, refineMV(1), mode)
-                      .url
-                  )
-                ),
-                TableElem("")
-              )
-            } else {
-              List(
-                TableElem(
-                  memberName.fullName
-                ),
-                TableElem(
-                  if (contributions.size == 1)
-                    Message("transferOut.memberList.singleStatus.some.contribution", contributions.size)
-                  else
-                    Message("transferOut.memberList.status.some.contributions", contributions.size)
-                ),
-                TableElem(
-                  LinkMessage(
-                    Message("site.change"),
-                    controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
-                      .onPageLoad(srn, nextIndex, CheckMode)
-                      .url
-                  )
-                ),
-                TableElem(
-                  LinkMessage(
-                    Message("site.remove"),
-                    controllers.nonsipp.membertransferout.routes.WhichTransferOutRemoveController
-                      .onSubmit(srn, nextIndex)
-                      .url
+    memberList.zipWithIndex
+      .map {
+        case (Some(memberName), index) =>
+          refineV[OneTo300](index + 1) match {
+            case Left(_) => Nil
+            case Right(nextIndex) =>
+              val contributions = userAnswers.map(ReceivingSchemeNamePages(srn, nextIndex))
+              if (contributions.isEmpty) {
+                List(
+                  TableElem(
+                    memberName.fullName
+                  ),
+                  TableElem(
+                    Message("transferOut.memberList.status.no.contributions")
+                  ),
+                  TableElem(
+                    LinkMessage(
+                      Message("site.add"),
+                      controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
+                        .onSubmit(srn, nextIndex, refineMV(1), mode)
+                        .url
+                    )
+                  ),
+                  TableElem("")
+                )
+              } else {
+                List(
+                  TableElem(
+                    memberName.fullName
+                  ),
+                  TableElem(
+                    if (contributions.size == 1)
+                      Message("transferOut.memberList.singleStatus.some.contribution", contributions.size)
+                    else
+                      Message("transferOut.memberList.status.some.contributions", contributions.size)
+                  ),
+                  TableElem(
+                    LinkMessage(
+                      Message("site.change"),
+                      controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
+                        .onPageLoad(srn, nextIndex, CheckMode)
+                        .url
+                    )
+                  ),
+                  TableElem(
+                    LinkMessage(
+                      Message("site.remove"),
+                      controllers.nonsipp.membertransferout.routes.WhichTransferOutRemoveController
+                        .onSubmit(srn, nextIndex)
+                        .url
+                    )
                   )
                 )
-              )
-            }
-        }
-    }
+              }
+          }
+        case _ => List.empty
+      }
+      .sortBy(_.headOption.map(_.text.toString))
 
   def viewModel(
     srn: Srn,
     page: Int,
     mode: Mode,
-    memberList: List[NameDOB],
+    memberList: List[Option[NameDOB]],
     userAnswers: UserAnswers
   ): FormPageViewModel[ActionTableViewModel] = {
     val title =
-      if (memberList.size == 1) "transferOut.memberList.title"
+      if (memberList.flatten.size == 1) "transferOut.memberList.title"
       else "transferOut.memberList.title.plural"
 
     val heading =
-      if (memberList.size == 1) "transferOut.memberList.heading"
+      if (memberList.flatten.size == 1) "transferOut.memberList.heading"
       else "transferOut.memberList.heading.plural"
 
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.transferOutListSize,
-      memberList.size,
+      memberList.flatten.size,
       controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
         .onPageLoad(srn, _, NormalMode)
     )
 
     FormPageViewModel(
-      title = Message(title, memberList.size),
-      heading = Message(heading, memberList.size),
+      title = Message(title, memberList.flatten.size),
+      heading = Message(heading, memberList.flatten.size),
       description = None,
       page = ActionTableViewModel(
         inset = ParagraphMessage(

@@ -17,23 +17,24 @@
 package controllers.nonsipp.membercontributions
 
 import services.PsrSubmissionService
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import pages.nonsipp.memberdetails.MembersDetailsPages
+import play.api.mvc._
 import config.Refined.Max300
 import controllers.PSRController
 import controllers.nonsipp.membercontributions.MemberContributionsCYAController._
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import models._
+import play.api.i18n.MessagesApi
 import viewmodels.implicits._
 import pages.nonsipp.membercontributions.{MemberContributionsCYAPage, TotalMemberContributionPage}
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import play.api.i18n.MessagesApi
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
 import scala.concurrent.ExecutionContext
+import scala.util.Left
 
 import javax.inject.{Inject, Named}
 
@@ -56,20 +57,45 @@ class MemberContributionsCYAController @Inject()(
       (
         for {
           contribution <- request.userAnswers.get(TotalMemberContributionPage(srn, index))
-          memberName = request.userAnswers.membersDetails(srn)
-        } yield Ok(
-          view(
-            viewModel(
-              ViewModelParameters(
-                srn,
-                memberName(index.value - 1).fullName,
-                index,
-                contribution,
-                mode
+          memberMap = request.userAnswers.map(MembersDetailsPages(srn))
+          maxIndex: Either[Result, Int] = memberMap.keys
+            .map(_.toInt)
+            .maxOption
+            .map(Right(_))
+            .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+
+          optionList: List[Option[NameDOB]] = maxIndex match {
+            case Right(index) =>
+              (0 to index).toList.map { index =>
+                val memberOption = memberMap.get(index.toString)
+                memberOption match {
+                  case Some(member) => Some(member)
+                  case None => None
+                }
+              }
+            case Left(_) => List.empty
+          }
+
+        } yield optionList(index.value - 1)
+          .map(_.fullName)
+          .getOrRecoverJourney
+          .map(
+            memberName =>
+              Ok(
+                view(
+                  viewModel(
+                    ViewModelParameters(
+                      srn,
+                      memberName,
+                      index,
+                      contribution,
+                      mode
+                    )
+                  )
+                )
               )
-            )
           )
-        )
+          .merge
       ).get
     }
 

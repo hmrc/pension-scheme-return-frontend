@@ -26,12 +26,13 @@ import controllers.PSRController
 import config.Constants
 import cats.implicits.catsSyntaxApplicativeId
 import config.Constants.maxSchemeMembers
-import controllers.actions._
 import forms.YesNoPageFormProvider
 import models.{ManualOrUpload, Mode, Pagination}
 import models.CheckOrChange.Change
 import views.html.ListView
 import models.SchemeId.Srn
+import controllers.actions._
+import eu.timepit.refined.refineV
 import play.api.Logger
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberStatusImplicits.MembersStatusOps
@@ -41,7 +42,7 @@ import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
-import utils.MapUtils.{MapOps, UserAnswersMapOps}
+import utils.MapUtils.UserAnswersMapOps
 import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -72,8 +73,8 @@ class SchemeMembersListController @Inject()(
         Redirect(routes.PensionSchemeMembersController.onPageLoad(srn))
       } else {
 
-        val listOfFullName = membersDetails.map(_.fullName)
-        filterDeletedMembers(listOfFullName, srn).map { filteredMembers =>
+        val mapOfFullName = membersDetails.view.mapValues(_.fullName).toMap
+        filterDeletedMembers(mapOfFullName, srn).map { filteredMembers =>
           Ok(
             view(
               form(manualOrUpload, filteredMembers.size >= maxSchemeMembers),
@@ -87,14 +88,14 @@ class SchemeMembersListController @Inject()(
   def onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val membersDetails = request.userAnswers.membersDetails(srn)
-      val lengthOfMembersDetails = membersDetails.length
-      val listOfFullName = membersDetails.map(_.fullName)
+      val lengthOfMembersDetails = membersDetails.size
+      val mapOfFullName = membersDetails.view.mapValues(_.fullName).toMap
 
       form(manualOrUpload, lengthOfMembersDetails >= maxSchemeMembers)
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            filterDeletedMembers(listOfFullName, srn).map { filteredMembers =>
+            filterDeletedMembers(mapOfFullName, srn).map { filteredMembers =>
               BadRequest(
                 view(
                   formWithErrors,
@@ -123,12 +124,12 @@ class SchemeMembersListController @Inject()(
 
   // merges member details with member states and filters out any soft deleted members
   private def filterDeletedMembers(
-    nameList: List[String],
+    nameMap: Map[String, String],
     srn: Srn
-  )(implicit request: DataRequest[_]): Either[Result, List[(Max300, String, MemberState)]] = {
+  )(implicit request: DataRequest[_]): Either[Result, List[(Max300, (String, String), MemberState)]] = {
 
     val maybeMembersDetails =
-      nameList.zipWithIndexToMap
+      nameMap.toList.zipWithIndexToMap
         .mapKeysToIndex[Max300.Refined]
         .getOrRecoverJourney
 
@@ -142,16 +143,14 @@ class SchemeMembersListController @Inject()(
           )
           Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         } else {
-          val sortedMemberDetails = membersDetails.sort({ Ordering.by(_.value) })
-          val sortedMemberStates = memberStates.sort { Ordering.by(_.value) }
-          val zippedMembers: List[((Max300, String), (Max300, MemberState))] =
-            sortedMemberDetails.zip(sortedMemberStates).toList
+          val zippedMembers = membersDetails.zip(memberStates).toMap
           val memberWithStates = zippedMembers.collect {
             case ((i1, details), (i2, state)) if i1.value == i2.value => Some((i1, details, state))
+            case ((i1, details), (i2, state)) if i1.value != i2.value => Some((i1, details, state))
             case _ => None
           }.flatten
 
-          if (memberWithStates.size != sortedMemberStates.size) {
+          if (memberWithStates.size != memberStates.size) {
             logger.error(
               s"zipping member details with states has resulted in a mismatch, this means the indexes didn't align after sorting"
             )
@@ -182,15 +181,16 @@ object SchemeMembersListController {
     page: Int,
     manualOrUpload: ManualOrUpload,
     mode: Mode,
-    filteredMembers: List[(Max300, String, MemberState)]
+    filteredMembers: List[(Max300, (String, String), MemberState)]
   ): FormPageViewModel[ListViewModel] = {
 
     val lengthOfFilteredMembers = filteredMembers.length
 
     val rows: List[ListRow] = filteredMembers
-      .sortBy(_._2)
+      .sortBy { case (_, (_, name), _) => name }
       .map {
-        case (index, memberFullName, _) =>
+        case (_, (unrefinedIndex, memberFullName), _) =>
+          val index = refineV[Max300.Refined](unrefinedIndex.toInt + 1).toOption.get
           ListRow(
             memberFullName,
             changeUrl = routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Change).url,

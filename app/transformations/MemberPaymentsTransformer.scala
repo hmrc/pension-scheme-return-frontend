@@ -61,6 +61,8 @@ class MemberPaymentsTransformer @Inject()(
 
     val refinedMemberDetails: List[(Max300, NameDOB)] = userAnswers
       .membersDetails(srn)
+      .values
+      .toList
       .zipWithIndex
       .flatMap {
         case (details, index) =>

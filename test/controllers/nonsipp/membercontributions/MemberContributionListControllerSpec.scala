@@ -29,6 +29,7 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito._
+import play.api.mvc.Result
 
 import scala.concurrent.Future
 
@@ -47,7 +48,21 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
   "MemberContributionListController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      val memberList = userAnswers.membersDetails(srn)
+      val memberMap = userAnswers.membersDetails(srn)
+
+      val maxIndex: Int = memberMap.keys
+        .map(_.toInt)
+        .maxOption
+        .get
+
+      val memberList: List[Option[NameDOB]] =
+        (0 to maxIndex).toList.map { index =>
+          val memberOption = memberMap.get(index.toString)
+          memberOption match {
+            case Some(member) => Some(member)
+            case None => None
+          }
+        }
 
       injected[TwoColumnsTripleAction].apply(
         MemberContributionListController.form(injected[YesNoPageFormProvider]),
@@ -55,7 +70,7 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
           srn,
           page = 1,
           NormalMode,
-          memberList: List[NameDOB],
+          memberList: List[Option[NameDOB]],
           userAnswers
         )
       )
@@ -63,7 +78,21 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
 
     act.like(renderPrePopView(onPageLoad, MemberContributionsListPage(srn), true, userAnswers) {
       implicit app => implicit request =>
-        val memberList = userAnswers.membersDetails(srn)
+        val memberMap = userAnswers.membersDetails(srn)
+
+        val maxIndex: Int = memberMap.keys
+          .map(_.toInt)
+          .maxOption
+          .get
+
+        val memberList: List[Option[NameDOB]] =
+          (0 to maxIndex).toList.map { index =>
+            val memberOption = memberMap.get(index.toString)
+            memberOption match {
+              case Some(member) => Some(member)
+              case None => None
+            }
+          }
 
         injected[TwoColumnsTripleAction]
           .apply(
@@ -72,7 +101,7 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
               srn,
               page = 1,
               NormalMode,
-              memberList: List[NameDOB],
+              memberList: List[Option[NameDOB]],
               userAnswers
             )
           )

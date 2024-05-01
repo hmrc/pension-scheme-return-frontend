@@ -17,7 +17,8 @@
 package controllers.nonsipp.memberreceivedpcls
 
 import services.{PsrSubmissionService, SaveService}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import pages.nonsipp.memberdetails.MembersDetailsPages
+import play.api.mvc._
 import com.google.inject.Inject
 import config.Refined.OneTo300
 import controllers.PSRController
@@ -26,14 +27,13 @@ import cats.implicits.{toBifunctorOps, toTraverseOps}
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models._
+import play.api.i18n.MessagesApi
 import viewmodels.implicits._
 import pages.nonsipp.memberreceivedpcls._
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
 import controllers.actions._
 import eu.timepit.refined.refineV
-import play.api.i18n.MessagesApi
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
@@ -60,11 +60,28 @@ class PclsMemberListController @Inject()(
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       val ua = request.userAnswers
-      val memberList = ua.membersDetails(srn)
+      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
+      val maxIndex: Either[Result, Int] = memberMap.keys
+        .map(_.toInt)
+        .maxOption
+        .map(Right(_))
+        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 
-      if (memberList.nonEmpty) {
+      val optionList: List[Option[NameDOB]] = maxIndex match {
+        case Right(index) =>
+          (0 to index).toList.map { index =>
+            val memberOption = memberMap.get(index.toString)
+            memberOption match {
+              case Some(member) => Some(member)
+              case None => None
+            }
+          }
+        case Left(_) => List.empty
+      }
+
+      if (optionList.flatten.nonEmpty) {
         val viewModel = PclsMemberListController
-          .viewModel(srn, page, mode, memberList, ua)
+          .viewModel(srn, page, mode, optionList, ua)
         val filledForm =
           request.userAnswers.get(PclsMemberListPage(srn)).fold(form)(form.fill)
         Ok(view(filledForm, viewModel))
@@ -76,10 +93,27 @@ class PclsMemberListController @Inject()(
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val ua = request.userAnswers
-      val memberList = ua.membersDetails(srn)
-      val memberListSize = memberList.size
 
-      if (memberListSize > Constants.maxSchemeMembers) {
+      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
+      val maxIndex: Either[Result, Int] = memberMap.keys
+        .map(_.toInt)
+        .maxOption
+        .map(Right(_))
+        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+
+      val optionList: List[Option[NameDOB]] = maxIndex match {
+        case Right(index) =>
+          (0 to index).toList.map { index =>
+            val memberOption = memberMap.get(index.toString)
+            memberOption match {
+              case Some(member) => Some(member)
+              case None => None
+            }
+          }
+        case Left(_) => List.empty
+      }
+
+      if (optionList.flatten.size > Constants.maxSchemeMembers) {
         Future.successful(
           Redirect(
             navigator.nextPage(PclsMemberListPage(srn), mode, ua)
@@ -93,12 +127,12 @@ class PclsMemberListController @Inject()(
             errors =>
               Future.successful(
                 BadRequest(
-                  view(errors, PclsMemberListController.viewModel(srn, page, mode, memberList, ua))
+                  view(errors, PclsMemberListController.viewModel(srn, page, mode, optionList, ua))
                 )
               ),
             value =>
               for {
-                updatedUserAnswers <- buildUserAnswerBySelection(srn, value, memberListSize)
+                updatedUserAnswers <- buildUserAnswerBySelection(srn, value, optionList.flatten.size)
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (value) {
                   psrSubmissionService.submitPsrDetails(srn)(
@@ -163,55 +197,58 @@ object PclsMemberListController {
 
   private def rows(
     srn: Srn,
-    memberList: List[NameDOB],
+    memberList: List[Option[NameDOB]],
     userAnswers: UserAnswers
   ): List[List[TableElem]] =
-    memberList.zipWithIndex.map {
-      case (memberName, index) =>
-        refineV[OneTo300](index + 1) match {
-          case Left(_) => Nil
-          case Right(nextIndex) =>
-            val items = userAnswers.get(PensionCommencementLumpSumAmountPage(srn, nextIndex))
-            if (items.isEmpty || items.exists(_.isZero)) {
-              List(
-                TableElem(
-                  memberName.fullName
-                ),
-                TableElem(
-                  Message("pcls.memberlist.status.no.items")
-                ),
-                TableElem.add(
-                  controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
-                    .onSubmit(srn, nextIndex, NormalMode)
-                ),
-                TableElem.empty
-              )
-            } else {
-              List(
-                TableElem(
-                  memberName.fullName
-                ),
-                TableElem(
-                  Message("pcls.memberlist.status.some.item", items.size)
-                ),
-                TableElem.change(
-                  controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
-                    .onSubmit(srn, nextIndex, CheckMode)
-                ),
-                TableElem.remove(
-                  controllers.nonsipp.memberreceivedpcls.routes.RemovePclsController
-                    .onSubmit(srn, nextIndex)
+    memberList.zipWithIndex
+      .map {
+        case (Some(memberName), index) =>
+          refineV[OneTo300](index + 1) match {
+            case Left(_) => Nil
+            case Right(nextIndex) =>
+              val items = userAnswers.get(PensionCommencementLumpSumAmountPage(srn, nextIndex))
+              if (items.isEmpty || items.exists(_.isZero)) {
+                List(
+                  TableElem(
+                    memberName.fullName
+                  ),
+                  TableElem(
+                    Message("pcls.memberlist.status.no.items")
+                  ),
+                  TableElem.add(
+                    controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
+                      .onSubmit(srn, nextIndex, NormalMode)
+                  ),
+                  TableElem.empty
                 )
-              )
-            }
-        }
-    }
+              } else {
+                List(
+                  TableElem(
+                    memberName.fullName
+                  ),
+                  TableElem(
+                    Message("pcls.memberlist.status.some.item", items.size)
+                  ),
+                  TableElem.change(
+                    controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
+                      .onSubmit(srn, nextIndex, CheckMode)
+                  ),
+                  TableElem.remove(
+                    controllers.nonsipp.memberreceivedpcls.routes.RemovePclsController
+                      .onSubmit(srn, nextIndex)
+                  )
+                )
+              }
+          }
+        case _ => List.empty
+      }
+      .sortBy(_.headOption.map(_.text.toString))
 
   def viewModel(
     srn: Srn,
     page: Int,
     mode: Mode,
-    memberList: List[NameDOB],
+    memberList: List[Option[NameDOB]],
     userAnswers: UserAnswers
   ): FormPageViewModel[ActionTableViewModel] = {
     val title = "pcls.memberlist.title"
@@ -220,14 +257,14 @@ object PclsMemberListController {
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.pclsInListSize,
-      memberList.size,
+      memberList.flatten.size,
       controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
         .onPageLoad(srn, _, NormalMode)
     )
 
     FormPageViewModel(
-      title = Message(title, memberList.size),
-      heading = Message(heading, memberList.size),
+      title = Message(title, memberList.flatten.size),
+      heading = Message(heading, memberList.flatten.size),
       description = None,
       page = ActionTableViewModel(
         inset = ParagraphMessage(

@@ -56,15 +56,28 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
   "SurrenderedBenefitsMemberListController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      val memberList = userAnswers.membersDetails(srn)
+      val memberMap = userAnswers.membersDetails(srn)
 
+      val maxIndex: Int = memberMap.keys
+        .map(_.toInt)
+        .maxOption
+        .get
+
+      val memberList: List[Option[NameDOB]] =
+        (0 to maxIndex).toList.map { index =>
+          val memberOption = memberMap.get(index.toString)
+          memberOption match {
+            case Some(member) => Some(member)
+            case None => None
+          }
+        }
       injected[TwoColumnsTripleAction].apply(
         form(injected[YesNoPageFormProvider]),
         viewModel(
           srn,
           page = 1,
           NormalMode,
-          memberList: List[NameDOB],
+          memberList: List[Option[NameDOB]],
           userAnswers: UserAnswers
         )
       )
@@ -72,8 +85,21 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
 
     act.like(renderPrePopView(onPageLoad, SurrenderedBenefitsMemberListPage(srn), true, userAnswers) {
       implicit app => implicit request =>
-        val memberList = userAnswers.membersDetails(srn)
+        val memberMap = userAnswers.membersDetails(srn)
 
+        val maxIndex: Int = memberMap.keys
+          .map(_.toInt)
+          .maxOption
+          .get
+
+        val memberList: List[Option[NameDOB]] =
+          (0 to maxIndex).toList.map { index =>
+            val memberOption = memberMap.get(index.toString)
+            memberOption match {
+              case Some(member) => Some(member)
+              case None => None
+            }
+          }
         injected[TwoColumnsTripleAction]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
@@ -81,7 +107,7 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
               srn,
               page = 1,
               NormalMode,
-              memberList: List[NameDOB],
+              memberList: List[Option[NameDOB]],
               userAnswers: UserAnswers
             )
           )
