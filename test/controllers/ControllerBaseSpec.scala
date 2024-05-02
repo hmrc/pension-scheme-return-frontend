@@ -160,8 +160,6 @@ trait TestValues {
   val otherAssetDescription = "other asset description"
   val fallbackUrl = "fallbackUrl"
   val fallbackCall: Call = Call("GET", fallbackUrl)
-  val currentReportNumber = 2
-  val previousReportNumber = 1
 
   val address: Address = Address(
     "test-id",

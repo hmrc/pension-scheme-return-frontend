@@ -72,7 +72,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
     when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(dateRange))
     when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(Future.successful(Seq()))
-    when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any())(any(), any(), any()))
+    when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(currentUA))
       .thenReturn(Future.successful(previousUA))
   }
@@ -84,7 +84,8 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
   private val name: String = "name"
   private val reason: String = "reason"
   private val numAccountingPeriods: Max3 = refineMV(1)
-  private val pensionSchemeId: PensionSchemeId = pensionSchemeIdGen.sample.value
+  private val submissionNumberTwo = 2
+  private val submissionNumberOne = 1
   private val yearString: String = dateRange.from.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
   // Build userAnswers
@@ -248,41 +249,49 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
 
   "ViewOnlyTaskListController" - {
 
-    lazy val viewModel = ViewOnlyTaskListController.viewModel(
+    lazy val viewModelSubmissionTwo = ViewOnlyTaskListController.viewModel(
       srn,
       schemeName,
-      dateRange.from,
-      dateRange.to,
+      dateRange,
       currentUA,
       previousUA,
-      pensionSchemeId
+      submissionNumberTwo
     )
 
-    lazy val onPageLoad = routes.ViewOnlyTaskListController.onPageLoad(
+    lazy val onPageLoadSubmissionTwo = routes.ViewOnlyTaskListController.onPageLoad(
       srn,
       yearString,
-      currentReportNumber,
-      previousReportNumber
+      submissionNumberTwo,
+      submissionNumberOne
     )
 
-    act.like(renderView(onPageLoad, currentUA) { implicit app => implicit request =>
+    act.like(renderView(onPageLoadSubmissionTwo, currentUA) { implicit app => implicit request =>
       val view = injected[TaskListView]
-      view(viewModel)
+      view(viewModelSubmissionTwo)
     }.withName("onPageLoad renders ok with indexes /2/1"))
 
-    lazy val onPageLoadWithZero = routes.ViewOnlyTaskListController.onPageLoad(
+    act.like(journeyRecoveryPage(onPageLoadSubmissionTwo).updateName("onPageLoad " + _))
+
+    lazy val viewModelVersionOne = ViewOnlyTaskListController.viewModel(
+      srn,
+      schemeName,
+      dateRange,
+      currentUA,
+      previousUA,
+      submissionNumberOne
+    )
+
+    lazy val onPageLoadSubmissionOne = routes.ViewOnlyTaskListController.onPageLoad(
       srn,
       yearString,
-      1,
+      submissionNumberOne,
       0
     )
 
-    act.like(renderView(onPageLoadWithZero, currentUA) { implicit app => implicit request =>
+    act.like(renderView(onPageLoadSubmissionOne, currentUA) { implicit app => implicit request =>
       val view = injected[TaskListView]
-      view(viewModel)
+      view(viewModelVersionOne)
     }.withName("onPageLoad renders ok with indexes /1/0"))
-
-    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     // TODO: implement lower-level journey navigation in future ticket, until then Unauthorised page used for all links
 
@@ -759,11 +768,10 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     val customViewModel = ViewOnlyTaskListController.viewModel(
       srn,
       schemeName,
-      dateRange.from,
-      dateRange.to,
+      dateRange,
       currentUA,
       previousUA,
-      pensionSchemeId
+      submissionNumberTwo
     )
     val sections = customViewModel.page.sections.toList
     sections(sectionIndex).title.key mustBe expectedTitleKey

@@ -181,6 +181,7 @@ GET         /:srn/change-fees-commissions-wages-salaries                        
 POST        /:srn/change-fees-commissions-wages-salaries                                controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/return-submitted                                                      controllers.nonsipp.ReturnSubmittedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/view-only-return-submitted/:year/:version                             controllers.nonsipp.ViewOnlyReturnSubmittedController.onPageLoad(srn: Srn, year: String, version: Int)
 
 GET         /:srn/unallocated-employer-contributions                                    controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/unallocated-employer-contributions                                    controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)

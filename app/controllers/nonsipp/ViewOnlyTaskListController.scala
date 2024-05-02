@@ -36,8 +36,6 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDate
-
 class ViewOnlyTaskListController @Inject()(
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -56,17 +54,26 @@ class ViewOnlyTaskListController @Inject()(
         case Some(dateRange: DateRange) =>
           val other: Int = if (previous == 0) current else previous
           for {
-            currentReturn <- psrRetrievalService.getStandardPsrDetails(None, Some(year), Some("%03d".format(current)))
+            currentReturn <- psrRetrievalService.getStandardPsrDetails(
+              None,
+              Some(year),
+              Some("%03d".format(current)),
+              controllers.routes.OverviewController.onPageLoad(srn)
+            )
             _ <- saveService.save(currentReturn)
-            previousReturn <- psrRetrievalService.getStandardPsrDetails(None, Some(year), Some("%03d".format(other)))
+            previousReturn <- psrRetrievalService.getStandardPsrDetails(
+              None,
+              Some(year),
+              Some("%03d".format(other)),
+              controllers.routes.OverviewController.onPageLoad(srn)
+            )
             viewModel = ViewOnlyTaskListController.viewModel(
               srn,
               request.schemeDetails.schemeName,
-              dateRange.from,
-              dateRange.to,
+              dateRange,
               currentReturn,
               previousReturn,
-              request.pensionSchemeId
+              current
             )
           } yield Ok(view(viewModel))
       }
@@ -78,11 +85,10 @@ object ViewOnlyTaskListController {
   def viewModel(
     srn: Srn,
     schemeName: String,
-    startDate: LocalDate,
-    endDate: LocalDate,
+    dateRange: DateRange,
     currentUA: UserAnswers,
     previousUA: UserAnswers,
-    pensionSchemeId: PensionSchemeId
+    version: Int
   ): PageViewModel[TaskListViewModel] = {
 
     val historyLink =
@@ -102,7 +108,7 @@ object ViewOnlyTaskListController {
       otherAssetsSection(currentUA, previousUA)
     )
 
-    val declarationSectionViewModel = declarationSection(srn, schemeName)
+    val declarationSectionViewModel = declarationSection(srn, schemeName, dateRange, version)
 
     val viewModel = TaskListViewModel(
       true,
@@ -114,8 +120,8 @@ object ViewOnlyTaskListController {
     val (numberOfCompleted, numberOfTotal) = evaluateCompletedTotalTuple(viewModel.sections.toList)
 
     PageViewModel(
-      Message("nonsipp.tasklist.title", startDate.show, endDate.show),
-      Message("nonsipp.tasklist.heading", startDate.show, endDate.show),
+      Message("nonsipp.tasklist.title", dateRange.from.show, dateRange.to.show),
+      Message("nonsipp.tasklist.heading", dateRange.from.show, dateRange.to.show),
       viewModel
     ).withDescription(
       Heading2.small("nonsipp.tasklist.subheading.completed") ++
@@ -580,14 +586,21 @@ object ViewOnlyTaskListController {
 
 //--Declaration-------------------------------------------------------------------------------------------------------//
 
-  private def declarationSection(srn: Srn, schemeName: String): TaskListSectionViewModel = {
+  private def declarationSection(
+    srn: Srn,
+    schemeName: String,
+    dateRange: DateRange,
+    version: Int
+  ): TaskListSectionViewModel = {
     val prefix = s"nonsipp.tasklist.declaration"
 
     TaskListSectionViewModel(
       s"$prefix.title",
       LinkMessage(
         Message("nonsipp.tasklist.declaration.view"),
-        controllers.nonsipp.routes.ReturnSubmittedController.onPageLoad(srn).url
+        controllers.nonsipp.routes.ViewOnlyReturnSubmittedController
+          .onPageLoad(srn, dateRange.from.toString, version)
+          .url
       ),
       LinkMessage(
         Message(s"$prefix.saveandreturn", schemeName),
