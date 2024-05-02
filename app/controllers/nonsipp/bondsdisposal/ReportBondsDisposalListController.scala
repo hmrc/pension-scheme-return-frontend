@@ -137,7 +137,14 @@ class ReportBondsDisposalListController @Inject()(
                         .set(BondsDisposalCompleted(srn), SectionCompleted)
                         .mapK[Future]
                       _ <- saveService.save(updatedUserAnswers)
-                      submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+                      submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+                        srn,
+                        updatedUserAnswers,
+                        optFallbackCall = Some(
+                          controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
+                            .onPageLoad(srn, page)
+                        )
+                      )
                     } yield submissionResult.getOrRecoverJourney(
                       _ =>
                         Redirect(

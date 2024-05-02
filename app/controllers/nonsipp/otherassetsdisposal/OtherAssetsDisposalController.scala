@@ -79,7 +79,13 @@ class OtherAssetsDisposalController @Inject()(
                 .set(OtherAssetsDisposalCompleted(srn), SectionCompleted)
                 .mapK[Future]
               _ <- saveService.save(updatedAnswers)
-              submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
+              submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+                srn,
+                updatedAnswers,
+                optFallbackCall = Some(
+                  controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController.onPageLoad(srn, mode)
+                )
+              )
             } yield submissionResult
               .getOrRecoverJourney(
                 _ => Redirect(navigator.nextPage(OtherAssetsDisposalPage(srn), mode, updatedAnswers))

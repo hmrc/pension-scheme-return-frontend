@@ -135,7 +135,12 @@ class PclsMemberListController @Inject()(
                 updatedUserAnswers <- buildUserAnswerBySelection(srn, value, optionList.flatten.size)
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (value) {
-                  psrSubmissionService.submitPsrDetails(srn)(
+                  psrSubmissionService.submitPsrDetails(
+                    srn,
+                    optFallbackCall = Some(
+                      controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController.onPageLoad(srn, page, mode)
+                    )
+                  )(
                     implicitly,
                     implicitly,
                     request = DataRequest(request.request, updatedUserAnswers)

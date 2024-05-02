@@ -97,13 +97,21 @@ class MemberPensionPaymentsCYAController @Inject()(
       ).get
     }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      psrSubmissionService.submitPsrDetails(srn).map {
-        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        case Some(_) =>
-          Redirect(navigator.nextPage(MemberPensionPaymentsCYAPage(srn), mode, request.userAnswers))
-      }
+      psrSubmissionService
+        .submitPsrDetails(
+          srn,
+          optFallbackCall = Some(
+            controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
+              .onPageLoad(srn, index, mode)
+          )
+        )
+        .map {
+          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          case Some(_) =>
+            Redirect(navigator.nextPage(MemberPensionPaymentsCYAPage(srn), mode, request.userAnswers))
+        }
     }
 }
 
@@ -139,7 +147,7 @@ object MemberPensionPaymentsCYAController {
       refresh = None,
       buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
       onSubmit = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-        .onSubmit(parameters.srn, NormalMode)
+        .onSubmit(parameters.srn, parameters.index, parameters.mode)
     )
 
   private def sections(

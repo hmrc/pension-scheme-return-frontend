@@ -164,7 +164,14 @@ class AssetDisposalCYAController @Inject()(
           .set(OtherAssetsDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
           .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
-        submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+        submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+          srn,
+          updatedUserAnswers,
+          optFallbackCall = Some(
+            controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+              .onPageLoad(srn, index, disposalIndex, mode)
+          )
+        )
       } yield submissionResult.getOrRecoverJourney(
         _ =>
           Redirect(

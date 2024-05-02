@@ -206,7 +206,14 @@ class SharesDisposalCYAController @Inject()(
           .set(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.Completed)
           .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
-        submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+        submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+          srn,
+          updatedUserAnswers,
+          optFallbackCall = Some(
+            controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+              .onPageLoad(srn, shareIndex, disposalIndex, mode)
+          )
+        )
       } yield submissionResult.getOrRecoverJourney(
         _ =>
           Redirect(

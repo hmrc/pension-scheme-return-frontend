@@ -93,27 +93,32 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
   "PSRRetrievalService" - {
 
     "should not getPsrDetails return data when not found" in {
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any())(any(), any()))
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
-      whenReady(service.getStandardPsrDetails(None, Some(pstr), Some(version))(mockReq, implicitly, implicitly)) {
-        result: UserAnswers =>
-          verify(mockMinimalRequiredSubmissionTransformer, never).transformFromEtmp(any(), any(), any(), any())
-          verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
-          result mustBe a[UserAnswers]
-          result.data.decryptedValue mustBe JsObject.empty
+      whenReady(
+        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
+          mockReq,
+          implicitly,
+          implicitly
+        )
+      ) { result: UserAnswers =>
+        verify(mockMinimalRequiredSubmissionTransformer, never).transformFromEtmp(any(), any(), any(), any())
+        verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
+        result mustBe a[UserAnswers]
+        result.data.decryptedValue mustBe JsObject.empty
       }
     }
     "should getPsrDetails return data when only minimal data was found in etmp" in {
       when(mockMinimalRequiredSubmissionTransformer.transformFromEtmp(any(), any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
         Future.successful(
           Some(
             PsrSubmission(
@@ -128,19 +133,20 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           )
         )
       )
-      whenReady(service.getStandardPsrDetails(None, Some(pstr), Some(version))(mockReq, implicitly, implicitly)) {
-        result: UserAnswers =>
-          verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
-          verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
-          result mustBe a[UserAnswers]
-          result.data.decryptedValue must not be JsObject.empty
+      whenReady(
+        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
+      ) { result: UserAnswers =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
+        verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
+        result mustBe a[UserAnswers]
+        result.data.decryptedValue must not be JsObject.empty
       }
     }
 
@@ -149,7 +155,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Try(defaultUserAnswers))
       when(mockLoanTransactionsTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
         Future.successful(
           Some(
             PsrSubmission(
@@ -164,19 +170,20 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           )
         )
       )
-      whenReady(service.getStandardPsrDetails(None, Some(pstr), Some(version))(mockReq, implicitly, implicitly)) {
-        result: UserAnswers =>
-          verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
-          verify(mockLoanTransactionsTransformer, times(1)).transformFromEtmp(any(), any(), any())
-          verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
-          result mustBe a[UserAnswers]
-          result.data.decryptedValue must not be JsObject.empty
+      whenReady(
+        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
+      ) { result: UserAnswers =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
+        verify(mockLoanTransactionsTransformer, times(1)).transformFromEtmp(any(), any(), any())
+        verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
+        result mustBe a[UserAnswers]
+        result.data.decryptedValue must not be JsObject.empty
       }
     }
 
@@ -185,7 +192,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Try(defaultUserAnswers))
       when(mockLandOrPropertyTransactionsTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
         Future.successful(
           Some(
             PsrSubmission(
@@ -200,19 +207,20 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           )
         )
       )
-      whenReady(service.getStandardPsrDetails(None, Some(pstr), Some(version))(mockReq, implicitly, implicitly)) {
-        result: UserAnswers =>
-          verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
-          verify(mockLandOrPropertyTransactionsTransformer, times(1)).transformFromEtmp(any(), any(), any())
-          verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
-          result mustBe a[UserAnswers]
-          result.data.decryptedValue must not be JsObject.empty
+      whenReady(
+        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
+      ) { result: UserAnswers =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
+        verify(mockLandOrPropertyTransactionsTransformer, times(1)).transformFromEtmp(any(), any(), any())
+        verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
+        result mustBe a[UserAnswers]
+        result.data.decryptedValue must not be JsObject.empty
       }
     }
 
@@ -221,7 +229,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Try(defaultUserAnswers))
       when(mockMoneyBorrowedTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
         Future.successful(
           Some(
             PsrSubmission(
@@ -236,19 +244,20 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           )
         )
       )
-      whenReady(service.getStandardPsrDetails(None, Some(pstr), Some(version))(mockReq, implicitly, implicitly)) {
-        result: UserAnswers =>
-          verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
-          verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMoneyBorrowedTransformer, times(1)).transformFromEtmp(any(), any(), any())
-          verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
-          result mustBe a[UserAnswers]
-          result.data.decryptedValue must not be JsObject.empty
+      whenReady(
+        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
+      ) { result: UserAnswers =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
+        verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMoneyBorrowedTransformer, times(1)).transformFromEtmp(any(), any(), any())
+        verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
+        result mustBe a[UserAnswers]
+        result.data.decryptedValue must not be JsObject.empty
       }
     }
 
@@ -258,7 +267,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       when(mockMemberPaymentsTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
 
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
         Future.successful(
           Some(
             PsrSubmission(
@@ -273,19 +282,20 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           )
         )
       )
-      whenReady(service.getStandardPsrDetails(None, Some(pstr), Some(version))(mockReq, implicitly, implicitly)) {
-        result: UserAnswers =>
-          verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
-          verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMemberPaymentsTransformer, times(1)).transformFromEtmp(any(), any(), any())
-          verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
-          result mustBe a[UserAnswers]
-          result.data.decryptedValue must not be JsObject.empty
+      whenReady(
+        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
+      ) { result: UserAnswers =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
+        verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, times(1)).transformFromEtmp(any(), any(), any())
+        verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
+        result mustBe a[UserAnswers]
+        result.data.decryptedValue must not be JsObject.empty
       }
     }
 
@@ -295,7 +305,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       when(mockSharesTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
 
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
         Future.successful(
           Some(
             PsrSubmission(
@@ -310,19 +320,20 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           )
         )
       )
-      whenReady(service.getStandardPsrDetails(None, Some(pstr), Some(version))(mockReq, implicitly, implicitly)) {
-        result: UserAnswers =>
-          verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
-          verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockSharesTransformer, times(1)).transformFromEtmp(any(), any(), any())
-          verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
-          result mustBe a[UserAnswers]
-          result.data.decryptedValue must not be JsObject.empty
+      whenReady(
+        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
+      ) { result: UserAnswers =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
+        verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockSharesTransformer, times(1)).transformFromEtmp(any(), any(), any())
+        verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
+        result mustBe a[UserAnswers]
+        result.data.decryptedValue must not be JsObject.empty
       }
     }
 
@@ -331,7 +342,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Try(defaultUserAnswers))
       when(mockBondTransactionsTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
         Future.successful(
           Some(
             PsrSubmission(
@@ -346,19 +357,20 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           )
         )
       )
-      whenReady(service.getStandardPsrDetails(None, Some(pstr), Some(version))(mockReq, implicitly, implicitly)) {
-        result: UserAnswers =>
-          verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
-          verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockBondTransactionsTransformer, times(1)).transformFromEtmp(any(), any(), any())
-          verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
-          result mustBe a[UserAnswers]
-          result.data.decryptedValue must not be JsObject.empty
+      whenReady(
+        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
+      ) { result: UserAnswers =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
+        verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockBondTransactionsTransformer, times(1)).transformFromEtmp(any(), any(), any())
+        verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
+        result mustBe a[UserAnswers]
+        result.data.decryptedValue must not be JsObject.empty
       }
     }
 
@@ -367,7 +379,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Try(defaultUserAnswers))
       when(mockOtherAssetTransactionsTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
         Future.successful(
           Some(
             PsrSubmission(
@@ -382,19 +394,20 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           )
         )
       )
-      whenReady(service.getStandardPsrDetails(None, Some(pstr), Some(version))(mockReq, implicitly, implicitly)) {
-        result: UserAnswers =>
-          verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
-          verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockOtherAssetTransactionsTransformer, times(1)).transformFromEtmp(any(), any(), any())
-          verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
-          result mustBe a[UserAnswers]
-          result.data.decryptedValue must not be JsObject.empty
+      whenReady(
+        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
+      ) { result: UserAnswers =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
+        verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockOtherAssetTransactionsTransformer, times(1)).transformFromEtmp(any(), any(), any())
+        verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
+        result mustBe a[UserAnswers]
+        result.data.decryptedValue must not be JsObject.empty
       }
     }
 
@@ -403,7 +416,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Try(defaultUserAnswers))
       when(mockDeclarationTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
         Future.successful(
           Some(
             PsrSubmission(
@@ -418,19 +431,20 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           )
         )
       )
-      whenReady(service.getStandardPsrDetails(None, Some(pstr), Some(version))(mockReq, implicitly, implicitly)) {
-        result: UserAnswers =>
-          verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
-          verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
-          verify(mockDeclarationTransformer, times(1)).transformFromEtmp(any(), any(), any())
-          result mustBe a[UserAnswers]
-          result.data.decryptedValue must not be JsObject.empty
+      whenReady(
+        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
+      ) { result: UserAnswers =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
+        verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockBondTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockOtherAssetTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockDeclarationTransformer, times(1)).transformFromEtmp(any(), any(), any())
+        result mustBe a[UserAnswers]
+        result.data.decryptedValue must not be JsObject.empty
       }
     }
   }

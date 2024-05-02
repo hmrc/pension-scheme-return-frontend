@@ -82,7 +82,13 @@ class PspDeclarationController @Inject()(
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(PspDeclarationPage(srn), answer))
               _ <- saveService.save(updatedAnswers)
-              _ <- psrSubmissionService.submitPsrDetails(srn = srn, isSubmitted = true)
+              _ <- psrSubmissionService.submitPsrDetails(
+                srn = srn,
+                isSubmitted = true,
+                optFallbackCall = Some(
+                  controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
+                )
+              )
               _ <- saveService.save(UserAnswers(request.userAnswers.id))
             } yield {
               Redirect(navigator.nextPage(PspDeclarationPage(srn), NormalMode, request.userAnswers))

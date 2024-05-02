@@ -109,7 +109,13 @@ class OtherAssetsListController @Inject()(
                   )
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (!addAnother) {
-                  psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+                  psrSubmissionService.submitPsrDetailsWithUA(
+                    srn,
+                    updatedUserAnswers,
+                    optFallbackCall = Some(
+                      controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onPageLoad(srn, page, mode)
+                    )
+                  )
                 } else {
                   Future.successful(Some(()))
                 }

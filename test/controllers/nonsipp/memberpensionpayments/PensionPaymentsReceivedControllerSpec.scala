@@ -44,7 +44,7 @@ class PensionPaymentsReceivedControllerSpec extends ControllerBaseSpec {
 
   override protected def beforeEach(): Unit = {
     reset(mockPSRSubmissionService)
-    when(mockPSRSubmissionService.submitPsrDetailsWithUA(any(), any())(any(), any(), any()))
+    when(mockPSRSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
   }
 

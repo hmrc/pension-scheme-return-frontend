@@ -92,7 +92,14 @@ class RemoveSharesController @Inject()(
                       .set(SharesJourneyStatus(srn), SectionStatus.InProgress)
                   )
                 _ <- saveService.save(updatedAnswers)
-                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
+                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+                  srn,
+                  updatedAnswers,
+                  optFallbackCall = Some(
+                    controllers.nonsipp.shares.routes.SharesListController
+                      .onPageLoad(srn, 1, mode)
+                  )
+                )
               } yield submissionResult.getOrRecoverJourney(
                 _ =>
                   Redirect(

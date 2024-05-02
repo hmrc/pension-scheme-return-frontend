@@ -70,7 +70,7 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
           .before(MockPSRSubmissionService.submitPsrDetails())
           .withName(s"redirect to next page when in ${checkOrChange.name} mode")
           .after({
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
       )

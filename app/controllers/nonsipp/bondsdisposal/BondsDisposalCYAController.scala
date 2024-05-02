@@ -130,7 +130,14 @@ class BondsDisposalCYAController @Inject()(
           request.userAnswers.set(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionCompleted)
         )
         _ <- saveService.save(updatedUserAnswers)
-        submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+        submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+          srn,
+          updatedUserAnswers,
+          optFallbackCall = Some(
+            controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+              .onPageLoad(srn, bondIndex, disposalIndex, mode)
+          )
+        )
       } yield submissionResult.getOrRecoverJourney(
         _ =>
           Redirect(

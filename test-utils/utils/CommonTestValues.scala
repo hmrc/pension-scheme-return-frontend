@@ -16,6 +16,7 @@
 
 package utils
 
+import play.api.mvc.Call
 import cats.data.NonEmptyList
 import models.requests.psr._
 import play.api.libs.json.{JsValue, Json}
@@ -29,6 +30,9 @@ trait CommonTestValues {
   val commonEndDate = "2024-04-06"
   val commonVersion = "001"
   val commonFbNumber = "123456785011"
+  val commonFeedback = "feedbackUrl"
+  val commonFallbackUrl = "fallbackUrl"
+  val commonFallbackCall: Call = Call("GET", commonFallbackUrl)
 
   val minimalSubmissionData: PsrSubmission = PsrSubmission(
     MinimalRequiredSubmission(

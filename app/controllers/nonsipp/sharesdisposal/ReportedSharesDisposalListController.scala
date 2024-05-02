@@ -97,7 +97,14 @@ class ReportedSharesDisposalListController @Inject()(
                       .mapK[Future]
                     _ <- saveService.save(updatedUserAnswers)
                     submissionResult <- if (!reportAnotherDisposal) {
-                      psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+                      psrSubmissionService.submitPsrDetailsWithUA(
+                        srn,
+                        updatedUserAnswers,
+                        optFallbackCall = Some(
+                          controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+                            .onPageLoad(srn, page)
+                        )
+                      )
                     } else {
                       Future.successful(Some(()))
                     }

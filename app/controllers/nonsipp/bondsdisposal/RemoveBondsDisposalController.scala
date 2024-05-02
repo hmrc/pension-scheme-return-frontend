@@ -97,7 +97,12 @@ class RemoveBondsDisposalController @Inject()(
 
                 _ <- saveService.save(removedUserAnswers)
                 redirectTo <- psrSubmissionService
-                  .submitPsrDetails(srn)(
+                  .submitPsrDetails(
+                    srn,
+                    optFallbackCall = Some(
+                      controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController.onPageLoad(srn, 1)
+                    )
+                  )(
                     implicitly,
                     implicitly,
                     request = DataRequest(request.request, removedUserAnswers)

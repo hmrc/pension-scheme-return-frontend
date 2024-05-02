@@ -50,7 +50,7 @@ class PsaDeclarationControllerSpec extends ControllerBaseSpec {
       agreeAndContinue(onSubmit)
         .before(MockPSRSubmissionService.submitPsrDetails())
         .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )

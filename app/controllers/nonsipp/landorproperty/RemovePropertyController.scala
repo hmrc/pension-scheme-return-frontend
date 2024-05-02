@@ -80,7 +80,13 @@ class RemovePropertyController @Inject()(
                   .fromTry(request.userAnswers.remove(LandPropertyInUKPage(srn, index)))
                 _ <- saveService.save(updatedAnswers)
                 redirectTo <- psrSubmissionService
-                  .submitPsrDetails(srn)(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                  .submitPsrDetails(
+                    srn,
+                    optFallbackCall = Some(
+                      controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
+                        .onPageLoad(srn, 1, mode)
+                    )
+                  )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                   .map {
                     case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
                     case Some(_) => Redirect(navigator.nextPage(RemovePropertyPage(srn, index), mode, updatedAnswers))

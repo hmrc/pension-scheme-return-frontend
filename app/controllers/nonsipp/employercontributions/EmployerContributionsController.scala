@@ -68,8 +68,17 @@ class EmployerContributionsController @Inject()(
                 .set(EmployerContributionsPage(srn), value)
             )
             _ <- saveService.save(updatedAnswers)
-            submissionResult <- if (value) Future.successful(Some(()))
-            else psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
+            submissionResult <- if (value) {
+              Future.successful(Some(()))
+            } else {
+              psrSubmissionService.submitPsrDetailsWithUA(
+                srn,
+                updatedAnswers,
+                optFallbackCall = Some(
+                  controllers.nonsipp.employercontributions.routes.EmployerContributionsController.onPageLoad(srn, mode)
+                )
+              )
+            }
           } yield submissionResult.getOrRecoverJourney(
             _ => Redirect(navigator.nextPage(EmployerContributionsPage(srn), mode, updatedAnswers))
           )

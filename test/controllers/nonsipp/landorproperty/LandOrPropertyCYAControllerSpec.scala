@@ -46,7 +46,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
   private def onPageLoad(mode: Mode) =
     routes.LandOrPropertyCYAController.onPageLoad(srn, index, mode)
 
-  private def onSubmit(mode: Mode) = routes.LandOrPropertyCYAController.onSubmit(srn, mode)
+  private def onSubmit(mode: Mode) = routes.LandOrPropertyCYAController.onSubmit(srn, index, mode)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(LandPropertyInUKPage(srn, index), true)
@@ -95,7 +95,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
         redirectNextPage(onSubmit(mode))
           .before(MockPSRSubmissionService.submitPsrDetails())
           .after({
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
           .withName(s"redirect to next page when in $mode mode")

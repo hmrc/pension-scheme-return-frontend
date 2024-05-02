@@ -52,7 +52,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
 
   private def onPageLoad(checkOrChange: CheckOrChange) = routes.LoansCYAController.onPageLoad(srn, index, checkOrChange)
 
-  private def onSubmit(checkOrChange: CheckOrChange) = routes.LoansCYAController.onSubmit(srn, checkOrChange)
+  private def onSubmit(checkOrChange: CheckOrChange) = routes.LoansCYAController.onSubmit(srn, index, checkOrChange)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
@@ -100,7 +100,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
         redirectNextPage(onSubmit(checkOrChange))
           .before(MockPSRSubmissionService.submitPsrDetails())
           .after({
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
           .withName(s"redirect to next page when in ${checkOrChange.name} mode")

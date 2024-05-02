@@ -93,7 +93,14 @@ class SurrenderedBenefitsCYAController @Inject()(
             .remove(SurrenderedBenefitsMemberListPage(srn))
         )
         _ <- saveService.save(updatedUserAnswers)
-        submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+        submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+          srn,
+          updatedUserAnswers,
+          optFallbackCall = Some(
+            controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
+              .onPageLoad(srn, memberIndex, mode)
+          )
+        )
       } yield submissionResult.getOrRecoverJourney(
         _ =>
           Redirect(

@@ -63,11 +63,18 @@ class PclsCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      psrSubmissionService.submitPsrDetails(srn).map {
-        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        case Some(_) =>
-          Redirect(navigator.nextPage(PclsCYAPage(srn, index), mode, request.userAnswers))
-      }
+      psrSubmissionService
+        .submitPsrDetails(
+          srn,
+          optFallbackCall = Some(
+            controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController.onPageLoad(srn, index, mode)
+          )
+        )
+        .map {
+          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          case Some(_) =>
+            Redirect(navigator.nextPage(PclsCYAPage(srn, index), mode, request.userAnswers))
+        }
     }
 }
 

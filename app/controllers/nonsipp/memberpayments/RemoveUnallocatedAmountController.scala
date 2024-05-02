@@ -93,7 +93,14 @@ class RemoveUnallocatedAmountController @Inject()(
               updatedAnswers <- Future
                 .fromTry(removeUnallocatedAmountPage(srn, request.userAnswers))
               _ <- saveService.save(updatedAnswers)
-              submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
+              submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+                srn,
+                updatedAnswers,
+                optFallbackCall = Some(
+                  controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
+                    .onPageLoad(srn, mode)
+                )
+              )
             } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
               _ =>
                 Redirect(

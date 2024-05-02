@@ -97,7 +97,12 @@ class RemoveOtherAssetController @Inject()(
 
                 _ <- saveService.save(removedUserAnswers)
                 redirectTo <- psrSubmissionService
-                  .submitPsrDetails(srn)(
+                  .submitPsrDetails(
+                    srn,
+                    optFallbackCall = Some(
+                      controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onPageLoad(srn, 1, mode)
+                    )
+                  )(
                     implicitly,
                     implicitly,
                     request = DataRequest(request.request, removedUserAnswers)

@@ -18,10 +18,13 @@ package controllers
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl._
-import views.html.{JourneyRecoveryContinueView, JourneyRecoveryStartAgainView}
+import config.FrontendAppConfig
 import uk.gov.hmrc.play.bootstrap.binders._
+import config.Constants.SRN
 import controllers.actions.IdentifierAction
 import play.api.Logging
+import views.html.{JourneyRecoveryContinueView, JourneyRecoveryStartAgainView}
+import models.SchemeId.Srn
 import play.api.i18n.I18nSupport
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
@@ -29,6 +32,7 @@ import javax.inject.Inject
 
 class JourneyRecoveryController @Inject()(
   val controllerComponents: MessagesControllerComponents,
+  config: FrontendAppConfig,
   identify: IdentifierAction,
   continueView: JourneyRecoveryContinueView,
   startAgainView: JourneyRecoveryStartAgainView
@@ -36,19 +40,30 @@ class JourneyRecoveryController @Inject()(
     with I18nSupport
     with Logging {
 
-  def onPageLoad(continueUrl: Option[RedirectUrl] = None): Action[AnyContent] = identify { implicit request =>
-    val safeUrl: Option[String] = continueUrl.flatMap { unsafeUrl =>
-      unsafeUrl.getEither(OnlyRelative) match {
-        case Right(safeUrl) =>
-          Some(safeUrl.url)
-        case Left(message) =>
-          logger.info(message)
-          None
+  def onPageLoad(continueUrl: Option[RedirectUrl] = None, answersSavedDisplayVersion: Int = 0): Action[AnyContent] =
+    identify { implicit request =>
+      val safeUrl: Option[String] = continueUrl.flatMap { unsafeUrl =>
+        unsafeUrl.getEither(OnlyRelative) match {
+          case Right(safeUrl) =>
+            Some(safeUrl.url)
+          case Left(message) =>
+            logger.info(message)
+            None
+        }
       }
-    }
 
-    safeUrl
-      .map(url => Ok(continueView(url)))
-      .getOrElse(Ok(startAgainView()))
-  }
+      safeUrl
+        .map(url => Ok(continueView(url, config.reportAProblemUrl, answersSavedDisplayVersion))) //if there is a URL passed in, continue button goes to that URL
+        .getOrElse(
+          Ok(
+            startAgainView( //if we have SRN in the session, continue button goes to tasklist, otherwise to MPS dashboard
+              url = Srn(request.session.get(SRN).getOrElse(""))
+                .fold(config.urls.managePensionsSchemes.dashboard) { srn =>
+                  controllers.nonsipp.routes.TaskListController.onPageLoad(srn).url
+                },
+              reportAProblemUrl = config.reportAProblemUrl
+            )
+          )
+        )
+    }
 }

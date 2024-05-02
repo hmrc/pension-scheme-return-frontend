@@ -42,7 +42,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any())(any(), any(), any()))
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
   }
 
@@ -273,7 +273,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
       act.like(
         redirectNextPage(onSubmit(mode))
           .after({
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
           .withName(s"redirect to next page when in $mode mode")

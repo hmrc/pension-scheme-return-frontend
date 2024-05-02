@@ -68,7 +68,7 @@ class RemoveOtherAssetControllerSpec extends ControllerBaseSpec {
       saveAndContinue(onSubmit, userAnswers, "value" -> "true")
         .before(MockPSRSubmissionService.submitPsrDetails())
         .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )

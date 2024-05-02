@@ -78,10 +78,17 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    psrSubmissionService.submitPsrDetails(srn).map {
-      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case Some(_) => Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
-    }
+    psrSubmissionService
+      .submitPsrDetails(
+        srn,
+        optFallbackCall =
+          Some(controllers.nonsipp.schemedesignatory.routes.HowMuchCashController.onPageLoad(srn, NormalMode))
+      )
+      .map {
+        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        case Some(_) =>
+          Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+      }
   }
 }
 

@@ -97,7 +97,14 @@ class ReportedOtherAssetsDisposalListController @Inject()(
                       .mapK[Future]
                     _ <- saveService.save(updatedUserAnswers)
                     submissionResult <- if (!reportAnotherDisposal) {
-                      psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+                      psrSubmissionService.submitPsrDetailsWithUA(
+                        srn,
+                        updatedUserAnswers,
+                        optFallbackCall = Some(
+                          controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+                            .onPageLoad(srn, page)
+                        )
+                      )
                     } else {
                       Future.successful(Some(()))
                     }

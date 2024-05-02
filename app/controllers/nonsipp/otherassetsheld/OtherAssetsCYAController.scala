@@ -190,10 +190,17 @@ class OtherAssetsCYAController @Inject()(
           request.userAnswers.set(OtherAssetsCompleted(srn, index), SectionCompleted)
         )
         _ <- saveService.save(updatedUserAnswers)
-        redirectTo <- psrSubmissionService.submitPsrDetails(srn).map {
-          case None => controllers.routes.JourneyRecoveryController.onPageLoad()
-          case Some(_) => navigator.nextPage(OtherAssetsCYAPage(srn), NormalMode, request.userAnswers)
-        }
+        redirectTo <- psrSubmissionService
+          .submitPsrDetails(
+            srn,
+            optFallbackCall = Some(
+              controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad(srn, index, mode)
+            )
+          )
+          .map {
+            case None => controllers.routes.JourneyRecoveryController.onPageLoad()
+            case Some(_) => navigator.nextPage(OtherAssetsCYAPage(srn), NormalMode, request.userAnswers)
+          }
       } yield Redirect(redirectTo)
     }
 }

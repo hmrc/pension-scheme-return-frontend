@@ -74,7 +74,11 @@ class BondsDisposalController @Inject()(
               )
             } else {
               psrSubmissionService
-                .submitPsrDetails(srn)(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                .submitPsrDetails(
+                  srn,
+                  optFallbackCall =
+                    Some(controllers.nonsipp.bondsdisposal.routes.BondsDisposalController.onPageLoad(srn, mode))
+                )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                 .map {
                   case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
                   case Some(_) =>

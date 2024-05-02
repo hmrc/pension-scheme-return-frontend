@@ -156,6 +156,8 @@ trait TestValues {
   val nameOfBonds = "name of bonds"
   val nameOfAsset = "name of asset"
   val otherAssetDescription = "other asset description"
+  val fallbackUrl = "fallbackUrl"
+  val fallbackCall: Call = Call("GET", fallbackUrl)
 
   val address: Address = Address(
     "test-id",

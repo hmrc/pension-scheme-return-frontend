@@ -98,7 +98,13 @@ class RemoveLandPropertyDisposalController @Inject()(
 
                 _ <- saveService.save(removedUserAnswers)
                 redirectTo <- psrSubmissionService
-                  .submitPsrDetails(srn)(
+                  .submitPsrDetails(
+                    srn,
+                    optFallbackCall = Some(
+                      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
+                        .onPageLoad(srn, 1)
+                    )
+                  )(
                     implicitly,
                     implicitly,
                     request = DataRequest(request.request, removedUserAnswers)

@@ -19,7 +19,7 @@ package controllers
 import services._
 import utils.DateTimeUtils
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.FrontendAppConfig
+import config.{Constants, FrontendAppConfig}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions}
 import controllers.actions._
 import pages.nonsipp.WhichTaxYearPage
@@ -183,6 +183,7 @@ class OverviewController @Inject()(
         outstanding = outstandingData(srn, overviewResponse, labelStart, labelContinue)
         previous = previousData(srn, getVersionsResponse, overviewResponse, labelView, outstanding)
       } yield Ok(view(outstanding, previous, request.schemeDetails.schemeName))
+        .addingToSession((Constants.SRN, srn.value))
     }
 
   def onSelectStart(srn: Srn, taxYear: String, version: String, reportType: String): Action[AnyContent] =
@@ -212,7 +213,12 @@ class OverviewController @Inject()(
           Future.successful(Redirect(sippUrl))
         case _ =>
           for {
-            updatedUserAnswers <- psrRetrievalService.getStandardPsrDetails(None, Some(taxYear), Some(version))
+            updatedUserAnswers <- psrRetrievalService.getStandardPsrDetails(
+              None,
+              Some(taxYear),
+              Some(version),
+              controllers.routes.OverviewController.onPageLoad(srn)
+            )
             _ <- saveService.save(updatedUserAnswers)
           } yield {
             Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
@@ -228,7 +234,8 @@ class OverviewController @Inject()(
           Future.successful(Redirect(sippUrl))
         case _ =>
           for {
-            updatedUserAnswers <- psrRetrievalService.getStandardPsrDetails(Some(fbNumber), None, None)
+            updatedUserAnswers <- psrRetrievalService
+              .getStandardPsrDetails(Some(fbNumber), None, None, controllers.routes.OverviewController.onPageLoad(srn))
             _ <- saveService.save(updatedUserAnswers)
           } yield {
             Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))

@@ -46,7 +46,7 @@ class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec {
     routes.MemberPensionPaymentsCYAController.onPageLoad(srn, index, mode)
 
   private def onSubmit(mode: Mode) =
-    routes.MemberPensionPaymentsCYAController.onSubmit(srn, mode)
+    routes.MemberPensionPaymentsCYAController.onSubmit(srn, index, mode)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(TotalAmountPensionPaymentsPage(srn, index), money)
@@ -76,7 +76,7 @@ class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec {
           .before(MockPSRSubmissionService.submitPsrDetails())
           .withName(s"redirect to next page when in $mode mode")
           .after({
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
       )

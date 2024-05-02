@@ -98,13 +98,20 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      psrSubmissionService.submitPsrDetails(srn).map {
-        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        case Some(_) =>
-          Redirect(navigator.nextPage(UnregulatedOrConnectedBondsHeldCYAPage(srn), NormalMode, request.userAnswers))
-      }
+      psrSubmissionService
+        .submitPsrDetails(
+          srn,
+          optFallbackCall = Some(
+            controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn, index, mode)
+          )
+        )
+        .map {
+          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          case Some(_) =>
+            Redirect(navigator.nextPage(UnregulatedOrConnectedBondsHeldCYAPage(srn), NormalMode, request.userAnswers))
+        }
     }
 }
 
@@ -151,7 +158,7 @@ object UnregulatedOrConnectedBondsHeldCYAController {
       refresh = None,
       buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
       onSubmit = routes.UnregulatedOrConnectedBondsHeldCYAController
-        .onSubmit(parameters.srn, parameters.mode)
+        .onSubmit(parameters.srn, parameters.index, parameters.mode)
     )
 
   private def sections(

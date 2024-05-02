@@ -102,7 +102,14 @@ class TransfersOutCYAController @Inject()(
             .remove(TransferOutMemberListPage(srn))
         )
         _ <- saveService.save(updatedUserAnswers)
-        submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedUserAnswers)
+        submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+          srn,
+          updatedUserAnswers,
+          optFallbackCall = Some(
+            controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
+              .onPageLoad(srn, index, mode)
+          )
+        )
       } yield submissionResult.getOrRecoverJourney(
         _ =>
           Redirect(

@@ -89,12 +89,20 @@ class MoneyBorrowedCYAController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, checkOrChange: CheckOrChange): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max5000, checkOrChange: CheckOrChange): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      psrSubmissionService.submitPsrDetails(srn).map {
-        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        case Some(_) => Redirect(navigator.nextPage(MoneyBorrowedCYAPage(srn), NormalMode, request.userAnswers))
-      }
+      psrSubmissionService
+        .submitPsrDetails(
+          srn,
+          optFallbackCall = Some(
+            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
+              .onPageLoad(srn, index, checkOrChange)
+          )
+        )
+        .map {
+          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          case Some(_) => Redirect(navigator.nextPage(MoneyBorrowedCYAPage(srn), NormalMode, request.userAnswers))
+        }
     }
 }
 
@@ -140,7 +148,7 @@ object MoneyBorrowedCYAController {
       ),
       refresh = None,
       buttonText = parameters.checkOrChange.fold(check = "site.saveAndContinue", change = "site.continue"),
-      onSubmit = routes.MoneyBorrowedCYAController.onSubmit(parameters.srn, parameters.checkOrChange)
+      onSubmit = routes.MoneyBorrowedCYAController.onSubmit(parameters.srn, parameters.index, parameters.checkOrChange)
     )
 
   private def sections(

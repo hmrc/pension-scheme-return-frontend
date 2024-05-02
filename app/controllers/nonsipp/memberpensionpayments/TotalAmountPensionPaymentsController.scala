@@ -134,7 +134,14 @@ class TotalAmountPensionPaymentsController @Inject()(
                   request.userAnswers.transformAndSet(TotalAmountPensionPaymentsPage(srn, index), value)
                 )
               _ <- saveService.save(updatedAnswers)
-              submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(srn, updatedAnswers)
+              submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+                srn,
+                updatedAnswers,
+                optFallbackCall = Some(
+                  controllers.nonsipp.memberpensionpayments.routes.TotalAmountPensionPaymentsController
+                    .onPageLoad(srn, index, mode)
+                )
+              )
             } yield submissionResult.getOrRecoverJourney(
               _ =>
                 Redirect(

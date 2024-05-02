@@ -23,7 +23,7 @@ import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
-import models.{IdentitySubject, IdentityType, Mode}
+import models._
 import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n.MessagesApi
@@ -114,7 +114,13 @@ class RemoveLoanController @Inject()(
                   .fromTry(request.userAnswers.remove(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)))
                 _ <- saveService.save(updatedAnswers)
                 redirectTo <- psrSubmissionService
-                  .submitPsrDetails(srn)(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                  .submitPsrDetails(
+                    srn,
+                    optFallbackCall = Some(
+                      controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
+                        .onPageLoad(srn, 1, mode)
+                    )
+                  )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                   .map {
                     case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
                     case Some(_) => Redirect(navigator.nextPage(RemoveLoanPage(srn, index), mode, updatedAnswers))

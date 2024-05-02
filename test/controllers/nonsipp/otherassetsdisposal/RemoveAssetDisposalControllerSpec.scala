@@ -69,11 +69,11 @@ class RemoveAssetDisposalControllerSpec extends ControllerBaseSpec {
     act.like(
       saveAndContinue(onSubmit, userAnswers, "value" -> "true")
         .before(
-          when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any())(any(), any(), any()))
+          when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(())))
         )
         .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )
