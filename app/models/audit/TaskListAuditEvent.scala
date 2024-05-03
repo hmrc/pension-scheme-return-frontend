@@ -16,19 +16,18 @@
 
 package models.audit
 
-
 import play.api.libs.json.{Format, JsObject, Json}
 
 case class TaskListAuditEvent(
-                               payload: JsObject
-                             ) extends AuditEvent {
+  payload: JsObject
+) extends AuditEvent {
   override def auditType: String = "PensionSchemeReturnCompiled"
 
-  override def details: Map[String, String] = {
-    payload.value.map { case (key, value) =>
-      key -> value.toString
+  override def details: Map[String, String] =
+    payload.value.map {
+      case (key, value) =>
+        key -> value.toString
     }.toMap
-  }
 
 }
 
