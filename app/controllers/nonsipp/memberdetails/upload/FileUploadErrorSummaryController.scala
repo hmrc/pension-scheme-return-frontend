@@ -29,7 +29,7 @@ import views.html.ContentPageView
 import models.SchemeId.Srn
 import play.api.i18n._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.LabelSize
+import viewmodels.HeadingSize
 import viewmodels.DisplayMessage._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 
@@ -78,7 +78,7 @@ object FileUploadErrorSummaryController {
       heading = "fileUploadErrorSummary.heading",
       description = Some(
         ParagraphMessage("fileUploadErrorSummary.paragraph") ++
-          Heading2("fileUploadErrorSummary.heading2", LabelSize.Medium) ++
+          Heading2("fileUploadErrorSummary.heading2", HeadingSize.Medium) ++
           errorSummary(errors)
       ),
       page = ContentPageViewModel(isLargeHeading = true),

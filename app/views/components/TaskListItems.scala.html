@@ -33,12 +33,14 @@
                 }
             </span>
             @if(item.status == Updated) {
-                <span class="hmrc-status-tag govuk-tag--green" id="@id">
-                @renderMessage(item.status.description)
+                <span class="hmrc-status-tag" id="@id">
+                    <strong class ="govuk-tag govuk-tag--green">
+                        @renderMessage(item.status.description)
+                    </strong>
                 </span>
             } else {
                 <span class="hmrc-status-tag" id="@id">
-                @renderMessage(item.status.description)
+                    @renderMessage(item.status.description)
                 </span>
             }
         </li>

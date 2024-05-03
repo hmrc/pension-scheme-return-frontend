@@ -29,7 +29,6 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito._
-import play.api.mvc.Result
 
 import scala.concurrent.Future
 

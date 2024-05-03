@@ -959,7 +959,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
     expectedTitleKey: String,
     expectedLinkContentKey: String,
     expectedLinkUrl: String
-  ) = {
+  ): Object = {
     val customViewModel = TaskListController.viewModel(
       srn,
       schemeName,

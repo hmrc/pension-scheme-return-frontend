@@ -17,6 +17,7 @@
 package viewmodels.govuk
 
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+import uk.gov.hmrc.govukfrontend.views.viewmodels.FormGroup
 import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
 import play.api.data.{Field, FormError}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.dateinput.{DateInput, InputItem}
@@ -92,8 +93,8 @@ trait DateFluency {
     def withHint(hint: Hint): DateInput =
       date.copy(hint = Some(hint))
 
-    def withFormGroupClasses(classes: String): DateInput =
-      date.copy(formGroupClasses = classes)
+    def withFormGroupClasses(formGroup: FormGroup): DateInput =
+      date.copy(formGroup = formGroup)
 
     def withCssClass(newClass: String): DateInput =
       date.copy(classes = s"${date.classes} $newClass")

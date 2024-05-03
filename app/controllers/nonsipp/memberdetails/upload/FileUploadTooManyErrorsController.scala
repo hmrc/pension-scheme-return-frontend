@@ -30,7 +30,7 @@ import views.html.ContentPageView
 import models.SchemeId.Srn
 import play.api.i18n._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.LabelSize
+import viewmodels.HeadingSize
 import viewmodels.DisplayMessage._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 
@@ -73,7 +73,7 @@ object FileUploadTooManyErrorsController {
       heading = "fileUploadTooManyErrors.heading",
       description = Some(
         ParagraphMessage("fileUploadTooManyErrors.paragraph") ++
-          Heading2("fileUploadTooManyErrors.heading2", LabelSize.Medium) ++
+          Heading2("fileUploadTooManyErrors.heading2", HeadingSize.Medium) ++
           ParagraphMessage(Message("fileUploadTooManyErrors.paragraph2", numErrors)) ++
           errorList(errorTypes)
       ),

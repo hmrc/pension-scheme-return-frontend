@@ -82,7 +82,7 @@ class ReturnsSubmittedController @Inject()(
                     TableElem(
                       LinkMessage(
                         Message("site.view"),
-                        controllers.nonsipp.routes.TaskListViewController
+                        controllers.nonsipp.routes.ViewOnlyTaskListController
                           .onPageLoad(
                             srn,
                             formatDateForApi(dateRange.from),
