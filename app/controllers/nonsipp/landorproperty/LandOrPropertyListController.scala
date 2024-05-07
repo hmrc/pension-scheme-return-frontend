@@ -93,22 +93,26 @@ object LandOrPropertyListController {
     )
 
   private def rows(srn: Srn, mode: Mode, addresses: Map[String, Address]): List[ListRow] =
-    addresses.flatMap {
-      case (index, address) =>
-        refineV[Max5000.Refined](index.toInt + 1).fold(
-          _ => Nil,
-          index =>
-            List(
-              ListRow(
-                address.addressLine1,
-                changeUrl = routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckMode).url,
-                changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1),
-                routes.RemovePropertyController.onPageLoad(srn, index, mode).url,
-                Message("landOrPropertyList.row.remove.hiddenText")
+    addresses
+      .flatMap {
+        case (index, address) =>
+          refineV[Max5000.Refined](index.toInt + 1).fold(
+            _ => Nil,
+            index =>
+              List(
+                index -> ListRow(
+                  address.addressLine1,
+                  changeUrl = routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckMode).url,
+                  changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1),
+                  routes.RemovePropertyController.onPageLoad(srn, index, mode).url,
+                  Message("landOrPropertyList.row.remove.hiddenText")
+                )
               )
-            )
-        )
-    }.toList
+          )
+      }
+      .toList
+      .sortBy { case (index, _) => index.value }
+      .map { case (_, listRow) => listRow }
 
   def viewModel(srn: Srn, page: Int, mode: Mode, addresses: Map[String, Address]): FormPageViewModel[ListViewModel] = {
 

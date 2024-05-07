@@ -133,11 +133,14 @@ class OtherAssetsListController @Inject()(
   private def otherAssetsData(srn: Srn, indexes: List[Max5000])(
     implicit req: DataRequest[_]
   ): Either[Result, List[OtherAssetsData]] =
-    indexes.map { index =>
-      for {
-        nameOfOtherAssets <- requiredPage(WhatIsOtherAssetPage(srn, index))
-      } yield OtherAssetsData(index, nameOfOtherAssets)
-    }.sequence
+    indexes
+      .sortBy(x => x.value)
+      .map { index =>
+        for {
+          nameOfOtherAssets <- requiredPage(WhatIsOtherAssetPage(srn, index))
+        } yield OtherAssetsData(index, nameOfOtherAssets)
+      }
+      .sequence
 }
 
 object OtherAssetsListController {

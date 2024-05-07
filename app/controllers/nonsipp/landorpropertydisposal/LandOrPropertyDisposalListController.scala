@@ -136,12 +136,14 @@ class LandOrPropertyDisposalListController @Inject()(
     disposals
       .map {
         case indexes @ (landOrPropertyIndex, _) =>
-          request.userAnswers
+          landOrPropertyIndex -> request.userAnswers
             .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex))
             .getOrRecoverJourney
             .map(address => (indexes, address))
       }
       .toList
+      .sortBy { case (index, _) => index.value }
+      .map { case (_, listRow) => listRow }
       .sequence
 
 }

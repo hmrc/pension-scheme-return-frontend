@@ -158,35 +158,38 @@ object ReportedOtherAssetsDisposalListController {
     disposals: Map[Max5000, List[Max50]],
     userAnswers: UserAnswers
   ): List[ListRow] =
-    disposals.flatMap {
-      case (otherAssetsIndex, disposalIndexes) =>
-        disposalIndexes.map { disposalIndex =>
-          val otherAssetsDisposalData = OtherAssetsDisposalData(
-            otherAssetsIndex,
-            disposalIndex,
-            userAnswers.get(WhatIsOtherAssetPage(srn, otherAssetsIndex)).get,
-            userAnswers.get(HowWasAssetDisposedOfPage(srn, otherAssetsIndex, disposalIndex)).get
-          )
-
-          ListRow(
-            buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
-            changeUrl = routes.AssetDisposalCYAController
-              .onPageLoad(srn, otherAssetsIndex, disposalIndex, CheckMode)
-              .url,
-            changeHiddenText = buildMessage(
-              "assetDisposal.reportedOtherAssetsDisposalList.row.change.hidden",
-              otherAssetsDisposalData
-            ),
-            removeUrl = routes.RemoveAssetDisposalController
-              .onPageLoad(srn, otherAssetsIndex, disposalIndex)
-              .url,
-            removeHiddenText = buildMessage(
-              "assetDisposal.reportedOtherAssetsDisposalList.row.remove.hidden",
-              otherAssetsDisposalData
+    disposals
+      .flatMap {
+        case (otherAssetsIndex, disposalIndexes) =>
+          disposalIndexes.map { disposalIndex =>
+            val otherAssetsDisposalData = OtherAssetsDisposalData(
+              otherAssetsIndex,
+              disposalIndex,
+              userAnswers.get(WhatIsOtherAssetPage(srn, otherAssetsIndex)).get,
+              userAnswers.get(HowWasAssetDisposedOfPage(srn, otherAssetsIndex, disposalIndex)).get
             )
-          )
-        }
-    }.toList
+
+            ListRow(
+              buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
+              changeUrl = routes.AssetDisposalCYAController
+                .onPageLoad(srn, otherAssetsIndex, disposalIndex, CheckMode)
+                .url,
+              changeHiddenText = buildMessage(
+                "assetDisposal.reportedOtherAssetsDisposalList.row.change.hidden",
+                otherAssetsDisposalData
+              ),
+              removeUrl = routes.RemoveAssetDisposalController
+                .onPageLoad(srn, otherAssetsIndex, disposalIndex)
+                .url,
+              removeHiddenText = buildMessage(
+                "assetDisposal.reportedOtherAssetsDisposalList.row.remove.hidden",
+                otherAssetsDisposalData
+              )
+            )
+          }
+      }
+      .toList
+      .sortBy(_.changeUrl)
 
   private def buildMessage(messageString: String, otherAssetsDisposalData: OtherAssetsDisposalData): Message =
     otherAssetsDisposalData match {

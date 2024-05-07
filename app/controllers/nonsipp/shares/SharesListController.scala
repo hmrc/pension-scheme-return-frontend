@@ -133,14 +133,17 @@ class SharesListController @Inject()(
   private def sharesData(srn: Srn, indexes: List[Max5000])(
     implicit req: DataRequest[_]
   ): Either[Result, List[SharesData]] =
-    indexes.map { index =>
-      for {
-        typeOfSharesHeld <- requiredPage(TypeOfSharesHeldPage(srn, index))
-        companyName <- requiredPage(CompanyNameRelatedSharesPage(srn, index))
-        acquisitionType <- requiredPage(WhyDoesSchemeHoldSharesPage(srn, index))
-        acquisitionDate = req.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index))
-      } yield SharesData(index, typeOfSharesHeld, companyName, acquisitionType, acquisitionDate)
-    }.sequence
+    indexes
+      .sortBy(listRow => listRow.value)
+      .map { index =>
+        for {
+          typeOfSharesHeld <- requiredPage(TypeOfSharesHeldPage(srn, index))
+          companyName <- requiredPage(CompanyNameRelatedSharesPage(srn, index))
+          acquisitionType <- requiredPage(WhyDoesSchemeHoldSharesPage(srn, index))
+          acquisitionDate = req.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index))
+        } yield SharesData(index, typeOfSharesHeld, companyName, acquisitionType, acquisitionDate)
+      }
+      .sequence
 }
 
 object SharesListController {

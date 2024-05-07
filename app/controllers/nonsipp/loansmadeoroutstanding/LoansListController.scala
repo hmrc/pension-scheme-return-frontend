@@ -97,6 +97,7 @@ class LoansListController @Inject()(
           key.toIntOption.flatMap(k => refineV[OneTo5000](k + 1).toOption.map(_ -> value))
       }
       .toList
+      .sortBy(listRow => listRow.map(list => list._1.value))
 
     for {
       receivedLoans <- whoReceivedLoans.traverse(_.getOrRecoverJourney)
