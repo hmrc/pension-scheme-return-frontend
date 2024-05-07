@@ -43,6 +43,7 @@ import uk.gov.hmrc.domain.Nino
 import play.api.libs.json.{Json, Reads, Writes}
 
 import java.time.{LocalDate, LocalDateTime}
+import java.time.format.DateTimeFormatter
 
 trait ControllerBaseSpec
     extends BaseSpec
@@ -136,6 +137,7 @@ trait TestValues {
   val otherRecipientDescription = "other description"
   val otherRecipientDetails: RecipientDetails = RecipientDetails(otherRecipientName, otherRecipientDescription)
   val pstr = "testPstr"
+  val qropsReferenceNumber = "Q123456"
   val version = "001"
   val titleNumber = "AB123456"
   val buyerName = "testBuyerName"
@@ -173,6 +175,20 @@ trait TestValues {
     ManualAddress
   )
 
+  val internationalAddress: Address = Address(
+    "test-id",
+    "testAddressLine1",
+    None,
+    None,
+    "testTown",
+    None,
+    "Japan",
+    "JP",
+    ManualAddress
+  )
+
+  val postcodeLookup: PostcodeLookup = PostcodeLookup("ZZ1 1ZZ", None)
+
   val individualDetails: IndividualDetails = IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")
 
   val userAnswersId: String = "id"
@@ -188,6 +204,8 @@ trait TestValues {
     from = LocalDate.of(2020, 4, 6),
     to = LocalDate.of(2021, 4, 5)
   )
+
+  val yearString: String = dateRange.from.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
   val localDateTime: LocalDateTime =
     LocalDateTime.of(2020, 12, 12, 10, 30, 15)

@@ -16,27 +16,40 @@
 
 package controllers.nonsipp
 
-import services._
-import pages.nonsipp.schemedesignatory._
 import models.ConditionalYesNo._
-import pages.nonsipp.shares._
+import pages.nonsipp.otherassetsheld._
 import config.Refined._
 import models.SchemeHoldShare._
-import eu.timepit.refined.refineMV
+import pages.nonsipp.landorproperty._
+import pages.nonsipp.receivetransfer._
+import pages.nonsipp.landorpropertydisposal._
+import pages.nonsipp.membersurrenderedbenefits._
 import models.{ConditionalYesNo, _}
-import pages.nonsipp.moneyborrowed._
 import models.SponsoringOrConnectedParty._
 import org.mockito.ArgumentMatchers._
+import pages.nonsipp.employercontributions._
+import services._
+import pages.nonsipp.otherassetsdisposal._
+import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.memberdetails._
+import pages.nonsipp.totalvaluequotedshares._
 import org.mockito.Mockito.when
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.bonds._
+import pages.nonsipp.membercontributions._
+import pages.nonsipp.memberreceivedpcls._
+import pages.nonsipp.shares._
+import play.api.mvc.Call
 import models.ManualOrUpload._
-import models.IdentityType.{Other, _}
+import models.PensionSchemeType._
+import models.IdentityType._
 import viewmodels.models.MemberState.Active
 import controllers.ControllerBaseSpec
 import views.html.TaskListView
 import models.TypeOfShares._
+import pages.nonsipp.memberpensionpayments._
+import eu.timepit.refined.refineMV
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import pages.nonsipp.sharesdisposal._
 import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
@@ -47,10 +60,13 @@ import viewmodels.models.TaskListStatus.{Completed, TaskListStatus, Updated}
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
 import models.IdentitySubject._
+import pages.nonsipp.membertransferout._
+import pages.nonsipp.moneyborrowed._
+import pages.nonsipp.bondsdisposal._
+import pages.nonsipp.memberpayments._
+import viewmodels.models.{PageViewModel, TaskListViewModel}
 
 import scala.concurrent.Future
-
-import java.time.format.DateTimeFormatter
 
 class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
@@ -77,18 +93,18 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
       .thenReturn(Future.successful(previousUA))
   }
 
-  //Set test values
+  // Set test values
   private val index1of300: Max300 = refineMV(1)
-  private val index1of5000: Max5000 = refineMV(1)
   private val index1of50: Max50 = refineMV(1)
+  private val index1of5: Max5 = refineMV(1)
+  private val index1of5000: Max5000 = refineMV(1)
   private val name: String = "name"
   private val reason: String = "reason"
   private val numAccountingPeriods: Max3 = refineMV(1)
-  private val submissionNumberTwo = 2
-  private val submissionNumberOne = 1
-  private val yearString: String = dateRange.from.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+  private val submissionNumberTwo: Int = 2
+  private val submissionNumberOne: Int = 1
 
-  // Build userAnswers
+  // Build userAnswers for current version
   private val currentUA: UserAnswers = defaultUserAnswers
     .unsafeSet(WhichTaxYearPage(srn), dateRange) // automatically set
     // Section 1 - Scheme Details
@@ -108,13 +124,39 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(MemberStatus(srn, index1of300), Active)
     // Section 3 - Member Payments
     // (S3) Employer Contributions
+    .unsafeSet(EmployerContributionsPage(srn), true)
+    .unsafeSet(EmployerNamePage(srn, index1of300, index1of50), name)
+    .unsafeSet(EmployerTypeOfBusinessPage(srn, index1of300, index1of50), IdentityType.Other)
+    .unsafeSet(OtherEmployeeDescriptionPage(srn, index1of300, index1of50), otherDetails)
+    .unsafeSet(TotalEmployerContributionPage(srn, index1of300, index1of50), money)
+    .unsafeSet(ContributionsFromAnotherEmployerPage(srn, index1of300, index1of50), false)
     // (S3) Unallocated Employer Contributions
+    .unsafeSet(UnallocatedEmployerContributionsPage(srn), true)
+    .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
     // (S3) Member Contributions
+    .unsafeSet(MemberContributionsPage(srn), false)
     // (S3) Transfers In
+    .unsafeSet(DidSchemeReceiveTransferPage(srn), true)
+    .unsafeSet(TransferringSchemeNamePage(srn, index1of300, index1of5), name)
+    .unsafeSet(TransferringSchemeTypePage(srn, index1of300, index1of5), RegisteredPS(pstr))
+    .unsafeSet(TotalValueTransferPage(srn, index1of300, index1of5), money)
+    .unsafeSet(WhenWasTransferReceivedPage(srn, index1of300, index1of5), localDate)
+    .unsafeSet(DidTransferIncludeAssetPage(srn, index1of300, index1of5), true)
     // (S3) Transfers Out
+    .unsafeSet(SchemeTransferOutPage(srn), true)
+    .unsafeSet(ReceivingSchemeNamePage(srn, index1of300, index1of5), name)
+    .unsafeSet(ReceivingSchemeTypePage(srn, index1of300, index1of5), PensionSchemeType.Other(otherDetails))
+    .unsafeSet(WhenWasTransferMadePage(srn, index1of300, index1of5), localDate)
     // (S3) PCLS
+    .unsafeSet(PensionCommencementLumpSumPage(srn), true)
+    .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index1of300), pcls)
     // (S3) Pension Payments
+    .unsafeSet(PensionPaymentsReceivedPage(srn), false)
     // (S3) Surrendered Benefits
+    .unsafeSet(SurrenderedBenefitsPage(srn), true)
+    .unsafeSet(SurrenderedBenefitsAmountPage(srn, index1of300), money)
+    .unsafeSet(WhenDidMemberSurrenderBenefitsPage(srn, index1of300), localDate)
+    .unsafeSet(WhyDidMemberSurrenderBenefitsPage(srn, index1of300), reason)
     // Section 4 - Loans Made & Money Borrowed
     // (S4) Loans Made
     .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
@@ -160,16 +202,88 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(WhenWereSharesSoldPage(srn, index1of5000, index1of50), localDate)
     .unsafeSet(HowManySharesSoldPage(srn, index1of5000, index1of50), totalShares)
     .unsafeSet(TotalConsiderationSharesSoldPage(srn, index1of5000, index1of50), money)
-    .unsafeSet(WhoWereTheSharesSoldToPage(srn, index1of5000, index1of50), Other)
-    .unsafeSet(OtherBuyerDetailsPage(srn, index1of5000, index1of50), otherRecipientDetails)
-    .unsafeSet(IsBuyerConnectedPartyPage(srn, index1of5000, index1of50), true)
-    .unsafeSet(IndependentValuationPage(srn, index1of5000, index1of50), true)
+    .unsafeSet(WhoWereTheSharesSoldToPage(srn, index1of5000, index1of50), IdentityType.Other)
+    .unsafeSet(pages.nonsipp.sharesdisposal.OtherBuyerDetailsPage(srn, index1of5000, index1of50), otherRecipientDetails)
+    .unsafeSet(pages.nonsipp.sharesdisposal.IsBuyerConnectedPartyPage(srn, index1of5000, index1of50), true)
+    .unsafeSet(pages.nonsipp.sharesdisposal.IndependentValuationPage(srn, index1of5000, index1of50), true)
     .unsafeSet(HowManyDisposalSharesPage(srn, index1of5000, index1of50), totalShares)
-  // Section 6 - Land or Property
-  // Section 7 - Bonds
-  // Section 8 - Other Assets
-  // Section 9 - Declaration
+    // (S5) Quoted Shares
+    .unsafeSet(TotalValueQuotedSharesPage(srn), money)
+    // Section 6 - Land or Property
+    // (S6) Land or Property
+    .unsafeSet(LandOrPropertyHeldPage(srn), true)
+    .unsafeSet(LandPropertyInUKPage(srn, index1of5000), true)
+    .unsafeSet(LandOrPropertyPostcodeLookupPage(srn, index1of5000), postcodeLookup)
+    .unsafeSet(AddressLookupResultsPage(srn, index1of5000), List(address, address, address))
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, index1of5000), address)
+    .unsafeSet(LandRegistryTitleNumberPage(srn, index1of5000), ConditionalYesNo.no[String, String](reason))
+    .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index1of5000), SchemeHoldLandProperty.Acquisition)
+    .unsafeSet(LandOrPropertyWhenDidSchemeAcquirePage(srn, index1of5000), localDate)
+    .unsafeSet(IdentityTypePage(srn, index1of5000, LandOrPropertySeller), UKCompany)
+    .unsafeSet(CompanySellerNamePage(srn, index1of5000), name)
+    .unsafeSet(CompanyRecipientCrnPage(srn, index1of5000, LandOrPropertySeller), ConditionalYesNo.yes[String, Crn](crn))
+    .unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, index1of5000), false)
+    .unsafeSet(LandOrPropertyTotalCostPage(srn, index1of5000), money)
+    .unsafeSet(LandPropertyIndependentValuationPage(srn, index1of5000), false)
+    .unsafeSet(IsLandOrPropertyResidentialPage(srn, index1of5000), false)
+    .unsafeSet(IsLandPropertyLeasedPage(srn, index1of5000), true)
+    .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, index1of5000), (leaseName, money, localDate))
+    .unsafeSet(IsLesseeConnectedPartyPage(srn, index1of5000), false)
+    .unsafeSet(LandOrPropertyTotalIncomePage(srn, index1of5000), money)
+    // (S6) Land or Property Disposals
+    .unsafeSet(LandOrPropertyDisposalPage(srn), true)
+    .unsafeSet(HowWasPropertyDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Transferred)
+    .unsafeSet(LandOrPropertyStillHeldPage(srn, index1of5000, index1of50), false)
+    // Section 7 - Bonds
+    // (S7) Bonds
+    .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
+    .unsafeSet(NameOfBondsPage(srn, index1of5000), name)
+    .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, index1of5000), SchemeHoldBond.Acquisition)
+    .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, index1of5000), localDate)
+    .unsafeSet(CostOfBondsPage(srn, index1of5000), money)
+    .unsafeSet(BondsFromConnectedPartyPage(srn, index1of5000), true)
+    .unsafeSet(AreBondsUnregulatedPage(srn, index1of5000), true)
+    .unsafeSet(IncomeFromBondsPage(srn, index1of5000), money)
+    // (S7) Bonds Disposals
+    .unsafeSet(BondsDisposalPage(srn), true)
+    .unsafeSet(HowWereBondsDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Other(otherDetails))
+    .unsafeSet(BondsStillHeldPage(srn, index1of5000, index1of50), bondsStillHeld)
+    // Section 8 - Other Assets
+    // (S8) Other Assets
+    .unsafeSet(OtherAssetsHeldPage(srn), true)
+    .unsafeSet(WhatIsOtherAssetPage(srn, index1of5000), otherAssetDescription)
+    .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, index1of5000), true)
+    .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index1of5000), SchemeHoldAsset.Acquisition)
+    .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, index1of5000), localDate)
+    .unsafeSet(IdentityTypePage(srn, index1of5000, OtherAssetSeller), Individual)
+    .unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, index1of5000), name)
+    .unsafeSet(OtherAssetIndividualSellerNINumberPage(srn, index1of5000), ConditionalYesNo.no[String, Nino](reason))
+    .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, index1of5000), true)
+    .unsafeSet(CostOfOtherAssetPage(srn, index1of5000), money)
+    .unsafeSet(pages.nonsipp.otherassetsheld.IndependentValuationPage(srn, index1of5000), true)
+    .unsafeSet(IncomeFromAssetPage(srn, index1of5000), money)
+    // (S8) Other Assets Disposals
+    .unsafeSet(OtherAssetsDisposalPage(srn), true)
+    .unsafeSet(HowWasAssetDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Transferred)
+    .unsafeSet(AnyPartAssetStillHeldPage(srn, index1of5000, index1of50), true)
 
+  lazy val viewModelSubmissionTwo: PageViewModel[TaskListViewModel] = ViewOnlyTaskListController.viewModel(
+    srn,
+    schemeName,
+    dateRange,
+    currentUA,
+    previousUA,
+    submissionNumberTwo
+  )
+
+  lazy val onPageLoadSubmissionTwo: Call = routes.ViewOnlyTaskListController.onPageLoad(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  // Build userAnswers for previous version
   private val previousUA: UserAnswers = defaultUserAnswers
     .unsafeSet(WhichTaxYearPage(srn), dateRange) // automatically set
     // Section 1 - Scheme Details
@@ -192,13 +306,43 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(MemberStatus(srn, index1of300), Active)
     // Section 3 - Member Payments
     // (S3) Employer Contributions
+    .unsafeSet(EmployerContributionsPage(srn), true)
+    .unsafeSet(EmployerNamePage(srn, index1of300, index1of50), name)
+    .unsafeSet(EmployerTypeOfBusinessPage(srn, index1of300, index1of50), UKPartnership)
+    .unsafeSet(PartnershipEmployerUtrPage(srn, index1of300, index1of50), ConditionalYesNo.yes[String, Utr](utr))
+    .unsafeSet(OtherEmployeeDescriptionPage(srn, index1of300, index1of50), otherDetails)
+    .unsafeSet(TotalEmployerContributionPage(srn, index1of300, index1of50), money)
+    .unsafeSet(ContributionsFromAnotherEmployerPage(srn, index1of300, index1of50), false)
     // (S3) Unallocated Employer Contributions
+    .unsafeSet(UnallocatedEmployerContributionsPage(srn), false)
     // (S3) Member Contributions
+    .unsafeSet(MemberContributionsPage(srn), true)
+    .unsafeSet(TotalMemberContributionPage(srn, index1of300), money)
     // (S3) Transfers In
+    .unsafeSet(DidSchemeReceiveTransferPage(srn), true)
+    .unsafeSet(TransferringSchemeNamePage(srn, index1of300, index1of5), name)
+    .unsafeSet(
+      TransferringSchemeTypePage(srn, index1of300, index1of5),
+      QualifyingRecognisedOverseasPS(qropsReferenceNumber)
+    )
+    .unsafeSet(TotalValueTransferPage(srn, index1of300, index1of5), money)
+    .unsafeSet(WhenWasTransferReceivedPage(srn, index1of300, index1of5), localDate)
+    .unsafeSet(DidTransferIncludeAssetPage(srn, index1of300, index1of5), false)
     // (S3) Transfers Out
+    .unsafeSet(SchemeTransferOutPage(srn), true)
+    .unsafeSet(ReceivingSchemeNamePage(srn, index1of300, index1of5), name)
+    .unsafeSet(ReceivingSchemeTypePage(srn, index1of300, index1of5), RegisteredPS(pstr))
+    .unsafeSet(WhenWasTransferMadePage(srn, index1of300, index1of5), localDate)
     // (S3) PCLS
+    .unsafeSet(PensionCommencementLumpSumPage(srn), false)
     // (S3) Pension Payments
+    .unsafeSet(PensionPaymentsReceivedPage(srn), true)
+    .unsafeSet(TotalAmountPensionPaymentsPage(srn, index1of300), money)
     // (S3) Surrendered Benefits
+    .unsafeSet(SurrenderedBenefitsPage(srn), true)
+    .unsafeSet(SurrenderedBenefitsAmountPage(srn, index1of300), money)
+    .unsafeSet(WhenDidMemberSurrenderBenefitsPage(srn, index1of300), localDate)
+    .unsafeSet(WhyDidMemberSurrenderBenefitsPage(srn, index1of300), "")
     // Section 4 - Loans Made & Money Borrowed
     // (S4) Loans Made
     .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
@@ -242,28 +386,96 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(HowManySharesRedeemedPage(srn, index1of5000, index1of50), totalShares)
     .unsafeSet(TotalConsiderationSharesRedeemedPage(srn, index1of5000, index1of50), money)
     .unsafeSet(HowManyDisposalSharesPage(srn, index1of5000, index1of50), totalShares)
-  // Section 6 - Land or Property
-  // Section 7 - Bonds
-  // Section 8 - Other Assets
-  // Section 9 - Declaration
+    // (S5) Quoted Shares
+    .unsafeSet(TotalValueQuotedSharesPage(srn), Money(0))
+    // Section 6 - Land or Property
+    // (S6) Land or Property
+    .unsafeSet(LandOrPropertyHeldPage(srn), true)
+    .unsafeSet(LandPropertyInUKPage(srn, index1of5000), false)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, index1of5000), internationalAddress)
+    .unsafeSet(LandRegistryTitleNumberPage(srn, index1of5000), ConditionalYesNo.yes[String, String](titleNumber))
+    .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index1of5000), SchemeHoldLandProperty.Contribution)
+    .unsafeSet(LandOrPropertyWhenDidSchemeAcquirePage(srn, index1of5000), localDate)
+    .unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, index1of5000), true)
+    .unsafeSet(LandOrPropertyTotalCostPage(srn, index1of5000), money)
+    .unsafeSet(LandPropertyIndependentValuationPage(srn, index1of5000), false)
+    .unsafeSet(IsLandOrPropertyResidentialPage(srn, index1of5000), false)
+    .unsafeSet(IsLandPropertyLeasedPage(srn, index1of5000), false)
+    .unsafeSet(LandOrPropertyTotalIncomePage(srn, index1of5000), money)
+    // (S6) Land or Property Disposals
+    .unsafeSet(LandOrPropertyDisposalPage(srn), true)
+    .unsafeSet(HowWasPropertyDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Sold)
+    .unsafeSet(WhenWasPropertySoldPage(srn, index1of5000, index1of50), localDate)
+    .unsafeSet(TotalProceedsSaleLandPropertyPage(srn, index1of5000, index1of50), money)
+    .unsafeSet(WhoPurchasedLandOrPropertyPage(srn, index1of5000, index1of50), UKPartnership)
+    .unsafeSet(pages.nonsipp.landorpropertydisposal.PartnershipBuyerNamePage(srn, index1of5000, index1of50), name)
+    .unsafeSet(
+      pages.nonsipp.landorpropertydisposal.PartnershipBuyerUtrPage(srn, index1of5000, index1of50),
+      ConditionalYesNo.no[String, Utr](reason)
+    )
+    .unsafeSet(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index1of5000, index1of50), true)
+    .unsafeSet(DisposalIndependentValuationPage(srn, index1of5000, index1of50), true)
+    .unsafeSet(LandOrPropertyStillHeldPage(srn, index1of5000, index1of50), true)
+    // Section 7 - Bonds
+    // (S7) Bonds
+    .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
+    .unsafeSet(NameOfBondsPage(srn, index1of5000), name)
+    .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, index1of5000), SchemeHoldBond.Contribution)
+    .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, index1of5000), localDate)
+    .unsafeSet(CostOfBondsPage(srn, index1of5000), money)
+    .unsafeSet(BondsFromConnectedPartyPage(srn, index1of5000), true)
+    .unsafeSet(AreBondsUnregulatedPage(srn, index1of5000), true)
+    .unsafeSet(IncomeFromBondsPage(srn, index1of5000), money)
+    // (S7) Bonds Disposals
+    .unsafeSet(BondsDisposalPage(srn), true)
+    .unsafeSet(HowWereBondsDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Sold)
+    .unsafeSet(WhenWereBondsSoldPage(srn, index1of5000, index1of50), localDate)
+    .unsafeSet(TotalConsiderationSaleBondsPage(srn, index1of5000, index1of50), money)
+    .unsafeSet(BuyerNamePage(srn, index1of5000, index1of50), name)
+    .unsafeSet(pages.nonsipp.bondsdisposal.IsBuyerConnectedPartyPage(srn, index1of5000, index1of50), false)
+    .unsafeSet(BondsStillHeldPage(srn, index1of5000, index1of50), bondsStillHeld)
+    // Section 8 - Other Assets
+    // (S8) Other Assets
+    .unsafeSet(OtherAssetsHeldPage(srn), true)
+    .unsafeSet(WhatIsOtherAssetPage(srn, index1of5000), otherAssetDescription)
+    .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, index1of5000), false)
+    .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index1of5000), SchemeHoldAsset.Contribution)
+    .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, index1of5000), localDate)
+    .unsafeSet(CostOfOtherAssetPage(srn, index1of5000), money)
+    .unsafeSet(pages.nonsipp.otherassetsheld.IndependentValuationPage(srn, index1of5000), false)
+    .unsafeSet(IncomeFromAssetPage(srn, index1of5000), money)
+    // (S8) Other Assets Disposals
+    .unsafeSet(OtherAssetsDisposalPage(srn), true)
+    .unsafeSet(HowWasAssetDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Sold)
+    .unsafeSet(WhenWasAssetSoldPage(srn, index1of5000, index1of50), localDate)
+    .unsafeSet(TotalConsiderationSaleAssetPage(srn, index1of5000, index1of50), money)
+    .unsafeSet(TypeOfAssetBuyerPage(srn, index1of5000, index1of50), UKPartnership)
+    .unsafeSet(pages.nonsipp.otherassetsdisposal.PartnershipBuyerNamePage(srn, index1of5000, index1of50), name)
+    .unsafeSet(
+      pages.nonsipp.otherassetsdisposal.PartnershipBuyerUtrPage(srn, index1of5000, index1of50),
+      ConditionalYesNo.no[String, Utr](reason)
+    )
+    .unsafeSet(pages.nonsipp.otherassetsdisposal.IsBuyerConnectedPartyPage(srn, index1of5000, index1of50), false)
+    .unsafeSet(AssetSaleIndependentValuationPage(srn, index1of5000, index1of50), false)
+    .unsafeSet(AnyPartAssetStillHeldPage(srn, index1of5000, index1of50), false)
+
+  lazy val viewModelVersionOne: PageViewModel[TaskListViewModel] = ViewOnlyTaskListController.viewModel(
+    srn,
+    schemeName,
+    dateRange,
+    currentUA,
+    previousUA,
+    submissionNumberOne
+  )
+
+  lazy val onPageLoadSubmissionOne: Call = routes.ViewOnlyTaskListController.onPageLoad(
+    srn,
+    yearString,
+    submissionNumberOne,
+    0
+  )
 
   "ViewOnlyTaskListController" - {
-
-    lazy val viewModelSubmissionTwo = ViewOnlyTaskListController.viewModel(
-      srn,
-      schemeName,
-      dateRange,
-      currentUA,
-      previousUA,
-      submissionNumberTwo
-    )
-
-    lazy val onPageLoadSubmissionTwo = routes.ViewOnlyTaskListController.onPageLoad(
-      srn,
-      yearString,
-      submissionNumberTwo,
-      submissionNumberOne
-    )
 
     act.like(renderView(onPageLoadSubmissionTwo, currentUA) { implicit app => implicit request =>
       val view = injected[TaskListView]
@@ -271,22 +483,6 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     }.withName("onPageLoad renders ok with indexes /2/1"))
 
     act.like(journeyRecoveryPage(onPageLoadSubmissionTwo).updateName("onPageLoad " + _))
-
-    lazy val viewModelVersionOne = ViewOnlyTaskListController.viewModel(
-      srn,
-      schemeName,
-      dateRange,
-      currentUA,
-      previousUA,
-      submissionNumberOne
-    )
-
-    lazy val onPageLoadSubmissionOne = routes.ViewOnlyTaskListController.onPageLoad(
-      srn,
-      yearString,
-      submissionNumberOne,
-      0
-    )
 
     act.like(renderView(onPageLoadSubmissionOne, currentUA) { implicit app => implicit request =>
       val view = injected[TaskListView]
@@ -404,18 +600,18 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             )
           }
 
-//          "Updated" in {
-//            testViewModel(
-//              currentUA,
-//              previousUA,
-//              2,
-//              0,
-//              expectedStatus = Updated,
-//              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
-//              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.employercontributions.title",
-//              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
-//            )
-//          }
+          "Updated" in {
+            testViewModel(
+              currentUA,
+              previousUA,
+              2,
+              0,
+              expectedStatus = Updated,
+              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
+              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.employercontributions.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
         }
 
         "(S3) Unallocated employer contributions" - {
@@ -433,18 +629,18 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             )
           }
 
-//          "Updated" in {
-//            testViewModel(
-//              currentUA,
-//              previousUA,
-//              2,
-//              1,
-//              expectedStatus = Updated,
-//              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
-//              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.unallocatedcontributions.title",
-//              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
-//            )
-//          }
+          "Updated" in {
+            testViewModel(
+              currentUA,
+              previousUA,
+              2,
+              1,
+              expectedStatus = Updated,
+              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
+              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.unallocatedcontributions.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
         }
 
         "(S3) Member contributions" - {
@@ -462,18 +658,18 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             )
           }
 
-//          "Updated" in {
-//            testViewModel(
-//              currentUA,
-//              previousUA,
-//              2,
-//              2,
-//              expectedStatus = Updated,
-//              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
-//              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.memberContributions.title",
-//              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
-//            )
-//          }
+          "Updated" in {
+            testViewModel(
+              currentUA,
+              previousUA,
+              2,
+              2,
+              expectedStatus = Updated,
+              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
+              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.memberContributions.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
         }
 
         "(S3) Transfers in" - {
@@ -491,18 +687,18 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             )
           }
 
-//          "Updated" in {
-//            testViewModel(
-//              currentUA,
-//              previousUA,
-//              2,
-//              3,
-//              expectedStatus = Updated,
-//              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
-//              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.transfersreceived.title",
-//              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
-//            )
-//          }
+          "Updated" in {
+            testViewModel(
+              currentUA,
+              previousUA,
+              2,
+              3,
+              expectedStatus = Updated,
+              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
+              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.transfersreceived.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
         }
 
         "(S3) Transfers out" - {
@@ -520,18 +716,18 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             )
           }
 
-//          "Updated" in {
-//            testViewModel(
-//              currentUA,
-//              previousUA,
-//              2,
-//              4,
-//              expectedStatus = Updated,
-//              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
-//              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.transfersout.title",
-//              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
-//            )
-//          }
+          "Updated" in {
+            testViewModel(
+              currentUA,
+              previousUA,
+              2,
+              4,
+              expectedStatus = Updated,
+              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
+              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.transfersout.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
         }
 
         "(S3) Pension commencement lump sum" - {
@@ -549,18 +745,18 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             )
           }
 
-//          "Updated" in {
-//            testViewModel(
-//              currentUA,
-//              previousUA,
-//              2,
-//              5,
-//              expectedStatus = Updated,
-//              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
-//              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.pcls.title",
-//              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
-//            )
-//          }
+          "Updated" in {
+            testViewModel(
+              currentUA,
+              previousUA,
+              2,
+              5,
+              expectedStatus = Updated,
+              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
+              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.pcls.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
         }
 
         "(S3) Pension payments" - {
@@ -578,18 +774,18 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             )
           }
 
-//          "Updated" in {
-//            testViewModel(
-//              currentUA,
-//              previousUA,
-//              2,
-//              6,
-//              expectedStatus = Updated,
-//              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
-//              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.payments.title",
-//              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
-//            )
-//          }
+          "Updated" in {
+            testViewModel(
+              currentUA,
+              previousUA,
+              2,
+              6,
+              expectedStatus = Updated,
+              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
+              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.payments.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
         }
 
         "(S3) Surrendered benefits" - {
@@ -607,18 +803,18 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             )
           }
 
-//          "Updated" in {
-//            testViewModel(
-//              currentUA,
-//              previousUA,
-//              2,
-//              7,
-//              expectedStatus = Updated,
-//              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
-//              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.surrenderedbenefits.title",
-//              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
-//            )
-//          }
+          "Updated" in {
+            testViewModel(
+              currentUA,
+              previousUA,
+              2,
+              7,
+              expectedStatus = Updated,
+              expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
+              expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.surrenderedbenefits.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
         }
       }
 
@@ -742,16 +938,237 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             )
           }
         }
+
+        "(S5) Quoted Shares" - {
+
+          "Completed" in {
+            testViewModel(
+              currentUA,
+              currentUA,
+              4,
+              2,
+              expectedStatus = Completed,
+              expectedTitleKey = "nonsipp.tasklist.shares.title",
+              expectedLinkContentKey = "nonsipp.tasklist.shares.view.quotedshares.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
+
+          "Updated" in {
+            testViewModel(
+              currentUA,
+              previousUA,
+              4,
+              2,
+              expectedStatus = Updated,
+              expectedTitleKey = "nonsipp.tasklist.shares.title",
+              expectedLinkContentKey = "nonsipp.tasklist.shares.view.quotedshares.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
+        }
       }
 
-      // Land or property
+      "Section 6 - Land or property" - {
 
-      // Bonds
+        "(S6) Land or property" - {
 
-      // Other assets
+          "Completed" in {
+            testViewModel(
+              currentUA,
+              currentUA,
+              5,
+              0,
+              expectedStatus = Completed,
+              expectedTitleKey = "nonsipp.tasklist.landorproperty.title",
+              expectedLinkContentKey = "nonsipp.tasklist.landorproperty.view.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
 
-      // Declaration
+          "Updated" in {
+            testViewModel(
+              currentUA,
+              previousUA,
+              5,
+              0,
+              expectedStatus = Updated,
+              expectedTitleKey = "nonsipp.tasklist.landorproperty.title",
+              expectedLinkContentKey = "nonsipp.tasklist.landorproperty.view.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
+        }
 
+        "(S6) Land or Property Disposals" - {
+
+          "Completed" in {
+            testViewModel(
+              currentUA,
+              currentUA,
+              5,
+              1,
+              expectedStatus = Completed,
+              expectedTitleKey = "nonsipp.tasklist.landorproperty.title",
+              expectedLinkContentKey = "nonsipp.tasklist.landorpropertydisposal.view.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
+
+          "Updated" in {
+            testViewModel(
+              currentUA,
+              previousUA,
+              5,
+              1,
+              expectedStatus = Updated,
+              expectedTitleKey = "nonsipp.tasklist.landorproperty.title",
+              expectedLinkContentKey = "nonsipp.tasklist.landorpropertydisposal.view.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
+        }
+      }
+
+      "Section 7 - Bonds" - {
+
+        "(S7) Bonds" - {
+
+          "Completed" in {
+            testViewModel(
+              currentUA,
+              currentUA,
+              6,
+              0,
+              expectedStatus = Completed,
+              expectedTitleKey = "nonsipp.tasklist.bonds.title",
+              expectedLinkContentKey = "nonsipp.tasklist.bonds.view.unregulatedorconnected.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
+
+          "Updated" in {
+            testViewModel(
+              currentUA,
+              previousUA,
+              6,
+              0,
+              expectedStatus = Updated,
+              expectedTitleKey = "nonsipp.tasklist.bonds.title",
+              expectedLinkContentKey = "nonsipp.tasklist.bonds.view.unregulatedorconnected.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
+        }
+
+        "(S7) Bonds Disposals" - {
+
+          "Completed" in {
+            testViewModel(
+              currentUA,
+              currentUA,
+              6,
+              1,
+              expectedStatus = Completed,
+              expectedTitleKey = "nonsipp.tasklist.bonds.title",
+              expectedLinkContentKey = "nonsipp.tasklist.bonds.view.bondsdisposal.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
+
+          "Updated" in {
+            testViewModel(
+              currentUA,
+              previousUA,
+              6,
+              1,
+              expectedStatus = Updated,
+              expectedTitleKey = "nonsipp.tasklist.bonds.title",
+              expectedLinkContentKey = "nonsipp.tasklist.bonds.view.bondsdisposal.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
+        }
+      }
+
+      "Section 8 - Other assets" - {
+
+        "(S8) Other Assets" - {
+
+          "Completed" in {
+            testViewModel(
+              currentUA,
+              currentUA,
+              7,
+              0,
+              expectedStatus = Completed,
+              expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+              expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
+
+          "Updated" in {
+            testViewModel(
+              currentUA,
+              previousUA,
+              7,
+              0,
+              expectedStatus = Updated,
+              expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+              expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
+        }
+
+        "(S8) Other Assets Disposals" - {
+
+          "Completed" in {
+            testViewModel(
+              currentUA,
+              currentUA,
+              7,
+              1,
+              expectedStatus = Completed,
+              expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+              expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.view.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
+
+          "Updated" in {
+            testViewModel(
+              currentUA,
+              previousUA,
+              7,
+              1,
+              expectedStatus = Updated,
+              expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+              expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.view.title",
+              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            )
+          }
+        }
+      }
+
+      "Section 9 - Declaration" - {
+
+        "Completed" in {
+          testViewModel(
+            currentUA,
+            currentUA,
+            8,
+            0,
+            expectedStatus = Completed,
+            expectedTitleKey = "nonsipp.tasklist.declaration.title",
+            expectedLinkContentKey = "nonsipp.tasklist.declaration.view",
+            expectedLinkUrl = controllers.nonsipp.routes.ViewOnlyReturnSubmittedController
+              .onPageLoad(srn, dateRange.from.toString, submissionNumberTwo)
+              .url
+          )
+        }
+      }
     }
   }
 
