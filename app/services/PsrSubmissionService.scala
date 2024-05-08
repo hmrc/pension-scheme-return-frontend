@@ -97,6 +97,9 @@ class PsrSubmissionService @Inject()(
       schemeDateService.schemeDate(srn)
     ).mapN { (minimalRequiredSubmission, checkReturnDates, taxYear) =>
       {
+        // TODO fire audit event only if submission is successful
+        val auditEvent = buildAuditEvent(taxYear, loggedInUserNameOrBlank(request))
+        auditService.sendEvent(auditEvent)
         psrConnector.submitPsrDetails(
           PsrSubmission(
             minimalRequiredSubmission = minimalRequiredSubmission,
@@ -117,8 +120,6 @@ class PsrSubmissionService @Inject()(
           ),
           optFallbackCall
         )
-        val auditEvent = buildAuditEvent(taxYear, loggedInUserNameOrBlank(request))
-        auditService.sendEvent(auditEvent)
       }
     }.sequence
   }

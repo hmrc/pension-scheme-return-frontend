@@ -31,9 +31,10 @@ object TaskListCipUtils {
       .replace(".declaration.incomplete", ".declaration.cip.incomplete")
       .replace(".declaration.complete", ".declaration.cip.complete")
 
-  def transformTaskListToCipFormat( taskList: List[TaskListSectionViewModel],
-                                    messagesApi: MessagesApi
-                                  ): ListTaskListLevel1 =
+  def transformTaskListToCipFormat(
+    taskList: List[TaskListSectionViewModel],
+    messagesApi: MessagesApi
+  ): ListTaskListLevel1 =
     ListTaskListLevel1(
       taskList.map(
         level1 =>
