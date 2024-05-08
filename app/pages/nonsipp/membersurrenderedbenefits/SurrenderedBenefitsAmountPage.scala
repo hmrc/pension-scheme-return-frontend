@@ -17,11 +17,15 @@
 package pages.nonsipp.membersurrenderedbenefits
 
 import utils.RefinedUtils.RefinedIntOps
+import utils.PageUtils.removePages
+import queries.Removable
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import models.Money
+import models.{Money, UserAnswers}
 import config.Refined.Max300
 import pages.QuestionPage
+
+import scala.util.Try
 
 case class SurrenderedBenefitsAmountPage(srn: Srn, memberIndex: Max300) extends QuestionPage[Money] {
 
@@ -29,4 +33,16 @@ case class SurrenderedBenefitsAmountPage(srn: Srn, memberIndex: Max300) extends 
 
   override def toString: String = "totalSurrendered"
 
+  override def cleanup(value: Option[Money], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value, userAnswers.get(this)) match {
+      case (None, _) =>
+        removePages(userAnswers, pages(srn))
+      case _ => Try(userAnswers)
+    }
+
+  private def pages(srn: Srn): List[Removable[_]] =
+    List(
+      WhenDidMemberSurrenderBenefitsPage(srn, memberIndex),
+      WhyDidMemberSurrenderBenefitsPage(srn, memberIndex)
+    )
 }

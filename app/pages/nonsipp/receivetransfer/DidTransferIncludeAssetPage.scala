@@ -28,3 +28,9 @@ case class DidTransferIncludeAssetPage(srn: Srn, index: Max300, secondaryIndex: 
 
   override def toString: String = "transferIncludedAsset"
 }
+
+case class AllDidTransferIncludeAssetPages(srn: Srn) extends QuestionPage[Map[String, Map[String, Boolean]]] {
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "transferIncludedAsset"
+}

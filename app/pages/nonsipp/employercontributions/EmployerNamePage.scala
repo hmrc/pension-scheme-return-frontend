@@ -66,7 +66,8 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
       OtherEmployeeDescriptionPage(srn, memberIndex, index),
       ContributionsFromAnotherEmployerPage(srn, memberIndex, index),
       EmployerContributionsCompleted(srn, memberIndex, index),
-      EmployerContributionsMemberListPage(srn)
+      EmployerContributionsMemberListPage(srn),
+      EmployerContributionsProgress(srn, memberIndex, index)
     )
 }
 

@@ -16,12 +16,18 @@
 
 package pages.nonsipp.membersurrenderedbenefits
 
-import config.Refined.Max300
+import config.Refined.{Max300, Max5}
+import controllers.TestValues
+import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineMV
+import utils.UserAnswersUtils.UserAnswersOps
 import models.Money
 import pages.behaviours.PageBehaviours
+import pages.nonsipp.memberdetails.MemberDetailsPage
 
-class SurrenderedBenefitsAmountPageSpec extends PageBehaviours {
+class SurrenderedBenefitsAmountPageSpec extends PageBehaviours with TestValues {
+
+  private val memberIndex = refineMV[Max300.Refined](1)
 
   "SurrenderedBenefitsAmountPage" - {
 
@@ -33,5 +39,19 @@ class SurrenderedBenefitsAmountPageSpec extends PageBehaviours {
 
     beRemovable[Money](SurrenderedBenefitsAmountPage(srnGen.sample.value, index))
 
+  }
+
+  "cleanup other fields when removed with index-1" in {
+    val userAnswers = defaultUserAnswers
+      .unsafeSet(MemberDetailsPage(srn, memberIndex), memberDetails)
+      .unsafeSet(SurrenderedBenefitsAmountPage(srn, memberIndex), money)
+      .unsafeSet(WhenDidMemberSurrenderBenefitsPage(srn, memberIndex), localDate)
+      .unsafeSet(WhyDidMemberSurrenderBenefitsPage(srn, memberIndex), otherDetails)
+
+    val result = userAnswers.remove(SurrenderedBenefitsAmountPage(srn, memberIndex)).success.value
+
+    result.get(SurrenderedBenefitsAmountPage(srn, memberIndex)) must be(empty)
+    result.get(WhenDidMemberSurrenderBenefitsPage(srn, memberIndex)) must be(empty)
+    result.get(WhyDidMemberSurrenderBenefitsPage(srn, memberIndex)) must be(empty)
   }
 }

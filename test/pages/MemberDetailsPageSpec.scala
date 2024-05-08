@@ -16,37 +16,44 @@
 
 package pages
 
-import pages.nonsipp.memberdetails._
+import config.Refined.{Max300, Max5, Max50}
+import controllers.TestValues
 import eu.timepit.refined.refineMV
-import utils.UserAnswersUtils.UserAnswersOps
-import models.{NameDOB, UserAnswers}
+import models.NameDOB
 import pages.behaviours.PageBehaviours
+import pages.nonsipp.employercontributions.EmployerNamePage
+import pages.nonsipp.membercontributions.TotalMemberContributionPage
+import pages.nonsipp.memberdetails._
+import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
+import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
+import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
+import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
+import utils.UserAnswersUtils.UserAnswersOps
 
-class MemberDetailsPageSpec extends PageBehaviours {
+class MemberDetailsPageSpec extends PageBehaviours with TestValues {
 
-  private val memberDetails: NameDOB = nameDobGen.sample.value
+  private val memberIndex = refineMV[Max300.Refined](1)
+  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val secondaryIndexMax5 = refineMV[Max5.Refined](1)
 
-  val srn = srnGen.sample.value
-  val nino = ninoGen.sample.value
-  val defaultUserAnswers: UserAnswers = UserAnswers("test")
-
-  beRetrievable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
-  beSettable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
-  beRemovable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
+  beRetrievable[NameDOB](MemberDetailsPage(srn, memberIndex))
+  beSettable[NameDOB](MemberDetailsPage(srn, memberIndex))
+  beRemovable[NameDOB](MemberDetailsPage(srn, memberIndex))
 
   "Remove data when member details page is removed" in {
 
     val userAnswers = defaultUserAnswers
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
-      .unsafeSet(NoNINOPage(srn, refineMV(1)), "test reason")
-      .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
+      .unsafeSet(MemberDetailsPage(srn, memberIndex), memberDetails)
+      .unsafeSet(MemberDetailsNinoPage(srn, memberIndex), nino)
+      .unsafeSet(NoNINOPage(srn, memberIndex), "test reason")
+      .unsafeSet(DoesMemberHaveNinoPage(srn, memberIndex), true)
 
-    val result = userAnswers.remove(MemberDetailsPage(srn, refineMV(1))).success.value
-    result.get(MemberDetailsPage(srn, refineMV(1))) must be(empty)
-    result.get(DoesMemberHaveNinoPage(srn, refineMV(1))) must be(empty)
-    result.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(empty)
-    result.get(NoNINOPage(srn, refineMV(1))) must be(empty)
+    val result = userAnswers.remove(MemberDetailsPage(srn, memberIndex)).success.value
+    result.get(MemberDetailsPage(srn, memberIndex)) must be(empty)
+    result.get(DoesMemberHaveNinoPage(srn, memberIndex)) must be(empty)
+    result.get(MemberDetailsNinoPage(srn, memberIndex)) must be(empty)
+    result.get(NoNINOPage(srn, memberIndex)) must be(empty)
   }
 
   "Retain data when member details page is modified" in {
@@ -54,15 +61,37 @@ class MemberDetailsPageSpec extends PageBehaviours {
     val nino = ninoGen.sample.value
 
     val userAnswers = defaultUserAnswers
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
-      .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
-      .unsafeSet(NoNINOPage(srn, refineMV(1)), "test reason")
+      .unsafeSet(MemberDetailsPage(srn, memberIndex), memberDetails)
+      .unsafeSet(DoesMemberHaveNinoPage(srn, memberIndex), true)
+      .unsafeSet(MemberDetailsNinoPage(srn, memberIndex), nino)
+      .unsafeSet(NoNINOPage(srn, memberIndex), "test reason")
 
-    val result = userAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).success.value
-    result.get(MemberDetailsPage(srn, refineMV(1))) mustBe Some(memberDetails)
-    result.get(DoesMemberHaveNinoPage(srn, refineMV(1))) mustBe Some(true)
-    result.get(MemberDetailsNinoPage(srn, refineMV(1))) mustBe Some(nino)
-    result.get(NoNINOPage(srn, refineMV(1))) mustBe Some("test reason")
+    val result = userAnswers.set(MemberDetailsPage(srn, memberIndex), memberDetails).success.value
+    result.get(MemberDetailsPage(srn, memberIndex)) mustBe Some(memberDetails)
+    result.get(DoesMemberHaveNinoPage(srn, memberIndex)) mustBe Some(true)
+    result.get(MemberDetailsNinoPage(srn, memberIndex)) mustBe Some(nino)
+    result.get(NoNINOPage(srn, memberIndex)) mustBe Some("test reason")
+  }
+
+  "cleanup member payments when member index 1 is removed" in {
+    val userAnswers = defaultUserAnswers
+      .unsafeSet(MemberDetailsPage(srn, memberIndex), memberDetails)
+      .unsafeSet(EmployerNamePage(srn, memberIndex, secondaryIndex), employerName)
+      .unsafeSet(TotalMemberContributionPage(srn, memberIndex), money)
+      .unsafeSet(TransferringSchemeNamePage(srn, memberIndex, secondaryIndexMax5), schemeName)
+      .unsafeSet(ReceivingSchemeNamePage(srn, memberIndex, secondaryIndexMax5), schemeName)
+      .unsafeSet(PensionCommencementLumpSumAmountPage(srn, memberIndex), pensionCommencementLumpSumGen.sample.value)
+      .unsafeSet(TotalAmountPensionPaymentsPage(srn, memberIndex), money)
+      .unsafeSet(SurrenderedBenefitsAmountPage(srn, memberIndex), money)
+
+    val result = userAnswers.remove(MemberDetailsPage(srn, memberIndex)).success.value
+
+    result.get(EmployerNamePage(srn, memberIndex, secondaryIndex)) must be(empty)
+    result.get(TotalMemberContributionPage(srn, memberIndex)) must be(empty)
+    result.get(TransferringSchemeNamePage(srn, memberIndex, secondaryIndexMax5)) must be(empty)
+    result.get(ReceivingSchemeNamePage(srn, memberIndex, secondaryIndexMax5)) must be(empty)
+    result.get(PensionCommencementLumpSumAmountPage(srn, memberIndex)) must be(empty)
+    result.get(TotalAmountPensionPaymentsPage(srn, memberIndex)) must be(empty)
+    result.get(SurrenderedBenefitsAmountPage(srn, memberIndex)) must be(empty)
   }
 }

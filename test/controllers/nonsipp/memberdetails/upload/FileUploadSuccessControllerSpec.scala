@@ -34,6 +34,14 @@ import pages.nonsipp.memberdetails._
 import org.mockito.Mockito.{reset, verify, when}
 import views.html.ContentPageView
 import models.SchemeId.Srn
+import pages.nonsipp.employercontributions.EmployerNamePage
+import pages.nonsipp.membercontributions.TotalMemberContributionPage
+import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
+import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
+import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
+import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
+import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -155,6 +163,46 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
         userAnswers.get(DoesMemberHaveNinoPage(srn, refineMV(2))) mustBe None
         userAnswers.get(NoNINOPage(srn, refineMV(2))) mustBe None
         userAnswers.get(MemberDetailsNinoPage(srn, refineMV(2))) mustBe None
+      }
+    }
+
+    "onSubmit should remove all member payments" in {
+
+      val userAnswers = addMemberDetails(emptyUserAnswers, srn, 20)
+        .unsafeSet(EmployerNamePage(srn, refineMV(1), refineMV(1)), employerName)
+        .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
+        .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), money)
+        .unsafeSet(TransferringSchemeNamePage(srn, refineMV(1), refineMV(1)), schemeName)
+        .unsafeSet(ReceivingSchemeNamePage(srn, refineMV(1), refineMV(1)), schemeName)
+        .unsafeSet(PensionCommencementLumpSumAmountPage(srn, refineMV(1)), pensionCommencementLumpSumGen.sample.value)
+        .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(1)), money)
+        .unsafeSet(SurrenderedBenefitsAmountPage(srn, refineMV(1)), money)
+
+      val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      val upload: UploadSuccess = UploadSuccess(
+        List(
+          UploadMemberDetails(1, NameDOB("A", "A", localDate), Right(Nino("AB123456A")))
+        )
+      )
+
+      mockGetUploadResult(upload.some)
+
+      running(_ => applicationBuilder(userAnswers = Some(userAnswers))) { implicit app =>
+        route(app, FakeRequest(onSubmit)).value.futureValue
+
+        verify(mockSaveService).save(captor.capture())(any(), any())
+
+        val userAnswers = captor.getValue
+
+        userAnswers.get(EmployerNamePage(srn, refineMV(1), refineMV(1))) mustBe None
+        userAnswers.get(UnallocatedEmployerAmountPage(srn)) mustBe None
+        userAnswers.get(TotalMemberContributionPage(srn, refineMV(1))) mustBe None
+        userAnswers.get(TransferringSchemeNamePage(srn, refineMV(1), refineMV(1))) mustBe None
+        userAnswers.get(ReceivingSchemeNamePage(srn, refineMV(1), refineMV(1))) mustBe None
+        userAnswers.get(PensionCommencementLumpSumAmountPage(srn, refineMV(1))) mustBe None
+        userAnswers.get(TotalAmountPensionPaymentsPage(srn, refineMV(1))) mustBe None
+        userAnswers.get(SurrenderedBenefitsAmountPage(srn, refineMV(1))) mustBe None
       }
     }
 
