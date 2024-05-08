@@ -19,6 +19,7 @@ package controllers.nonsipp
 import services.{PsrRetrievalService, PsrVersionsService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.ListUtils.ListOps
 import controllers.PSRController
 import config.FrontendAppConfig
 import cats.implicits.toShow
@@ -52,18 +53,19 @@ class ViewOnlyReturnSubmittedController @Inject()(
   def onPageLoad(srn: Srn, year: String, version: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
-        returnDetails <- psrRetrievalService.getStandardPsrDetails(
+        retrievedUserAnswers <- psrRetrievalService.getStandardPsrDetails(
           None,
           Some(year),
           Some("%03d".format(version)),
           controllers.routes.OverviewController.onPageLoad(srn)
         )
-        response <- psrVersionsService.getVersions(request.schemeDetails.pstr, year)
+        psrVersionsResponse <- psrVersionsService.getVersions(request.schemeDetails.pstr, year)
         viewModel = ViewOnlyReturnSubmittedController.viewModel(
           srn,
           request.schemeDetails.schemeName,
-          returnDetails,
-          response(version),
+          retrievedUserAnswers,
+          psrVersionsResponse,
+          version,
           config.urls.pensionSchemeEnquiry,
           config.urls.managePensionsSchemes.dashboard
         )
@@ -76,32 +78,40 @@ object ViewOnlyReturnSubmittedController {
   def viewModel(
     srn: Srn,
     schemeName: String,
-    submittedUA: UserAnswers,
-    psrVersionResponse: PsrVersionsResponse,
+    retrievedUserAnswers: UserAnswers,
+    psrVersionsResponse: Seq[PsrVersionsResponse],
+    version: Int,
     pensionSchemeEnquiriesUrl: String,
     managePensionSchemeDashboardUrl: String
   ): SubmissionViewModel = {
 
     val schemeRow = Message("returnSubmitted.table.field1") -> Message(schemeName)
 
-    val periodOfReturnRow: List[(Message, Message)] = submittedUA.get(WhichTaxYearPage(srn)) match {
+    val periodOfReturnRow: List[(Message, Message)] = retrievedUserAnswers.get(WhichTaxYearPage(srn)) match {
       case Some(dateRange) =>
         List(Message("returnSubmitted.table.field2") -> Message("site.to", dateRange.from.show, dateRange.to.show))
       case _ => List.empty
     }
 
-    val submissionDateTime = psrVersionResponse.compilationOrSubmissionDate
-    val dateSubmittedRow = Message("returnSubmitted.table.field3") -> Message(
-      "site.at",
-      submissionDateTime.show,
-      submissionDateTime.format(DateRange.readableTimeFormat).toLowerCase()
-    )
+    val dateSubmittedRow: Option[(Message, Message)] = psrVersionsResponse.lift(version) match {
+      case Some(psrVersionResponse) =>
+        Some(
+          Message("returnSubmitted.table.field3") -> Message(
+            "site.at",
+            psrVersionResponse.compilationOrSubmissionDate.show,
+            psrVersionResponse.compilationOrSubmissionDate.format(DateRange.readableTimeFormat).toLowerCase()
+          )
+        )
+      case None => None
+    }
+
+    val tailRows: List[(Message, Message)] = periodOfReturnRow :?+ dateSubmittedRow
 
     SubmissionViewModel(
       "returnSubmitted.title",
       "returnSubmitted.panel.heading",
       "returnSubmitted.panel.content",
-      content = TableMessage(NonEmptyList(schemeRow, periodOfReturnRow :+ dateSubmittedRow)),
+      content = TableMessage(NonEmptyList(schemeRow, tailRows)),
       whatHappensNextContent =
         ParagraphMessage("returnSubmitted.whatHappensNext.paragraph1") ++
           ParagraphMessage(
