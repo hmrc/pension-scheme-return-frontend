@@ -131,13 +131,16 @@ class BondsListController @Inject()(
   private def bondsData(srn: Srn, indexes: List[Max5000])(
     implicit req: DataRequest[_]
   ): Either[Result, List[BondsData]] =
-    indexes.map { index =>
-      for {
-        nameOfBonds <- requiredPage(NameOfBondsPage(srn, index))
-        acquisitionType <- requiredPage(WhyDoesSchemeHoldBondsPage(srn, index))
-        costOfBonds <- requiredPage(CostOfBondsPage(srn, index))
-      } yield BondsData(index, nameOfBonds, acquisitionType, costOfBonds)
-    }.sequence
+    indexes
+      .sortBy(x => x.value)
+      .map { index =>
+        for {
+          nameOfBonds <- requiredPage(NameOfBondsPage(srn, index))
+          acquisitionType <- requiredPage(WhyDoesSchemeHoldBondsPage(srn, index))
+          costOfBonds <- requiredPage(CostOfBondsPage(srn, index))
+        } yield BondsData(index, nameOfBonds, acquisitionType, costOfBonds)
+      }
+      .sequence
 }
 
 object BondsListController {

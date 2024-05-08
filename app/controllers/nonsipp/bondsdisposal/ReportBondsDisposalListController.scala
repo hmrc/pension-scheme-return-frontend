@@ -188,12 +188,14 @@ class ReportBondsDisposalListController @Inject()(
     disposals
       .map {
         case indexes @ (index, _) =>
-          request.userAnswers
+          index -> request.userAnswers
             .get(BondsCompleted(srn, index))
             .getOrRecoverJourney
             .map(bondsDisposal => (indexes, bondsDisposal))
       }
       .toList
+      .sortBy { case (index, _) => index.value }
+      .map { case (_, listRow) => listRow }
       .sequence
 }
 

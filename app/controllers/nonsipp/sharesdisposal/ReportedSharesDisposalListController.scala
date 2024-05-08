@@ -158,34 +158,39 @@ object ReportedSharesDisposalListController {
     disposals: Map[Max5000, List[Max50]],
     userAnswers: UserAnswers
   ): List[ListRow] =
-    disposals.flatMap {
-      case (shareIndex, disposalIndexes) =>
-        disposalIndexes.map { disposalIndex =>
-          val sharesDisposalData = SharesDisposalData(
-            shareIndex,
-            disposalIndex,
-            userAnswers.get(TypeOfSharesHeldPage(srn, shareIndex)).get,
-            userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).get,
-            userAnswers.get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex)).get
-          )
-
-          ListRow(
-            buildMessage("sharesDisposal.reportedSharesDisposalList.row", sharesDisposalData),
-            changeUrl = routes.SharesDisposalCYAController
-              .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
-              .url,
-            changeHiddenText = buildMessage(
-              "sharesDisposal.reportedSharesDisposalList.row.change.hidden",
-              sharesDisposalData
-            ),
-            removeUrl = routes.RemoveShareDisposalController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode).url,
-            removeHiddenText = buildMessage(
-              "sharesDisposal.reportedSharesDisposalList.row.remove.hidden",
-              sharesDisposalData
+    disposals
+      .flatMap {
+        case (shareIndex, disposalIndexes) =>
+          disposalIndexes.map { disposalIndex =>
+            val sharesDisposalData = SharesDisposalData(
+              shareIndex,
+              disposalIndex,
+              userAnswers.get(TypeOfSharesHeldPage(srn, shareIndex)).get,
+              userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).get,
+              userAnswers.get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex)).get
             )
-          )
-        }
-    }.toList
+
+            ListRow(
+              buildMessage("sharesDisposal.reportedSharesDisposalList.row", sharesDisposalData),
+              changeUrl = routes.SharesDisposalCYAController
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+                .url,
+              changeHiddenText = buildMessage(
+                "sharesDisposal.reportedSharesDisposalList.row.change.hidden",
+                sharesDisposalData
+              ),
+              removeUrl =
+                routes.RemoveShareDisposalController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode).url,
+              removeHiddenText = buildMessage(
+                "sharesDisposal.reportedSharesDisposalList.row.remove.hidden",
+                sharesDisposalData
+              )
+            )
+          }
+      }
+      .toList
+      .sortBy(_.changeUrl)
+
 
   private def buildMessage(messageString: String, sharesDisposalData: SharesDisposalData): Message =
     sharesDisposalData match {
