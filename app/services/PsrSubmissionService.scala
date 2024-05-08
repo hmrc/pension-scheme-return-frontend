@@ -16,7 +16,7 @@
 
 package services
 
-import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
+import utils.nonsipp.TaskListCipUtils.transformTaskListToCipFormat
 import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import connectors.PSRConnector
@@ -25,15 +25,21 @@ import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import cats.implicits._
 import transformations._
 import pages.nonsipp.sharesdisposal.SharesDisposalPage
-import pages.nonsipp.CheckReturnDatesPage
 import uk.gov.hmrc.http.HeaderCarrier
-import models.UserAnswers
+import models.{DateRange, UserAnswers}
 import pages.nonsipp.loansmadeoroutstanding._
 import models.requests.DataRequest
+import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
+import models.audit.PSRCompileAuditEvent
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import play.api.mvc.Call
 import models.requests.psr._
+import config.Constants.{PSA, PSP}
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
+import pages.nonsipp.CheckReturnDatesPage
+import utils.nonsipp.TaskListUtils.getSectionList
+import play.api.libs.json.Json
+import play.api.i18n.{I18nSupport, MessagesApi}
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
 import pages.nonsipp.bondsdisposal.BondsDisposalPage
 
@@ -43,6 +49,9 @@ import javax.inject.Inject
 
 class PsrSubmissionService @Inject()(
   psrConnector: PSRConnector,
+  schemeDateService: SchemeDateService,
+  auditService: AuditService,
+  override val messagesApi: MessagesApi,
   minimalRequiredSubmissionTransformer: MinimalRequiredSubmissionTransformer,
   loanTransactionsTransformer: LoanTransactionsTransformer,
   landOrPropertyTransactionsTransformer: LandOrPropertyTransactionsTransformer,
@@ -52,7 +61,7 @@ class PsrSubmissionService @Inject()(
   bondTransactionsTransformer: BondTransactionsTransformer,
   otherAssetTransactionsTransformer: OtherAssetTransactionsTransformer,
   declarationTransformer: DeclarationTransformer
-) {
+) extends I18nSupport {
 
   def submitPsrDetailsWithUA(
     srn: Srn,
@@ -84,30 +93,45 @@ class PsrSubmissionService @Inject()(
 
     (
       minimalRequiredSubmissionTransformer.transformToEtmp(srn),
-      request.userAnswers.get(CheckReturnDatesPage(srn))
-    ).mapN { (minimalRequiredSubmission, checkReturnDates) =>
-      psrConnector.submitPsrDetails(
-        PsrSubmission(
-          minimalRequiredSubmission = minimalRequiredSubmission,
-          checkReturnDates = checkReturnDates,
-          loans = buildLoans(srn)(optSchemeHadLoans),
-          assets = buildAssets(srn)(
-            optLandOrPropertyHeld,
-            optMoneyWasBorrowed,
-            optDisposeAnyLandOrProperty,
-            optUnregulatedOrConnectedBondsHeld,
-            optBondsDisposal,
-            optOtherAssetsHeld,
-            optOtherAssetsDisposal
+      request.userAnswers.get(CheckReturnDatesPage(srn)),
+      schemeDateService.schemeDate(srn)
+    ).mapN { (minimalRequiredSubmission, checkReturnDates, taxYear) =>
+      {
+        psrConnector.submitPsrDetails(
+          PsrSubmission(
+            minimalRequiredSubmission = minimalRequiredSubmission,
+            checkReturnDates = checkReturnDates,
+            loans = buildLoans(srn)(optSchemeHadLoans),
+            assets = buildAssets(srn)(
+              optLandOrPropertyHeld,
+              optMoneyWasBorrowed,
+              optDisposeAnyLandOrProperty,
+              optUnregulatedOrConnectedBondsHeld,
+              optBondsDisposal,
+              optOtherAssetsHeld,
+              optOtherAssetsDisposal
+            ),
+            membersPayments = memberPaymentsTransformer.transformToEtmp(srn, request.userAnswers),
+            shares = buildShares(srn)(optDidSchemeHoldAnyShares, optSharesDisposal),
+            psrDeclaration = Option.when(isSubmitted)(declarationTransformer.transformToEtmp)
           ),
-          membersPayments = memberPaymentsTransformer.transformToEtmp(srn, request.userAnswers),
-          shares = buildShares(srn)(optDidSchemeHoldAnyShares, optSharesDisposal),
-          psrDeclaration = Option.when(isSubmitted)(declarationTransformer.transformToEtmp)
-        ),
-        optFallbackCall
-      )
+          optFallbackCall
+        )
+        val auditEvent = buildAuditEvent(taxYear, loggedInUserNameOrBlank(request))
+        auditService.sendEvent(auditEvent)
+      }
     }.sequence
   }
+
+  private def loggedInUserNameOrBlank(implicit request: DataRequest[_]): String =
+    request.minimalDetails.individualDetails match {
+      case Some(individual) => individual.fullName
+      case None =>
+        request.minimalDetails.organisationName match {
+          case Some(orgName) => orgName
+          case None => ""
+        }
+    }
 
   private def buildLoans(
     srn: Srn
@@ -174,4 +198,24 @@ class PsrSubmissionService @Inject()(
       val sharesDisposal = optSharesDisposal.getOrElse(false)
       sharesTransformer.transformToEtmp(srn, sharesDisposal)
     }
+
+  private def buildAuditEvent(taxYear: DateRange, userName: String)(
+    implicit req: DataRequest[_]
+  ) = PSRCompileAuditEvent(
+    schemeName = req.schemeDetails.schemeName,
+    req.schemeDetails.establishers.headOption.fold(userName)(e => e.name),
+    psaOrPspId = req.pensionSchemeId.value,
+    schemeTaxReference = req.schemeDetails.pstr,
+    affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
+    credentialRole = if (req.pensionSchemeId.isPSP) PSP else PSA,
+    taxYear = taxYear,
+    taskList = Json
+      .toJson(
+        transformTaskListToCipFormat(
+          getSectionList(req.srn, req.schemeDetails.schemeName, req.userAnswers, req.pensionSchemeId),
+          messagesApi
+        ).list
+      )
+      .toString()
+  )
 }

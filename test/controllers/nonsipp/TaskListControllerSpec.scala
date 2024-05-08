@@ -93,7 +93,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
             0,
             expectedStatus = TaskListStatus.InProgress,
             expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
-            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.details.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.change.details.title",
             expectedLinkUrl = controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
           )
         }
@@ -109,7 +109,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
             0,
             expectedStatus = TaskListStatus.InProgress,
             expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
-            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.details.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.change.details.title",
             expectedLinkUrl = controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
           )
         }
@@ -125,7 +125,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
             0,
             expectedStatus = TaskListStatus.InProgress,
             expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
-            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.details.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.change.details.title",
             expectedLinkUrl =
               controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode).url
           )
@@ -143,7 +143,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
             0,
             expectedStatus = TaskListStatus.InProgress,
             expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
-            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.details.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.change.details.title",
             expectedLinkUrl =
               controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode).url
           )
@@ -162,7 +162,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
             0,
             expectedStatus = TaskListStatus.InProgress,
             expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
-            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.details.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.change.details.title",
             expectedLinkUrl =
               controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode).url
           )
@@ -180,7 +180,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
             0,
             expectedStatus = TaskListStatus.InProgress,
             expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
-            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.details.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.change.details.title",
             expectedLinkUrl =
               controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, NormalMode).url
           )
@@ -199,7 +199,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           0,
           expectedStatus = TaskListStatus.Completed,
           expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
-          expectedLinkContentKey = "nonsipp.tasklist.schemedetails.details.title",
+          expectedLinkContentKey = "nonsipp.tasklist.schemedetails.change.details.title",
           expectedLinkUrl =
             controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode).url
         )

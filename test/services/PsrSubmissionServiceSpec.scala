@@ -27,12 +27,15 @@ import pages.nonsipp.sharesdisposal.SharesDisposalPage
 import utils.UserAnswersUtils.UserAnswersOps
 import pages.nonsipp.CheckReturnDatesPage
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.connector.AuditResult
+import models.DateRange
 import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
 import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import services.PsrSubmissionServiceSpec.{callCaptor, captor, minimalRequiredSubmission}
 import play.api.test.FakeRequest
+import play.api.test.Helpers.stubMessagesApi
 import org.mockito.Mockito._
 import utils.BaseSpec
 import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
@@ -50,7 +53,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import java.time.LocalDate
 
 class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
-
+  val schemeDateRange: DateRange = dateRangeGen.sample.value
   override def beforeEach(): Unit = {
     reset(mockConnector)
     reset(mockMinimalRequiredSubmissionTransformer)
@@ -62,6 +65,10 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     reset(mockBondTransactionsTransformer)
     reset(mockOtherAssetTransactionsTransformer)
     reset(mockDeclarationTransformer)
+    reset(mockSchemeDateService)
+    reset(mockAuditService)
+    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(schemeDateRange))
+    when(mockAuditService.sendEvent(any)(any(), any())).thenReturn(Future.successful(AuditResult.Success))
   }
 
   val allowedAccessRequest
@@ -69,6 +76,8 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
   private val mockConnector = mock[PSRConnector]
+  private val mockSchemeDateService = mock[SchemeDateService]
+  private val mockAuditService = mock[AuditService]
   private val mockMinimalRequiredSubmissionTransformer = mock[MinimalRequiredSubmissionTransformer]
   private val mockLoanTransactionsTransformer = mock[LoanTransactionsTransformer]
   private val mockLandOrPropertyTransactionsTransformer = mock[LandOrPropertyTransactionsTransformer]
@@ -82,6 +91,9 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
   private val service =
     new PsrSubmissionService(
       mockConnector,
+      mockSchemeDateService,
+      mockAuditService,
+      stubMessagesApi(),
       mockMinimalRequiredSubmissionTransformer,
       mockLoanTransactionsTransformer,
       mockLandOrPropertyTransactionsTransformer,
