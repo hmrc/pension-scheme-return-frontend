@@ -100,10 +100,9 @@ class ReportedOtherAssetsDisposalListController @Inject()(
                       psrSubmissionService.submitPsrDetailsWithUA(
                         srn,
                         updatedUserAnswers,
-                        optFallbackCall = Some(
+                        fallbackCall =
                           controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
                             .onPageLoad(srn, page)
-                        )
                       )
                     } else {
                       Future.successful(Some(()))

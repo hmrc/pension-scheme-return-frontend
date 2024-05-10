@@ -106,10 +106,8 @@ class RemoveTransferOutController @Inject()(
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                   srn,
                   updatedAnswers,
-                  optFallbackCall = Some(
-                    controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
-                      .onPageLoad(srn, 1, NormalMode)
-                  )
+                  fallbackCall = controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
+                    .onPageLoad(srn, 1, NormalMode)
                 )
               } yield submissionResult.getOrRecoverJourney(
                 _ =>

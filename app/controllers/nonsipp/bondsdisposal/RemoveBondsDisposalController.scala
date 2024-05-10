@@ -99,9 +99,8 @@ class RemoveBondsDisposalController @Inject()(
                 redirectTo <- psrSubmissionService
                   .submitPsrDetails(
                     srn,
-                    optFallbackCall = Some(
+                    fallbackCall =
                       controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController.onPageLoad(srn, 1)
-                    )
                   )(
                     implicitly,
                     implicitly,

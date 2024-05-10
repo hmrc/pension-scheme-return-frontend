@@ -82,10 +82,8 @@ class RemovePropertyController @Inject()(
                 redirectTo <- psrSubmissionService
                   .submitPsrDetails(
                     srn,
-                    optFallbackCall = Some(
-                      controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
-                        .onPageLoad(srn, 1, mode)
-                    )
+                    fallbackCall =
+                      controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, 1, mode)
                   )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                   .map {
                     case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

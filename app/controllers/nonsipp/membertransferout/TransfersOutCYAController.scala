@@ -105,10 +105,8 @@ class TransfersOutCYAController @Inject()(
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
           srn,
           updatedUserAnswers,
-          optFallbackCall = Some(
-            controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
-              .onPageLoad(srn, index, mode)
-          )
+          fallbackCall =
+            controllers.nonsipp.membertransferout.routes.TransfersOutCYAController.onPageLoad(srn, index, mode)
         )
       } yield submissionResult.getOrRecoverJourney(
         _ =>

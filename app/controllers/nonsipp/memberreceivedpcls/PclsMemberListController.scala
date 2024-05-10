@@ -137,9 +137,8 @@ class PclsMemberListController @Inject()(
                 submissionResult <- if (value) {
                   psrSubmissionService.submitPsrDetails(
                     srn,
-                    optFallbackCall = Some(
+                    fallbackCall =
                       controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController.onPageLoad(srn, page, mode)
-                    )
                   )(
                     implicitly,
                     implicitly,

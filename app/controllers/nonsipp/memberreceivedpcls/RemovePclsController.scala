@@ -109,10 +109,8 @@ class RemovePclsController @Inject()(
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                   srn,
                   updatedAnswers,
-                  optFallbackCall = Some(
-                    controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
-                      .onPageLoad(srn, 1, NormalMode)
-                  )
+                  fallbackCall = controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
+                    .onPageLoad(srn, 1, NormalMode)
                 )
               } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
                 _ =>

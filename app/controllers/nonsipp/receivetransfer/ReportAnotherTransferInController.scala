@@ -85,10 +85,8 @@ class ReportAnotherTransferInController @Inject()(
               submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                 srn,
                 updatedAnswers,
-                optFallbackCall = Some(
-                  controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
-                    .onPageLoad(srn, index, secondaryIndex, mode)
-                )
+                fallbackCall = controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
+                  .onPageLoad(srn, index, secondaryIndex, mode)
               )
             } yield submissionResult.getOrRecoverJourney(
               _ =>

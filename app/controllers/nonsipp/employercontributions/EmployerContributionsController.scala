@@ -74,9 +74,8 @@ class EmployerContributionsController @Inject()(
               psrSubmissionService.submitPsrDetailsWithUA(
                 srn,
                 updatedAnswers,
-                optFallbackCall = Some(
+                fallbackCall =
                   controllers.nonsipp.employercontributions.routes.EmployerContributionsController.onPageLoad(srn, mode)
-                )
               )
             }
           } yield submissionResult.getOrRecoverJourney(

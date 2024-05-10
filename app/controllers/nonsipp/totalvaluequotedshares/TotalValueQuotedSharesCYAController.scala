@@ -75,10 +75,8 @@ class TotalValueQuotedSharesCYAController @Inject()(
     psrSubmissionService
       .submitPsrDetails(
         srn,
-        optFallbackCall = Some(
-          controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
-            .onPageLoad(srn)
-        )
+        fallbackCall =
+          controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController.onPageLoad(srn)
       )
       .map {
         case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

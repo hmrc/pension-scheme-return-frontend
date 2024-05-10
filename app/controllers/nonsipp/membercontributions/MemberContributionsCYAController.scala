@@ -104,9 +104,8 @@ class MemberContributionsCYAController @Inject()(
       psrSubmissionService
         .submitPsrDetails(
           srn,
-          optFallbackCall = Some(
+          fallbackCall =
             controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController.onPageLoad(srn, index, mode)
-          )
         )
         .map {
           case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

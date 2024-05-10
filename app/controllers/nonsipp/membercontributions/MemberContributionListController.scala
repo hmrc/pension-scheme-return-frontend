@@ -137,10 +137,8 @@ class MemberContributionListController @Inject()(
                   psrSubmissionService.submitPsrDetailsWithUA(
                     srn,
                     updatedUserAnswers,
-                    optFallbackCall = Some(
-                      controllers.nonsipp.membercontributions.routes.MemberContributionListController
-                        .onPageLoad(srn, page, mode)
-                    )
+                    fallbackCall = controllers.nonsipp.membercontributions.routes.MemberContributionListController
+                      .onPageLoad(srn, page, mode)
                   )
                 } else {
                   Future.successful(Some(()))

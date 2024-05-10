@@ -140,10 +140,8 @@ class TransferReceivedMemberListController @Inject()(
                   psrSubmissionService.submitPsrDetailsWithUA(
                     srn,
                     updatedUserAnswers,
-                    optFallbackCall = Some(
-                      controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-                        .onPageLoad(srn, page, mode)
-                    )
+                    fallbackCall = controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+                      .onPageLoad(srn, page, mode)
                   )
                 else Future.successful(Some(()))
               } yield Redirect(

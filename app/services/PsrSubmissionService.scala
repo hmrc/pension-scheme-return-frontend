@@ -69,9 +69,9 @@ class PsrSubmissionService @Inject()(
   def submitPsrDetailsWithUA(
     srn: Srn,
     userAnswers: UserAnswers,
-    optFallbackCall: Option[Call] = None
+    fallbackCall: Call
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
-    submitPsrDetails(srn, optFallbackCall = optFallbackCall)(
+    submitPsrDetails(srn, fallbackCall = fallbackCall)(
       implicitly,
       implicitly,
       DataRequest(request.request, userAnswers)
@@ -80,7 +80,7 @@ class PsrSubmissionService @Inject()(
   def submitPsrDetails(
     srn: Srn,
     isSubmitted: Boolean = false,
-    optFallbackCall: Option[Call] = None
+    fallbackCall: Call
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] = {
 
     val optSchemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn))
@@ -122,10 +122,7 @@ class PsrSubmissionService @Inject()(
           )
           .flatMap {
             case Left(message: String) =>
-              throw PostPsrException(message, optFallbackCall.fold(appConfig.urls.managePensionsSchemes.dashboard) {
-                fallbackCall =>
-                  fallbackCall.url
-              })
+              throw PostPsrException(message, fallbackCall.url)
             case Right(()) =>
               auditService.sendExtendedEvent(buildAuditEvent(taxYear, loggedInUserNameOrBlank(request)))
               Future.unit

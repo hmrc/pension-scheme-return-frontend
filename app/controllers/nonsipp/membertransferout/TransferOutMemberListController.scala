@@ -139,10 +139,8 @@ class TransferOutMemberListController @Inject()(
                   psrSubmissionService.submitPsrDetailsWithUA(
                     srn,
                     updatedUserAnswers,
-                    optFallbackCall = Some(
-                      controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
-                        .onPageLoad(srn, 1, NormalMode)
-                    )
+                    fallbackCall = controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
+                      .onPageLoad(srn, 1, NormalMode)
                   )
                 else Future.successful(Some(()))
               } yield submissionResult.getOrRecoverJourney(

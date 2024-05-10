@@ -175,10 +175,8 @@ class LandOrPropertyCYAController @Inject()(
       psrSubmissionService
         .submitPsrDetails(
           srn,
-          optFallbackCall = Some(
-            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-              .onPageLoad(srn, index, mode)
-          )
+          fallbackCall =
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, mode)
         )
         .map {
           case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

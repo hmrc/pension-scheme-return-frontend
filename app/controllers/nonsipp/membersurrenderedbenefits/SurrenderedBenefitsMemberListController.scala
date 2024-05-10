@@ -148,10 +148,9 @@ class SurrenderedBenefitsMemberListController @Inject()(
                   psrSubmissionService.submitPsrDetailsWithUA(
                     srn,
                     updatedUserAnswers,
-                    optFallbackCall = Some(
+                    fallbackCall =
                       controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
                         .onPageLoad(srn, page, mode)
-                    )
                   )
                 } else {
                   Future.successful(Some(()))

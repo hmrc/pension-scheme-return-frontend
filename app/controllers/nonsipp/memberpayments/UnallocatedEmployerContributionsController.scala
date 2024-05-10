@@ -76,10 +76,8 @@ class UnallocatedEmployerContributionsController @Inject()(
               psrSubmissionService
                 .submitPsrDetails(
                   srn,
-                  optFallbackCall = Some(
-                    controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
-                      .onPageLoad(srn, mode)
-                  )
+                  fallbackCall = controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
+                    .onPageLoad(srn, mode)
                 )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                 .map {
                   case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

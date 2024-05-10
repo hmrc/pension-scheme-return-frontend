@@ -59,9 +59,7 @@ class PsaDeclarationController @Inject()(
         _ <- psrSubmissionService.submitPsrDetails(
           srn = srn,
           isSubmitted = true,
-          optFallbackCall = Some(
-            controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
-          )
+          fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
         )
         _ <- saveService.save(UserAnswers(request.userAnswers.id))
       } yield {

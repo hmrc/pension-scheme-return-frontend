@@ -87,10 +87,8 @@ class EmployerContributionsCYAController @Inject()(
             .submitPsrDetailsWithUA(
               srn,
               updatedAnswers,
-              optFallbackCall = Some(
-                controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                  .onPageLoad(srn, index, page, mode)
-              )
+              fallbackCall = controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                .onPageLoad(srn, index, page, mode)
             )
             .liftF
         } yield submissionResult.getOrRecoverJourney(

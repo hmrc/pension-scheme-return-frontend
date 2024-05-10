@@ -69,9 +69,8 @@ class FileUploadSuccessController @Inject()(
           submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
             srn,
             updatedUserAnswers,
-            optFallbackCall = Some(
+            fallbackCall =
               controllers.nonsipp.memberdetails.upload.routes.FileUploadSuccessController.onPageLoad(srn, mode)
-            )
           )
         } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
           _ => Redirect(navigator.nextPage(FileUploadSuccessPage(srn), mode, updatedUserAnswers))

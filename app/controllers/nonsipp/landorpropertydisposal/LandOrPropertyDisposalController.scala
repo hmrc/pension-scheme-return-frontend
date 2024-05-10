@@ -75,10 +75,8 @@ class LandOrPropertyDisposalController @Inject()(
               psrSubmissionService
                 .submitPsrDetails(
                   srn,
-                  optFallbackCall = Some(
-                    controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalController
-                      .onPageLoad(srn, mode)
-                  )
+                  fallbackCall = controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalController
+                    .onPageLoad(srn, mode)
                 )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                 .map {
                   case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

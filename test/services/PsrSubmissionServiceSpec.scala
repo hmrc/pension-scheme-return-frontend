@@ -123,7 +123,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
-            service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
+            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
           ) { result: Option[Unit] =>
             verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
             verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
@@ -161,7 +161,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
-            service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
+            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
           ) { result: Option[Unit] =>
             verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
             verify(mockLoanTransactionsTransformer, times(1)).transformToEtmp(any())(any())
@@ -199,7 +199,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
-            service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
+            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
           ) {
             result: Option[Unit] =>
               verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
@@ -253,7 +253,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
-            service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
+            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
           ) {
             result: Option[Unit] =>
               verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
@@ -306,7 +306,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
-            service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
+            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
           ) {
             result: Option[Unit] =>
               verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
@@ -353,7 +353,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
-            service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
+            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
           ) { result: Option[Unit] =>
             verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
             verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
@@ -393,7 +393,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
-            service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
+            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
           ) {
             result: Option[Unit] =>
               verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
@@ -433,7 +433,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
-            service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
+            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
           ) {
             result: Option[Unit] =>
               verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
@@ -486,7 +486,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
-            service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
+            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
           ) {
             result: Option[Unit] =>
               verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
@@ -539,7 +539,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
-            service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
+            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
           ) {
             result: Option[Unit] =>
               verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
@@ -593,7 +593,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
-            service.submitPsrDetails(srn, false, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
+            service.submitPsrDetails(srn, false, fallbackCall = fallbackCall)(implicitly, implicitly, request)
           ) {
             result: Option[Unit] =>
               verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
@@ -649,7 +649,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       when(mockDeclarationTransformer.transformToEtmp(any())).thenReturn(declaration)
       when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
-      whenReady(service.submitPsrDetails(srn = srn, isSubmitted = true)(implicitly, implicitly, request)) {
+      whenReady(service.submitPsrDetails(srn = srn, isSubmitted = true, fallbackCall)(implicitly, implicitly, request)) {
         result: Option[Unit] =>
           verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
           verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
@@ -675,7 +675,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     "shouldn't submitPsrDetails request when userAnswer is empty" in {
       when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
         .thenReturn(Some(minimalRequiredSubmission))
-      whenReady(service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))) { result: Option[Unit] =>
+      whenReady(service.submitPsrDetails(srn, fallbackCall = fallbackCall)) { result: Option[Unit] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
         verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
         verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())

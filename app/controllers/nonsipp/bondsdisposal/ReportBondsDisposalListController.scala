@@ -140,10 +140,8 @@ class ReportBondsDisposalListController @Inject()(
                       submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                         srn,
                         updatedUserAnswers,
-                        optFallbackCall = Some(
-                          controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-                            .onPageLoad(srn, page)
-                        )
+                        fallbackCall = controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
+                          .onPageLoad(srn, page)
                       )
                     } yield submissionResult.getOrRecoverJourney(
                       _ =>

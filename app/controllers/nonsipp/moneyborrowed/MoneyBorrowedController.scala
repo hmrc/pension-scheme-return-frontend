@@ -75,10 +75,7 @@ class MoneyBorrowedController @Inject()(
               psrSubmissionService
                 .submitPsrDetails(
                   srn,
-                  optFallbackCall = Some(
-                    controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController
-                      .onPageLoad(srn, mode)
-                  )
+                  fallbackCall = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode)
                 )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                 .map {
                   case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

@@ -82,9 +82,8 @@ class OtherAssetsDisposalController @Inject()(
               submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                 srn,
                 updatedAnswers,
-                optFallbackCall = Some(
+                fallbackCall =
                   controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController.onPageLoad(srn, mode)
-                )
               )
             } yield submissionResult
               .getOrRecoverJourney(

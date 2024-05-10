@@ -142,10 +142,8 @@ class MemberPensionPaymentsListController @Inject()(
                 submissionResult <- if (value) {
                   psrSubmissionService.submitPsrDetails(
                     srn,
-                    optFallbackCall = Some(
-                      controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
-                        .onPageLoad(srn, page, mode)
-                    )
+                    fallbackCall = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+                      .onPageLoad(srn, page, mode)
                   )(
                     implicitly,
                     implicitly,

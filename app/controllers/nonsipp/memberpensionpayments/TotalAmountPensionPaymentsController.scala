@@ -137,10 +137,8 @@ class TotalAmountPensionPaymentsController @Inject()(
               submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                 srn,
                 updatedAnswers,
-                optFallbackCall = Some(
-                  controllers.nonsipp.memberpensionpayments.routes.TotalAmountPensionPaymentsController
-                    .onPageLoad(srn, index, mode)
-                )
+                fallbackCall = controllers.nonsipp.memberpensionpayments.routes.TotalAmountPensionPaymentsController
+                  .onPageLoad(srn, index, mode)
               )
             } yield submissionResult.getOrRecoverJourney(
               _ =>
