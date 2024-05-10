@@ -81,8 +81,10 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
     psrSubmissionService
       .submitPsrDetails(
         srn,
-        optFallbackCall =
-          Some(controllers.nonsipp.schemedesignatory.routes.HowMuchCashController.onPageLoad(srn, NormalMode))
+        optFallbackCall = Some(
+          controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+            .onPageLoad(srn, NormalMode)
+        )
       )
       .map {
         case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

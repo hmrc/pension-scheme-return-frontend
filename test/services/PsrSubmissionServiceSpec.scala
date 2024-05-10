@@ -20,6 +20,7 @@ import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import connectors.PSRConnector
 import controllers.TestValues
+import config.FrontendAppConfig
 import cats.data.NonEmptyList
 import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import transformations._
@@ -33,14 +34,14 @@ import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
 import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import services.PsrSubmissionServiceSpec.{callCaptor, captor, minimalRequiredSubmission}
+import services.PsrSubmissionServiceSpec.{captor, minimalRequiredSubmission}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesApi
 import org.mockito.Mockito._
 import utils.BaseSpec
 import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
-import play.api.mvc.{AnyContentAsEmpty, Call}
+import play.api.mvc.AnyContentAsEmpty
 import models.requests.psr._
 import config.Constants.PSP
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
@@ -75,6 +76,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
+  private val mockAppConfig = mock[FrontendAppConfig]
   private val mockConnector = mock[PSRConnector]
   private val mockSchemeDateService = mock[SchemeDateService]
   private val mockAuditService = mock[AuditService]
@@ -90,6 +92,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
   private val service =
     new PsrSubmissionService(
+      mockAppConfig,
       mockConnector,
       mockSchemeDateService,
       mockAuditService,
@@ -117,7 +120,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           val request = DataRequest(allowedAccessRequest, userAnswers)
           when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
             .thenReturn(Some(minimalRequiredSubmission))
-          when(mockConnector.submitPsrDetails(any(), any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
             service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
@@ -130,7 +133,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
             verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
             verify(mockDeclarationTransformer, never).transformToEtmp(any())
-            verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), callCaptor.capture())(any(), any())
+            verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
             verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
             captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -140,8 +143,6 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             captor.getValue.shares mustBe None
             captor.getValue.psrDeclaration mustBe None
             result mustBe Some(())
-
-            callCaptor.getValue mustBe Some(fallbackCall)
           }
         }
     )
@@ -157,7 +158,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
             .thenReturn(Some(minimalRequiredSubmission))
           when(mockLoanTransactionsTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any(), any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
             service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
@@ -170,7 +171,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
             verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
             verify(mockDeclarationTransformer, never).transformToEtmp(any())
-            verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+            verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
             verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
             captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -195,7 +196,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
             .thenReturn(Some(minimalRequiredSubmission))
           when(mockLandOrPropertyTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any(), any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
             service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
@@ -210,7 +211,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
               verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -249,7 +250,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
             .thenReturn(Some(minimalRequiredSubmission))
           when(mockLandOrPropertyTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any(), any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
             service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
@@ -264,7 +265,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
               verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -302,7 +303,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
             .thenReturn(Some(minimalRequiredSubmission))
           when(mockMoneyBorrowedTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any(), any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
             service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
@@ -316,7 +317,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
               verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -349,7 +350,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             .thenReturn(Some(minimalRequiredSubmission))
           when(mockSharesTransformer.transformToEtmp(any(), any())(any()))
             .thenReturn(Shares(optShareTransactions = None, optTotalValueQuotedShares = None))
-          when(mockConnector.submitPsrDetails(any(), any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
             service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
@@ -362,7 +363,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
             verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
             verify(mockDeclarationTransformer, never).transformToEtmp(any())
-            verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+            verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
             verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
             captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -389,7 +390,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             .thenReturn(Some(minimalRequiredSubmission))
           when(mockSharesTransformer.transformToEtmp(any(), any())(any()))
             .thenReturn(Shares(optShareTransactions = None, optTotalValueQuotedShares = None))
-          when(mockConnector.submitPsrDetails(any(), any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
             service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
@@ -404,7 +405,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
               verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -429,7 +430,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
             .thenReturn(Some(minimalRequiredSubmission))
           when(mockBondTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any(), any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
             service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
@@ -443,7 +444,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockBondTransactionsTransformer, times(1)).transformToEtmp(srn, bondsDisposal = false)(request)
               verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
               verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -482,7 +483,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
             .thenReturn(Some(minimalRequiredSubmission))
           when(mockBondTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any(), any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
             service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
@@ -497,7 +498,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
                 .transformToEtmp(srn = srn, bondsDisposal = bondsDisposal)(request)
               verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
               verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -535,7 +536,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
             .thenReturn(Some(minimalRequiredSubmission))
           when(mockOtherAssetTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any(), any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
             service.submitPsrDetails(srn, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
@@ -550,7 +551,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockOtherAssetTransactionsTransformer, times(1))
                 .transformToEtmp(srn = srn, otherAssetDisposed = false)(request)
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
               verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -589,7 +590,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
             .thenReturn(Some(minimalRequiredSubmission))
           when(mockOtherAssetTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any(), any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
           whenReady(
             service.submitPsrDetails(srn, false, optFallbackCall = Some(fallbackCall))(implicitly, implicitly, request)
@@ -604,7 +605,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockOtherAssetTransactionsTransformer, times(1))
                 .transformToEtmp(srn = srn, otherAssetDisposed = otherAssetsDisposalPage)(request)
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), callCaptor.capture())(any(), any())
+              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
               verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -646,7 +647,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
         .thenReturn(Some(minimalRequiredSubmission))
       when(mockDeclarationTransformer.transformToEtmp(any())).thenReturn(declaration)
-      when(mockConnector.submitPsrDetails(any(), any())(any(), any())).thenReturn(Future.successful(()))
+      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
 
       whenReady(service.submitPsrDetails(srn = srn, isSubmitted = true)(implicitly, implicitly, request)) {
         result: Option[Unit] =>
@@ -658,7 +659,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
           verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
           verify(mockDeclarationTransformer, times(1)).transformToEtmp(any())
-          verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+          verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
           verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
           captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -684,7 +685,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockDeclarationTransformer, never).transformToEtmp(any())
-        verify(mockConnector, never).submitPsrDetails(any(), any())(any(), any())
+        verify(mockConnector, never).submitPsrDetails(any())(any(), any())
         verify(mockAuditService, never).sendExtendedEvent(any())(any(), any())
         result mustBe None
       }
@@ -694,7 +695,6 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
 object PsrSubmissionServiceSpec {
   val captor: ArgumentCaptor[PsrSubmission] = ArgumentCaptor.forClass(classOf[PsrSubmission])
-  val callCaptor: ArgumentCaptor[Option[Call]] = ArgumentCaptor.forClass(classOf[Option[Call]])
 
   val sampleDate: LocalDate = LocalDate.now
   val minimalRequiredSubmission: MinimalRequiredSubmission = MinimalRequiredSubmission(
