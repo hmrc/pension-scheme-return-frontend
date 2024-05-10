@@ -131,6 +131,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
             verify(mockDeclarationTransformer, never).transformToEtmp(any())
             verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), callCaptor.capture())(any(), any())
+            verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
             captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
             captor.getValue.checkReturnDates mustBe checkReturnDatesAnswer
@@ -170,6 +171,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
             verify(mockDeclarationTransformer, never).transformToEtmp(any())
             verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+            verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
             captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
             captor.getValue.checkReturnDates mustBe false
@@ -209,6 +211,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
               verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
               captor.getValue.checkReturnDates mustBe false
@@ -262,6 +265,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
               verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
               captor.getValue.checkReturnDates mustBe false
@@ -313,6 +317,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
               verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
               captor.getValue.checkReturnDates mustBe false
@@ -358,6 +363,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
             verify(mockDeclarationTransformer, never).transformToEtmp(any())
             verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+            verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
             captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
             captor.getValue.checkReturnDates mustBe false
@@ -399,6 +405,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
               verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
               captor.getValue.checkReturnDates mustBe false
@@ -437,6 +444,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
               verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
               captor.getValue.checkReturnDates mustBe false
@@ -490,6 +498,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
               verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
               captor.getValue.checkReturnDates mustBe false
@@ -542,6 +551,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
                 .transformToEtmp(srn = srn, otherAssetDisposed = false)(request)
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
               verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
               captor.getValue.checkReturnDates mustBe false
@@ -595,6 +605,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
                 .transformToEtmp(srn = srn, otherAssetDisposed = otherAssetsDisposalPage)(request)
               verify(mockDeclarationTransformer, never).transformToEtmp(any())
               verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), callCaptor.capture())(any(), any())
+              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
               captor.getValue.checkReturnDates mustBe false
@@ -648,6 +659,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
           verify(mockDeclarationTransformer, times(1)).transformToEtmp(any())
           verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any())(any(), any())
+          verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
 
           captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
           captor.getValue.checkReturnDates mustBe false
@@ -673,6 +685,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockDeclarationTransformer, never).transformToEtmp(any())
         verify(mockConnector, never).submitPsrDetails(any(), any())(any(), any())
+        verify(mockAuditService, never).sendExtendedEvent(any())(any(), any())
         result mustBe None
       }
     }

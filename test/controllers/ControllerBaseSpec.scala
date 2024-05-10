@@ -28,6 +28,7 @@ import generators.ModelGenerators._
 import models._
 import uk.gov.hmrc.time.TaxYear
 import pages.nonsipp.moneyborrowed.LenderNamePage
+import viewmodels.models._
 import play.api.data.Form
 import utils.{BaseSpec, DisplayMessageUtils}
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
@@ -272,6 +273,40 @@ trait TestValues {
       ValidationError("M10", ValidationErrorType.DateOfBirth, "error M10"),
       ValidationError("E2", ValidationErrorType.DateOfBirth, "error E2"),
       ValidationError("S11", ValidationErrorType.DateOfBirth, "error S11")
+    )
+  )
+
+  val taskListInAuditEvent: ListTaskListLevel1 = ListTaskListLevel1(
+    List(
+      TaskListCipViewModel(
+        "Section1",
+        ListTaskListLevel2(
+          List(
+            TaskListLevel2("Sub-section 1-1.cip", "tasklist.completed"),
+            TaskListLevel2("Sub-section 1-2.cip", "tasklist.notStarted"),
+            TaskListLevel2(
+              "Sub-section 1-3.cip",
+              "tasklist.unableToStart"
+            )
+          )
+        )
+      ),
+      TaskListCipViewModel(
+        "Declaration incomplete",
+        ListTaskListLevel2(
+          List(
+            TaskListLevel2("Sub-section 2-1.declaration.cip.incomplete", "tasklist.completed")
+          )
+        )
+      ),
+      TaskListCipViewModel(
+        "Declaration complete",
+        ListTaskListLevel2(
+          List(
+            TaskListLevel2("Declaration complete", "Disabled")
+          )
+        )
+      )
     )
   )
 

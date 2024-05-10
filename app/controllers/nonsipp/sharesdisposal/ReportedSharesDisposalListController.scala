@@ -191,7 +191,6 @@ object ReportedSharesDisposalListController {
       .toList
       .sortBy(_.changeUrl)
 
-
   private def buildMessage(messageString: String, sharesDisposalData: SharesDisposalData): Message =
     sharesDisposalData match {
       case SharesDisposalData(_, _, typeOfShares, companyName, typeOfDisposal) =>

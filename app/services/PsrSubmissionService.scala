@@ -99,7 +99,7 @@ class PsrSubmissionService @Inject()(
       {
         // TODO fire audit event only if submission is successful
         val auditEvent = buildAuditEvent(taxYear, loggedInUserNameOrBlank(request))
-        auditService.sendEvent(auditEvent)
+        auditService.sendExtendedEvent(auditEvent)
         psrConnector.submitPsrDetails(
           PsrSubmission(
             minimalRequiredSubmission = minimalRequiredSubmission,
@@ -217,6 +217,5 @@ class PsrSubmissionService @Inject()(
           messagesApi
         ).list
       )
-      .toString()
   )
 }

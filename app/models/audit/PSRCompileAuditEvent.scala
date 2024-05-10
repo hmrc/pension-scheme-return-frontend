@@ -16,6 +16,7 @@
 
 package models.audit
 
+import play.api.libs.json.{JsObject, JsValue, Json}
 import models.DateRange
 
 case class PSRCompileAuditEvent(
@@ -26,14 +27,14 @@ case class PSRCompileAuditEvent(
   affinityGroup: String,
   credentialRole: String,
   taxYear: DateRange,
-  taskList: String
-) extends AuditEvent {
+  taskList: JsValue
+) extends ExtendedAuditEvent {
 
-  override def auditType: String = "PensionSchemeReturnComplied"
+  override def auditType: String = "PensionSchemeReturnCompiled"
 
-  override def details: Map[String, String] = {
+  override def details: JsObject = {
 
-    val common = Map(
+    val compiledDetails = Json.obj(
       "SchemeName" -> schemeName,
       "PensionSchemeTaxReference" -> schemeTaxReference,
       "AffinityGroup" -> affinityGroup,
@@ -42,6 +43,6 @@ case class PSRCompileAuditEvent(
       "Sections" -> taskList
     )
 
-    psaOrPspIdDetails(credentialRole, psaOrPspId, schemeAdministratorOrPractitionerName) ++ common
+    psaOrPspIdDetails(credentialRole, psaOrPspId, schemeAdministratorOrPractitionerName) ++ compiledDetails
   }
 }

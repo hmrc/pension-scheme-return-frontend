@@ -29,7 +29,7 @@ case class PSRStartAuditEvent(
   howManyMembers: Int,
   howManyDeferredMembers: Int,
   howManyPensionerMembers: Int
-) extends AuditEvent {
+) extends BasicAuditEvent {
 
   override def auditType: String = "PensionSchemeReturnStarted"
 

@@ -30,7 +30,7 @@ case class PSRFileValidationAuditEvent(
   fileValidationTimeInMilliSeconds: Long,
   numberOfEntries: Int,
   numberOfFailures: Int
-) extends AuditEvent {
+) extends BasicAuditEvent {
 
   override def auditType: String = "PensionSchemeReturnFileValidationCheck"
 
