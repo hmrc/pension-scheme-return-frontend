@@ -123,9 +123,9 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
     "submit standard Psr" in runningApplication { implicit app =>
       stubPost(submitStandardUrl, noContent())
 
-      val result:Either[String, Boolean] = connector.submitPsrDetails(minimalSubmissionData).futureValue
+      val result:Either[String, Unit] = connector.submitPsrDetails(minimalSubmissionData).futureValue
 
-      result mustBe Right(true)
+      result mustBe Right(())
     }
   }
 

@@ -45,7 +45,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
 
   def submitPsrDetails(
     psrSubmission: PsrSubmission
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Boolean]] =
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] =
     http
       .POST[PsrSubmission, HttpResponse](
         submitStandardUrl,
@@ -53,7 +53,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
       )
       .map { response =>
         response.status match {
-          case NO_CONTENT => Right(true)
+          case NO_CONTENT => Right(Future.unit)
           case _ =>
             Left(s"{${response.status}, ${response.json}}")
         }
