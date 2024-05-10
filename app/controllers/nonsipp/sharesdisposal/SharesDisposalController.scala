@@ -82,9 +82,7 @@ class SharesDisposalController @Inject()(
               submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                 srn,
                 updatedAnswers,
-                optFallbackCall = Some(
-                  controllers.nonsipp.sharesdisposal.routes.SharesDisposalController.onPageLoad(srn, mode)
-                )
+                fallbackCall = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController.onPageLoad(srn, mode)
               )
             } yield submissionResult
               .getOrRecoverJourney(_ => Redirect(navigator.nextPage(SharesDisposalPage(srn), mode, updatedAnswers)))

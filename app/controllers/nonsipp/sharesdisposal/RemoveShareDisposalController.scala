@@ -98,9 +98,8 @@ class RemoveShareDisposalController @Inject()(
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                   srn,
                   removedUserAnswers,
-                  optFallbackCall = Some(
+                  fallbackCall =
                     controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController.onPageLoad(srn, 1)
-                  )
                 )
               } yield submissionResult.getOrRecoverJourney(
                 _ => Redirect(navigator.nextPage(RemoveShareDisposalPage(srn), mode, removedUserAnswers))

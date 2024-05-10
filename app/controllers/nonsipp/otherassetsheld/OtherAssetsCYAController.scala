@@ -193,9 +193,8 @@ class OtherAssetsCYAController @Inject()(
         redirectTo <- psrSubmissionService
           .submitPsrDetails(
             srn,
-            optFallbackCall = Some(
+            fallbackCall =
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad(srn, index, mode)
-            )
           )
           .map {
             case None => controllers.routes.JourneyRecoveryController.onPageLoad()

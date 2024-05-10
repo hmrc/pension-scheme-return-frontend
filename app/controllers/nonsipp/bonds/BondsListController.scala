@@ -110,9 +110,7 @@ class BondsListController @Inject()(
                   psrSubmissionService.submitPsrDetailsWithUA(
                     srn,
                     updatedUserAnswers,
-                    optFallbackCall = Some(
-                      controllers.nonsipp.bonds.routes.BondsListController.onPageLoad(srn, page, mode)
-                    )
+                    fallbackCall = controllers.nonsipp.bonds.routes.BondsListController.onPageLoad(srn, page, mode)
                   )
                 } else {
                   Future.successful(Some(()))

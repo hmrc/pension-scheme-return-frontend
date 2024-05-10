@@ -75,10 +75,8 @@ class UnallocatedContributionCYAController @Inject()(
       psrSubmissionService
         .submitPsrDetails(
           srn,
-          optFallbackCall = Some(
-            controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-              .onPageLoad(srn, checkOrChange)
-          )
+          fallbackCall = controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+            .onPageLoad(srn, checkOrChange)
         )
         .map {
           case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

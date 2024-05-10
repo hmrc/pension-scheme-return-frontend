@@ -17,12 +17,14 @@
 package services
 
 import play.api.test.FakeRequest
-import models.audit.PSRStartAuditEvent
+import models.audit.{PSRCompileAuditEvent, PSRStartAuditEvent}
 import play.api.mvc.AnyContentAsEmpty
-import uk.gov.hmrc.play.audit.model.DataEvent
+import uk.gov.hmrc.play.audit.model.{DataEvent, ExtendedDataEvent}
+import viewmodels.models.TaskListCipViewModel.writeListTaskListLevel1
 import controllers.TestValues
 import config.FrontendAppConfig
 import config.Constants.{PSA, PSP}
+import play.api.libs.json.Json
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -50,7 +52,7 @@ class AuditServiceSpec extends BaseSpec with TestValues {
   }
 
   "AuditService" - {
-    "PSRStartAuditEvent for PSA" in {
+    "sendEvent for PSA" in {
 
       val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
@@ -91,7 +93,7 @@ class AuditServiceSpec extends BaseSpec with TestValues {
       dataEvent.detail mustEqual expectedDataEvent
     }
 
-    "PSRStartAuditEvent for PSP" in {
+    "sendEvent for PSP" in {
 
       val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
@@ -130,6 +132,80 @@ class AuditServiceSpec extends BaseSpec with TestValues {
       dataEvent.auditSource mustEqual testAppName
       dataEvent.auditType mustEqual "PensionSchemeReturnStarted"
       dataEvent.detail mustEqual expectedDataEvent
+    }
+
+    "sendExtendedEvent for PSA" in {
+
+      val captor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+
+      when(mockAuditConnector.sendExtendedEvent(captor.capture())(any(), any()))
+        .thenReturn(Future.successful(AuditResult.Success))
+
+      val auditEvent = PSRCompileAuditEvent(
+        schemeName,
+        "testAdminName",
+        psaId.value,
+        pstr,
+        "testAffinity",
+        PSA,
+        dateRange,
+        taskList = Json.toJson(taskListInAuditEvent)
+      )
+
+      service.sendExtendedEvent(auditEvent).futureValue
+
+      val extendedDataEvent = captor.getValue
+      val expectedExtendedDataEvent = Json.obj(
+        "SchemeName" -> schemeName,
+        "SchemeAdministratorName" -> "testAdminName",
+        "PensionSchemeAdministratorId" -> psaId.value,
+        "PensionSchemeTaxReference" -> pstr,
+        "AffinityGroup" -> "testAffinity",
+        "CredentialRole(PSA/PSP)" -> PSA,
+        "TaxYear" -> s"${dateRange.from.getYear}-${dateRange.to.getYear}",
+        "Sections" -> Json.toJson(taskListInAuditEvent)
+      )
+
+      extendedDataEvent.auditSource mustEqual testAppName
+      extendedDataEvent.auditType mustEqual "PensionSchemeReturnCompiled"
+      extendedDataEvent.detail mustEqual expectedExtendedDataEvent
+    }
+
+    "sendExtendedEvent for PSP" in {
+
+      val captor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+
+      when(mockAuditConnector.sendExtendedEvent(captor.capture())(any(), any()))
+        .thenReturn(Future.successful(AuditResult.Success))
+
+      val auditEvent = PSRCompileAuditEvent(
+        schemeName,
+        "testAdminName",
+        pspId.value,
+        pstr,
+        "testAffinity",
+        PSP,
+        dateRange,
+        taskList = Json.toJson(taskListInAuditEvent)
+      )
+
+      service.sendExtendedEvent(auditEvent).futureValue
+
+      val extendedDataEvent = captor.getValue
+      val expectedExtendedDataEvent = Json.obj(
+        "SchemeName" -> schemeName,
+        "SchemePractitionerName" -> "testAdminName",
+        "PensionSchemePractitionerId" -> pspId.value,
+        "PensionSchemeTaxReference" -> pstr,
+        "AffinityGroup" -> "testAffinity",
+        "CredentialRole(PSA/PSP)" -> PSP,
+        "TaxYear" -> s"${dateRange.from.getYear}-${dateRange.to.getYear}",
+        "Sections" -> Json.toJson(taskListInAuditEvent)
+      )
+
+      extendedDataEvent.auditSource mustEqual testAppName
+      extendedDataEvent.auditType mustEqual "PensionSchemeReturnCompiled"
+      extendedDataEvent.detail mustEqual expectedExtendedDataEvent
     }
   }
 }

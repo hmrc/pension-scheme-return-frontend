@@ -100,10 +100,8 @@ class ReportedSharesDisposalListController @Inject()(
                       psrSubmissionService.submitPsrDetailsWithUA(
                         srn,
                         updatedUserAnswers,
-                        optFallbackCall = Some(
-                          controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
-                            .onPageLoad(srn, page)
-                        )
+                        fallbackCall = controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+                          .onPageLoad(srn, page)
                       )
                     } else {
                       Future.successful(Some(()))
@@ -190,7 +188,6 @@ object ReportedSharesDisposalListController {
       }
       .toList
       .sortBy(_.changeUrl)
-
 
   private def buildMessage(messageString: String, sharesDisposalData: SharesDisposalData): Message =
     sharesDisposalData match {

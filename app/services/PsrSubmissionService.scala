@@ -20,7 +20,7 @@ import utils.nonsipp.TaskListCipUtils.transformTaskListToCipFormat
 import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import connectors.PSRConnector
-import models.SchemeId.Srn
+import config.FrontendAppConfig
 import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import cats.implicits._
 import transformations._
@@ -33,6 +33,8 @@ import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
 import models.audit.PSRCompileAuditEvent
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import play.api.mvc.Call
+import handlers.PostPsrException
+import models.SchemeId.Srn
 import models.requests.psr._
 import config.Constants.{PSA, PSP}
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
@@ -48,6 +50,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.Inject
 
 class PsrSubmissionService @Inject()(
+  appConfig: FrontendAppConfig,
   psrConnector: PSRConnector,
   schemeDateService: SchemeDateService,
   auditService: AuditService,
@@ -66,9 +69,9 @@ class PsrSubmissionService @Inject()(
   def submitPsrDetailsWithUA(
     srn: Srn,
     userAnswers: UserAnswers,
-    optFallbackCall: Option[Call] = None
+    fallbackCall: Call
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
-    submitPsrDetails(srn, optFallbackCall = optFallbackCall)(
+    submitPsrDetails(srn, fallbackCall = fallbackCall)(
       implicitly,
       implicitly,
       DataRequest(request.request, userAnswers)
@@ -77,7 +80,7 @@ class PsrSubmissionService @Inject()(
   def submitPsrDetails(
     srn: Srn,
     isSubmitted: Boolean = false,
-    optFallbackCall: Option[Call] = None
+    fallbackCall: Call
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] = {
 
     val optSchemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn))
@@ -97,29 +100,33 @@ class PsrSubmissionService @Inject()(
       schemeDateService.schemeDate(srn)
     ).mapN { (minimalRequiredSubmission, checkReturnDates, taxYear) =>
       {
-        // TODO fire audit event only if submission is successful
-        val auditEvent = buildAuditEvent(taxYear, loggedInUserNameOrBlank(request))
-        auditService.sendEvent(auditEvent)
-        psrConnector.submitPsrDetails(
-          PsrSubmission(
-            minimalRequiredSubmission = minimalRequiredSubmission,
-            checkReturnDates = checkReturnDates,
-            loans = buildLoans(srn)(optSchemeHadLoans),
-            assets = buildAssets(srn)(
-              optLandOrPropertyHeld,
-              optMoneyWasBorrowed,
-              optDisposeAnyLandOrProperty,
-              optUnregulatedOrConnectedBondsHeld,
-              optBondsDisposal,
-              optOtherAssetsHeld,
-              optOtherAssetsDisposal
-            ),
-            membersPayments = memberPaymentsTransformer.transformToEtmp(srn, request.userAnswers),
-            shares = buildShares(srn)(optDidSchemeHoldAnyShares, optSharesDisposal),
-            psrDeclaration = Option.when(isSubmitted)(declarationTransformer.transformToEtmp)
-          ),
-          optFallbackCall
-        )
+        psrConnector
+          .submitPsrDetails(
+            PsrSubmission(
+              minimalRequiredSubmission = minimalRequiredSubmission,
+              checkReturnDates = checkReturnDates,
+              loans = buildLoans(srn)(optSchemeHadLoans),
+              assets = buildAssets(srn)(
+                optLandOrPropertyHeld,
+                optMoneyWasBorrowed,
+                optDisposeAnyLandOrProperty,
+                optUnregulatedOrConnectedBondsHeld,
+                optBondsDisposal,
+                optOtherAssetsHeld,
+                optOtherAssetsDisposal
+              ),
+              membersPayments = memberPaymentsTransformer.transformToEtmp(srn, request.userAnswers),
+              shares = buildShares(srn)(optDidSchemeHoldAnyShares, optSharesDisposal),
+              psrDeclaration = Option.when(isSubmitted)(declarationTransformer.transformToEtmp)
+            )
+          )
+          .flatMap {
+            case Left(message: String) =>
+              throw PostPsrException(message, fallbackCall.url)
+            case Right(()) =>
+              auditService.sendExtendedEvent(buildAuditEvent(taxYear, loggedInUserNameOrBlank(request)))
+              Future.unit
+          }
       }
     }.sequence
   }
@@ -217,6 +224,5 @@ class PsrSubmissionService @Inject()(
           messagesApi
         ).list
       )
-      .toString()
   )
 }

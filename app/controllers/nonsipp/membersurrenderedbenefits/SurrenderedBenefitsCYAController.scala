@@ -96,10 +96,8 @@ class SurrenderedBenefitsCYAController @Inject()(
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
           srn,
           updatedUserAnswers,
-          optFallbackCall = Some(
-            controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
-              .onPageLoad(srn, memberIndex, mode)
-          )
+          fallbackCall = controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
+            .onPageLoad(srn, memberIndex, mode)
         )
       } yield submissionResult.getOrRecoverJourney(
         _ =>

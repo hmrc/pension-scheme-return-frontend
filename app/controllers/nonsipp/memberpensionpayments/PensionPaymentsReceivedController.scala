@@ -107,10 +107,8 @@ class PensionPaymentsReceivedController @Inject()(
               submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                 srn,
                 updatedAnswers,
-                optFallbackCall = Some(
-                  controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
-                    .onPageLoad(srn, mode)
-                )
+                fallbackCall = controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
+                  .onPageLoad(srn, mode)
               )
             } yield submissionResult.getOrRecoverJourney(
               _ => Redirect(navigator.nextPage(PensionPaymentsReceivedPage(srn), mode, updatedAnswers))

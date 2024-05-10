@@ -167,10 +167,8 @@ class LandPropertyDisposalCYAController @Inject()(
         redirectTo <- psrSubmissionService
           .submitPsrDetails(
             srn,
-            optFallbackCall = Some(
-              controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-                .onPageLoad(srn, index, disposalIndex, mode)
-            )
+            fallbackCall = controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+              .onPageLoad(srn, index, disposalIndex, mode)
           )(implicitly, implicitly, request = DataRequest(request.request, updatedUserAnswers))
           .map {
             case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

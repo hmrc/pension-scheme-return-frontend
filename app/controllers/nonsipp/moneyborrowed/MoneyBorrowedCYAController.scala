@@ -94,10 +94,8 @@ class MoneyBorrowedCYAController @Inject()(
       psrSubmissionService
         .submitPsrDetails(
           srn,
-          optFallbackCall = Some(
-            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-              .onPageLoad(srn, index, checkOrChange)
-          )
+          fallbackCall =
+            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, checkOrChange)
         )
         .map {
           case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

@@ -83,10 +83,9 @@ class RemoveAssetDisposalController @Inject()(
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                   srn,
                   removedUserAnswers,
-                  optFallbackCall = Some(
+                  fallbackCall =
                     controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
                       .onPageLoad(srn, 1)
-                  )
                 )
               } yield submissionResult.getOrRecoverJourney(
                 _ => Redirect(navigator.nextPage(RemoveAssetDisposalPage(srn), NormalMode, removedUserAnswers))

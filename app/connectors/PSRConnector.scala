@@ -17,10 +17,9 @@
 package connectors
 
 import config.FrontendAppConfig
-import handlers.{GetPsrException, PostPsrException}
+import handlers.GetPsrException
 import models.requests.psr.PsrSubmission
 import models.AnswersSavedDisplayVersion
-import play.api.mvc.Results.NoContent
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import play.api.mvc.Call
 import play.api.Logger
@@ -45,9 +44,8 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
     s"$baseUrl/pension-scheme-return/psr/versions/$pstr?startDate=$startDate"
 
   def submitPsrDetails(
-    psrSubmission: PsrSubmission,
-    optFallbackCall: Option[Call] = None
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    psrSubmission: PsrSubmission
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] =
     http
       .POST[PsrSubmission, HttpResponse](
         submitStandardUrl,
@@ -55,12 +53,9 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
       )
       .map { response =>
         response.status match {
-          case NO_CONTENT => NoContent
+          case NO_CONTENT => Right(())
           case _ =>
-            val url = optFallbackCall.fold(appConfig.urls.managePensionsSchemes.dashboard) { fallbackCall =>
-              fallbackCall.url
-            }
-            throw PostPsrException(s"{${response.status}, ${response.json}}", url)
+            Left(s"{${response.status}, ${response.json}}")
         }
       }
 

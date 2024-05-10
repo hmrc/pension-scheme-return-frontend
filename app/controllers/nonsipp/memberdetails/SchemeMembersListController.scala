@@ -113,10 +113,8 @@ class SchemeMembersListController @Inject()(
                   psrSubmissionService.submitPsrDetailsWithUA(
                     srn,
                     request.userAnswers,
-                    optFallbackCall = Some(
-                      controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-                        .onPageLoad(srn, page, manualOrUpload)
-                    )
+                    fallbackCall = controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+                      .onPageLoad(srn, page, manualOrUpload)
                   )
                 } else {
                   Future.successful(Some(()))

@@ -17,10 +17,13 @@
 package models.audit
 
 import config.Constants.PSA
-
+import play.api.libs.json.{JsObject, Json}
 trait AuditEvent {
 
   def auditType: String
+}
+
+trait BasicAuditEvent extends AuditEvent {
 
   def details: Map[String, String]
 
@@ -37,6 +40,29 @@ trait AuditEvent {
         )
       case _ =>
         Map(
+          "PensionSchemePractitionerId" -> psaOrPspId,
+          "SchemePractitionerName" -> schemeAdministratorOrPractitionerName
+        )
+    }
+}
+
+trait ExtendedAuditEvent extends AuditEvent {
+
+  def details: JsObject
+
+  def psaOrPspIdDetails(
+    credentialRole: String,
+    psaOrPspId: String,
+    schemeAdministratorOrPractitionerName: String
+  ): JsObject =
+    credentialRole match {
+      case PSA =>
+        Json.obj(
+          "PensionSchemeAdministratorId" -> psaOrPspId,
+          "SchemeAdministratorName" -> schemeAdministratorOrPractitionerName
+        )
+      case _ =>
+        Json.obj(
           "PensionSchemePractitionerId" -> psaOrPspId,
           "SchemePractitionerName" -> schemeAdministratorOrPractitionerName
         )

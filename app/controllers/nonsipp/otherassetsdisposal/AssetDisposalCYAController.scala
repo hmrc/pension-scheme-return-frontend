@@ -167,10 +167,8 @@ class AssetDisposalCYAController @Inject()(
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
           srn,
           updatedUserAnswers,
-          optFallbackCall = Some(
-            controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
-              .onPageLoad(srn, index, disposalIndex, mode)
-          )
+          fallbackCall = controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+            .onPageLoad(srn, index, disposalIndex, mode)
         )
       } yield submissionResult.getOrRecoverJourney(
         _ =>

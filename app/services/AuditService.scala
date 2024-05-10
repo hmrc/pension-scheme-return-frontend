@@ -16,16 +16,17 @@
 
 package services
 
-import models.audit.AuditEvent
+import models.audit.{BasicAuditEvent, ExtendedAuditEvent}
 import play.api.mvc.RequestHeader
 import com.google.inject.Inject
-import uk.gov.hmrc.play.audit.model.DataEvent
+import uk.gov.hmrc.play.audit.model.{DataEvent, ExtendedDataEvent}
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import config.FrontendAppConfig
 import cats.implicits._
-import play.api.Logger
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import play.api.Logger
+import play.api.libs.json.{JsObject, JsValue, Json}
 
 import scala.language.implicitConversions
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,7 +38,7 @@ class AuditService @Inject()(
 ) {
   private val logger = Logger(classOf[AuditService])
 
-  def sendEvent[T <: AuditEvent](event: T)(implicit rh: RequestHeader, ec: ExecutionContext): Future[Unit] = {
+  def sendEvent[T <: BasicAuditEvent](event: T)(implicit rh: RequestHeader, ec: ExecutionContext): Future[Unit] = {
 
     implicit def toHc(request: RequestHeader): AuditHeaderCarrier =
       auditHeaderCarrier(HeaderCarrierConverter.fromRequestAndSession(request, request.session))
@@ -63,6 +64,39 @@ class AuditService @Inject()(
         value
       case value @ Failure(e) =>
         logger.error(s"[AuditService][sendEvent] failed to send event ${event.auditType}", e)
+        value
+    }.void
+  }
+
+  def sendExtendedEvent[T <: ExtendedAuditEvent](
+    event: T
+  )(implicit rh: RequestHeader, ec: ExecutionContext): Future[Unit] = {
+
+    implicit def toHc(request: RequestHeader): AuditHeaderCarrier =
+      auditHeaderCarrier(HeaderCarrierConverter.fromRequestAndSession(request, request.session))
+
+    val details: JsValue =
+      Json.toJson(rh.toAuditDetails()).as[JsObject].deepMerge(event.details)
+
+    logger.debug(s"[AuditService][sendExtendedEvent] sending ${event.auditType}")
+
+    val result: Future[AuditResult] = connector.sendExtendedEvent(
+      ExtendedDataEvent(
+        auditSource = config.appName,
+        auditType = event.auditType,
+        tags = rh.toAuditTags(
+          transactionName = event.auditType,
+          path = rh.path
+        ),
+        detail = details
+      )
+    )
+    result.transform {
+      case value @ Success(_) =>
+        logger.debug(s"[AuditService][sendExtendedEvent] successfully sent ${event.auditType}")
+        value
+      case value @ Failure(e) =>
+        logger.error(s"[AuditService][sendExtendedEvent] failed to send event ${event.auditType}", e)
         value
     }.void
   }

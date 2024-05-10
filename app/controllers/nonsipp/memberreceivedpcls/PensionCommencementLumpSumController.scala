@@ -74,10 +74,8 @@ class PensionCommencementLumpSumController @Inject()(
                 psrSubmissionService
                   .submitPsrDetails(
                     srn,
-                    optFallbackCall = Some(
-                      controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
-                        .onPageLoad(srn, mode)
-                    )
+                    fallbackCall = controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
+                      .onPageLoad(srn, mode)
                   )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                   .map {
                     case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

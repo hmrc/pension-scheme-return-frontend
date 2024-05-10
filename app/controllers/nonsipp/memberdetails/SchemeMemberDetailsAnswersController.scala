@@ -72,10 +72,8 @@ class SchemeMemberDetailsAnswersController @Inject()(
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
           srn,
           updatedUserAnswers,
-          optFallbackCall = Some(
-            controllers.nonsipp.memberdetails.routes.SchemeMemberDetailsAnswersController
-              .onPageLoad(srn, index, checkOrChange)
-          )
+          fallbackCall = controllers.nonsipp.memberdetails.routes.SchemeMemberDetailsAnswersController
+            .onPageLoad(srn, index, checkOrChange)
         )
       } yield submissionResult.fold(
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

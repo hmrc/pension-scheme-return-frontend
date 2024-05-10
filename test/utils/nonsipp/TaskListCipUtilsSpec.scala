@@ -22,11 +22,11 @@ import generators.BasicGenerators
 import org.scalatest.OptionValues
 import generators.ModelGenerators.pensionSchemeIdGen
 import models.PensionSchemeId
+import play.api.i18n.MessagesApi
 import play.api.test.Helpers.stubMessagesApi
 import org.scalatest.freespec.AnyFreeSpec
 import viewmodels.DisplayMessage.{LinkMessage, Message}
 import viewmodels.models._
-import play.api.i18n.MessagesApi
 
 class TaskListCipUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues with BasicGenerators {
 
@@ -94,39 +94,7 @@ class TaskListCipUtilsSpec extends AnyFreeSpec with Matchers with OptionValues w
       val result = TaskListCipUtils.transformTaskListToCipFormat(taskList, messagesApi)
       result.list.size mustBe 3
       result.list(0).subSections.list.size mustBe 3
-      result mustBe ListTaskListLevel1(
-        List(
-          TaskListCipViewModel(
-            "Section1",
-            ListTaskListLevel2(
-              List(
-                TaskListLevel2("Sub-section 1-1.cip", "tasklist.completed"),
-                TaskListLevel2("Sub-section 1-2.cip", "tasklist.notStarted"),
-                TaskListLevel2(
-                  "Sub-section 1-3.cip",
-                  "tasklist.unableToStart"
-                )
-              )
-            )
-          ),
-          TaskListCipViewModel(
-            "Declaration incomplete",
-            ListTaskListLevel2(
-              List(
-                TaskListLevel2("Sub-section 2-1.declaration.cip.incomplete", "tasklist.completed")
-              )
-            )
-          ),
-          TaskListCipViewModel(
-            "Declaration complete",
-            ListTaskListLevel2(
-              List(
-                TaskListLevel2("Declaration complete", "Disabled")
-              )
-            )
-          )
-        )
-      )
+      result mustBe taskListInAuditEvent
     }
   }
 

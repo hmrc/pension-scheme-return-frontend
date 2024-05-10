@@ -112,9 +112,8 @@ class OtherAssetsListController @Inject()(
                   psrSubmissionService.submitPsrDetailsWithUA(
                     srn,
                     updatedUserAnswers,
-                    optFallbackCall = Some(
+                    fallbackCall =
                       controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onPageLoad(srn, page, mode)
-                    )
                   )
                 } else {
                   Future.successful(Some(()))

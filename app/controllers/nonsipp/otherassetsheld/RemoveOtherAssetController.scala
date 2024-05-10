@@ -99,9 +99,8 @@ class RemoveOtherAssetController @Inject()(
                 redirectTo <- psrSubmissionService
                   .submitPsrDetails(
                     srn,
-                    optFallbackCall = Some(
+                    fallbackCall =
                       controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onPageLoad(srn, 1, mode)
-                    )
                   )(
                     implicitly,
                     implicitly,

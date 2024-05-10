@@ -96,10 +96,8 @@ class RemoveUnallocatedAmountController @Inject()(
               submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                 srn,
                 updatedAnswers,
-                optFallbackCall = Some(
-                  controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
-                    .onPageLoad(srn, mode)
-                )
+                fallbackCall = controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
+                  .onPageLoad(srn, mode)
               )
             } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
               _ =>

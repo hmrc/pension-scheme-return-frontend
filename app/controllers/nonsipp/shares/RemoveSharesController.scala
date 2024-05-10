@@ -95,10 +95,7 @@ class RemoveSharesController @Inject()(
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                   srn,
                   updatedAnswers,
-                  optFallbackCall = Some(
-                    controllers.nonsipp.shares.routes.SharesListController
-                      .onPageLoad(srn, 1, mode)
-                  )
+                  fallbackCall = controllers.nonsipp.shares.routes.SharesListController.onPageLoad(srn, 1, mode)
                 )
               } yield submissionResult.getOrRecoverJourney(
                 _ =>

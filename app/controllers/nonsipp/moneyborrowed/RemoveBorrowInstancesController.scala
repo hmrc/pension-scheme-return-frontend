@@ -101,10 +101,8 @@ class RemoveBorrowInstancesController @Inject()(
                 redirectTo <- psrSubmissionService
                   .submitPsrDetails(
                     srn,
-                    optFallbackCall = Some(
-                      controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
-                        .onPageLoad(srn, 1, mode)
-                    )
+                    fallbackCall =
+                      controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, 1, mode)
                   )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                   .map {
                     case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

@@ -97,10 +97,9 @@ class RemoveEmployerContributionsController @Inject()(
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                   srn,
                   updatedAnswers,
-                  optFallbackCall = Some(
+                  fallbackCall =
                     controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
                       .onPageLoad(srn, 1, NormalMode)
-                  )
                 )
               } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
                 _ =>

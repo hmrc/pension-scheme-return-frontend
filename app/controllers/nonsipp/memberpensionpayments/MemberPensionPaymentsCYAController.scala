@@ -102,10 +102,8 @@ class MemberPensionPaymentsCYAController @Inject()(
       psrSubmissionService
         .submitPsrDetails(
           srn,
-          optFallbackCall = Some(
-            controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-              .onPageLoad(srn, index, mode)
-          )
+          fallbackCall = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
+            .onPageLoad(srn, index, mode)
         )
         .map {
           case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

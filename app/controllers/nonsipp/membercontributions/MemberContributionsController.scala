@@ -77,9 +77,8 @@ class MemberContributionsController @Inject()(
                 psrSubmissionService
                   .submitPsrDetails(
                     srn,
-                    optFallbackCall = Some(
+                    fallbackCall =
                       controllers.nonsipp.membercontributions.routes.MemberContributionsController.onPageLoad(srn, mode)
-                    )
                   )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                   .map {
                     case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

@@ -82,9 +82,8 @@ class UnregulatedOrConnectedBondsHeldController @Inject()(
               psrSubmissionService
                 .submitPsrDetails(
                   srn,
-                  optFallbackCall = Some(
+                  fallbackCall =
                     controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController.onPageLoad(srn, mode)
-                  )
                 )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                 .map {
                   case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

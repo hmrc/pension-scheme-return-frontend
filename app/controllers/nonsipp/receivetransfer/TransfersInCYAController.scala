@@ -112,9 +112,8 @@ class TransfersInCYAController @Inject()(
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
           srn,
           updatedUserAnswers,
-          optFallbackCall = Some(
+          fallbackCall =
             controllers.nonsipp.receivetransfer.routes.TransfersInCYAController.onPageLoad(srn, index, mode)
-          )
         )
       } yield submissionResult.getOrRecoverJourney(
         _ => Redirect(navigator.nextPage(TransfersInCYAPage(srn), mode, updatedUserAnswers))

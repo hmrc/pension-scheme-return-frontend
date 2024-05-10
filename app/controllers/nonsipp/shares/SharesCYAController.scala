@@ -181,10 +181,7 @@ class SharesCYAController @Inject()(
         redirectTo <- psrSubmissionService
           .submitPsrDetails(
             srn,
-            optFallbackCall = Some(
-              controllers.nonsipp.shares.routes.SharesCYAController
-                .onPageLoad(srn, index, mode)
-            )
+            fallbackCall = controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, mode)
           )
           .map {
             case None => controllers.routes.JourneyRecoveryController.onPageLoad()

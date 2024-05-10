@@ -100,10 +100,9 @@ class RemoveLandPropertyDisposalController @Inject()(
                 redirectTo <- psrSubmissionService
                   .submitPsrDetails(
                     srn,
-                    optFallbackCall = Some(
+                    fallbackCall =
                       controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
                         .onPageLoad(srn, 1)
-                    )
                   )(
                     implicitly,
                     implicitly,

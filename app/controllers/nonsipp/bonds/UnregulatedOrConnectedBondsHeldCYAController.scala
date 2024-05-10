@@ -103,9 +103,8 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
       psrSubmissionService
         .submitPsrDetails(
           srn,
-          optFallbackCall = Some(
+          fallbackCall =
             controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn, index, mode)
-          )
         )
         .map {
           case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

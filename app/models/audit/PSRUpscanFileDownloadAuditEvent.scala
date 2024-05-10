@@ -28,7 +28,7 @@ case class PSRUpscanFileDownloadAuditEvent(
   taxYear: DateRange,
   downloadStatus: String,
   downloadTimeInMilliSeconds: Long
-) extends AuditEvent {
+) extends BasicAuditEvent {
 
   override def auditType: String = "PensionSchemeReturnFileUpscanDownloadCheck"
 
