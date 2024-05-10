@@ -126,7 +126,7 @@ class PsrSubmissionService @Inject()(
                 fallbackCall =>
                   fallbackCall.url
               })
-            case Right(_) =>
+            case Right(()) =>
               auditService.sendExtendedEvent(buildAuditEvent(taxYear, loggedInUserNameOrBlank(request)))
               Future.unit
           }

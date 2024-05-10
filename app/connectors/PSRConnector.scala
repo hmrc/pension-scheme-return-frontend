@@ -53,7 +53,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
       )
       .map { response =>
         response.status match {
-          case NO_CONTENT => Right(Future.unit)
+          case NO_CONTENT => Right(())
           case _ =>
             Left(s"{${response.status}, ${response.json}}")
         }
