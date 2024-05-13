@@ -17,10 +17,15 @@
 package pages.nonsipp.membertransferout
 
 import utils.RefinedUtils.RefinedIntOps
+import utils.PageUtils.removePages
+import queries.Removable
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import models.UserAnswers
 import config.Refined.{Max300, Max5}
 import pages.QuestionPage
+
+import scala.util.Try
 
 case class ReceivingSchemeNamePage(srn: Srn, index: Max300, transferIndex: Max5) extends QuestionPage[String] {
 
@@ -28,6 +33,20 @@ case class ReceivingSchemeNamePage(srn: Srn, index: Max300, transferIndex: Max5)
     Paths.memberTransfersOut \ toString \ index.arrayIndex.toString \ transferIndex.arrayIndex.toString
 
   override def toString: String = "schemeName"
+
+  override def cleanup(value: Option[String], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value, userAnswers.get(this)) match {
+      case (None, _) =>
+        removePages(userAnswers, pages(srn))
+      case _ => Try(userAnswers)
+    }
+
+  private def pages(srn: Srn): List[Removable[_]] =
+    List(
+      ReceivingSchemeTypePage(srn, index, transferIndex),
+      WhenWasTransferMadePage(srn, index, transferIndex),
+      ReportAnotherTransferOutPage(srn, index, transferIndex)
+    )
 }
 
 case class ReceivingSchemeNamePages(srn: Srn, index: Max300) extends QuestionPage[Map[String, String]] {

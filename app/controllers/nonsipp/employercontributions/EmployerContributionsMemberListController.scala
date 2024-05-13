@@ -116,7 +116,7 @@ class EmployerContributionsMemberListController @Inject()(
         case Left(_) => List.empty
       }
 
-      if (memberMap.size > Constants.maxSchemeMembers) {
+      if (optionList.flatten.size > Constants.maxSchemeMembers) {
         Future.successful(
           Redirect(
             navigator.nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)

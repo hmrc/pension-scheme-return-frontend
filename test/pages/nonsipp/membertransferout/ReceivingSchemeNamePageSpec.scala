@@ -16,12 +16,19 @@
 
 package pages.nonsipp.membertransferout
 
-import config.Refined.{OneTo300, OneTo5}
+import config.Refined.{Max300, Max5, OneTo300, OneTo5}
+import controllers.TestValues
+import eu.timepit.refined.api.Refined
+import utils.UserAnswersUtils.UserAnswersOps
 import eu.timepit.refined.refineMV
 import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
 import pages.behaviours.PageBehaviours
+import pages.nonsipp.memberdetails.MemberDetailsPage
 
-class ReceivingSchemeNamePageSpec extends PageBehaviours {
+class ReceivingSchemeNamePageSpec extends PageBehaviours with TestValues {
+
+  private val memberIndex = refineMV[Max300.Refined](1)
+  val index: Refined[Int, Max5.Refined] = refineMV[Max5.Refined](1)
 
   "ReceivingSchemeNamePage" - {
 
@@ -33,5 +40,18 @@ class ReceivingSchemeNamePageSpec extends PageBehaviours {
     beSettable[String](ReceivingSchemeNamePage(srnGen.sample.value, index, transferIndex))
 
     beRemovable[String](ReceivingSchemeNamePage(srnGen.sample.value, index, transferIndex))
+  }
+
+  "cleanup other fields when removed with index-1" in {
+    val userAnswers = defaultUserAnswers
+      .unsafeSet(MemberDetailsPage(srn, memberIndex), memberDetails)
+      .unsafeSet(WhenWasTransferMadePage(srn, memberIndex, index), localDate)
+      .unsafeSet(ReportAnotherTransferOutPage(srn, memberIndex, index), false)
+
+    val result = userAnswers.remove(ReceivingSchemeNamePage(srn, memberIndex, index)).success.value
+
+    result.get(WhenWasTransferMadePage(srn, memberIndex, index)) must be(empty)
+    result.get(ReportAnotherTransferOutPage(srn, memberIndex, index)) must be(empty)
+    result.get(ReceivingSchemeTypePage(srn, memberIndex, index)) must be(empty)
   }
 }

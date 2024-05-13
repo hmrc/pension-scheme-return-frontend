@@ -16,20 +16,31 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import services.{PsrSubmissionService, SaveService, UploadService}
 import pages.nonsipp.memberdetails._
-import viewmodels.implicits._
 import play.api.mvc._
 import config.Refined.OneTo300
+import pages.nonsipp.receivetransfer._
 import navigation.Navigator
 import pages.nonsipp.memberdetails.upload.FileUploadSuccessPage
+import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsMemberListPage}
 import models._
+import pages.nonsipp.employercontributions.{
+  AllEmployerContributionsProgress,
+  EmployerContributionsMemberListPage,
+  EmployerContributionsSectionStatus
+}
+import services.{PsrSubmissionService, SaveService, UploadService}
+import viewmodels.implicits._
+import pages.nonsipp.membercontributions.MemberContributionsListPage
 import views.html.ContentPageView
 import models.SchemeId.Srn
+import pages.nonsipp.memberpensionpayments.MemberPensionPaymentsListPage
 import controllers.actions._
 import eu.timepit.refined.refineV
+import pages.nonsipp.membertransferout.{TransferOutMemberListPage, TransfersOutJourneyStatus}
 import play.api.i18n._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import pages.nonsipp.memberpayments.MemberPaymentsPage
 import viewmodels.DisplayMessage._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel, MemberState}
 import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
@@ -93,7 +104,21 @@ class FileUploadSuccessController @Inject()(
       UserAnswers.remove(DoesMemberHaveNinoPages(srn)),
       UserAnswers.remove(MemberDetailsNinoPages(srn)),
       UserAnswers.remove(NoNinoPages(srn)),
-      UserAnswers.remove(MemberStatuses(srn))
+      UserAnswers.remove(MemberStatuses(srn)),
+      UserAnswers.remove(MemberPaymentsPage),
+      UserAnswers.remove(AllWhenWasTransferMadePages(srn)),
+      UserAnswers.remove(AllDidTransferIncludeAssetPages(srn)),
+      UserAnswers.remove(EmployerContributionsSectionStatus(srn)),
+      UserAnswers.remove(AllEmployerContributionsProgress(srn)),
+      UserAnswers.remove(EmployerContributionsMemberListPage(srn)),
+      UserAnswers.remove(MemberContributionsListPage(srn)),
+      UserAnswers.remove(TransfersInJourneyStatus(srn)),
+      UserAnswers.remove(TransferReceivedMemberListPage(srn)),
+      UserAnswers.remove(TransfersOutJourneyStatus(srn)),
+      UserAnswers.remove(TransferOutMemberListPage(srn)),
+      UserAnswers.remove(MemberPensionPaymentsListPage(srn)),
+      UserAnswers.remove(SurrenderedBenefitsJourneyStatus(srn)),
+      UserAnswers.remove(SurrenderedBenefitsMemberListPage(srn))
     )
 
     val insertions = memberDetails.flatMap { details =>

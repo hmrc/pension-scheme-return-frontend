@@ -22,7 +22,7 @@ import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models.{ConditionalYesNo, Crn}
-import viewmodels.models.SectionStatus
+import viewmodels.models.{SectionJourneyStatus, SectionStatus}
 import pages.behaviours.PageBehaviours
 
 class EmployerNamePageSpec extends PageBehaviours with TestValues {
@@ -50,6 +50,7 @@ class EmployerNamePageSpec extends PageBehaviours with TestValues {
       .unsafeSet(TotalEmployerContributionPage(srn, memberIndex, indexOne), money)
       .unsafeSet(EmployerCompanyCrnPage(srn, memberIndex, indexOne), ConditionalYesNo.yes[String, Crn](crn))
       .unsafeSet(ContributionsFromAnotherEmployerPage(srn, memberIndex, indexOne), true)
+      .unsafeSet(EmployerContributionsProgress(srn, memberIndex, indexOne), SectionJourneyStatus.Completed)
 
     val result = userAnswers.remove(EmployerNamePage(srn, memberIndex, indexOne)).success.value
 
@@ -58,6 +59,7 @@ class EmployerNamePageSpec extends PageBehaviours with TestValues {
     result.get(EmployerCompanyCrnPage(srn, memberIndex, indexOne)) must be(empty)
     result.get(ContributionsFromAnotherEmployerPage(srn, memberIndex, indexOne)) must be(empty)
     result.get(EmployerContributionsPage(srn)) must be(Some(true)) // this stays as per agreement with design
+    result.get(EmployerContributionsProgress(srn, memberIndex, indexOne)) must be(empty)
   }
 
   "cleanup other fields when removed with index bigger than 1" in {

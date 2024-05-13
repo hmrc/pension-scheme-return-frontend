@@ -30,3 +30,10 @@ case class WhenWasTransferReceivedPage(srn: Srn, index: Max300, secondaryIndex: 
 
   override def toString: String = "dateOfTransfer"
 }
+
+case class AllWhenWasTransferMadePages(srn: Srn) extends QuestionPage[Map[String, Map[String, LocalDate]]] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "dateOfTransfer"
+}
