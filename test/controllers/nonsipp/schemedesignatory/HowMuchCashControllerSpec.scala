@@ -20,7 +20,7 @@ import services.SchemeDateService
 import pages.nonsipp.schemedesignatory.HowMuchCashPage
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
-import views.html.MoneyView
+import views.html.MultipleQuestionView
 import utils.Transform._
 import play.api.libs.json.JsPath
 import forms.MoneyFormProvider
@@ -60,14 +60,14 @@ class HowMuchCashControllerSpec extends ControllerBaseSpec {
     lazy val onSubmit = routes.HowMuchCashController.onSubmit(srn, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      val view = injected[MoneyView]
-      view(viewModel(form))
+      val view = injected[MultipleQuestionView]
+      view(form, viewModel(form))
     })
 
     act.like(renderPrePopView(onPageLoad, HowMuchCashPage(srn, NormalMode), moneyInPeriodData) {
       implicit app => implicit request =>
-        val view = injected[MoneyView]
-        view(viewModel(form.fill(moneyInPeriodData.from[(Money, Money)])))
+        val view = injected[MultipleQuestionView]
+        view(form.fill(moneyInPeriodData.from[(Money, Money)]), viewModel(form))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))

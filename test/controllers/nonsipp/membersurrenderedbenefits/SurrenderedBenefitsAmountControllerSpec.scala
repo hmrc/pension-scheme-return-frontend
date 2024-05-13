@@ -21,10 +21,10 @@ import config.Refined.Max300
 import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import eu.timepit.refined.refineMV
+import forms.MoneyFormProvider
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
 import models.NormalMode
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountController.{form, viewModel}
-import forms.mappings.errors.MoneyFormErrorProvider
 
 class SurrenderedBenefitsAmountControllerSpec extends ControllerBaseSpec {
 
@@ -40,11 +40,12 @@ class SurrenderedBenefitsAmountControllerSpec extends ControllerBaseSpec {
       renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
         injected[MoneyView]
           .apply(
+            form(injected[MoneyFormProvider]),
             viewModel(
               srn,
               memberDetails.fullName,
               index,
-              form(injected[MoneyFormErrorProvider]),
+              form(injected[MoneyFormProvider]),
               NormalMode
             )
           )
@@ -55,11 +56,12 @@ class SurrenderedBenefitsAmountControllerSpec extends ControllerBaseSpec {
       renderPrePopView(onPageLoad, SurrenderedBenefitsAmountPage(srn, index), money, userAnswers) {
         implicit app => implicit request =>
           injected[MoneyView].apply(
+            form(injected[MoneyFormProvider]).fill(money),
             viewModel(
               srn,
               memberDetails.fullName,
               index,
-              form(injected[MoneyFormErrorProvider]).fill(money),
+              form(injected[MoneyFormProvider]),
               NormalMode
             )
           )

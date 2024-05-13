@@ -21,9 +21,9 @@ import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import eu.timepit.refined.refineMV
-import controllers.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetController._
 import models.NormalMode
-import forms.mappings.errors.MoneyFormErrorProvider
+import controllers.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetController._
+import forms.MoneyFormProvider
 
 class TotalConsiderationSaleAssetControllerSpec extends ControllerBaseSpec {
 
@@ -41,11 +41,12 @@ class TotalConsiderationSaleAssetControllerSpec extends ControllerBaseSpec {
       renderView(onPageLoad) { implicit app => implicit request =>
         injected[MoneyView]
           .apply(
+            form(injected[MoneyFormProvider]),
             viewModel(
               srn,
               assetIndex,
               disposalIndex,
-              form(injected[MoneyFormErrorProvider]),
+              form(injected[MoneyFormProvider]),
               NormalMode
             )
           )
@@ -56,11 +57,12 @@ class TotalConsiderationSaleAssetControllerSpec extends ControllerBaseSpec {
       renderPrePopView(onPageLoad, TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex), money) {
         implicit app => implicit request =>
           injected[MoneyView].apply(
+            form(injected[MoneyFormProvider]).fill(money),
             viewModel(
               srn,
               assetIndex,
               disposalIndex,
-              form(injected[MoneyFormErrorProvider]).fill(money),
+              form(injected[MoneyFormProvider]),
               NormalMode
             )
           )

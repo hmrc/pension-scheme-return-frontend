@@ -22,9 +22,9 @@ import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.{HowManySharesRedeemedPage, TotalConsiderationSharesRedeemedPage}
-import controllers.nonsipp.sharesdisposal.TotalConsiderationSharesRedeemedController._
 import models.NormalMode
-import forms.mappings.errors.MoneyFormErrorProvider
+import controllers.nonsipp.sharesdisposal.TotalConsiderationSharesRedeemedController._
+import forms.MoneyFormProvider
 
 class TotalConsiderationSharesRedeemedControllerSpec extends ControllerBaseSpec {
 
@@ -47,13 +47,14 @@ class TotalConsiderationSharesRedeemedControllerSpec extends ControllerBaseSpec 
       renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
         injected[MoneyView]
           .apply(
+            form(injected[MoneyFormProvider]),
             viewModel(
               srn,
               shareIndex,
               disposalIndex,
               totalShares,
               companyName,
-              form(injected[MoneyFormErrorProvider]),
+              form(injected[MoneyFormProvider]),
               NormalMode
             )
           )
@@ -68,13 +69,14 @@ class TotalConsiderationSharesRedeemedControllerSpec extends ControllerBaseSpec 
         userAnswers
       ) { implicit app => implicit request =>
         injected[MoneyView].apply(
+          form(injected[MoneyFormProvider]).fill(money),
           viewModel(
             srn,
             shareIndex,
             disposalIndex,
             totalShares,
             companyName,
-            form(injected[MoneyFormErrorProvider]).fill(money),
+            form(injected[MoneyFormProvider]),
             NormalMode
           )
         )

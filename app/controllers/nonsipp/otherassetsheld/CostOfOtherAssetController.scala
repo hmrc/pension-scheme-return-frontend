@@ -53,16 +53,16 @@ class CostOfOtherAssetController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  private def form = CostOfOtherAssetController.form(formProvider)
+  private def form: Form[Money] = CostOfOtherAssetController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
-          viewModel(srn, index, form.fromUserAnswers(CostOfOtherAssetPage(srn, index)), mode)
+          form.fromUserAnswers(CostOfOtherAssetPage(srn, index)),
+          viewModel(srn, index, form, mode)
         )
       )
-
   }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
@@ -74,7 +74,8 @@ class CostOfOtherAssetController @Inject()(
             Future.successful(
               BadRequest(
                 view(
-                  CostOfOtherAssetController.viewModel(srn, index, formWithErrors, mode)
+                  formWithErrors,
+                  CostOfOtherAssetController.viewModel(srn, index, form, mode)
                 )
               )
             ),

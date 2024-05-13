@@ -62,14 +62,27 @@ class DatePeriodLoanControllerSpec extends ControllerBaseSpec {
     val taxYear = Some(Left(dateRange))
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[MultipleQuestionView].apply(viewModel(srn, index, schemeName, NormalMode, form(date)))
+      injected[MultipleQuestionView].apply(
+        form(date),
+        viewModel(srn, index, schemeName, NormalMode, form(date))
+      )
     }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear)))
 
-    act.like(renderPrePopView(onPageLoad, DatePeriodLoanPage(srn, index), (date, money, 12)) {
-      implicit app => implicit request =>
+    act.like(
+      renderPrePopView(
+        onPageLoad,
+        DatePeriodLoanPage(srn, index),
+        (date, money, 12)
+      ) { implicit app => implicit request =>
         val preparedForm = form(date).fill((date, money, 12))
-        injected[MultipleQuestionView].apply(viewModel(srn, index, schemeName, NormalMode, preparedForm))
-    }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear)))
+
+        injected[MultipleQuestionView].apply(
+          preparedForm,
+          viewModel(srn, index, schemeName, NormalMode, form(date))
+        )
+
+      }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 

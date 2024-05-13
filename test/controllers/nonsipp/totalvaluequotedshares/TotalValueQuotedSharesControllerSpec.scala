@@ -57,12 +57,12 @@ class TotalValueQuotedSharesControllerSpec extends ControllerBaseSpec {
     lazy val onSubmit = routes.TotalValueQuotedSharesController.onSubmit(srn)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[MoneyView].apply(viewModel(srn, schemeName, form, schemeDatePeriod))
+      injected[MoneyView].apply(form, viewModel(srn, schemeName, form, schemeDatePeriod))
     })
 
     act.like(renderPrePopView(onPageLoad, TotalValueQuotedSharesPage(srn), validMoney) {
       implicit app => implicit request =>
-        injected[MoneyView].apply(viewModel(srn, schemeName, form.fill(validMoney), schemeDatePeriod))
+        injected[MoneyView].apply(form.fill(validMoney), viewModel(srn, schemeName, form, schemeDatePeriod))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))

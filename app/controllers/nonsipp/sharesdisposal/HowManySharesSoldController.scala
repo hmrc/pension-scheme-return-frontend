@@ -63,13 +63,14 @@ class HowManySharesSoldController @Inject()(
       request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).getOrRecoverJourney { companyName =>
         Ok(
           view(
+            form.fromUserAnswers(HowManySharesSoldPage(srn, shareIndex, disposalIndex)),
             viewModel(
               srn,
               shareIndex,
               disposalIndex,
               companyName,
               mode,
-              form.fromUserAnswers(HowManySharesSoldPage(srn, shareIndex, disposalIndex))
+              form
             )
           )
         )
@@ -86,7 +87,8 @@ class HowManySharesSoldController @Inject()(
               Future.successful(
                 BadRequest(
                   view(
-                    viewModel(srn, shareIndex, disposalIndex, companyName, mode, formWithErrors)
+                    formWithErrors,
+                    viewModel(srn, shareIndex, disposalIndex, companyName, mode, form)
                   )
                 )
               ),

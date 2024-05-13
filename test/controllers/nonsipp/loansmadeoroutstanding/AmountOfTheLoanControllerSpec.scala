@@ -20,7 +20,7 @@ import services.SchemeDateService
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
-import views.html.MoneyView
+import views.html.MultipleQuestionView
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.{DateRange, NormalMode}
@@ -60,14 +60,14 @@ class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
     lazy val onSubmit = routes.AmountOfTheLoanController.onSubmit(srn, index, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      val view = injected[MoneyView]
-      view(viewModel(form))
+      val view = injected[MultipleQuestionView]
+      view(form, viewModel(form))
     })
 
     act.like(renderPrePopView(onPageLoad, AmountOfTheLoanPage(srn, index), (money, money, money)) {
       implicit app => implicit request =>
-        val view = injected[MoneyView]
-        view(viewModel(form.fill((money, money, money))))
+        val view = injected[MultipleQuestionView]
+        view(form.fill((money, money, money)), viewModel(form))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))

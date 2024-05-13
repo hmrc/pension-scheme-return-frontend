@@ -42,6 +42,7 @@ class TotalMemberContributionControllerSpec extends ControllerBaseSpec {
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[MoneyView]
         .apply(
+          form(injected[MoneyFormProvider]),
           viewModel(
             srn,
             index,
@@ -56,11 +57,12 @@ class TotalMemberContributionControllerSpec extends ControllerBaseSpec {
       renderPrePopView(onPageLoad, TotalMemberContributionPage(srn, index), money, userAnswers) {
         implicit app => implicit request =>
           injected[MoneyView].apply(
+            form(injected[MoneyFormProvider]).fill(money),
             viewModel(
               srn,
               index,
               memberDetails.fullName,
-              form(injected[MoneyFormProvider]).fill(money),
+              form(injected[MoneyFormProvider]),
               NormalMode
             )
           )

@@ -62,10 +62,10 @@ class BorrowedAmountAndRateController @Inject()(
           index,
           mode,
           request.schemeDetails.schemeName,
-          request.userAnswers.fillForm(BorrowedAmountAndRatePage(srn, index), form)
+          form
         )
 
-        Ok(view(viewModel))
+        Ok(view(request.userAnswers.fillForm(BorrowedAmountAndRatePage(srn, index), form), viewModel))
       }
   }
 
@@ -79,9 +79,9 @@ class BorrowedAmountAndRateController @Inject()(
           formWithErrors => {
             val viewModel =
               BorrowedAmountAndRateController
-                .viewModel(srn, index, mode, request.schemeDetails.schemeName, formWithErrors)
+                .viewModel(srn, index, mode, request.schemeDetails.schemeName, form)
 
-            Future.successful(BadRequest(view(viewModel)))
+            Future.successful(BadRequest(view(formWithErrors, viewModel)))
           },
           value =>
             for {

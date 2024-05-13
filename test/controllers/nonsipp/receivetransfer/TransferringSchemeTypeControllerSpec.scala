@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.recievetransfer
+package controllers.nonsipp.receivetransfer
 
 import config.Refined.{Max300, Max5}
 import controllers.ControllerBaseSpec

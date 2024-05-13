@@ -53,13 +53,14 @@ class IncomeFromBondsController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  private def form = IncomeFromBondsController.form(formProvider)
+  private def form: Form[Money] = IncomeFromBondsController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
-          viewModel(srn, index, form.fromUserAnswers(IncomeFromBondsPage(srn, index)), mode)
+          form.fromUserAnswers(IncomeFromBondsPage(srn, index)),
+          viewModel(srn, index, form, mode)
         )
       )
 
@@ -74,7 +75,8 @@ class IncomeFromBondsController @Inject()(
             Future.successful(
               BadRequest(
                 view(
-                  IncomeFromBondsController.viewModel(srn, index, formWithErrors, mode)
+                  formWithErrors,
+                  IncomeFromBondsController.viewModel(srn, index, form, mode)
                 )
               )
             ),

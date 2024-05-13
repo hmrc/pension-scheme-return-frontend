@@ -60,6 +60,7 @@ class LandOrPropertyLeaseDetailsControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, userAnswersWithAddress) { implicit app => implicit request =>
       injected[MultipleQuestionView].apply(
+        form(localDate),
         viewModel(srn, index, address.addressLine1, form(localDate), NormalMode)
       )
     }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear)))
@@ -72,7 +73,8 @@ class LandOrPropertyLeaseDetailsControllerSpec extends ControllerBaseSpec {
         userAnswersWithAddress
       ) { implicit app => implicit request =>
         injected[MultipleQuestionView].apply(
-          viewModel(srn, index, address.addressLine1, form(localDate).fill((leaseName, money, localDate)), NormalMode)
+          form(localDate).fill((leaseName, money, localDate)),
+          viewModel(srn, index, address.addressLine1, form(localDate), NormalMode)
         )
       }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
     )

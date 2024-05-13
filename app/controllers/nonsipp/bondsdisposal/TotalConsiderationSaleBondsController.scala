@@ -21,9 +21,10 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
 import config.Constants.{maxTotalConsiderationAmount, minTotalConsiderationAmount}
 import controllers.actions.IdentifyAndRequireData
+import forms.MoneyFormProvider
 import models.{Mode, Money}
 import play.api.data.Form
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
+import forms.mappings.errors.MoneyFormErrors
 import config.Refined.{Max50, Max5000}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import views.html.MoneyView
@@ -44,7 +45,7 @@ class TotalConsiderationSaleBondsController @Inject()(
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
-  formProvider: MoneyFormErrorProvider,
+  formProvider: MoneyFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: MoneyView
 )(implicit ec: ExecutionContext)
@@ -57,7 +58,7 @@ class TotalConsiderationSaleBondsController @Inject()(
       val preparedForm =
         request.userAnswers.fillForm(TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex), form)
 
-      Ok(view(viewModel(srn, bondIndex, disposalIndex, preparedForm, mode)))
+      Ok(view(preparedForm, viewModel(srn, bondIndex, disposalIndex, form, mode)))
     }
 
   def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
@@ -68,7 +69,10 @@ class TotalConsiderationSaleBondsController @Inject()(
           formWithErrors => {
             Future.successful(
               BadRequest(
-                view(viewModel(srn, bondIndex, disposalIndex, formWithErrors, mode))
+                view(
+                  formWithErrors,
+                  viewModel(srn, bondIndex, disposalIndex, form, mode)
+                )
               )
             )
           },
@@ -88,7 +92,7 @@ class TotalConsiderationSaleBondsController @Inject()(
 }
 
 object TotalConsiderationSaleBondsController {
-  def form(formProvider: MoneyFormErrorProvider): Form[Money] = formProvider(
+  def form(formProvider: MoneyFormProvider): Form[Money] = formProvider(
     MoneyFormErrors(
       requiredKey = "bondsDisposal.totalConsiderationBondsSold.error.required",
       nonNumericKey = "bondsDisposal.totalConsiderationBondsSold.error.invalid.characters",

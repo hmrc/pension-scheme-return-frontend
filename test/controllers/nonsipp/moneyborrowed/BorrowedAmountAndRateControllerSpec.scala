@@ -40,13 +40,19 @@ class BorrowedAmountAndRateControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[MultipleQuestionView]
-      view(viewModel(BorrowedAmountAndRateController.form()))
+      view(
+        BorrowedAmountAndRateController.form(),
+        viewModel(BorrowedAmountAndRateController.form())
+      )
     })
 
     act.like(renderPrePopView(onPageLoad, BorrowedAmountAndRatePage(srn, index), (money, percentage)) {
       implicit app => implicit request =>
         val view = injected[MultipleQuestionView]
-        view(viewModel(BorrowedAmountAndRateController.form().fill((money, percentage))))
+        view(
+          BorrowedAmountAndRateController.form().fill((money, percentage)),
+          viewModel(BorrowedAmountAndRateController.form())
+        )
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))

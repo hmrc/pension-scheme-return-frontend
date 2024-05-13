@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.recievetransfer
+package controllers.nonsipp.receivetransfer
 
 import controllers.nonsipp.receivetransfer.routes
 import controllers.ControllerBaseSpec

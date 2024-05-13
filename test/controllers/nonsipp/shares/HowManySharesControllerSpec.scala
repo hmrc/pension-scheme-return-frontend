@@ -37,16 +37,36 @@ class HowManySharesControllerSpec extends ControllerBaseSpec {
     lazy val onPageLoad = routes.HowManySharesController.onPageLoad(srn, index, NormalMode)
     lazy val onSubmit = routes.HowManySharesController.onSubmit(srn, index, NormalMode)
 
-    act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
-      injected[IntView]
-        .apply(viewModel(srn, index, companyName, NormalMode, form(injected[IntFormProvider])))
-    })
+    act.like(
+      renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
+        injected[IntView].apply(
+          form(injected[IntFormProvider]),
+          viewModel(
+            srn,
+            index,
+            companyName,
+            NormalMode,
+            form(injected[IntFormProvider])
+          )
+        )
+      }
+    )
 
-    act.like(renderPrePopView(onPageLoad, HowManySharesPage(srn, index), totalShares, populatedUserAnswers) {
-      implicit app => implicit request =>
-        injected[IntView]
-          .apply(viewModel(srn, index, companyName, NormalMode, form(injected[IntFormProvider]).fill(totalShares)))
-    })
+    act.like(
+      renderPrePopView(onPageLoad, HowManySharesPage(srn, index), totalShares, populatedUserAnswers) {
+        implicit app => implicit request =>
+          injected[IntView].apply(
+            form(injected[IntFormProvider]).fill(totalShares),
+            viewModel(
+              srn,
+              index,
+              companyName,
+              NormalMode,
+              form(injected[IntFormProvider])
+            )
+          )
+      }
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 

@@ -29,7 +29,7 @@ import navigation.Navigator
 import forms.MoneyFormProvider
 import cats.{Id, Monad}
 import forms.mappings.errors.MoneyFormErrors
-import views.html.MoneyView
+import views.html.MultipleQuestionView
 import models.SchemeId.Srn
 import utils.DateTimeUtils.localDateShow
 import models._
@@ -49,7 +49,7 @@ class ValueOfAssetsController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: MoneyView,
+  view: MultipleQuestionView,
   formProvider: MoneyFormProvider,
   saveService: SaveService,
   schemeDateService: SchemeDateService
@@ -65,10 +65,10 @@ class ValueOfAssetsController @Inject()(
         mode,
         request.schemeDetails.schemeName,
         period,
-        request.userAnswers.fillForm(ValueOfAssetsPage(srn, mode), form)
+        form
       )
 
-      Ok(view(viewModel))
+      Ok(view(request.userAnswers.fillForm(ValueOfAssetsPage(srn, mode), form), viewModel))
     }
   }
 
@@ -81,9 +81,9 @@ class ValueOfAssetsController @Inject()(
         .fold(
           formWithErrors => {
             val viewModel =
-              ValueOfAssetsController.viewModel(srn, mode, request.schemeDetails.schemeName, period, formWithErrors)
+              ValueOfAssetsController.viewModel(srn, mode, request.schemeDetails.schemeName, period, form)
 
-            Future.successful(BadRequest(view(viewModel)))
+            Future.successful(BadRequest(view(formWithErrors, viewModel)))
           },
           value =>
             for {

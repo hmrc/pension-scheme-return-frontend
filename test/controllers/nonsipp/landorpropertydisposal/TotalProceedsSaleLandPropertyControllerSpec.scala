@@ -42,6 +42,7 @@ class TotalProceedsSaleLandPropertyControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, updatedUserAnswers) { implicit app => implicit request =>
       injected[MoneyView].apply(
+        form(injected[MoneyFormProvider]),
         viewModel(srn, index, disposalIndex, address.addressLine1, form(injected[MoneyFormProvider]), NormalMode)
       )
     })
@@ -54,12 +55,13 @@ class TotalProceedsSaleLandPropertyControllerSpec extends ControllerBaseSpec {
         updatedUserAnswers
       ) { implicit app => implicit request =>
         injected[MoneyView].apply(
+          form(injected[MoneyFormProvider]).fill(money),
           viewModel(
             srn,
             index,
             disposalIndex,
             address.addressLine1,
-            form(injected[MoneyFormProvider]).fill(money),
+            form(injected[MoneyFormProvider]),
             NormalMode
           )
         )

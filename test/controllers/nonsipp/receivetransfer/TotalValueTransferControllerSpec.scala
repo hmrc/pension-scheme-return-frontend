@@ -45,6 +45,7 @@ class TotalValueTransferControllerSpec extends ControllerBaseSpec {
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[MoneyView]
         .apply(
+          form(injected[MoneyFormProvider]),
           viewModel(
             srn,
             index,
@@ -61,13 +62,14 @@ class TotalValueTransferControllerSpec extends ControllerBaseSpec {
       renderPrePopView(onPageLoad, TotalValueTransferPage(srn, index, secondaryIndex), money, userAnswers) {
         implicit app => implicit request =>
           injected[MoneyView].apply(
+            form(injected[MoneyFormProvider]).fill(money),
             viewModel(
               srn,
               index,
               secondaryIndex,
               memberDetails.fullName,
               transferringSchemeName,
-              form(injected[MoneyFormProvider]).fill(money),
+              form(injected[MoneyFormProvider]),
               NormalMode
             )
           )

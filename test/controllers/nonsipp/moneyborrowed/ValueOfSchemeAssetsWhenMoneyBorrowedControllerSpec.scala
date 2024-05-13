@@ -21,9 +21,9 @@ import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import eu.timepit.refined.refineMV
+import forms.MoneyFormProvider
 import models.NormalMode
 import pages.nonsipp.moneyborrowed.{ValueOfSchemeAssetsWhenMoneyBorrowedPage, WhenBorrowedPage}
-import forms.mappings.errors.MoneyFormErrorProvider
 
 import java.time.LocalDate
 import java.util.Locale
@@ -53,7 +53,8 @@ class ValueOfSchemeAssetsWhenMoneyBorrowedControllerSpec extends ControllerBaseS
 
     act.like(renderView(onPageLoad, updatedUserAnswers) { implicit app => implicit request =>
       injected[MoneyView].apply(
-        viewModel(srn, index, schemeName, formatDate(localDate), form(injected[MoneyFormErrorProvider]), NormalMode)
+        form(injected[MoneyFormProvider]),
+        viewModel(srn, index, schemeName, formatDate(localDate), form(injected[MoneyFormProvider]), NormalMode)
       )
     })
 
@@ -61,12 +62,13 @@ class ValueOfSchemeAssetsWhenMoneyBorrowedControllerSpec extends ControllerBaseS
       renderPrePopView(onPageLoad, ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index), money, updatedUserAnswers) {
         implicit app => implicit request =>
           injected[MoneyView].apply(
+            form(injected[MoneyFormProvider]).fill(money),
             viewModel(
               srn,
               index,
               schemeName,
               formatDate(localDate),
-              form(injected[MoneyFormErrorProvider]).fill(money),
+              form(injected[MoneyFormProvider]),
               NormalMode
             )
           )

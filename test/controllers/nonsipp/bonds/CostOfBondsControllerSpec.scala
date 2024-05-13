@@ -37,6 +37,7 @@ class CostOfBondsControllerSpec extends ControllerBaseSpec {
     act.like(renderView(onPageLoad, defaultUserAnswers) { implicit app => implicit request =>
       injected[MoneyView]
         .apply(
+          form(injected[MoneyFormProvider]),
           viewModel(
             srn,
             index,
@@ -50,10 +51,11 @@ class CostOfBondsControllerSpec extends ControllerBaseSpec {
       renderPrePopView(onPageLoad, CostOfBondsPage(srn, index), money, defaultUserAnswers) {
         implicit app => implicit request =>
           injected[MoneyView].apply(
+            form(injected[MoneyFormProvider]).fill(money),
             viewModel(
               srn,
               index,
-              form(injected[MoneyFormProvider]).fill(money),
+              form(injected[MoneyFormProvider]),
               NormalMode
             )
           )

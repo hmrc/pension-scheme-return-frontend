@@ -37,16 +37,31 @@ class InterestOnLoanControllerSpec extends ControllerBaseSpec {
     lazy val onPageLoad = routes.InterestOnLoanController.onPageLoad(srn, index, NormalMode)
     lazy val onSubmit = routes.InterestOnLoanController.onSubmit(srn, index, NormalMode)
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      val view = injected[MultipleQuestionView]
-      view(viewModel(InterestOnLoanController.form()))
-    })
-
-    act.like(renderPrePopView(onPageLoad, InterestOnLoanPage(srn, index), (money, percentage, money)) {
-      implicit app => implicit request =>
+    act.like(
+      renderView(onPageLoad) { implicit app => implicit request =>
         val view = injected[MultipleQuestionView]
-        view(viewModel(InterestOnLoanController.form().fill((money, percentage, money))))
-    })
+
+        view(
+          InterestOnLoanController.form(),
+          viewModel(InterestOnLoanController.form())
+        )
+      }
+    )
+
+    act.like(
+      renderPrePopView(
+        onPageLoad,
+        InterestOnLoanPage(srn, index),
+        (money, percentage, money)
+      ) { implicit app => implicit request =>
+        val view = injected[MultipleQuestionView]
+
+        view(
+          InterestOnLoanController.form().fill((money, percentage, money)),
+          viewModel(InterestOnLoanController.form())
+        )
+      }
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

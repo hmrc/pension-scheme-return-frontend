@@ -24,9 +24,10 @@ import controllers.PSRController
 import config.Constants
 import controllers.actions._
 import navigation.Navigator
+import forms.MoneyFormProvider
 import models.{Mode, Money}
 import play.api.data.Form
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
+import forms.mappings.errors.MoneyFormErrors
 import config.Refined.Max5000
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import views.html.MoneyView
@@ -48,7 +49,7 @@ class ValueOfSchemeAssetsWhenMoneyBorrowedController @Inject()(
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
-  formProvider: MoneyFormErrorProvider,
+  formProvider: MoneyFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: MoneyView
 )(implicit ec: ExecutionContext)
@@ -61,7 +62,7 @@ class ValueOfSchemeAssetsWhenMoneyBorrowedController @Inject()(
       request.usingAnswer(WhenBorrowedPage(srn, index)).sync { date =>
         val preparedForm = request.userAnswers.fillForm(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index), form)
 
-        Ok(view(viewModel(srn, index, request.schemeDetails.schemeName, formatDate(date), preparedForm, mode)))
+        Ok(view(preparedForm, viewModel(srn, index, request.schemeDetails.schemeName, formatDate(date), form, mode)))
       }
   }
 
@@ -84,7 +85,10 @@ class ValueOfSchemeAssetsWhenMoneyBorrowedController @Inject()(
             request.usingAnswer(WhenBorrowedPage(srn, index)).async { date =>
               Future.successful(
                 BadRequest(
-                  view(viewModel(srn, index, request.schemeDetails.schemeName, formatDate(date), formWithErrors, mode))
+                  view(
+                    formWithErrors,
+                    viewModel(srn, index, request.schemeDetails.schemeName, formatDate(date), form, mode)
+                  )
                 )
               )
             }
@@ -104,7 +108,7 @@ class ValueOfSchemeAssetsWhenMoneyBorrowedController @Inject()(
 }
 
 object ValueOfSchemeAssetsWhenMoneyBorrowedController {
-  def form(formProvider: MoneyFormErrorProvider): Form[Money] = formProvider(
+  def form(formProvider: MoneyFormProvider): Form[Money] = formProvider(
     MoneyFormErrors(
       "valueOfSchemeAssetsWhenMoneyBorrowed.error.required",
       "valueOfSchemeAssetsWhenMoneyBorrowed.error.invalid",

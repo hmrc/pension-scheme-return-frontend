@@ -26,7 +26,7 @@ import config.Constants.maxMembers
 import controllers.actions._
 import forms.IntFormProvider
 import forms.mappings.errors.IntFormErrors
-import views.html.IntView
+import views.html.MultipleQuestionView
 import models.SchemeId.Srn
 import controllers.nonsipp.schemedesignatory.HowManyMembersController._
 import navigation.Navigator
@@ -51,7 +51,7 @@ class HowManyMembersController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: IntFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: IntView,
+  view: MultipleQuestionView,
   dateService: SchemeDateService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -64,7 +64,7 @@ class HowManyMembersController @Inject()(
       val page = HowManyMembersPage(srn, request.pensionSchemeId)
       val schemeName = request.schemeDetails.schemeName
 
-      Ok(view(viewModel(srn, schemeName, submissionEndDate, mode, request.userAnswers.fillForm(page, form))))
+      Ok(view(request.userAnswers.fillForm(page, form), viewModel(srn, schemeName, submissionEndDate, mode, form)))
     }
   }
 
@@ -78,7 +78,7 @@ class HowManyMembersController @Inject()(
         formWithErrors =>
           Future.successful {
             usingSubmissionEndDate(srn) { submissionEndDate =>
-              BadRequest(view(viewModel(srn, schemeName, submissionEndDate, mode, formWithErrors)))
+              BadRequest(view(formWithErrors, viewModel(srn, schemeName, submissionEndDate, mode, form)))
             }
           },
         value =>

@@ -37,6 +37,7 @@ class LandOrPropertyTotalCostControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, updatedUserAnswers) { implicit app => implicit request =>
       injected[MoneyView].apply(
+        form(injected[MoneyFormProvider]),
         viewModel(srn, index, address.addressLine1, form(injected[MoneyFormProvider]), NormalMode)
       )
     })
@@ -44,7 +45,8 @@ class LandOrPropertyTotalCostControllerSpec extends ControllerBaseSpec {
     act.like(renderPrePopView(onPageLoad, LandOrPropertyTotalCostPage(srn, index), money, updatedUserAnswers) {
       implicit app => implicit request =>
         injected[MoneyView].apply(
-          viewModel(srn, index, address.addressLine1, form(injected[MoneyFormProvider]).fill(money), NormalMode)
+          form(injected[MoneyFormProvider]).fill(money),
+          viewModel(srn, index, address.addressLine1, form(injected[MoneyFormProvider]), NormalMode)
         )
     })
 

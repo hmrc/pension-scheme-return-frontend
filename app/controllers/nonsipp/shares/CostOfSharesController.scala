@@ -53,14 +53,15 @@ class CostOfSharesController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  private def form = CostOfSharesController.form(formProvider)
+  private def form: Form[Money] = CostOfSharesController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { nameOfSharesCompany =>
         Ok(
           view(
-            viewModel(srn, index, nameOfSharesCompany, form.fromUserAnswers(CostOfSharesPage(srn, index)), mode)
+            form.fromUserAnswers(CostOfSharesPage(srn, index)),
+            viewModel(srn, index, nameOfSharesCompany, form, mode)
           )
         )
       }
@@ -76,7 +77,8 @@ class CostOfSharesController @Inject()(
               Future.successful(
                 BadRequest(
                   view(
-                    CostOfSharesController.viewModel(srn, index, nameOfSharesCompany, formWithErrors, mode)
+                    formWithErrors,
+                    CostOfSharesController.viewModel(srn, index, nameOfSharesCompany, form, mode)
                   )
                 )
               ),

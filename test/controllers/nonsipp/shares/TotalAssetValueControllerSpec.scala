@@ -37,6 +37,7 @@ class TotalAssetValueControllerSpec extends ControllerBaseSpec {
     act.like(renderView(onPageLoad, defaultUserAnswers) { implicit app => implicit request =>
       injected[MoneyView]
         .apply(
+          form(injected[MoneyFormProvider]),
           viewModel(
             srn,
             index,
@@ -51,11 +52,12 @@ class TotalAssetValueControllerSpec extends ControllerBaseSpec {
       renderPrePopView(onPageLoad, TotalAssetValuePage(srn, index), money, defaultUserAnswers) {
         implicit app => implicit request =>
           injected[MoneyView].apply(
+            form(injected[MoneyFormProvider]).fill(money),
             viewModel(
               srn,
               index,
               schemeName,
-              form(injected[MoneyFormProvider]).fill(money),
+              form(injected[MoneyFormProvider]),
               NormalMode
             )
           )

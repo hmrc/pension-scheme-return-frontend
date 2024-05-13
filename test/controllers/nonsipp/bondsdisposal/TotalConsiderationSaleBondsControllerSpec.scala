@@ -21,9 +21,9 @@ import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.bondsdisposal.TotalConsiderationSaleBondsController._
+import forms.MoneyFormProvider
 import models.NormalMode
 import pages.nonsipp.bondsdisposal.TotalConsiderationSaleBondsPage
-import forms.mappings.errors.MoneyFormErrorProvider
 
 class TotalConsiderationSaleBondsControllerSpec extends ControllerBaseSpec {
 
@@ -41,11 +41,12 @@ class TotalConsiderationSaleBondsControllerSpec extends ControllerBaseSpec {
       renderView(onPageLoad) { implicit app => implicit request =>
         injected[MoneyView]
           .apply(
+            form(injected[MoneyFormProvider]),
             viewModel(
               srn,
               bondIndex,
               disposalIndex,
-              form(injected[MoneyFormErrorProvider]),
+              form(injected[MoneyFormProvider]),
               NormalMode
             )
           )
@@ -56,11 +57,12 @@ class TotalConsiderationSaleBondsControllerSpec extends ControllerBaseSpec {
       renderPrePopView(onPageLoad, TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex), money) {
         implicit app => implicit request =>
           injected[MoneyView].apply(
+            form(injected[MoneyFormProvider]).fill(money),
             viewModel(
               srn,
               bondIndex,
               disposalIndex,
-              form(injected[MoneyFormErrorProvider]).fill(money),
+              form(injected[MoneyFormProvider]),
               NormalMode
             )
           )

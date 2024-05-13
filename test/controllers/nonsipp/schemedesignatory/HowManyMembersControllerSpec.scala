@@ -20,7 +20,7 @@ import services.SchemeDateService
 import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
-import views.html.IntView
+import views.html.MultipleQuestionView
 import controllers.nonsipp.schemedesignatory.HowManyMembersController._
 import forms.IntFormProvider
 import models.{NormalMode, SchemeMemberNumbers}
@@ -52,21 +52,23 @@ class HowManyMembersControllerSpec extends ControllerBaseSpec {
   "HowManyMembersController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      val view = injected[IntView]
+      val view = injected[MultipleQuestionView]
       val viewForm = form(injected[IntFormProvider])
 
       view(
+        viewForm,
         viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode, viewForm)
       )
     })
 
     act.like(renderPrePopView(onPageLoad, HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(1, 2, 3)) {
       implicit app => implicit request =>
-        val view = injected[IntView]
-        val populatedForm = form(injected[IntFormProvider]).fill((1, 2, 3))
+        val view = injected[MultipleQuestionView]
+        val viewForm = form(injected[IntFormProvider])
 
         view(
-          viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode, populatedForm)
+          viewForm.fill((1, 2, 3)),
+          viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode, viewForm)
         )
     })
 

@@ -23,15 +23,16 @@ import controllers.PSRController
 import config.Constants.{maxTotalConsiderationAmount, minTotalConsiderationAmount}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
-import controllers.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetController._
 import models.{Mode, Money}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
+import forms.mappings.errors.MoneyFormErrors
 import config.Refined.{Max50, Max5000}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import views.html.MoneyView
 import models.SchemeId.Srn
+import controllers.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetController._
+import forms.MoneyFormProvider
 import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.models.{FormPageViewModel, QuestionField}
 
@@ -44,7 +45,7 @@ class TotalConsiderationSaleAssetController @Inject()(
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
-  formProvider: MoneyFormErrorProvider,
+  formProvider: MoneyFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: MoneyView
 )(implicit ec: ExecutionContext)
@@ -57,7 +58,7 @@ class TotalConsiderationSaleAssetController @Inject()(
       val preparedForm =
         request.userAnswers.fillForm(TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex), form)
 
-      Ok(view(viewModel(srn, assetIndex, disposalIndex, preparedForm, mode)))
+      Ok(view(preparedForm, viewModel(srn, assetIndex, disposalIndex, form, mode)))
     }
 
   def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
@@ -68,7 +69,10 @@ class TotalConsiderationSaleAssetController @Inject()(
           formWithErrors => {
             Future.successful(
               BadRequest(
-                view(viewModel(srn, assetIndex, disposalIndex, formWithErrors, mode))
+                view(
+                  formWithErrors,
+                  viewModel(srn, assetIndex, disposalIndex, form, mode)
+                )
               )
             )
           },
@@ -88,7 +92,7 @@ class TotalConsiderationSaleAssetController @Inject()(
 }
 
 object TotalConsiderationSaleAssetController {
-  def form(formProvider: MoneyFormErrorProvider): Form[Money] = formProvider(
+  def form(formProvider: MoneyFormProvider): Form[Money] = formProvider(
     MoneyFormErrors(
       requiredKey = "totalConsiderationSaleAsset.error.required",
       nonNumericKey = "totalConsiderationSaleAsset.error.invalid.characters",

@@ -23,9 +23,10 @@ import config.Constants.{maxTotalConsiderationAmount, minTotalConsiderationAmoun
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal.{HowManySharesSoldPage, TotalConsiderationSharesSoldPage}
 import navigation.Navigator
+import forms.MoneyFormProvider
 import models.{Mode, Money}
 import play.api.i18n.MessagesApi
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
+import forms.mappings.errors.MoneyFormErrors
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max50, Max5000}
@@ -46,7 +47,7 @@ class TotalConsiderationSharesSoldController @Inject()(
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
-  formProvider: MoneyFormErrorProvider,
+  formProvider: MoneyFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: MoneyView
 )(implicit ec: ExecutionContext)
@@ -62,7 +63,7 @@ class TotalConsiderationSharesSoldController @Inject()(
             val preparedForm =
               request.userAnswers.fillForm(TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex), form)
 
-            Ok(view(viewModel(srn, shareIndex, disposalIndex, numShares, companyName, preparedForm, mode)))
+            Ok(view(preparedForm, viewModel(srn, shareIndex, disposalIndex, numShares, companyName, form, mode)))
         }
       }
     }
@@ -78,7 +79,10 @@ class TotalConsiderationSharesSoldController @Inject()(
                 formWithErrors => {
                   Future.successful(
                     BadRequest(
-                      view(viewModel(srn, shareIndex, disposalIndex, numShares, companyName, formWithErrors, mode))
+                      view(
+                        formWithErrors,
+                        viewModel(srn, shareIndex, disposalIndex, numShares, companyName, form, mode)
+                      )
                     )
                   )
                 },
@@ -100,7 +104,7 @@ class TotalConsiderationSharesSoldController @Inject()(
 }
 
 object TotalConsiderationSharesSoldController {
-  def form(formProvider: MoneyFormErrorProvider): Form[Money] = formProvider(
+  def form(formProvider: MoneyFormProvider): Form[Money] = formProvider(
     MoneyFormErrors(
       requiredKey = "sharesDisposal.totalConsiderationSharesSold.error.required",
       nonNumericKey = "sharesDisposal.totalConsiderationSharesSold.error.invalid.characters",

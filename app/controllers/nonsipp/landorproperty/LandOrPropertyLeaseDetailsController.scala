@@ -63,7 +63,12 @@ class LandOrPropertyLeaseDetailsController @Inject()(
         endDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourneyT
         address <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourneyT
         preparedForm = request.userAnswers.fillForm(LandOrPropertyLeaseDetailsPage(srn, index), form(endDate.to))
-      } yield Ok(view(viewModel(srn, index, address.addressLine1, preparedForm, mode)))
+      } yield Ok(
+        view(
+          preparedForm,
+          viewModel(srn, index, address.addressLine1, form(endDate.to), mode)
+        )
+      )
 
       result.merge
   }
@@ -78,7 +83,14 @@ class LandOrPropertyLeaseDetailsController @Inject()(
           .bindFromRequest()
           .fold(
             formWithErrors =>
-              Future.successful(BadRequest(view(viewModel(srn, index, address.addressLine1, formWithErrors, mode)))),
+              Future.successful(
+                BadRequest(
+                  view(
+                    formWithErrors,
+                    viewModel(srn, index, address.addressLine1, form(endDate.to), mode)
+                  )
+                )
+              ),
             value =>
               for {
                 updatedAnswers <- Future

@@ -19,7 +19,8 @@ package controllers.nonsipp.schemedesignatory
 import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
 import views.html.MoneyView
 import forms.MoneyFormProvider
-import models.NormalMode
+import models.{Money, NormalMode}
+import play.api.data.Form
 import controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController._
 import controllers.ControllerBaseSpec
 import play.api.Application
@@ -32,17 +33,17 @@ class FeesCommissionsWagesSalariesControllerSpec extends ControllerBaseSpec {
 
   private val maxAllowedAmount = 999999999.99
   private val validMoney = moneyGen.sample.value
-  private def moneyForm(implicit app: Application) = form(injected[MoneyFormProvider])
+  private def moneyForm(implicit app: Application): Form[Money] = form(injected[MoneyFormProvider])
 
   "FeesCommissionsWagesSalariesController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[MoneyView].apply(viewModel(srn, schemeName, moneyForm, NormalMode))
+      injected[MoneyView].apply(moneyForm, viewModel(srn, schemeName, moneyForm, NormalMode))
     })
 
     act.like(renderPrePopView(onPageLoad, FeesCommissionsWagesSalariesPage(srn, NormalMode), validMoney) {
       implicit app => implicit request =>
-        injected[MoneyView].apply(viewModel(srn, schemeName, moneyForm.fill(validMoney), NormalMode))
+        injected[MoneyView].apply(moneyForm.fill(validMoney), viewModel(srn, schemeName, moneyForm, NormalMode))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))

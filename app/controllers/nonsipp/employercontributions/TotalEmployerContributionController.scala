@@ -23,10 +23,11 @@ import config.Constants
 import cats.implicits.catsSyntaxApplicativeId
 import controllers.actions._
 import navigation.Navigator
+import forms.MoneyFormProvider
 import models._
 import play.api.i18n.MessagesApi
 import play.api.data.Form
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
+import forms.mappings.errors.MoneyFormErrors
 import pages.nonsipp.employercontributions.{EmployerNamePage, TotalEmployerContributionPage}
 import services.SaveService
 import viewmodels.implicits._
@@ -48,7 +49,7 @@ class TotalEmployerContributionController @Inject()(
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
-  formProvider: MoneyFormErrorProvider,
+  formProvider: MoneyFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: MoneyView
 )(implicit ec: ExecutionContext)
@@ -64,7 +65,12 @@ class TotalEmployerContributionController @Inject()(
         for {
           memberName <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
           employerName <- request.userAnswers.get(EmployerNamePage(srn, index, secondaryIndex)).getOrRecoverJourney
-        } yield Ok(view(viewModel(srn, employerName, memberName.fullName, index, secondaryIndex, preparedForm, mode)))
+        } yield Ok(
+          view(
+            preparedForm,
+            viewModel(srn, employerName, memberName.fullName, index, secondaryIndex, form, mode)
+          )
+        )
       ).merge
     }
 
@@ -81,7 +87,10 @@ class TotalEmployerContributionController @Inject()(
                   .get(EmployerNamePage(srn, index, secondaryIndex))
                   .getOrRecoverJourney
               } yield BadRequest(
-                view(viewModel(srn, employerName, memberName.fullName, index, secondaryIndex, formWithErrors, mode))
+                view(
+                  formWithErrors,
+                  viewModel(srn, employerName, memberName.fullName, index, secondaryIndex, form, mode)
+                )
               )
             ).merge.pure[Future]
           },
@@ -107,7 +116,7 @@ class TotalEmployerContributionController @Inject()(
 }
 
 object TotalEmployerContributionController {
-  def form(formProvider: MoneyFormErrorProvider): Form[Money] = formProvider(
+  def form(formProvider: MoneyFormProvider): Form[Money] = formProvider(
     MoneyFormErrors(
       requiredKey = "totalEmployerContribution.error.required",
       nonNumericKey = "totalEmployerContribution.error.invalid",

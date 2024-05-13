@@ -18,9 +18,10 @@ package controllers.nonsipp.memberpayments
 
 import controllers.ControllerBaseSpec
 import views.html.MoneyView
+import forms.MoneyFormProvider
+import controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController._
 import models.NormalMode
 import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
-import forms.mappings.errors.MoneyFormErrorProvider
 
 class UnallocatedEmployerAmountControllerSpec extends ControllerBaseSpec {
 
@@ -31,10 +32,11 @@ class UnallocatedEmployerAmountControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[MoneyView].apply(
-        UnallocatedEmployerAmountController.viewModel(
+        form(injected[MoneyFormProvider]),
+        viewModel(
           srn,
           schemeName,
-          UnallocatedEmployerAmountController.form(injected[MoneyFormErrorProvider]),
+          form(injected[MoneyFormProvider]),
           NormalMode
         )
       )
@@ -43,10 +45,11 @@ class UnallocatedEmployerAmountControllerSpec extends ControllerBaseSpec {
     act.like(
       renderPrePopView(onPageLoad, UnallocatedEmployerAmountPage(srn), money) { implicit app => implicit request =>
         injected[MoneyView].apply(
-          UnallocatedEmployerAmountController.viewModel(
+          form(injected[MoneyFormProvider]).fill(money),
+          viewModel(
             srn,
             schemeName,
-            UnallocatedEmployerAmountController.form(injected[MoneyFormErrorProvider]).fill(money),
+            form(injected[MoneyFormProvider]),
             NormalMode
           )
         )

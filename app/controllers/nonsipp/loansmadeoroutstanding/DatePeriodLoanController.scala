@@ -63,12 +63,13 @@ class DatePeriodLoanController @Inject()(
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         Ok(
           view(
+            request.userAnswers.fillForm(DatePeriodLoanPage(srn, index), form(date.to)),
             viewModel(
               srn,
               index,
               request.schemeDetails.schemeName,
               mode,
-              request.userAnswers.fillForm(DatePeriodLoanPage(srn, index), form(date.to))
+              form(date.to)
             )
           )
         )
@@ -83,7 +84,12 @@ class DatePeriodLoanController @Inject()(
           .fold(
             formWithErrors =>
               Future.successful {
-                BadRequest(view(viewModel(srn, index, request.schemeDetails.schemeName, mode, formWithErrors)))
+                BadRequest(
+                  view(
+                    formWithErrors,
+                    viewModel(srn, index, request.schemeDetails.schemeName, mode, form(date.to))
+                  )
+                )
               },
             value =>
               for {
