@@ -24,7 +24,11 @@ import config.Refined.{Max5000, OneTo5000}
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInJourneyStatus}
-import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
+import pages.nonsipp.landorpropertydisposal.{
+  HowWasPropertyDisposedOfPagesTaskListStatus,
+  LandOrPropertyDisposalPage,
+  LandPropertyDisposalCompletedPages
+}
 import pages.nonsipp.sharesdisposal._
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
 import models._
@@ -602,18 +606,28 @@ object TaskListStatusUtils {
       userAnswers.get(LandPropertyDisposalCompletedPages(srn)).exists(_.values.exists(_.values.nonEmpty))
     val started = userAnswers.get(LandOrPropertyDisposalPage(srn)).contains(true)
     val completedNoDisposals = userAnswers.get(LandOrPropertyDisposalPage(srn)).contains(false)
+    val completedPage =
+      userAnswers.map(LandPropertyDisposalCompletedPages(srn)).view.mapValues(_.count(_ => true)).values.sum
+    val inProgressStartedPage =
+      userAnswers.map(HowWasPropertyDisposedOfPagesTaskListStatus(srn)).view.mapValues(_.count(_ => true)).values.sum
 
     val initialDisposalUrl = controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalController
       .onPageLoad(srn, NormalMode)
       .url
 
+    val inProgressDisposalUrl =
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalAddressListController
+        .onPageLoad(srn, page = 1)
+        .url
+
     val disposalListPage = controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
       .onPageLoad(srn, page = 1)
       .url
 
-    if (atLeastOneCompleted) (TaskListStatus.Completed, disposalListPage)
+    if (inProgressStartedPage > completedPage) (TaskListStatus.InProgress, inProgressDisposalUrl)
+    else if (atLeastOneCompleted) (TaskListStatus.Completed, disposalListPage)
     else if (completedNoDisposals) (TaskListStatus.Completed, initialDisposalUrl)
-    else if (started) (TaskListStatus.InProgress, initialDisposalUrl)
+    else if (started) (TaskListStatus.InProgress, inProgressDisposalUrl)
     else (TaskListStatus.NotStarted, initialDisposalUrl)
   }
 
