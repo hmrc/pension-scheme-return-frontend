@@ -16,20 +16,20 @@
 
 package pages
 
+import pages.nonsipp.employercontributions.EmployerNamePage
+import pages.nonsipp.memberdetails._
 import config.Refined.{Max300, Max5, Max50}
 import controllers.TestValues
-import eu.timepit.refined.refineMV
-import models.NameDOB
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.employercontributions.EmployerNamePage
-import pages.nonsipp.membercontributions.TotalMemberContributionPage
-import pages.nonsipp.memberdetails._
-import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
-import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
-import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
-import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
 import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
 import utils.UserAnswersUtils.UserAnswersOps
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
+import models.NameDOB
+import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
+import pages.behaviours.PageBehaviours
+import pages.nonsipp.membercontributions.TotalMemberContributionPage
+import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
+import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
+import eu.timepit.refined.refineMV
 
 class MemberDetailsPageSpec extends PageBehaviours with TestValues {
 

@@ -18,10 +18,12 @@ package controllers
 
 import services.{PsrSubmissionService, SchemeDateService}
 import org.mockito.Mockito.when
+import connectors.{EmailConnector, EmailSent, EmailStatus}
 import config.Refined.Max3
 import cats.data.NonEmptyList
 import org.mockito.stubbing.OngoingStubbing
 import models.DateRange
+import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
@@ -47,5 +49,24 @@ trait MockBehaviours {
     def submitPsrDetails()(implicit mock: PsrSubmissionService): OngoingStubbing[Future[Option[Unit]]] =
       when(mock.submitPsrDetails(any(), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(())))
+  }
+
+  object MockEmailConnector {
+    def sendEmail(testEmailAddress: String, testTemplateId: String)(
+      implicit mockEmailConnector: EmailConnector
+    ): OngoingStubbing[Future[EmailStatus]] =
+      when(
+        mockEmailConnector.sendEmail(
+          psaOrPsp = any(),
+          requestId = any(),
+          psaOrPspId = any(),
+          pstr = any(),
+          emailAddress = ArgumentMatchers.eq(testEmailAddress),
+          templateId = ArgumentMatchers.eq(testTemplateId),
+          templateParams = any(),
+          reportVersion = any()
+        )(any(), any())
+      ).thenReturn(Future.successful(EmailSent))
+
   }
 }

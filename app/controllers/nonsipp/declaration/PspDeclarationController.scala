@@ -16,26 +16,31 @@
 
 package controllers.nonsipp.declaration
 
-import services.{PsrSubmissionService, SaveService, SchemeDateService}
+import services._
+import models.audit.PSRSubmissionEmailAuditEvent
 import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import connectors.{EmailConnector, EmailStatus}
 import controllers.PSRController
-import config.Constants.{RETURN_PERIODS, SUBMISSION_DATE}
+import config.FrontendAppConfig
+import config.Constants._
 import controllers.actions._
 import navigation.Navigator
-import forms.TextFormProvider
-import models.{NormalMode, UserAnswers}
-import play.api.data.Form
+import models.{DateRange, NormalMode, UserAnswers}
 import views.html.PsaIdInputView
 import models.SchemeId.Srn
+import forms.TextFormProvider
+import uk.gov.hmrc.http.HeaderCarrier
 import play.api.i18n.MessagesApi
 import pages.nonsipp.declaration.PspDeclarationPage
 import viewmodels.DisplayMessage._
 import viewmodels.models.{FormPageViewModel, TextInputViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
-
+import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
 class PspDeclarationController @Inject()(
@@ -47,7 +52,10 @@ class PspDeclarationController @Inject()(
   schemeDateService: SchemeDateService,
   psrSubmissionService: PsrSubmissionService,
   formProvider: TextFormProvider,
-  view: PsaIdInputView
+  view: PsaIdInputView,
+  emailConnector: EmailConnector,
+  config: FrontendAppConfig,
+  auditService: AuditService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -64,38 +72,100 @@ class PspDeclarationController @Inject()(
 
   def onSubmit(srn: Srn): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      PspDeclarationController
-        .form(formProvider, request.schemeDetails.authorisingPSAID)
-        .bindFromRequest()
-        .fold(
-          formWithErrors =>
-            Future.successful(
-              BadRequest(
-                view(
-                  formWithErrors,
-                  PspDeclarationController.viewModel(srn)
-                )
-              )
-            ),
-          answer => {
-            for {
-              updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(PspDeclarationPage(srn), answer))
-              _ <- saveService.save(updatedAnswers)
-              _ <- psrSubmissionService.submitPsrDetails(
-                srn = srn,
-                isSubmitted = true,
-                fallbackCall = controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
-              )
-              _ <- saveService.save(UserAnswers(request.userAnswers.id))
-            } yield {
-              Redirect(navigator.nextPage(PspDeclarationPage(srn), NormalMode, request.userAnswers))
-                .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
-                .addingToSession((SUBMISSION_DATE, schemeDateService.submissionDateAsString(schemeDateService.now())))
-            }
-          }
-        )
+      schemeDateService.schemeDate(srn) match {
+        case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        case Some(dates) =>
+          def emailFuture: Future[EmailStatus] =
+            sendEmail(
+              loggedInUserNameOrBlank(request),
+              request.minimalDetails.email,
+              dates,
+              request.schemeDetails.schemeName
+            )
+
+          PspDeclarationController
+            .form(formProvider, request.schemeDetails.authorisingPSAID)
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      PspDeclarationController.viewModel(srn)
+                    )
+                  )
+                ),
+              answer => {
+                for {
+                  updatedAnswers <- Future
+                    .fromTry(request.userAnswers.set(PspDeclarationPage(srn), answer))
+                  _ <- saveService.save(updatedAnswers)
+                  _ <- psrSubmissionService.submitPsrDetails(
+                    srn = srn,
+                    isSubmitted = true,
+                    fallbackCall = controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
+                  )
+                  _ <- emailFuture
+                  _ <- saveService.save(UserAnswers(request.userAnswers.id))
+                } yield {
+                  Redirect(navigator.nextPage(PspDeclarationPage(srn), NormalMode, request.userAnswers))
+                    .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
+                    .addingToSession(
+                      (SUBMISSION_DATE, schemeDateService.submissionDateAsString(schemeDateService.now()))
+                    )
+                }
+              }
+            )
+      }
     }
+
+  private def sendEmail(name: String, email: String, taxYear: DateRange, schemeName: String)(
+    implicit request: DataRequest[_],
+    hc: HeaderCarrier
+  ): Future[EmailStatus] = {
+    val requestId = hc.requestId.map(_.value).getOrElse(request.headers.get("X-Session-ID").getOrElse(""))
+
+    val submittedDate = LocalDateTime.now().toString // TODO change as per PSR-1139
+
+    val templateParams = Map(
+      "psaName" -> name,
+      "schemeName" -> schemeName,
+      "taxYear" -> taxYear.toString, //TODO change as per PSR-1139
+      "dateSubmitted" -> submittedDate
+    )
+
+    val reportVersion = "001" //TODO change as per PSR-1139
+
+    emailConnector
+      .sendEmail(
+        PSP,
+        requestId,
+        psaOrPspId = request.getUserId,
+        request.schemeDetails.pstr,
+        email,
+        config.fileReturnTemplateId,
+        templateParams,
+        reportVersion
+      )
+      .map { emailStatus =>
+        auditService.sendEvent(
+          PSRSubmissionEmailAuditEvent(
+            schemeName = request.schemeDetails.schemeName,
+            request.schemeDetails.establishers.headOption.fold(name)(e => e.name),
+            psaOrPspId = request.pensionSchemeId.value,
+            schemeTaxReference = request.schemeDetails.pstr,
+            affinityGroup = if (request.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
+            credentialRole = PSP,
+            taxYear = taxYear,
+            email,
+            reportVersion,
+            emailStatus
+          )
+        )
+        emailStatus
+      }
+  }
 }
 
 object PspDeclarationController {
