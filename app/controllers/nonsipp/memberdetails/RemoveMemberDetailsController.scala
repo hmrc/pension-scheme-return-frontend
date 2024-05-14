@@ -100,9 +100,12 @@ object RemoveMemberDetailsController {
   )
 
   def viewModel(srn: Srn, index: Max300, nameDOB: NameDOB, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
-    YesNoPageViewModel(
+    FormPageViewModel(
       Message("removeMemberDetails.title", nameDOB.fullName),
       Message("removeMemberDetails.heading", nameDOB.fullName),
+      YesNoPageViewModel(
+        hint = Some(Message("removeMemberDetails.hint"))
+      ),
       routes.RemoveMemberDetailsController.onSubmit(srn, index, mode)
     )
 }

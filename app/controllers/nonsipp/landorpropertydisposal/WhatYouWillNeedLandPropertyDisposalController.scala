@@ -66,14 +66,13 @@ object WhatYouWillNeedLandPropertyDisposalController {
       .withDescription(
         ParagraphMessage("whatYouWillNeedLandPropertyDisposal.paragraph1") ++
           ParagraphMessage("whatYouWillNeedLandPropertyDisposal.paragraph2") ++
-          ParagraphMessage("whatYouWillNeedLandPropertyDisposal.paragraph3") ++
           ListMessage(
             ListType.Bullet,
             "whatYouWillNeedLandPropertyDisposal.tellUs1",
             "whatYouWillNeedLandPropertyDisposal.tellUs2",
             "whatYouWillNeedLandPropertyDisposal.tellUs3"
           ) ++
-          ParagraphMessage("whatYouWillNeedLandPropertyDisposal.paragraph4") ++
+          ParagraphMessage("whatYouWillNeedLandPropertyDisposal.paragraph3") ++
           ListMessage(
             ListType.Bullet,
             "whatYouWillNeedLandPropertyDisposal.landOrPropertySold1",

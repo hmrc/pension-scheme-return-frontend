@@ -65,7 +65,6 @@ object WhatYouWillNeedReceivedTransferController {
     ).withButtonText(Message("site.continue"))
       .withDescription(
         ParagraphMessage("WhatYouWillNeed.ReceivedTransfer.paragraph1") ++
-          ParagraphMessage("WhatYouWillNeed.ReceivedTransfer.paragraph2") ++
           ListMessage(
             ListType.Bullet,
             "WhatYouWillNeed.ReceivedTransfer.tellUs1",
@@ -75,8 +74,6 @@ object WhatYouWillNeedReceivedTransferController {
             "WhatYouWillNeed.ReceivedTransfer.tellUs5",
             "WhatYouWillNeed.ReceivedTransfer.tellUs6",
             "WhatYouWillNeed.ReceivedTransfer.tellUs7"
-          ) ++
-          ParagraphMessage("WhatYouWillNeed.ReceivedTransfer.paragraph3") ++
-          ParagraphMessage("WhatYouWillNeed.ReceivedTransfer.paragraph4")
+          )
       )
 }
