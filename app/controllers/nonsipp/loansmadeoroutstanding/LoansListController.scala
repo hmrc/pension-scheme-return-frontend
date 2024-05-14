@@ -156,6 +156,7 @@ object LoansListController {
 
     val title = if (recipients.length == 1) "loansList.title" else "loansList.title.plural"
     val heading = if (recipients.length == 1) "loansList.heading" else "loansList.heading.plural"
+    val description = if (recipients.length < maxLoans) Some(ParagraphMessage("loansList.description")) else None
 
     val pagination = Pagination(
       currentPage = page,
@@ -167,7 +168,7 @@ object LoansListController {
     FormPageViewModel(
       title = Message(title, recipients.length),
       heading = Message(heading, recipients.length),
-      description = Some(ParagraphMessage("loansList.description")),
+      description,
       page = ListViewModel(
         inset = "loansList.inset",
         rows(srn, mode, recipients),
