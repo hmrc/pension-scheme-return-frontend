@@ -90,6 +90,16 @@ case class HowWasPropertyDisposedOfPages(
   override def toString: String = "methodOfDisposal"
 }
 
+case class HowWasPropertyDisposedOfPagesTaskListStatus(
+  srn: Srn
+) extends QuestionPage[Map[String, Map[String, HowDisposed]]] {
+
+  override def path: JsPath =
+    Paths.disposalPropertyTransaction \ toString
+
+  override def toString: String = "methodOfDisposal"
+}
+
 object HowWasPropertyDisposedOfPage {
   def apply(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50): HowWasPropertyDisposedOfPage =
     HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex, answerChanged = false)
