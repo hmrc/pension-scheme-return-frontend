@@ -188,9 +188,9 @@ POST        /:srn/unallocated-employer-contributions                            
 GET         /:srn/change-unallocated-employer-contributions                             controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-unallocated-employer-contributions                             controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/how-to-upload                                                         controllers.nonsipp.memberdetails.HowToUploadController.onPageLoad(srn: Srn)
-GET         /:srn/submit-how-to-upload                                                  controllers.nonsipp.memberdetails.HowToUploadController.onSubmit(srn: Srn)
-GET         /download-file                                                              controllers.nonsipp.memberdetails.DownloadPensionSchemeTemplateController.downloadFile
+GET         /:srn/download-template-file                                                 controllers.nonsipp.memberdetails.HowToUploadController.onPageLoad(srn: Srn)
+GET         /:srn/submit-download-template-file                                          controllers.nonsipp.memberdetails.HowToUploadController.onSubmit(srn: Srn)
+GET         /download-file                                                               controllers.nonsipp.memberdetails.DownloadPensionSchemeTemplateController.downloadFile
 
 GET         /:srn/check-member-details-file                                             controllers.nonsipp.memberdetails.CheckMemberDetailsFileController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/check-member-details-file                                             controllers.nonsipp.memberdetails.CheckMemberDetailsFileController.onSubmit(srn: Srn, mode: Mode = NormalMode)
