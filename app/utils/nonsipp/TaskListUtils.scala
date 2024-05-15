@@ -19,6 +19,7 @@ package utils.nonsipp
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
 import pages.nonsipp.memberdetails._
 import viewmodels.implicits._
+import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import config.Refined.OneTo300
 import utils.nonsipp.TaskListStatusUtils._
 import models.SchemeId.Srn
@@ -383,7 +384,6 @@ object TaskListUtils {
   private def sharesSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.shares"
     val (sharesStatus, sharesLink) = getSharesTaskListStatusAndLink(userAnswers, srn)
-    val quotedSharesStatusAndLink = getQuotedSharesTaskListStatusAndLink(userAnswers, srn)
     val (sharesDisposalsStatus, sharesDisposalsLinkUrl) =
       TaskListStatusUtils.getSharesDisposalsTaskListStatusWithLink(userAnswers, srn)
 
@@ -402,13 +402,6 @@ object TaskListUtils {
           sharesDisposalsLinkUrl
         ),
         sharesDisposalsStatus
-      ),
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "quotedshares.title", quotedSharesStatusAndLink._1),
-          quotedSharesStatusAndLink._2
-        ),
-        quotedSharesStatusAndLink._1
       )
     )
   }
@@ -465,27 +458,60 @@ object TaskListUtils {
 
   private def otherAssetsSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.otherassets"
+    val quotedSharesStatusAndLink = getQuotedSharesTaskListStatusAndLink(userAnswers, srn)
     val (otherAssetsStatus, otherAssetsLink) = getOtherAssetsTaskListStatusAndLink(userAnswers, srn)
     val (otherAssetsDisposalsStatus, otherAssetsDisposalsLinkUrl) =
       TaskListStatusUtils.getOtherAssetsDisposalTaskListStatusAndLink(userAnswers, srn)
 
-    TaskListSectionViewModel(
-      s"$prefix.title",
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "title", otherAssetsStatus),
-          otherAssetsLink
+    val sharesStarted = userAnswers.get(DidSchemeHoldAnySharesPage(srn)) match {
+      case Some(_) => true
+      case None => false
+    }
+
+    if (sharesStarted) {
+      TaskListSectionViewModel(
+        s"$prefix.title",
+        TaskListItemViewModel(
+          LinkMessage(
+            messageKey(prefix, "quotedshares.title", quotedSharesStatusAndLink._1),
+            quotedSharesStatusAndLink._2
+          ),
+          quotedSharesStatusAndLink._1
         ),
-        otherAssetsStatus
-      ),
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey("nonsipp.tasklist.otherassetsdisposal", "title", otherAssetsDisposalsStatus),
-          otherAssetsDisposalsLinkUrl
+        TaskListItemViewModel(
+          LinkMessage(
+            messageKey(prefix, "title", otherAssetsStatus),
+            otherAssetsLink
+          ),
+          otherAssetsStatus
         ),
-        otherAssetsDisposalsStatus
+        TaskListItemViewModel(
+          LinkMessage(
+            messageKey("nonsipp.tasklist.otherassetsdisposal", "title", otherAssetsDisposalsStatus),
+            otherAssetsDisposalsLinkUrl
+          ),
+          otherAssetsDisposalsStatus
+        )
       )
-    )
+    } else {
+      TaskListSectionViewModel(
+        s"$prefix.title",
+        TaskListItemViewModel(
+          LinkMessage(
+            messageKey(prefix, "title", otherAssetsStatus),
+            otherAssetsLink
+          ),
+          otherAssetsStatus
+        ),
+        TaskListItemViewModel(
+          LinkMessage(
+            messageKey("nonsipp.tasklist.otherassetsdisposal", "title", otherAssetsDisposalsStatus),
+            otherAssetsDisposalsLinkUrl
+          ),
+          otherAssetsDisposalsStatus
+        )
+      )
+    }
   }
 
   private def messageKey(prefix: String, suffix: String, status: TaskListStatus): String =

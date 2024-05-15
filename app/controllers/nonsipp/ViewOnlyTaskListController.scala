@@ -18,11 +18,12 @@ package controllers.nonsipp
 
 import services.{PsrRetrievalService, SaveService}
 import viewmodels.implicits._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
 import cats.implicits.toShow
 import controllers.actions._
 import viewmodels.models.TaskListStatus._
+import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import views.html.TaskListView
 import models.SchemeId.Srn
 import pages.nonsipp.WhichTaxYearPage
@@ -105,7 +106,7 @@ object ViewOnlyTaskListController {
       sharesSection(currentUA, previousUA),
       landOrPropertySection(currentUA, previousUA),
       bondsSection(currentUA, previousUA),
-      otherAssetsSection(currentUA, previousUA)
+      otherAssetsSection(currentUA, previousUA, srn)
     )
 
     val declarationSectionViewModel = declarationSection(srn, schemeName, dateRange, version)
@@ -441,12 +442,6 @@ object ViewOnlyTaskListController {
       pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction
     )
 
-    val quotedSharesStatusAndLink: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
-      currentUA,
-      previousUA,
-      JsPath \ "totalValueQuotedShares"
-    )
-
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
@@ -462,13 +457,6 @@ object ViewOnlyTaskListController {
           controllers.routes.UnauthorisedController.onPageLoad().url
         ),
         shareDisposalTaskListStatus
-      ),
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "quotedshares.title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
-        ),
-        quotedSharesStatusAndLink
       )
     )
   }
@@ -549,8 +537,18 @@ object ViewOnlyTaskListController {
 
 //--Other assets------------------------------------------------------------------------------------------------------//
 
-  private def otherAssetsSection(currentUA: UserAnswers, previousUA: UserAnswers): TaskListSectionViewModel = {
+  private def otherAssetsSection(
+    currentUA: UserAnswers,
+    previousUA: UserAnswers,
+    srn: Srn
+  ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.otherassets"
+
+    val quotedSharesStatusAndLink: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      JsPath \ "totalValueQuotedShares"
+    )
 
     val otherAssetsTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
@@ -565,23 +563,57 @@ object ViewOnlyTaskListController {
       pages.nonsipp.otherassetsdisposal.Paths.assetsDisposed
     )
 
-    TaskListSectionViewModel(
-      s"$prefix.title",
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
+    val sharesExist =
+      (currentUA.get(DidSchemeHoldAnySharesPage(srn)), previousUA.get(DidSchemeHoldAnySharesPage(srn))) match {
+        case (Some(_), _) => true
+        case (_, Some(_)) => true
+        case _ => false
+      }
+
+    if (sharesExist) {
+      TaskListSectionViewModel(
+        s"$prefix.title",
+        TaskListItemViewModel(
+          LinkMessage(
+            messageKey(prefix, "quotedshares.title"),
+            controllers.routes.UnauthorisedController.onPageLoad().url
+          ),
+          quotedSharesStatusAndLink
         ),
-        otherAssetsTaskListStatus
-      ),
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey("nonsipp.tasklist.otherassetsdisposal", "title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
+        TaskListItemViewModel(
+          LinkMessage(
+            messageKey(prefix, "title"),
+            controllers.routes.UnauthorisedController.onPageLoad().url
+          ),
+          otherAssetsTaskListStatus
         ),
-        otherAssetsDisposalTaskListStatus
+        TaskListItemViewModel(
+          LinkMessage(
+            messageKey("nonsipp.tasklist.otherassetsdisposal", "title"),
+            controllers.routes.UnauthorisedController.onPageLoad().url
+          ),
+          otherAssetsDisposalTaskListStatus
+        )
       )
-    )
+    } else {
+      TaskListSectionViewModel(
+        s"$prefix.title",
+        TaskListItemViewModel(
+          LinkMessage(
+            messageKey(prefix, "title"),
+            controllers.routes.UnauthorisedController.onPageLoad().url
+          ),
+          otherAssetsTaskListStatus
+        ),
+        TaskListItemViewModel(
+          LinkMessage(
+            messageKey("nonsipp.tasklist.otherassetsdisposal", "title"),
+            controllers.routes.UnauthorisedController.onPageLoad().url
+          ),
+          otherAssetsDisposalTaskListStatus
+        )
+      )
+    }
   }
 
 //--Declaration-------------------------------------------------------------------------------------------------------//

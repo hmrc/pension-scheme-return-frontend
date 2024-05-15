@@ -939,17 +939,17 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
           }
         }
 
-        "(S5) Quoted Shares" - {
+        "(S8) Quoted Shares" - {
 
           "Completed" in {
             testViewModel(
               currentUA,
               currentUA,
-              4,
-              2,
+              7,
+              0,
               expectedStatus = Completed,
-              expectedTitleKey = "nonsipp.tasklist.shares.title",
-              expectedLinkContentKey = "nonsipp.tasklist.shares.view.quotedshares.title",
+              expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+              expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.quotedshares.title",
               expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
             )
           }
@@ -958,11 +958,11 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             testViewModel(
               currentUA,
               previousUA,
-              4,
-              2,
+              7,
+              0,
               expectedStatus = Updated,
-              expectedTitleKey = "nonsipp.tasklist.shares.title",
-              expectedLinkContentKey = "nonsipp.tasklist.shares.view.quotedshares.title",
+              expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+              expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.quotedshares.title",
               expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
             )
           }
@@ -1100,7 +1100,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               currentUA,
               currentUA,
               7,
-              0,
+              1,
               expectedStatus = Completed,
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.title",
@@ -1113,7 +1113,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               currentUA,
               previousUA,
               7,
-              0,
+              1,
               expectedStatus = Updated,
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.title",
@@ -1129,7 +1129,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               currentUA,
               currentUA,
               7,
-              1,
+              2,
               expectedStatus = Completed,
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.view.title",
@@ -1142,7 +1142,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               currentUA,
               previousUA,
               7,
-              1,
+              2,
               expectedStatus = Updated,
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.view.title",

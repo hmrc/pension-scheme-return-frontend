@@ -30,3 +30,9 @@ case class SharesTotalIncomePage(srn: Srn, index: Max5000) extends QuestionPage[
 
   override def toString: String = "totalDividendsOrReceipts"
 }
+
+case class SharesTotalIncomePages(srn: Srn) extends QuestionPage[Map[String, Money]] {
+  override def path: JsPath = Paths.heldSharesTransaction \ toString
+
+  override def toString: String = "totalDividendsOrReceipts"
+}

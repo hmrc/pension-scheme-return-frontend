@@ -721,32 +721,33 @@ class TaskListControllerSpec extends ControllerBaseSpec {
     }
 
     "quotedSharesSection" - {
-      "notStarted" in {
+      "notStarted and only visible with shares answered" in {
         testViewModel(
-          defaultUserAnswers,
-          4,
-          2,
+          defaultUserAnswers.unsafeSet(DidSchemeHoldAnySharesPage(srn), true),
+          7,
+          0,
           expectedStatus = TaskListStatus.NotStarted,
-          expectedTitleKey = "nonsipp.tasklist.shares.title",
-          expectedLinkContentKey = "nonsipp.tasklist.shares.add.quotedshares.title",
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassets.add.quotedshares.title",
           expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.QuotedSharesManagedFundsHeldController
             .onPageLoad(srn, NormalMode)
             .url
         )
       }
 
-      "completed" in {
+      "completed and only visible with shares answered" in {
         val userAnswersWithData =
           defaultUserAnswers
             .unsafeSet(QuotedSharesManagedFundsHeldPage(srn), true)
+            .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
 
         testViewModel(
           userAnswersWithData,
-          4,
-          2,
+          7,
+          0,
           expectedStatus = TaskListStatus.Completed,
-          expectedTitleKey = "nonsipp.tasklist.shares.title",
-          expectedLinkContentKey = "nonsipp.tasklist.shares.change.quotedshares.title",
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassets.change.quotedshares.title",
           expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.QuotedSharesManagedFundsHeldController
             .onPageLoad(srn, NormalMode)
             .url
