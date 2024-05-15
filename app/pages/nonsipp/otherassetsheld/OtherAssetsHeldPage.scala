@@ -22,7 +22,7 @@ import play.api.libs.json.JsPath
 
 case class OtherAssetsHeldPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = Paths.otherAssets \ toString
 
   override def toString: String = "otherAssetsHeld"
 }

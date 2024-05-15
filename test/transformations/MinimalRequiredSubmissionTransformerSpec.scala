@@ -23,8 +23,9 @@ import org.scalatest.matchers.must.Matchers
 import play.api.mvc.AnyContentAsEmpty
 import controllers.TestValues
 import cats.data.NonEmptyList
-import models.requests.psr.{MinimalRequiredSubmission, ReportDetails, SchemeDesignatory}
-import pages.nonsipp.accountingperiod.AccountingPeriods
+import models.requests.psr._
+import eu.timepit.refined.refineMV
+import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriodRecordVersionPage, AccountingPeriods}
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
 import models.requests.{AllowedAccessRequest, DataRequest}
@@ -37,6 +38,8 @@ import models._
 import models.SchemeMemberNumbers._
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.mockito.MockitoSugar.mock
+
+import java.time.LocalDate
 
 class MinimalRequiredSubmissionTransformerSpec
     extends AnyFreeSpec
@@ -61,7 +64,7 @@ class MinimalRequiredSubmissionTransformerSpec
 
       when(mockSchemeDateService.returnPeriods(any())(any())).thenReturn(Some(NonEmptyList.of(dateRange)))
 
-      val result = transformer.transformToEtmp(srn)
+      val result = transformer.transformToEtmp(srn, emptyUserAnswers)
       verify(mockSchemeDateService, times(1)).returnPeriods(any())(any())
       result mustBe None
     }
@@ -74,24 +77,30 @@ class MinimalRequiredSubmissionTransformerSpec
 
       when(mockSchemeDateService.returnPeriods(any())(any())).thenReturn(None)
 
-      val result = transformer.transformToEtmp(srn)(request)
+      val result = transformer.transformToEtmp(srn, emptyUserAnswers)(request)
       verify(mockSchemeDateService, times(1)).returnPeriods(any())(any())
       result mustBe None
     }
 
-    "should returned transformed object" in {
+    "should returned transformed object without recordVersions when UAs not equal" in {
       val userAnswers = emptyUserAnswers
         .unsafeSet(WhyNoBankAccountPage(srn), "reasonForNoBankAccount")
         .unsafeSet(WhichTaxYearPage(srn), dateRange)
         .unsafeSet(ValueOfAssetsPage(srn, NormalMode), MoneyInPeriod(money, money))
         .unsafeSet(FeesCommissionsWagesSalariesPage(srn, NormalMode), money)
         .unsafeSet(HowManyMembersPage(srn, allowedAccessRequest.pensionSchemeId), SchemeMemberNumbers(2, 3, 4))
+        .unsafeSet(
+          AccountingPeriodPage(srn, refineMV(1), NormalMode),
+          DateRange(from = LocalDate.of(2020, 4, 6), to = LocalDate.of(2021, 4, 5))
+        )
+        .unsafeSet(AccountingPeriodRecordVersionPage(srn), "001")
+        .unsafeSet(SchemeDesignatoryRecordVersionPage(srn), "001")
 
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
       when(mockSchemeDateService.returnPeriods(any())(any())).thenReturn(Some(NonEmptyList.of(dateRange)))
 
-      val result = transformer.transformToEtmp(srn)(request)
+      val result = transformer.transformToEtmp(srn, emptyUserAnswers)(request)
       verify(mockSchemeDateService, times(1)).returnPeriods(any())(any())
       result mustBe Some(
         MinimalRequiredSubmission(
@@ -103,8 +112,12 @@ class MinimalRequiredSubmissionTransformerSpec
             periodEnd = dateRange.to,
             compilationOrSubmissionDate = None
           ),
-          NonEmptyList.of(dateRange.from -> dateRange.to),
+          AccountingPeriodDetails(
+            recordVersion = None,
+            accountingPeriods = NonEmptyList.of(dateRange.from -> dateRange.to)
+          ),
           SchemeDesignatory(
+            recordVersion = None,
             openBankAccount = false,
             Some("reasonForNoBankAccount"),
             2,
@@ -120,6 +133,56 @@ class MinimalRequiredSubmissionTransformerSpec
       )
     }
 
+    "should returned transformed object with recordVersions when UAs are equal" in {
+      val userAnswers = emptyUserAnswers
+        .unsafeSet(WhyNoBankAccountPage(srn), "reasonForNoBankAccount")
+        .unsafeSet(WhichTaxYearPage(srn), dateRange)
+        .unsafeSet(ValueOfAssetsPage(srn, NormalMode), MoneyInPeriod(money, money))
+        .unsafeSet(FeesCommissionsWagesSalariesPage(srn, NormalMode), money)
+        .unsafeSet(HowManyMembersPage(srn, allowedAccessRequest.pensionSchemeId), SchemeMemberNumbers(2, 3, 4))
+        .unsafeSet(
+          AccountingPeriodPage(srn, refineMV(1), NormalMode),
+          DateRange(from = LocalDate.of(2020, 4, 6), to = LocalDate.of(2021, 4, 5))
+        )
+        .unsafeSet(AccountingPeriodRecordVersionPage(srn), "001")
+        .unsafeSet(SchemeDesignatoryRecordVersionPage(srn), "001")
+
+      val request = DataRequest(allowedAccessRequest, userAnswers)
+
+      when(mockSchemeDateService.returnPeriods(any())(any())).thenReturn(Some(NonEmptyList.of(dateRange)))
+
+      val result = transformer.transformToEtmp(srn, userAnswers)(request)
+      verify(mockSchemeDateService, times(1)).returnPeriods(any())(any())
+      result mustBe Some(
+        MinimalRequiredSubmission(
+          ReportDetails(
+            fbVersion = None,
+            fbstatus = None,
+            pstr = request.schemeDetails.pstr,
+            periodStart = dateRange.from,
+            periodEnd = dateRange.to,
+            compilationOrSubmissionDate = None
+          ),
+          AccountingPeriodDetails(
+            recordVersion = Some("001"),
+            accountingPeriods = NonEmptyList.of(dateRange.from -> dateRange.to)
+          ),
+          SchemeDesignatory(
+            recordVersion = Some("001"),
+            openBankAccount = false,
+            Some("reasonForNoBankAccount"),
+            2,
+            3,
+            4,
+            Some(money.value),
+            Some(money.value),
+            None,
+            None,
+            Some(money.value)
+          )
+        )
+      )
+    }
   }
 
   "Transform from ETMP" - {
@@ -135,8 +198,9 @@ class MinimalRequiredSubmissionTransformerSpec
           periodEnd = dateRange.to,
           compilationOrSubmissionDate = None
         ),
-        accountingPeriods,
+        AccountingPeriodDetails(Some("001"), accountingPeriods),
         SchemeDesignatory(
+          Some("001"),
           openBankAccount = false,
           Some("reasonForNoBankAccount"),
           2,
@@ -159,6 +223,8 @@ class MinimalRequiredSubmissionTransformerSpec
       result.fold(
         ex => fail(ex.getMessage),
         userAnswers => {
+          userAnswers.get(AccountingPeriodRecordVersionPage(srn)) mustBe Some("001")
+          userAnswers.get(SchemeDesignatoryRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(WhichTaxYearPage(srn)) mustBe Some(DateRange(dateRange.from, dateRange.to))
           userAnswers.get(CheckReturnDatesPage(srn)) mustBe Some(false)
           userAnswers.get(ActiveBankAccountPage(srn)) mustBe Some(false)
@@ -187,8 +253,9 @@ class MinimalRequiredSubmissionTransformerSpec
           periodEnd = dateRange.to,
           compilationOrSubmissionDate = None
         ),
-        accountingPeriods,
+        AccountingPeriodDetails(Some("001"), accountingPeriods),
         SchemeDesignatory(
+          Some("001"),
           openBankAccount = true,
           None,
           2,
@@ -211,6 +278,8 @@ class MinimalRequiredSubmissionTransformerSpec
       result.fold(
         ex => fail(ex.getMessage),
         userAnswers => {
+          userAnswers.get(AccountingPeriodRecordVersionPage(srn)) mustBe Some("001")
+          userAnswers.get(SchemeDesignatoryRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(WhichTaxYearPage(srn)) mustBe Some(DateRange(dateRange.from, dateRange.to))
           userAnswers.get(CheckReturnDatesPage(srn)) mustBe Some(false)
           userAnswers.get(ActiveBankAccountPage(srn)) mustBe Some(true)

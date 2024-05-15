@@ -26,7 +26,7 @@ import pages.QuestionPage
 
 case class AccountingPeriodPage(srn: Srn, index: Max3, mode: Mode) extends QuestionPage[DateRange] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex
+  override def path: JsPath = Paths.accountingPeriodDetails \ toString \ index.arrayIndex
 
   override def toString: String = "accountingPeriods"
 }
@@ -36,7 +36,7 @@ case class AccountingPeriods(srn: Srn)
     with Settable[List[DateRange]]
     with Removable[List[DateRange]] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = Paths.accountingPeriodDetails \ toString
 
   override def toString: String = "accountingPeriods"
 }

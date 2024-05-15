@@ -21,7 +21,6 @@ import com.google.inject.Singleton
 import pages.nonsipp.memberdetails.MembersDetailsPage._
 import config.Refined.{Max300, Max50}
 import models.SchemeId.Srn
-import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import pages.nonsipp.memberpensionpayments._
 import uk.gov.hmrc.domain.Nino
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
@@ -40,9 +39,15 @@ import pages.nonsipp.memberreceivedpcls.{
   PensionCommencementLumpSumAmountPage,
   PensionCommencementLumpSumPage
 }
+import pages.nonsipp.memberpensionpayments.Paths.membersPayments
+import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import models.requests.psr._
 import models.UserAnswers.implicits._
-import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
+import pages.nonsipp.memberpayments.{
+  MemberPaymentsRecordVersionPage,
+  UnallocatedEmployerAmountPage,
+  UnallocatedEmployerContributionsPage
+}
 import viewmodels.models._
 
 import scala.collection.immutable.Nil
@@ -59,7 +64,7 @@ class MemberPaymentsTransformer @Inject()(
 
   private val noUpdate: List[Try[UserAnswers] => Try[UserAnswers]] = Nil
 
-  def transformToEtmp(srn: Srn, userAnswers: UserAnswers): Option[MemberPayments] = {
+  def transformToEtmp(srn: Srn, userAnswers: UserAnswers, initialUA: UserAnswers): Option[MemberPayments] = {
 
     val refinedMemberDetails: List[(Max300, NameDOB)] = userAnswers
       .membersDetails(srn)
@@ -115,6 +120,9 @@ class MemberPaymentsTransformer @Inject()(
       case _ =>
         Some(
           MemberPayments(
+            recordVersion = Option.when(userAnswers.get(membersPayments) == initialUA.get(membersPayments))(
+              userAnswers.get(MemberPaymentsRecordVersionPage(srn)).get
+            ),
             memberDetails = memberDetails ++ softDeletedMembers,
             employerContributionsDetails = SectionDetails(
               made = userAnswers.get(EmployerContributionsPage(srn)).getOrElse(false),
@@ -144,7 +152,10 @@ class MemberPaymentsTransformer @Inject()(
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, memberPayments: MemberPayments): Try[UserAnswers] =
     for {
-      ua1 <- userAnswers.set(UnallocatedEmployerContributionsPage(srn), memberPayments.unallocatedContribsMade)
+      ua0 <- memberPayments.recordVersion.fold(Try(userAnswers))(
+        userAnswers.set(MemberPaymentsRecordVersionPage(srn), _)
+      )
+      ua1 <- ua0.set(UnallocatedEmployerContributionsPage(srn), memberPayments.unallocatedContribsMade)
       ua2 <- memberPayments.unallocatedContribAmount match {
         case Some(value) => ua1.set(UnallocatedEmployerAmountPage(srn), Money(value))
         case None => Try(ua1)

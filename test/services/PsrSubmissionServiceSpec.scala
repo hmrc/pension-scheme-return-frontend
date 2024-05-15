@@ -16,37 +16,27 @@
 
 package services
 
-import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
-import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
+import play.api.mvc.AnyContentAsEmpty
 import connectors.PSRConnector
 import controllers.TestValues
-import config.FrontendAppConfig
 import cats.data.NonEmptyList
-import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import transformations._
-import pages.nonsipp.sharesdisposal.SharesDisposalPage
 import utils.UserAnswersUtils.UserAnswersOps
 import pages.nonsipp.CheckReturnDatesPage
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import models.DateRange
-import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
 import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import services.PsrSubmissionServiceSpec.{captor, minimalRequiredSubmission}
+import services.PsrSubmissionServiceSpec._
 import play.api.test.FakeRequest
+import utils.BaseSpec
 import play.api.test.Helpers.stubMessagesApi
 import org.mockito.Mockito._
-import utils.BaseSpec
-import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
-import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
-import play.api.mvc.AnyContentAsEmpty
 import models.requests.psr._
-import config.Constants.PSP
-import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
-import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
-import pages.nonsipp.bondsdisposal.BondsDisposalPage
+import config.Constants.{PSP, UNCHANGED_SESSION_PREFIX}
+import repositories.SessionRepository
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -54,20 +44,20 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import java.time.LocalDate
 
 class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
+
   val schemeDateRange: DateRange = dateRangeGen.sample.value
+
   override def beforeEach(): Unit = {
     reset(mockConnector)
     reset(mockMinimalRequiredSubmissionTransformer)
-    reset(mockLoanTransactionsTransformer)
-    reset(mockLandOrPropertyTransactionsTransformer)
-    reset(mockMoneyBorrowedTransformer)
+    reset(mockLoansTransformer)
+    reset(mockAssetsTransformer)
     reset(mockMemberPaymentsTransformerTransformer)
     reset(mockSharesTransformer)
-    reset(mockBondTransactionsTransformer)
-    reset(mockOtherAssetTransactionsTransformer)
     reset(mockDeclarationTransformer)
     reset(mockSchemeDateService)
     reset(mockAuditService)
+    reset(mockSessionRepository)
     when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(schemeDateRange))
     when(mockAuditService.sendEvent(any)(any(), any())).thenReturn(Future.successful(AuditResult.Success))
   }
@@ -76,41 +66,88 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
-  private val mockAppConfig = mock[FrontendAppConfig]
+  private implicit val hc: HeaderCarrier = HeaderCarrier()
+
   private val mockConnector = mock[PSRConnector]
   private val mockSchemeDateService = mock[SchemeDateService]
   private val mockAuditService = mock[AuditService]
   private val mockMinimalRequiredSubmissionTransformer = mock[MinimalRequiredSubmissionTransformer]
-  private val mockLoanTransactionsTransformer = mock[LoanTransactionsTransformer]
-  private val mockLandOrPropertyTransactionsTransformer = mock[LandOrPropertyTransactionsTransformer]
-  private val mockMoneyBorrowedTransformer = mock[MoneyBorrowedTransformer]
+  private val mockLoansTransformer = mock[LoansTransformer]
+  private val mockAssetsTransformer = mock[AssetsTransformer]
   private val mockMemberPaymentsTransformerTransformer = mock[MemberPaymentsTransformer]
   private val mockSharesTransformer = mock[SharesTransformer]
-  private val mockBondTransactionsTransformer = mock[BondTransactionsTransformer]
-  private val mockOtherAssetTransactionsTransformer = mock[OtherAssetTransactionsTransformer]
   private val mockDeclarationTransformer = mock[DeclarationTransformer]
+  private val mockSessionRepository = mock[SessionRepository]
 
   private val service =
     new PsrSubmissionService(
-      mockAppConfig,
       mockConnector,
       mockSchemeDateService,
       mockAuditService,
       stubMessagesApi(),
       mockMinimalRequiredSubmissionTransformer,
-      mockLoanTransactionsTransformer,
-      mockLandOrPropertyTransactionsTransformer,
+      mockLoansTransformer,
       mockMemberPaymentsTransformerTransformer,
-      mockMoneyBorrowedTransformer,
       mockSharesTransformer,
-      mockBondTransactionsTransformer,
-      mockOtherAssetTransactionsTransformer,
-      mockDeclarationTransformer
+      mockAssetsTransformer,
+      mockDeclarationTransformer,
+      mockSessionRepository
     )
 
-  private implicit val hc: HeaderCarrier = HeaderCarrier()
-
   "PSRSubmissionService" - {
+
+    "shouldn't submit PsrDetails request when initial UA not exist yet" in {
+      when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
+        .thenReturn(Future.successful(None))
+      whenReady(service.submitPsrDetails(srn, fallbackCall = fallbackCall)) { result: Option[Unit] =>
+        verify(mockMinimalRequiredSubmissionTransformer, never).transformToEtmp(any(), any())(any())
+        verify(mockLoansTransformer, never).transformToEtmp(any(), any())(any())
+        verify(mockAssetsTransformer, never).transformToEtmp(any(), any())(any())
+        verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
+        verify(mockMemberPaymentsTransformerTransformer, never).transformToEtmp(any(), any(), any())
+        verify(mockDeclarationTransformer, never).transformToEtmp(any())
+        verify(mockConnector, never).submitPsrDetails(any())(any(), any())
+        verify(mockAuditService, never).sendExtendedEvent(any())(any(), any())
+        verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
+        result mustBe None
+      }
+    }
+
+    "shouldn't submit PsrDetails request when initial UA and current UA are same" in {
+      when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
+        .thenReturn(Future.successful(Some(defaultUserAnswers)))
+      whenReady(service.submitPsrDetails(srn, fallbackCall = fallbackCall)) { result: Option[Unit] =>
+        verify(mockMinimalRequiredSubmissionTransformer, never).transformToEtmp(any(), any())(any())
+        verify(mockLoansTransformer, never).transformToEtmp(any(), any())(any())
+        verify(mockAssetsTransformer, never).transformToEtmp(any(), any())(any())
+        verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
+        verify(mockMemberPaymentsTransformerTransformer, never).transformToEtmp(any(), any(), any())
+        verify(mockDeclarationTransformer, never).transformToEtmp(any())
+        verify(mockConnector, never).submitPsrDetails(any())(any(), any())
+        verify(mockAuditService, never).sendExtendedEvent(any())(any(), any())
+        verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
+        result mustBe Some(())
+      }
+    }
+
+    "shouldn't submit PsrDetails request when userAnswer is empty (initial and current UAs are different)" in {
+      when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
+        .thenReturn(Future.successful(Some(emptyUserAnswers)))
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any())(any()))
+        .thenReturn(Some(minimalRequiredSubmission))
+      whenReady(service.submitPsrDetails(srn, fallbackCall = fallbackCall)) { result: Option[Unit] =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any(), any())(any())
+        verify(mockLoansTransformer, never).transformToEtmp(any(), any())(any())
+        verify(mockAssetsTransformer, never).transformToEtmp(any(), any())(any())
+        verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
+        verify(mockMemberPaymentsTransformerTransformer, never).transformToEtmp(any(), any(), any())
+        verify(mockDeclarationTransformer, never).transformToEtmp(any())
+        verify(mockConnector, never).submitPsrDetails(any())(any(), any())
+        verify(mockAuditService, never).sendExtendedEvent(any())(any(), any())
+        verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
+        result mustBe None
+      }
+    }
 
     List(true, false).foreach(
       checkReturnDatesAnswer =>
@@ -118,23 +155,28 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           val userAnswers = defaultUserAnswers
             .unsafeSet(CheckReturnDatesPage(srn), checkReturnDatesAnswer)
           val request = DataRequest(allowedAccessRequest, userAnswers)
-          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+
+          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any())(any()))
             .thenReturn(Some(minimalRequiredSubmission))
-          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
+          when(mockLoansTransformer.transformToEtmp(any(), any())(any())).thenReturn(None)
+          when(mockMemberPaymentsTransformerTransformer.transformToEtmp(any(), any(), any())).thenReturn(None)
+          when(mockAssetsTransformer.transformToEtmp(any(), any())(any())).thenReturn(None)
+          when(mockSharesTransformer.transformToEtmp(any(), any())(any())).thenReturn(None)
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(())))
+          when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
+            .thenReturn(Future.successful(Some(emptyUserAnswers)))
 
           whenReady(
             service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
           ) { result: Option[Unit] =>
-            verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-            verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-            verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-            verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-            verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
-            verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-            verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
+            verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any(), any())(any())
+            verify(mockLoansTransformer, times(1)).transformToEtmp(any(), any())(any())
+            verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
+            verify(mockSharesTransformer, times(1)).transformToEtmp(any(), any())(any())
             verify(mockDeclarationTransformer, never).transformToEtmp(any())
             verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
             verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
+            verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
 
             captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
             captor.getValue.checkReturnDates mustBe checkReturnDatesAnswer
@@ -147,547 +189,79 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         }
     )
 
-    List(true, false).foreach(
-      loansMadeOrOutstanding =>
-        s"submitPsrDetails request successfully when LoansMadeOrOutstandingPage is $loansMadeOrOutstanding" in {
-          val userAnswers = defaultUserAnswers
-            .unsafeSet(CheckReturnDatesPage(srn), false)
-            .unsafeSet(LoansMadeOrOutstandingPage(srn), loansMadeOrOutstanding)
-          val request = DataRequest(allowedAccessRequest, userAnswers)
+    s"submitPsrDetails request successfully when optional fields are not None" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(CheckReturnDatesPage(srn), false)
+      val request = DataRequest(allowedAccessRequest, userAnswers)
 
-          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-            .thenReturn(Some(minimalRequiredSubmission))
-          when(mockLoanTransactionsTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any())(any()))
+        .thenReturn(Some(minimalRequiredSubmission))
+      when(mockLoansTransformer.transformToEtmp(any(), any())(any())).thenReturn(optLoans)
+      when(mockMemberPaymentsTransformerTransformer.transformToEtmp(any(), any(), any())).thenReturn(optMemberPayments)
+      when(mockAssetsTransformer.transformToEtmp(any(), any())(any())).thenReturn(optAssets)
+      when(mockSharesTransformer.transformToEtmp(any(), any())(any())).thenReturn(optShares)
+      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(())))
+      when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
+        .thenReturn(Future.successful(Some(emptyUserAnswers)))
 
-          whenReady(
-            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
-          ) { result: Option[Unit] =>
-            verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-            verify(mockLoanTransactionsTransformer, times(1)).transformToEtmp(any())(any())
-            verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-            verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-            verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
-            verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-            verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-            verify(mockDeclarationTransformer, never).transformToEtmp(any())
-            verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
-            verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
+      whenReady(
+        service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
+      ) { result: Option[Unit] =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any(), any())(any())
+        verify(mockLoansTransformer, times(1)).transformToEtmp(any(), any())(any())
+        verify(mockMemberPaymentsTransformerTransformer, times(1)).transformToEtmp(any(), any(), any())
+        verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
+        verify(mockSharesTransformer, times(1)).transformToEtmp(any(), any())(any())
+        verify(mockDeclarationTransformer, never).transformToEtmp(any())
+        verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+        verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
+        verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
 
-            captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-            captor.getValue.checkReturnDates mustBe false
-            captor.getValue.loans mustBe Some(Loans(schemeHadLoans = loansMadeOrOutstanding, List.empty))
-            captor.getValue.assets mustBe None
-            captor.getValue.shares mustBe None
-            captor.getValue.psrDeclaration mustBe None
-            result mustBe Some(())
-          }
-        }
-    )
-
-    List(true, false).foreach(
-      landOrPropertyHeld =>
-        s"submitPsrDetails request successfully when LandOrPropertyHeldPage is $landOrPropertyHeld" in {
-          val userAnswers = defaultUserAnswers
-            .unsafeSet(CheckReturnDatesPage(srn), false)
-            .unsafeSet(LandOrPropertyHeldPage(srn), landOrPropertyHeld)
-          val request = DataRequest(allowedAccessRequest, userAnswers)
-
-          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-            .thenReturn(Some(minimalRequiredSubmission))
-          when(mockLandOrPropertyTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
-
-          whenReady(
-            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
-          ) {
-            result: Option[Unit] =>
-              verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-              verify(mockLandOrPropertyTransactionsTransformer, times(1))
-                .transformToEtmp(srn = srn, disposeAnyLandOrProperty = false)(request)
-              verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-              verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-              verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
-              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
-
-              captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-              captor.getValue.checkReturnDates mustBe false
-              captor.getValue.loans mustBe None
-              captor.getValue.assets mustBe Some(
-                Assets(
-                  optLandOrProperty = Some(
-                    LandOrProperty(
-                      landOrPropertyHeld = landOrPropertyHeld,
-                      disposeAnyLandOrProperty = false,
-                      List.empty
-                    )
-                  ),
-                  optBorrowing = None,
-                  optBonds = None,
-                  optOtherAssets = None
-                )
-              )
-              captor.getValue.shares mustBe None
-              captor.getValue.psrDeclaration mustBe None
-              result mustBe Some(())
-          }
-        }
-    )
-
-    List(true, false).foreach(
-      landOrPropertyDisposal =>
-        s"submitPsrDetails request successfully when LandOrPropertyDisposalPage is $landOrPropertyDisposal" in {
-          val userAnswers = defaultUserAnswers
-            .unsafeSet(CheckReturnDatesPage(srn), false)
-            .unsafeSet(LandOrPropertyHeldPage(srn), true)
-            .unsafeSet(LandOrPropertyDisposalPage(srn), landOrPropertyDisposal)
-          val request = DataRequest(allowedAccessRequest, userAnswers)
-
-          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-            .thenReturn(Some(minimalRequiredSubmission))
-          when(mockLandOrPropertyTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
-
-          whenReady(
-            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
-          ) {
-            result: Option[Unit] =>
-              verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-              verify(mockLandOrPropertyTransactionsTransformer, times(1))
-                .transformToEtmp(srn = srn, disposeAnyLandOrProperty = landOrPropertyDisposal)(request)
-              verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-              verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-              verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
-              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
-
-              captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-              captor.getValue.checkReturnDates mustBe false
-              captor.getValue.loans mustBe None
-              captor.getValue.assets mustBe Some(
-                Assets(
-                  optLandOrProperty = Some(
-                    LandOrProperty(
-                      landOrPropertyHeld = true,
-                      disposeAnyLandOrProperty = landOrPropertyDisposal,
-                      List.empty
-                    )
-                  ),
-                  optBorrowing = None,
-                  optBonds = None,
-                  optOtherAssets = None
-                )
-              )
-              captor.getValue.shares mustBe None
-              captor.getValue.psrDeclaration mustBe None
-              result mustBe Some(())
-          }
-        }
-    )
-
-    List(true, false).foreach(
-      moneyBorrowed =>
-        s"submitPsrDetails request successfully when MoneyBorrowedPage is $moneyBorrowed" in {
-          val userAnswers = defaultUserAnswers
-            .unsafeSet(CheckReturnDatesPage(srn), false)
-            .unsafeSet(MoneyBorrowedPage(srn), moneyBorrowed)
-          val request = DataRequest(allowedAccessRequest, userAnswers)
-
-          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-            .thenReturn(Some(minimalRequiredSubmission))
-          when(mockMoneyBorrowedTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
-
-          whenReady(
-            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
-          ) {
-            result: Option[Unit] =>
-              verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-              verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-              verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockMoneyBorrowedTransformer, times(1)).transformToEtmp(any())(any())
-              verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
-              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
-
-              captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-              captor.getValue.checkReturnDates mustBe false
-              captor.getValue.loans mustBe None
-              captor.getValue.assets mustBe Some(
-                Assets(
-                  optLandOrProperty = None,
-                  optBorrowing = Some(Borrowing(moneyWasBorrowed = moneyBorrowed, List.empty)),
-                  optBonds = None,
-                  optOtherAssets = None
-                )
-              )
-              captor.getValue.shares mustBe None
-              captor.getValue.psrDeclaration mustBe None
-              result mustBe Some(())
-          }
-        }
-    )
-
-    List(true, false).foreach(
-      didSchemeHoldAnyShares =>
-        s"submitPsrDetails request successfully when DidSchemeHoldAnySharesPage is $didSchemeHoldAnyShares" in {
-          val userAnswers = defaultUserAnswers
-            .unsafeSet(CheckReturnDatesPage(srn), false)
-            .unsafeSet(DidSchemeHoldAnySharesPage(srn), didSchemeHoldAnyShares)
-          val request = DataRequest(allowedAccessRequest, userAnswers)
-
-          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-            .thenReturn(Some(minimalRequiredSubmission))
-          when(mockSharesTransformer.transformToEtmp(any(), any())(any()))
-            .thenReturn(Shares(optShareTransactions = None, optTotalValueQuotedShares = None))
-          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
-
-          whenReady(
-            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
-          ) { result: Option[Unit] =>
-            verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-            verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-            verify(mockSharesTransformer, times(1)).transformToEtmp(srn, sharesDisposal = false)(request)
-            verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-            verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-            verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-            verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-            verify(mockDeclarationTransformer, never).transformToEtmp(any())
-            verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
-            verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
-
-            captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-            captor.getValue.checkReturnDates mustBe false
-            captor.getValue.loans mustBe None
-            captor.getValue.assets mustBe None
-            captor.getValue.shares mustBe Some(Shares(optShareTransactions = None, optTotalValueQuotedShares = None))
-            captor.getValue.psrDeclaration mustBe None
-            result mustBe Some(())
-          }
-        }
-    )
-
-    List(true, false).foreach(
-      didSchemeDisposeAnyShares =>
-        s"submitPsrDetails request successfully when SharesDisposalPage is $didSchemeDisposeAnyShares" in {
-          val userAnswers = defaultUserAnswers
-            .unsafeSet(CheckReturnDatesPage(srn), false)
-            .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
-            .unsafeSet(SharesDisposalPage(srn), didSchemeDisposeAnyShares)
-          val request = DataRequest(allowedAccessRequest, userAnswers)
-
-          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-            .thenReturn(Some(minimalRequiredSubmission))
-          when(mockSharesTransformer.transformToEtmp(any(), any())(any()))
-            .thenReturn(Shares(optShareTransactions = None, optTotalValueQuotedShares = None))
-          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
-
-          whenReady(
-            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
-          ) {
-            result: Option[Unit] =>
-              verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-              verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-              verify(mockSharesTransformer, times(1))
-                .transformToEtmp(srn, didSchemeDisposeAnyShares)(request)
-              verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-              verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
-              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
-
-              captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-              captor.getValue.checkReturnDates mustBe false
-              captor.getValue.loans mustBe None
-              captor.getValue.assets mustBe None
-              captor.getValue.shares mustBe Some(Shares(optShareTransactions = None, optTotalValueQuotedShares = None))
-              captor.getValue.psrDeclaration mustBe None
-              result mustBe Some(())
-          }
-        }
-    )
-
-    List(true, false).foreach(
-      unregulatedOrConnectedBondsHeld =>
-        s"submitPsrDetails request successfully when UnregulatedOrConnectedBondsHeldPage is $unregulatedOrConnectedBondsHeld" in {
-          val userAnswers = defaultUserAnswers
-            .unsafeSet(CheckReturnDatesPage(srn), false)
-            .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), unregulatedOrConnectedBondsHeld)
-          val request = DataRequest(allowedAccessRequest, userAnswers)
-
-          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-            .thenReturn(Some(minimalRequiredSubmission))
-          when(mockBondTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
-
-          whenReady(
-            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
-          ) {
-            result: Option[Unit] =>
-              verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-              verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-              verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-              verify(mockBondTransactionsTransformer, times(1)).transformToEtmp(srn, bondsDisposal = false)(request)
-              verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
-              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
-
-              captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-              captor.getValue.checkReturnDates mustBe false
-              captor.getValue.loans mustBe None
-              captor.getValue.assets mustBe Some(
-                Assets(
-                  optLandOrProperty = None,
-                  optBorrowing = None,
-                  optBonds = Some(
-                    Bonds(
-                      bondsWereAdded = unregulatedOrConnectedBondsHeld,
-                      bondsWereDisposed = false,
-                      bondTransactions = List.empty
-                    )
-                  ),
-                  optOtherAssets = None
-                )
-              )
-              captor.getValue.shares mustBe None
-              captor.getValue.psrDeclaration mustBe None
-              result mustBe Some(())
-          }
-        }
-    )
-
-    List(true, false).foreach(
-      bondsDisposal =>
-        s"submitPsrDetails request successfully when BondsDisposalPage is $bondsDisposal" in {
-          val userAnswers = defaultUserAnswers
-            .unsafeSet(CheckReturnDatesPage(srn), false)
-            .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
-            .unsafeSet(BondsDisposalPage(srn), bondsDisposal)
-          val request = DataRequest(allowedAccessRequest, userAnswers)
-
-          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-            .thenReturn(Some(minimalRequiredSubmission))
-          when(mockBondTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
-
-          whenReady(
-            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
-          ) {
-            result: Option[Unit] =>
-              verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-              verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-              verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-              verify(mockBondTransactionsTransformer, times(1))
-                .transformToEtmp(srn = srn, bondsDisposal = bondsDisposal)(request)
-              verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
-              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
-
-              captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-              captor.getValue.checkReturnDates mustBe false
-              captor.getValue.loans mustBe None
-              captor.getValue.assets mustBe Some(
-                Assets(
-                  optLandOrProperty = None,
-                  optBorrowing = None,
-                  optBonds = Some(
-                    Bonds(
-                      bondsWereAdded = true,
-                      bondsWereDisposed = bondsDisposal,
-                      bondTransactions = List.empty
-                    )
-                  ),
-                  optOtherAssets = None
-                )
-              )
-              captor.getValue.shares mustBe None
-              captor.getValue.psrDeclaration mustBe None
-              result mustBe Some(())
-          }
-        }
-    )
-
-    List(true, false).foreach(
-      otherAssetsHeldPage =>
-        s"submitPsrDetails request successfully when OtherAssetsHeldPage is $otherAssetsHeldPage" in {
-          val userAnswers = defaultUserAnswers
-            .unsafeSet(CheckReturnDatesPage(srn), false)
-            .unsafeSet(OtherAssetsHeldPage(srn), otherAssetsHeldPage)
-          val request = DataRequest(allowedAccessRequest, userAnswers)
-
-          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-            .thenReturn(Some(minimalRequiredSubmission))
-          when(mockOtherAssetTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
-
-          whenReady(
-            service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
-          ) {
-            result: Option[Unit] =>
-              verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-              verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-              verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-              verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockOtherAssetTransactionsTransformer, times(1))
-                .transformToEtmp(srn = srn, otherAssetDisposed = false)(request)
-              verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
-              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
-
-              captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-              captor.getValue.checkReturnDates mustBe false
-              captor.getValue.loans mustBe None
-              captor.getValue.assets mustBe Some(
-                Assets(
-                  optLandOrProperty = None,
-                  optBorrowing = None,
-                  optBonds = None,
-                  optOtherAssets = Some(
-                    OtherAssets(
-                      otherAssetsWereHeld = otherAssetsHeldPage,
-                      otherAssetsWereDisposed = false,
-                      otherAssetTransactions = List.empty
-                    )
-                  )
-                )
-              )
-              captor.getValue.shares mustBe None
-              captor.getValue.psrDeclaration mustBe None
-              result mustBe Some(())
-          }
-        }
-    )
-
-    List(true, false).foreach(
-      otherAssetsDisposalPage =>
-        s"submitPsrDetails request successfully when OtherAssetsDisposalPage is $otherAssetsDisposalPage" in {
-          val userAnswers = defaultUserAnswers
-            .unsafeSet(CheckReturnDatesPage(srn), false)
-            .unsafeSet(OtherAssetsHeldPage(srn), true)
-            .unsafeSet(OtherAssetsDisposalPage(srn), otherAssetsDisposalPage)
-          val request = DataRequest(allowedAccessRequest, userAnswers)
-
-          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-            .thenReturn(Some(minimalRequiredSubmission))
-          when(mockOtherAssetTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
-          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
-
-          whenReady(
-            service.submitPsrDetails(srn, false, fallbackCall = fallbackCall)(implicitly, implicitly, request)
-          ) {
-            result: Option[Unit] =>
-              verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-              verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-              verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-              verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-              verify(mockOtherAssetTransactionsTransformer, times(1))
-                .transformToEtmp(srn = srn, otherAssetDisposed = otherAssetsDisposalPage)(request)
-              verify(mockDeclarationTransformer, never).transformToEtmp(any())
-              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
-              verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
-
-              captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-              captor.getValue.checkReturnDates mustBe false
-              captor.getValue.loans mustBe None
-              captor.getValue.assets mustBe Some(
-                Assets(
-                  optLandOrProperty = None,
-                  optBorrowing = None,
-                  optBonds = None,
-                  optOtherAssets = Some(
-                    OtherAssets(
-                      otherAssetsWereHeld = true,
-                      otherAssetsWereDisposed = otherAssetsDisposalPage,
-                      otherAssetTransactions = List.empty
-                    )
-                  )
-                )
-              )
-              captor.getValue.shares mustBe None
-              captor.getValue.psrDeclaration mustBe None
-              result mustBe Some(())
-          }
-        }
-    )
+        captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+        captor.getValue.checkReturnDates mustBe false
+        captor.getValue.loans mustBe optLoans
+        captor.getValue.assets mustBe optAssets
+        captor.getValue.shares mustBe optShares
+        captor.getValue.psrDeclaration mustBe None
+        result mustBe Some(())
+      }
+    }
 
     s"submitPsrDetails request successfully with PsrDeclaration when isSubmitted is true" in {
       val userAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), false)
       val request = DataRequest(allowedAccessRequest, userAnswers)
-      val declaration = PsrDeclaration(
-        submittedBy = PSP,
-        submitterId = "submitterId",
-        optAuthorisingPSAID = Some("authorisingPSAID"),
-        declaration1 = true,
-        declaration2 = true
-      )
 
-      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any())(any()))
         .thenReturn(Some(minimalRequiredSubmission))
+      when(mockLoansTransformer.transformToEtmp(any(), any())(any())).thenReturn(optLoans)
+      when(mockMemberPaymentsTransformerTransformer.transformToEtmp(any(), any(), any())).thenReturn(optMemberPayments)
+      when(mockAssetsTransformer.transformToEtmp(any(), any())(any())).thenReturn(optAssets)
+      when(mockSharesTransformer.transformToEtmp(any(), any())(any())).thenReturn(optShares)
+      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(())))
       when(mockDeclarationTransformer.transformToEtmp(any())).thenReturn(declaration)
-      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(Right(true)))
+      when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
+        .thenReturn(Future.successful(Some(emptyUserAnswers)))
 
       whenReady(service.submitPsrDetails(srn = srn, isSubmitted = true, fallbackCall)(implicitly, implicitly, request)) {
         result: Option[Unit] =>
-          verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-          verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-          verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-          verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
-          verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-          verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-          verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
+          verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any(), any())(any())
+          verify(mockLoansTransformer, times(1)).transformToEtmp(any(), any())(any())
+          verify(mockMemberPaymentsTransformerTransformer, times(1)).transformToEtmp(any(), any(), any())
+          verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
+          verify(mockSharesTransformer, times(1)).transformToEtmp(any(), any())(any())
           verify(mockDeclarationTransformer, times(1)).transformToEtmp(any())
           verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
           verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
+          verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
 
           captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
           captor.getValue.checkReturnDates mustBe false
-          captor.getValue.loans mustBe None
-          captor.getValue.assets mustBe None
-          captor.getValue.shares mustBe None
+          captor.getValue.loans mustBe optLoans
+          captor.getValue.assets mustBe optAssets
+          captor.getValue.shares mustBe optShares
           captor.getValue.psrDeclaration mustBe Some(declaration)
           result mustBe Some(())
-      }
-    }
-
-    "shouldn't submitPsrDetails request when userAnswer is empty" in {
-      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-        .thenReturn(Some(minimalRequiredSubmission))
-      whenReady(service.submitPsrDetails(srn, fallbackCall = fallbackCall)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-        verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-        verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-        verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
-        verify(mockMemberPaymentsTransformerTransformer, never).transformToEtmp(any(), any())
-        verify(mockBondTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-        verify(mockOtherAssetTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-        verify(mockDeclarationTransformer, never).transformToEtmp(any())
-        verify(mockConnector, never).submitPsrDetails(any())(any(), any())
-        verify(mockAuditService, never).sendExtendedEvent(any())(any(), any())
-        result mustBe None
       }
     }
   }
@@ -706,8 +280,9 @@ object PsrSubmissionServiceSpec {
       periodEnd = sampleDate,
       compilationOrSubmissionDate = None
     ),
-    NonEmptyList.of(sampleDate -> sampleDate),
+    AccountingPeriodDetails(Some("001"), NonEmptyList.of(sampleDate -> sampleDate)),
     SchemeDesignatory(
+      Some("001"),
       openBankAccount = true,
       Some("reasonForNoBankAccount"),
       1,
@@ -719,5 +294,37 @@ object PsrSubmissionServiceSpec {
       None,
       None
     )
+  )
+  val optLoans: Option[Loans] = Some(
+    Loans(recordVersion = Some("001"), schemeHadLoans = true, loanTransactions = Seq.empty)
+  )
+  val optMemberPayments: Option[MemberPayments] = Some(
+    MemberPayments(
+      recordVersion = Some("001"),
+      memberDetails = List.empty,
+      employerContributionsDetails = SectionDetails(made = true, completed = true),
+      transfersInCompleted = true,
+      transfersOutCompleted = true,
+      unallocatedContribsMade = true,
+      unallocatedContribAmount = None,
+      memberContributionMade = true,
+      lumpSumReceived = true,
+      pensionReceived = true,
+      benefitsSurrenderedDetails = SectionDetails(made = true, completed = true)
+    )
+  )
+  val optAssets: Option[Assets] = Some(
+    Assets(optLandOrProperty = None, optBorrowing = None, optBonds = None, optOtherAssets = None)
+  )
+  val optShares: Option[Shares] = Some(
+    Shares(recordVersion = Some("001"), optShareTransactions = None, optTotalValueQuotedShares = None)
+  )
+
+  val declaration: PsrDeclaration = PsrDeclaration(
+    submittedBy = PSP,
+    submitterId = "submitterId",
+    optAuthorisingPSAID = Some("authorisingPSAID"),
+    declaration1 = true,
+    declaration2 = true
   )
 }

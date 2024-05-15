@@ -17,10 +17,10 @@
 package transformations
 
 import pages.nonsipp.bonds._
+import pages.nonsipp.bonds.Paths.bonds
 import config.Refined.{Max5000, OneTo50, OneTo5000}
 import models.SchemeHoldBond.{Acquisition, Transfer}
 import models.SchemeId.Srn
-import models.requests.psr.{BondDisposed, BondTransactions, Bonds}
 import eu.timepit.refined.refineV
 import models.{HowDisposed, Money, UserAnswers}
 import pages.nonsipp.bondsdisposal._
@@ -29,15 +29,31 @@ import models.requests.DataRequest
 import eu.timepit.refined.api.Refined
 import models.HowDisposed.{Other, Sold}
 import com.google.inject.Singleton
+import models.requests.psr.{BondDisposed, BondTransactions, Bonds}
+import models.UserAnswers.implicits.UserAnswersTryOps
 
 import scala.util.Try
 
 import javax.inject.Inject
 
 @Singleton()
-class BondTransactionsTransformer @Inject() extends Transformer {
+class BondsTransformer @Inject() extends Transformer {
 
-  def transformToEtmp(srn: Srn, bondsDisposal: Boolean)(
+  def transformToEtmp(srn: Srn, optUnregulatedOrConnectedBondsHeld: Option[Boolean], initialUA: UserAnswers)(
+    implicit request: DataRequest[_]
+  ): Option[Bonds] = optUnregulatedOrConnectedBondsHeld.map { bondsWereAdded =>
+    val bondsDisposal = request.userAnswers.get(BondsDisposalPage(srn)).getOrElse(false)
+    Bonds(
+      recordVersion = Option.when(request.userAnswers.get(bonds) == initialUA.get(bonds))(
+        request.userAnswers.get(BondsRecordVersionPage(srn)).get
+      ),
+      bondsWereAdded = bondsWereAdded,
+      bondsWereDisposed = bondsDisposal,
+      bondTransactions = bondTransactionsTransformToEtmp(srn, bondsDisposal)
+    )
+  }
+
+  private def bondTransactionsTransformToEtmp(srn: Srn, bondsDisposal: Boolean)(
     implicit request: DataRequest[_]
   ): List[BondTransactions] =
     request.userAnswers
@@ -145,9 +161,13 @@ class BondTransactionsTransformer @Inject() extends Transformer {
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, bond: Bonds): Try[UserAnswers] = {
     val bondTransactions = bond.bondTransactions
+    val userAnswersOfBondsHeld = userAnswers.set(UnregulatedOrConnectedBondsHeldPage(srn), bond.bondsWereAdded)
+    val userAnswersWithRecordVersion =
+      bond.recordVersion.fold(userAnswersOfBondsHeld)(userAnswersOfBondsHeld.set(BondsRecordVersionPage(srn), _))
+
     for {
       indexes <- buildIndexesForMax5000(bondTransactions.size)
-      resultUA <- indexes.foldLeft(userAnswers.set(UnregulatedOrConnectedBondsHeldPage(srn), bond.bondsWereAdded)) {
+      resultUA <- indexes.foldLeft(userAnswersWithRecordVersion) {
         case (ua, index) =>
           val bondTransaction = bondTransactions(index.value - 1)
 

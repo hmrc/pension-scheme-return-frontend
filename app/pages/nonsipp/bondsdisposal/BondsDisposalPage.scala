@@ -20,6 +20,6 @@ import pages.QuestionPage
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 case class BondsDisposalPage(srn: Srn) extends QuestionPage[Boolean] {
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = Paths.bonds \ toString
   override def toString: String = "bondsDisposal"
 }

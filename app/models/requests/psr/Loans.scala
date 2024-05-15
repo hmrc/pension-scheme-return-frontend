@@ -21,7 +21,7 @@ import models.IdentityType
 
 import java.time.LocalDate
 
-case class Loans(schemeHadLoans: Boolean, loanTransactions: Seq[LoanTransactions])
+case class Loans(recordVersion: Option[String], schemeHadLoans: Boolean, loanTransactions: Seq[LoanTransactions])
 
 case class LoanTransactions(
   recipientIdentityType: RecipientIdentityType,

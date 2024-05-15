@@ -17,7 +17,7 @@
 package controllers.nonsipp.bondsdisposal
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
+import pages.nonsipp.bonds._
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max50, Max5000}
