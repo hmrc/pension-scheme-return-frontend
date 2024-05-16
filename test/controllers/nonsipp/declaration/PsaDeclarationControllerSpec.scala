@@ -16,20 +16,42 @@
 
 package controllers.nonsipp.declaration
 
-import services.PsrSubmissionService
+import connectors.EmailConnector
 import controllers.ControllerBaseSpec
-import play.api.inject.bind
-import views.html.ContentPageView
+import models.DateRange
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{reset, times, verify, when}
+import org.scalatest.BeforeAndAfterEach
+import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
-import org.mockito.Mockito.{reset, times, verify}
+import services.{AuditService, PsrSubmissionService, SchemeDateService}
+import uk.gov.hmrc.play.audit.http.connector.AuditResult
+import views.html.ContentPageView
 
-class PsaDeclarationControllerSpec extends ControllerBaseSpec {
+import scala.concurrent.Future
+
+class PsaDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfterEach {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+  private implicit val mockEmailConnector = mock[EmailConnector]
+  private val mockAuditService = mock[AuditService]
+  private val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
+  private val schemeDatePeriod: DateRange = dateRangeGen.sample.value
+  private val templateId = "pods_event_report_submitted" // TODO change as per PSR-1139
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    reset(mockAuditService)
+    reset(mockEmailConnector)
+    reset(mockSchemeDateService)
+    super.beforeEach()
+  }
 
   override protected val additionalBindings: List[GuiceableModule] = List(
-    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService),
+    bind[AuditService].toInstance(mockAuditService),
+    bind[SchemeDateService].toInstance(mockSchemeDateService),
+    bind[EmailConnector].toInstance(mockEmailConnector)
   )
 
   "PsaDeclarationController" - {
@@ -48,10 +70,19 @@ class PsaDeclarationControllerSpec extends ControllerBaseSpec {
 
     act.like(
       agreeAndContinue(onSubmit)
-        .before(MockPSRSubmissionService.submitPsrDetails())
+        .before({
+          when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(schemeDatePeriod))
+          when(mockSchemeDateService.returnPeriodsAsJsonString(any())(any())).thenReturn("")
+          when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")
+          when(mockAuditService.sendEvent(any)(any(), any())).thenReturn(Future.successful(AuditResult.Success))
+          MockPSRSubmissionService.submitPsrDetails()
+          MockEmailConnector.sendEmail(email, templateId)
+        })
         .after({
           verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-          reset(mockPsrSubmissionService)
+          verify(mockEmailConnector, times(1))
+            .sendEmail(any(), any(), any(), any(), any(), any(), any(), any())(any(), any())
+          verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
         })
     )
 

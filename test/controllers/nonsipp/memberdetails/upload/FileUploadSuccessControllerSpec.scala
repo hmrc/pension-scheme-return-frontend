@@ -17,31 +17,31 @@
 package controllers.nonsipp.memberdetails.upload
 
 import play.api.test.FakeRequest
-import services.{PsrSubmissionService, SaveService, UploadService}
 import config.Refined.OneTo300
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
-import cats.implicits.catsSyntaxOptionId
-import eu.timepit.refined.{refineMV, refineV}
 import uk.gov.hmrc.domain.Nino
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
 import models._
-import models.UploadStatus.UploadStatus
+import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
 import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
+import pages.nonsipp.employercontributions.EmployerNamePage
+import services.{PsrSubmissionService, SaveService, UploadService}
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails._
 import org.mockito.Mockito.{reset, verify, when}
+import pages.nonsipp.membercontributions.TotalMemberContributionPage
+import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
 import views.html.ContentPageView
 import models.SchemeId.Srn
-import pages.nonsipp.employercontributions.EmployerNamePage
-import pages.nonsipp.membercontributions.TotalMemberContributionPage
-import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
-import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
-import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
-import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
-import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
+import cats.implicits.catsSyntaxOptionId
 import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
+import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
+import eu.timepit.refined.{refineMV, refineV}
+import models.UploadStatus.UploadStatus
+import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
 
 import scala.concurrent.Future
 import scala.util.Try

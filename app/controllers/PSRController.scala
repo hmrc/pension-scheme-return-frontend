@@ -94,6 +94,16 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
     )
   }
 
+  def loggedInUserNameOrBlank(implicit request: DataRequest[_]): String =
+    request.minimalDetails.individualDetails match {
+      case Some(individual) => individual.fullName
+      case None =>
+        request.minimalDetails.organisationName match {
+          case Some(orgName) => orgName
+          case None => ""
+        }
+    }
+
   implicit class OptionOps[A](maybe: Option[A]) {
     def getOrRecoverJourney[F[_]: Applicative](f: A => F[Result]): F[Result] = maybe match {
       case Some(value) => f(value)

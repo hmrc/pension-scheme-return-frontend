@@ -16,14 +16,14 @@
 
 package pages.nonsipp.membertransferout
 
-import config.Refined.{Max300, Max5, OneTo300, OneTo5}
-import controllers.TestValues
-import eu.timepit.refined.api.Refined
-import utils.UserAnswersUtils.UserAnswersOps
-import eu.timepit.refined.refineMV
-import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
-import pages.behaviours.PageBehaviours
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import config.Refined._
+import controllers.TestValues
+import eu.timepit.refined.refineMV
+import utils.UserAnswersUtils.UserAnswersOps
+import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
+import eu.timepit.refined.api.Refined
+import pages.behaviours.PageBehaviours
 
 class ReceivingSchemeNamePageSpec extends PageBehaviours with TestValues {
 

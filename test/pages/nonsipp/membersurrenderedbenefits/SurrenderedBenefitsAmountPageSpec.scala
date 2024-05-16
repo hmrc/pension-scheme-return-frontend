@@ -16,14 +16,13 @@
 
 package pages.nonsipp.membersurrenderedbenefits
 
-import config.Refined.{Max300, Max5}
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import config.Refined.Max300
 import controllers.TestValues
-import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models.Money
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberdetails.MemberDetailsPage
 
 class SurrenderedBenefitsAmountPageSpec extends PageBehaviours with TestValues {
 

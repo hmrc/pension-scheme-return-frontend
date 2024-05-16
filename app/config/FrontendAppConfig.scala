@@ -62,6 +62,30 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   val upscanMaxFileSizeMB: String = s"${upscanMaxFileSize}MB"
   val secureUpscanCallBack: Boolean = config.getOptional[Boolean]("microservice.services.upscan.secure").getOrElse(true)
 
+  val emailService: Service = config.get[Service]("microservice.services.email")
+  val emailApiUrl: String = emailService.baseUrl
+  val emailSendForce: Boolean = config.getOptional[Boolean]("email.force").getOrElse(false)
+  val fileReturnTemplateId: String = config.get[String]("email.fileReturnTemplateId")
+
+  def eventReportingEmailCallback(
+    psaOrPsp: String,
+    requestId: String,
+    encryptedEmail: String,
+    encryptedPsaId: String,
+    encryptedPstr: String,
+    reportVersion: String
+  ): String =
+    s"${pensionsScheme.baseUrl}${config
+      .get[String](path = "urls.emailCallback")
+      .format(
+        psaOrPsp,
+        requestId,
+        encryptedEmail,
+        encryptedPsaId,
+        encryptedPstr,
+        reportVersion
+      )}"
+
   object features {
     val welshTranslation: Boolean = config.get[Boolean]("features.welsh-translation")
   }
