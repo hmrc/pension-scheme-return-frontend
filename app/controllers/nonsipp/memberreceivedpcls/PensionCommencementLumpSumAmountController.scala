@@ -67,7 +67,7 @@ class PensionCommencementLumpSumAmountController @Inject()(
             .get(PensionCommencementLumpSumAmountPage(srn, index))
             .fold(form)(value => if (value.isZero) form else form.fill(value.tuple))
 
-        Ok(view(viewModel(srn, index, memberName.fullName, mode, preparedForm)))
+        Ok(view(preparedForm, viewModel(srn, index, memberName.fullName, mode, form)))
       }
     }
 
@@ -78,7 +78,14 @@ class PensionCommencementLumpSumAmountController @Inject()(
           .bindFromRequest()
           .fold(
             formWithErrors =>
-              Future.successful(BadRequest(view(viewModel(srn, index, memberName.fullName, mode, formWithErrors)))),
+              Future.successful(
+                BadRequest(
+                  view(
+                    formWithErrors,
+                    viewModel(srn, index, memberName.fullName, mode, form)
+                  )
+                )
+              ),
             value =>
               for {
                 updatedAnswers <- Future

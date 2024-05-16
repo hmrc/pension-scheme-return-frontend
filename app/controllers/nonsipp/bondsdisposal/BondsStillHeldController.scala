@@ -59,13 +59,14 @@ class BondsStillHeldController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       Ok(
         view(
+          form.fromUserAnswers(BondsStillHeldPage(srn, bondIndex, disposalIndex)),
           viewModel(
             srn,
             bondIndex,
             disposalIndex,
             request.schemeDetails.schemeName,
             mode,
-            form.fromUserAnswers(BondsStillHeldPage(srn, bondIndex, disposalIndex))
+            form
           )
         )
       )
@@ -80,6 +81,7 @@ class BondsStillHeldController @Inject()(
             Future.successful(
               BadRequest(
                 view(
+                  formWithErrors,
                   BondsStillHeldController
                     .viewModel(
                       srn,
@@ -87,7 +89,7 @@ class BondsStillHeldController @Inject()(
                       disposalIndex,
                       request.schemeDetails.schemeName,
                       mode,
-                      formWithErrors
+                      form
                     )
                 )
               )

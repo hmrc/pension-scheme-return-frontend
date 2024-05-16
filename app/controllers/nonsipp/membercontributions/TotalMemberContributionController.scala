@@ -84,7 +84,7 @@ class TotalMemberContributionController @Inject()(
       optionList(index.value - 1)
         .map(_.fullName)
         .getOrRecoverJourney
-        .map(memberName => Ok(view(viewModel(srn, index, memberName, preparedForm, mode))))
+        .map(memberName => Ok(view(preparedForm, viewModel(srn, index, memberName, form, mode))))
         .merge
     }
 
@@ -120,7 +120,7 @@ class TotalMemberContributionController @Inject()(
                 .map(
                   memberName =>
                     BadRequest(
-                      view(viewModel(srn, index, memberName, formWithErrors, mode))
+                      view(formWithErrors, viewModel(srn, index, memberName, form, mode))
                     )
                 )
                 .merge

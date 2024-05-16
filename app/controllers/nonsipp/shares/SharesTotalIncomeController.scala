@@ -58,7 +58,7 @@ class SharesTotalIncomeController @Inject()(
     implicit request =>
       request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { companyName =>
         val preparedForm = request.userAnswers.fillForm(SharesTotalIncomePage(srn, index), form)
-        Ok(view(viewModel(srn, index, companyName, preparedForm, mode)))
+        Ok(view(preparedForm, viewModel(srn, index, companyName, form, mode)))
       }
   }
 
@@ -69,7 +69,7 @@ class SharesTotalIncomeController @Inject()(
         .fold(
           formWithErrors => {
             request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { companyName =>
-              Future.successful(BadRequest(view(viewModel(srn, index, companyName, formWithErrors, mode))))
+              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, companyName, form, mode))))
             }
           },
           value =>

@@ -58,7 +58,7 @@ class LandOrPropertyTotalIncomeController @Inject()(
     implicit request =>
       request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
         val preparedForm = request.userAnswers.fillForm(LandOrPropertyTotalIncomePage(srn, index), form)
-        Ok(view(viewModel(srn, index, preparedForm, address.addressLine1, mode)))
+        Ok(view(preparedForm, viewModel(srn, index, form, address.addressLine1, mode)))
       }
   }
 
@@ -69,7 +69,11 @@ class LandOrPropertyTotalIncomeController @Inject()(
         .fold(
           formWithErrors => {
             request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-              Future.successful(BadRequest(view(viewModel(srn, index, formWithErrors, address.addressLine1, mode))))
+              Future.successful(
+                BadRequest(
+                  view(formWithErrors, viewModel(srn, index, form, address.addressLine1, mode))
+                )
+              )
             }
           },
           value =>

@@ -24,10 +24,12 @@ import controllers.PSRController
 import config.Constants
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
+import forms.MoneyFormProvider
+import controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController._
 import models.{Mode, Money}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
+import forms.mappings.errors.MoneyFormErrors
 import views.html.MoneyView
 import models.SchemeId.Srn
 import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
@@ -43,7 +45,7 @@ class UnallocatedEmployerAmountController @Inject()(
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
-  formProvider: MoneyFormErrorProvider,
+  formProvider: MoneyFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: MoneyView
 )(implicit ec: ExecutionContext)
@@ -55,13 +57,7 @@ class UnallocatedEmployerAmountController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm = request.userAnswers.get(UnallocatedEmployerAmountPage(srn)).fold(form)(form.fill)
 
-      Ok(
-        view(
-          UnallocatedEmployerAmountController
-            .viewModel(srn, request.schemeDetails.schemeName, preparedForm, mode)
-        )
-      )
-
+      Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, form, mode)))
     }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
@@ -70,11 +66,14 @@ class UnallocatedEmployerAmountController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            val viewModel =
-              UnallocatedEmployerAmountController
-                .viewModel(srn, request.schemeDetails.schemeName, formWithErrors, mode)
-
-            Future.successful(BadRequest(view(viewModel)))
+            Future.successful(
+              BadRequest(
+                view(
+                  formWithErrors,
+                  viewModel(srn, request.schemeDetails.schemeName, form, mode)
+                )
+              )
+            )
           },
           value =>
             for {
@@ -87,7 +86,7 @@ class UnallocatedEmployerAmountController @Inject()(
 }
 
 object UnallocatedEmployerAmountController {
-  def form(formProvider: MoneyFormErrorProvider): Form[Money] = formProvider(
+  def form(formProvider: MoneyFormProvider): Form[Money] = formProvider(
     MoneyFormErrors(
       requiredKey = "unallocatedEmployerAmount.error.required",
       nonNumericKey = "unallocatedEmployerAmount.error.invalid",

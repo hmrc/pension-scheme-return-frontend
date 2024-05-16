@@ -28,14 +28,14 @@
   govukSelect: GovukSelect
 )
 
-@(viewmodel: FormPageViewModel[MultipleQuestionsViewModel[_]])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], viewmodel: FormPageViewModel[MultipleQuestionsViewModel[_]])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
+@layout(pageTitle = title(form, viewmodel.title.toMessage)) {
 
   @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
 
-    @if(viewmodel.page.form.hasErrors) {
-      @govukErrorSummary(ErrorSummaryViewModel(viewmodel.page.form))
+    @if(form.hasErrors) {
+      @govukErrorSummary(ErrorSummaryViewModel(form))
     }
 
 
@@ -70,7 +70,7 @@
 @input(index: Int, width: Option[InputWidth], field: QuestionField) = {
     @govukInput(
         InputViewModel(
-            field = viewmodel.page.form(s"value.${index + 1}"),
+            field = form(s"value.${index + 1}"),
             label = LabelViewModel(renderMessage(field.label))
         )
         .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
@@ -81,7 +81,7 @@
 @currency(index: Int, field: QuestionField) = {
     @govukInput(
         InputViewModel(
-            field = viewmodel.page.form(s"value.${index + 1}"),
+            field = form(s"value.${index + 1}"),
             label = LabelViewModel(renderMessage(field.label))
         )
         .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
@@ -94,7 +94,7 @@
   @percentage(index: Int, field: QuestionField) = {
     @govukInput(
         InputViewModel(
-            field = viewmodel.page.form(s"value.${index + 1}"),
+            field = form(s"value.${index + 1}"),
             label = LabelViewModel(renderMessage(field.label))
         )
         .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
@@ -107,7 +107,7 @@
 @date(index: Int, field: QuestionField) = {
     @govukDateInput(
         DateViewModel(
-            field  = viewmodel.page.form(s"value.${index + 1}"),
+            field  = form(s"value.${index + 1}"),
             legend = LegendViewModel(renderMessage(field.label))
         )
     )
@@ -125,14 +125,14 @@
                     SelectItem(
                         value = Some(selectInput.value),
                         text = selectInput.label,
-                        selected = viewmodel.page.form(s"value.${index + 1}").value.contains(selectInput.value)
+                        selected = form(s"value.${index + 1}").value.contains(selectInput.value)
                     )
                 ),
-        errorMessage = viewmodel.page.form(s"value.${index + 1}").error.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*))))
+        errorMessage = form(s"value.${index + 1}").error.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*))))
     ).asAccessibleAutocomplete(Some(
         AccessibleAutocomplete(
             showAllValues = false,
             autoSelect = true
         )
-    )).withFormField(viewmodel.page.form(s"value.${index + 1}")))
+    )).withFormField(form(s"value.${index + 1}")))
 }

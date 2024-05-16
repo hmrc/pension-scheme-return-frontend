@@ -63,7 +63,12 @@ class LandPropertyAddressManualController @Inject()(
         val preparedForm = previousAnswer.fold(ukAddressForm)(
           address => if (address.isManualAddress) ukAddressForm.fill(address.asUKAddressTuple) else ukAddressForm
         )
-        Ok(view(viewModel(srn, index, ukPage(preparedForm), isUkAddress, mode)))
+        Ok(
+          view(
+            preparedForm,
+            viewModel(srn, index, ukPage(preparedForm), isUkAddress, mode)
+          )
+        )
       } else {
         val preparedForm = previousAnswer.fold(internationalAddressFormWithCountries)(
           address =>
@@ -73,7 +78,12 @@ class LandPropertyAddressManualController @Inject()(
               internationalAddressFormWithCountries
             }
         )
-        Ok(view(viewModel(srn, index, internationalPage(preparedForm, Country.countries), isUkAddress, mode)))
+        Ok(
+          view(
+            preparedForm,
+            viewModel(srn, index, internationalPage(preparedForm, Country.countries), isUkAddress, mode)
+          )
+        )
       }
     }
 
@@ -93,7 +103,14 @@ class LandPropertyAddressManualController @Inject()(
       .bindFromRequest()
       .fold(
         formWithErrors => {
-          Future.successful(BadRequest(view(viewModel(srn, index, ukPage(formWithErrors), isUkAddress = true, mode))))
+          Future.successful(
+            BadRequest(
+              view(
+                formWithErrors,
+                viewModel(srn, index, ukPage(formWithErrors), isUkAddress = true, mode)
+              )
+            )
+          )
         },
         value =>
           for {
@@ -116,13 +133,8 @@ class LandPropertyAddressManualController @Inject()(
           Future.successful(
             BadRequest(
               view(
-                viewModel(
-                  srn,
-                  index,
-                  internationalPage(formWithErrors, Country.countries),
-                  isUkAddress = false,
-                  mode
-                )
+                formWithErrors,
+                viewModel(srn, index, internationalPage(formWithErrors, Country.countries), isUkAddress = false, mode)
               )
             )
           )
@@ -253,5 +265,4 @@ object LandPropertyAddressManualController {
         .select(label = "landPropertyAddressManual.field6.label", selectSource = countryOptions)
         .withWidth(InputWidth.TwoThirds)
     )
-
 }

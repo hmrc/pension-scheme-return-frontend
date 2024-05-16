@@ -42,6 +42,7 @@ class BondsStillHeldControllerSpec extends ControllerBaseSpec {
     act.like(
       renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
         injected[IntView].apply(
+          form(injected[IntFormProvider]),
           viewModel(
             srn,
             bondIndex,
@@ -59,13 +60,14 @@ class BondsStillHeldControllerSpec extends ControllerBaseSpec {
         implicit app => implicit request =>
           injected[IntView]
             .apply(
+              form(injected[IntFormProvider]).fill(bondsStillHeld),
               viewModel(
                 srn,
                 bondIndex,
                 disposalIndex,
                 schemeName,
                 NormalMode,
-                form(injected[IntFormProvider]).fill(bondsStillHeld)
+                form(injected[IntFormProvider])
               )
             )
       }

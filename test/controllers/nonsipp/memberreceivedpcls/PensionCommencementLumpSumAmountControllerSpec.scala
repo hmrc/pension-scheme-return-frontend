@@ -48,10 +48,12 @@ class PensionCommencementLumpSumAmountControllerSpec extends ControllerBaseSpec 
     lazy val onPageLoad = routes.PensionCommencementLumpSumAmountController.onPageLoad(srn, index, NormalMode)
     lazy val onSubmit = routes.PensionCommencementLumpSumAmountController.onSubmit(srn, index, NormalMode)
 
-    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      val view = injected[MultipleQuestionView]
-      view(viewModel(form))
-    })
+    act.like(
+      renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
+        val view = injected[MultipleQuestionView]
+        view(form, viewModel(form))
+      }
+    )
 
     act.like(
       renderPrePopView(
@@ -61,7 +63,7 @@ class PensionCommencementLumpSumAmountControllerSpec extends ControllerBaseSpec 
         userAnswers
       ) { implicit app => implicit request =>
         val view = injected[MultipleQuestionView]
-        view(viewModel(form.fill(lumpSumData.from[(Money, Money)])))
+        view(form.fill(lumpSumData.from[(Money, Money)]), viewModel(form))
       }
     )
 

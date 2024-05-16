@@ -36,6 +36,7 @@ class LandPropertyAddressManualControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[MultipleQuestionView].apply(
+        ukAddressForm,
         viewModel(srn, index, ukPage(ukAddressForm), isUkAddress = true, NormalMode)
       )
     })
@@ -43,7 +44,8 @@ class LandPropertyAddressManualControllerSpec extends ControllerBaseSpec {
     act.like(renderPrePopView(onPageLoad, LandOrPropertyChosenAddressPage(srn, index), address) {
       implicit app => implicit request =>
         injected[MultipleQuestionView].apply(
-          viewModel(srn, index, ukPage(ukAddressForm.fill(address.asUKAddressTuple)), isUkAddress = true, NormalMode)
+          ukAddressForm.fill(address.asUKAddressTuple),
+          viewModel(srn, index, ukPage(ukAddressForm), isUkAddress = true, NormalMode)
         )
     })
 

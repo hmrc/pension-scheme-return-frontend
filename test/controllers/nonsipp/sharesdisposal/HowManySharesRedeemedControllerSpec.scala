@@ -43,6 +43,7 @@ class HowManySharesRedeemedControllerSpec extends ControllerBaseSpec {
     act.like(
       renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
         injected[IntView].apply(
+          form(injected[IntFormProvider]),
           viewModel(
             srn,
             shareIndex,
@@ -60,13 +61,14 @@ class HowManySharesRedeemedControllerSpec extends ControllerBaseSpec {
         implicit app => implicit request =>
           injected[IntView]
             .apply(
+              form(injected[IntFormProvider]).fill(totalShares),
               viewModel(
                 srn,
                 shareIndex,
                 disposalIndex,
                 companyName,
                 NormalMode,
-                form(injected[IntFormProvider]).fill(totalShares)
+                form(injected[IntFormProvider])
               )
             )
       }

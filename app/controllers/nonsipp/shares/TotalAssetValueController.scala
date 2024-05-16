@@ -59,11 +59,12 @@ class TotalAssetValueController @Inject()(
     implicit request =>
       Ok(
         view(
+          form.fromUserAnswers(TotalAssetValuePage(srn, index)),
           viewModel(
             srn,
             index,
             request.schemeDetails.schemeName,
-            form.fromUserAnswers(TotalAssetValuePage(srn, index)),
+            form,
             mode
           )
         )
@@ -79,8 +80,9 @@ class TotalAssetValueController @Inject()(
             Future.successful(
               BadRequest(
                 view(
+                  formWithErrors,
                   TotalAssetValueController
-                    .viewModel(srn, index, request.schemeDetails.schemeName, formWithErrors, mode)
+                    .viewModel(srn, index, request.schemeDetails.schemeName, form, mode)
                 )
               )
             ),

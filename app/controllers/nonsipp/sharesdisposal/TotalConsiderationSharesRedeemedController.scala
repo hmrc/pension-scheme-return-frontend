@@ -23,17 +23,18 @@ import config.Constants.{maxTotalConsiderationAmount, minTotalConsiderationAmoun
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal.{HowManySharesRedeemedPage, TotalConsiderationSharesRedeemedPage}
 import navigation.Navigator
-import controllers.nonsipp.sharesdisposal.TotalConsiderationSharesRedeemedController._
 import models.{Mode, Money}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
+import forms.mappings.errors.MoneyFormErrors
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max50, Max5000}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import views.html.MoneyView
 import models.SchemeId.Srn
+import controllers.nonsipp.sharesdisposal.TotalConsiderationSharesRedeemedController._
+import forms.MoneyFormProvider
 import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.models.{FormPageViewModel, QuestionField}
 
@@ -46,7 +47,7 @@ class TotalConsiderationSharesRedeemedController @Inject()(
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
-  formProvider: MoneyFormErrorProvider,
+  formProvider: MoneyFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: MoneyView
 )(implicit ec: ExecutionContext)
@@ -62,7 +63,7 @@ class TotalConsiderationSharesRedeemedController @Inject()(
             val preparedForm =
               request.userAnswers.fillForm(TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex), form)
 
-            Ok(view(viewModel(srn, shareIndex, disposalIndex, numShares, companyName, preparedForm, mode)))
+            Ok(view(preparedForm, viewModel(srn, shareIndex, disposalIndex, numShares, companyName, form, mode)))
         }
       }
     }
@@ -78,7 +79,10 @@ class TotalConsiderationSharesRedeemedController @Inject()(
                 formWithErrors => {
                   Future.successful(
                     BadRequest(
-                      view(viewModel(srn, shareIndex, disposalIndex, numShares, companyName, formWithErrors, mode))
+                      view(
+                        formWithErrors,
+                        viewModel(srn, shareIndex, disposalIndex, numShares, companyName, form, mode)
+                      )
                     )
                   )
                 },
@@ -105,7 +109,7 @@ class TotalConsiderationSharesRedeemedController @Inject()(
 }
 
 object TotalConsiderationSharesRedeemedController {
-  def form(formProvider: MoneyFormErrorProvider): Form[Money] = formProvider(
+  def form(formProvider: MoneyFormProvider): Form[Money] = formProvider(
     MoneyFormErrors(
       requiredKey = "sharesDisposal.totalConsiderationSharesRedeemed.error.required",
       nonNumericKey = "sharesDisposal.totalConsiderationSharesRedeemed.error.invalid.characters",

@@ -62,10 +62,10 @@ class InterestOnLoanController @Inject()(
           index,
           mode,
           request.schemeDetails.schemeName,
-          request.userAnswers.fillForm(InterestOnLoanPage(srn, index), form)
+          form
         )
 
-        Ok(view(viewModel))
+        Ok(view(request.userAnswers.fillForm(InterestOnLoanPage(srn, index), form), viewModel))
       }
   }
 
@@ -78,9 +78,9 @@ class InterestOnLoanController @Inject()(
         .fold(
           formWithErrors => {
             val viewModel =
-              InterestOnLoanController.viewModel(srn, index, mode, request.schemeDetails.schemeName, formWithErrors)
+              InterestOnLoanController.viewModel(srn, index, mode, request.schemeDetails.schemeName, form)
 
-            Future.successful(BadRequest(view(viewModel)))
+            Future.successful(BadRequest(view(formWithErrors, viewModel)))
           },
           value =>
             for {

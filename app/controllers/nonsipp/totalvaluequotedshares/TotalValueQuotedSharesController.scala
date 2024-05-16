@@ -61,7 +61,7 @@ class TotalValueQuotedSharesController @Inject()(
     usingSchemeDate[Id](srn) { period =>
       val form = TotalValueQuotedSharesController.form(formProvider, period)
       val preparedForm = request.userAnswers.fillForm(TotalValueQuotedSharesPage(srn), form)
-      Ok(view(viewModel(srn, request.schemeDetails.schemeName, preparedForm, period)))
+      Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, form, period)))
     }
   }
 
@@ -74,9 +74,9 @@ class TotalValueQuotedSharesController @Inject()(
           formWithErrors => {
             val viewModel =
               TotalValueQuotedSharesController
-                .viewModel(srn, request.schemeDetails.schemeName, formWithErrors, period)
+                .viewModel(srn, request.schemeDetails.schemeName, form, period)
 
-            Future.successful(BadRequest(view(viewModel)))
+            Future.successful(BadRequest(view(formWithErrors, viewModel)))
           },
           value =>
             for {

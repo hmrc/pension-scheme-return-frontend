@@ -61,7 +61,7 @@ class TotalProceedsSaleLandPropertyController @Inject()(
         address =>
           val preparedForm = request.userAnswers
             .fillForm(TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex), form)
-          Ok(view(viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, preparedForm, mode)))
+          Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, form, mode)))
       }
     }
 
@@ -75,7 +75,10 @@ class TotalProceedsSaleLandPropertyController @Inject()(
               address =>
                 Future.successful(
                   BadRequest(
-                    view(viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, formWithErrors, mode))
+                    view(
+                      formWithErrors,
+                      viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, form, mode)
+                    )
                   )
                 )
             }

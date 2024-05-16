@@ -23,8 +23,8 @@ import config.Refined._
 import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import eu.timepit.refined.refineMV
+import forms.MoneyFormProvider
 import models.NormalMode
-import forms.mappings.errors.MoneyFormErrorProvider
 
 class TotalEmployerContributionControllerSpec extends ControllerBaseSpec {
 
@@ -44,13 +44,14 @@ class TotalEmployerContributionControllerSpec extends ControllerBaseSpec {
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[MoneyView]
         .apply(
+          form(injected[MoneyFormProvider]),
           viewModel(
             srn,
             employerName,
             memberDetails.fullName,
             index,
             secondaryIndex,
-            form(injected[MoneyFormErrorProvider]),
+            form(injected[MoneyFormProvider]),
             NormalMode
           )
         )
@@ -60,13 +61,14 @@ class TotalEmployerContributionControllerSpec extends ControllerBaseSpec {
       renderPrePopView(onPageLoad, TotalEmployerContributionPage(srn, index, secondaryIndex), money, userAnswers) {
         implicit app => implicit request =>
           injected[MoneyView].apply(
+            form(injected[MoneyFormProvider]).fill(money),
             viewModel(
               srn,
               employerName,
               memberDetails.fullName,
               index,
               secondaryIndex,
-              form(injected[MoneyFormErrorProvider]).fill(money),
+              form(injected[MoneyFormProvider]),
               NormalMode
             )
           )

@@ -38,6 +38,7 @@ class SharesTotalIncomeControllerSpec extends ControllerBaseSpec {
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[MoneyView]
         .apply(
+          form(injected[MoneyFormProvider]),
           viewModel(
             srn,
             index,
@@ -52,11 +53,12 @@ class SharesTotalIncomeControllerSpec extends ControllerBaseSpec {
       renderPrePopView(onPageLoad, SharesTotalIncomePage(srn, index), money, userAnswers) {
         implicit app => implicit request =>
           injected[MoneyView].apply(
+            form(injected[MoneyFormProvider]).fill(money),
             viewModel(
               srn,
               index,
               companyName,
-              form(injected[MoneyFormProvider]).fill(money),
+              form(injected[MoneyFormProvider]),
               NormalMode
             )
           )

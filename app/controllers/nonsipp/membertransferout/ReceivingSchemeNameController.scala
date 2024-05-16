@@ -27,7 +27,7 @@ import forms.TextFormProvider
 import models.Mode
 import viewmodels.models.{FormPageViewModel, TextInputViewModel}
 import play.api.data.Form
-import views.html.TexInputViewWidth40
+import views.html.TextInputViewWidth40
 import models.SchemeId.Srn
 import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
 import play.api.i18n.MessagesApi
@@ -43,7 +43,7 @@ class ReceivingSchemeNameController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: TextFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: TexInputViewWidth40
+  view: TextInputViewWidth40
 )(implicit ec: ExecutionContext)
     extends PSRController {
 

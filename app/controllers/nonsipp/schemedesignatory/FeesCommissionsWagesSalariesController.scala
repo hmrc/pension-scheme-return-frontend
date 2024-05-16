@@ -56,7 +56,7 @@ class FeesCommissionsWagesSalariesController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val preparedForm = request.userAnswers.fillForm(FeesCommissionsWagesSalariesPage(srn, mode), form)
-    Ok(view(viewModel(srn, request.schemeDetails.schemeName, preparedForm, mode)))
+    Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, form, mode)))
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
@@ -64,7 +64,14 @@ class FeesCommissionsWagesSalariesController @Inject()(
       .bindFromRequest()
       .fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(viewModel(srn, request.schemeDetails.schemeName, formWithErrors, mode)))),
+          Future.successful(
+            BadRequest(
+              view(
+                formWithErrors,
+                viewModel(srn, request.schemeDetails.schemeName, form, mode)
+              )
+            )
+          ),
         value =>
           for {
             updatedAnswers <- Future

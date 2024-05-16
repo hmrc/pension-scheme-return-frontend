@@ -86,7 +86,12 @@ class TotalValueTransferController @Inject()(
         .getOrRecoverJourney
         .map(
           memberName =>
-            Ok(view(viewModel(srn, index, secondaryIndex, memberName, transferSchemeName.get, preparedForm, mode)))
+            Ok(
+              view(
+                preparedForm,
+                viewModel(srn, index, secondaryIndex, memberName, transferSchemeName.get, form, mode)
+              )
+            )
         )
         .merge
 
@@ -126,13 +131,14 @@ class TotalValueTransferController @Inject()(
                   memberName =>
                     BadRequest(
                       view(
+                        formWithErrors,
                         viewModel(
                           srn,
                           index,
                           secondaryIndex,
                           memberName,
                           transferSchemeName.get,
-                          formWithErrors,
+                          form,
                           mode
                         )
                       )

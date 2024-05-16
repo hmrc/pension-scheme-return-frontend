@@ -28,7 +28,7 @@ import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
 import config.Refined.Max5000
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
-import views.html.MoneyView
+import views.html.MultipleQuestionView
 import models.SchemeId.Srn
 import utils.DateTimeUtils.localDateShow
 import models.{DateRange, Mode, Money}
@@ -50,7 +50,7 @@ class AmountOfTheLoanController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: MoneyView,
+  view: MultipleQuestionView,
   formProvider: MoneyFormProvider,
   saveService: SaveService,
   schemeDateService: SchemeDateService
@@ -68,10 +68,10 @@ class AmountOfTheLoanController @Inject()(
           mode,
           request.schemeDetails.schemeName,
           period,
-          request.userAnswers.fillForm(AmountOfTheLoanPage(srn, index), form)
+          form
         )
 
-        Ok(view(viewModel))
+        Ok(view(request.userAnswers.fillForm(AmountOfTheLoanPage(srn, index), form), viewModel))
       }
   }
 
@@ -86,9 +86,9 @@ class AmountOfTheLoanController @Inject()(
             formWithErrors => {
               val viewModel =
                 AmountOfTheLoanController
-                  .viewModel(srn, index, mode, request.schemeDetails.schemeName, period, formWithErrors)
+                  .viewModel(srn, index, mode, request.schemeDetails.schemeName, period, form)
 
-              Future.successful(BadRequest(view(viewModel)))
+              Future.successful(BadRequest(view(formWithErrors, viewModel)))
             },
             value =>
               for {

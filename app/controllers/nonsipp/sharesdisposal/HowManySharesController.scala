@@ -55,13 +55,14 @@ class HowManySharesController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  private def form = HowManySharesController.form(formProvider)
+  private def form: Form[Int] = HowManySharesController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { nameOfSharesCompany =>
         Ok(
           view(
+            form.fromUserAnswers(HowManyDisposalSharesPage(srn, index, disposalIndex)),
             viewModel(
               srn,
               index,
@@ -69,7 +70,7 @@ class HowManySharesController @Inject()(
               nameOfSharesCompany,
               request.schemeDetails.schemeName,
               mode,
-              form.fromUserAnswers(HowManyDisposalSharesPage(srn, index, disposalIndex))
+              form
             )
           )
         )
@@ -86,6 +87,7 @@ class HowManySharesController @Inject()(
               Future.successful(
                 BadRequest(
                   view(
+                    formWithErrors,
                     HowManySharesController
                       .viewModel(
                         srn,
@@ -94,7 +96,7 @@ class HowManySharesController @Inject()(
                         nameOfSharesCompany,
                         request.schemeDetails.schemeName,
                         mode,
-                        formWithErrors
+                        form
                       )
                   )
                 )

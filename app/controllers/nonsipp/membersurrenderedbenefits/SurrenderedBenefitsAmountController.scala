@@ -24,11 +24,12 @@ import controllers.PSRController
 import config.Constants.{maxSurrenderedBenefitAmount, minPosMoneyValue}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
+import forms.MoneyFormProvider
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
 import models.{Mode, Money}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
+import forms.mappings.errors.MoneyFormErrors
 import config.Refined.Max300
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import views.html.MoneyView
@@ -46,7 +47,7 @@ class SurrenderedBenefitsAmountController @Inject()(
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
-  formProvider: MoneyFormErrorProvider,
+  formProvider: MoneyFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: MoneyView
 )(implicit ec: ExecutionContext)
@@ -59,7 +60,7 @@ class SurrenderedBenefitsAmountController @Inject()(
       request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
         val preparedForm = request.userAnswers.fillForm(SurrenderedBenefitsAmountPage(srn, memberIndex), form)
 
-        Ok(view(viewModel(srn, memberName.fullName, memberIndex, preparedForm, mode)))
+        Ok(view(preparedForm, viewModel(srn, memberName.fullName, memberIndex, form, mode)))
       }
     }
 
@@ -71,7 +72,12 @@ class SurrenderedBenefitsAmountController @Inject()(
           .fold(
             formWithErrors => {
               Future.successful(
-                BadRequest(view(viewModel(srn, memberName.fullName, memberIndex, formWithErrors, mode)))
+                BadRequest(
+                  view(
+                    formWithErrors,
+                    viewModel(srn, memberName.fullName, memberIndex, form, mode)
+                  )
+                )
               )
             },
             value =>
@@ -88,7 +94,7 @@ class SurrenderedBenefitsAmountController @Inject()(
 }
 
 object SurrenderedBenefitsAmountController {
-  def form(formProvider: MoneyFormErrorProvider): Form[Money] = formProvider(
+  def form(formProvider: MoneyFormProvider): Form[Money] = formProvider(
     MoneyFormErrors(
       requiredKey = "surrenderedBenefits.amount.error.required",
       nonNumericKey = "surrenderedBenefits.amount.error.invalid",

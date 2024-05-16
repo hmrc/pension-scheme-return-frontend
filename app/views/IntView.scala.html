@@ -23,14 +23,14 @@
   govukInput: GovukInput
 )
 
-@(viewmodel: FormPageViewModel[MultipleQuestionsViewModel[_]])(implicit request: Request[_], messages: Messages)
+@(form: Form[Int], viewmodel: FormPageViewModel[MultipleQuestionsViewModel[_]])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
+@layout(pageTitle = title(form, viewmodel.title.toMessage)) {
 
   @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
 
-    @if(viewmodel.page.form.hasErrors) {
-      @govukErrorSummary(ErrorSummaryViewModel(viewmodel.page.form))
+    @if(form.hasErrors) {
+      @govukErrorSummary(ErrorSummaryViewModel(form))
     }
 
     @if(viewmodel.page.fields.length > 1) {
@@ -49,7 +49,7 @@
 
         @govukInput(
           InputViewModel(
-            field = viewmodel.page.form(s"value.${index + 1}"),
+            field = form(s"value.${index + 1}"),
             label = LabelViewModel(renderMessage(field.label))
           )
                   .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
@@ -60,7 +60,7 @@
         @viewmodel.page.fields.map { case (field) =>
             @govukInput(
                 InputViewModel(
-                    field = viewmodel.page.form("value"),
+                    field = form("value"),
                     label = LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading()
                 )
                 .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))

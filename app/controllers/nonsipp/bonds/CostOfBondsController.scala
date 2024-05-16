@@ -53,16 +53,16 @@ class CostOfBondsController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  private def form = CostOfBondsController.form(formProvider)
+  private def form: Form[Money] = CostOfBondsController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
-          viewModel(srn, index, form.fromUserAnswers(CostOfBondsPage(srn, index)), mode)
+          form.fromUserAnswers(CostOfBondsPage(srn, index)),
+          viewModel(srn, index, form, mode)
         )
       )
-
   }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
@@ -74,7 +74,8 @@ class CostOfBondsController @Inject()(
             Future.successful(
               BadRequest(
                 view(
-                  CostOfBondsController.viewModel(srn, index, formWithErrors, mode)
+                  formWithErrors,
+                  CostOfBondsController.viewModel(srn, index, form, mode)
                 )
               )
             ),
