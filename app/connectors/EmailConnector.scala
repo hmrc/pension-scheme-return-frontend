@@ -63,7 +63,7 @@ class EmailConnector @Inject()(
     val encryptedEmail =
       URLEncoder.encode(crypto.QueryParameterCrypto.encrypt(PlainText(email)).value, StandardCharsets.UTF_8.toString)
 
-    appConfig.eventReportingEmailCallback(
+    val callbackUrl = appConfig.eventReportingEmailCallback(
       psaOrPsp,
       requestId,
       encryptedEmail,
@@ -71,6 +71,8 @@ class EmailConnector @Inject()(
       encryptedPstr,
       reportVersion
     )
+    logger.info(s"Callback URL: $callbackUrl")
+    callbackUrl
   }
 
   //scalastyle:off parameter.number
