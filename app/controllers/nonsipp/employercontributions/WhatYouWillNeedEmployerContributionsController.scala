@@ -65,15 +65,12 @@ object WhatYouWillNeedEmployerContributionsController {
     ).withButtonText(Message("site.continue"))
       .withDescription(
         ParagraphMessage("whatYouWillNeedEmployerContributions.paragraph1") ++
-          ParagraphMessage("whatYouWillNeedEmployerContributions.paragraph2") ++
           ListMessage(
             ListType.Bullet,
             "whatYouWillNeedEmployerContributions.tellUs1",
             "whatYouWillNeedEmployerContributions.tellUs2",
             "whatYouWillNeedEmployerContributions.tellUs3",
             "whatYouWillNeedEmployerContributions.tellUs4"
-          ) ++
-          ParagraphMessage("whatYouWillNeedEmployerContributions.paragraph3") ++
-          ParagraphMessage("whatYouWillNeedEmployerContributions.paragraph4")
+          )
       )
 }

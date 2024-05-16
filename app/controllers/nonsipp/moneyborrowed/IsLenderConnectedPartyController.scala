@@ -33,7 +33,7 @@ import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import pages.nonsipp.moneyborrowed.{IsLenderConnectedPartyPage, LenderNamePage}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage._
 import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -111,10 +111,16 @@ object IsLenderConnectedPartyController {
           Message("isLenderConnectedParty.content"),
           ParagraphMessage("isLenderConnectedParty.paragraph1") ++
             ParagraphMessage("isLenderConnectedParty.paragraph2") ++
+            ParagraphMessage("isLenderConnectedParty.paragraph3") ++
+            ListMessage(
+              ListType.Bullet,
+              "isLenderConnectedParty.list1",
+              "isLenderConnectedParty.list2"
+            ) ++
             ParagraphMessage(
-              "isLenderConnectedParty.paragraph3",
+              "isLenderConnectedParty.paragraph4",
               LinkMessage(
-                "isLenderConnectedParty.paragraph3.link",
+                "isLenderConnectedParty.paragraph4.link",
                 incomeTaxAct,
                 Map("rel" -> "noreferrer noopener", "target" -> "_blank")
               )

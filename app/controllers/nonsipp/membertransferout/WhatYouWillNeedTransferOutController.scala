@@ -65,7 +65,6 @@ object WhatYouWillNeedTransferOutController {
     ).withButtonText(Message("site.continue"))
       .withDescription(
         ParagraphMessage("WhatYouWillNeed.TransferOut.paragraph1") ++
-          ParagraphMessage("WhatYouWillNeed.TransferOut.paragraph2") ++
           ListMessage(
             ListType.Bullet,
             "WhatYouWillNeed.TransferOut.tellUs1",
@@ -73,8 +72,6 @@ object WhatYouWillNeedTransferOutController {
             "WhatYouWillNeed.TransferOut.tellUs3",
             "WhatYouWillNeed.TransferOut.tellUs4",
             "WhatYouWillNeed.TransferOut.tellUs5"
-          ) ++
-          ParagraphMessage("WhatYouWillNeed.TransferOut.paragraph3") ++
-          ParagraphMessage("WhatYouWillNeed.TransferOut.paragraph4")
+          )
       )
 }

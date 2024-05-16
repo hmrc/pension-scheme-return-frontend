@@ -33,7 +33,7 @@ import views.html.YesNoPageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage._
 import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -111,9 +111,17 @@ object IsIndividualRecipientConnectedPartyController {
           ParagraphMessage("isIndividualRecipientConnectedParty.paragraph1") ++
             ParagraphMessage("isIndividualRecipientConnectedParty.paragraph2") ++
             ParagraphMessage(
-              "isIndividualRecipientConnectedParty.paragraph3",
+              "isIndividualRecipientConnectedParty.paragraph3"
+            ) ++
+            ListMessage(
+              ListType.Bullet,
+              "isIndividualRecipientConnectedParty.list1",
+              "isIndividualRecipientConnectedParty.list2"
+            ) ++
+            ParagraphMessage(
+              "isIndividualRecipientConnectedParty.paragraph4",
               LinkMessage(
-                "isIndividualRecipientConnectedParty.paragraph3.link",
+                "isIndividualRecipientConnectedParty.paragraph4.link",
                 incomeTaxAct,
                 Map("rel" -> "noreferrer noopener", "target" -> "_blank")
               )

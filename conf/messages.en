@@ -370,6 +370,7 @@ changeMemberDetails.heading = Change {0}’s details
 
 removeMemberDetails.title = Are you sure you want to remove this member?
 removeMemberDetails.heading = Are you sure you want to remove {0}?
+removeMemberDetails.hint = This will also remove any payments for them you have previously added in the ‘Member payments’ section.
 removeMemberDetails.error.required = Select yes if you are sure you want to remove
 
 activeAccountDetails.title = Did the scheme have at least one open bank account during the period of this return?
@@ -948,13 +949,9 @@ uploadMemberDetails.list3 = their National Insurance number, in the format QQ123
 uploadMemberDetails.error.required = Select a file
 uploadMemberDetails.error.size = The selected file must be smaller than {0}
 
-howToUpload.title = How to upload member details
-howToUpload.heading = How to upload member details
-howToUpload.paragraph = You need to upload a .csv file and include the following information for each member of the scheme:
-howToUpload.name = their first and last name
-howToUpload.nino = their National Insurance number, in the format QQ 12 34 56 C, or the reason they do not have one
-howToUpload.dob = their date of birth, in the format 01/08/1970
-howToUpload.linkMessage = Download the template file
+howToUpload.title = Download template file
+howToUpload.heading = Download template file
+howToUpload.linkMessage = Download the template .csv file
 howToUpload.linkMessage1 = and use this to enter the information. Do not change or delete the header row (row 1) or change the order of the columns in the template file.
 
 checkMemberDetailsFile.title = Check your member details file
@@ -1233,9 +1230,12 @@ isIndividualRecipientConnectedParty.error.required = Select yes if the recipient
 isIndividualRecipientConnectedParty.change.hidden = IsMemberOrConnectedParty
 isIndividualRecipientConnectedParty.content = What is a connected party?
 isIndividualRecipientConnectedParty.paragraph1 = A connected party is an individual, company or partnership that is connected to either a member of the scheme or the sponsoring employer of the scheme.
-isIndividualRecipientConnectedParty.paragraph2 = A connected party of a member is usually their spouse, civil partner or close relative (for example their parent, sibling, child or grandchild). A connected party of a sponsoring employer can be someone who has control over the company; it can also be another company, where the same person has control of both.
-isIndividualRecipientConnectedParty.paragraph3 = There are other circumstances where an individual, company or partnership might be a connected party. You can read a full list in
-isIndividualRecipientConnectedParty.paragraph3.link = Section 993 of the Income Tax Act 2007.
+isIndividualRecipientConnectedParty.paragraph2 = A connected party of a member is usually their spouse, civil partner or close relative. For example their parent, sibling, child or grandchild.
+isIndividualRecipientConnectedParty.paragraph3 = A connected party of a sponsoring employer can be:
+isIndividualRecipientConnectedParty.list1 = someone who has control over the company
+isIndividualRecipientConnectedParty.list2 = another company, where the same person has control of both
+isIndividualRecipientConnectedParty.paragraph4 = See a
+isIndividualRecipientConnectedParty.paragraph4.link = full list of circumstances where an individual, company or partnership might be a connected party (opens in new tab).
 
 individualRecipientNino.title = Do you know the recipient’s National Insurance number?
 individualRecipientNino.heading = Do you know {0}’s National Insurance number?
@@ -1683,13 +1683,12 @@ partnershipSellerName.error.tooLong = Seller’s partnership name must be 160 ch
 
 whatYouWillNeedLandPropertyDisposal.title = Land or property disposed of by the scheme
 whatYouWillNeedLandPropertyDisposal.heading = Land or property disposed of by {0}
-whatYouWillNeedLandPropertyDisposal.paragraph1 = Answer these questions for one property or piece of land at a time. If you need to report more, you will be able to do this later.
-whatYouWillNeedLandPropertyDisposal.paragraph2 = You must tell us about all land or property the scheme disposed of during the period of this return.
-whatYouWillNeedLandPropertyDisposal.paragraph3 = You need to tell us:
+whatYouWillNeedLandPropertyDisposal.paragraph1 = You must tell us about all land or property the scheme disposed of during the period of this return.
+whatYouWillNeedLandPropertyDisposal.paragraph2 = You need to tell us:
 whatYouWillNeedLandPropertyDisposal.tellUs1 = which land or property was disposed of
 whatYouWillNeedLandPropertyDisposal.tellUs2 = if it was disposed of by sale, transfer out or other
 whatYouWillNeedLandPropertyDisposal.tellUs3 = if any part of the land or property is still held
-whatYouWillNeedLandPropertyDisposal.paragraph4 = If any land or property was sold, you need to tell us:
+whatYouWillNeedLandPropertyDisposal.paragraph3 = If any land or property was sold, you need to tell us:
 whatYouWillNeedLandPropertyDisposal.landOrPropertySold1 = the date it was sold
 whatYouWillNeedLandPropertyDisposal.landOrPropertySold2 = if the buyer was an individual, company, partnership or other
 whatYouWillNeedLandPropertyDisposal.landOrPropertySold3 = the buyer’s National Insurance number, Company Registration Number, Unique Taxpayer Reference or details – whichever applies
@@ -1703,7 +1702,7 @@ isLesseeConnectedParty.error.required = Select yes if any lessee is a connected 
 
 landOrPropertyTotalIncome.title = What was the total income from the land or property in the period of this return, in pounds and pence?
 landOrPropertyTotalIncome.heading = What was the total income from {0} in the period of this return, in pounds and pence?
-landOrPropertyTotalIncome.hint = This includes income, such as rent, and all other receipts received in respect of this land or property.
+landOrPropertyTotalIncome.hint = This includes income, such as rent, and all other receipts received in respect of this land or property. Also includes VAT.
 landOrPropertyTotalIncome.error.required = Enter the total income from the land or property in the period of this return, in pounds and pence
 landOrPropertyTotalIncome.error.invalid = Total income from the land or property in the period of this return must be an amount of money, like 123 or 123.45
 landOrPropertyTotalIncome.error.tooLarge = Total income from the land or property in the period of this return must be 999999999.99 or less
@@ -1998,9 +1997,12 @@ isLenderConnectedParty.heading = Is {0} a connected party?
 isLenderConnectedParty.error.required = Select yes if the lender is a connected party
 isLenderConnectedParty.content = What is a connected party?
 isLenderConnectedParty.paragraph1 = A connected party is an individual, company or partnership that is connected to either a member of the scheme or the sponsoring employer of the scheme.
-isLenderConnectedParty.paragraph2 = A connected party of a member is usually their spouse, civil partner or close relative (for example their parent, sibling, child or grandchild). A connected party of a sponsoring employer can be someone who has control over the company; it can also be another company, where the same person has control of both.
-isLenderConnectedParty.paragraph3 = There are other circumstances where an individual, company or partnership might be a connected party. You can read a full list in
-isLenderConnectedParty.paragraph3.link = Section 993 of the Income Tax Act 2007.
+isLenderConnectedParty.paragraph2 = A connected party of a member is usually their spouse, civil partner or close relative. For example their parent, sibling, child or grandchild.
+isLenderConnectedParty.paragraph3 = A connected party of a sponsoring employer can be:
+isLenderConnectedParty.list1 = someone who has control over the company
+isLenderConnectedParty.list2 = another company, where the same person has control of both
+isLenderConnectedParty.paragraph4 = See a
+isLenderConnectedParty.paragraph4.link = full list of circumstances where an individual, company or partnership might be a connected party (opens in new tab).
 
 moneyBorrowed.borrowedAmountAndRate.title = Amount of money borrowed and interest rate
 moneyBorrowed.borrowedAmountAndRate.heading = Amount of money borrowed and interest rate
@@ -2063,14 +2065,11 @@ moneyBorrowedCheckYourAnswers.change.heading = Change details for £{0} borrowed
 
 whatYouWillNeedEmployerContributions.title = Employer contributions for members of {0}
 whatYouWillNeedEmployerContributions.heading = Employer contributions for members of {0}
-whatYouWillNeedEmployerContributions.paragraph1 = You must tell us about all employer contributions made for members of the scheme during the period of this return.
-whatYouWillNeedEmployerContributions.paragraph2 = For each member employer contributions were made for, you need to tell us:
+whatYouWillNeedEmployerContributions.paragraph1 = For each member employer contributions were made for, you need to tell us:
 whatYouWillNeedEmployerContributions.tellUs1 = the name of the employer
 whatYouWillNeedEmployerContributions.tellUs2 = if the employer is a UK company, UK partnership or other
 whatYouWillNeedEmployerContributions.tellUs3 = the employer’s Company Registration Number, Unique Taxpayer Reference, or a description of the employer – whichever applies
 whatYouWillNeedEmployerContributions.tellUs4 = the total contribution made for the member by the employer
-whatYouWillNeedEmployerContributions.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
-whatYouWillNeedEmployerContributions.paragraph4 = If employer contributions were made for any member by more than one employer, you must tell us about all of them. Answer the questions for one employer at a time.
 
 employerName.title = What is the employer’s name?
 employerName.heading = What is the employer’s name?
@@ -2232,8 +2231,7 @@ WhatYouWillNeed.MemberContributions.paragraph4 = On the next page, you will be a
 
 WhatYouWillNeed.ReceivedTransfer.title   = Transfers in for members of the scheme
 WhatYouWillNeed.ReceivedTransfer.heading = Transfers in for members of {0}
-WhatYouWillNeed.ReceivedTransfer.paragraph1 = You must tell us about all transfers received for members of the scheme during the period of this return.
-WhatYouWillNeed.ReceivedTransfer.paragraph2 = For each transfer, you need to tell us:
+WhatYouWillNeed.ReceivedTransfer.paragraph1 = For each transfer, you need to tell us:
 WhatYouWillNeed.ReceivedTransfer.tellUs1 = which member received the transfer
 WhatYouWillNeed.ReceivedTransfer.tellUs2 = the name of the transferring scheme
 WhatYouWillNeed.ReceivedTransfer.tellUs3 = if the transferring scheme is a registered pension scheme, qualifying recognised overseas pension scheme (QROPS) or other
@@ -2241,8 +2239,6 @@ WhatYouWillNeed.ReceivedTransfer.tellUs4 = the transferring scheme’s Pension S
 WhatYouWillNeed.ReceivedTransfer.tellUs5 = the total value of the transfer
 WhatYouWillNeed.ReceivedTransfer.tellUs6 = the date the transfer was received
 WhatYouWillNeed.ReceivedTransfer.tellUs7 = if the transfer included an asset
-WhatYouWillNeed.ReceivedTransfer.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
-WhatYouWillNeed.ReceivedTransfer.paragraph4 = If the scheme received more than one transfer for any member, you must tell us about all of them. Answer the questions for one transfer at a time.
 
 WhatYouWillNeed.PensionCommencementLumpSum.title = Pension commencement lump sum details for members of the scheme
 WhatYouWillNeed.PensionCommencementLumpSum.heading = Pension commencement lump sum details for members of {0}
@@ -2421,15 +2417,12 @@ transfersInCYAController.rows.reportAnotherTransfer.hidden =  if you need to rep
 
 WhatYouWillNeed.TransferOut.title   = Transfers out for members of the scheme
 WhatYouWillNeed.TransferOut.heading = Transfers out for members of {0}
-WhatYouWillNeed.TransferOut.paragraph1 = You must tell us about all transfers out for members of the scheme during the period of this return.
-WhatYouWillNeed.TransferOut.paragraph2 = For each transfer out, you need to tell us:
+WhatYouWillNeed.TransferOut.paragraph1 = For each transfer out, you need to tell us:
 WhatYouWillNeed.TransferOut.tellUs1 = which member the transfer was made for
 WhatYouWillNeed.TransferOut.tellUs2 = the name of the receiving scheme
 WhatYouWillNeed.TransferOut.tellUs3 = if the receiving scheme is a registered pension scheme, qualifying recognised overseas pension scheme (QROPS) or other
 WhatYouWillNeed.TransferOut.tellUs4 = the receiving scheme’s Pension Scheme Tax Reference (PSTR), QROPS reference number, or a description of the receiving scheme – whichever applies
 WhatYouWillNeed.TransferOut.tellUs5 = the date the transfer was made
-WhatYouWillNeed.TransferOut.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
-WhatYouWillNeed.TransferOut.paragraph4 = If the scheme made more than one transfer out for any member, you must tell us about all of them. Answer the questions for one transfer at a time.
 
 transferOut.memberList.title = Select a member to report transfers out
 transferOut.memberList.title.plural = Select a member to report transfers out

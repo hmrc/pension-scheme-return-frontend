@@ -64,19 +64,12 @@ object HowToUploadController {
       routes.HowToUploadController.onSubmit(srn)
     ).withButtonText(Message("site.continue"))
       .withDescription(
-        ParagraphMessage("howToUpload.paragraph") ++
-          ListMessage(
-            ListType.Bullet,
-            "howToUpload.name",
-            "howToUpload.nino",
-            "howToUpload.dob"
-          ) ++
-          ParagraphMessage(
-            DownloadLinkMessage(
-              "howToUpload.linkMessage",
-              routes.DownloadPensionSchemeTemplateController.downloadFile.url
-            ),
-            "howToUpload.linkMessage1"
-          )
+        ParagraphMessage(
+          DownloadLinkMessage(
+            "howToUpload.linkMessage",
+            routes.DownloadPensionSchemeTemplateController.downloadFile.url
+          ),
+          "howToUpload.linkMessage1"
+        )
       )
 }
