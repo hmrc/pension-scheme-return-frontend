@@ -75,7 +75,7 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
     encryptedPstr: String,
     reportVersion: String
   ): String =
-    s"${pensionsScheme.baseUrl}${config
+    s"${pensionSchemeReturn.baseUrl}${config
       .get[String](path = "urls.emailCallback")
       .format(
         psaOrPsp,
