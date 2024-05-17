@@ -52,12 +52,12 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
           .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
       case (None, _) =>
         //deletion
-        removePages(userAnswers, pages(srn, userAnswers))
+        removePages(userAnswers, pages(srn))
           .flatMap(_.set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress))
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn, userAnswers: UserAnswers): List[Removable[_]] =
+  private def pages(srn: Srn): List[Removable[_]] =
     List(
       EmployerTypeOfBusinessPage(srn, memberIndex, index),
       TotalEmployerContributionPage(srn, memberIndex, index),

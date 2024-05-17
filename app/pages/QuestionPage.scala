@@ -16,6 +16,6 @@
 
 package pages
 
-import queries.{Gettable, Settable}
+import queries._
 
-trait QuestionPage[A] extends Page with Gettable[A] with Settable[A]
+trait QuestionPage[A] extends Page with Gettable[A] with Settable[A] with Removable[A]

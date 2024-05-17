@@ -36,5 +36,8 @@ object MapUtils {
         .toList
         .sequence
         .map(_.toMap)
+
+    def refine[I: Validate[Int, *]]: Option[List[Refined[Int, I]]] =
+      mapKeysToIndex[I].map(_.keys.toList)
   }
 }

@@ -32,7 +32,7 @@ import views.html.DatePageView
 import models.SchemeId.Srn
 import utils.DateTimeUtils.localDateShow
 import models.{DateRange, Mode}
-import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, TransfersOutCompletedPage, WhenWasTransferMadePage}
+import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, TransfersOutSectionCompleted, WhenWasTransferMadePage}
 import play.api.i18n.{Messages, MessagesApi}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{DatePageViewModel, FormPageViewModel, SectionCompleted}
@@ -115,7 +115,7 @@ class WhenWasTransferMadeController @Inject()(
                   .fromTry(
                     request.userAnswers
                       .set(WhenWasTransferMadePage(srn, index, secondaryIndex), value)
-                      .set(TransfersOutCompletedPage(srn, index, secondaryIndex), SectionCompleted)
+                      .set(TransfersOutSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
                   )
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(

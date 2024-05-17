@@ -19,6 +19,7 @@ package models.requests.psr
 import cats.syntax.either._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import viewmodels.models.MemberState
 
 import java.time.LocalDate
 
@@ -41,13 +42,14 @@ case class MemberPayments(
 )
 
 case class MemberDetails(
+  state: MemberState,
   personalDetails: MemberPersonalDetails,
   employerContributions: List[EmployerContributions],
   transfersIn: List[TransfersIn],
   totalContributions: Option[Double],
   memberLumpSumReceived: Option[MemberLumpSumReceived],
   transfersOut: List[TransfersOut],
-  benefitsSurrendered: Option[PensionSurrender],
+  benefitsSurrendered: Option[SurrenderedBenefits],
   pensionAmountReceived: Option[Double]
 )
 

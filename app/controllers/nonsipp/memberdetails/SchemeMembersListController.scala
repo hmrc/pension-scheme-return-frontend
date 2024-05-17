@@ -21,6 +21,7 @@ import pages.nonsipp.memberdetails.SchemeMembersListPage
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
+import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.Max300
 import controllers.PSRController
 import config.Constants
@@ -28,6 +29,9 @@ import cats.implicits.catsSyntaxApplicativeId
 import config.Constants.maxSchemeMembers
 import forms.YesNoPageFormProvider
 import models.{ManualOrUpload, Mode, Pagination}
+import controllers.nonsipp.memberdetails.SchemeMembersListController._
+import play.api.i18n.MessagesApi
+import play.api.data.Form
 import models.CheckOrChange.Change
 import views.html.ListView
 import models.SchemeId.Srn
@@ -35,15 +39,8 @@ import controllers.actions._
 import eu.timepit.refined.refineV
 import play.api.Logger
 import navigation.Navigator
-import pages.nonsipp.memberdetails.MemberStatusImplicits.MembersStatusOps
-import controllers.nonsipp.memberdetails.SchemeMembersListController._
-import play.api.i18n.MessagesApi
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.models._
-import models.requests.DataRequest
-import utils.MapUtils.UserAnswersMapOps
-import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -73,15 +70,19 @@ class SchemeMembersListController @Inject()(
         Redirect(routes.PensionSchemeMembersController.onPageLoad(srn))
       } else {
 
-        val mapOfFullName = membersDetails.view.mapValues(_.fullName).toMap
-        filterDeletedMembers(mapOfFullName, srn).map { filteredMembers =>
-          Ok(
-            view(
-              form(manualOrUpload, filteredMembers.size >= maxSchemeMembers),
-              viewModel(srn, page, manualOrUpload, mode, filteredMembers)
+        membersDetails.view
+          .mapValues(_.fullName)
+          .toList
+          .zipWithRefinedIndex[Max300.Refined]
+          .map { filteredMembers =>
+            Ok(
+              view(
+                form(manualOrUpload, filteredMembers.size >= maxSchemeMembers),
+                viewModel(srn, page, manualOrUpload, mode, filteredMembers)
+              )
             )
-          )
-        }.merge
+          }
+          .merge
       }
     }
 
@@ -89,20 +90,23 @@ class SchemeMembersListController @Inject()(
     identifyAndRequireData(srn).async { implicit request =>
       val membersDetails = request.userAnswers.membersDetails(srn)
       val lengthOfMembersDetails = membersDetails.size
-      val mapOfFullName = membersDetails.view.mapValues(_.fullName).toMap
 
       form(manualOrUpload, lengthOfMembersDetails >= maxSchemeMembers)
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            filterDeletedMembers(mapOfFullName, srn).map { filteredMembers =>
-              BadRequest(
-                view(
-                  formWithErrors,
-                  viewModel(srn, page, manualOrUpload, mode, filteredMembers)
+            membersDetails.view
+              .mapValues(_.fullName)
+              .toList
+              .zipWithRefinedIndex[Max300.Refined]
+              .map { filteredMembers =>
+                BadRequest(
+                  view(
+                    formWithErrors,
+                    viewModel(srn, page, manualOrUpload, mode, filteredMembers)
+                  )
                 )
-              )
-            }
+              }
           }.merge.pure[Future],
           value => {
             if (lengthOfMembersDetails == maxSchemeMembers && value) {
@@ -126,47 +130,6 @@ class SchemeMembersListController @Inject()(
           }
         )
     }
-
-  // merges member details with member states and filters out any soft deleted members
-  private def filterDeletedMembers(
-    nameMap: Map[String, String],
-    srn: Srn
-  )(implicit request: DataRequest[_]): Either[Result, List[(Max300, (String, String), MemberState)]] = {
-
-    val maybeMembersDetails =
-      nameMap.toList.zipWithIndexToMap
-        .mapKeysToIndex[Max300.Refined]
-        .getOrRecoverJourney
-
-    val maybeMemberStates = request.userAnswers.memberStates(srn).mapKeysToIndex[Max300.Refined].getOrRecoverJourney
-
-    maybeMembersDetails.flatMap { membersDetails =>
-      maybeMemberStates.flatMap { memberStates =>
-        if (membersDetails.size != memberStates.size) {
-          logger.error(
-            s"member details of size ${membersDetails.size} was not the same as size of member states ${memberStates.size}"
-          )
-          Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-        } else {
-          val zippedMembers = membersDetails.zip(memberStates).toMap
-          val memberWithStates = zippedMembers.collect {
-            case ((i1, details), (i2, state)) if i1.value == i2.value => Some((i1, details, state))
-            case ((i1, details), (i2, state)) if i1.value != i2.value => Some((i1, details, state))
-            case _ => None
-          }.flatten
-
-          if (memberWithStates.size != memberStates.size) {
-            logger.error(
-              s"zipping member details with states has resulted in a mismatch, this means the indexes didn't align after sorting"
-            )
-            Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-          } else {
-            Right(memberWithStates.iterator.filter { case (_, _, state) => state == MemberState.Active }.toList)
-          }
-        }
-      }
-    }
-  }
 }
 
 object SchemeMembersListController {
@@ -186,15 +149,15 @@ object SchemeMembersListController {
     page: Int,
     manualOrUpload: ManualOrUpload,
     mode: Mode,
-    filteredMembers: List[(Max300, (String, String), MemberState)]
+    filteredMembers: List[(Max300, (String, String))]
   ): FormPageViewModel[ListViewModel] = {
 
     val lengthOfFilteredMembers = filteredMembers.length
 
     val rows: List[ListRow] = filteredMembers
-      .sortBy { case (_, (_, name), _) => name }
+      .sortBy { case (_, (_, name)) => name }
       .map {
-        case (_, (unrefinedIndex, memberFullName), _) =>
+        case (_, (unrefinedIndex, memberFullName)) =>
           val index = refineV[Max300.Refined](unrefinedIndex.toInt + 1).toOption.get
           ListRow(
             memberFullName,

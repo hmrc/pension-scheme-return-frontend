@@ -20,14 +20,12 @@ import play.api.test.FakeRequest
 import config.Refined.OneTo300
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
-import uk.gov.hmrc.domain.Nino
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
 import models._
-import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
 import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.employercontributions.EmployerNamePage
+import pages.nonsipp.employercontributions.{EmployerContributionsProgress, EmployerNamePage}
 import services.{PsrSubmissionService, SaveService, UploadService}
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails._
@@ -37,11 +35,15 @@ import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
 import views.html.ContentPageView
 import models.SchemeId.Srn
 import cats.implicits.catsSyntaxOptionId
-import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
+import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, TransfersInSectionCompleted}
 import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
 import eu.timepit.refined.{refineMV, refineV}
+import uk.gov.hmrc.domain.Nino
+import play.api.libs.json.Json
 import models.UploadStatus.UploadStatus
-import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
+import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, TransfersOutSectionCompleted}
+import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -168,7 +170,7 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
 
     "onSubmit should remove all member payments" in {
 
-      val userAnswers = addMemberDetails(emptyUserAnswers, srn, 20)
+      val userAnswers = addMemberDetails(emptyUserAnswers, srn, 5)
         .unsafeSet(EmployerNamePage(srn, refineMV(1), refineMV(1)), employerName)
         .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
         .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), money)
@@ -177,6 +179,9 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
         .unsafeSet(PensionCommencementLumpSumAmountPage(srn, refineMV(1)), pensionCommencementLumpSumGen.sample.value)
         .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(1)), money)
         .unsafeSet(SurrenderedBenefitsAmountPage(srn, refineMV(1)), money)
+        .unsafeSet(EmployerContributionsProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+        .unsafeSet(TransfersInSectionCompleted(srn, refineMV(1), refineMV(1)), SectionCompleted)
+        .unsafeSet(TransfersOutSectionCompleted(srn, refineMV(1), refineMV(1)), SectionCompleted)
 
       val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
@@ -194,6 +199,8 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
         verify(mockSaveService).save(captor.capture())(any(), any())
 
         val userAnswers = captor.getValue
+
+        println("=========== " + Json.prettyPrint(userAnswers.data.decryptedValue))
 
         userAnswers.get(EmployerNamePage(srn, refineMV(1), refineMV(1))) mustBe None
         userAnswers.get(UnallocatedEmployerAmountPage(srn)) mustBe None

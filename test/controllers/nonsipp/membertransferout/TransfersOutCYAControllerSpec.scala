@@ -46,7 +46,7 @@ class TransfersOutCYAControllerSpec extends ControllerBaseSpec {
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
-    .unsafeSet(TransfersOutCompletedPage(srn, index, secondaryIndex), SectionCompleted)
+    .unsafeSet(TransfersOutSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
     .unsafeSet(ReceivingSchemeNamePage(srn, index, secondaryIndex), receivingSchemeName)
     .unsafeSet(ReceivingSchemeTypePage(srn, index, secondaryIndex), pensionSchemeType)
     .unsafeSet(WhenWasTransferMadePage(srn, index, secondaryIndex), localDate)
