@@ -16,6 +16,7 @@
 
 package navigation.nonsipp
 
+import org.scalacheck.Gen
 import navigation.{Navigator, NavigatorBehaviours}
 import utils.BaseSpec
 import pages.nonsipp.totalvaluequotedshares._
@@ -23,6 +24,28 @@ import pages.nonsipp.totalvaluequotedshares._
 class TotalValueQuotedSharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
+
+  "QuotedSharesManagedFundsHeldPage" - {
+    act.like(
+      normalmode
+        .navigateToWithData(
+          QuotedSharesManagedFundsHeldPage,
+          Gen.const(true),
+          (srn, _) => controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController.onPageLoad(srn)
+        )
+        .withName("go from quoted shares managed funds held page to total value quoted shares page when yes selected")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithData(
+          QuotedSharesManagedFundsHeldPage,
+          Gen.const(false),
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+        )
+        .withName("go from quoted shares managed funds held page to task list page when no selected")
+    )
+  }
 
   "TotalValueQuotedSharesNavigator" - {
 
@@ -36,6 +59,19 @@ class TotalValueQuotedSharesNavigatorSpec extends BaseSpec with NavigatorBehavio
               .onPageLoad(srn)
         )
         .withName("go from total value quoted shares page to check your answers page")
+    )
+  }
+
+  "TotalValueQuotedSharesCYAPage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          TotalValueQuotedSharesCYAPage,
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+        )
+        .withName(
+          "go from total value quoted shares CYA page to task list page"
+        )
     )
   }
 

@@ -3,6 +3,11 @@ POST        /:srn/which-shares-held                                             
 GET         /:srn/change-which-shares-held                                         controllers.nonsipp.shares.DidSchemeHoldAnySharesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-which-shares-held                                         controllers.nonsipp.shares.DidSchemeHoldAnySharesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
+GET         /:srn/quoted-shares-managed-funds-held                                 controllers.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/quoted-shares-managed-funds-held                                 controllers.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-quoted-shares-managed-funds-held                          controllers.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-quoted-shares-managed-funds-held                          controllers.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
 GET         /:srn/total-value-quoted-shares                                        controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onPageLoad(srn: Srn)
 POST        /:srn/total-value-quoted-shares                                        controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onSubmit(srn: Srn)
 

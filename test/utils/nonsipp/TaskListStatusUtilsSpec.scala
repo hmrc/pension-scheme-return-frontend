@@ -31,7 +31,7 @@ import pages.nonsipp.loansmadeoroutstanding._
 import viewmodels.models.{SectionCompleted, SectionStatus}
 import models.SponsoringOrConnectedParty.Sponsoring
 import pages.nonsipp.bonds._
-import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import pages.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldPage
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage, NoNINOPage}
 import org.scalatest.freespec.AnyFreeSpec
 import pages.nonsipp.membercontributions.{MemberContributionsListPage, MemberContributionsPage}
@@ -455,23 +455,23 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
   }
 
   "Quoted shares status" - {
-    val totalSharesPageUrl =
-      controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController
-        .onPageLoad(srn)
+    val quotedSharesManagedFundsUrl =
+      controllers.nonsipp.totalvaluequotedshares.routes.QuotedSharesManagedFundsHeldController
+        .onPageLoad(srn, NormalMode)
         .url
 
     "should be Not Started" - {
       "when default data" in {
         val result = TaskListStatusUtils.getQuotedSharesTaskListStatusAndLink(defaultUserAnswers, srn)
-        result mustBe (NotStarted, totalSharesPageUrl)
+        result mustBe (NotStarted, quotedSharesManagedFundsUrl)
       }
     }
     "should be Complete" - {
       "when TotalValueQuotedSharesPage is present" in {
         val customUserAnswers = defaultUserAnswers
-          .unsafeSet(TotalValueQuotedSharesPage(srn), money)
+          .unsafeSet(QuotedSharesManagedFundsHeldPage(srn), true)
         val result = TaskListStatusUtils.getQuotedSharesTaskListStatusAndLink(customUserAnswers, srn)
-        result mustBe (Completed, totalSharesPageUrl)
+        result mustBe (Completed, quotedSharesManagedFundsUrl)
       }
     }
   }
