@@ -345,7 +345,7 @@ object TaskListStatusUtils {
     val memberContributionsListPage = userAnswers.get(MemberContributionsListPage(srn))
 
     (wereContributions, memberContributionsListPage) match {
-      case (None, None) =>
+      case (None, _) =>
         (
           getNotStartedOrCannotStartYetStatus(userAnswers, srn),
           controllers.nonsipp.membercontributions.routes.MemberContributionsController
