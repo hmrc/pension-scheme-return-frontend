@@ -24,7 +24,14 @@ import models.UserAnswers
 
 object TotalValueQuotedSharesNavigator extends JourneyNavigator {
 
-  override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
+  override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+
+    case page @ QuotedSharesManagedFundsHeldPage(srn) =>
+      if (userAnswers.get(page).contains(true)) {
+        controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController.onPageLoad(srn)
+      } else {
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+      }
 
     case TotalValueQuotedSharesPage(srn) =>
       controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController.onPageLoad(srn)

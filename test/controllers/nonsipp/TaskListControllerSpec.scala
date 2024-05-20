@@ -33,7 +33,7 @@ import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.otherassetsdisposal._
 import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.memberdetails._
-import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import pages.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldPage
 import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
@@ -729,8 +729,8 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           expectedStatus = TaskListStatus.NotStarted,
           expectedTitleKey = "nonsipp.tasklist.shares.title",
           expectedLinkContentKey = "nonsipp.tasklist.shares.add.quotedshares.title",
-          expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController
-            .onPageLoad(srn)
+          expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.QuotedSharesManagedFundsHeldController
+            .onPageLoad(srn, NormalMode)
             .url
         )
       }
@@ -738,7 +738,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       "completed" in {
         val userAnswersWithData =
           defaultUserAnswers
-            .unsafeSet(TotalValueQuotedSharesPage(srn), money)
+            .unsafeSet(QuotedSharesManagedFundsHeldPage(srn), true)
 
         testViewModel(
           userAnswersWithData,
@@ -747,8 +747,8 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           expectedStatus = TaskListStatus.Completed,
           expectedTitleKey = "nonsipp.tasklist.shares.title",
           expectedLinkContentKey = "nonsipp.tasklist.shares.change.quotedshares.title",
-          expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController
-            .onPageLoad(srn)
+          expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.QuotedSharesManagedFundsHeldController
+            .onPageLoad(srn, NormalMode)
             .url
         )
       }
