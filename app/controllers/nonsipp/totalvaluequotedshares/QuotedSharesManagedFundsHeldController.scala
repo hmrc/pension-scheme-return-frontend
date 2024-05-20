@@ -39,16 +39,16 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Named}
 
 class QuotedSharesManagedFundsHeldController @Inject()(
-                                           override val messagesApi: MessagesApi,
-                                           saveService: SaveService,
-                                           @Named("non-sipp") navigator: Navigator,
-                                           identifyAndRequireData: IdentifyAndRequireData,
-                                           formProvider: YesNoPageFormProvider,
-                                           val controllerComponents: MessagesControllerComponents,
-                                           view: YesNoPageView,
-                                           psrSubmissionService: PsrSubmissionService
-                                         )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+  override val messagesApi: MessagesApi,
+  saveService: SaveService,
+  @Named("non-sipp") navigator: Navigator,
+  identifyAndRequireData: IdentifyAndRequireData,
+  formProvider: YesNoPageFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: YesNoPageView,
+  psrSubmissionService: PsrSubmissionService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   private val form = QuotedSharesManagedFundsHeldController.form(formProvider)

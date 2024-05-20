@@ -44,9 +44,10 @@ class QuotedSharesManagedFundsHeldControllerSpec extends ControllerBaseSpec {
       injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, schemeName, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, QuotedSharesManagedFundsHeldPage(srn), true) { implicit app => implicit request =>
-      injected[YesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, NormalMode))
+    act.like(renderPrePopView(onPageLoad, QuotedSharesManagedFundsHeldPage(srn), true) {
+      implicit app => implicit request =>
+        injected[YesNoPageView]
+          .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, NormalMode))
     })
 
     act.like(
