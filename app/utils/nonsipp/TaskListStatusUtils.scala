@@ -218,7 +218,7 @@ object TaskListStatusUtils {
     val status = userAnswers.get(TransfersInJourneyStatus(srn))
     val wereTransfersIn = userAnswers.get(DidSchemeReceiveTransferPage(srn))
     (wereTransfersIn, status) match {
-      case (None, None) =>
+      case (None, _) =>
         (
           getNotStartedOrCannotStartYetStatus(userAnswers, srn),
           controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController
@@ -260,7 +260,7 @@ object TaskListStatusUtils {
     val status = userAnswers.get(TransfersOutJourneyStatus(srn))
     val wereTransfersIn = userAnswers.get(SchemeTransferOutPage(srn))
     (wereTransfersIn, status) match {
-      case (None, None) =>
+      case (None, _) =>
         (
           getNotStartedOrCannotStartYetStatus(userAnswers, srn),
           controllers.nonsipp.membertransferout.routes.SchemeTransferOutController
@@ -302,7 +302,7 @@ object TaskListStatusUtils {
     val status = userAnswers.get(SurrenderedBenefitsJourneyStatus(srn))
     val wereSurrenderedBenefits = userAnswers.get(SurrenderedBenefitsPage(srn))
     (wereSurrenderedBenefits, status) match {
-      case (None, None) =>
+      case (None, _) =>
         (
           getNotStartedOrCannotStartYetStatus(userAnswers, srn),
           controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsController
@@ -381,7 +381,7 @@ object TaskListStatusUtils {
     val listPage = userAnswers.get(PclsMemberListPage(srn))
 
     (wereContributions, listPage) match {
-      case (None, None) =>
+      case (None, _) =>
         (
           getNotStartedOrCannotStartYetStatus(userAnswers, srn),
           controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
@@ -417,7 +417,7 @@ object TaskListStatusUtils {
     val listPage = userAnswers.get(MemberPensionPaymentsListPage(srn))
 
     (werePensionPayments, listPage) match {
-      case (None, None) =>
+      case (None, _) =>
         (
           getNotStartedOrCannotStartYetStatus(userAnswers, srn),
           controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
@@ -456,7 +456,7 @@ object TaskListStatusUtils {
     val amount = userAnswers.get(UnallocatedEmployerAmountPage(srn))
 
     (wereUnallocatedContributions, amount) match {
-      case (None, None) =>
+      case (None, _) =>
         (
           getNotStartedOrCannotStartYetStatus(userAnswers, srn),
           controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
