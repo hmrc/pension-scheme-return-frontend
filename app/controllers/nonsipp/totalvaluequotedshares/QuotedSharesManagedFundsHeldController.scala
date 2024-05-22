@@ -22,9 +22,9 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
-import models.Mode
+import models.{Mode, Money}
 import controllers.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldController.viewModel
-import pages.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldPage
+import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -66,7 +66,17 @@ class QuotedSharesManagedFundsHeldController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(QuotedSharesManagedFundsHeldPage(srn), value))
+            updatedAnswers <- Future.fromTry {
+              val baseUpdate = request.userAnswers.set(QuotedSharesManagedFundsHeldPage(srn), value)
+              val finalUpdate = if (!value) {
+                baseUpdate.flatMap { updatedUserAnswers =>
+                  updatedUserAnswers.set(TotalValueQuotedSharesPage(srn), Money(0.00))
+                }
+              } else {
+                baseUpdate
+              }
+              finalUpdate
+            }
             _ <- saveService.save(updatedAnswers)
             redirectTo <- if (value) {
               Future.successful(

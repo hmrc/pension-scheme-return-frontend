@@ -64,8 +64,8 @@ class SharesTransformer @Inject() extends Transformer {
   )(implicit request: DataRequest[_]): Option[List[ShareTransaction]] =
     request.userAnswers
       .get(TypeOfSharesHeldPages(srn))
-      .map { jsValue =>
-        jsValue.keys.toList
+      .flatMap { jsValue =>
+        val transactions = jsValue.keys.toList
           .flatMap { key =>
             key.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
               case None => None
@@ -80,9 +80,7 @@ class SharesTransformer @Inject() extends Transformer {
                   costOfShares <- request.userAnswers.get(CostOfSharesPage(srn, index))
                   supportedByIndepValuation <- request.userAnswers.get(SharesIndependentValuationPage(srn, index))
                   totalDividendsOrReceipts <- request.userAnswers.get(SharesTotalIncomePage(srn, index))
-
                 } yield {
-
                   val optDateOfAcqOrContrib = Option.when(schemeHoldShare != Transfer)(
                     request.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)).get
                   )
@@ -124,6 +122,7 @@ class SharesTransformer @Inject() extends Transformer {
                 }
             }
           }
+        if (transactions.isEmpty) None else Some(transactions)
       }
 
   private def buildOptAcquisitionRelatedDetails(
