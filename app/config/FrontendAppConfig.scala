@@ -29,17 +29,17 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   val host: String = config.get[String]("host")
   val appName: String = config.get[String]("appName")
 
-  private val contactService: Service = config.get[Service]("microservice.services.contact-frontend")
-  private val contactUrl: String = contactService.baseUrl
   private val contactFormServiceIdentifier = config.get[String]("microservice.services.contact-frontend.serviceId")
+  private val betaFeedbackUrl = config.get[String]("microservice.services.contact-frontend.beta-feedback-url")
+  private val reportProblemUrl = config.get[String]("microservice.services.contact-frontend.report-problem-url")
 
   def feedbackUrl(implicit request: RequestHeader): String = {
     val redirectUrl: String =
       RedirectUrl(host + request.uri).get(OnlyRelative | AbsoluteWithHostnameFromAllowlist("localhost")).encodedUrl
-    s"$contactUrl/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=$redirectUrl"
+    s"$betaFeedbackUrl?service=$contactFormServiceIdentifier&backUrl=$redirectUrl"
   }
 
-  def reportAProblemUrl: String = s"$contactUrl/contact/report-technical-problem?service=$contactFormServiceIdentifier"
+  def reportAProblemUrl: String = s"$reportProblemUrl?service=$contactFormServiceIdentifier"
 
   def languageMap: Map[String, Lang] = Map(
     "en" -> Lang("en"),
