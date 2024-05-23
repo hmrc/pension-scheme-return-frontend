@@ -23,7 +23,7 @@ import models.{PensionSchemeId, SchemeMemberNumbers}
 
 case class HowManyMembersPage(srn: Srn, request: PensionSchemeId) extends QuestionPage[SchemeMemberNumbers] {
 
-  override def path: JsPath = SchemeDesignatoryPage.path \ toString
+  override def path: JsPath = Paths.schemeDesignatory \ toString
 
   override def toString: String = "howManyMembersPage"
 }

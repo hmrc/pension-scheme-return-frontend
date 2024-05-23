@@ -36,23 +36,48 @@ import pages.nonsipp.landorpropertydisposal.{Paths, _}
 import org.scalatest.OptionValues
 import play.api.libs.json.Json
 
-class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
+class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
   val allowedAccessRequest
     : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
-  private val transformer = new LandOrPropertyTransactionsTransformer()
+  private val transformer = new LandOrPropertyTransformer()
 
-  "LandOrPropertyTransactionsTransformer - To Etmp" - {
-    "should return empty List when userAnswer is empty" in {
+  "LandOrPropertyTransformer - To Etmp" - {
+    "should return None when userAnswer is empty" in {
 
-      val result = transformer.transformToEtmp(srn, disposeAnyLandOrProperty = false)
-      result mustBe List.empty
+      val result = transformer.transformToEtmp(srn, None, defaultUserAnswers)
+      result mustBe None
+    }
+
+    "should omit Record Version when there is a change in userAnswers" in {
+      val userAnswers = emptyUserAnswers
+        .unsafeSet(LandOrPropertyHeldPage(srn), false)
+        .unsafeSet(LandOrPropertyRecordVersionPage(srn), "001")
+
+      val initialUserAnswer = emptyUserAnswers
+        .unsafeSet(LandOrPropertyHeldPage(srn), true)
+        .unsafeSet(LandOrPropertyRecordVersionPage(srn), "001")
+
+      val result =
+        transformer.transformToEtmp(srn = srn, Some(false), initialUserAnswer)(
+          DataRequest(allowedAccessRequest, userAnswers)
+        )
+      result mustBe Some(
+        LandOrProperty(
+          recordVersion = None,
+          landOrPropertyHeld = false,
+          disposeAnyLandOrProperty = false,
+          landOrPropertyTransactions = Seq.empty
+        )
+      )
     }
 
     "should return empty List when index as string not a valid number" in {
       val userAnswers = emptyUserAnswers
+        .unsafeSet(LandOrPropertyHeldPage(srn), true)
+        .unsafeSet(LandOrPropertyRecordVersionPage(srn), "001")
         .unsafeSet(
           Paths.landOrPropertyTransactions \ "propertyDetails" \ "landOrPropertyInUK",
           Json.obj("InvalidIntValue" -> true)
@@ -60,12 +85,19 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
 
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      val result = transformer.transformToEtmp(srn, disposeAnyLandOrProperty = false)(request)
-      result mustBe List.empty
+      val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+      result mustBe Some(
+        LandOrProperty(
+          recordVersion = Some("001"),
+          landOrPropertyHeld = true,
+          disposeAnyLandOrProperty = false,
+          landOrPropertyTransactions = Seq.empty
+        )
+      )
     }
   }
 
-  "LandOrPropertyTransactionsTransformer - From Etmp" - {
+  "LandOrPropertyTransformer - From Etmp" - {
     "when Individual has nino" in {
 
       val result = transformer.transformFromEtmp(
@@ -80,6 +112,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
           userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
           userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
@@ -142,6 +175,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
           userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
           userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
@@ -205,6 +239,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
           userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
           userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
@@ -269,6 +304,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
           userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
           userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
@@ -333,6 +369,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
           userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
           userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
@@ -398,6 +435,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
           userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
           userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
@@ -463,6 +501,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
+          userAnswers.get(LandOrPropertyRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
           userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
           userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
@@ -514,6 +553,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
 
   def buildLandOrProperty(name: String, propertyAcquiredFrom: PropertyAcquiredFrom): LandOrProperty =
     LandOrProperty(
+      recordVersion = Some("001"),
       landOrPropertyHeld = true,
       disposeAnyLandOrProperty = true,
       landOrPropertyTransactions = Seq(

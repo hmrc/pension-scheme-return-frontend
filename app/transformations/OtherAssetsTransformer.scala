@@ -21,7 +21,6 @@ import config.Refined.{Max5000, OneTo50, OneTo5000}
 import models.SchemeId.Srn
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import eu.timepit.refined.refineV
-import uk.gov.hmrc.domain.Nino
 import pages.nonsipp.common._
 import models.IdentitySubject.OtherAssetSeller
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
@@ -32,6 +31,8 @@ import models.HowDisposed.{HowDisposed, Other, Sold}
 import com.google.inject.Singleton
 import models.requests.psr.{OtherAssetDisposed, OtherAssetTransaction, OtherAssets}
 import models.UserAnswers.implicits.UserAnswersTryOps
+import pages.nonsipp.otherassetsheld.Paths.otherAssets
+import uk.gov.hmrc.domain.Nino
 import models._
 import models.SchemeHoldAsset.{Acquisition, Transfer}
 
@@ -41,9 +42,24 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @Singleton()
-class OtherAssetTransactionsTransformer @Inject() extends Transformer {
+class OtherAssetsTransformer @Inject() extends Transformer {
 
-  def transformToEtmp(srn: Srn, otherAssetDisposed: Boolean)(
+  def transformToEtmp(srn: Srn, optOtherAssetsHeld: Option[Boolean], initialUA: UserAnswers)(
+    implicit request: DataRequest[_]
+  ): Option[OtherAssets] =
+    optOtherAssetsHeld.map { otherAssetsHeld =>
+      val otherAssetsDisposal = request.userAnswers.get(OtherAssetsDisposalPage(srn)).getOrElse(false)
+      OtherAssets(
+        recordVersion = Option.when(request.userAnswers.get(otherAssets) == initialUA.get(otherAssets))(
+          request.userAnswers.get(OtherAssetsRecordVersionPage(srn)).get
+        ),
+        otherAssetsWereHeld = otherAssetsHeld,
+        otherAssetsWereDisposed = otherAssetsDisposal,
+        otherAssetTransactions = otherAssetTransactionsTransformToEtmp(srn, otherAssetsDisposal)
+      )
+    }
+
+  private def otherAssetTransactionsTransformToEtmp(srn: Srn, otherAssetDisposed: Boolean)(
     implicit request: DataRequest[_]
   ): List[OtherAssetTransaction] =
     request.userAnswers
@@ -410,9 +426,15 @@ class OtherAssetTransactionsTransformer @Inject() extends Transformer {
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, otherAssets: OtherAssets): Try[UserAnswers] = {
     val otherAssetTransactions = otherAssets.otherAssetTransactions
+    val userAnswersOfOtherAssetsHeld = userAnswers.set(OtherAssetsHeldPage(srn), otherAssets.otherAssetsWereHeld)
+    val userAnswersWithRecordVersion =
+      otherAssets.recordVersion.fold(userAnswersOfOtherAssetsHeld)(
+        userAnswersOfOtherAssetsHeld.set(OtherAssetsRecordVersionPage(srn), _)
+      )
+
     for {
       indexes <- buildIndexesForMax5000(otherAssetTransactions.size)
-      resultUA <- indexes.foldLeft(userAnswers.set(OtherAssetsHeldPage(srn), otherAssets.otherAssetsWereHeld)) {
+      resultUA <- indexes.foldLeft(userAnswersWithRecordVersion) {
         case (ua, index) =>
           val otherAssetTransaction = otherAssetTransactions(index.value - 1)
 

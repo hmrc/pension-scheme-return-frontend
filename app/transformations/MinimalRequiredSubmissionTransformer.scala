@@ -18,13 +18,15 @@ package transformations
 
 import services.SchemeDateService
 import pages.nonsipp.schemedesignatory._
+import pages.nonsipp.accountingperiod.Paths.accountingPeriodDetails
 import com.google.inject.Singleton
 import models.SchemeId.Srn
 import cats.implicits.catsSyntaxTuple2Semigroupal
-import models.requests.psr.{MinimalRequiredSubmission, ReportDetails, SchemeDesignatory}
-import pages.nonsipp.accountingperiod.AccountingPeriods
+import models.requests.psr._
+import pages.nonsipp.accountingperiod.{AccountingPeriodRecordVersionPage, AccountingPeriods}
 import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import models._
+import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import models.requests.DataRequest
 
 import scala.util.Try
@@ -34,19 +36,26 @@ import javax.inject.Inject
 @Singleton()
 class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDateService) {
 
-  def transformToEtmp(srn: Srn)(implicit request: DataRequest[_]): Option[MinimalRequiredSubmission] = {
-    val reasonForNoBankAccount = request.userAnswers.get(WhyNoBankAccountPage(srn))
-    val taxYear = request.userAnswers.get(WhichTaxYearPage(srn))
-    val valueOfAssets = request.userAnswers.get(ValueOfAssetsPage(srn, NormalMode))
-    val howMuchCash = request.userAnswers.get(HowMuchCashPage(srn, NormalMode))
-    val feesCommissionsWagesSalaries = request.userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
+  def transformToEtmp(srn: Srn, initialUA: UserAnswers)(
+    implicit request: DataRequest[_]
+  ): Option[MinimalRequiredSubmission] = {
+
+    val currentUA = request.userAnswers
+    val reasonForNoBankAccount = currentUA.get(WhyNoBankAccountPage(srn))
+    val taxYear = currentUA.get(WhichTaxYearPage(srn))
+    val valueOfAssets = currentUA.get(ValueOfAssetsPage(srn, NormalMode))
+    val howMuchCash = currentUA.get(HowMuchCashPage(srn, NormalMode))
+    val feesCommissionsWagesSalaries = currentUA.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
+
+    val accountingPeriodsSame = currentUA.get(accountingPeriodDetails) == initialUA.get(accountingPeriodDetails)
+    val schemeDesignatorySame = currentUA.get(schemeDesignatory) == initialUA.get(schemeDesignatory)
 
     (
       schemeDateService.returnPeriods(srn),
-      request.userAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
+      currentUA.get(HowManyMembersPage(srn, request.pensionSchemeId))
     ).mapN { (returnPeriods, schemeMemberNumbers) =>
       MinimalRequiredSubmission(
-        ReportDetails(
+        reportDetails = ReportDetails(
           fbVersion = None,
           fbstatus = None,
           pstr = request.schemeDetails.pstr,
@@ -54,9 +63,13 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
           periodEnd = taxYear.get.to,
           compilationOrSubmissionDate = None
         ),
-        returnPeriods.map(range => range.from -> range.to),
-        SchemeDesignatory(
-          openBankAccount = reasonForNoBankAccount.isEmpty,
+        accountingPeriodDetails = AccountingPeriodDetails(
+          if (accountingPeriodsSame) currentUA.get(AccountingPeriodRecordVersionPage(srn)) else None,
+          returnPeriods.map(range => range.from -> range.to)
+        ),
+        schemeDesignatory = SchemeDesignatory(
+          if (schemeDesignatorySame) currentUA.get(SchemeDesignatoryRecordVersionPage(srn)) else None,
+          reasonForNoBankAccount.isEmpty,
           reasonForNoBankAccount,
           schemeMemberNumbers.noOfActiveMembers,
           schemeMemberNumbers.noOfDeferredMembers,
@@ -87,14 +100,15 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
       )
       ua1 <- ua0.set(
         CheckReturnDatesPage(srn),
-        minimalRequiredSubmission.accountingPeriods.size == 1 &&
-          minimalRequiredSubmission.accountingPeriods.head._1
+        minimalRequiredSubmission.accountingPeriodDetails.accountingPeriods.size == 1 &&
+          minimalRequiredSubmission.accountingPeriodDetails.accountingPeriods.head._1
             .isEqual(minimalRequiredSubmission.reportDetails.periodStart) &&
-          minimalRequiredSubmission.accountingPeriods.head._2.isEqual(minimalRequiredSubmission.reportDetails.periodEnd)
+          minimalRequiredSubmission.accountingPeriodDetails.accountingPeriods.head._2
+            .isEqual(minimalRequiredSubmission.reportDetails.periodEnd)
       )
       ua2 <- ua1.set(
         AccountingPeriods(srn),
-        minimalRequiredSubmission.accountingPeriods.toList
+        minimalRequiredSubmission.accountingPeriodDetails.accountingPeriods.toList
           .map(x => DateRange(x._1, x._2))
       )
       openBankAccount = minimalRequiredSubmission.schemeDesignatory.openBankAccount
@@ -158,7 +172,13 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
           minimalRequiredSubmission.schemeDesignatory.pensionerMembers
         )
       )
+      ua9 <- minimalRequiredSubmission.accountingPeriodDetails.recordVersion
+        .map(rv => ua8.set(AccountingPeriodRecordVersionPage(srn), rv))
+        .getOrElse(Try(ua8))
+      ua10 <- minimalRequiredSubmission.schemeDesignatory.recordVersion
+        .map(rv => ua9.set(SchemeDesignatoryRecordVersionPage(srn), rv))
+        .getOrElse(Try(ua9))
     } yield {
-      ua8
+      ua10
     }
 }

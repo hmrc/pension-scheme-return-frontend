@@ -22,7 +22,7 @@ import play.api.libs.json.JsPath
 import models.{Mode, Money}
 
 case class FeesCommissionsWagesSalariesPage(srn: Srn, mode: Mode) extends QuestionPage[Money] {
-  override def path: JsPath = SchemeDesignatoryPage.path \ toString
+  override def path: JsPath = Paths.schemeDesignatory \ toString
 
   override def toString: String = "totalPayments"
 }

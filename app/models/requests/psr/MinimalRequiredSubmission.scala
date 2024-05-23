@@ -23,7 +23,7 @@ import java.time.{LocalDate, LocalDateTime}
 
 case class MinimalRequiredSubmission(
   reportDetails: ReportDetails,
-  accountingPeriods: NonEmptyList[(LocalDate, LocalDate)],
+  accountingPeriodDetails: AccountingPeriodDetails,
   schemeDesignatory: SchemeDesignatory
 )
 
@@ -36,7 +36,13 @@ case class ReportDetails(
   compilationOrSubmissionDate: Option[LocalDateTime]
 )
 
+case class AccountingPeriodDetails(
+  recordVersion: Option[String],
+  accountingPeriods: NonEmptyList[(LocalDate, LocalDate)]
+)
+
 case class SchemeDesignatory(
+  recordVersion: Option[String],
   openBankAccount: Boolean,
   reasonForNoBankAccount: Option[String],
   activeMembers: Int,
@@ -51,6 +57,8 @@ case class SchemeDesignatory(
 
 object MinimalRequiredSubmission {
   private implicit val reportDetailsFormat: OFormat[ReportDetails] = Json.format[ReportDetails]
+  private implicit val formatAccountingPeriodDetails: OFormat[AccountingPeriodDetails] =
+    Json.format[AccountingPeriodDetails]
   private implicit val schemeDesignatoryFormat: OFormat[SchemeDesignatory] = Json.format[SchemeDesignatory]
   implicit def nonEmptyListFormat[T: Format]: Format[NonEmptyList[T]] = Format(
     Reads.list[T].flatMap { xs =>

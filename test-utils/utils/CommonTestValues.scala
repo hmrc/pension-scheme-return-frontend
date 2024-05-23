@@ -44,8 +44,12 @@ trait CommonTestValues {
         periodEnd = LocalDate.parse("2024-04-05"),
         compilationOrSubmissionDate = None
       ),
-      accountingPeriods = NonEmptyList((LocalDate.parse("2023-04-06"), LocalDate.parse("2024-04-05")), List()),
+      accountingPeriodDetails = AccountingPeriodDetails(
+        recordVersion = Some("001"),
+        accountingPeriods = NonEmptyList((LocalDate.parse("2023-04-06"), LocalDate.parse("2024-04-05")), List())
+      ),
       schemeDesignatory = SchemeDesignatory(
+        recordVersion = Some("001"),
         openBankAccount = true,
         reasonForNoBankAccount = None,
         activeMembers = 23,
@@ -67,21 +71,24 @@ trait CommonTestValues {
   )
 
   val minimalSubmissionJson: JsValue = Json.parse(
-    """
-      |{
+    """{
       |  "minimalRequiredSubmission": {
       |    "reportDetails": {
       |      "pstr": "00000042IN",
       |      "periodStart": "2023-04-06",
       |      "periodEnd": "2024-04-05"
       |    },
-      |    "accountingPeriods": [
-      |      [
-      |        "2023-04-06",
-      |        "2024-04-05"
+      |    "accountingPeriodDetails": {
+      |      "recordVersion": "001",
+      |      "accountingPeriods": [
+      |        [
+      |          "2023-04-06",
+      |          "2024-04-05"
+      |        ]
       |      ]
-      |    ],
+      |    },
       |    "schemeDesignatory": {
+      |      "recordVersion": "001",
       |      "openBankAccount": true,
       |      "activeMembers": 23,
       |      "deferredMembers": 45,
@@ -90,9 +97,7 @@ trait CommonTestValues {
       |    }
       |  },
       |  "checkReturnDates": true
-      |}
-      |
-      |""".stripMargin
+      |}""".stripMargin
   )
   val versionsResponse: Seq[PsrVersionsResponse] = {
     Seq(

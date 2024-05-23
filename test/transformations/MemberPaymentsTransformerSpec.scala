@@ -59,6 +59,7 @@ class MemberPaymentsTransformerSpec
     new MemberPaymentsTransformer(transfersInTransformer, transfersOutTransformer, pensionSurrenderTransformer)
 
   private val memberPayments = MemberPayments(
+    recordVersion = Some("001"),
     memberDetails = List(
       MemberDetails(
         state = MemberState.Active,
@@ -207,6 +208,7 @@ class MemberPaymentsTransformerSpec
   private val transfersOutIndex = refineMV[Max5.Refined](1)
 
   private val userAnswers = defaultUserAnswers
+    .unsafeSet(MemberPaymentsRecordVersionPage(srn), "001")
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
     .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
     .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
@@ -267,12 +269,17 @@ class MemberPaymentsTransformerSpec
 
   "MemberPaymentsTransformer - To Etmp" - {
     "should return empty List when userAnswer is empty" in {
-      val result = memberPaymentsTransformer.transformToEtmp(srn, defaultUserAnswers)
+      val result = memberPaymentsTransformer.transformToEtmp(srn, defaultUserAnswers, defaultUserAnswers)
       result shouldMatchTo None
     }
 
-    "should return member payments" in {
-      val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswers)
+    "should return member payments without recordVersion when initial UA and current UA are different" in {
+      val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswers, emptyUserAnswers)
+      result shouldMatchTo Some(memberPayments.copy(recordVersion = None))
+    }
+
+    "should return member payments with recordVersion when initial UA and current UA are same" in {
+      val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswers, userAnswers)
       result shouldMatchTo Some(memberPayments)
     }
   }
@@ -285,7 +292,7 @@ class MemberPaymentsTransformerSpec
 
     "should return employer contributions Completed if no contribution are added" in {
       val memberPaymentsNoContributions =
-        memberPayments.copy(employerContributionsDetails = SectionDetails(false, false))
+        memberPayments.copy(employerContributionsDetails = SectionDetails(made = false, completed = false))
       val userAnswersNoContributions = userAnswers
         .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
         .unsafeSet(EmployerContributionsPage(srn), false)

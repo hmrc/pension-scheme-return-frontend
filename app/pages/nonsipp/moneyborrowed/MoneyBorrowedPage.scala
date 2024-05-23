@@ -22,8 +22,8 @@ import play.api.libs.json.JsPath
 
 case class MoneyBorrowedPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = Paths.borrowing \ toString
 
-  override def toString: String = "moneyBorrowed"
+  override def toString: String = "moneyWasBorrowed"
 
 }

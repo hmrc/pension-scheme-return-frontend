@@ -17,19 +17,23 @@
 package controllers.nonsipp
 
 import services.{PsrRetrievalService, SaveService}
-import viewmodels.implicits._
 import com.google.inject.Inject
-import cats.implicits.toShow
 import controllers.actions._
-import viewmodels.models.TaskListStatus._
-import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
+import pages.nonsipp.memberdetails.Paths.personalDetails
+import viewmodels.implicits._
+import pages.nonsipp.accountingperiod.Paths.accountingPeriodDetails
+import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, Paths}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import views.html.TaskListView
 import models.SchemeId.Srn
+import cats.implicits.toShow
+import pages.nonsipp.memberpensionpayments.Paths.membersPayments
 import pages.nonsipp.WhichTaxYearPage
 import play.api.libs.json._
 import utils.DateTimeUtils.localDateShow
 import models._
+import viewmodels.models.TaskListStatus._
+import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
@@ -179,16 +183,16 @@ object ViewOnlyTaskListController {
     previousUA: UserAnswers
   ): TaskListItemViewModel = {
 
-    val accountingPeriodsSame = currentUA.get(JsPath \ "accountingPeriods") == previousUA.get(
-      JsPath \ "accountingPeriods"
+    val accountingPeriodsSame = currentUA.get(accountingPeriodDetails \ "accountingPeriods") == previousUA.get(
+      accountingPeriodDetails \ "accountingPeriods"
     )
 
     val designatoryCurrent = currentUA
-      .get(JsPath \ "schemeDesignatory")
+      .get(schemeDesignatory)
       .get
       .as[JsObject] - "totalAssetValue" - "totalPayments" - "totalCash"
     val designatoryPrevious = previousUA
-      .get(JsPath \ "schemeDesignatory")
+      .get(schemeDesignatory)
       .get
       .as[JsObject] - "totalAssetValue" - "totalPayments" - "totalCash"
     val schemeDesignatoriesSame = designatoryCurrent == designatoryPrevious
@@ -216,14 +220,14 @@ object ViewOnlyTaskListController {
   ): TaskListItemViewModel = {
 
     val financialDetailsTaskListStatus =
-      if (currentUA.get(JsPath \ "schemeDesignatory" \ "totalAssetValue") ==
-          previousUA.get(JsPath \ "schemeDesignatory" \ "totalAssetValue")
+      if (currentUA.get(schemeDesignatory \ "totalAssetValue") ==
+          previousUA.get(schemeDesignatory \ "totalAssetValue")
         &&
-        currentUA.get(JsPath \ "schemeDesignatory" \ "totalPayments") ==
-          previousUA.get(JsPath \ "schemeDesignatory" \ "totalPayments")
+        currentUA.get(schemeDesignatory \ "totalPayments") ==
+          previousUA.get(schemeDesignatory \ "totalPayments")
         &&
-        currentUA.get(JsPath \ "schemeDesignatory" \ "totalCash") ==
-          previousUA.get(JsPath \ "schemeDesignatory" \ "totalCash")) {
+        currentUA.get(schemeDesignatory \ "totalCash") ==
+          previousUA.get(schemeDesignatory \ "totalCash")) {
         Completed
       } else {
         Updated
@@ -249,7 +253,7 @@ object ViewOnlyTaskListController {
     val membersTaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
-      JsPath \ "membersPayments" \ "memberDetails" \ "personalDetails"
+      personalDetails
     )
 
     TaskListSectionViewModel(
@@ -278,7 +282,7 @@ object ViewOnlyTaskListController {
     val unallocatedEmployerContributionsTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
-      JsPath \ "membersPayments" \ "unallocatedContribAmount"
+      membersPayments \ "unallocatedContribAmount"
     )
 
     val memberContributionTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
@@ -547,7 +551,7 @@ object ViewOnlyTaskListController {
     val quotedSharesStatusAndLink: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
-      JsPath \ "totalValueQuotedShares"
+      Paths.shares \ "totalValueQuotedShares"
     )
 
     val otherAssetsTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(

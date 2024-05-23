@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.schemedesignatory
+package pages.nonsipp.accountingperiod
 
 import pages.QuestionPage
+import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 
-case object SchemeDesignatoryPage extends QuestionPage[Nothing] {
+case class AccountingPeriodRecordVersionPage(srn: Srn) extends QuestionPage[String] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = Paths.accountingPeriodDetails \ toString
 
-  override def toString: String = "schemeDesignatory"
+  override def toString: String = "recordVersion"
 }

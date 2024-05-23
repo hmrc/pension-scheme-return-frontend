@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.membercontributions
+package pages.nonsipp.loansmadeoroutstanding
 
-import pages.QuestionPage
-import models.SchemeId.Srn
-import play.api.libs.json.JsPath
+import models.SchemeId
+import pages.behaviours.PageBehaviours
 
-case class MemberContributionsListPage(srn: Srn) extends QuestionPage[Boolean] {
+class LoansRecordVersionPageSpec extends PageBehaviours {
 
-  override def path: JsPath = Paths.membersPayments \ toString
+  private val srn: SchemeId.Srn = srnGen.sample.value
 
-  override def toString: String = "memberContributionsListPage"
+  "LoansRecordVersionPage" - {
+
+    beRetrievable[String](LoansRecordVersionPage(srn))
+
+    beSettable[String](LoansRecordVersionPage(srn))
+
+    beRemovable[String](LoansRecordVersionPage(srn))
+  }
 }

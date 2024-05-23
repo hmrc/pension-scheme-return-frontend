@@ -16,7 +16,6 @@
 
 package transformations
 
-import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import eu.timepit.refined.refineV
@@ -31,6 +30,8 @@ import models.HowDisposed.{HowDisposed, Other, Sold}
 import com.google.inject.Singleton
 import config.Refined.{Max5000, OneTo50, OneTo5000}
 import models.SchemeHoldLandProperty.{Acquisition, Transfer}
+import pages.nonsipp.landorproperty.Paths.landOrProperty
+import models.SchemeId.Srn
 import models.requests.psr._
 import pages.nonsipp.landorpropertydisposal._
 import models.UserAnswers.implicits.UserAnswersTryOps
@@ -41,9 +42,24 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @Singleton()
-class LandOrPropertyTransactionsTransformer @Inject() extends Transformer {
+class LandOrPropertyTransformer @Inject() extends Transformer {
 
-  def transformToEtmp(srn: Srn, disposeAnyLandOrProperty: Boolean)(
+  def transformToEtmp(srn: Srn, optLandOrPropertyHeld: Option[Boolean], initialUA: UserAnswers)(
+    implicit request: DataRequest[_]
+  ): Option[LandOrProperty] =
+    optLandOrPropertyHeld.map(landOrPropertyHeld => {
+      val disposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn)).getOrElse(false)
+      LandOrProperty(
+        recordVersion = Option.when(request.userAnswers.get(landOrProperty) == initialUA.get(landOrProperty))(
+          request.userAnswers.get(LandOrPropertyRecordVersionPage(srn)).get
+        ),
+        landOrPropertyHeld = landOrPropertyHeld,
+        disposeAnyLandOrProperty = disposeAnyLandOrProperty,
+        landOrPropertyTransactions = transformLandOrPropertyTransactionsToEtmp(srn, disposeAnyLandOrProperty)
+      )
+    })
+
+  private def transformLandOrPropertyTransactionsToEtmp(srn: Srn, disposeAnyLandOrProperty: Boolean)(
     implicit request: DataRequest[_]
   ): List[LandOrPropertyTransactions] =
     request.userAnswers
@@ -98,10 +114,16 @@ class LandOrPropertyTransactionsTransformer @Inject() extends Transformer {
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, landOrProperty: LandOrProperty): Try[UserAnswers] = {
     val landOrPropertyTransactions = landOrProperty.landOrPropertyTransactions
+    val userAnswersOfLandOrPropertyHeld =
+      userAnswers.set(LandOrPropertyHeldPage(srn), landOrProperty.landOrPropertyHeld)
+    val userAnswersWithRecordVersion =
+      landOrProperty.recordVersion.fold(userAnswersOfLandOrPropertyHeld)(
+        userAnswersOfLandOrPropertyHeld.set(LandOrPropertyRecordVersionPage(srn), _)
+      )
 
     for {
       indexes <- buildIndexesForMax5000(landOrPropertyTransactions.size)
-      resultUA <- indexes.foldLeft(userAnswers.set(LandOrPropertyHeldPage(srn), landOrProperty.landOrPropertyHeld)) {
+      resultUA <- indexes.foldLeft(userAnswersWithRecordVersion) {
         case (ua, index) =>
           val propertyDetails = landOrPropertyTransactions(index.value - 1).propertyDetails
           val heldPropertyTransaction = landOrPropertyTransactions(index.value - 1).heldPropertyTransaction

@@ -22,6 +22,7 @@ import models.{PropertyAcquiredFrom, SchemeHoldShare, TypeOfShares}
 import java.time.LocalDate
 
 case class Shares(
+  recordVersion: Option[String],
   optShareTransactions: Option[List[ShareTransaction]],
   optTotalValueQuotedShares: Option[Double]
 )

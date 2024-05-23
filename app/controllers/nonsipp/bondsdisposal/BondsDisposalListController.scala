@@ -16,7 +16,6 @@
 
 package controllers.nonsipp.bondsdisposal
 
-import services.SaveService
 import pages.nonsipp.bonds._
 import viewmodels.implicits._
 import play.api.mvc._
@@ -44,8 +43,6 @@ import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
 
-import scala.concurrent.ExecutionContext
-
 import javax.inject.Named
 
 class BondsDisposalListController @Inject()(
@@ -54,10 +51,8 @@ class BondsDisposalListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: ListRadiosView,
-  formProvider: RadioListFormProvider,
-  saveService: SaveService
-)(implicit ec: ExecutionContext)
-    extends PSRController {
+  formProvider: RadioListFormProvider
+) extends PSRController {
 
   val form: Form[Max5000] = BondsDisposalListController.form(formProvider)
 
