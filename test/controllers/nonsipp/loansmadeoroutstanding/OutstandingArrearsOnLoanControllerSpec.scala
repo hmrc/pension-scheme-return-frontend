@@ -16,15 +16,22 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import services.SchemeDateService
 import models.ConditionalYesNo._
 import controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController._
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import views.html.ConditionalYesNoPageView
 import eu.timepit.refined.refineMV
+import play.api.inject
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, Money, NormalMode}
+import models._
 import pages.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanPage
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, when}
+
+import java.time.LocalDate
 
 class OutstandingArrearsOnLoanControllerSpec extends ControllerBaseSpec {
 
@@ -35,18 +42,33 @@ class OutstandingArrearsOnLoanControllerSpec extends ControllerBaseSpec {
 
   private val conditionalYes: ConditionalYes[Money] = ConditionalYesNo.yes(money)
 
+  val schemeDatePeriod: DateRange = DateRange(LocalDate.parse("2020-04-06"), LocalDate.parse("2021-04-05"))
+  private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
+
+  override val additionalBindings: List[GuiceableModule] =
+    List(inject.bind[SchemeDateService].toInstance(mockSchemeDateService))
+
+  override def beforeEach(): Unit = {
+    reset(mockSchemeDateService)
+    setSchemeDate(Some(schemeDatePeriod))
+  }
+
+  def setSchemeDate(date: Option[DateRange]): Unit =
+    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(date)
+
   "OutstandingArrearsOnLoanController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[ConditionalYesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, NormalMode))
+      injected[ConditionalYesNoPageView]
+        .apply(form(injected[YesNoPageFormProvider], dateRange), viewModel(srn, index, NormalMode, dateRange))
     })
 
     act.like(renderPrePopView(onPageLoad, OutstandingArrearsOnLoanPage(srn, index), conditionalYes) {
       implicit app => implicit request =>
         injected[ConditionalYesNoPageView]
           .apply(
-            form(injected[YesNoPageFormProvider]).fill(conditionalYes.value),
-            viewModel(srn, index, NormalMode)
+            form(injected[YesNoPageFormProvider], dateRange).fill(conditionalYes.value),
+            viewModel(srn, index, NormalMode, dateRange)
           )
     })
 

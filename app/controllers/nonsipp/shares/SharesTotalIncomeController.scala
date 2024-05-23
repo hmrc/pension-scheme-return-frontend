@@ -91,8 +91,7 @@ object SharesTotalIncomeController {
     MoneyFormErrors(
       "sharesTotalIncome.error.required",
       "sharesTotalIncome.error.invalid",
-      (Constants.maxMoneyValue, "sharesTotalIncome.error.tooLarge"),
-      (Constants.minPosMoneyValue, "sharesTotalIncome.error.tooSmall")
+      (Constants.maxMoneyValue, "sharesTotalIncome.error.tooLarge")
     )
   )
 

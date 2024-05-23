@@ -160,9 +160,12 @@ object LandOrPropertyLeaseDetailsController {
     description = Some("landOrPropertyLeaseDetails.paragraph"),
     page = TripleQuestion(
       form,
-      QuestionField.input("landOrPropertyLeaseDetails.field1.label"),
-      QuestionField.money("landOrPropertyLeaseDetails.field2.label"),
-      QuestionField.localDate("landOrPropertyLeaseDetails.field3.label")
+      QuestionField
+        .input("landOrPropertyLeaseDetails.field1.label", Some("landOrPropertyLeaseDetails.field1.label.hint")),
+      QuestionField
+        .money("landOrPropertyLeaseDetails.field2.label", Some("landOrPropertyLeaseDetails.field2.label.hint")),
+      QuestionField
+        .localDate("landOrPropertyLeaseDetails.field3.label", Some("landOrPropertyLeaseDetails.field3.label.hint"))
     ),
     refresh = None,
     buttonText = "site.saveAndContinue",

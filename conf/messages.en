@@ -1094,10 +1094,10 @@ quotedSharesManagedFundsHeld.error.required = Select yes if the scheme held any 
 
 totalValueQuotedShares.title = What was the total value of all quoted shares and third party managed funds held by the scheme on {0}, in pounds and pence?
 totalValueQuotedShares.heading = What was the total value of all quoted shares and third party managed funds held by {0} on {1}, in pounds and pence?
-totalValueQuotedShares.hint = Quoted shares are those listed by a recognised stock exchange. If there were none, enter 0.
 totalValueQuotedShares.error.required = Enter the total value of all quoted shares and third party managed funds held by the scheme on {0}, in pounds and pence
 totalValueQuotedShares.error.invalid = Total value of all quoted shares and third party managed funds must be an amount of money, like 123.45 or 156
 totalValueQuotedShares.error.tooLarge = Total value of all quoted shares and third party managed funds must be 999999999.99 or less
+totalValueQuotedShares.error.tooSmall = Total value of all quoted shares and third party managed funds must be 0.01 or more
 
 totalValueQuotedSharesCYA.section.totalCost = Total value of all quoted shares and third party managed funds held by {0} on {1}
 totalValueQuotedSharesCYA.section.totalCost.hidden = total value of all quoted shares and third party managed funds held by {0} on {1}
@@ -1191,9 +1191,7 @@ whatYouWillNeedLoans.loansFor3 = the interest payable for the term of the loan
 whatYouWillNeedLoans.loansFor4 = the total interest payments received in the period of this return
 whatYouWillNeedLoans.loansFor5 = the total amount of the loan outstanding at the end of the period of this return
 whatYouWillNeedLoans.paragraph7 = Details of any security given on the loan.
-whatYouWillNeedLoans.security = details of the security, if applicable
 whatYouWillNeedLoans.paragraph8 = Amount of any outstanding arrears on the loan at the end of the period of this return.
-whatYouWillNeedLoans.arrears = the amount of the arrears, if applicable
 
 basicDetailsCheckYourAnswersController.schemeDetails.heading = Scheme details
 basicDetailsCheckYourAnswersController.schemeDetails.schemeName = Scheme name
@@ -1433,8 +1431,8 @@ loanCheckYourAnswers.section3.loanAmount.outstanding.hidden = amount of loan out
 loanCheckYourAnswers.section3.loanAmount.instalments = Are the loan repayments in equal annual instalments?
 loanCheckYourAnswers.section3.loanAmount.instalments.hidden = if the loan repayments are in equal annual instalments
 loanCheckYourAnswers.section4.heading = Interest on the loan
-loanCheckYourAnswers.section4.payable = Interest payable
-loanCheckYourAnswers.section4.payable.hidden = interest payable
+loanCheckYourAnswers.section4.payable = Interest payable for term of loan
+loanCheckYourAnswers.section4.payable.hidden = interest payable for term of loan
 loanCheckYourAnswers.section4.rate = Interest rate
 loanCheckYourAnswers.section4.rate.hidden = interest rate
 loanCheckYourAnswers.section4.payments = Interest payments received in the period of this return
@@ -1445,8 +1443,8 @@ loanCheckYourAnswers.section5.security.hidden = if security has been given for t
 loanCheckYourAnswers.section5.security.yes = Details of the security
 loanCheckYourAnswers.section5.security.yes.hidden = details of the security
 loanCheckYourAnswers.section6.heading = Arrears
-loanCheckYourAnswers.section6.arrears = Are there any outstanding arrears on this loan?
-loanCheckYourAnswers.section6.arrears.hidden = if there are any outstanding arrears on this loan
+loanCheckYourAnswers.section6.arrears = Are there any outstanding arrears on this loan on {0}?
+loanCheckYourAnswers.section6.arrears.hidden = if there are any outstanding arrears on this loan on {0}
 loanCheckYourAnswers.section6.arrears.yes = What is the amount of the arrears?
 loanCheckYourAnswers.section6.arrears.yes.hidden = amount of the arrears
 
@@ -1454,12 +1452,12 @@ loanCheckYourAnswers.change.title = Change details for loan
 loanCheckYourAnswers.change.heading = Change details for loan of £{0} to {1}
 
 outstandingArrearsOnLoan.title = Are there any outstanding arrears on this loan?
-outstandingArrearsOnLoan.heading = Are there any outstanding arrears on this loan?
+outstandingArrearsOnLoan.heading = Are there any outstanding arrears on this loan on {0}?
 outstandingArrearsOnLoan.yes.conditional = What is the amount of the arrears, in pounds and pence?
 outstandingArrearsOnLoan.yes.error.required = Enter the total amount of arrears, in pounds and pence
 outstandingArrearsOnLoan.yes.error.nonNumeric = Total amount of arrears must be an amount of money, like 123 or 123.45
 outstandingArrearsOnLoan.yes.error.max = Total amount of arrears must be 999999999.99 or less
-outstandingArrearsOnLoan.error.required = Select yes if there are any outstanding arrears on this loan
+outstandingArrearsOnLoan.error.required = Select yes if there are any outstanding arrears on this loan on {0}
 
 securityGivenForLoan.securityGiven.title = Has security been given for this loan?
 securityGivenForLoan.securityGiven.heading = Has security been given for this loan?
@@ -1562,6 +1560,7 @@ isLandOrPropertyResidential.error.required = Select yes if any part of the land 
 
 IsLandPropertyLeased.title = Is the land or property leased?
 IsLandPropertyLeased.heading = Is {0} leased?
+IsLandPropertyLeased.hint = This includes leaseholds and tenants.
 isLandPropertyLeased.error.required =  Select yes if the land or property is leased
 
 landPropertyIndependentValuation.title = Was the transaction supported by an independent valuation?
@@ -1574,10 +1573,12 @@ landOrPropertyLeaseDetails.field1.label = Lessee’s name
 landOrPropertyLeaseDetails.field1.error.required = Enter the lessee’s name
 landOrPropertyLeaseDetails.field1.error.invalid = Lessee’s name must only include letters a to z, hyphens, apostrophes and spaces
 landOrPropertyLeaseDetails.field1.error.length = Lessee’s name must be 160 characters or fewer
+landOrPropertyLeaseDetails.field1.label.hint = If more than one lessee, enter '''multiple'''.
 landOrPropertyLeaseDetails.field2.label = Annual lease amount, in pounds and pence
 landOrPropertyLeaseDetails.field2.error.required = Enter annual lease amount, in pounds and pence
 landOrPropertyLeaseDetails.field2.error.invalid = Annual lease amount must be an amount of money, like 123 or 123.45
 landOrPropertyLeaseDetails.field2.error.max = Annual lease amount must be 999999999.99 or less
+landOrPropertyLeaseDetails.field2.label.hint = If multiple lessees, enter the total amount received.
 landOrPropertyLeaseDetails.field3.label = Date the lease was granted
 landOrPropertyLeaseDetails.field3.error.required.all = Enter the date the lease was granted
 landOrPropertyLeaseDetails.field3.error.required.day = Date the lease was granted must include must include a day
@@ -1588,6 +1589,7 @@ landOrPropertyLeaseDetails.field3.error.invalid.date = Date the lease was grante
 landOrPropertyLeaseDetails.field3.error.invalid.characters = Date the lease was granted must include must only include numbers 0 to 9
 landOrPropertyLeaseDetails.field3.error.future = Date the lease was granted must be before {0}
 landOrPropertyLeaseDetails.field3.error.after = Date the lease was granted must be after {0}
+landOrPropertyLeaseDetails.field3.label.hint = If multiple lessees, enter the earliest date an existing lease was granted.
 
 companySellerName.title = What is the seller’s company name?
 companySellerName.heading = What is the seller’s company name?
@@ -2615,9 +2617,8 @@ sharesTotalIncome.title = What was the total income from these shares in the per
 sharesTotalIncome.heading = What was the total income from these shares in {0} in the period of this return, in pounds and pence?
 sharesTotalIncome.hint = This includes dividends and any other receipts.
 sharesTotalIncome.error.required = Enter the total income from these shares in the period of this return, in pounds and pence
-sharesTotalIncome.error.invalid = Total income from these shares in the period of this return must be an amount of money, like 123 or 123.45
+sharesTotalIncome.error.invalid = Total income from these shares in the period of this return must be an amount of money that is 0 or more, like 123 or 123.45
 sharesTotalIncome.error.tooLarge = Total income from these shares in the period of this return must be 999999999.99 or less
-sharesTotalIncome.error.tooSmall = Total income from these shares in the period of this return must be 0.01 or more
 
 sharesList.title = You have added {0} share transaction
 sharesList.title.plural = You have added {0} share transactions

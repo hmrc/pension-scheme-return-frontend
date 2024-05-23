@@ -8,8 +8,8 @@ POST        /:srn/quoted-shares-managed-funds-held                              
 GET         /:srn/change-quoted-shares-managed-funds-held                          controllers.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-quoted-shares-managed-funds-held                          controllers.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/total-value-quoted-shares                                        controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onPageLoad(srn: Srn)
-POST        /:srn/total-value-quoted-shares                                        controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onSubmit(srn: Srn)
+GET         /:srn/total-value-quoted-shares-managed-funds                                        controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onPageLoad(srn: Srn)
+POST        /:srn/total-value-quoted-shares-managed-funds                                        controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onSubmit(srn: Srn)
 
 GET         /:srn/check-answers-quoted-shares                                      controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesCYAController.onPageLoad(srn: Srn)
 POST        /:srn/check-answers-quoted-shares                                      controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesCYAController.onSubmit(srn: Srn)

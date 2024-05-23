@@ -84,9 +84,12 @@ object IsLandPropertyLeasedController {
   )
 
   def viewModel(srn: Srn, index: Max5000, addressLine1: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
-    YesNoPageViewModel(
+    FormPageViewModel(
       "IsLandPropertyLeased.title",
       Message("IsLandPropertyLeased.heading", addressLine1),
+      YesNoPageViewModel(
+        hint = Some(Message("IsLandPropertyLeased.hint"))
+      ),
       routes.IsLandPropertyLeasedController.onSubmit(srn, index, mode)
     )
 }
