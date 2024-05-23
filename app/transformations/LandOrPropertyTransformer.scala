@@ -211,7 +211,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
               prop => {
                 OtherRecipientDetailsPage(srn, index, LandOrPropertySeller) -> RecipientDetails(
                   heldPropertyTransaction.optPropertyAcquiredFromName.get,
-                  prop.otherDescription.get
+                  prop.otherDescription.getOrElse("")
                 )
               }
             )
@@ -370,7 +370,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
                     prop => {
                       OtherBuyerDetailsPage(srn, index, disposalIndex) -> RecipientDetails(
                         disposedPropertyTransaction.optNameOfPurchaser.get,
-                        prop.otherDescription.get
+                        prop.otherDescription.getOrElse("")
                       )
                     }
                   )
@@ -570,7 +570,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
                       identityType = receivedLandType,
                       idNumber = None,
                       reasonNoIdNumber = None,
-                      otherDescription = Some(other.description)
+                      otherDescription = Option.when(other.description.nonEmpty)(other.description)
                     )
                   )
               )
@@ -775,7 +775,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
                       identityType = landOrPropertyDisposedType,
                       idNumber = None,
                       reasonNoIdNumber = None,
-                      otherDescription = Some(other.description)
+                      otherDescription = Option.when(other.description.nonEmpty)(other.description)
                     )
                   )
               )
