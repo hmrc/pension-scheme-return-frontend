@@ -518,7 +518,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
               prop => {
                 OtherRecipientDetailsPage(srn, index, OtherAssetSeller) -> RecipientDetails(
                   otherAssetTransaction.optPropertyAcquiredFromName.get,
-                  prop.otherDescription.get
+                  prop.otherDescription.getOrElse("")
                 )
               }
             )
@@ -659,7 +659,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
                   .map(prop => {
                     OtherBuyerDetailsPage(srn, index, disposalIndex) -> RecipientDetails(
                       otherAssetDisposed.optPurchaserName.get,
-                      prop.otherDescription.get
+                      prop.otherDescription.getOrElse("")
                     )
                   })
 
