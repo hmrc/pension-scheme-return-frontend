@@ -240,7 +240,7 @@ class SharesTransformer @Inject() extends Transformer {
                       identityType = identityType,
                       idNumber = None,
                       reasonNoIdNumber = None,
-                      otherDescription = Some(other.description)
+                      otherDescription = Option.when(other.description.nonEmpty)(other.description)
                     )
                   )
               )
@@ -419,7 +419,7 @@ class SharesTransformer @Inject() extends Transformer {
                       identityType = whoWereTheSharesSoldTo,
                       idNumber = None,
                       reasonNoIdNumber = None,
-                      otherDescription = Some(other.description)
+                      otherDescription = Option.when(other.description.nonEmpty)(other.description)
                     )
                   )
               )
@@ -539,7 +539,7 @@ class SharesTransformer @Inject() extends Transformer {
                 prop => {
                   OtherRecipientDetailsPage(srn, index, SharesSeller) -> RecipientDetails(
                     heldSharesTransaction.optAcquiredFromName.get,
-                    prop.otherDescription.get
+                    prop.otherDescription.getOrElse("")
                   )
                 }
               )
@@ -708,7 +708,7 @@ class SharesTransformer @Inject() extends Transformer {
                   .map(salesQuestions => {
                     OtherBuyerDetailsPage(srn, index, disposalIndex) -> RecipientDetails(
                       salesQuestions.nameOfPurchaser,
-                      salesQuestions.purchaserType.otherDescription.get
+                      salesQuestions.purchaserType.otherDescription.getOrElse("")
                     )
                   })
 

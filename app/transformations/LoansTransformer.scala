@@ -142,7 +142,12 @@ class LoansTransformer @Inject() extends Transformer {
                             other =>
                               (
                                 other.name,
-                                RecipientIdentityType(IdentityType.Other, None, None, Some(other.description)),
+                                RecipientIdentityType(
+                                  IdentityType.Other,
+                                  None,
+                                  None,
+                                  Option.when(other.description.nonEmpty)(other.description)
+                                ),
                                 recipientSponsoringEmployer.contains(ConnectedParty),
                                 recipientSponsoringEmployer.map(_.name)
                               )

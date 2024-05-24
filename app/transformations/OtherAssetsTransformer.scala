@@ -212,7 +212,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
                       identityType = sellerIdentityType,
                       idNumber = None,
                       reasonNoIdNumber = None,
-                      otherDescription = Some(other.description)
+                      otherDescription = Option.when(other.description.nonEmpty)(other.description)
                     )
                   )
               )
@@ -415,7 +415,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
                       identityType = purchaserType,
                       idNumber = None,
                       reasonNoIdNumber = None,
-                      otherDescription = Some(other.description)
+                      otherDescription = Option.when(other.description.nonEmpty)(other.description)
                     )
                   )
               )
