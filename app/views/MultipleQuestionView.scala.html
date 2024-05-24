@@ -109,7 +109,7 @@
         DateViewModel(
             field  = form(s"value.${index + 1}"),
             legend = LegendViewModel(renderMessage(field.label))
-        )
+        ).withHint(HintViewModel(renderMessage(field.hint.getOrElse(""))))
     )
 }
 

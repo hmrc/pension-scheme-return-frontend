@@ -21,6 +21,7 @@ import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import viewmodels.implicits._
 import play.api.mvc._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import config.Constants
 import cats.implicits.toShow
 import config.Constants.maxMoneyValue
 import controllers.actions._
@@ -102,7 +103,8 @@ object TotalValueQuotedSharesController {
     MoneyFormErrors(
       ("totalValueQuotedShares.error.required"),
       "totalValueQuotedShares.error.invalid",
-      (maxMoneyValue, "totalValueQuotedShares.error.tooLarge")
+      (maxMoneyValue, "totalValueQuotedShares.error.tooLarge"),
+      (Constants.minPosMoneyValue, "totalValueQuotedShares.error.tooSmall")
     ),
     Seq(period.to.show)
   )
@@ -118,7 +120,7 @@ object TotalValueQuotedSharesController {
       Message("totalValueQuotedShares.heading", schemeName, period.to.show),
       SingleQuestion(
         form,
-        QuestionField.input(Empty, Some("totalValueQuotedShares.hint"))
+        QuestionField.input(Empty)
       ),
       routes.TotalValueQuotedSharesController.onSubmit(srn)
     )
