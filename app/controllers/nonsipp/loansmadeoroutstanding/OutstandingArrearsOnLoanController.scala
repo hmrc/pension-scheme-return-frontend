@@ -58,8 +58,6 @@ class OutstandingArrearsOnLoanController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-//  private val form = OutstandingArrearsOnLoanController.form(formProvider)
-
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       usingSchemeDate[Id](srn) { period =>
