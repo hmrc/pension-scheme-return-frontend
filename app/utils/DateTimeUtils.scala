@@ -33,6 +33,11 @@ object DateTimeUtils {
     localDateTime.format(formatter)
   }
 
+  def formatReadable(localDateTime: LocalDateTime): String = {
+    val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' h:mma")
+    localDateTime.format(formatter)
+  }
+
   implicit val localDateShow: Show[LocalDate] = d => formatHtml(d)
   implicit val localDateTimeShow: Show[LocalDateTime] = d => formatHtml(d)
 }

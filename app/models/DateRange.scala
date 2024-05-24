@@ -35,8 +35,11 @@ case class DateRange(from: LocalDate, to: LocalDate) {
     !date.isBefore(from) && !date.isAfter(to)
 
   private val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
+  private val formatterFull = DateTimeFormatter.ofPattern("dd MMMM yyyy")
   override def toString: String =
     s"${from.format(formatter)}-${to.format(formatter)}"
+  def toSentenceFormat: String =
+    s"${from.format(formatterFull)} to ${to.format(formatterFull)}"
 }
 
 object DateRange {

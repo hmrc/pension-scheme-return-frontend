@@ -18,6 +18,7 @@ package controllers.nonsipp.declaration
 
 import services._
 import models.audit.PSRSubmissionEmailAuditEvent
+import utils.DateTimeUtils
 import viewmodels.implicits._
 import play.api.mvc._
 import connectors.{EmailConnector, EmailStatus}
@@ -67,12 +68,14 @@ class PsaDeclarationController @Inject()(
       schemeDateService.schemeDate(srn) match {
         case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         case Some(dates) =>
+          val now = schemeDateService.now()
           def emailFuture: Future[EmailStatus] =
             sendEmail(
               loggedInUserNameOrBlank(request),
               request.minimalDetails.email,
               dates,
-              request.schemeDetails.schemeName
+              request.schemeDetails.schemeName,
+              now
             )
 
           for {
@@ -86,25 +89,29 @@ class PsaDeclarationController @Inject()(
           } yield {
             Redirect(navigator.nextPage(PsaDeclarationPage(srn), NormalMode, request.userAnswers))
               .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
-              .addingToSession((SUBMISSION_DATE, schemeDateService.submissionDateAsString(schemeDateService.now())))
+              .addingToSession((SUBMISSION_DATE, schemeDateService.submissionDateAsString(now)))
           }
       }
     }
 
-  private def sendEmail(name: String, email: String, taxYear: DateRange, schemeName: String)(
+  private def sendEmail(
+    name: String,
+    email: String,
+    taxYear: DateRange,
+    schemeName: String,
+    submittedDate: LocalDateTime
+  )(
     implicit request: DataRequest[_],
     hc: HeaderCarrier
   ): Future[EmailStatus] = {
 
     val requestId = hc.requestId.map(_.value).getOrElse(request.headers.get("X-Session-ID").getOrElse(""))
 
-    val submittedDate = LocalDateTime.now().toString // TODO change as per PSR-1139
-
     val templateParams = Map(
-      "psaName" -> name,
       "schemeName" -> schemeName,
-      "taxYear" -> taxYear.toString, //TODO change as per PSR-1139
-      "dateSubmitted" -> submittedDate
+      "periodOfReturn" -> taxYear.toSentenceFormat,
+      "dateSubmitted" -> DateTimeUtils.formatReadable(submittedDate),
+      "psaName" -> name
     )
 
     val reportVersion = "001" //TODO change as per PSR-1139
