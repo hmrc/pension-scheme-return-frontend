@@ -31,15 +31,16 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 
-import java.time.LocalDateTime
 import scala.concurrent.Future
+
+import java.time.LocalDateTime
 
 class PspDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfterEach {
   private val populatedUserAnswers = {
     defaultUserAnswers.unsafeSet(PspDeclarationPage(srn), psaId.value)
   }
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
-  private implicit val mockEmailConnector = mock[EmailConnector]
+  private implicit val mockEmailConnector: EmailConnector = mock[EmailConnector]
   private val mockAuditService = mock[AuditService]
   private val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private val schemeDatePeriod: DateRange = dateRangeGen.sample.value

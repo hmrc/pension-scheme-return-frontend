@@ -547,7 +547,7 @@ object AssetDisposalCYAController {
       ).withAction(
         SummaryAction(
           "site.change",
-          controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
+          controllers.nonsipp.otherassetsdisposal.routes.HowWasAssetDisposedOfController
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent("assetDisposalCYA.section1.assetDisposedDetails.hidden")
