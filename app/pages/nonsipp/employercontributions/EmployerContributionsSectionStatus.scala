@@ -25,5 +25,5 @@ case class EmployerContributionsSectionStatus(srn: Srn) extends QuestionPage[Sec
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "employerContributionsCYA"
+  override def toString: String = "employerContributionsSectionStatus"
 }

@@ -59,7 +59,7 @@ class EmployerContributionsCYAController @Inject()(
       (
         for {
           membersName <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
-          indexes <- buildSecondaryIndexes(srn, index)
+          indexes <- buildCompletedSecondaryIndexes(srn, index)
           employerCYAs <- indexes.map(secondaryIndex => buildCYA(srn, index, secondaryIndex)).sequence
           orderedCYAs = employerCYAs.sortBy(_.secondaryIndex.value)
           _ <- recoverJourneyWhen(orderedCYAs.isEmpty)
@@ -71,7 +71,8 @@ class EmployerContributionsCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, page: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val userAnswersWithSectionCompleted = buildSecondaryIndexes(srn, index).map(
+      // Set EmployerContributionsCompleted for each journey that's no longer In Progress:
+      val userAnswersWithJourneysCompleted = buildCompletedSecondaryIndexes(srn, index).map(
         _.foldLeft(Try(request.userAnswers))(
           (userAnswers, secondaryIndex) =>
             userAnswers.set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
@@ -80,7 +81,7 @@ class EmployerContributionsCYAController @Inject()(
 
       (
         for {
-          userAnswers <- EitherT(userAnswersWithSectionCompleted.pure[Future])
+          userAnswers <- EitherT(userAnswersWithJourneysCompleted.pure[Future])
           updatedAnswers <- Future.fromTry(userAnswers).liftF
           _ <- saveService.save(updatedAnswers).liftF
           submissionResult <- psrSubmissionService
@@ -97,7 +98,7 @@ class EmployerContributionsCYAController @Inject()(
       ).merge
     }
 
-  private def buildSecondaryIndexes(srn: Srn, index: Max300)(
+  private def buildCompletedSecondaryIndexes(srn: Srn, index: Max300)(
     implicit request: DataRequest[_]
   ): Either[Result, List[Max50]] =
     request.userAnswers
