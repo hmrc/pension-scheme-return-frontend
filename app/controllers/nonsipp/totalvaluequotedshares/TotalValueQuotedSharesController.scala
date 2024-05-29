@@ -61,7 +61,11 @@ class TotalValueQuotedSharesController @Inject()(
   def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     usingSchemeDate[Id](srn) { period =>
       val form = TotalValueQuotedSharesController.form(formProvider, period)
-      val preparedForm = request.userAnswers.fillForm(TotalValueQuotedSharesPage(srn), form)
+      val filledForm = request.userAnswers.fillForm(TotalValueQuotedSharesPage(srn), form)
+
+      val containsZeroMoney = request.userAnswers.get(TotalValueQuotedSharesPage(srn)).contains(Money(0.00))
+      val preparedForm = if (containsZeroMoney) form else filledForm
+
       Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, form, period)))
     }
   }

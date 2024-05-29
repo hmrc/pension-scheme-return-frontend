@@ -33,7 +33,7 @@ import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.otherassetsdisposal._
 import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.memberdetails._
-import pages.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldPage
+import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
 import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
@@ -739,6 +739,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         val userAnswersWithData =
           defaultUserAnswers
             .unsafeSet(QuotedSharesManagedFundsHeldPage(srn), true)
+            .unsafeSet(TotalValueQuotedSharesPage(srn), money)
             .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
 
         testViewModel(
@@ -748,8 +749,8 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           expectedStatus = TaskListStatus.Completed,
           expectedTitleKey = "nonsipp.tasklist.otherassets.title",
           expectedLinkContentKey = "nonsipp.tasklist.otherassets.change.quotedshares.title",
-          expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.QuotedSharesManagedFundsHeldController
-            .onPageLoad(srn, NormalMode)
+          expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
+            .onPageLoad(srn)
             .url
         )
       }
