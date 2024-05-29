@@ -74,7 +74,10 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
     encryptedEmail: String,
     encryptedPsaId: String,
     encryptedPstr: String,
-    reportVersion: String
+    reportVersion: String,
+    encryptedSchemeName: String,
+    taxYear: String,
+    encryptedUserName: String
   ): String =
     s"${pensionSchemeReturn.baseUrl}${config
       .get[String](path = "urls.emailCallback")
@@ -84,7 +87,10 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
         encryptedEmail,
         encryptedPsaId,
         encryptedPstr,
-        reportVersion
+        reportVersion,
+        encryptedSchemeName,
+        taxYear,
+        encryptedUserName
       )}"
 
   object features {

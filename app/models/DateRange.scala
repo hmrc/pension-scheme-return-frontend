@@ -40,6 +40,7 @@ case class DateRange(from: LocalDate, to: LocalDate) {
     s"${from.format(formatter)}-${to.format(formatter)}"
   def toSentenceFormat: String =
     s"${from.format(formatterFull)} to ${to.format(formatterFull)}"
+  def toYearFormat: String = s"${from.getYear}-${to.getYear}"
 }
 
 object DateRange {

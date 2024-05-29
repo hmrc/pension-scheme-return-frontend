@@ -34,6 +34,10 @@ class EmailConnectorSpec extends AsyncWordSpec with Matchers with WireMockHelper
   private val testPstr = "87219363YN"
   private val requestId = "test-Request-Id"
   private val psaOrPsp = "PSA"
+  private val testVersion = "reportVersion"
+  private val testSchemeName = "testSchemeName"
+  private val testTaxYear = "taxYear"
+  private val testUserName = "testFirstName testLastName"
 
   private val testEmailAddress = "test@test.com"
   private val testTemplate = "testTemplate"
@@ -59,7 +63,10 @@ class EmailConnectorSpec extends AsyncWordSpec with Matchers with WireMockHelper
             testEmailAddress,
             testTemplate,
             Map.empty,
-            "reportVersion"
+            testVersion,
+            testSchemeName,
+            testTaxYear,
+            testUserName
           )
           .map { result =>
             result mustBe EmailSent
@@ -85,7 +92,10 @@ class EmailConnectorSpec extends AsyncWordSpec with Matchers with WireMockHelper
             testEmailAddress,
             testTemplate,
             Map.empty,
-            "reportVersion"
+            testVersion,
+            testSchemeName,
+            testTaxYear,
+            testUserName
           )
           .map { result =>
             result mustBe EmailNotSent
@@ -108,7 +118,10 @@ class EmailConnectorSpec extends AsyncWordSpec with Matchers with WireMockHelper
             testEmailAddress,
             testTemplate,
             Map.empty,
-            "reportVersion"
+            testVersion,
+            testSchemeName,
+            testTaxYear,
+            testUserName
           )
           .map { result =>
             result mustBe EmailNotSent

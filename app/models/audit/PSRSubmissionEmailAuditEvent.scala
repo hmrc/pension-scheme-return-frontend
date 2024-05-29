@@ -37,9 +37,14 @@ case class PSRSubmissionEmailAuditEvent(
   override def details: Map[String, String] = {
 
     val emailDetails = Map(
-      "emailAddress" -> emailAddress,
-      "reportVersion" -> reportVersion,
-      "event" -> emailStatus.toString
+      "SchemeName" -> schemeName,
+      "PensionSchemeTaxReference" -> schemeTaxReference,
+      "AffinityGroup" -> affinityGroup,
+      "CredentialRole(PSA/PSP)" -> credentialRole,
+      "TaxYear" -> taxYear.toYearFormat,
+      "EmailAddress" -> emailAddress,
+      "ReportVersion" -> reportVersion,
+      "Event" -> emailStatus.toString
     )
 
     psaOrPspIdDetails(credentialRole, psaOrPspId, schemeAdministratorOrPractitionerName) ++ emailDetails
