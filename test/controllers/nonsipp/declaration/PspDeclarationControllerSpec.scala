@@ -31,6 +31,7 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class PspDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfterEach {
@@ -42,7 +43,7 @@ class PspDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfte
   private val mockAuditService = mock[AuditService]
   private val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private val schemeDatePeriod: DateRange = dateRangeGen.sample.value
-  private val templateId = "pods_event_report_submitted" // TODO change as per PSR-1139
+  private val templateId = "pods_pension_scheme_return_submitted"
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
@@ -81,6 +82,8 @@ class PspDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfte
           when(mockSchemeDateService.returnPeriodsAsJsonString(any())(any())).thenReturn("")
           when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")
           when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(schemeDatePeriod))
+          when(mockSchemeDateService.now()).thenReturn(LocalDateTime.now())
+
           when(mockAuditService.sendEvent(any)(any(), any())).thenReturn(Future.successful(AuditResult.Success))
         })
         .after({
