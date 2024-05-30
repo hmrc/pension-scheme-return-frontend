@@ -1488,13 +1488,13 @@ removeLoan.error.required = Select yes if you are sure you want to remove this l
 financialDetailsCheckYourAnswersController.title = Check your answers
 financialDetailsCheckYourAnswersController.heading = Check your answers
 financialDetailsCheckYourAnswersController.totalCashInStartDate = How much cash did {0} hold in all bank accounts on {1}?
-financialDetailsCheckYourAnswersController.totalCashInStartDate.hidden = total cash in all bank accounts
+financialDetailsCheckYourAnswersController.totalCashInStartDate.hidden = total cash in all bank accounts, on {0}
 financialDetailsCheckYourAnswersController.totalCashInEndDate = How much cash did {0} hold in all bank accounts on {1}?
-financialDetailsCheckYourAnswersController.totalCashInEndDate.hidden = total cash in all bank accounts
+financialDetailsCheckYourAnswersController.totalCashInEndDate.hidden = total cash in all bank accounts, on {0}
 financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate = What was the total value of {0}’s assets, including cash, on {1}?
-financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate.hidden = total value of scheme assets, including cash
+financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate.hidden = total value of scheme assets, including cash, on {0}
 financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate = What was the total value of {0}’s assets, including cash, on {1}?
-financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate.hidden = total value of scheme assets, including cash
+financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate.hidden = total value of scheme assets, including cash, on {0}
 financialDetailsCheckYourAnswersController.feeCommissionWagesSalary = How much did {0} pay in fees or commissions of over 10%?
 financialDetailsCheckYourAnswersController.feeCommissionWagesSalary.hidden = how much the scheme paid in fees or commissions of over 10%
 

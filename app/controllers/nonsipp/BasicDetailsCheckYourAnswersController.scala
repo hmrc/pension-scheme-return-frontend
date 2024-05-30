@@ -278,7 +278,9 @@ object BasicDetailsCheckYourAnswersController {
           ),
           schemeMemberNumbers.noOfActiveMembers.toString
         ).withChangeAction(
-            controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, mode).url,
+            controllers.nonsipp.schemedesignatory.routes.HowManyMembersController
+              .onPageLoad(srn, mode)
+              .url + "#activeMembers",
             hidden = Message(
               "basicDetailsCheckYourAnswersController.memberDetails.activeMembers.hidden",
               taxEndDate(taxYearOrAccountingPeriods).show
@@ -293,7 +295,9 @@ object BasicDetailsCheckYourAnswersController {
           ),
           schemeMemberNumbers.noOfDeferredMembers.toString
         ).withChangeAction(
-            controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, mode).url,
+            controllers.nonsipp.schemedesignatory.routes.HowManyMembersController
+              .onPageLoad(srn, mode)
+              .url + "#deferredMembers",
             hidden = Message(
               "basicDetailsCheckYourAnswersController.memberDetails.deferredMembers.hidden",
               taxEndDate(taxYearOrAccountingPeriods).show
@@ -308,7 +312,9 @@ object BasicDetailsCheckYourAnswersController {
           ),
           schemeMemberNumbers.noOfPensionerMembers.toString
         ).withChangeAction(
-            controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, mode).url,
+            controllers.nonsipp.schemedesignatory.routes.HowManyMembersController
+              .onPageLoad(srn, mode)
+              .url + "#pensionerMembers",
             hidden = Message(
               "basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers.hidden",
               taxEndDate(taxYearOrAccountingPeriods).show
