@@ -79,11 +79,8 @@ class TransfersInTransformer @Inject() extends Transformer {
             )
         }
     } ++ List(
-      _.set(DidSchemeReceiveTransferPage(srn), transfersIn.nonEmpty),
-      _.set(TransferReceivedMemberListPage(srn), transfersInCompleted),
-      _.set(
-        TransfersInJourneyStatus(srn),
-        if (transfersInCompleted) SectionStatus.Completed else SectionStatus.InProgress
-      )
+      _.setWhen(transfersInCompleted)(DidSchemeReceiveTransferPage(srn), transfersIn.nonEmpty),
+      _.setWhen(transfersInCompleted)(TransferReceivedMemberListPage(srn), true),
+      _.setWhen(transfersInCompleted)(TransfersInJourneyStatus(srn), SectionStatus.Completed)
     )
 }

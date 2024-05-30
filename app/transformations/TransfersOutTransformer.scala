@@ -72,11 +72,8 @@ class TransfersOutTransformer @Inject() extends Transformer {
             )
         }
     } ++ List(
-      _.set(SchemeTransferOutPage(srn), transfersOut.nonEmpty),
-      _.set(TransferOutMemberListPage(srn), transfersOutCompleted),
-      _.set(
-        TransfersOutJourneyStatus(srn),
-        if (transfersOutCompleted) SectionStatus.Completed else SectionStatus.InProgress
-      )
+      _.setWhen(transfersOutCompleted)(SchemeTransferOutPage(srn), transfersOut.nonEmpty),
+      _.setWhen(transfersOutCompleted)(TransferOutMemberListPage(srn), true),
+      _.setWhen(transfersOutCompleted)(TransfersOutJourneyStatus(srn), SectionStatus.Completed)
     )
 }

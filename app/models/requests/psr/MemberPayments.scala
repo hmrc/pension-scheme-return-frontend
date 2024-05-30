@@ -26,7 +26,9 @@ import java.time.LocalDate
 case class SectionDetails(
   made: Boolean,
   completed: Boolean
-)
+) {
+  val started: Boolean = !(!made && !completed)
+}
 
 case class MemberPayments(
   recordVersion: Option[String],
