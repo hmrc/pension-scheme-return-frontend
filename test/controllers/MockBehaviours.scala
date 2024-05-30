@@ -64,7 +64,10 @@ trait MockBehaviours {
           emailAddress = ArgumentMatchers.eq(testEmailAddress),
           templateId = ArgumentMatchers.eq(testTemplateId),
           templateParams = any(),
-          reportVersion = any()
+          reportVersion = any(),
+          schemeName = any(),
+          taxYear = any(),
+          userName = any()
         )(any(), any())
       ).thenReturn(Future.successful(EmailSent))
 

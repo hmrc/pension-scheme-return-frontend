@@ -32,7 +32,7 @@ import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.Mockito
 import org.scalatest.freespec.AnyFreeSpec
 import org.mockito.Mockito.{times, verify, when}
-import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
+import pages.nonsipp.{CheckReturnDatesPage, FbVersionPage, WhichTaxYearPage}
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import models._
 import models.SchemeMemberNumbers._
@@ -191,7 +191,7 @@ class MinimalRequiredSubmissionTransformerSpec
       val userAnswers = emptyUserAnswers
       val minimalRequiredSubmission = MinimalRequiredSubmission(
         ReportDetails(
-          fbVersion = None,
+          fbVersion = Some("001"),
           fbstatus = None,
           pstr = request.schemeDetails.pstr,
           periodStart = dateRange.from,
@@ -223,6 +223,7 @@ class MinimalRequiredSubmissionTransformerSpec
       result.fold(
         ex => fail(ex.getMessage),
         userAnswers => {
+          userAnswers.get(FbVersionPage(srn)) mustBe Some("001")
           userAnswers.get(AccountingPeriodRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(SchemeDesignatoryRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(WhichTaxYearPage(srn)) mustBe Some(DateRange(dateRange.from, dateRange.to))
@@ -246,7 +247,7 @@ class MinimalRequiredSubmissionTransformerSpec
       val userAnswers = emptyUserAnswers
       val minimalRequiredSubmission = MinimalRequiredSubmission(
         ReportDetails(
-          fbVersion = None,
+          fbVersion = Some("001"),
           fbstatus = None,
           pstr = request.schemeDetails.pstr,
           periodStart = dateRange.from,
@@ -278,6 +279,7 @@ class MinimalRequiredSubmissionTransformerSpec
       result.fold(
         ex => fail(ex.getMessage),
         userAnswers => {
+          userAnswers.get(FbVersionPage(srn)) mustBe Some("001")
           userAnswers.get(AccountingPeriodRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(SchemeDesignatoryRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(WhichTaxYearPage(srn)) mustBe Some(DateRange(dateRange.from, dateRange.to))

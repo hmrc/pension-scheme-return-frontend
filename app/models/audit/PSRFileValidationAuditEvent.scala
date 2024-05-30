@@ -41,7 +41,7 @@ case class PSRFileValidationAuditEvent(
       "PensionSchemeTaxReference" -> schemeTaxReference,
       "AffinityGroup" -> affinityGroup,
       "CredentialRole(PSA/PSP)" -> credentialRole,
-      "TaxYear" -> s"${taxYear.from.getYear}-${taxYear.to.getYear}",
+      "TaxYear" -> taxYear.toYearFormat,
       "ValidationCheckStatus" -> validationCheckStatus,
       "FileValidationTimeInMilliSeconds" -> fileValidationTimeInMilliSeconds.toString,
       "NumberOfEntries" -> numberOfEntries.toString,

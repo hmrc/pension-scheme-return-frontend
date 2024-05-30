@@ -19,6 +19,7 @@ package utils
 import cats.Show
 
 import java.time.{LocalDate, LocalDateTime}
+import java.util.Locale
 import java.time.format.DateTimeFormatter
 
 object DateTimeUtils {
@@ -34,7 +35,7 @@ object DateTimeUtils {
   }
 
   def formatReadable(localDateTime: LocalDateTime): String = {
-    val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' h:mma")
+    val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy 'at' h:mma").withLocale(Locale.UK)
     localDateTime.format(formatter)
   }
 
