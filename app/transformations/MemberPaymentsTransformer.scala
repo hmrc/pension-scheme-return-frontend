@@ -194,19 +194,26 @@ class MemberPaymentsTransformer @Inject()(
                 index,
                 memberPayments.lumpSumReceived,
                 memberDetails.memberLumpSumReceived
-              ) ++ pensionSurrenderTransformer.transformFromEtmp(
-                srn,
-                index,
-                memberDetails.benefitsSurrendered,
-                memberPayments.benefitsSurrenderedDetails
+              ) ++ memberDetails.benefitsSurrendered.toList.flatMap(
+                benefitsSurrendered =>
+                  pensionSurrenderTransformer.transformFromEtmp(
+                    srn,
+                    index,
+                    benefitsSurrendered
+                  )
               ) ++ memberDetails.pensionAmountReceived.fold(noUpdate)(
                 pensionAmountReceivedPages(srn, index, _)
               )
 
             pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))
         }
+
+      ua3_1 = ua3.compose(
+        pensionSurrenderTransformer.transformFromEtmp(srn, memberPayments.benefitsSurrenderedDetails)
+      )
+
       emptyTotalContributionNotExist = !memberPayments.memberDetails.exists(_.totalContributions.isEmpty)
-      ua4 <- ua3.set(MemberContributionsListPage(srn), emptyTotalContributionNotExist)
+      ua4 <- ua3_1.set(MemberContributionsListPage(srn), emptyTotalContributionNotExist)
 
       emptyMemberLumpSumReceivedNotExist = !memberPayments.memberDetails.exists(_.memberLumpSumReceived.isEmpty)
       ua5 <- ua4.set(PclsMemberListPage(srn), emptyMemberLumpSumReceivedNotExist)

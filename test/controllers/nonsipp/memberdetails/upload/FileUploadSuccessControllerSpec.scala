@@ -20,6 +20,7 @@ import play.api.test.FakeRequest
 import config.Refined.OneTo300
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
+import uk.gov.hmrc.domain.Nino
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
 import models._
 import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
@@ -38,8 +39,6 @@ import cats.implicits.catsSyntaxOptionId
 import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, TransfersInSectionCompleted}
 import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
 import eu.timepit.refined.{refineMV, refineV}
-import uk.gov.hmrc.domain.Nino
-import play.api.libs.json.Json
 import models.UploadStatus.UploadStatus
 import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, TransfersOutSectionCompleted}
 import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
@@ -199,8 +198,6 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
         verify(mockSaveService).save(captor.capture())(any(), any())
 
         val userAnswers = captor.getValue
-
-        println("=========== " + Json.prettyPrint(userAnswers.data.decryptedValue))
 
         userAnswers.get(EmployerNamePage(srn, refineMV(1), refineMV(1))) mustBe None
         userAnswers.get(UnallocatedEmployerAmountPage(srn)) mustBe None
