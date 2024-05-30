@@ -145,7 +145,7 @@ object HowWereSharesDisposedController {
     formProvider.singleConditional[HowSharesDisposed, String](
       "sharesDisposal.howWereSharesDisposed.error.required",
       Other.name,
-      Mappings.input("conditional", formErrors)
+      Mappings.input(formErrors)
     )
 
   def viewModel(

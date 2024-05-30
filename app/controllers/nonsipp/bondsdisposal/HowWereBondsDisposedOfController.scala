@@ -139,7 +139,7 @@ object HowWereBondsDisposedOfController {
     formProvider.singleConditional[HowDisposed, String](
       "howWereBondsDisposedOf.error.required",
       Other.name,
-      Mappings.input("conditional", formErrors)
+      Mappings.input(formErrors)
     )
 
   def viewModel(

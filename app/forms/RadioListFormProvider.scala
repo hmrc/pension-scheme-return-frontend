@@ -44,7 +44,7 @@ class RadioListFormProvider @Inject() extends Mappings {
     Form(
       mapping[A, String, Option[Conditional]](
         "value" -> text(requiredKey),
-        "isRequired" -> ConditionalMappings.mandatoryIf[Conditional](conditional, conditionalMapping)
+        "conditional" -> ConditionalMappings.mandatoryIf[Conditional](conditional, conditionalMapping)
       )((x, y) => ev.to((x, y)))(ev.from)
     )
   }
