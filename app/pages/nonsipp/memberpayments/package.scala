@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberpayments
+package pages.nonsipp
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{__, JsPath}
 
-case object MemberPaymentsPage extends QuestionPage[Nothing] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "membersPayments"
+package object memberpayments {
+  object Paths {
+    val membersPayments: JsPath = __ \ "membersPayments"
+  }
 }

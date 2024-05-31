@@ -20,6 +20,7 @@ import play.api.libs.json.{__, JsPath}
 
 package object memberdetails {
   object Paths {
-    val personalDetails: JsPath = __ \ "membersPayments" \ "memberDetails" \ "personalDetails"
+    val memberDetails: JsPath = __ \ "membersPayments" \ "memberDetails"
+    val personalDetails: JsPath = memberDetails \ "personalDetails"
   }
 }

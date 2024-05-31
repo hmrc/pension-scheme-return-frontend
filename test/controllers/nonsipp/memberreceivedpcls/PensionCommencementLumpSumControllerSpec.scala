@@ -79,7 +79,7 @@ class PensionCommencementLumpSumControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit " + _))
 
-    act.like(saveAndContinue(onSubmit, Some(Paths.memberDetails \ "lumpSumReceived"), "value" -> "true"))
+    act.like(saveAndContinue(onSubmit, Some(Paths.membersPayments \ "lumpSumReceived"), "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
   }

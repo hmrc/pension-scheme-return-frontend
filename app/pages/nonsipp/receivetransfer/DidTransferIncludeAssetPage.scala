@@ -24,13 +24,8 @@ import pages.QuestionPage
 
 case class DidTransferIncludeAssetPage(srn: Srn, index: Max300, secondaryIndex: Max5) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
-
-  override def toString: String = "transferIncludedAsset"
-}
-
-case class AllDidTransferIncludeAssetPages(srn: Srn) extends QuestionPage[Map[String, Map[String, Boolean]]] {
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath =
+    Paths.memberTransfersIn \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
   override def toString: String = "transferIncludedAsset"
 }

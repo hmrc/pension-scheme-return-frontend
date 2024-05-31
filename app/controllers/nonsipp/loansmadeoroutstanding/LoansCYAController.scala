@@ -618,7 +618,7 @@ object LoansCYAController {
             SummaryAction(
               "site.change",
               routes.OutstandingArrearsOnLoanController.onPageLoad(srn, index, mode).url
-            ).withVisuallyHiddenContent("loanCheckYourAnswers.section6.arrears.hidden", returnEndDate.show)
+            ).withVisuallyHiddenContent(("loanCheckYourAnswers.section6.arrears.hidden", returnEndDate.show))
           )
         ) :?+ outstandingArrearsOnLoan.map { value =>
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section6.arrears.yes", s"£${value.displayAs}")

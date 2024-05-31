@@ -18,20 +18,20 @@ package pages.nonsipp.employercontributions
 
 import pages.QuestionPage
 import models.SchemeId.Srn
+import pages.nonsipp.employercontributions.Paths.membersPayments
 import play.api.libs.json.JsPath
 import models.UserAnswers
-import pages.nonsipp.memberpayments.MemberPaymentsPage
 import viewmodels.models.SectionStatus
 
 import scala.util.Try
 
 case class EmployerContributionsPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = MemberPaymentsPage.path \ toString
+  override def path: JsPath = membersPayments \ toString
 
   override def toString: String = "employerContributionMade"
 
-  def setSectionStatus(userAnswers: UserAnswers, newValue: Boolean): Try[UserAnswers] =
+  private def setSectionStatus(userAnswers: UserAnswers, newValue: Boolean): Try[UserAnswers] =
     userAnswers.set(
       EmployerContributionsSectionStatus(srn),
       if (newValue) {
