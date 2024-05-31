@@ -20,14 +20,12 @@ import pages.nonsipp.memberdetails.MembersDetailsPages
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
-import config.Refined.{Max300, Max50}
 import controllers.PSRController
-import config.Constants
 import cats.implicits.catsSyntaxApplicativeId
+import _root_.config.Constants
 import navigation.Navigator
 import models._
 import play.api.i18n.MessagesApi
-import pages.nonsipp.employercontributions.EmployerContributionsProgress.EmployerContributionsUserAnswersOps
 import pages.nonsipp.employercontributions.{EmployerContributionsMemberListPage, EmployerContributionsSectionStatus}
 import services.{PsrSubmissionService, SaveService}
 import views.html.TwoColumnsTripleAction
@@ -41,6 +39,8 @@ import viewmodels.models.SectionJourneyStatus.InProgress
 import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
+import pages.nonsipp.employercontributions.EmployerContributionsProgress.EmployerContributionsUserAnswersOps
+import _root_.config.Refined.{Max300, Max50}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -229,7 +229,8 @@ object EmployerContributionsMemberListController {
                 controllers.nonsipp.employercontributions.routes.EmployerNameController
                   .onSubmit(srn, employerContribution.memberIndex, refineMV(1), mode)
                   .url
-            }
+            },
+            Message("employerContributions.MemberList.add.hidden.text", employerContribution.employerFullName)
           ),
           TableElem.empty
         )
@@ -253,11 +254,13 @@ object EmployerContributionsMemberListController {
           ),
           TableElem.change(
             controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-              .onSubmit(srn, employerContribution.memberIndex, page = 1, CheckMode)
+              .onSubmit(srn, employerContribution.memberIndex, page = 1, CheckMode),
+            Message("employerContributions.MemberList.change.hidden.text", employerContribution.employerFullName)
           ),
           TableElem.remove(
             controllers.nonsipp.employercontributions.routes.WhichEmployerContributionRemoveController
-              .onSubmit(srn, employerContribution.memberIndex)
+              .onSubmit(srn, employerContribution.memberIndex),
+            Message("employerContributions.MemberList.remove.hidden.text", employerContribution.employerFullName)
           )
         )
       }

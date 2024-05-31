@@ -124,8 +124,8 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
           val href = routes.AccountingPeriodController.onPageLoad(srn, refineMV[OneToThree](1), NormalMode).url
 
           val actions = List(
-            SummaryAction(content, href, Message("site.startDate")),
-            SummaryAction(content, href, Message("site.endDate"))
+            SummaryAction(content, href + "#startDate", Message("site.startDate")),
+            SummaryAction(content, href + "#endDate", Message("site.endDate"))
           )
 
           viewModel(srn, refineMV[OneToThree](1), dateRange, NormalMode).page.sections

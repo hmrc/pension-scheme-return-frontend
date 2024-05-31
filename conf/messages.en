@@ -2286,6 +2286,9 @@ employerContributions.MemberList.radios.error.required = Select yes if you have 
 employerContributions.MemberList.status.no.contributions = No employer contributions
 employerContributions.MemberList.status.some.contributions = {0} employer contributions
 employerContributions.MemberList.status.single.contribution = {0} employer contribution
+employerContributions.MemberList.add.hidden.text = employer contributions for {0}
+employerContributions.MemberList.change.hidden.text = employer contributions for {0}
+employerContributions.MemberList.remove.hidden.text = employer contributions for {0}
 
 ReportContribution.MemberList.title = Select a member to report member contributions
 ReportContribution.MemberList.title.plural = Select a member to report member contributions

@@ -22,7 +22,9 @@ import viewmodels.DisplayMessage.{LinkMessage, Message}
 
 case class TableElem(
   text: DisplayMessage,
-  hiddenText: Option[Message] = None
+  hiddenText: Option[Message] = None,
+  url: Option[String] = None,
+  messageKey: Option[String] = None
 )
 
 object TableElem {
@@ -31,6 +33,15 @@ object TableElem {
   def add(url: String): TableElem = TableElem(LinkMessage(Message("site.add"), url))
   def change(call: Call): TableElem = TableElem(LinkMessage(Message("site.change"), call.url))
   def remove(call: Call): TableElem = TableElem(LinkMessage(Message("site.remove"), call.url))
+
+  def add(call: Call, hiddenText: Message): TableElem =
+    TableElem(Message("site.add"), Some(hiddenText), Some(call.url), Some("site.add"))
+  def add(url: String, hiddenText: Message): TableElem =
+    TableElem(Message("site.add"), Some(hiddenText), Some(url), Some("site.add"))
+  def change(call: Call, hiddenText: Message): TableElem =
+    TableElem(Message("site.change"), Some(hiddenText), Some(call.url), Some("site.change"))
+  def remove(call: Call, hiddenText: Message): TableElem =
+    TableElem(Message("site.remove"), Some(hiddenText), Some(call.url), Some("site.remove"))
 }
 
 case class ActionTableViewModel(
