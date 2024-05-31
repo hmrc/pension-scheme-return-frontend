@@ -41,7 +41,7 @@ import pages.nonsipp.otherassetsdisposal.{
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import pages.nonsipp.bonds._
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
-import pages.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldPage
+import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
 import pages.nonsipp.membercontributions._
 import pages.nonsipp.memberreceivedpcls.{PclsMemberListPage, PensionCommencementLumpSumPage}
 import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, PensionPaymentsReceivedPage}
@@ -809,14 +809,21 @@ object TaskListStatusUtils {
 
   def getQuotedSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val quotedSharesManagedFundsHeld = userAnswers.get(QuotedSharesManagedFundsHeldPage(srn))
+    val totalValueQuotedShares = userAnswers.get(TotalValueQuotedSharesPage(srn))
     val defaultLink =
       controllers.nonsipp.totalvaluequotedshares.routes.QuotedSharesManagedFundsHeldController
         .onPageLoad(srn, NormalMode)
         .url
 
-    quotedSharesManagedFundsHeld match {
-      case None => (NotStarted, defaultLink)
-      case Some(_) => (Completed, defaultLink)
+    val cyaLink =
+      controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
+        .onPageLoad(srn)
+        .url
+
+    (quotedSharesManagedFundsHeld, totalValueQuotedShares) match {
+      case (Some(false), _) => (Completed, defaultLink)
+      case (_, Some(amount)) => if (amount == Money(0.00)) (Completed, defaultLink) else (Completed, cyaLink)
+      case _ => (NotStarted, defaultLink)
     }
   }
 
