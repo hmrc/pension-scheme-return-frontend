@@ -305,11 +305,11 @@ object PsrSubmissionServiceSpec {
       employerContributionsDetails = SectionDetails(made = true, completed = true),
       transfersInCompleted = true,
       transfersOutCompleted = true,
-      unallocatedContribsMade = true,
+      unallocatedContribsMade = Some(true),
       unallocatedContribAmount = None,
-      memberContributionMade = true,
-      lumpSumReceived = true,
-      pensionReceived = true,
+      memberContributionMade = Some(true),
+      lumpSumReceived = Some(true),
+      pensionReceived = Some(true),
       benefitsSurrenderedDetails = SectionDetails(made = true, completed = true)
     )
   )

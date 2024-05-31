@@ -17,22 +17,36 @@
 package pages.nonsipp.membersurrenderedbenefits
 
 import utils.RefinedUtils._
+import utils.ListUtils.ListOps
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import models.UserAnswers
 import viewmodels.models.SectionCompleted
 import config.Refined._
 import pages.{IndexedQuestionPage, QuestionPage}
 
-case class SurrenderedBenefitsCompletedPage(srn: Srn, index: Max300) extends QuestionPage[SectionCompleted.type] {
+case class SurrenderedBenefitsCompletedPage(srn: Srn, index: Max300) extends QuestionPage[SectionCompleted] {
 
   override def path: JsPath = Paths.memberPensionSurrender \ toString \ index.arrayIndex.toString
 
   override def toString: String = "surrenderedBenefitsSectionCompleted"
 }
 
-case class SurrenderedBenefitsCompletedPages(srn: Srn) extends IndexedQuestionPage[SectionCompleted.type] {
+object SurrenderedBenefitsCompleted {
+  def all(srn: Srn): IndexedQuestionPage[SectionCompleted] = new IndexedQuestionPage[SectionCompleted] {
 
-  override def path: JsPath = Paths.memberPensionSurrender \ toString
+    override def path: JsPath = Paths.memberPensionSurrender \ toString
 
-  override def toString: String = "surrenderedBenefitsSectionCompleted"
+    override def toString: String = "surrenderedBenefitsSectionCompleted"
+  }
+
+  implicit class SurrenderedBenefitsUserAnswersOps(ua: UserAnswers) {
+    def surrenderedBenefitsCompleted(srn: Srn): List[Max300] =
+      ua.map(SurrenderedBenefitsCompleted.all(srn))
+        .toList
+        .collect {
+          case (index, _) => index
+        }
+        .refine[Max300.Refined]
+  }
 }

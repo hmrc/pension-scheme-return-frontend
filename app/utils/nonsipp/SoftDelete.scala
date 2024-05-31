@@ -18,7 +18,6 @@ package utils.nonsipp
 
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.membertransferout.TransfersOutSectionCompleted.TransfersOutSectionCompletedUserAnswersOps
-import cats.syntax.apply._
 import config.Refined.{Max300, Max5, Max50}
 import controllers.PSRController
 import models.SchemeId.Srn
@@ -43,12 +42,15 @@ import pages.nonsipp.membercontributions.{
   MemberContributionsPage,
   TotalMemberContributionPage
 }
+import queries.{Gettable, Removable}
 import pages.nonsipp.memberreceivedpcls.{
   PclsMemberListPage,
   PensionCommencementLumpSumAmountPage,
   PensionCommencementLumpSumPage
 }
-import queries.{Gettable, Removable}
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCompleted.SurrenderedBenefitsUserAnswersOps
+import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
+import cats.syntax.apply._
 import cats.syntax.option._
 import pages.nonsipp.membertransferout._
 
@@ -60,7 +62,7 @@ trait SoftDelete { _: PSRController =>
     softDeleteMember(srn, index, req.userAnswers)
 
   /**
-   * Only remove completed flags when the member is safe deleted
+   * Only remove completed flags when the member is soft deleted
    * return Option when something has gone wrong - todo: change to type that can store the error for logging
    * - When hard deleting members after moving them to the soft delete group,
    *   the function checks to see if any section journeys still exist (e.g. employer contributions).
@@ -121,9 +123,7 @@ trait SoftDelete { _: PSRController =>
       SurrenderedBenefitsCompletedPage(srn, index),
       SurrenderedBenefitsAmountPage(srn, index),
       WhenDidMemberSurrenderBenefitsPage(srn, index),
-      WhyDidMemberSurrenderBenefitsPage(srn, index),
-      SurrenderedBenefitsJourneyStatus(srn),
-      SurrenderedBenefitsPage(srn)
+      WhyDidMemberSurrenderBenefitsPage(srn, index)
     )
 
     val memberContributionsPages: List[Removable[_]] = List(
@@ -254,6 +254,7 @@ trait SoftDelete { _: PSRController =>
       sdm =>
         userAnswers
           .set(SoftDeletedMembers(srn), existingSoftDeletedMembers :+ sdm)
+          .remove(memberDetailsPages)
           .flatMap { ua =>
             ua.employerContributionsCompleted(srn, index)
               .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(employerContributionsPages(secondaryIndex)))
@@ -263,9 +264,15 @@ trait SoftDelete { _: PSRController =>
             ua =>
               ua.transfersInSectionCompleted(srn, index)
                 .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(transfersInPages(secondaryIndex)))
-                .removeWhen(!_.map(TransfersInSectionCompleted.all(srn)).values.exists(_.values.nonEmpty))(
-                  TransfersInJourneyStatus(srn),
-                  DidSchemeReceiveTransferPage(srn)
+                .when(_.get(DidSchemeReceiveTransferPage(srn)))(
+                  ifTrue = _.removeWhen(!_.map(TransfersInSectionCompleted.all(srn)).values.exists(_.values.nonEmpty))(
+                    TransfersInJourneyStatus(srn),
+                    DidSchemeReceiveTransferPage(srn)
+                  ),
+                  ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(
+                    TransfersInJourneyStatus(srn),
+                    DidSchemeReceiveTransferPage(srn)
+                  )
                 )
           )
           .flatMap(
@@ -277,10 +284,21 @@ trait SoftDelete { _: PSRController =>
                   SchemeTransferOutPage(srn)
                 )
           )
+          .flatMap { ua =>
+            ua.remove(surrenderedBenefitsPages)
+              .when(_.get(SurrenderedBenefitsPage(srn)))(
+                ifTrue = _.removeWhen(_.surrenderedBenefitsCompleted(srn).isEmpty)(
+                  SurrenderedBenefitsJourneyStatus(srn),
+                  SurrenderedBenefitsPage(srn)
+                ),
+                ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(
+                  SurrenderedBenefitsJourneyStatus(srn),
+                  SurrenderedBenefitsPage(srn)
+                )
+              )
+          }
           .remove(
-            memberDetailsPages ++
-              surrenderedBenefitsPages ++
-              memberContributionsPages ++
+            memberContributionsPages ++
               memberPensionPaymentsPages ++
               memberCommencementLumpSumPages ++
               unallocatedEmployerContributionsPages :+

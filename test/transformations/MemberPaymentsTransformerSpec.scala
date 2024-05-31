@@ -56,8 +56,15 @@ class MemberPaymentsTransformerSpec
   private val transfersInTransformer = new TransfersInTransformer()
   private val transfersOutTransformer = new TransfersOutTransformer()
   private val pensionSurrenderTransformer = new PensionSurrenderTransformer()
+  private val pensionAmountReceivedTransformer = new PensionAmountReceivedTransformer()
+
   private val memberPaymentsTransformer =
-    new MemberPaymentsTransformer(transfersInTransformer, transfersOutTransformer, pensionSurrenderTransformer)
+    new MemberPaymentsTransformer(
+      transfersInTransformer,
+      transfersOutTransformer,
+      pensionSurrenderTransformer,
+      pensionAmountReceivedTransformer
+    )
 
   private val memberPayments = MemberPayments(
     recordVersion = Some("001"),
@@ -154,12 +161,12 @@ class MemberPaymentsTransformerSpec
     employerContributionsDetails = SectionDetails(made = true, completed = true),
     transfersInCompleted = false,
     transfersOutCompleted = false,
-    unallocatedContribsMade = true,
+    unallocatedContribsMade = Some(true),
     unallocatedContribAmount = Some(money.value),
-    memberContributionMade = true,
-    lumpSumReceived = true,
+    memberContributionMade = Some(true),
+    lumpSumReceived = Some(true),
     benefitsSurrenderedDetails = SectionDetails(made = true, completed = true),
-    pensionReceived = true
+    pensionReceived = Some(true)
   )
 
   private val softDeletedMember = SoftDeletedMember(

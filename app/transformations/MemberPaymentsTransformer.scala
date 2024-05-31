@@ -59,10 +59,11 @@ import javax.inject.Inject
 class MemberPaymentsTransformer @Inject()(
   transfersInTransformer: TransfersInTransformer,
   transfersOutTransformer: TransfersOutTransformer,
-  pensionSurrenderTransformer: PensionSurrenderTransformer
+  pensionSurrenderTransformer: PensionSurrenderTransformer,
+  pensionAmountReceivedTransformer: PensionAmountReceivedTransformer
 ) extends Transformer {
 
-  private val noUpdate: List[Try[UserAnswers] => Try[UserAnswers]] = Nil
+  private val noUpdate: List[UserAnswers.Compose] = Nil
 
   def transformToEtmp(srn: Srn, userAnswers: UserAnswers, initialUA: UserAnswers): Option[MemberPayments] = {
 
@@ -127,11 +128,11 @@ class MemberPaymentsTransformer @Inject()(
               case SectionStatus.InProgress => false
               case SectionStatus.Completed => true
             },
-            unallocatedContribsMade = userAnswers.get(UnallocatedEmployerContributionsPage(srn)).getOrElse(false),
+            unallocatedContribsMade = userAnswers.get(UnallocatedEmployerContributionsPage(srn)),
             unallocatedContribAmount = userAnswers.get(UnallocatedEmployerAmountPage(srn)).map(_.value),
-            memberContributionMade = userAnswers.get(MemberContributionsPage(srn)).getOrElse(false),
-            lumpSumReceived = userAnswers.get(PensionCommencementLumpSumPage(srn)).getOrElse(false),
-            pensionReceived = userAnswers.get(PensionPaymentsReceivedPage(srn)).getOrElse(false),
+            memberContributionMade = userAnswers.get(MemberContributionsPage(srn)),
+            lumpSumReceived = userAnswers.get(PensionCommencementLumpSumPage(srn)),
+            pensionReceived = userAnswers.get(PensionPaymentsReceivedPage(srn)),
             benefitsSurrenderedDetails = benefitsSurrenderedDetails(userAnswers)
           )
         )
@@ -173,7 +174,15 @@ class MemberPaymentsTransformer @Inject()(
       ua0 <- memberPayments.recordVersion.fold(Try(userAnswers))(
         userAnswers.set(MemberPaymentsRecordVersionPage(srn), _)
       )
-      ua1 <- ua0.set(UnallocatedEmployerContributionsPage(srn), memberPayments.unallocatedContribsMade)
+      // Only set UnallocatedEmployerContributionsPage when unallocatedContribsMade exists
+      // If empty, this infers that the section hasn't been started yet
+      ua1 <- memberPayments.unallocatedContribsMade.fold(Try(ua0))(
+        unallocatedContribsMade =>
+          ua0.set(
+            UnallocatedEmployerContributionsPage(srn),
+            unallocatedContribsMade
+          )
+      )
       ua2 <- memberPayments.unallocatedContribAmount match {
         case Some(value) => ua1.set(UnallocatedEmployerAmountPage(srn), Money(value))
         case None => Try(ua1)
@@ -202,25 +211,14 @@ class MemberPaymentsTransformer @Inject()(
                 index,
                 memberDetails.transfersOut,
                 memberPayments.transfersInCompleted
-              ) ++ memberContributionsPages(
-                srn,
-                index,
-                memberPayments.memberContributionMade,
-                memberDetails.totalContributions
-              ) ++ memberLumpSumReceivedPages(
-                srn,
-                index,
-                memberPayments.lumpSumReceived,
-                memberDetails.memberLumpSumReceived
-              ) ++ memberDetails.benefitsSurrendered.toList.flatMap(
-                benefitsSurrendered =>
-                  pensionSurrenderTransformer.transformFromEtmp(
-                    srn,
-                    index,
-                    benefitsSurrendered
-                  )
+              ) ++ memberPayments.memberContributionMade.fold(noUpdate)(
+                memberContributionsPages(srn, index, _, memberDetails.totalContributions)
+              ) ++ memberPayments.lumpSumReceived.fold(noUpdate)(
+                memberLumpSumReceivedPages(srn, index, _, memberDetails.memberLumpSumReceived)
+              ) ++ memberDetails.benefitsSurrendered.fold(noUpdate)(
+                pensionSurrenderTransformer.transformFromEtmp(srn, index, _)
               ) ++ memberDetails.pensionAmountReceived.fold(noUpdate)(
-                pensionAmountReceivedPages(srn, index, _)
+                pensionAmountReceivedTransformer.transformFromEtmp(srn, index, _)
               ) :+ (
                 triedUA =>
                   memberDetails.memberPSRVersion.fold(triedUA)(triedUA.set(MemberPsrVersionPage(srn, index), _))
@@ -229,8 +227,14 @@ class MemberPaymentsTransformer @Inject()(
             pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))
         }
 
+      // Section wide user answers (this includes initial pages, completion pages, section status pages and pages that don't require an index)
       ua3_1 = ua3.compose(
-        pensionSurrenderTransformer.transformFromEtmp(srn, memberPayments.benefitsSurrenderedDetails)
+        pensionSurrenderTransformer.transformFromEtmp(srn, memberPayments.benefitsSurrenderedDetails) ++
+          pensionAmountReceivedTransformer.transformFromEtmp(
+            srn,
+            memberPayments.pensionReceived,
+            memberPayments.memberDetails.map(_.pensionAmountReceived)
+          )
       )
 
       emptyTotalContributionNotExist = !memberPayments.memberDetails.exists(_.totalContributions.isEmpty)
@@ -239,17 +243,7 @@ class MemberPaymentsTransformer @Inject()(
       emptyMemberLumpSumReceivedNotExist = !memberPayments.memberDetails.exists(_.memberLumpSumReceived.isEmpty)
       ua5 <- ua4.set(PclsMemberListPage(srn), emptyMemberLumpSumReceivedNotExist)
 
-      ua6 <- pensionAmountReceivedStatus(memberPayments).fold(Try(ua5))(
-        status =>
-          ua5
-            .set(PensionPaymentsJourneyStatus(srn), status)
-            .set(MemberPensionPaymentsListPage(srn), if (status.isCompleted) true else false)
-      )
-
-      pensionPaymentsReceived = !memberPayments.memberDetails.forall(_.pensionAmountReceived.contains(0))
-
-      ua7 <- ua6.set(PensionPaymentsReceivedPage(srn), pensionPaymentsReceived)
-      ua8 <- ua7.set(
+      ua8 <- ua5.set(
         SoftDeletedMembers(srn),
         memberPayments.memberDetails
           .filter(_.state == MemberState.Deleted)
@@ -435,29 +429,6 @@ class MemberPaymentsTransformer @Inject()(
           .getOrElse(ua),
       _.set(PensionCommencementLumpSumPage(srn), lumpSumReceived)
     )
-
-  private def pensionAmountReceivedPages(
-    srn: Srn,
-    index: Max300,
-    pensionReceived: Double
-  ): List[Try[UserAnswers] => Try[UserAnswers]] =
-    List(
-      _.set(TotalAmountPensionPaymentsPage(srn, index), Money(pensionReceived))
-    )
-
-  private def pensionAmountReceivedStatus(memberPayments: MemberPayments): Option[SectionStatus] = {
-    val pensionAmountReceived = memberPayments.memberDetails.map(_.pensionAmountReceived)
-
-    if (pensionAmountReceived.nonEmpty) {
-      if (pensionAmountReceived.exists(_.exists(_ == 0))) {
-        Some(SectionStatus.InProgress)
-      } else {
-        Some(SectionStatus.Completed)
-      }
-    } else {
-      None
-    }
-  }
 
   private def toEmployerType(
     srn: Srn,

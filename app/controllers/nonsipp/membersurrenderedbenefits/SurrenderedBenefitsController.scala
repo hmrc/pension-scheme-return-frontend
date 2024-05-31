@@ -24,14 +24,15 @@ import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
-import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsPage
+import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
 import models.Mode
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import views.html.YesNoPageView
 import models.SchemeId.Srn
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -64,7 +65,10 @@ class SurrenderedBenefitsController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(SurrenderedBenefitsPage(srn), value))
+            updatedAnswers <- request.userAnswers
+              .set(SurrenderedBenefitsPage(srn), value)
+              .setWhen(!value)(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.Completed)
+              .mapK[Future]
             _ <- saveService.save(updatedAnswers)
             submissionResult <- if (!value) {
               psrSubmissionService.submitPsrDetailsWithUA(
