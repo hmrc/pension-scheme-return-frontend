@@ -26,13 +26,12 @@ import controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesCYAContr
 import cats.implicits.toShow
 import controllers.actions._
 import navigation.Navigator
+import play.api.i18n._
 import cats.data.NonEmptyList
-import views.html.CheckYourAnswersView
+import views.html.CYAWithRemove
 import models.SchemeId.Srn
 import utils.DateTimeUtils.localDateShow
 import models._
-import play.api.i18n._
-import viewmodels.Margin
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
@@ -48,7 +47,7 @@ class TotalValueQuotedSharesCYAController @Inject()(
   schemeDateService: SchemeDateService,
   psrSubmissionService: PsrSubmissionService,
   val controllerComponents: MessagesControllerComponents,
-  view: CheckYourAnswersView
+  view: CYAWithRemove
 )(implicit ec: ExecutionContext)
     extends PSRController
     with I18nSupport {
@@ -102,9 +101,10 @@ object TotalValueQuotedSharesCYAController {
           srn,
           totalCost,
           taxYearOrAccountingPeriods,
-          schemeDetails
+          schemeDetails,
+          CheckMode
         )
-      ).withMarginBottom(Margin.Fixed60Bottom),
+      ),
       refresh = None,
       buttonText = "site.saveAndContinue",
       onSubmit = controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController.onSubmit(srn)
@@ -114,7 +114,8 @@ object TotalValueQuotedSharesCYAController {
     srn: Srn,
     totalCost: Money,
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
-    schemeDetails: SchemeDetails
+    schemeDetails: SchemeDetails,
+    mode: Mode
   ): List[CheckYourAnswersSection] = List(
     CheckYourAnswersSection(
       None,
@@ -126,13 +127,32 @@ object TotalValueQuotedSharesCYAController {
             taxEndDate(taxYearOrAccountingPeriods).show
           ),
           "£" + totalCost.displayAs
-        ).withChangeAction(
+        ).with2Actions(
+          SummaryAction(
+            "site.change",
             controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController
               .onPageLoad(srn)
-              .url,
-            hidden = "totalValueQuotedSharesCYA.section.totalCost.hidden"
+              .url
+          ).withVisuallyHiddenContent(
+            Message(
+              "totalValueQuotedSharesCYA.section.totalCost.hidden",
+              schemeDetails.schemeName,
+              taxEndDate(taxYearOrAccountingPeriods).show
+            )
+          ),
+          SummaryAction(
+            "site.remove",
+            controllers.nonsipp.totalvaluequotedshares.routes.RemoveTotalValueQuotedSharesController
+              .onPageLoad(srn, NormalMode)
+              .url
+          ).withVisuallyHiddenContent(
+            Message(
+              "totalValueQuotedSharesCYA.section.totalCost.hidden",
+              schemeDetails.schemeName,
+              taxEndDate(taxYearOrAccountingPeriods).show
+            )
           )
-          .withOneHalfWidth()
+        )
       )
     )
   )
