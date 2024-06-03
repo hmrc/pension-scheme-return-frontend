@@ -225,11 +225,13 @@ object MemberPensionPaymentsListController {
                   ),
                   TableElem.change(
                     controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-                      .onPageLoad(srn, nextIndex, CheckMode)
+                      .onPageLoad(srn, nextIndex, CheckMode),
+                    Message("memberPensionPayments.memberList.change.hidden.text", memberName.fullName)
                   ),
                   TableElem.remove(
                     controllers.nonsipp.memberpensionpayments.routes.RemovePensionPaymentsController
-                      .onPageLoad(srn, nextIndex)
+                      .onPageLoad(srn, nextIndex),
+                    Message("memberPensionPayments.memberList.remove.hidden.text", memberName.fullName)
                   )
                 )
               } else {
@@ -242,7 +244,8 @@ object MemberPensionPaymentsListController {
                   ),
                   TableElem.add(
                     controllers.nonsipp.memberpensionpayments.routes.TotalAmountPensionPaymentsController
-                      .onSubmit(srn, nextIndex, mode)
+                      .onSubmit(srn, nextIndex, mode),
+                    Message("memberPensionPayments.memberList.add.hidden.text", memberName.fullName)
                   ),
                   TableElem.empty
                 )

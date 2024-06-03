@@ -67,12 +67,12 @@ object AccountingPeriodCheckYourAnswersController {
   private def rows(srn: Srn, index: Max3, dateRange: DateRange, mode: Mode): List[CheckYourAnswersRowViewModel] = List(
     CheckYourAnswersRowViewModel("site.startDate", dateRange.from.show)
       .withAction(
-        SummaryAction("site.change", routes.AccountingPeriodController.onPageLoad(srn, index, mode).url)
+        SummaryAction("site.change", routes.AccountingPeriodController.onPageLoad(srn, index, mode).url + "#startDate")
           .withVisuallyHiddenContent("site.startDate")
       ),
     CheckYourAnswersRowViewModel("site.endDate", dateRange.to.show)
       .withAction(
-        SummaryAction("site.change", routes.AccountingPeriodController.onPageLoad(srn, index, mode).url)
+        SummaryAction("site.change", routes.AccountingPeriodController.onPageLoad(srn, index, mode).url + "#endDate")
           .withVisuallyHiddenContent("site.endDate")
       )
   )
