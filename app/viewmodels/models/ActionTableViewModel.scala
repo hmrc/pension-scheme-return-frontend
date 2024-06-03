@@ -18,7 +18,7 @@ package viewmodels.models
 
 import play.api.mvc.Call
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{LinkMessage, Message}
+import viewmodels.DisplayMessage.Message
 
 case class TableElem(
   text: DisplayMessage,
@@ -29,6 +29,7 @@ case class TableElem(
 
 object TableElem {
   val empty: TableElem = TableElem(DisplayMessage.Empty)
+  def emptyWithHiddenText(hiddenText: Message): TableElem = TableElem(DisplayMessage.Empty, Some(hiddenText))
   def add(call: Call, hiddenText: Message): TableElem =
     TableElem(Message("site.add"), Some(hiddenText), Some(call.url), Some("site.add"))
   def add(url: String, hiddenText: Message): TableElem =
