@@ -29,12 +29,13 @@ import navigation.Navigator
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.otherassetsheld.OtherAssetsListController._
 import models._
-import play.api.i18n.MessagesApi
 import pages.nonsipp.otherassetsheld._
 import com.google.inject.Inject
-import views.html.TwoColumnsTripleAction
+import views.html.ListView
 import models.SchemeId.Srn
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import play.api.i18n.MessagesApi
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
@@ -48,7 +49,7 @@ class OtherAssetsListController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: TwoColumnsTripleAction,
+  view: ListView,
   formProvider: YesNoPageFormProvider,
   psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
@@ -152,30 +153,22 @@ object OtherAssetsListController {
     srn: Srn,
     mode: Mode,
     memberList: List[OtherAssetsData]
-  ): List[List[TableElem]] =
+  ): List[ListRow] =
     memberList.map {
       case OtherAssetsData(index, nameOfOtherAssets) =>
         val otherAssetsMessage =
           Message("otherAssets.list.row", nameOfOtherAssets.show)
 
-        List(
-          TableElem(otherAssetsMessage),
-          TableElem(
-            LinkMessage(
-              Message("site.change"),
-              controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                .onPageLoad(srn, index, CheckMode)
-                .url
-            )
-          ),
-          TableElem(
-            LinkMessage(
-              Message("site.remove"),
-              controllers.nonsipp.otherassetsheld.routes.RemoveOtherAssetController
-                .onPageLoad(srn, index, NormalMode)
-                .url
-            )
-          )
+        ListRow(
+          otherAssetsMessage,
+          changeUrl = controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
+            .onPageLoad(srn, index, CheckMode)
+            .url,
+          changeHiddenText = Message("bondsList.row.change.hiddenText", otherAssetsMessage),
+          removeUrl = controllers.nonsipp.otherassetsheld.routes.RemoveOtherAssetController
+            .onPageLoad(srn, index, NormalMode)
+            .url,
+          removeHiddenText = Message("bondsList.row.remove.hiddenText", otherAssetsMessage)
         )
     }
 
@@ -184,7 +177,7 @@ object OtherAssetsListController {
     page: Int,
     mode: Mode,
     data: List[OtherAssetsData]
-  ): FormPageViewModel[ActionTableViewModel] = {
+  ): FormPageViewModel[ListViewModel] = {
     val title = if (data.size > 1) "otherAssets.list.title.plural" else "otherAssets.list.title"
     val heading = if (data.size > 1) "otherAssets.list.heading.plural" else "otherAssets.list.heading"
 
@@ -195,18 +188,23 @@ object OtherAssetsListController {
       call = controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onPageLoad(srn, _, mode)
     )
 
+    val conditionalInsetText: DisplayMessage = {
+      if (data.size >= Constants.maxOtherAssetsTransactions) {
+        ParagraphMessage("otherAssets.list.inset")
+      } else {
+        Message("")
+      }
+    }
     FormPageViewModel(
       title = Message(title, data.size),
       heading = Message(heading, data.size),
       description = Some(ParagraphMessage("otherAssets.list.description")),
-      page = ActionTableViewModel(
-        inset = ParagraphMessage("otherAssets.list.inset"),
-        head = None,
+      page = ListViewModel(
+        inset = conditionalInsetText,
         rows = rows(srn, mode, data),
         radioText = Message("otherAssets.list.radios"),
         showRadios = data.size < Constants.maxOtherAssetsTransactions,
         showInsetWithRadios = !(data.length < Constants.maxOtherAssetsTransactions),
-        showInset = data.size >= Constants.maxOtherAssetsTransactions,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

@@ -20,7 +20,7 @@ import services.PsrSubmissionService
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.bonds.BondsListController._
-import views.html.TwoColumnsTripleAction
+import views.html.{ListView, TwoColumnsTripleAction}
 import eu.timepit.refined.refineMV
 import play.api.inject
 import forms.YesNoPageFormProvider
@@ -74,13 +74,13 @@ class BondsListControllerSpec extends ControllerBaseSpec {
   "BondsListController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      injected[TwoColumnsTripleAction]
+      injected[ListView]
         .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, page, NormalMode, bondsData))
     })
 
     act.like(
       renderPrePopView(onPageLoad, BondsListPage(srn), true, userAnswers) { implicit app => implicit request =>
-        injected[TwoColumnsTripleAction]
+        injected[ListView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
             viewModel(srn, page, NormalMode, bondsData)

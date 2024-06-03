@@ -104,8 +104,8 @@ object LandOrPropertyListController {
                   address.addressLine1,
                   changeUrl = routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckMode).url,
                   changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1),
-                  routes.RemovePropertyController.onPageLoad(srn, index, mode).url,
-                  Message("landOrPropertyList.row.remove.hiddenText")
+                  removeUrl = routes.RemovePropertyController.onPageLoad(srn, index, mode).url,
+                  removeHiddenText = Message("landOrPropertyList.row.remove.hiddenText", address.addressLine1)
                 )
               )
           )

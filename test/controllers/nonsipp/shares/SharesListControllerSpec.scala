@@ -20,7 +20,7 @@ import services.PsrSubmissionService
 import pages.nonsipp.shares._
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import views.html.TwoColumnsTripleAction
+import views.html.ListView
 import controllers.nonsipp.shares.SharesListController._
 import eu.timepit.refined.refineMV
 import play.api.inject
@@ -76,13 +76,13 @@ class SharesListControllerSpec extends ControllerBaseSpec {
   "SharesIndividualSellerNINumberController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      injected[TwoColumnsTripleAction]
+      injected[ListView]
         .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, page, NormalMode, sharesData))
     })
 
     act.like(
       renderPrePopView(onPageLoad, SharesListPage(srn), true, userAnswers) { implicit app => implicit request =>
-        injected[TwoColumnsTripleAction]
+        injected[ListView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
             viewModel(srn, page, NormalMode, sharesData)
