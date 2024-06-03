@@ -19,10 +19,11 @@ package pages.nonsipp.memberpayments
 import pages.QuestionPage
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import pages.nonsipp.memberpayments.Paths.membersPayments
 
 case class MemberPaymentsRecordVersionPage(srn: Srn) extends QuestionPage[String] {
 
-  override def path: JsPath = MemberPaymentsPage.path \ toString
+  override def path: JsPath = membersPayments \ toString
 
   override def toString: String = "recordVersion"
 }

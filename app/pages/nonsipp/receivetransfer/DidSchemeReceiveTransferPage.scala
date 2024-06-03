@@ -16,14 +16,14 @@
 
 package pages.nonsipp.receivetransfer
 
+import pages.nonsipp.receivetransfer.Paths.membersPayments
 import pages.QuestionPage
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import pages.nonsipp.memberpayments.MemberPaymentsPage
 
 case class DidSchemeReceiveTransferPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = MemberPaymentsPage.path \ toString
+  override def path: JsPath = membersPayments \ toString
 
   override def toString: String = "schemeReceivedTransferIn"
 }

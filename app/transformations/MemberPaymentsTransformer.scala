@@ -48,9 +48,9 @@ import pages.nonsipp.memberpayments.{
   UnallocatedEmployerAmountPage,
   UnallocatedEmployerContributionsPage
 }
+import config.Refined.Max300.Refined
 import viewmodels.models._
 
-import scala.collection.immutable.Nil
 import scala.util.Try
 
 import javax.inject.Inject
@@ -66,35 +66,23 @@ class MemberPaymentsTransformer @Inject()(
 
   def transformToEtmp(srn: Srn, userAnswers: UserAnswers, initialUA: UserAnswers): Option[MemberPayments] = {
 
-    val refinedMemberDetails: List[(Max300, NameDOB)] = userAnswers
-      .membersDetails(srn)
-      .flatMap { case (index, value) => refineIndex[Max300.Refined](index).map(_ -> value) }
-      .toList
+    val currentMemberDetailsMap: Map[Max300, MemberDetails] = buildMemberDetails(srn, userAnswers)
+    val initialMemberDetailsMap: Map[Max300, MemberDetails] = buildMemberDetails(srn, initialUA)
 
-    val memberDetails: List[MemberDetails] = refinedMemberDetails.flatMap {
-      case (index, memberDetails) =>
-        for {
-          employerContributions <- buildEmployerContributions(srn, index, userAnswers)
-          transfersIn <- transfersInTransformer.transformToEtmp(srn, index, userAnswers)
-          transfersOut <- transfersOutTransformer.transformToEtmp(srn, index, userAnswers)
-          benefitsSurrendered = pensionSurrenderTransformer.transformToEtmp(srn, index, userAnswers)
-        } yield MemberDetails(
-          state = MemberState.Active,
-          personalDetails = buildMemberPersonalDetails(srn, index, memberDetails, userAnswers),
-          employerContributions = employerContributions,
-          transfersIn = transfersIn,
-          totalContributions = userAnswers.get(TotalMemberContributionPage(srn, index)).map(_.value),
-          memberLumpSumReceived = buildMemberLumpSumReceived(srn, index, userAnswers),
-          transfersOut = transfersOut,
-          benefitsSurrendered = benefitsSurrendered,
-          pensionAmountReceived = userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)).map(_.value)
+    val currentMemberDetailsList: List[MemberDetails] = currentMemberDetailsMap.map {
+      case (index, currentMemberDetail) =>
+        val optInitialMemberDetail = initialMemberDetailsMap.get(index)
+        currentMemberDetail.copy(
+          memberPSRVersion =
+            if (optInitialMemberDetail.contains(currentMemberDetail)) currentMemberDetail.memberPSRVersion else None
         )
-    }
+    }.toList
 
     val softDeletedMembers: List[MemberDetails] = userAnswers.get(SoftDeletedMembers(srn)).toList.flatten.map {
       softDeletedMember =>
         MemberDetails(
           state = MemberState.Deleted,
+          memberPSRVersion = softDeletedMember.memberPSRVersion,
           personalDetails = softDeletedMember.memberDetails,
           employerContributions = softDeletedMember.employerContributions,
           transfersIn = softDeletedMember.transfersIn,
@@ -115,7 +103,7 @@ class MemberPaymentsTransformer @Inject()(
         }
       )
 
-    (memberDetails, softDeletedMembers) match {
+    (currentMemberDetailsList, softDeletedMembers) match {
       case (Nil, Nil) => None
       case _ =>
         Some(
@@ -123,7 +111,7 @@ class MemberPaymentsTransformer @Inject()(
             recordVersion = Option.when(userAnswers.get(membersPayments) == initialUA.get(membersPayments))(
               userAnswers.get(MemberPaymentsRecordVersionPage(srn)).get
             ),
-            memberDetails = memberDetails ++ softDeletedMembers,
+            memberDetails = currentMemberDetailsList ++ softDeletedMembers,
             employerContributionsDetails = SectionDetails(
               made = userAnswers.get(EmployerContributionsPage(srn)).getOrElse(false),
               completed = userAnswers.get(EmployerContributionsSectionStatus(srn)).exists {
@@ -148,6 +136,36 @@ class MemberPaymentsTransformer @Inject()(
           )
         )
     }
+  }
+
+  private def buildMemberDetails(srn: Srn, userAnswers: UserAnswers): Map[Max300, MemberDetails] = {
+    val refinedMemberDetails: Map[Max300, NameDOB] = userAnswers
+      .membersDetails(srn)
+      .flatMap { case (index, value) => refineIndex[Refined](index).map(_ -> value) }
+
+    val memberDetails: Map[Max300, MemberDetails] = refinedMemberDetails.flatMap {
+      case (index, memberDetails) =>
+        for {
+          employerContributions <- buildEmployerContributions(srn, index, userAnswers)
+          transfersIn <- transfersInTransformer.transformToEtmp(srn, index, userAnswers)
+          transfersOut <- transfersOutTransformer.transformToEtmp(srn, index, userAnswers)
+          benefitsSurrendered = pensionSurrenderTransformer.transformToEtmp(srn, index, userAnswers)
+        } yield {
+          index -> MemberDetails(
+            state = MemberState.Active,
+            memberPSRVersion = userAnswers.get(MemberPsrVersionPage(srn, index)),
+            personalDetails = buildMemberPersonalDetails(srn, index, memberDetails, userAnswers),
+            employerContributions = employerContributions,
+            transfersIn = transfersIn,
+            totalContributions = userAnswers.get(TotalMemberContributionPage(srn, index)).map(_.value),
+            memberLumpSumReceived = buildMemberLumpSumReceived(srn, index, userAnswers),
+            transfersOut = transfersOut,
+            benefitsSurrendered = benefitsSurrendered,
+            pensionAmountReceived = userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)).map(_.value)
+          )
+        }
+    }
+    memberDetails
   }
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, memberPayments: MemberPayments): Try[UserAnswers] =
@@ -203,7 +221,10 @@ class MemberPaymentsTransformer @Inject()(
                   )
               ) ++ memberDetails.pensionAmountReceived.fold(noUpdate)(
                 pensionAmountReceivedPages(srn, index, _)
-              )
+              ) :+ (
+                triedUA =>
+                  memberDetails.memberPSRVersion.fold(triedUA)(triedUA.set(MemberPsrVersionPage(srn, index), _))
+                )
 
             pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))
         }
@@ -235,6 +256,7 @@ class MemberPaymentsTransformer @Inject()(
           .map(
             memberDetails =>
               SoftDeletedMember(
+                memberPSRVersion = memberDetails.memberPSRVersion,
                 memberDetails = memberDetails.personalDetails,
                 employerContributions = memberDetails.employerContributions,
                 transfersIn = memberDetails.transfersIn,

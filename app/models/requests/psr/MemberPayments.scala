@@ -46,6 +46,7 @@ case class MemberPayments(
 
 case class MemberDetails(
   state: MemberState,
+  memberPSRVersion: Option[String],
   personalDetails: MemberPersonalDetails,
   employerContributions: List[EmployerContributions],
   transfersIn: List[TransfersIn],

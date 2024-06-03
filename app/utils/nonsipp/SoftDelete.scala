@@ -226,6 +226,7 @@ trait SoftDelete { _: PSRController =>
     )
 
     val softDeletedMember = (
+      get(MemberPsrVersionPage).some,
       memberDetails,
       employerContributions.some,
       transfersIn.some,

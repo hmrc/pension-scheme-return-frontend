@@ -292,18 +292,11 @@ object ViewOnlyTaskListController {
     )
 
     val transferInTaskListStatus: TaskListStatus =
-      if (currentUA.get(pages.nonsipp.receivetransfer.Paths.memberTransfersIn) ==
-          previousUA.get(pages.nonsipp.receivetransfer.Paths.memberTransfersIn)
-        &&
-        currentUA.get(JsPath \ "dateOfTransfer") ==
-          previousUA.get(JsPath \ "dateOfTransfer")
-        &&
-        currentUA.get(JsPath \ "transferIncludedAsset") ==
-          previousUA.get(JsPath \ "transferIncludedAsset")) {
-        Completed
-      } else {
-        Updated
-      }
+      getCompletedOrUpdatedTaskListStatus(
+        currentUA,
+        previousUA,
+        pages.nonsipp.receivetransfer.Paths.memberTransfersIn
+      )
 
     val transferOutTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,

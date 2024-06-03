@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.membertransferout
+package pages.nonsipp.memberdetails
 
-import pages.QuestionPage
+import utils.RefinedUtils.RefinedIntOps
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import pages.nonsipp.membertransferout.Paths.membersPayments
+import pages.nonsipp.memberdetails.Paths.memberDetails
+import config.Refined.Max300
+import pages.QuestionPage
 
-case class SchemeTransferOutPage(srn: Srn) extends QuestionPage[Boolean] {
+case class MemberPsrVersionPage(srn: Srn, index: Max300) extends QuestionPage[String] {
 
-  override def path: JsPath = membersPayments \ toString
+  override def path: JsPath = memberDetails \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "schemeMadeTransferOut"
+  override def toString: String = "memberPSRVersion"
 }

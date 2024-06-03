@@ -19,7 +19,6 @@ package transformations
 import org.scalatest.matchers.must.Matchers
 import com.softwaremill.diffx.scalatest.DiffShouldMatcher
 import config.Refined.{Max300, Max5, Max50}
-import controllers.TestValues
 import models.requests.psr._
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalatest.OptionValues
@@ -32,6 +31,8 @@ import pages.nonsipp.memberdetails._
 import org.scalatest.freespec.AnyFreeSpec
 import pages.nonsipp.membercontributions._
 import pages.nonsipp.memberreceivedpcls._
+import viewmodels.models.MemberState.Deleted
+import controllers.TestValues
 import cats.implicits.catsSyntaxEitherId
 import pages.nonsipp.receivetransfer._
 import pages.nonsipp.memberpensionpayments._
@@ -63,6 +64,7 @@ class MemberPaymentsTransformerSpec
     memberDetails = List(
       MemberDetails(
         state = MemberState.Active,
+        memberPSRVersion = Some("001"),
         personalDetails = MemberPersonalDetails(
           firstName = memberDetails.firstName,
           lastName = memberDetails.lastName,
@@ -106,6 +108,7 @@ class MemberPaymentsTransformerSpec
       ),
       MemberDetails(
         state = MemberState.Deleted,
+        memberPSRVersion = Some("001"),
         personalDetails = MemberPersonalDetails(
           firstName = memberDetails.firstName,
           lastName = memberDetails.lastName,
@@ -160,6 +163,7 @@ class MemberPaymentsTransformerSpec
   )
 
   private val softDeletedMember = SoftDeletedMember(
+    memberPSRVersion = Some("001"),
     memberDetails = MemberPersonalDetails(
       firstName = memberDetails.firstName,
       lastName = memberDetails.lastName,
@@ -213,6 +217,7 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
     .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
     .unsafeSet(MemberStatus(srn, index), MemberState.Active)
+    .unsafeSet(MemberPsrVersionPage(srn, index), "001")
     // employer contributions
     .unsafeSet(EmployerContributionsPage(srn), true)
     .unsafeSet(EmployerNamePage(srn, index, employerContribsIndex), employerName)
@@ -275,10 +280,17 @@ class MemberPaymentsTransformerSpec
 
     "should return member payments without recordVersion when initial UA and current UA are different" in {
       val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswers, emptyUserAnswers)
-      result shouldMatchTo Some(memberPayments.copy(recordVersion = None))
+      val memberDetails = memberPayments.memberDetails
+      result shouldMatchTo Some(
+        memberPayments
+          .copy(
+            recordVersion = None,
+            memberDetails = memberDetails.map(md => if (md.state == Deleted) md else md.copy(memberPSRVersion = None))
+          )
+      )
     }
 
-    "should return member payments with recordVersion when initial UA and current UA are same" in {
+    "should return member payments with recordVersion/memberPsrVersion when initial UA and current UA are same" in {
       val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswers, userAnswers)
       result shouldMatchTo Some(memberPayments)
     }

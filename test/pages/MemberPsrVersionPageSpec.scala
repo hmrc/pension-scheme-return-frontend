@@ -14,16 +14,25 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.membertransferout
+package pages
 
-import pages.QuestionPage
-import models.SchemeId.Srn
-import play.api.libs.json.JsPath
-import pages.nonsipp.membertransferout.Paths.membersPayments
+import pages.nonsipp.memberdetails.MemberPsrVersionPage
+import config.Refined.Max300
+import eu.timepit.refined.refineMV
+import models.SchemeId
+import pages.behaviours.PageBehaviours
 
-case class SchemeTransferOutPage(srn: Srn) extends QuestionPage[Boolean] {
+class MemberPsrVersionPageSpec extends PageBehaviours {
 
-  override def path: JsPath = membersPayments \ toString
+  private val srn: SchemeId.Srn = srnGen.sample.value
+  private val memberIndex = refineMV[Max300.Refined](1)
 
-  override def toString: String = "schemeMadeTransferOut"
+  "MemberPsrVersionPage" - {
+
+    beRetrievable[String](MemberPsrVersionPage(srn, memberIndex))
+
+    beSettable[String](MemberPsrVersionPage(srn, memberIndex))
+
+    beRemovable[String](MemberPsrVersionPage(srn, memberIndex))
+  }
 }
