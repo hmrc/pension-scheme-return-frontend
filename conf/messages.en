@@ -797,6 +797,9 @@ pcls.memberlist.radios.error.required = Select yes if you have finished reportin
 pcls.memberlist.pagination.label = Showing {0} - {1} of {2} members
 pcls.memberlist.status.no.items = No PCLS
 pcls.memberlist.status.some.item = PCLS reported
+pcls.memberList.add.hidden.text = PCLS for {0}
+pcls.memberList.change.hidden.text = PCLS for {0}
+pcls.memberList.remove.hidden.text = PCLS for {0}
 
 pclsCYA.change.title.check = Change details of PCLS for this member
 pclsCYA.heading.check = Change details of PCLS for {0}
@@ -1488,13 +1491,13 @@ removeLoan.error.required = Select yes if you are sure you want to remove this l
 financialDetailsCheckYourAnswersController.title = Check your answers
 financialDetailsCheckYourAnswersController.heading = Check your answers
 financialDetailsCheckYourAnswersController.totalCashInStartDate = How much cash did {0} hold in all bank accounts on {1}?
-financialDetailsCheckYourAnswersController.totalCashInStartDate.hidden = total cash in all bank accounts
+financialDetailsCheckYourAnswersController.totalCashInStartDate.hidden = total cash in all bank accounts, on {0}
 financialDetailsCheckYourAnswersController.totalCashInEndDate = How much cash did {0} hold in all bank accounts on {1}?
-financialDetailsCheckYourAnswersController.totalCashInEndDate.hidden = total cash in all bank accounts
+financialDetailsCheckYourAnswersController.totalCashInEndDate.hidden = total cash in all bank accounts, on {0}
 financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate = What was the total value of {0}’s assets, including cash, on {1}?
-financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate.hidden = total value of scheme assets, including cash
+financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate.hidden = total value of scheme assets, including cash, on {0}
 financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate = What was the total value of {0}’s assets, including cash, on {1}?
-financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate.hidden = total value of scheme assets, including cash
+financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate.hidden = total value of scheme assets, including cash, on {0}
 financialDetailsCheckYourAnswersController.feeCommissionWagesSalary = How much did {0} pay in fees or commissions of over 10%?
 financialDetailsCheckYourAnswersController.feeCommissionWagesSalary.hidden = how much the scheme paid in fees or commissions of over 10%
 
@@ -1728,6 +1731,8 @@ landOrPropertyList.inset = You cannot add another land or property as you have e
 landOrPropertyList.radios = Do you need to add another land or property?
 landOrPropertyList.radios.error.required = Select yes if you need to add another land or property
 landOrPropertyList.pagination.label = Showing {0} - {1} of {2} land or properties
+landOrPropertyList.row.change.hiddenText = {0}
+landOrPropertyList.row.remove.hiddenText = {0}
 
 landOrPropertyStillHeld.title = Is any part of the land or property still held by the scheme?
 landOrPropertyStillHeld.heading = Is any part of {0} still held by {1}?
@@ -1975,6 +1980,8 @@ landOrPropertyDisposalList.radios = Do you need to report another land or proper
 landOrPropertyDisposalList.inset = You cannot add another land or property disposal as you have entered the maximum of 50.
 landOrPropertyDisposalList.pagination.label = Showing {0} - {1} of {2} land or property disposals
 landOrPropertyDisposalList.radios.error.required = Select yes if you need to report another land or property disposal
+landOrPropertyDisposalList.row.change.hidden = details of the disposal of {0}
+landOrPropertyDisposalList.row.remove.hidden = details of the disposal of {0}
 
 removeLandPropertyDisposal.title = Are you sure you want to remove this land or property disposal?
 removeLandPropertyDisposal.heading = Are you sure you want to remove details of the disposal for {0}?
@@ -2286,6 +2293,9 @@ employerContributions.MemberList.radios.error.required = Select yes if you have 
 employerContributions.MemberList.status.no.contributions = No employer contributions
 employerContributions.MemberList.status.some.contributions = {0} employer contributions
 employerContributions.MemberList.status.single.contribution = {0} employer contribution
+employerContributions.MemberList.add.hidden.text = employer contributions for {0}
+employerContributions.MemberList.change.hidden.text = employer contributions for {0}
+employerContributions.MemberList.remove.hidden.text = employer contributions for {0}
 
 ReportContribution.MemberList.title = Select a member to report member contributions
 ReportContribution.MemberList.title.plural = Select a member to report member contributions
@@ -2296,6 +2306,9 @@ ReportContribution.MemberList.paragraph2 = If you need to add a new member, go t
 ReportContribution.MemberList.radios = Have you finished reporting member contributions?
 ReportContribution.MemberList.radios.error.required = Select yes if you have finished reporting member contributions
 ReportContribution.MemberList.pagination.label = Showing {0} - {1} of {2} members
+ReportContribution.MemberList.add.hidden.text = member contributions for {0}
+ReportContribution.MemberList.change.hidden.text = member contributions for {0}
+ReportContribution.MemberList.remove.hidden.text = member contributions for {0}
 
 MemberContributionCYA.title = Check your answers
 MemberContributionCYA.change.title = Change details of member contributions
@@ -2418,7 +2431,7 @@ transfersInCYAController.rows.totalValue.hidden = the total value of the transfe
 transfersInCYAController.rows.dateOfTransfer = Date the transfer from {0} for {1} was received
 transfersInCYAController.rows.dateOfTransfer.hidden = date the transfer from {0} for {1} was received
 transfersInCYAController.rows.transferIncludeAsset = Did the transfer from {0} for {1} include an asset?
-transfersInCYAController.rows.transferIncludeAsset.hidden = if the transfer from {0} for {1} included an asse
+transfersInCYAController.rows.transferIncludeAsset.hidden = if the transfer from {0} for {1} included an asset
 transfersInCYAController.rows.reportAnotherTransfer = Do you need to report another transfer in for {0}?
 transfersInCYAController.rows.reportAnotherTransfer.hidden =  if you need to report another transfer in for {0}
 
@@ -2518,6 +2531,9 @@ memberPensionPayments.memberList.radios.error.required = Select yes if you have 
 memberPensionPayments.memberList.pagination.label = Showing {0} - {1} of {2} members
 memberPensionPayments.memberList.pensionPaymentsReported = Pension payments reported
 memberPensionPayments.memberList.noPensionPayments = No pension payments
+memberPensionPayments.memberList.add.hidden.text = pension payments for {0}
+memberPensionPayments.memberList.change.hidden.text = pension payments for {0}
+memberPensionPayments.memberList.remove.hidden.text = pension payments for {0}
 
 totalAmountPensionPayments.title = What was the taxable amount of pension payments received by the member during the period of this return, in pounds and pence?
 totalAmountPensionPayments.heading = What was the taxable amount of pension payments received by {0} during the period of this return, in pounds and pence?

@@ -221,7 +221,8 @@ object PclsMemberListController {
                   ),
                   TableElem.add(
                     controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
-                      .onSubmit(srn, nextIndex, NormalMode)
+                      .onSubmit(srn, nextIndex, NormalMode),
+                    Message("pcls.memberList.add.hidden.text", memberName.fullName)
                   ),
                   TableElem.empty
                 )
@@ -235,11 +236,13 @@ object PclsMemberListController {
                   ),
                   TableElem.change(
                     controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
-                      .onSubmit(srn, nextIndex, CheckMode)
+                      .onSubmit(srn, nextIndex, CheckMode),
+                    Message("pcls.memberList.change.hidden.text", memberName.fullName)
                   ),
                   TableElem.remove(
                     controllers.nonsipp.memberreceivedpcls.routes.RemovePclsController
-                      .onSubmit(srn, nextIndex)
+                      .onSubmit(srn, nextIndex),
+                    Message("pcls.memberList.remove.hidden.text", memberName.fullName)
                   )
                 )
               }

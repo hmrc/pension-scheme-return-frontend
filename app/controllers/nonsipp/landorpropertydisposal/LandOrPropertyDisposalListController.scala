@@ -163,9 +163,9 @@ object LandOrPropertyDisposalListController {
             changeUrl = routes.LandPropertyDisposalCYAController
               .onPageLoad(srn, index, x, mode)
               .url,
-            changeHiddenText = Message("landOrPropertyDisposalList.row.change.hidden"),
+            changeHiddenText = Message("landOrPropertyDisposalList.row.change.hidden", address.addressLine1),
             removeUrl = routes.RemoveLandPropertyDisposalController.onPageLoad(srn, index, x, NormalMode).url,
-            removeHiddenText = Message("landOrPropertyDisposalList.row.remove.hidden")
+            removeHiddenText = Message("landOrPropertyDisposalList.row.remove.hidden", address.addressLine1)
           )
         }
     }
