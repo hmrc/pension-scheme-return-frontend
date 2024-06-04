@@ -43,7 +43,7 @@ trait PaginationFluency {
 
       val previousItem: Option[PaginationItem] = Option.when(currentPage > 2)(
         PaginationItem(
-          href = call(currentPage - 1).url,
+          href = call(currentPage - 1).url + "#previous",
           number = Some((currentPage - 1).toString)
         )
       )
@@ -58,7 +58,7 @@ trait PaginationFluency {
 
       val nextItem: Option[PaginationItem] = Option.when((totalPages - currentPage) > 1)(
         PaginationItem(
-          href = call(currentPage + 1).url,
+          href = call(currentPage + 1).url + "#next",
           number = Some((currentPage + 1).toString)
         )
       )
@@ -84,9 +84,12 @@ trait PaginationFluency {
 
       Pagination(
         items = Option.when(totalSize > pageSize)(pageItems),
-        next = Option.when(showNextPageLink)(PaginationLink(call(currentPage + 1).url, Some(messages("site.next")))),
-        previous =
-          Option.when(showPreviousPageLink)(PaginationLink(call(currentPage - 1).url, Some(messages("site.previous"))))
+        next = Option.when(showNextPageLink)(
+          PaginationLink(call(currentPage + 1).url + "#previous", Some(messages("site.next")))
+        ),
+        previous = Option.when(showPreviousPageLink)(
+          PaginationLink(call(currentPage - 1).url + "#next", Some(messages("site.previous")))
+        )
       )
     }
   }

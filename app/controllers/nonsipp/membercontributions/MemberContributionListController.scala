@@ -210,11 +210,13 @@ object MemberContributionListController {
                   TableElem("Member contributions reported"),
                   TableElem.change(
                     controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
-                      .onPageLoad(srn, index, CheckMode)
+                      .onPageLoad(srn, index, CheckMode),
+                    Message("ReportContribution.MemberList.change.hidden.text", memberName.fullName)
                   ),
                   TableElem.remove(
                     controllers.nonsipp.membercontributions.routes.RemoveMemberContributionController
-                      .onPageLoad(srn, index)
+                      .onPageLoad(srn, index),
+                    Message("ReportContribution.MemberList.remove.hidden.text", memberName.fullName)
                   )
                 )
               } else {
@@ -223,7 +225,8 @@ object MemberContributionListController {
                   TableElem("No member contributions"),
                   TableElem.add(
                     controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
-                      .onSubmit(srn, index, mode)
+                      .onSubmit(srn, index, mode),
+                    Message("ReportContribution.MemberList.add.hidden.text", memberName.fullName)
                   ),
                   TableElem.empty
                 )

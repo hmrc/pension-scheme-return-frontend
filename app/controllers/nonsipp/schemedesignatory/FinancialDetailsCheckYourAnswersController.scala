@@ -21,12 +21,12 @@ import pages.nonsipp.schemedesignatory._
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
-import config.Refined.Max3
 import controllers.PSRController
 import cats.implicits.toShow
 import controllers.actions._
 import navigation.Navigator
 import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
+import _root_.config.Refined.Max3
 import cats.data.NonEmptyList
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
@@ -146,8 +146,11 @@ object FinancialDetailsCheckYourAnswersController {
           ).withChangeAction(
               controllers.nonsipp.schemedesignatory.routes.HowMuchCashController
                 .onPageLoad(srn, CheckMode)
-                .url,
-              hidden = "financialDetailsCheckYourAnswersController.totalCashInStartDate.hidden"
+                .url + "#taxStartDate",
+              hidden = Message(
+                "financialDetailsCheckYourAnswersController.totalCashInStartDate.hidden",
+                taxStartDate(taxYearOrAccountingPeriods).show
+              )
             )
             .withOneHalfWidth()
       ) :?+
@@ -163,8 +166,11 @@ object FinancialDetailsCheckYourAnswersController {
             ).withChangeAction(
                 controllers.nonsipp.schemedesignatory.routes.HowMuchCashController
                   .onPageLoad(srn, CheckMode)
-                  .url,
-                hidden = "financialDetailsCheckYourAnswersController.totalCashInEndDate.hidden"
+                  .url + "#taxEndDate",
+                hidden = Message(
+                  "financialDetailsCheckYourAnswersController.totalCashInEndDate.hidden",
+                  taxEndDate(taxYearOrAccountingPeriods).show
+                )
               )
               .withOneHalfWidth()
         ) :?+
@@ -180,8 +186,11 @@ object FinancialDetailsCheckYourAnswersController {
             ).withChangeAction(
                 controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController
                   .onPageLoad(srn, CheckMode)
-                  .url,
-                hidden = "financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate.hidden"
+                  .url + "#taxStartDate",
+                hidden = Message(
+                  "financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate.hidden",
+                  taxStartDate(taxYearOrAccountingPeriods).show
+                )
               )
               .withOneHalfWidth()
         ) :?+
@@ -197,8 +206,11 @@ object FinancialDetailsCheckYourAnswersController {
             ).withChangeAction(
                 controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController
                   .onPageLoad(srn, CheckMode)
-                  .url,
-                hidden = "financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate.hidden"
+                  .url + "#taxEndDate",
+                hidden = Message(
+                  "financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate.hidden",
+                  taxEndDate(taxYearOrAccountingPeriods).show
+                )
               )
               .withOneHalfWidth()
         ) :?+

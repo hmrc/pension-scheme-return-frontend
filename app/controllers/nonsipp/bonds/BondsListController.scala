@@ -24,17 +24,18 @@ import com.google.inject.Inject
 import utils.ListUtils._
 import config.Refined.Max5000
 import controllers.PSRController
+import controllers.nonsipp.bonds.BondsListController._
 import cats.implicits.{catsSyntaxApplicativeId, toShow, toTraverseOps}
+import _root_.config.Constants
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models._
-import play.api.i18n.MessagesApi
-import controllers.nonsipp.bonds.BondsListController._
-import config.Constants
-import views.html.TwoColumnsTripleAction
+import views.html.ListView
 import models.SchemeId.Srn
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import play.api.i18n.MessagesApi
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
@@ -48,7 +49,7 @@ class BondsListController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: TwoColumnsTripleAction,
+  view: ListView,
   formProvider: YesNoPageFormProvider,
   psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
@@ -151,7 +152,7 @@ object BondsListController {
     srn: Srn,
     mode: Mode,
     memberList: List[BondsData]
-  ): List[List[TableElem]] =
+  ): List[ListRow] =
     memberList.map {
       case BondsData(index, nameOfBonds, acquisition, costOfBonds) =>
         val acquisitionType = acquisition match {
@@ -162,24 +163,16 @@ object BondsListController {
         val bondsMessage =
           Message("bondsList.row.withCost", nameOfBonds.show, acquisitionType, costOfBonds.displayAs)
 
-        List(
-          TableElem(bondsMessage),
-          TableElem(
-            LinkMessage(
-              Message("site.change"),
-              controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
-                .onPageLoad(srn, index, CheckMode)
-                .url
-            )
-          ),
-          TableElem(
-            LinkMessage(
-              Message("site.remove"),
-              controllers.nonsipp.bonds.routes.RemoveBondsController
-                .onPageLoad(srn, index, NormalMode)
-                .url
-            )
-          )
+        ListRow(
+          bondsMessage,
+          changeUrl = controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+            .onPageLoad(srn, index, CheckMode)
+            .url,
+          changeHiddenText = Message("bondsList.row.change.hiddenText", bondsMessage),
+          removeUrl = controllers.nonsipp.bonds.routes.RemoveBondsController
+            .onPageLoad(srn, index, NormalMode)
+            .url,
+          removeHiddenText = Message("bondsList.row.remove.hiddenText", bondsMessage)
         )
     }
 
@@ -188,7 +181,7 @@ object BondsListController {
     page: Int,
     mode: Mode,
     data: List[BondsData]
-  ): FormPageViewModel[ActionTableViewModel] = {
+  ): FormPageViewModel[ListViewModel] = {
     val title = if (data.size > 1) "bondsList.title.plural" else "bondsList.title"
     val heading = if (data.size > 1) "bondsList.heading.plural" else "bondsList.heading"
 
@@ -199,18 +192,24 @@ object BondsListController {
       call = controllers.nonsipp.bonds.routes.BondsListController.onPageLoad(srn, _, mode)
     )
 
+    val conditionalInsetText: DisplayMessage = {
+      if (data.size >= Constants.maxBondsTransactions) {
+        ParagraphMessage("bondsList.inset")
+      } else {
+        Message("")
+      }
+    }
+
     FormPageViewModel(
       title = Message(title, data.size),
       heading = Message(heading, data.size),
       description = Some(ParagraphMessage("bondsList.description")),
-      page = ActionTableViewModel(
-        inset = ParagraphMessage("bondsList.inset"),
-        head = None,
+      page = ListViewModel(
+        inset = conditionalInsetText,
         rows = rows(srn, mode, data),
         radioText = Message("bondsList.radios"),
         showRadios = data.size < Constants.maxBondsTransactions,
         showInsetWithRadios = !(data.length < Constants.maxBondsTransactions),
-        showInset = data.size >= Constants.maxBondsTransactions,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

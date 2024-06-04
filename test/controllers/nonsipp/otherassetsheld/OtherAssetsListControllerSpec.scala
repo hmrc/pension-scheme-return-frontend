@@ -20,7 +20,7 @@ import services.PsrSubmissionService
 import pages.nonsipp.otherassetsheld._
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import views.html.TwoColumnsTripleAction
+import views.html.{ListView, TwoColumnsTripleAction}
 import eu.timepit.refined.refineMV
 import play.api.inject
 import forms.YesNoPageFormProvider
@@ -70,13 +70,13 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
   "OtherAssetsListController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      injected[TwoColumnsTripleAction]
+      injected[ListView]
         .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, page, NormalMode, otherAssetsData))
     })
 
     act.like(
       renderPrePopView(onPageLoad, OtherAssetsListPage(srn), true, userAnswers) { implicit app => implicit request =>
-        injected[TwoColumnsTripleAction]
+        injected[ListView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
             viewModel(srn, page, NormalMode, otherAssetsData)

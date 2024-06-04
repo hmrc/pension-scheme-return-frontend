@@ -66,33 +66,32 @@ class PsaDeclarationController @Inject()(
 
   def onSubmit(srn: Srn): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      request.userAnswers.get(FbVersionPage(srn)).getOrRecoverJourney { fbVersion =>
-        schemeDateService.schemeDate(srn) match {
-          case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-          case Some(dates) =>
-            val now = schemeDateService.now()
+      val fbVersion = request.userAnswers.get(FbVersionPage(srn)).getOrElse("000") // 000 as no versions yet - initial submission
+      schemeDateService.schemeDate(srn) match {
+        case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        case Some(dates) =>
+          val now = schemeDateService.now()
 
-            for {
-              _ <- psrSubmissionService.submitPsrDetails(
-                srn = srn,
-                isSubmitted = true,
-                fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
-              )
-              _ <- sendEmail(
-                loggedInUserNameOrBlank(request),
-                request.minimalDetails.email,
-                dates,
-                request.schemeDetails.schemeName,
-                now,
-                fbVersion
-              )
-              _ <- saveService.save(UserAnswers(request.userAnswers.id))
-            } yield {
-              Redirect(navigator.nextPage(PsaDeclarationPage(srn), NormalMode, request.userAnswers))
-                .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
-                .addingToSession((SUBMISSION_DATE, schemeDateService.submissionDateAsString(now)))
-            }
-        }
+          for {
+            _ <- psrSubmissionService.submitPsrDetails(
+              srn = srn,
+              isSubmitted = true,
+              fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
+            )
+            _ <- sendEmail(
+              loggedInUserNameOrBlank(request),
+              request.minimalDetails.email,
+              dates,
+              request.schemeDetails.schemeName,
+              now,
+              fbVersion
+            )
+            _ <- saveService.save(UserAnswers(request.userAnswers.id))
+          } yield {
+            Redirect(navigator.nextPage(PsaDeclarationPage(srn), NormalMode, request.userAnswers))
+              .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
+              .addingToSession((SUBMISSION_DATE, schemeDateService.submissionDateAsString(now)))
+          }
       }
     }
 

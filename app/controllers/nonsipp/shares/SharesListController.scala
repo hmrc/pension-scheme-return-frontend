@@ -26,16 +26,17 @@ import config.Constants
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
-import play.api.i18n.MessagesApi
 import pages.nonsipp.shares._
 import play.api.mvc._
-import views.html.TwoColumnsTripleAction
+import views.html.ListView
 import models.SchemeId.Srn
 import cats.implicits.{catsSyntaxApplicativeId, toShow, toTraverseOps}
 import controllers.nonsipp.shares.SharesListController._
 import utils.DateTimeUtils.localDateShow
 import models._
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import play.api.i18n.MessagesApi
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
@@ -50,7 +51,7 @@ class SharesListController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: TwoColumnsTripleAction,
+  view: ListView,
   formProvider: YesNoPageFormProvider,
   psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
@@ -154,7 +155,7 @@ object SharesListController {
     srn: Srn,
     mode: Mode,
     memberList: List[SharesData]
-  ): List[List[TableElem]] =
+  ): List[ListRow] =
     memberList.map {
       case SharesData(index, typeOfShares, companyName, acquisition, acquisitionDate) =>
         val sharesType = typeOfShares match {
@@ -171,20 +172,12 @@ object SharesListController {
           case Some(date) => Message("sharesList.row.withDate", sharesType, companyName, acquisitionType, date.show)
           case None => Message("sharesList.row", sharesType, companyName, acquisitionType)
         }
-        List(
-          TableElem(sharesMessage),
-          TableElem(
-            LinkMessage(
-              Message("site.change"),
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode).url
-            )
-          ),
-          TableElem(
-            LinkMessage(
-              Message("site.remove"),
-              routes.RemoveSharesController.onPageLoad(srn, index, mode).url
-            )
-          )
+        ListRow(
+          sharesMessage,
+          changeUrl = controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode).url,
+          changeHiddenText = Message("sharesList.row.change.hiddenText", sharesMessage),
+          removeUrl = routes.RemoveSharesController.onPageLoad(srn, index, mode).url,
+          removeHiddenText = Message("sharesList.row.remove.hiddenText", sharesMessage)
         )
     }
 
@@ -193,7 +186,7 @@ object SharesListController {
     page: Int,
     mode: Mode,
     data: List[SharesData]
-  ): FormPageViewModel[ActionTableViewModel] = {
+  ): FormPageViewModel[ListViewModel] = {
     val title = if (data.size > 1) "sharesList.title.plural" else "sharesList.title"
     val heading = if (data.size > 1) "sharesList.heading.plural" else "sharesList.heading"
 
@@ -204,18 +197,24 @@ object SharesListController {
       call = controllers.nonsipp.shares.routes.SharesListController.onPageLoad(srn, _, mode)
     )
 
+    val conditionalInsetText: DisplayMessage = {
+      if (data.size >= Constants.maxSharesTransactions) {
+        ParagraphMessage("sharesList.inset")
+      } else {
+        Message("")
+      }
+    }
+
     FormPageViewModel(
       title = Message(title, data.size),
       heading = Message(heading, data.size),
       description = Some(ParagraphMessage("sharesList.description")),
-      page = ActionTableViewModel(
-        inset = ParagraphMessage("sharesList.inset"),
-        head = None,
+      page = ListViewModel(
+        inset = conditionalInsetText,
         rows = rows(srn, mode, data),
         radioText = Message("sharesList.radios"),
         showRadios = data.size < Constants.maxSharesTransactions,
         showInsetWithRadios = !(data.length < Constants.maxSharesTransactions),
-        showInset = data.size >= Constants.maxSharesTransactions,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
