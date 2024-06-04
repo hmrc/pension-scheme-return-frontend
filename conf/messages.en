@@ -1099,6 +1099,10 @@ totalValueQuotedShares.error.invalid = Total value of all quoted shares and thir
 totalValueQuotedShares.error.tooLarge = Total value of all quoted shares and third party managed funds must be 999999999.99 or less
 totalValueQuotedShares.error.tooSmall = Total value of all quoted shares and third party managed funds must be 0.01 or more
 
+removeTotalValueQuotedShares.title = Are you sure you want to remove the quoted shares and third party managed funds?
+removeTotalValueQuotedShares.heading = Are you sure you want to remove the quoted shares and third party managed funds of £{0}?
+removeTotalValueQuotedShares.error.required = Select yes if you are sure you want to remove the quoted shares and third party managed funds
+
 totalValueQuotedSharesCYA.section.totalCost = Total value of all quoted shares and third party managed funds held by {0} on {1}
 totalValueQuotedSharesCYA.section.totalCost.hidden = total value of all quoted shares and third party managed funds held by {0} on {1}
 

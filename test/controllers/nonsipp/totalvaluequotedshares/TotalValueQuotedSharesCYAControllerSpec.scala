@@ -29,7 +29,7 @@ import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import org.mockito.Mockito.{times, verify, when}
 import cats.data.NonEmptyList
-import views.html.CheckYourAnswersView
+import views.html.CYAWithRemove
 
 class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
 
@@ -51,7 +51,7 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
       .unsafeSet(TotalValueQuotedSharesPage(srn), money)
 
     act.like(renderView(onPageLoad, userAnswersWithTaxYear) { implicit app => implicit request =>
-      injected[CheckYourAnswersView].apply(
+      injected[CYAWithRemove].apply(
         viewModel(
           srn,
           totalCost = money,
