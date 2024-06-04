@@ -301,6 +301,7 @@ object TaskListStatusUtils {
   def getSurrenderedBenefitsStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val status = userAnswers.get(SurrenderedBenefitsJourneyStatus(srn))
     val wereSurrenderedBenefits = userAnswers.get(SurrenderedBenefitsPage(srn))
+
     (wereSurrenderedBenefits, status) match {
       case (None, _) =>
         (
