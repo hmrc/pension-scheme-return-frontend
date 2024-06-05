@@ -19,10 +19,11 @@ package transformations
 import com.google.inject.Singleton
 import config.Refined.Max300
 import models.SchemeId.Srn
-import models.UserAnswers.implicits.UserAnswersTryOps
 import pages.nonsipp.memberpensionpayments._
 import models.{Money, UserAnswers}
 import viewmodels.models.SectionStatus
+import models.requests.psr.SectionDetails
+import models.UserAnswers.implicits.UserAnswersTryOps
 
 import javax.inject.Inject
 
@@ -31,6 +32,15 @@ class PensionAmountReceivedTransformer @Inject() extends Transformer {
 
   def transformToEtmp(srn: Srn, index: Max300, userAnswers: UserAnswers): Option[Double] =
     userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)).map(_.value)
+
+  // Build section details
+  def transformToEtmp(srn: Srn, userAnswers: UserAnswers): SectionDetails = SectionDetails(
+    made = userAnswers.get(PensionPaymentsReceivedPage(srn)).getOrElse(false),
+    completed = userAnswers.get(PensionPaymentsJourneyStatus(srn)).exists {
+      case SectionStatus.InProgress => false
+      case SectionStatus.Completed => true
+    }
+  )
 
   // Save member specific answers
   def transformFromEtmp(
@@ -45,22 +55,20 @@ class PensionAmountReceivedTransformer @Inject() extends Transformer {
   // Save section wide answers
   def transformFromEtmp(
     srn: Srn,
-    pensionReceived: Option[Boolean],
-    pensionAmountReceived: List[Option[Double]]
+    pensionReceived: SectionDetails
   ): List[UserAnswers.Compose] = {
-    val status: Option[SectionStatus] = (pensionReceived, pensionAmountReceived) match {
-      case (None, _) => None // not started
-      case (Some(false), _) => Some(SectionStatus.Completed)
-      case (Some(true), list) if list.exists(_.exists(_ == 0)) => Some(SectionStatus.InProgress)
-      case _ => Some(SectionStatus.Completed)
+    val status: Option[SectionStatus] = pensionReceived match {
+      case SectionDetails(made @ false, completed @ false) => None // not started
+      case SectionDetails(made @ false, completed @ true) => Some(SectionStatus.Completed)
+      case SectionDetails(made @ true, completed @ false) => Some(SectionStatus.InProgress)
+      case SectionDetails(made @ true, completed @ true) => Some(SectionStatus.Completed)
     }
 
     status.fold(List.empty[UserAnswers.Compose]) { s =>
-      val made = !pensionAmountReceived.forall(_.contains(0))
       List[UserAnswers.Compose](
-        _.set(PensionPaymentsJourneyStatus(srn), s),
-        _.set(MemberPensionPaymentsListPage(srn), if (s.isCompleted) true else false),
-        _.set(PensionPaymentsReceivedPage(srn), made)
+        _.setWhen(pensionReceived.started)(PensionPaymentsJourneyStatus(srn), s),
+        _.setWhen(pensionReceived.started)(MemberPensionPaymentsListPage(srn), if (s.isCompleted) true else false),
+        _.setWhen(pensionReceived.started)(PensionPaymentsReceivedPage(srn), pensionReceived.made)
       )
     }
   }

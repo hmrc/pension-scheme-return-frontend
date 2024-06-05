@@ -32,10 +32,12 @@ case class PensionCommencementLumpSumAmountPage(srn: Srn, index: Max300)
   override def toString: String = "memberLumpSumReceived"
 }
 
-case class AllPensionCommencementLumpSumAmountPages(srn: Srn)
-    extends IndexedQuestionPage[QuestionPage[PensionCommencementLumpSum]] {
+object PensionCommencementLumpSumAmountPage {
+  def all(srn: Srn): IndexedQuestionPage[PensionCommencementLumpSum] =
+    new IndexedQuestionPage[PensionCommencementLumpSum] {
 
-  override def path: JsPath = memberDetails \ toString
+      override def path: JsPath = memberDetails \ toString
 
-  override def toString: String = "memberLumpSumReceived"
+      override def toString: String = "memberLumpSumReceived"
+    }
 }

@@ -132,7 +132,7 @@ class MemberPaymentsTransformer @Inject()(
             unallocatedContribAmount = userAnswers.get(UnallocatedEmployerAmountPage(srn)).map(_.value),
             memberContributionMade = userAnswers.get(MemberContributionsPage(srn)),
             lumpSumReceived = userAnswers.get(PensionCommencementLumpSumPage(srn)),
-            pensionReceived = userAnswers.get(PensionPaymentsReceivedPage(srn)),
+            pensionReceived = pensionAmountReceivedTransformer.transformToEtmp(srn, userAnswers),
             benefitsSurrenderedDetails = benefitsSurrenderedDetails(userAnswers)
           )
         )
@@ -144,7 +144,7 @@ class MemberPaymentsTransformer @Inject()(
       .membersDetails(srn)
       .flatMap { case (index, value) => refineIndex[Refined](index).map(_ -> value) }
 
-    val memberDetails: Map[Max300, MemberDetails] = refinedMemberDetails.flatMap {
+    refinedMemberDetails.flatMap {
       case (index, memberDetails) =>
         for {
           employerContributions <- buildEmployerContributions(srn, index, userAnswers)
@@ -166,7 +166,6 @@ class MemberPaymentsTransformer @Inject()(
           )
         }
     }
-    memberDetails
   }
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, memberPayments: MemberPayments): Try[UserAnswers] =
@@ -232,8 +231,7 @@ class MemberPaymentsTransformer @Inject()(
         pensionSurrenderTransformer.transformFromEtmp(srn, memberPayments.benefitsSurrenderedDetails) ++
           pensionAmountReceivedTransformer.transformFromEtmp(
             srn,
-            memberPayments.pensionReceived,
-            memberPayments.memberDetails.map(_.pensionAmountReceived)
+            memberPayments.pensionReceived
           )
       )
 

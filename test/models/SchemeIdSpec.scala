@@ -16,13 +16,13 @@
 
 package models
 
-import config.Constants
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import utils.BaseSpec
-import models.SchemeId.Srn
-import org.mockito.Mockito.when
-import org.scalacheck.Gen.alphaNumStr
 import play.api.mvc.Session
+import config.Constants
+import models.SchemeId.Srn
+import org.scalacheck.Gen.alphaNumStr
+import utils.BaseSpec
+import org.mockito.Mockito.when
 
 class SchemeIdSpec extends BaseSpec with ScalaCheckPropertyChecks {
   private val mockSession = mock[Session]

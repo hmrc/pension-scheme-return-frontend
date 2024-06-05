@@ -49,6 +49,9 @@ object TransfersOutSectionCompleted {
 
       override def toString: String = "transfersOutCYA"
     }
+
+  def exists(srn: Srn, userAnswers: UserAnswers): Boolean = userAnswers.map(all(srn)).values.exists(_.values.nonEmpty)
+
   implicit class TransfersOutSectionCompletedUserAnswersOps(ua: UserAnswers) {
     def transfersOutSectionCompleted(srn: Srn, index: Max300): List[Max5] =
       ua.map(TransfersOutCompletedPages(srn, index))

@@ -166,7 +166,7 @@ class MemberPaymentsTransformerSpec
     memberContributionMade = Some(true),
     lumpSumReceived = Some(true),
     benefitsSurrenderedDetails = SectionDetails(made = true, completed = true),
-    pensionReceived = Some(true)
+    pensionReceived = SectionDetails(made = true, completed = true)
   )
 
   private val softDeletedMember = SoftDeletedMember(
