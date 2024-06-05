@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberdetails
 
 import services.PsrSubmissionService
-import pages.nonsipp.memberdetails.SchemeMembersListPage
+import pages.nonsipp.memberdetails.{MembersDetailsCompletedPages, SchemeMembersListPage}
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
@@ -64,13 +64,18 @@ class SchemeMembersListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
+      val completedMembers = request.userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty)
       val membersDetails = request.userAnswers.membersDetails(srn)
+      val completedMembersDetails = completedMembers.keySet
+        .intersect(membersDetails.keySet)
+        .map(k => k -> membersDetails(k))
+        .toMap
       if (membersDetails.isEmpty) {
         logger.error(s"no members found")
         Redirect(routes.PensionSchemeMembersController.onPageLoad(srn))
       } else {
 
-        membersDetails.view
+        completedMembersDetails.view
           .mapValues(_.fullName)
           .toList
           .zipWithRefinedIndex[Max300.Refined]

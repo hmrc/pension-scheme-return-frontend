@@ -282,6 +282,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
         .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
         .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
+        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
       "notStarted" in {
         testViewModel(

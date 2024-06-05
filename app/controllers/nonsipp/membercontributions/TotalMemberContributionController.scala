@@ -17,7 +17,7 @@
 package controllers.nonsipp.membercontributions
 
 import services.SaveService
-import pages.nonsipp.memberdetails.MembersDetailsPages
+import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.PSRController
 import config.Constants
 import controllers.actions._
@@ -57,24 +57,7 @@ class TotalMemberContributionController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
-      val maxIndex: Either[Result, Int] = memberMap.keys
-        .map(_.toInt)
-        .maxOption
-        .map(Right(_))
-        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-
-      val optionList: List[Option[NameDOB]] = maxIndex match {
-        case Right(index) =>
-          (0 to index).toList.map { index =>
-            val memberOption = memberMap.get(index.toString)
-            memberOption match {
-              case Some(member) => Some(member)
-              case None => None
-            }
-          }
-        case Left(_) => List.empty
-      }
+      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
 
       val preparedForm =
         request.userAnswers
@@ -90,24 +73,7 @@ class TotalMemberContributionController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
-      val maxIndex: Either[Result, Int] = memberMap.keys
-        .map(_.toInt)
-        .maxOption
-        .map(Right(_))
-        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-
-      val optionList: List[Option[NameDOB]] = maxIndex match {
-        case Right(index) =>
-          (0 to index).toList.map { index =>
-            val memberOption = memberMap.get(index.toString)
-            memberOption match {
-              case Some(member) => Some(member)
-              case None => None
-            }
-          }
-        case Left(_) => List.empty
-      }
+      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
 
       form
         .bindFromRequest()

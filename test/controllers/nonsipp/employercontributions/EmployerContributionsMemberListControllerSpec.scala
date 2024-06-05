@@ -21,12 +21,12 @@ import play.api.inject.bind
 import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import models.NormalMode
-import viewmodels.models.SectionJourneyStatus
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.employercontributions.{EmployerContributionsMemberListPage, EmployerContributionsProgress}
 import services.PsrSubmissionService
 import play.api.inject.guice.GuiceableModule
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito.{reset, when}
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
@@ -40,6 +40,7 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
     .unsafeSet(
       EmployerContributionsProgress(srn, refineMV(1), refineMV(1)),
       SectionJourneyStatus.Completed

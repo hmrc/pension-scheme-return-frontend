@@ -40,7 +40,7 @@ import pages.nonsipp.otherassetsdisposal.{
 }
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import pages.nonsipp.bonds._
-import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
+import pages.nonsipp.memberdetails._
 import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
 import pages.nonsipp.membercontributions._
 import pages.nonsipp.memberreceivedpcls.{PclsMemberListPage, PensionCommencementLumpSumPage}
@@ -87,14 +87,16 @@ object TaskListStatusUtils {
     (membersDetailsPages, ninoPages, noNinoPages) match {
       case (None, _, _) => NotStarted
       case (Some(_), None, None) => InProgress
-      case (Some(memberDetails), ninos, noNinos) =>
+      case (Some(memberDetails), _, _) =>
         if (memberDetails.isEmpty) {
           NotStarted
         } else {
           val countMemberDetails = memberDetails.size
-          val countNinos = ninos.getOrElse(List.empty).size
-          val countNoninos = noNinos.getOrElse(List.empty).size
-          if (countMemberDetails > countNinos + countNoninos) {
+          val countCompletedMembers = userAnswers.get(MembersDetailsCompletedPages(srn)) match {
+            case Some(value) => value.size
+            case None => 0
+          }
+          if (countMemberDetails > countCompletedMembers) {
             InProgress
           } else {
             Completed
@@ -182,7 +184,11 @@ object TaskListStatusUtils {
   }
   def getNotStartedOrCannotStartYetStatus(userAnswers: UserAnswers, srn: Srn): TaskListStatus =
     getMembersTaskListStatus(userAnswers, srn) match {
-      case TaskListStatus.InProgress => TaskListStatus.NotStarted
+      case TaskListStatus.InProgress =>
+        userAnswers.get(MembersDetailsCompletedPages(srn)) match {
+          case Some(completed) => TaskListStatus.NotStarted
+          case None => TaskListStatus.UnableToStart
+        }
       case TaskListStatus.Completed => TaskListStatus.NotStarted
       case TaskListStatus.UnableToStart => TaskListStatus.UnableToStart
       case TaskListStatus.NotStarted => TaskListStatus.UnableToStart

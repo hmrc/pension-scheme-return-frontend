@@ -34,7 +34,7 @@ import utils.nonsipp.SoftDelete
 import pages.nonsipp.memberdetails.upload.FileUploadSuccessPage
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage._
-import viewmodels.models.{ContentPageViewModel, FormPageViewModel, MemberState}
+import viewmodels.models._
 import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
 import utils.MapUtils.UserAnswersMapOps
 
@@ -114,7 +114,8 @@ class FileUploadSuccessController @Inject()(
             UserAnswers.set(NoNINOPage(srn, index), _),
             UserAnswers.set(MemberDetailsNinoPage(srn, index), _)
           ),
-          UserAnswers.set(MemberStatus(srn, index), MemberState.Active)
+          UserAnswers.set(MemberStatus(srn, index), MemberState.Active),
+          UserAnswers.set(MemberDetailsCompletedPage(srn, index), SectionCompleted)
         )
       }
     }.flatten

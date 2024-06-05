@@ -17,9 +17,9 @@
 package controllers.nonsipp.membercontributions
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.memberdetails.MembersDetailsPages
 import play.api.mvc._
 import com.google.inject.Inject
+import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.OneTo300
 import controllers.PSRController
 import config.Constants
@@ -60,26 +60,9 @@ class MemberContributionListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
-      val maxIndex: Either[Result, Int] = memberMap.keys
-        .map(_.toInt)
-        .maxOption
-        .map(Right(_))
-        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
 
-      val optionList: List[Option[NameDOB]] = maxIndex match {
-        case Right(index) =>
-          (0 to index).toList.map { index =>
-            val memberOption = memberMap.get(index.toString)
-            memberOption match {
-              case Some(member) => Some(member)
-              case None => None
-            }
-          }
-        case Left(_) => List.empty
-      }
-
-      if (memberMap.nonEmpty) {
+      if (optionList.flatten.nonEmpty) {
         val filledForm = request.userAnswers.get(MemberContributionsListPage(srn)).fold(form)(form.fill)
         Ok(view(filledForm, viewModel(srn, page, mode, optionList, request.userAnswers)))
       } else {
@@ -90,24 +73,7 @@ class MemberContributionListController @Inject()(
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val userAnswers = request.userAnswers
-      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
-      val maxIndex: Either[Result, Int] = memberMap.keys
-        .map(_.toInt)
-        .maxOption
-        .map(Right(_))
-        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-
-      val optionList: List[Option[NameDOB]] = maxIndex match {
-        case Right(index) =>
-          (0 to index).toList.map { index =>
-            val memberOption = memberMap.get(index.toString)
-            memberOption match {
-              case Some(member) => Some(member)
-              case None => None
-            }
-          }
-        case Left(_) => List.empty
-      }
+      val optionList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
       if (optionList.flatten.size > Constants.maxSchemeMembers) {
         Future.successful(
