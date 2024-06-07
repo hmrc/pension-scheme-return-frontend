@@ -16,7 +16,7 @@
 
 package controllers.nonsipp
 
-import services.{PsrVersionsService, SchemeDateService}
+import services.PsrVersionsService
 import models.ConditionalYesNo._
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
@@ -37,7 +37,7 @@ import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, T
 import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
-import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import play.api.inject
 import viewmodels.models.TaskListStatus.TaskListStatus
 import pages.nonsipp.common.IdentityTypePage
@@ -46,37 +46,34 @@ import scala.concurrent.Future
 
 class TaskListControllerSpec extends ControllerBaseSpec {
 
-  val schemeDateRange: DateRange = dateRangeGen.sample.value
   val pensionSchemeId: PensionSchemeId = pensionSchemeIdGen.sample.value
 
-  private val mockSchemeDateService = mock[SchemeDateService]
   private val mockPsrVersionsService = mock[PsrVersionsService]
 
   override val additionalBindings: List[GuiceableModule] =
     List(
-      inject.bind[SchemeDateService].toInstance(mockSchemeDateService),
       inject.bind[PsrVersionsService].toInstance(mockPsrVersionsService)
     )
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(schemeDateRange))
     when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(Future.successful(Seq()))
   }
 
   "TaskListController" - {
+    val populatedUserAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
 
     lazy val viewModel = TaskListController.viewModel(
       srn,
       schemeName,
-      schemeDateRange.from,
-      schemeDateRange.to,
+      dateRange.from,
+      dateRange.to,
       defaultUserAnswers,
       pensionSchemeId
     )
     lazy val onPageLoad = routes.TaskListController.onPageLoad(srn)
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
       val view = injected[TaskListView]
       view(viewModel)
     }.withName("task list renders OK"))
@@ -965,8 +962,8 @@ class TaskListControllerSpec extends ControllerBaseSpec {
     val customViewModel = TaskListController.viewModel(
       srn,
       schemeName,
-      schemeDateRange.from,
-      schemeDateRange.to,
+      dateRange.from,
+      dateRange.to,
       userAnswersPopulated,
       pensionSchemeId
     )
