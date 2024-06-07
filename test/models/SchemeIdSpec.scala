@@ -16,12 +16,17 @@
 
 package models
 
+import config.Constants
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import utils.BaseSpec
 import models.SchemeId.Srn
+import org.mockito.Mockito.when
 import org.scalacheck.Gen.alphaNumStr
+import play.api.mvc.Session
 
 class SchemeIdSpec extends BaseSpec with ScalaCheckPropertyChecks {
+  private val mockSession = mock[Session]
+  private val srn = srnGen.sample.value
 
   "Srn" - {
 
@@ -37,6 +42,16 @@ class SchemeIdSpec extends BaseSpec with ScalaCheckPropertyChecks {
           Srn(invalidSrn) mustBe None
         }
       }
+    }
+
+    "return srn value" in {
+      when(mockSession.get(Constants.SRN)).thenReturn(Some(srn.value))
+      Srn.fromSession(mockSession) mustBe srn.toString
+    }
+
+    "return empty srn value" in {
+      when(mockSession.get(Constants.SRN)).thenReturn(None)
+      Srn.fromSession(mockSession) mustBe ""
     }
   }
 }

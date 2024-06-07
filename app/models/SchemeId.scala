@@ -16,6 +16,9 @@
 
 package models
 
+import play.api.mvc.Session
+import config.Constants
+
 sealed abstract class SchemeId(val idType: String) {
   val value: String
 }
@@ -29,6 +32,15 @@ object SchemeId {
 
     def apply(value: String): Option[Srn] =
       if (value.matches(srnRegex)) Some(new Srn(value)) else None
+
+    def fromSession(session: Session): String =
+      session
+        .get(Constants.SRN)
+        .fold("") { value =>
+          Srn(value).fold("") { srn =>
+            srn.toString
+          }
+        }
   }
 
   object asSrn {

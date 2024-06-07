@@ -18,6 +18,7 @@ package controllers.auth
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.FrontendAppConfig
+import models.SchemeId.Srn
 import controllers.actions.IdentifierAction
 import repositories.SessionRepository
 import play.api.i18n.I18nSupport
@@ -38,7 +39,7 @@ class AuthController @Inject()(
 
   def signOut(): Action[AnyContent] = identify.async { implicit request =>
     sessionRepository
-      .clear(request.getUserId)
+      .clear(request.getUserId + Srn.fromSession(request.session))
       .map { _ =>
         Redirect(config.urls.signOutSurvey).withNewSession
       }
@@ -46,7 +47,7 @@ class AuthController @Inject()(
 
   def signOutNoSurvey(): Action[AnyContent] = identify.async { implicit request =>
     sessionRepository
-      .clear(request.getUserId)
+      .clear(request.getUserId + Srn.fromSession(request.session))
       .map { _ =>
         Redirect(config.urls.signOutNoSurveyUrl).withNewSession
       }
