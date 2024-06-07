@@ -84,7 +84,8 @@ trait SoftDelete { _: PSRController =>
       MemberDetailsPage(srn, index),
       DoesMemberHaveNinoPage(srn, index),
       NoNINOPage(srn, index),
-      MemberDetailsNinoPage(srn, index)
+      MemberDetailsNinoPage(srn, index),
+      MemberDetailsCompletedPage(srn, index)
     )
 
     val employerContributionsPages: Max50 => List[Removable[_]] = secondaryIndex =>

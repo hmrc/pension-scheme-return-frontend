@@ -305,7 +305,8 @@ class MemberPaymentsTransformer @Inject()(
         personalDetails.nino
           .map(nino => ua.set(MemberDetailsNinoPage(srn, index), Nino(nino)))
           .getOrElse(ua),
-      _.set(MemberStatus(srn, index), MemberState.Active)
+      _.set(MemberStatus(srn, index), MemberState.Active),
+      _.set(MemberDetailsCompletedPage(srn, index), SectionCompleted)
     )
 
   private def buildEmployerContributions(

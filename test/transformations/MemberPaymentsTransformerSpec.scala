@@ -224,6 +224,7 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
     .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
     .unsafeSet(MemberStatus(srn, index), MemberState.Active)
+    .unsafeSet(MemberDetailsCompletedPage(srn, index), SectionCompleted)
     .unsafeSet(MemberPsrVersionPage(srn, index), "001")
     // employer contributions
     .unsafeSet(EmployerContributionsPage(srn), true)

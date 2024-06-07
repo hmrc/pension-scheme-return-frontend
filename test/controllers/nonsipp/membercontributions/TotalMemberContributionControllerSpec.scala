@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.membercontributions
 
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
 import controllers.nonsipp.membercontributions.TotalMemberContributionController._
 import config.Refined._
@@ -25,11 +25,14 @@ import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
+import viewmodels.models.SectionCompleted
 
 class TotalMemberContributionControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
-  private val userAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+  private val userAnswers = defaultUserAnswers
+    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
   private lazy val onPageLoad =
     routes.TotalMemberContributionController.onPageLoad(srn, index, NormalMode)

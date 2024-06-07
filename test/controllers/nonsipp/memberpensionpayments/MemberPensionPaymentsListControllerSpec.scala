@@ -23,9 +23,10 @@ import play.api.inject.bind
 import views.html.TwoColumnsTripleAction
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
+import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
 import pages.nonsipp.memberpensionpayments.MemberPensionPaymentsListPage
 import eu.timepit.refined.refineMV
@@ -40,26 +41,14 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
-  val userAnswers: UserAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+  val userAnswers: UserAnswers = defaultUserAnswers
+    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
   "MemberPensionPaymentsListController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      val memberMap = userAnswers.membersDetails(srn)
-
-      val maxIndex: Int = memberMap.keys
-        .map(_.toInt)
-        .maxOption
-        .get
-
-      val memberList: List[Option[NameDOB]] =
-        (0 to maxIndex).toList.map { index =>
-          val memberOption = memberMap.get(index.toString)
-          memberOption match {
-            case Some(member) => Some(member)
-            case None => None
-          }
-        }
+      val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
       injected[TwoColumnsTripleAction].apply(
         MemberPensionPaymentsListController.form(injected[YesNoPageFormProvider]),
@@ -75,21 +64,7 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
 
     act.like(renderPrePopView(onPageLoad, MemberPensionPaymentsListPage(srn), true, userAnswers) {
       implicit app => implicit request =>
-        val memberMap = userAnswers.membersDetails(srn)
-
-        val maxIndex: Int = memberMap.keys
-          .map(_.toInt)
-          .maxOption
-          .get
-
-        val memberList: List[Option[NameDOB]] =
-          (0 to maxIndex).toList.map { index =>
-            val memberOption = memberMap.get(index.toString)
-            memberOption match {
-              case Some(member) => Some(member)
-              case None => None
-            }
-          }
+        val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
         injected[TwoColumnsTripleAction]
           .apply(

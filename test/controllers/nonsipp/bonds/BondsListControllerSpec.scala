@@ -20,7 +20,7 @@ import services.PsrSubmissionService
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.bonds.BondsListController._
-import views.html.{ListView, TwoColumnsTripleAction}
+import views.html.ListView
 import eu.timepit.refined.refineMV
 import play.api.inject
 import forms.YesNoPageFormProvider

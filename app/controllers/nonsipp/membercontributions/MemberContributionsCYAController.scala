@@ -17,8 +17,8 @@
 package controllers.nonsipp.membercontributions
 
 import services.PsrSubmissionService
-import pages.nonsipp.memberdetails.MembersDetailsPages
 import play.api.mvc._
+import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.Max300
 import controllers.PSRController
 import controllers.nonsipp.membercontributions.MemberContributionsCYAController._
@@ -34,7 +34,6 @@ import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
 import scala.concurrent.ExecutionContext
-import scala.util.Left
 
 import javax.inject.{Inject, Named}
 
@@ -57,24 +56,7 @@ class MemberContributionsCYAController @Inject()(
       (
         for {
           contribution <- request.userAnswers.get(TotalMemberContributionPage(srn, index))
-          memberMap = request.userAnswers.map(MembersDetailsPages(srn))
-          maxIndex: Either[Result, Int] = memberMap.keys
-            .map(_.toInt)
-            .maxOption
-            .map(Right(_))
-            .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-
-          optionList: List[Option[NameDOB]] = maxIndex match {
-            case Right(index) =>
-              (0 to index).toList.map { index =>
-                val memberOption = memberMap.get(index.toString)
-                memberOption match {
-                  case Some(member) => Some(member)
-                  case None => None
-                }
-              }
-            case Left(_) => List.empty
-          }
+          optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
 
         } yield optionList(index.value - 1)
           .map(_.fullName)

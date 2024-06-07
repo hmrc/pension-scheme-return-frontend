@@ -25,9 +25,10 @@ import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
+import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
 
 import scala.concurrent.Future
@@ -42,26 +43,14 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
-  val userAnswers: UserAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+  val userAnswers: UserAnswers = defaultUserAnswers
+    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
   "MemberContributionListController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      val memberMap = userAnswers.membersDetails(srn)
-
-      val maxIndex: Int = memberMap.keys
-        .map(_.toInt)
-        .maxOption
-        .get
-
-      val memberList: List[Option[NameDOB]] =
-        (0 to maxIndex).toList.map { index =>
-          val memberOption = memberMap.get(index.toString)
-          memberOption match {
-            case Some(member) => Some(member)
-            case None => None
-          }
-        }
+      val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
       injected[TwoColumnsTripleAction].apply(
         MemberContributionListController.form(injected[YesNoPageFormProvider]),
@@ -77,21 +66,7 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
 
     act.like(renderPrePopView(onPageLoad, MemberContributionsListPage(srn), true, userAnswers) {
       implicit app => implicit request =>
-        val memberMap = userAnswers.membersDetails(srn)
-
-        val maxIndex: Int = memberMap.keys
-          .map(_.toInt)
-          .maxOption
-          .get
-
-        val memberList: List[Option[NameDOB]] =
-          (0 to maxIndex).toList.map { index =>
-            val memberOption = memberMap.get(index.toString)
-            memberOption match {
-              case Some(member) => Some(member)
-              case None => None
-            }
-          }
+        val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
         injected[TwoColumnsTripleAction]
           .apply(

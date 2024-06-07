@@ -16,10 +16,10 @@
 
 package controllers.nonsipp.employercontributions
 
-import pages.nonsipp.memberdetails.MembersDetailsPages
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
+import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.PSRController
 import cats.implicits.catsSyntaxApplicativeId
 import _root_.config.Constants
@@ -62,26 +62,8 @@ class EmployerContributionsMemberListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
-      val maxIndex: Either[Result, Int] = memberMap.keys
-        .map(_.toInt)
-        .maxOption
-        .map(Right(_))
-        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-
-      val optionList: List[Option[NameDOB]] = maxIndex match {
-        case Right(index) =>
-          (0 to index).toList.map { index =>
-            val memberOption = memberMap.get(index.toString)
-            memberOption match {
-              case Some(member) => Some(member)
-              case None => None
-            }
-          }
-        case Left(_) => List.empty
-      }
-
-      if (memberMap.nonEmpty) {
+      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
+      if (optionList.flatten.nonEmpty) {
         optionList
           .zipWithRefinedIndex[Max300.Refined]
           .map { indexes =>
@@ -97,24 +79,7 @@ class EmployerContributionsMemberListController @Inject()(
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
-      val maxIndex: Either[Result, Int] = memberMap.keys
-        .map(_.toInt)
-        .maxOption
-        .map(Right(_))
-        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-
-      val optionList: List[Option[NameDOB]] = maxIndex match {
-        case Right(index) =>
-          (0 to index).toList.map { index =>
-            val memberOption = memberMap.get(index.toString)
-            memberOption match {
-              case Some(member) => Some(member)
-              case None => None
-            }
-          }
-        case Left(_) => List.empty
-      }
+      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
 
       if (optionList.flatten.size > Constants.maxSchemeMembers) {
         Future.successful(

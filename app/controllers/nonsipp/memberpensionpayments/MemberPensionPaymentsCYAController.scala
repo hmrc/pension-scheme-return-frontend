@@ -17,10 +17,10 @@
 package controllers.nonsipp.memberpensionpayments
 
 import services.PsrSubmissionService
-import pages.nonsipp.memberdetails.MembersDetailsPages
 import viewmodels.implicits._
 import play.api.mvc._
 import controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController._
+import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.Max300
 import controllers.PSRController
 import navigation.Navigator
@@ -56,24 +56,7 @@ class MemberPensionPaymentsCYAController @Inject()(
       (
         for {
           pensionPayment <- request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index))
-          memberMap = request.userAnswers.map(MembersDetailsPages(srn))
-          maxIndex: Either[Result, Int] = memberMap.keys
-            .map(_.toInt)
-            .maxOption
-            .map(Right(_))
-            .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-
-          optionList: List[Option[NameDOB]] = maxIndex match {
-            case Right(index) =>
-              (0 to index).toList.map { index =>
-                val memberOption = memberMap.get(index.toString)
-                memberOption match {
-                  case Some(member) => Some(member)
-                  case None => None
-                }
-              }
-            case Left(_) => List.empty
-          }
+          optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
         } yield optionList(index.value - 1)
           .map(_.fullName)
           .getOrRecoverJourney
