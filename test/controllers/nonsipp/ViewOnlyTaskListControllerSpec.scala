@@ -72,21 +72,18 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
 
   // Set up services
   private val mockSaveService: SaveService = mock[SaveService]
-  private val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private val mockPsrVersionsService: PsrVersionsService = mock[PsrVersionsService]
   private val mockPsrRetrievalService: PsrRetrievalService = mock[PsrRetrievalService]
 
   override val additionalBindings: List[GuiceableModule] =
     List(
       inject.bind[SaveService].toInstance(mockSaveService),
-      inject.bind[SchemeDateService].toInstance(mockSchemeDateService),
       inject.bind[PsrVersionsService].toInstance(mockPsrVersionsService),
       inject.bind[PsrRetrievalService].toInstance(mockPsrRetrievalService)
     )
 
   override def beforeEach(): Unit = {
     when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
-    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(dateRange))
     when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(Future.successful(Seq()))
     when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(currentUA))
