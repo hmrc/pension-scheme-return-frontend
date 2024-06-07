@@ -17,17 +17,21 @@
 package utils.nonsipp
 
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
-import pages.nonsipp.memberdetails._
 import viewmodels.implicits._
-import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
+import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
+import pages.nonsipp.otherassetsheld.OtherAssetsCompleted
 import config.Refined.OneTo300
 import utils.nonsipp.TaskListStatusUtils._
-import models.SchemeId.Srn
+import pages.nonsipp.landorproperty.LandOrPropertyCompleted
 import eu.timepit.refined.refineV
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import pages.nonsipp.CheckReturnDatesPage
 import models._
 import viewmodels.models.TaskListStatus._
+import pages.nonsipp.bonds.BondsCompleted
+import pages.nonsipp.memberdetails._
+import cats.data.NonEmptyList
+import models.SchemeId.Srn
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
@@ -387,23 +391,30 @@ object TaskListUtils {
     val (sharesDisposalsStatus, sharesDisposalsLinkUrl) =
       TaskListStatusUtils.getSharesDisposalsTaskListStatusWithLink(userAnswers, srn)
 
-    TaskListSectionViewModel(
-      s"$prefix.title",
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "sponsoringemployer.title", sharesStatus),
-          sharesLink
-        ),
-        sharesStatus
+    val sharesItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey(prefix, "sponsoringemployer.title", sharesStatus),
+        sharesLink
       ),
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey("nonsipp.tasklist.sharesdisposal", "title", sharesDisposalsStatus),
-          sharesDisposalsLinkUrl
-        ),
-        sharesDisposalsStatus
-      )
+      sharesStatus
     )
+
+    val sharesDisposalItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey("nonsipp.tasklist.sharesdisposal", "title", sharesDisposalsStatus),
+        sharesDisposalsLinkUrl
+      ),
+      sharesDisposalsStatus
+    )
+
+    val viewModelList = NonEmptyList
+      .fromList(userAnswers.get(SharesCompleted.all(srn)) match {
+        case Some(_) => List(sharesItem, sharesDisposalItem)
+        case None => List(sharesItem)
+      })
+      .get
+
+    TaskListSectionViewModel(s"$prefix.title", Right(viewModelList), None)
   }
 
   private def landOrPropertySection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
@@ -413,23 +424,30 @@ object TaskListUtils {
     val (landOrPropertyDisposalsStatus, landOrPropertyDisposalsLinkUrl) =
       TaskListStatusUtils.getLandOrPropertyDisposalsTaskListStatusWithLink(userAnswers, srn)
 
-    TaskListSectionViewModel(
-      s"$prefix.title",
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "title", landOrPropertyStatus._1),
-          landOrPropertyStatus._2
-        ),
-        landOrPropertyStatus._1
+    val landOrPropertyItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey(prefix, "title", landOrPropertyStatus._1),
+        landOrPropertyStatus._2
       ),
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey("nonsipp.tasklist.landorpropertydisposal", "title", UnableToStart),
-          landOrPropertyDisposalsLinkUrl
-        ),
-        landOrPropertyDisposalsStatus
-      )
+      landOrPropertyStatus._1
     )
+
+    val landOrPropertyDisposalItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey("nonsipp.tasklist.landorpropertydisposal", "title", UnableToStart),
+        landOrPropertyDisposalsLinkUrl
+      ),
+      landOrPropertyDisposalsStatus
+    )
+
+    val viewModelList = NonEmptyList
+      .fromList(userAnswers.get(LandOrPropertyCompleted.all(srn)) match {
+        case Some(_) => List(landOrPropertyItem, landOrPropertyDisposalItem)
+        case None => List(landOrPropertyItem)
+      })
+      .get
+
+    TaskListSectionViewModel(s"$prefix.title", Right(viewModelList), None)
   }
 
   private def bondsSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
@@ -437,23 +455,30 @@ object TaskListUtils {
     val (bondStatus, bondLink) = getBondsTaskListStatusAndLink(userAnswers, srn)
     val (disposalStatus, disposalLink) = getBondsDisposalsTaskListStatusWithLink(userAnswers, srn)
 
-    TaskListSectionViewModel(
-      s"$prefix.title",
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "unregulatedorconnected.title", bondStatus),
-          bondLink
-        ),
-        bondStatus
+    val bondsItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey(prefix, "unregulatedorconnected.title", bondStatus),
+        bondLink
       ),
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "bondsdisposal.title", disposalStatus),
-          disposalLink
-        ),
-        disposalStatus
-      )
+      bondStatus
     )
+
+    val bondsDisposalItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey(prefix, "bondsdisposal.title", disposalStatus),
+        disposalLink
+      ),
+      disposalStatus
+    )
+
+    val viewModelList = NonEmptyList
+      .fromList(userAnswers.get(BondsCompleted.all(srn)) match {
+        case Some(_) => List(bondsItem, bondsDisposalItem)
+        case None => List(bondsItem)
+      })
+      .get
+
+    TaskListSectionViewModel(s"$prefix.title", Right(viewModelList), None)
   }
 
   private def otherAssetsSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
@@ -463,55 +488,42 @@ object TaskListUtils {
     val (otherAssetsDisposalsStatus, otherAssetsDisposalsLinkUrl) =
       TaskListStatusUtils.getOtherAssetsDisposalTaskListStatusAndLink(userAnswers, srn)
 
-    val sharesStarted = userAnswers.get(DidSchemeHoldAnySharesPage(srn)) match {
-      case Some(_) => true
-      case None => false
-    }
+    val quotedSharesItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey(prefix, "quotedshares.title", quotedSharesStatusAndLink._1),
+        quotedSharesStatusAndLink._2
+      ),
+      quotedSharesStatusAndLink._1
+    )
 
-    if (sharesStarted) {
-      TaskListSectionViewModel(
-        s"$prefix.title",
-        TaskListItemViewModel(
-          LinkMessage(
-            messageKey(prefix, "quotedshares.title", quotedSharesStatusAndLink._1),
-            quotedSharesStatusAndLink._2
-          ),
-          quotedSharesStatusAndLink._1
-        ),
-        TaskListItemViewModel(
-          LinkMessage(
-            messageKey(prefix, "title", otherAssetsStatus),
-            otherAssetsLink
-          ),
-          otherAssetsStatus
-        ),
-        TaskListItemViewModel(
-          LinkMessage(
-            messageKey("nonsipp.tasklist.otherassetsdisposal", "title", otherAssetsDisposalsStatus),
-            otherAssetsDisposalsLinkUrl
-          ),
-          otherAssetsDisposalsStatus
-        )
+    val otherAssetsItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey(prefix, "title", otherAssetsStatus),
+        otherAssetsLink
+      ),
+      otherAssetsStatus
+    )
+
+    val otherAssetsDisposalItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey("nonsipp.tasklist.otherassetsdisposal", "title", otherAssetsDisposalsStatus),
+        otherAssetsDisposalsLinkUrl
+      ),
+      otherAssetsDisposalsStatus
+    )
+
+    val viewModelList = NonEmptyList
+      .fromList(
+        (userAnswers.get(OtherAssetsCompleted.all(srn)), userAnswers.get(DidSchemeHoldAnySharesPage(srn))) match {
+          case (Some(_), Some(_)) => List(quotedSharesItem, otherAssetsItem, otherAssetsDisposalItem)
+          case (Some(_), _) => List(otherAssetsItem, otherAssetsDisposalItem)
+          case (_, Some(_)) => List(quotedSharesItem, otherAssetsItem)
+          case (_, _) => List(otherAssetsItem)
+        }
       )
-    } else {
-      TaskListSectionViewModel(
-        s"$prefix.title",
-        TaskListItemViewModel(
-          LinkMessage(
-            messageKey(prefix, "title", otherAssetsStatus),
-            otherAssetsLink
-          ),
-          otherAssetsStatus
-        ),
-        TaskListItemViewModel(
-          LinkMessage(
-            messageKey("nonsipp.tasklist.otherassetsdisposal", "title", otherAssetsDisposalsStatus),
-            otherAssetsDisposalsLinkUrl
-          ),
-          otherAssetsDisposalsStatus
-        )
-      )
-    }
+      .get
+
+    TaskListSectionViewModel(s"$prefix.title", Right(viewModelList), None)
   }
 
   private def messageKey(prefix: String, suffix: String, status: TaskListStatus): String =
