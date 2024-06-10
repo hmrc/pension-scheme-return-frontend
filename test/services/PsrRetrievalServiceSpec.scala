@@ -374,7 +374,7 @@ object PsrRetrievalServiceSpec {
     unallocatedContribAmount = None,
     memberContributionMade = Some(true),
     lumpSumReceived = Some(true),
-    pensionReceived = Some(true),
+    pensionReceived = SectionDetails(made = true, completed = true),
     benefitsSurrenderedDetails = SectionDetails(made = true, completed = true)
   )
 

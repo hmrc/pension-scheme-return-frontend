@@ -63,20 +63,19 @@ class TransfersInTransformer @Inject() extends Transformer {
   ): List[Try[UserAnswers] => Try[UserAnswers]] =
     transfersIn.zipWithIndex.flatMap {
       case (transferIn, zippedIndex) =>
-        refineIndex[Max5.Refined](zippedIndex).fold(List.empty[Try[UserAnswers] => Try[UserAnswers]]) {
-          secondaryIndex =>
-            List[Try[UserAnswers] => Try[UserAnswers]](
-              _.set(
-                TransfersInSectionCompleted(srn, index, secondaryIndex),
-                SectionCompleted
-              ),
-              _.set(TransferringSchemeNamePage(srn, index, secondaryIndex), transferIn.schemeName),
-              _.set(WhenWasTransferReceivedPage(srn, index, secondaryIndex), transferIn.dateOfTransfer),
-              _.set(TotalValueTransferPage(srn, index, secondaryIndex), Money(transferIn.transferValue)),
-              _.set(DidTransferIncludeAssetPage(srn, index, secondaryIndex), transferIn.transferIncludedAsset),
-              _.set(TransferringSchemeTypePage(srn, index, secondaryIndex), transferIn.transferSchemeType),
-              _.set(ReportAnotherTransferInPage(srn, index, secondaryIndex), false)
-            )
+        refineIndex[Max5.Refined](zippedIndex).fold(List.empty[UserAnswers.Compose]) { secondaryIndex =>
+          List[UserAnswers.Compose](
+            _.set(
+              TransfersInSectionCompleted(srn, index, secondaryIndex),
+              SectionCompleted
+            ),
+            _.set(TransferringSchemeNamePage(srn, index, secondaryIndex), transferIn.schemeName),
+            _.set(WhenWasTransferReceivedPage(srn, index, secondaryIndex), transferIn.dateOfTransfer),
+            _.set(TotalValueTransferPage(srn, index, secondaryIndex), Money(transferIn.transferValue)),
+            _.set(DidTransferIncludeAssetPage(srn, index, secondaryIndex), transferIn.transferIncludedAsset),
+            _.set(TransferringSchemeTypePage(srn, index, secondaryIndex), transferIn.transferSchemeType),
+            _.set(ReportAnotherTransferInPage(srn, index, secondaryIndex), false)
+          )
         }
     } ++ List(
       _.setWhen(transfersInCompleted)(DidSchemeReceiveTransferPage(srn), transfersIn.nonEmpty),

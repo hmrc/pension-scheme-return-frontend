@@ -19,19 +19,20 @@ package controllers.nonsipp.receivetransfer
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
+import controllers.PSRController
+import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInJourneyStatus}
 import controllers.actions._
 import controllers.nonsipp.receivetransfer.DidSchemeReceiveTransferController._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
+import play.api.i18n.MessagesApi
 import play.api.data.Form
 import views.html.YesNoPageView
 import models.SchemeId.Srn
-import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -49,8 +50,7 @@ class DidSchemeReceiveTransferController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends PSRController {
 
   private val form = DidSchemeReceiveTransferController.form(formProvider)
 
@@ -69,7 +69,10 @@ class DidSchemeReceiveTransferController @Inject()(
             Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(DidSchemeReceiveTransferPage(srn), value))
+              updatedAnswers <- request.userAnswers
+                .set(DidSchemeReceiveTransferPage(srn), value)
+                .setWhen(!value)(TransfersInJourneyStatus(srn), SectionStatus.Completed)
+                .mapK[Future]
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(navigator.nextPage(DidSchemeReceiveTransferPage(srn), mode, updatedAnswers))
         )

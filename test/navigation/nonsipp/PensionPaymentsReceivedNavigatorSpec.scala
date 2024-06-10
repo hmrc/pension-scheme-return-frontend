@@ -72,7 +72,7 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
       normalmode
         .navigateToWithIndex(
           index,
-          TotalAmountPensionPaymentsPage,
+          TotalAmountPensionPaymentsPage.apply,
           (srn, index: Max300, _) =>
             controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
               .onPageLoad(srn, index, NormalMode)

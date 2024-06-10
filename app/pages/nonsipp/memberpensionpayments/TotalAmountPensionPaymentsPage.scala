@@ -32,9 +32,11 @@ case class TotalAmountPensionPaymentsPage(srn: Srn, index: Max300) extends Quest
 
 }
 
-case class AllTotalAmountPensionPaymentsPages(srn: Srn) extends IndexedQuestionPage[QuestionPage[Money]] {
+object TotalAmountPensionPaymentsPage {
+  def all(srn: Srn): IndexedQuestionPage[Money] = new IndexedQuestionPage[Money] {
 
-  override def path: JsPath = Paths.memberDetails \ toString
+    override def path: JsPath = Paths.memberDetails \ toString
 
-  override def toString: String = "pensionAmountReceived"
+    override def toString: String = "pensionAmountReceived"
+  }
 }

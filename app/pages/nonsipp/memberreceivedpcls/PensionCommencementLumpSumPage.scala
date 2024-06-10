@@ -39,6 +39,6 @@ case class PensionCommencementLumpSumPage(srn: Srn) extends QuestionPage[Boolean
     }
 
   private def pages(srn: Srn): List[Removable[_]] =
-    List(AllPensionCommencementLumpSumAmountPages(srn))
+    List(PensionCommencementLumpSumAmountPage.all(srn))
 
 }
