@@ -22,10 +22,10 @@ import config.Refined._
 import models.SchemeHoldShare._
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer._
-import pages.nonsipp.landorpropertydisposal._
 import pages.nonsipp.membersurrenderedbenefits._
 import models.{ConditionalYesNo, _}
 import models.SponsoringOrConnectedParty._
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._
 import pages.nonsipp.employercontributions._
 import services._
@@ -33,7 +33,7 @@ import pages.nonsipp.otherassetsdisposal._
 import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.totalvaluequotedshares._
-import org.mockito.Mockito.when
+import org.mockito.Mockito._
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds._
@@ -48,6 +48,8 @@ import viewmodels.models.MemberState.Active
 import controllers.ControllerBaseSpec
 import views.html.TaskListView
 import models.TypeOfShares._
+import config.Constants.COMPARE_PREVIOUS_PREFIX
+import pages.nonsipp.landorpropertydisposal._
 import pages.nonsipp.memberpensionpayments._
 import eu.timepit.refined.refineMV
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
@@ -474,18 +476,33 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
 
   "ViewOnlyTaskListController" - {
 
-    act.like(renderView(onPageLoadSubmissionTwo, currentUA) { implicit app => implicit request =>
-      val view = injected[TaskListView]
-      view(viewModelSubmissionTwo)
-    }.withName("onPageLoad renders ok with indexes /2/1"))
+    act.like(
+      renderView(onPageLoadSubmissionTwo, currentUA) { implicit app => implicit request =>
+        val view = injected[TaskListView]
+        view(viewModelSubmissionTwo)
+      }.after({
+          val userAnswerCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(mockSaveService, times(2)).save(userAnswerCaptor.capture())(any(), any())
+          userAnswerCaptor.getAllValues.get(1).id mustEqual s"$COMPARE_PREVIOUS_PREFIX${currentUA.id}"
+          reset(mockSaveService)
+        })
+        .withName("onPageLoad renders ok with indexes /2/1")
+    )
 
     act.like(journeyRecoveryPage(onPageLoadSubmissionTwo).updateName("onPageLoad " + _))
 
-    act.like(renderView(onPageLoadSubmissionOne, currentUA) { implicit app => implicit request =>
-      val view = injected[TaskListView]
-      view(viewModelVersionOne)
-    }.withName("onPageLoad renders ok with indexes /1/0"))
-
+    act.like(
+      renderView(onPageLoadSubmissionOne, currentUA) { implicit app => implicit request =>
+        val view = injected[TaskListView]
+        view(viewModelVersionOne)
+      }.after({
+          val userAnswerCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(mockSaveService, times(2)).save(userAnswerCaptor.capture())(any(), any())
+          userAnswerCaptor.getAllValues.get(1).id mustEqual s"$COMPARE_PREVIOUS_PREFIX${currentUA.id}"
+          reset(mockSaveService)
+        })
+        .withName("onPageLoad renders ok with indexes /1/0")
+    )
     // TODO: implement lower-level journey navigation in future ticket, until then Unauthorised page used for all links
 
     "Status, content, and URL tests" - {

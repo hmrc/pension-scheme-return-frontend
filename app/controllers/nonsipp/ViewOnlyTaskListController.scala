@@ -18,6 +18,7 @@ package controllers.nonsipp
 
 import services.{PsrRetrievalService, SaveService}
 import com.google.inject.Inject
+import config.Constants.COMPARE_PREVIOUS_PREFIX
 import controllers.actions._
 import pages.nonsipp.memberdetails.Paths.personalDetails
 import viewmodels.implicits._
@@ -72,6 +73,7 @@ class ViewOnlyTaskListController @Inject()(
               Some("%03d".format(other)),
               controllers.routes.OverviewController.onPageLoad(srn)
             )
+            _ <- saveService.save(previousReturn.copy(id = COMPARE_PREVIOUS_PREFIX + previousReturn.id))
             viewModel = ViewOnlyTaskListController.viewModel(
               srn,
               request.schemeDetails.schemeName,

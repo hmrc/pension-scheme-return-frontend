@@ -16,12 +16,12 @@
 
 package controllers
 
-import services.PsrVersionsService
+import services.{ComparisonService, PsrRetrievalService, PsrVersionsService, SaveService}
 import play.api.inject.bind
-import pages.nonsipp.WhichTaxYearPage
+import pages.nonsipp.{FbVersionPage, WhichTaxYearPage}
 import controllers.ReturnsSubmittedController._
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, when}
+import org.mockito.Mockito.{reset, times, verify, when}
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
 import views.html.ReturnsSubmittedView
@@ -34,7 +34,9 @@ import scala.concurrent.Future
 class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
   private val populatedUserAnswers = {
-    defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
+    defaultUserAnswers
+      .unsafeSet(WhichTaxYearPage(srn), dateRange)
+      .unsafeSet(FbVersionPage(srn), version)
   }
   private val page = 1
   private def data(srn: Srn) =
@@ -66,13 +68,33 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
     )
 
   private implicit val mockPsrVersionsService: PsrVersionsService = mock[PsrVersionsService]
+  private implicit val mockComparisonService: ComparisonService = mock[ComparisonService]
+  private implicit val mockSaveService: SaveService = mock[SaveService]
+  private implicit val mockPsrRetrievalService: PsrRetrievalService = mock[PsrRetrievalService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
-    bind[PsrVersionsService].toInstance(mockPsrVersionsService)
+    bind[PsrVersionsService].toInstance(mockPsrVersionsService),
+    bind[ComparisonService].toInstance(mockComparisonService),
+    bind[SaveService].toInstance(mockSaveService),
+    bind[PsrRetrievalService].toInstance(mockPsrRetrievalService)
   )
 
-  override protected def beforeAll(): Unit =
+  override protected def beforeAll(): Unit = {
     reset(mockPsrVersionsService)
+    reset(mockComparisonService)
+    reset(mockSaveService)
+    reset(mockPsrRetrievalService)
+    when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(
+      Future.successful(versionsResponse)
+    )
+    when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any(), any())(any(), any(), any())).thenReturn(
+      Future.successful(populatedUserAnswers)
+    )
+    when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
+    when(mockComparisonService.getPureUserAnswers()(any())).thenReturn(
+      Future.successful(Some(populatedUserAnswers))
+    )
+  }
 
   "ReturnsSubmittedController" - {
 
@@ -88,7 +110,6 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
             Future.successful(versionsResponse)
           )
         )
-        .after(reset(mockPsrVersionsService))
         .withName("onPageLoad renders ok")
     )
 
@@ -98,5 +119,22 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       ).withName("onSelect redirects ok")
     )
+
+    "save service is called when currentFbVersion and pureFbVersion are different" - {
+      act.like(
+        renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
+          injected[ReturnsSubmittedView]
+            .apply(viewModel(srn, page, data(srn), fromYearUi, toYearUi, schemeName))
+        }.before({
+            when(mockComparisonService.getPureUserAnswers()(any())).thenReturn(
+              Future.successful(Some(defaultUserAnswers.unsafeSet(FbVersionPage(srn), "000")))
+            )
+          })
+          .after({
+            verify(mockSaveService, times(1)).save(any())(any(), any())
+          })
+          .withName("onPageLoad renders ok")
+      )
+    }
   }
 }

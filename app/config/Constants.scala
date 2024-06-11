@@ -21,6 +21,7 @@ import java.time.LocalDate
 object Constants {
 
   val UNCHANGED_SESSION_PREFIX = "pure_"
+  val COMPARE_PREVIOUS_PREFIX = "compare_previous_"
 
   val psaEnrolmentKey = "HMRC-PODS-ORG"
   val pspEnrolmentKey = "HMRC-PODSPP-ORG"
@@ -123,4 +124,6 @@ object Constants {
     """^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}|BFPO\s?[0-9]{1,3}$"""
 
   val earliestDate: LocalDate = LocalDate.of(1900, 1, 1)
+
+  val defaultFbVersion = "000"
 }

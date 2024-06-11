@@ -16,7 +16,7 @@
 
 package controllers
 
-import services.PsrVersionsService
+import services._
 import utils.DateTimeUtils
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -41,17 +41,36 @@ class ReturnsSubmittedController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   psrVersionsService: PsrVersionsService,
+  comparisonService: ComparisonService,
+  saveService: SaveService,
+  psrRetrievalService: PsrRetrievalService,
   view: ReturnsSubmittedView
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
   def onPageLoad(srn: Srn, page: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      request.userAnswers.get(WhichTaxYearPage(srn)) match {
-        case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-        case Some(dateRange: DateRange) =>
-          val response = psrVersionsService.getVersions(request.schemeDetails.pstr, formatDateForApi(dateRange.from))
-          response.map { seqPsrVersionsResponse =>
+      request.usingAnswer(WhichTaxYearPage(srn)).async { dateRange =>
+        for {
+          seqPsrVersionsResponse <- psrVersionsService
+            .getVersions(request.schemeDetails.pstr, formatDateForApi(dateRange.from))
+          pure <- comparisonService.getPureUserAnswers()
+          lastReturn <- if (currentFbVersion(request.userAnswers, srn) != pureFbVersion(pure, srn)) {
+            psrRetrievalService.getStandardPsrDetails(
+              None,
+              Some(formatDateForApi(dateRange.from)),
+              Some(pureFbVersion(pure, srn)),
+              controllers.routes.OverviewController.onPageLoad(srn)
+            )
+          } else {
+            Future.successful(request.userAnswers)
+          }
+          _ <- if (currentFbVersion(request.userAnswers, srn) != pureFbVersion(pure, srn)) {
+            saveService.save(lastReturn)
+          } else {
+            Future.successful(Some(()))
+          }
+          myViewModel = {
             val reportVersions = seqPsrVersionsResponse.map(_.reportVersion)
             val listRetHistorySummary = seqPsrVersionsResponse
               .filter(
@@ -97,19 +116,16 @@ class ReturnsSubmittedController @Inject()(
               }
               .toList
             val schemeName = request.schemeDetails.schemeName
-            Ok(
-              view(
-                viewModel(
-                  srn,
-                  page,
-                  listRetHistorySummary,
-                  DateTimeUtils.formatHtml(dateRange.from),
-                  DateTimeUtils.formatHtml(dateRange.to),
-                  schemeName
-                )
-              )
+            viewModel(
+              srn,
+              page,
+              listRetHistorySummary,
+              DateTimeUtils.formatHtml(dateRange.from),
+              DateTimeUtils.formatHtml(dateRange.to),
+              schemeName
             )
           }
+        } yield Ok(view(myViewModel))
       }
     }
 

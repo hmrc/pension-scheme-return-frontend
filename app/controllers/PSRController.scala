@@ -20,17 +20,20 @@ import queries.{Gettable, Removable, Settable}
 import play.api.mvc.Result
 import org.slf4j.LoggerFactory
 import config.Refined.Max3
-import cats.data.{EitherT, NonEmptyList}
 import cats.implicits.toTraverseOps
-import cats.syntax.applicative._
-import play.api.libs.json.{Reads, Writes}
 import models.backend.responses.{IndividualDetails, PsrVersionsResponse}
 import models.{DateRange, UserAnswers}
 import cats.Applicative
 import models.requests.DataRequest
 import eu.timepit.refined.api.{Refined, Validate}
+import cats.data.{EitherT, NonEmptyList}
+import models.SchemeId.Srn
+import cats.syntax.applicative._
+import config.Constants.defaultFbVersion
 import cats.syntax.either._
 import eu.timepit.refined.refineV
+import pages.nonsipp.FbVersionPage
+import play.api.libs.json.{Reads, Writes}
 import play.api.i18n.I18nSupport
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
@@ -102,6 +105,13 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
           case Some(orgName) => orgName
           case None => ""
         }
+    }
+
+  def currentFbVersion(ua: UserAnswers, srn: Srn): String = ua.get(FbVersionPage(srn)).getOrElse(defaultFbVersion)
+
+  def pureFbVersion(pure: Option[UserAnswers], srn: Srn): String =
+    pure.fold(defaultFbVersion) { ua =>
+      ua.get(FbVersionPage(srn)).fold(defaultFbVersion)(ua1 => ua1)
     }
 
   implicit class OptionOps[A](maybe: Option[A]) {

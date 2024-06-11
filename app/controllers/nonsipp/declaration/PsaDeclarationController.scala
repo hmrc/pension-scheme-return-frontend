@@ -66,7 +66,7 @@ class PsaDeclarationController @Inject()(
 
   def onSubmit(srn: Srn): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val fbVersion = request.userAnswers.get(FbVersionPage(srn)).getOrElse("000") // 000 as no versions yet - initial submission
+      val fbVersion = request.userAnswers.get(FbVersionPage(srn)).getOrElse(defaultFbVersion) // 000 as no versions yet - initial submission
       schemeDateService.schemeDate(srn) match {
         case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         case Some(dates) =>
