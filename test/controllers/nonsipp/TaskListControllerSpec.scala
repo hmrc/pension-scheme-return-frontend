@@ -18,8 +18,8 @@ package controllers.nonsipp
 
 import services.PsrVersionsService
 import models.ConditionalYesNo._
-import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
-import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
+import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
+import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, OtherAssetsHeldPage}
 import controllers.ControllerBaseSpec
 import views.html.TaskListView
 import eu.timepit.refined.refineMV
@@ -592,9 +592,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
 
     "sharesDisposalSection" - {
 
-      "notStarted" in {
+      "notStarted and only visible with a share existing" in {
         testViewModel(
-          defaultUserAnswers,
+          defaultUserAnswers.unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted),
           4,
           1,
           expectedStatus = TaskListStatus.NotStarted,
@@ -606,8 +606,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "completed (with 'No' selection on first page)" in {
+      "completed (with 'No' selection on first page) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), false)
           .unsafeSet(SharesDisposalCompleted(srn), SectionCompleted)
 
@@ -624,8 +625,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "inProgress (with only 1 incomplete disposal)" in {
+      "inProgress (with only 1 incomplete disposal) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), true)
           // Shares 1 - Disposal 1 - Incomplete journey:
           .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Sold)
@@ -644,8 +646,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "inProgress (with 1 complete and 1 incomplete disposal)" in {
+      "inProgress (with 1 complete and 1 incomplete disposal) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), true)
           // Shares 1 - Disposal 1 - Complete journey:
           .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Transferred)
@@ -669,8 +672,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "completed (with only 1 complete disposal)" in {
+      "completed (with only 1 complete disposal) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), true)
           // Shares 1 - Disposal 1 - Complete journey:
           .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Transferred)
@@ -691,8 +695,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "notStarted (with removal of only complete disposal)" in {
+      "notStarted (with removal of only complete disposal) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), true)
           // Shares 1 - Disposal 1 - Complete journey:
           .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Transferred)
@@ -824,9 +829,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
 
     "otherAssetsDisposalSection" - {
 
-      "notStarted" in {
+      "notStarted and only visible with an asset existing" in {
         testViewModel(
-          defaultUserAnswers,
+          defaultUserAnswers.unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted),
           7,
           1,
           expectedStatus = TaskListStatus.NotStarted,
@@ -838,8 +843,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "completed (with 'No' selection on first page)" in {
+      "completed (with 'No' selection on first page) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(OtherAssetsDisposalPage(srn), false)
           .unsafeSet(OtherAssetsDisposalCompleted(srn), SectionCompleted)
 
@@ -856,8 +862,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "inProgress (with only 1 incomplete disposal)" in {
+      "inProgress (with only 1 incomplete disposal) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
           // Other Assets 1 - Disposal 1 - Incomplete journey:
           .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Sold)
@@ -876,8 +883,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "inProgress (with 1 complete and 1 incomplete disposal)" in {
+      "inProgress (with 1 complete and 1 incomplete disposal) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
           // Other Asset 1 - Disposal 1 - Complete journey:
           .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
@@ -901,8 +909,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "completed (with only 1 complete disposal)" in {
+      "completed (with only 1 complete disposal) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
           // Other Asset 1 - Disposal 1 - Complete journey:
           .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
@@ -923,8 +932,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "notStarted (with removal of only complete disposal)" in {
+      "notStarted (with removal of only complete disposal) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
           // Other Asset 1 - Disposal 1 - Complete journey:
           .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
