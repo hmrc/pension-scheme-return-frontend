@@ -27,7 +27,7 @@ import scala.concurrent.Future
 import javax.inject.Inject
 
 class ComparisonService @Inject()(
-   sessionRepository: SessionRepository
+  sessionRepository: SessionRepository
 ) {
   def getPureUserAnswers()(
     implicit request: DataRequest[AnyContent]

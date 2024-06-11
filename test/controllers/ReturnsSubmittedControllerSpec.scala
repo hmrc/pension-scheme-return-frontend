@@ -16,12 +16,12 @@
 
 package controllers
 
-import services.{ComparisonService, PsrRetrievalService, PsrVersionsService, SaveService}
+import services._
 import play.api.inject.bind
 import pages.nonsipp.{FbVersionPage, WhichTaxYearPage}
 import controllers.ReturnsSubmittedController._
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, times, verify, when}
+import org.mockito.Mockito._
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
 import views.html.ReturnsSubmittedView
