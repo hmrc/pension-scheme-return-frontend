@@ -408,7 +408,7 @@ object TaskListUtils {
     )
 
     val viewModelList = NonEmptyList
-      .fromList(userAnswers.get(SharesCompleted.all(srn)) match {
+      .fromList(userAnswers.get(SharesCompleted.all(srn)).filter(_.nonEmpty) match {
         case Some(_) => List(sharesItem, sharesDisposalItem)
         case None => List(sharesItem)
       })
@@ -441,7 +441,7 @@ object TaskListUtils {
     )
 
     val viewModelList = NonEmptyList
-      .fromList(userAnswers.get(LandOrPropertyCompleted.all(srn)) match {
+      .fromList(userAnswers.get(LandOrPropertyCompleted.all(srn)).filter(_.nonEmpty) match {
         case Some(_) => List(landOrPropertyItem, landOrPropertyDisposalItem)
         case None => List(landOrPropertyItem)
       })
@@ -472,7 +472,7 @@ object TaskListUtils {
     )
 
     val viewModelList = NonEmptyList
-      .fromList(userAnswers.get(BondsCompleted.all(srn)) match {
+      .fromList(userAnswers.get(BondsCompleted.all(srn)).filter(_.nonEmpty) match {
         case Some(_) => List(bondsItem, bondsDisposalItem)
         case None => List(bondsItem)
       })
@@ -514,7 +514,10 @@ object TaskListUtils {
 
     val viewModelList = NonEmptyList
       .fromList(
-        (userAnswers.get(OtherAssetsCompleted.all(srn)), userAnswers.get(DidSchemeHoldAnySharesPage(srn))) match {
+        (
+          userAnswers.get(OtherAssetsCompleted.all(srn)).filter(_.nonEmpty),
+          userAnswers.get(DidSchemeHoldAnySharesPage(srn))
+        ) match {
           case (Some(_), Some(_)) => List(quotedSharesItem, otherAssetsItem, otherAssetsDisposalItem)
           case (Some(_), _) => List(otherAssetsItem, otherAssetsDisposalItem)
           case (_, Some(_)) => List(quotedSharesItem, otherAssetsItem)
