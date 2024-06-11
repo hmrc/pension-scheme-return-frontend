@@ -26,8 +26,15 @@ import play.api.mvc.Results.Redirect
 
 import scala.concurrent.Future
 
-case class OptionalDataRequest[A](request: AllowedAccessRequest[A], userAnswers: Option[UserAnswers])
-    extends WrappedRequest[A](request) {
+case class OptionalDataRequest[A](
+  request: AllowedAccessRequest[A],
+  userAnswers: Option[UserAnswers],
+  pureUserAnswers: Option[UserAnswers] = None,
+  previousUserAnswers: Option[UserAnswers] = None,
+  year: Option[String] = None,
+  currentVersion: Option[Int] = None,
+  previousVersion: Option[Int] = None
+) extends WrappedRequest[A](request) {
 
   val getUserId: String = request.getUserId
 
@@ -38,8 +45,15 @@ case class OptionalDataRequest[A](request: AllowedAccessRequest[A], userAnswers:
   val srn: Srn = request.srn
 }
 
-case class DataRequest[A](request: AllowedAccessRequest[A], userAnswers: UserAnswers)
-    extends WrappedRequest[A](request) {
+case class DataRequest[A](
+  request: AllowedAccessRequest[A],
+  userAnswers: UserAnswers,
+  pureUserAnswers: Option[UserAnswers] = None,
+  previousUserAnswers: Option[UserAnswers] = None,
+  year: Option[String] = None,
+  currentVersion: Option[Int] = None,
+  previousVersion: Option[Int] = None
+) extends WrappedRequest[A](request) {
 
   val pensionSchemeId: PensionSchemeId = request.pensionSchemeId
 

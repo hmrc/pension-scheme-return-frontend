@@ -24,7 +24,7 @@ import models.SchemeId.Srn
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import models.requests.psr._
 import pages.nonsipp.accountingperiod.{AccountingPeriodRecordVersionPage, AccountingPeriods}
-import pages.nonsipp.{CheckReturnDatesPage, FbVersionPage, WhichTaxYearPage}
+import pages.nonsipp._
 import models._
 import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import models.requests.DataRequest
@@ -181,7 +181,10 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
       ua11 <- minimalRequiredSubmission.reportDetails.fbVersion
         .map(rv => ua10.set(FbVersionPage(srn), rv))
         .getOrElse(Try(ua10))
+      ua12 <- minimalRequiredSubmission.reportDetails.compilationOrSubmissionDate
+        .map(rv => ua11.set(CompilationOrSubmissionDatePage(srn), rv))
+        .getOrElse(Try(ua11))
     } yield {
-      ua11
+      ua12
     }
 }

@@ -20,24 +20,28 @@ import play.api.mvc.JavascriptLiteral
 
 sealed trait Mode {
 
-  val isNormalMode: Boolean
+  // TODO deprecated, remove when it is not used
   def fold[A](normal: => A, check: => A): A = this match {
     case CheckMode => check
     case NormalMode => normal
   }
+
+  def fold[A](normal: => A, check: => A, viewOnly: => A): A = this match {
+    case CheckMode => check
+    case NormalMode => normal
+    case ViewOnlyMode => viewOnly
+  }
 }
 
-case object CheckMode extends Mode {
-  val isNormalMode: Boolean = false
-}
-case object NormalMode extends Mode {
-  val isNormalMode: Boolean = true
-}
+case object CheckMode extends Mode
+case object NormalMode extends Mode
+case object ViewOnlyMode extends Mode
 
 object Mode {
 
   implicit val jsLiteral: JavascriptLiteral[Mode] = {
     case NormalMode => "NormalMode"
     case CheckMode => "CheckMode"
+    case ViewOnlyMode => "ViewOnlyMode"
   }
 }

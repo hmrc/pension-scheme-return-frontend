@@ -30,6 +30,7 @@ import pages.nonsipp.landorpropertydisposal.{
   LandPropertyDisposalCompletedPages
 }
 import pages.nonsipp.sharesdisposal._
+import play.api.libs.json.{JsObject, JsPath}
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
 import models._
 import pages.nonsipp.loansmadeoroutstanding._
@@ -47,6 +48,7 @@ import pages.nonsipp.memberreceivedpcls.{PclsMemberListPage, PensionCommencement
 import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, PensionPaymentsReceivedPage}
 import eu.timepit.refined.{refineMV, refineV}
 import viewmodels.models.TaskListStatus._
+import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import pages.nonsipp.common.IdentityTypes
 import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutJourneyStatus}
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
@@ -977,4 +979,33 @@ object TaskListStatusUtils {
 
     (status, link)
   }
+
+  def getCompletedOrUpdatedTaskListStatus(
+    currentUA: UserAnswers,
+    previousUA: UserAnswers,
+    path: JsPath,
+    toExclude: Option[String] = None
+  ): TaskListStatus = {
+    val c = currentUA.get(path).getOrElse(JsObject.empty).as[JsObject] - toExclude.getOrElse("")
+    val p = previousUA.get(path).getOrElse(JsObject.empty).as[JsObject] - toExclude.getOrElse("")
+    if (c == p) {
+      Completed
+    } else {
+      Updated
+    }
+  }
+
+  def getFinancialDetailsTaskListStatus(currentUA: UserAnswers, previousUA: UserAnswers): TaskListStatus =
+    if (currentUA.get(schemeDesignatory \ "totalAssetValue") ==
+        previousUA.get(schemeDesignatory \ "totalAssetValue")
+      &&
+      currentUA.get(schemeDesignatory \ "totalPayments") ==
+        previousUA.get(schemeDesignatory \ "totalPayments")
+      &&
+      currentUA.get(schemeDesignatory \ "totalCash") ==
+        previousUA.get(schemeDesignatory \ "totalCash")) {
+      Completed
+    } else {
+      Updated
+    }
 }

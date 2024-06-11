@@ -25,11 +25,28 @@
         govukButton: GovukButton,
 )
 
-@(viewmodel: FormPageViewModel[CheckYourAnswersViewModel])(implicit request: Request[_], messages: Messages)
+    @(viewmodel: FormPageViewModel[CheckYourAnswersViewModel])(implicit request: Request[_], messages: Messages)
 
     @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
-        <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+        @if(viewmodel.mode == NormalMode || viewmodel.mode == CheckMode) {
+            <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+        }
+        @if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) {
+            @if(viewmodel.optViewOnlyDetails.get.updated) {
+                <strong class ="govuk-tag govuk-tag--green govuk-!-margin-bottom-4">Updated</strong><br/>
+            }
+
+            @viewmodel.optViewOnlyDetails.get.link.map { link =>
+                <p class="govuk-body">
+                    <a href=@link.url
+                   class="govuk-link" rel="noreferrer noopener" target="_blank" >@renderMessage(link.content)</a></p>
+            }
+            @viewmodel.optViewOnlyDetails.get.submittedText.map { submittedText =>
+                <span class="govuk-caption-l">@renderMessage(submittedText)</span>
+            }
+            <h1 class="govuk-heading-l">@renderMessage(viewmodel.optViewOnlyDetails.get.heading)</h1>
+        }
 
         @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.sections)(paginatedViewModel =>
             viewmodel.page.sections.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
@@ -42,9 +59,10 @@
                             SummaryListRowViewModel(
                                 key = if(row.oneHalfWidth) KeyViewModel(row.key.toMessage).withOneHalfWidth() else KeyViewModel(row.key.toMessage),
                                 value = ValueViewModel(renderMessage(row.value)),
-                                actions = row.actions.map { a =>
-                                    ActionItemViewModel(Text(a.content.toMessage), a.href)
-                                            .withVisuallyHiddenText(a.visuallyHiddenContent.toMessage)
+                                actions = if (viewmodel.mode == ViewOnlyMode) Seq() else {
+                                    row.actions.map { a =>
+                                        ActionItemViewModel(Text(a.content.toMessage), a.href).withVisuallyHiddenText(a.visuallyHiddenContent.toMessage)
+                                    }
                                 }
                             )
                         }
@@ -64,9 +82,12 @@
             @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
         }
 
-        @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
+        @formHelper(action = if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.onSubmit else viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
             @govukButton(
-                ButtonViewModel(renderMessage(viewmodel.buttonText))
+                if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty)
+                    ButtonViewModel(renderMessage(viewmodel.optViewOnlyDetails.get.buttonText))
+                else
+                    ButtonViewModel(renderMessage(viewmodel.buttonText))
             )
         }
     }

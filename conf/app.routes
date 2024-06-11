@@ -411,6 +411,10 @@ GET         /:srn/check-answers-financial-details                               
 POST        /:srn/submit-check-answers-financial-details                                controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-check-answers-financial-details                                controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-submit-check-answers-financial-details                         controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-submit-check-answers-financial-details                         controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = ViewOnlyMode)
+GET         /:srn/check-answers-financial-details/view/:year/:current/:previous         controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoadViewOnly(srn: Srn, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/check-answers-financial-details/previous/:year/:current/:previous     controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int)
+GET         /:srn/submit-check-answers-financial-details/view/:year/:current/:previous  controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
 
 GET         /:srn/how-much-unallocated-employer-contributions                           controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/how-much-unallocated-employer-contributions                           controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onSubmit(srn: Srn, mode: Mode = NormalMode)

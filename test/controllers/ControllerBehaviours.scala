@@ -44,11 +44,20 @@ trait ControllerBehaviours {
       bind[Navigator].qualifiedWith("non-sipp").toInstance(new FakeNavigator(onwardRoute))
     )
 
-  def renderView(call: => Call, userAnswers: UserAnswers = defaultUserAnswers)(
+  def renderView(
+    call: => Call,
+    userAnswers: UserAnswers = defaultUserAnswers,
+    pureUserAnswers: UserAnswers = defaultUserAnswers,
+    optPreviousAnswers: Option[UserAnswers] = None
+  )(
     view: Application => Request[_] => Html
   ): BehaviourTest =
     "return OK and the correct view".hasBehaviour {
-      val appBuilder = applicationBuilder(Some(userAnswers))
+      val appBuilder = applicationBuilder(
+        userAnswers = Some(userAnswers),
+        pureUserAnswers = Some(pureUserAnswers),
+        previousUserAnswers = optPreviousAnswers
+      )
       render(appBuilder, call)(view)
     }
 
@@ -114,7 +123,9 @@ trait ControllerBehaviours {
       val expectedView = view(app)(request)
 
       status(result) shouldMatchTo OK
-      contentAsString(result) shouldMatchTo expectedView.body
+      val x = contentAsString(result)
+      val y = expectedView.body
+      x shouldMatchTo y
     }
 
   def invalidForm(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
