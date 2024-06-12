@@ -18,6 +18,7 @@ package controllers.nonsipp
 
 import services.{PsrRetrievalService, SaveService}
 import com.google.inject.Inject
+import utils.nonsipp.TaskListStatusUtils.{getCompletedOrUpdatedTaskListStatus, getFinancialDetailsTaskListStatus}
 import config.Constants.COMPARE_PREVIOUS_PREFIX
 import controllers.actions._
 import pages.nonsipp.memberdetails.Paths.personalDetails
@@ -146,21 +147,6 @@ object ViewOnlyTaskListController {
 
   private def messageKey(prefix: String, suffix: String): String = s"$prefix.view.$suffix"
 
-  private def getCompletedOrUpdatedTaskListStatus(
-    currentUA: UserAnswers,
-    previousUA: UserAnswers,
-    path: JsPath,
-    toExclude: Option[String] = None
-  ): TaskListStatus = {
-    val c = currentUA.get(path).getOrElse(JsObject.empty).as[JsObject] - toExclude.getOrElse("")
-    val p = previousUA.get(path).getOrElse(JsObject.empty).as[JsObject] - toExclude.getOrElse("")
-    if (c == p) {
-      Completed
-    } else {
-      Updated
-    }
-  }
-
 // TODO: implement lower-level journey navigation in future ticket - until then, Unauthorised page used for all links
 
 //--Scheme details----------------------------------------------------------------------------------------------------//
@@ -219,30 +205,14 @@ object ViewOnlyTaskListController {
     prefix: String,
     currentUA: UserAnswers,
     previousUA: UserAnswers
-  ): TaskListItemViewModel = {
-
-    val financialDetailsTaskListStatus =
-      if (currentUA.get(schemeDesignatory \ "totalAssetValue") ==
-          previousUA.get(schemeDesignatory \ "totalAssetValue")
-        &&
-        currentUA.get(schemeDesignatory \ "totalPayments") ==
-          previousUA.get(schemeDesignatory \ "totalPayments")
-        &&
-        currentUA.get(schemeDesignatory \ "totalCash") ==
-          previousUA.get(schemeDesignatory \ "totalCash")) {
-        Completed
-      } else {
-        Updated
-      }
-
+  ): TaskListItemViewModel =
     TaskListItemViewModel(
       LinkMessage(
         Message(messageKey(prefix, "finances.title"), schemeName),
         controllers.routes.UnauthorisedController.onPageLoad().url
       ),
-      financialDetailsTaskListStatus
+      getFinancialDetailsTaskListStatus(currentUA, previousUA)
     )
-  }
 
 //--Members-----------------------------------------------------------------------------------------------------------//
 

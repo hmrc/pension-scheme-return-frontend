@@ -22,10 +22,12 @@ import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
 import controllers.PSRController
+import utils.nonsipp.TaskListStatusUtils.getFinancialDetailsTaskListStatus
 import cats.implicits.toShow
 import controllers.actions._
 import navigation.Navigator
 import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
+import viewmodels.models.TaskListStatus.Updated
 import _root_.config.Refined.Max3
 import cats.data.NonEmptyList
 import views.html.CheckYourAnswersView
@@ -37,7 +39,7 @@ import viewmodels.Margin
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
@@ -69,7 +71,12 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
               valueOfAssetsPage,
               feesCommissionsWagesSalariesPage,
               periods,
-              request.schemeDetails
+              request.schemeDetails,
+              if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+                getFinancialDetailsTaskListStatus(request.userAnswers, request.previousUserAnswers.get) == Updated
+              } else {
+                false
+              }
             )
           )
         )
@@ -78,17 +85,34 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    psrSubmissionService
-      .submitPsrDetails(
-        srn,
-        fallbackCall = controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
-          .onPageLoad(srn, NormalMode)
+    mode match {
+      case ViewOnlyMode =>
+        //TODO revert mongodb collections to the latest version
+        Future.successful(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
+      case _ =>
+        psrSubmissionService
+          .submitPsrDetails(
+            srn,
+            fallbackCall = controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+              .onPageLoad(srn, NormalMode)
+          )
+          .map {
+            case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            case Some(_) =>
+              Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+          }
+    }
+  }
+
+  def onPrevious(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    // TODO: shift mongo collections ()
+    // and redirect to onPageLoad of this same page
+    Future.successful(
+      Redirect(
+        controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+          .onPageLoad(srn, ViewOnlyMode)
       )
-      .map {
-        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        case Some(_) =>
-          Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
-      }
+    )
   }
 }
 
@@ -100,9 +124,11 @@ object FinancialDetailsCheckYourAnswersController {
     valueOfAssetsPage: Option[MoneyInPeriod],
     feesCommissionsWagesSalariesPage: Option[Money],
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
-    schemeDetails: SchemeDetails
+    schemeDetails: SchemeDetails,
+    viewOnlyUpdated: Boolean
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
+      mode = mode,
       title = "financialDetailsCheckYourAnswersController.title",
       heading = "financialDetailsCheckYourAnswersController.heading",
       description = None,
@@ -120,7 +146,28 @@ object FinancialDetailsCheckYourAnswersController {
       refresh = None,
       buttonText = "site.saveAndContinue",
       onSubmit =
-        controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController.onSubmit(srn, mode)
+        controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController.onSubmit(srn, mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = Some(
+              LinkMessage(
+                "financialDetailsCheckYourAnswersController.viewOnly.link",
+                controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+                  .onPrevious(srn)
+                  .url
+              )
+            ),
+            submittedText = Some("Submitted on 26 July 2022"), // TODO
+            title = "financialDetailsCheckYourAnswersController.viewOnly.title",
+            heading = "financialDetailsCheckYourAnswersController.viewOnly.heading",
+            buttonText = "site.continue"
+          )
+        )
+      } else {
+        None
+      }
     )
 
   private def sections(

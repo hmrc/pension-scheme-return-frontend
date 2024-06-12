@@ -17,6 +17,7 @@
 package controllers.actions
 
 import play.api.mvc.ActionTransformer
+import config.Constants.{COMPARE_PREVIOUS_PREFIX, UNCHANGED_SESSION_PREFIX}
 import repositories.SessionRepository
 import models.requests.{AllowedAccessRequest, OptionalDataRequest}
 
@@ -31,7 +32,11 @@ class DataRetrievalActionImpl @Inject()(
 
   override protected def transform[A](request: AllowedAccessRequest[A]): Future[OptionalDataRequest[A]] = {
     val userAnswersKey = request.getUserId + request.srn
-    sessionRepository.get(userAnswersKey).map(OptionalDataRequest(request, _))
+    for {
+      ua <- sessionRepository.get(userAnswersKey)
+      pureUa <- sessionRepository.get(UNCHANGED_SESSION_PREFIX + userAnswersKey)
+      previousUa <- sessionRepository.get(COMPARE_PREVIOUS_PREFIX + userAnswersKey)
+    } yield OptionalDataRequest(request, ua, pureUa, previousUa)
   }
 }
 

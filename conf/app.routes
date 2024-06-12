@@ -411,6 +411,9 @@ GET         /:srn/check-answers-financial-details                               
 POST        /:srn/submit-check-answers-financial-details                                controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-check-answers-financial-details                                controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-submit-check-answers-financial-details                         controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/view-check-answers-financial-details                                  controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = ViewOnlyMode)
+POST        /:srn/submit-view-check-answers-financial-details                           controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = ViewOnlyMode)
+GET         /:srn/previous-view-check-answers-financial-details                         controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPrevious(srn: Srn, mode: Mode = ViewOnlyMode)
 
 GET         /:srn/how-much-unallocated-employer-contributions                           controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/how-much-unallocated-employer-contributions                           controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onSubmit(srn: Srn, mode: Mode = NormalMode)

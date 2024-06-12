@@ -59,7 +59,8 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
           valueOfAssetsPage = None,
           feesCommissionsWagesSalariesPage = None,
           Left(dateRange),
-          defaultSchemeDetails
+          defaultSchemeDetails,
+          false
         )
       )
     }.before(mockTaxYear(dateRange)))
