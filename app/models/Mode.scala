@@ -33,12 +33,9 @@ sealed trait Mode {
   }
 }
 
-case object CheckMode extends Mode {
-}
-case object NormalMode extends Mode {
-}
-case object ViewOnlyMode extends Mode {
-}
+case object CheckMode extends Mode
+case object NormalMode extends Mode
+case object ViewOnlyMode extends Mode
 
 object Mode {
 

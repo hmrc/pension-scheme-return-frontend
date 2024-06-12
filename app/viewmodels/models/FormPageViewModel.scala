@@ -17,6 +17,7 @@
 package viewmodels.models
 
 import play.api.mvc.Call
+import models.{Mode, NormalMode}
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{InlineMessage, Message}
 
@@ -28,7 +29,9 @@ case class FormPageViewModel[+A](
   refresh: Option[Int],
   buttonText: Message,
   details: Option[FurtherDetailsViewModel] = None,
-  onSubmit: Call
+  onSubmit: Call,
+  mode: Mode = NormalMode,
+  optViewOnlyDetails: Option[ViewOnlyDetailsViewModel] = None
 ) {
 
   def withDescription(message: Option[DisplayMessage]): FormPageViewModel[A] =
@@ -42,6 +45,9 @@ case class FormPageViewModel[+A](
 
   def withButtonText(message: Message): FormPageViewModel[A] =
     copy(buttonText = message)
+
+  def withViewOnlyDetails(viewOnlyDetailsViewModel: ViewOnlyDetailsViewModel): FormPageViewModel[A] =
+    copy(optViewOnlyDetails = Some(viewOnlyDetailsViewModel))
 }
 
 object FormPageViewModel {
