@@ -233,24 +233,34 @@ class MemberPaymentsTransformer @Inject()(
             memberPayments.pensionReceived
           )
       )
-      
-      ua3_2 <- ua3_1
-        .set(
-          EmployerContributionsPage(srn),
-          // If 1 or more Employer Contributions have been made, then this answer must be set to true / Yes, even if the
-          // value in ETMP is false - this is used as a workaround to indicate the section is In Progress.
-          if (memberPayments.memberDetails.exists(_.employerContributions.nonEmpty)) true
-          else memberPayments.employerContributionsDetails.made
-        )
-        .set(
-          EmployerContributionsSectionStatus(srn),
-          if (memberPayments.employerContributionsDetails.completed) SectionStatus.Completed
-          else SectionStatus.InProgress
-        )
-        .set(
-          EmployerContributionsMemberListPage(srn),
-          memberPayments.employerContributionsDetails.completed
-        )
+
+      employerContributionsNotStarted = (
+        !memberPayments.employerContributionsDetails.made
+          && memberPayments.memberDetails.forall(_.employerContributions.isEmpty)
+          && !memberPayments.employerContributionsDetails.completed
+      )
+
+      ua3_2 <- employerContributionsNotStarted match {
+        case true => ua3_1
+        case false =>
+          ua3_1
+            .set(
+              EmployerContributionsPage(srn),
+              // If 1 or more Employer Contributions have been made, then this answer must be set to true / Yes, even if
+              // the value in ETMP is false - this is used as a workaround to indicate the section is In Progress.
+              if (memberPayments.memberDetails.exists(_.employerContributions.nonEmpty)) true
+              else memberPayments.employerContributionsDetails.made
+            )
+            .set(
+              EmployerContributionsSectionStatus(srn),
+              if (memberPayments.employerContributionsDetails.completed) SectionStatus.Completed
+              else SectionStatus.InProgress
+            )
+            .set(
+              EmployerContributionsMemberListPage(srn), // todo: ...maybe don't set this at all?
+              memberPayments.employerContributionsDetails.completed
+            )
+      }
 
       emptyTotalContributionNotExist = !memberPayments.memberDetails.exists(_.totalContributions.isEmpty)
       ua4 <- ua3_2.set(MemberContributionsListPage(srn), emptyTotalContributionNotExist)
