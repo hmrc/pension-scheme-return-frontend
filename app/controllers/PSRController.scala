@@ -174,5 +174,10 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
 
     def removeWhen(bool: UserAnswers => Boolean)(page: Removable[_]*): Try[UserAnswers] =
       userAnswers.flatMap(ua => ua.removeWhen(bool(ua))(page: _*))
+
+    def when(
+      get: UserAnswers => Option[Boolean]
+    )(ifTrue: UserAnswers => Try[UserAnswers], ifFalse: UserAnswers => Try[UserAnswers]): Try[UserAnswers] =
+      userAnswers.flatMap(ua => ua.when(get)(ifTrue, ifFalse))
   }
 }

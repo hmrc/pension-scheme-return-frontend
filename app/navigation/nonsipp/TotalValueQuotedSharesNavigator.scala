@@ -20,7 +20,7 @@ import pages.nonsipp.totalvaluequotedshares._
 import play.api.mvc.Call
 import pages.Page
 import navigation.JourneyNavigator
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 
 object TotalValueQuotedSharesNavigator extends JourneyNavigator {
 
@@ -39,6 +39,14 @@ object TotalValueQuotedSharesNavigator extends JourneyNavigator {
     case TotalValueQuotedSharesCYAPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
+    case RemoveTotalValueQuotedSharesPage(srn) =>
+      if (userAnswers.get(TotalValueQuotedSharesPage(srn)).isEmpty) {
+        controllers.nonsipp.totalvaluequotedshares.routes.QuotedSharesManagedFundsHeldController
+          .onPageLoad(srn, NormalMode)
+      } else {
+        controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
+          .onPageLoad(srn)
+      }
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =

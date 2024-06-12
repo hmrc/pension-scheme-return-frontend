@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.receivetransfer
 
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import controllers.nonsipp.receivetransfer.TotalValueTransferController._
 import config.Refined._
 import controllers.ControllerBaseSpec
@@ -25,6 +25,7 @@ import pages.nonsipp.receivetransfer.{TotalValueTransferPage, TransferringScheme
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
+import viewmodels.models.SectionCompleted
 
 class TotalValueTransferControllerSpec extends ControllerBaseSpec {
 
@@ -32,6 +33,7 @@ class TotalValueTransferControllerSpec extends ControllerBaseSpec {
   private val secondaryIndex = refineMV[Max5.Refined](1)
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
     .unsafeSet(TransferringSchemeNamePage(srn, index, secondaryIndex), transferringSchemeName)
 
   private lazy val onPageLoad =

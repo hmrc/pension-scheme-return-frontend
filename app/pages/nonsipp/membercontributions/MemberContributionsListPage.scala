@@ -22,7 +22,7 @@ import play.api.libs.json.JsPath
 
 case class MemberContributionsListPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = Paths.membersPayments \ toString
 
   override def toString: String = "memberContributionsListPage"
 }

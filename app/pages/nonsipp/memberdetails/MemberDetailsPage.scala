@@ -18,12 +18,14 @@ package pages.nonsipp.memberdetails
 
 import utils.RefinedUtils.RefinedIntOps
 import pages.nonsipp.employercontributions.{Paths => _}
+import play.api.mvc.Result
 import models.SchemeId.Srn
 import pages.nonsipp.receivetransfer.{Paths => _}
 import play.api.libs.json.JsPath
 import pages.nonsipp.membersurrenderedbenefits.{Paths => _}
 import models.{NameDOB, UserAnswers}
 import pages.nonsipp.membertransferout.{Paths => _}
+import play.api.mvc.Results.Redirect
 import config.Refined.Max300
 import pages.{IndexedQuestionPage, QuestionPage}
 
@@ -48,5 +50,27 @@ object MembersDetailsPage {
 
   implicit class MembersDetailsOps(ua: UserAnswers) {
     def membersDetails(srn: Srn): Map[String, NameDOB] = ua.map(MembersDetailsPages(srn))
+
+    def membersOptionList(srn: Srn): List[Option[NameDOB]] = {
+      val completedMembers = ua.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty)
+      val memberMap = ua.map(MembersDetailsPages(srn))
+      val completedMembersDetails = completedMembers.keySet
+        .intersect(memberMap.keySet)
+        .map(k => k -> memberMap(k))
+        .toMap
+      val maxIndex: Either[Result, Int] = completedMembersDetails.keys
+        .map(_.toInt)
+        .maxOption
+        .map(Right(_))
+        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+
+      maxIndex match {
+        case Right(index) =>
+          (0 to index).toList.map { index =>
+            completedMembersDetails.get(index.toString)
+          }
+        case Left(_) => List.empty
+      }
+    }
   }
 }

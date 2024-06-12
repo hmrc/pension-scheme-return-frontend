@@ -25,8 +25,6 @@ import viewmodels.models.{SectionCompleted, SectionStatus}
 import models.requests.psr._
 import models.UserAnswers.implicits.UserAnswersTryOps
 
-import scala.util.Try
-
 import javax.inject.Inject
 
 @Singleton()
@@ -43,41 +41,30 @@ class PensionSurrenderTransformer @Inject() extends Transformer {
       surrenderReason = surrenderReason
     )
 
+  // Save member specific answers
   def transformFromEtmp(
     srn: Srn,
     index: Max300,
-    optPensionSurrender: Option[SurrenderedBenefits],
+    pensionSurrender: SurrenderedBenefits
+  ): List[UserAnswers.Compose] =
+    List[UserAnswers.Compose](
+      _.set(SurrenderedBenefitsCompletedPage(srn, index), SectionCompleted),
+      _.set(SurrenderedBenefitsAmountPage(srn, index), Money(pensionSurrender.totalSurrendered)),
+      _.set(WhenDidMemberSurrenderBenefitsPage(srn, index), pensionSurrender.dateOfSurrender),
+      _.set(WhyDidMemberSurrenderBenefitsPage(srn, index), pensionSurrender.surrenderReason)
+    )
+
+  // Save section wide answers
+  def transformFromEtmp(
+    srn: Srn,
     pensionSurrenderDetails: SectionDetails
-  ): List[Try[UserAnswers] => Try[UserAnswers]] =
-    optPensionSurrender.fold(
-      List[Try[UserAnswers] => Try[UserAnswers]](
-        _.set(SurrenderedBenefitsPage(srn), pensionSurrenderDetails.made),
-        _.set(SurrenderedBenefitsCompletedPage(srn, index), SectionCompleted),
-        _.set(
-          SurrenderedBenefitsJourneyStatus(srn),
-          (pensionSurrenderDetails.made, pensionSurrenderDetails.completed) match {
-            case (false, _) => SectionStatus.Completed
-            case (true, _) if pensionSurrenderDetails.completed => SectionStatus.Completed
-            case (true, _) if !pensionSurrenderDetails.completed => SectionStatus.InProgress
-          }
-        )
-      )
-    ) { pensionSurrender =>
-      List[Try[UserAnswers] => Try[UserAnswers]](
-        _.set(SurrenderedBenefitsCompletedPage(srn, index), SectionCompleted),
-        _.set(
-          SurrenderedBenefitsJourneyStatus(srn),
-          (pensionSurrenderDetails.made, pensionSurrenderDetails.completed) match {
-            case (false, _) => SectionStatus.Completed
-            case (true, _) if pensionSurrenderDetails.completed => SectionStatus.Completed
-            case (true, _) if !pensionSurrenderDetails.completed => SectionStatus.InProgress
-          }
-        ),
-        _.set(SurrenderedBenefitsMemberListPage(srn), pensionSurrenderDetails.completed),
-        _.set(SurrenderedBenefitsPage(srn), pensionSurrenderDetails.made),
-        _.set(SurrenderedBenefitsAmountPage(srn, index), Money(pensionSurrender.totalSurrendered)),
-        _.set(WhenDidMemberSurrenderBenefitsPage(srn, index), pensionSurrender.dateOfSurrender),
-        _.set(WhyDidMemberSurrenderBenefitsPage(srn, index), pensionSurrender.surrenderReason)
-      )
-    }
+  ): List[UserAnswers.Compose] =
+    List[UserAnswers.Compose](
+      _.setWhen(pensionSurrenderDetails.completed)(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.Completed),
+      _.setWhen(pensionSurrenderDetails.started)(
+        SurrenderedBenefitsMemberListPage(srn),
+        pensionSurrenderDetails.completed
+      ),
+      _.setWhen(pensionSurrenderDetails.started)(SurrenderedBenefitsPage(srn), pensionSurrenderDetails.made)
+    )
 }

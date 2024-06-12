@@ -20,15 +20,15 @@ import utils.PageUtils
 import queries.Removable
 import pages.QuestionPage
 import models.SchemeId.Srn
+import pages.nonsipp.memberpensionpayments.Paths.membersPayments
 import play.api.libs.json.JsPath
 import models.UserAnswers
-import pages.nonsipp.memberpayments.MemberPaymentsPage
 
 import scala.util.Try
 
 case class PensionPaymentsReceivedPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = MemberPaymentsPage.path \ toString
+  override def path: JsPath = membersPayments \ toString
 
   override def toString: String = "pensionReceived"
 
@@ -39,5 +39,5 @@ case class PensionPaymentsReceivedPage(srn: Srn) extends QuestionPage[Boolean] {
     }
 
   private def pages(srn: Srn): List[Removable[_]] =
-    List(AllTotalAmountPensionPaymentsPages(srn))
+    List(TotalAmountPensionPaymentsPage.all(srn))
 }

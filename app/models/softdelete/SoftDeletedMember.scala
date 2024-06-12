@@ -21,6 +21,7 @@ import play.api.libs.json.{Format, Json}
 import models._
 
 case class SoftDeletedMember(
+  memberPSRVersion: Option[String],
   memberDetails: MemberPersonalDetails,
   employerContributions: List[EmployerContributions],
   transfersIn: List[TransfersIn],

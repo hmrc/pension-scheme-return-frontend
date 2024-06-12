@@ -32,7 +32,7 @@ case class TotalMemberContributionPage(srn: Srn, index: Max300) extends Question
 
 }
 
-case class AllTotalMemberContributionPages(srn: Srn) extends IndexedQuestionPage[QuestionPage[Money]] {
+case class AllTotalMemberContributionPages(srn: Srn) extends IndexedQuestionPage[Money] {
 
   override def path: JsPath =
     Paths.memberDetails \ toString

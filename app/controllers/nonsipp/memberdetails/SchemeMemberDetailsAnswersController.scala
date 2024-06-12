@@ -67,7 +67,11 @@ class SchemeMemberDetailsAnswersController @Inject()(
   def onSubmit(srn: Srn, index: Max300, checkOrChange: CheckOrChange): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
-        updatedUserAnswers <- Future.fromTry(request.userAnswers.set(MemberStatus(srn, index), MemberState.Active))
+        updatedUserAnswers <- Future.fromTry(
+          request.userAnswers
+            .set(MemberStatus(srn, index), MemberState.Active)
+            .set(MemberDetailsCompletedPage(srn, index), SectionCompleted)
+        )
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
           srn,

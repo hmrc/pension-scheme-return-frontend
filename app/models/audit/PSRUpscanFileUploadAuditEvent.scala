@@ -40,7 +40,7 @@ case class PSRUpscanFileUploadAuditEvent(
       "PensionSchemeTaxReference" -> schemeTaxReference,
       "AffinityGroup" -> affinityGroup,
       "CredentialRole(PSA/PSP)" -> credentialRole,
-      "TaxYear" -> s"${taxYear.from.getYear}-${taxYear.to.getYear}"
+      "TaxYear" -> taxYear.toYearFormat
     )
 
     val outcomeMap = outcome match {

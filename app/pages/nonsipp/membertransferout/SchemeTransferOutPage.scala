@@ -19,11 +19,11 @@ package pages.nonsipp.membertransferout
 import pages.QuestionPage
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import pages.nonsipp.memberpayments.MemberPaymentsPage
+import pages.nonsipp.membertransferout.Paths.membersPayments
 
 case class SchemeTransferOutPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = MemberPaymentsPage.path \ toString
+  override def path: JsPath = membersPayments \ toString
 
   override def toString: String = "schemeMadeTransferOut"
 }

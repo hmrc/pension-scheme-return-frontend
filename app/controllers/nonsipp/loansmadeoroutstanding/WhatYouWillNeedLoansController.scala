@@ -91,14 +91,6 @@ object WhatYouWillNeedLoansController {
             "whatYouWillNeedLoans.loansFor5"
           ) ++
           ParagraphMessage("whatYouWillNeedLoans.paragraph7") ++
-          ListMessage(
-            ListType.Bullet,
-            "whatYouWillNeedLoans.security"
-          ) ++
-          ParagraphMessage("whatYouWillNeedLoans.paragraph8") ++
-          ListMessage(
-            ListType.Bullet,
-            "whatYouWillNeedLoans.arrears"
-          )
+          ParagraphMessage("whatYouWillNeedLoans.paragraph8")
       )
 }

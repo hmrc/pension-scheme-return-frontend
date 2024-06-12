@@ -31,8 +31,8 @@ import pages.nonsipp.loansmadeoroutstanding._
 import viewmodels.models.{SectionCompleted, SectionStatus}
 import models.SponsoringOrConnectedParty.Sponsoring
 import pages.nonsipp.bonds._
-import pages.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldPage
-import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage, NoNINOPage}
+import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import pages.nonsipp.memberdetails._
 import org.scalatest.freespec.AnyFreeSpec
 import pages.nonsipp.membercontributions.{MemberContributionsListPage, MemberContributionsPage}
 import pages.nonsipp.memberreceivedpcls.{PclsMemberListPage, PensionCommencementLumpSumPage}
@@ -460,6 +460,11 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         .onPageLoad(srn, NormalMode)
         .url
 
+    val totalValueQuotedSharesCyaUrl =
+      controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
+        .onPageLoad(srn)
+        .url
+
     "should be Not Started" - {
       "when default data" in {
         val result = TaskListStatusUtils.getQuotedSharesTaskListStatusAndLink(defaultUserAnswers, srn)
@@ -469,9 +474,9 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     "should be Complete" - {
       "when TotalValueQuotedSharesPage is present" in {
         val customUserAnswers = defaultUserAnswers
-          .unsafeSet(QuotedSharesManagedFundsHeldPage(srn), true)
+          .unsafeSet(TotalValueQuotedSharesPage(srn), money)
         val result = TaskListStatusUtils.getQuotedSharesTaskListStatusAndLink(customUserAnswers, srn)
-        result mustBe (Completed, quotedSharesManagedFundsUrl)
+        result mustBe (Completed, totalValueQuotedSharesCyaUrl)
       }
     }
   }
@@ -697,7 +702,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           defaultUserAnswers
             .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
             .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-            .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason),
+            .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
+            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted),
           srn
         )
         result mustBe (NotStarted, wereContributions)
@@ -753,7 +759,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           defaultUserAnswers
             .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
             .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-            .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason),
+            .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
+            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted),
           srn
         )
         result mustBe (NotStarted, wereTransfersIn)
@@ -809,7 +816,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           defaultUserAnswers
             .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
             .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-            .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason),
+            .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
+            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted),
           srn
         )
         result mustBe (NotStarted, wereTransfersOut)
@@ -865,7 +873,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           defaultUserAnswers
             .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
             .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-            .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason),
+            .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
+            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted),
           srn
         )
         result mustBe (NotStarted, wereSurrenderedBenefits)
@@ -912,6 +921,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
       .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
       .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
+      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
     "should be Unable to start" - {
       "when default data" in {
@@ -968,6 +978,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
       .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
       .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
+      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
     "should be Unable to start" - {
       "when default data" in {
@@ -1024,6 +1035,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
       .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
       .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
+      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
     "should be Unable to start" - {
       "when default data" in {

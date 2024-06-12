@@ -17,9 +17,9 @@
 package controllers.nonsipp.memberreceivedpcls
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.memberdetails.MembersDetailsPages
 import play.api.mvc._
 import com.google.inject.Inject
+import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.OneTo300
 import controllers.PSRController
 import config.Constants
@@ -60,24 +60,7 @@ class PclsMemberListController @Inject()(
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       val ua = request.userAnswers
-      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
-      val maxIndex: Either[Result, Int] = memberMap.keys
-        .map(_.toInt)
-        .maxOption
-        .map(Right(_))
-        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-
-      val optionList: List[Option[NameDOB]] = maxIndex match {
-        case Right(index) =>
-          (0 to index).toList.map { index =>
-            val memberOption = memberMap.get(index.toString)
-            memberOption match {
-              case Some(member) => Some(member)
-              case None => None
-            }
-          }
-        case Left(_) => List.empty
-      }
+      val optionList: List[Option[NameDOB]] = ua.membersOptionList(srn)
 
       if (optionList.flatten.nonEmpty) {
         val viewModel = PclsMemberListController
@@ -93,25 +76,7 @@ class PclsMemberListController @Inject()(
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val ua = request.userAnswers
-
-      val memberMap = request.userAnswers.map(MembersDetailsPages(srn))
-      val maxIndex: Either[Result, Int] = memberMap.keys
-        .map(_.toInt)
-        .maxOption
-        .map(Right(_))
-        .getOrElse(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-
-      val optionList: List[Option[NameDOB]] = maxIndex match {
-        case Right(index) =>
-          (0 to index).toList.map { index =>
-            val memberOption = memberMap.get(index.toString)
-            memberOption match {
-              case Some(member) => Some(member)
-              case None => None
-            }
-          }
-        case Left(_) => List.empty
-      }
+      val optionList: List[Option[NameDOB]] = ua.membersOptionList(srn)
 
       if (optionList.flatten.size > Constants.maxSchemeMembers) {
         Future.successful(
@@ -221,7 +186,8 @@ object PclsMemberListController {
                   ),
                   TableElem.add(
                     controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
-                      .onSubmit(srn, nextIndex, NormalMode)
+                      .onSubmit(srn, nextIndex, NormalMode),
+                    Message("pcls.memberList.add.hidden.text", memberName.fullName)
                   ),
                   TableElem.empty
                 )
@@ -235,11 +201,13 @@ object PclsMemberListController {
                   ),
                   TableElem.change(
                     controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
-                      .onSubmit(srn, nextIndex, CheckMode)
+                      .onSubmit(srn, nextIndex, CheckMode),
+                    Message("pcls.memberList.change.hidden.text", memberName.fullName)
                   ),
                   TableElem.remove(
                     controllers.nonsipp.memberreceivedpcls.routes.RemovePclsController
-                      .onSubmit(srn, nextIndex)
+                      .onSubmit(srn, nextIndex),
+                    Message("pcls.memberList.remove.hidden.text", memberName.fullName)
                   )
                 )
               }

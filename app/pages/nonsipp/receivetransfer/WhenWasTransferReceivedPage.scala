@@ -20,20 +20,14 @@ import utils.RefinedUtils._
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import config.Refined._
-import pages.{IndexedQuestionPage, QuestionPage}
+import pages.QuestionPage
 
 import java.time.LocalDate
 
 case class WhenWasTransferReceivedPage(srn: Srn, index: Max300, secondaryIndex: Max5) extends QuestionPage[LocalDate] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
-
-  override def toString: String = "dateOfTransfer"
-}
-
-case class AllWhenWasTransferMadePages(srn: Srn) extends IndexedQuestionPage[Map[String, LocalDate]] {
-
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath =
+    Paths.memberTransfersIn \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
   override def toString: String = "dateOfTransfer"
 }

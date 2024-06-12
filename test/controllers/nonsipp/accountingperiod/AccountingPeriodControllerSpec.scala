@@ -21,11 +21,10 @@ import org.mockito.Mockito.reset
 import controllers.ControllerBaseSpec
 import views.html.DateRangeView
 import eu.timepit.refined.refineMV
-import pages.nonsipp.accountingperiod.AccountingPeriodPage
+import pages.nonsipp.accountingperiod.{AccountingPeriodPage, Paths}
+import pages.nonsipp.WhichTaxYearPage
 import forms.DateRangeFormProvider
 import models.NormalMode
-import pages.nonsipp.WhichTaxYearPage
-import play.api.libs.json.JsPath
 
 class AccountingPeriodControllerSpec extends ControllerBaseSpec {
 
@@ -69,7 +68,12 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
 
     "allow accounting period to be updated" - {
       act.like(
-        saveAndContinue(onSubmit, userAnswers, Some(JsPath \ "accountingPeriods"), formData(form, dateRangeData): _*)
+        saveAndContinue(
+          onSubmit,
+          userAnswers,
+          Some(Paths.accountingPeriodDetails \ "accountingPeriods"),
+          formData(form, dateRangeData): _*
+        )
       )
     }
 

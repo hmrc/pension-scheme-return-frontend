@@ -29,16 +29,17 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   val host: String = config.get[String]("host")
   val appName: String = config.get[String]("appName")
 
-  private val contactHost = config.get[String]("contact-frontend.host")
-  private val contactFormServiceIdentifier = "pension-scheme-return-frontend"
+  private val contactFormServiceIdentifier = config.get[String]("microservice.services.contact-frontend.serviceId")
+  private val betaFeedbackUrl = config.get[String]("microservice.services.contact-frontend.beta-feedback-url")
+  private val reportProblemUrl = config.get[String]("microservice.services.contact-frontend.report-problem-url")
 
   def feedbackUrl(implicit request: RequestHeader): String = {
     val redirectUrl: String =
       RedirectUrl(host + request.uri).get(OnlyRelative | AbsoluteWithHostnameFromAllowlist("localhost")).encodedUrl
-    s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=$redirectUrl"
+    s"$betaFeedbackUrl?service=$contactFormServiceIdentifier&backUrl=$redirectUrl"
   }
 
-  val reportAProblemUrl: String = s"$contactHost/contact/report-technical-problem?service=$contactFormServiceIdentifier"
+  def reportAProblemUrl: String = s"$reportProblemUrl?service=$contactFormServiceIdentifier"
 
   def languageMap: Map[String, Lang] = Map(
     "en" -> Lang("en"),
@@ -73,7 +74,10 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
     encryptedEmail: String,
     encryptedPsaId: String,
     encryptedPstr: String,
-    reportVersion: String
+    reportVersion: String,
+    encryptedSchemeName: String,
+    taxYear: String,
+    encryptedUserName: String
   ): String =
     s"${pensionSchemeReturn.baseUrl}${config
       .get[String](path = "urls.emailCallback")
@@ -83,7 +87,10 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
         encryptedEmail,
         encryptedPsaId,
         encryptedPstr,
-        reportVersion
+        reportVersion,
+        encryptedSchemeName,
+        taxYear,
+        encryptedUserName
       )}"
 
   object features {

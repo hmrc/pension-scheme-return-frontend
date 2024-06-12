@@ -23,6 +23,7 @@ import config.Refined.{Max5000, OneTo50, OneTo5000}
 import models.SchemeHoldShare.{Acquisition, Transfer}
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import eu.timepit.refined.refineV
+import pages.nonsipp.shares.Paths.shares
 import pages.nonsipp.sharesdisposal._
 import models._
 import pages.nonsipp.common._
@@ -46,12 +47,20 @@ class SharesTransformer @Inject() extends Transformer {
 
   def transformToEtmp(
     srn: Srn,
-    sharesDisposal: Boolean
-  )(implicit request: DataRequest[_]): Shares =
-    Shares(
-      optShareTransactions = buildOptShareTransactions(srn, sharesDisposal),
-      optTotalValueQuotedShares = buildOptQuotedShares(srn)
-    )
+    initialUA: UserAnswers
+  )(implicit request: DataRequest[_]): Option[Shares] = {
+    val optDidSchemeHoldAnyShares = request.userAnswers.get(DidSchemeHoldAnySharesPage(srn))
+    optDidSchemeHoldAnyShares.map { _ =>
+      val sharesDisposal = request.userAnswers.get(SharesDisposalPage(srn)).getOrElse(false)
+      Shares(
+        recordVersion = Option.when(request.userAnswers.get(shares) == initialUA.get(shares))(
+          request.userAnswers.get(SharesRecordVersionPage(srn)).get
+        ),
+        optShareTransactions = buildOptShareTransactions(srn, sharesDisposal),
+        optTotalValueQuotedShares = buildOptQuotedShares(srn)
+      )
+    }
+  }
 
   private def buildOptQuotedShares(srn: Srn)(implicit request: DataRequest[_]): Option[Double] = {
     val totalValueQuotedSharesPage = request.userAnswers.get(TotalValueQuotedSharesPage(srn))
@@ -64,9 +73,10 @@ class SharesTransformer @Inject() extends Transformer {
   )(implicit request: DataRequest[_]): Option[List[ShareTransaction]] =
     request.userAnswers
       .get(TypeOfSharesHeldPages(srn))
-      .map { jsValue =>
-        jsValue.keys.toList
-          .flatMap { key =>
+      .flatMap { jsValue =>
+        val keys = jsValue.keys.toList
+        Option.when(keys.nonEmpty)(
+          keys.flatMap { key =>
             key.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
               case None => None
               case Some(index) =>
@@ -80,9 +90,7 @@ class SharesTransformer @Inject() extends Transformer {
                   costOfShares <- request.userAnswers.get(CostOfSharesPage(srn, index))
                   supportedByIndepValuation <- request.userAnswers.get(SharesIndependentValuationPage(srn, index))
                   totalDividendsOrReceipts <- request.userAnswers.get(SharesTotalIncomePage(srn, index))
-
                 } yield {
-
                   val optDateOfAcqOrContrib = Option.when(schemeHoldShare != Transfer)(
                     request.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)).get
                   )
@@ -124,6 +132,7 @@ class SharesTransformer @Inject() extends Transformer {
                 }
             }
           }
+        )
       }
 
   private def buildOptAcquisitionRelatedDetails(
@@ -441,11 +450,14 @@ class SharesTransformer @Inject() extends Transformer {
     val userAnswersWithQuotedShares = shares.optTotalValueQuotedShares.fold(userAnswersOfShares)(
       totalValueQuotedShares => userAnswersOfShares.set(TotalValueQuotedSharesPage(srn), Money(totalValueQuotedShares))
     )
+    val userAnswersWithRecordVersion = shares.recordVersion.fold(userAnswersWithQuotedShares)(
+      recordVersion => userAnswersWithQuotedShares.set(SharesRecordVersionPage(srn), recordVersion)
+    )
 
-    shares.optShareTransactions.fold(userAnswersWithQuotedShares) { shareTransactions =>
+    shares.optShareTransactions.fold(userAnswersWithRecordVersion) { shareTransactions =>
       for {
         indexes <- buildIndexesForMax5000(shareTransactions.size)
-        resultUA <- indexes.foldLeft(userAnswersWithQuotedShares) {
+        resultUA <- indexes.foldLeft(userAnswersWithRecordVersion) {
           case (ua, index) =>
             val shareTransaction = shareTransactions(index.value - 1)
 

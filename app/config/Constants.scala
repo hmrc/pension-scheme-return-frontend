@@ -20,6 +20,8 @@ import java.time.LocalDate
 
 object Constants {
 
+  val UNCHANGED_SESSION_PREFIX = "pure_"
+
   val psaEnrolmentKey = "HMRC-PODS-ORG"
   val pspEnrolmentKey = "HMRC-PODSPP-ORG"
 

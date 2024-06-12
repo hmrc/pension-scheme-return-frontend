@@ -29,6 +29,7 @@ case class Assets(
 )
 
 case class LandOrProperty(
+  recordVersion: Option[String],
   landOrPropertyHeld: Boolean,
   disposeAnyLandOrProperty: Boolean,
   landOrPropertyTransactions: Seq[LandOrPropertyTransactions]
@@ -80,7 +81,7 @@ case class LeaseDetails(
   connectedPartyStatus: Boolean
 )
 
-case class Borrowing(moneyWasBorrowed: Boolean, moneyBorrowed: Seq[MoneyBorrowed])
+case class Borrowing(recordVersion: Option[String], moneyWasBorrowed: Boolean, moneyBorrowed: Seq[MoneyBorrowed])
 
 case class MoneyBorrowed(
   dateOfBorrow: LocalDate,
@@ -93,6 +94,7 @@ case class MoneyBorrowed(
 )
 
 case class Bonds(
+  recordVersion: Option[String],
   bondsWereAdded: Boolean,
   bondsWereDisposed: Boolean,
   bondTransactions: Seq[BondTransactions]
@@ -120,6 +122,7 @@ case class BondDisposed(
 )
 
 case class OtherAssets(
+  recordVersion: Option[String],
   otherAssetsWereHeld: Boolean,
   otherAssetsWereDisposed: Boolean,
   otherAssetTransactions: Seq[OtherAssetTransaction]

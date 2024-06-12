@@ -47,32 +47,132 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
   private val transformer = new SharesTransformer
 
   "SharesTransformer - To Etmp" - {
-    "should return None values when userAnswer is empty" in {
 
-      val result = transformer.transformToEtmp(srn = srn, sharesDisposal = false)
-      result.optShareTransactions mustBe None
-      result.optTotalValueQuotedShares mustBe None
+    "should return None when userAnswer is empty" in {
+      val result = transformer.transformToEtmp(srn = srn, initialUA = defaultUserAnswers)
+      result mustBe None
     }
 
-    "should return Quoted share value when quoted share is in userAnswers" in {
+    "should omit Record Version when there is a change in userAnswers" in {
       val userAnswers = emptyUserAnswers
-        .unsafeSet(TotalValueQuotedSharesPage(srn), money)
+        .unsafeSet(DidSchemeHoldAnySharesPage(srn), false)
+        .unsafeSet(SharesRecordVersionPage(srn), "001")
 
-      val request = DataRequest(allowedAccessRequest, userAnswers)
-      val result = transformer.transformToEtmp(srn = srn, sharesDisposal = false)(request)
-      result mustBe Shares(optShareTransactions = None, optTotalValueQuotedShares = Some(money.value))
+      val initialUserAnswer = emptyUserAnswers
+        .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+        .unsafeSet(SharesRecordVersionPage(srn), "001")
+
+      val result =
+        transformer.transformToEtmp(srn = srn, initialUserAnswer)(DataRequest(allowedAccessRequest, userAnswers))
+      result mustBe Some(Shares(None, None, None))
+    }
+
+    "should return recordVersion when there is no change among UAs" - {
+
+      "should return Quoted Share when quoted share is in userAnswers" in {
+        val userAnswers = emptyUserAnswers
+          .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+          .unsafeSet(TotalValueQuotedSharesPage(srn), money)
+          .unsafeSet(SharesRecordVersionPage(srn), "001")
+
+        val result = transformer.transformToEtmp(srn = srn, userAnswers)(DataRequest(allowedAccessRequest, userAnswers))
+        result mustBe Some(
+          Shares(
+            recordVersion = Some("001"),
+            optShareTransactions = None,
+            optTotalValueQuotedShares = Some(money.value)
+          )
+        )
+      }
+
+      "should return Quoted Share and Share Transactions when all of them are in userAnswers" in {
+        val userAnswers = emptyUserAnswers
+          .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+          .unsafeSet(TotalValueQuotedSharesPage(srn), money)
+          .unsafeSet(SharesRecordVersionPage(srn), "001")
+          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), Unquoted)
+          .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, refineMV(1)), Contribution)
+          .unsafeSet(CompanyNameRelatedSharesPage(srn, refineMV(1)), "nameOfSharesCompany")
+          .unsafeSet(SharesCompanyCrnPage(srn, refineMV(1)), ConditionalYesNo.no[String, Crn]("CRN-No-Reason"))
+          .unsafeSet(ClassOfSharesPage(srn, refineMV(1)), "classOfShares")
+          .unsafeSet(HowManySharesPage(srn, refineMV(1)), 123)
+          .unsafeSet(CostOfSharesPage(srn, refineMV(1)), money)
+          .unsafeSet(SharesIndependentValuationPage(srn, refineMV(1)), true)
+          .unsafeSet(SharesTotalIncomePage(srn, refineMV(1)), money)
+          .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, refineMV(1)), localDate)
+          .unsafeSet(SharesFromConnectedPartyPage(srn, refineMV(1)), false)
+          .unsafeSet(SharesDisposalPage(srn), true)
+          .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), Redeemed)
+          .unsafeSet(HowManyDisposalSharesPage(srn, refineMV(1), refineMV(1)), 123)
+          .unsafeSet(WhenWereSharesRedeemedPage(srn, refineMV(1), refineMV(1)), localDate)
+          .unsafeSet(HowManySharesRedeemedPage(srn, refineMV(1), refineMV(1)), 123)
+          .unsafeSet(TotalConsiderationSharesRedeemedPage(srn, refineMV(1), refineMV(1)), money)
+
+        val result = transformer.transformToEtmp(srn = srn, userAnswers)(DataRequest(allowedAccessRequest, userAnswers))
+        result mustBe Some(
+          Shares(
+            recordVersion = Some("001"),
+            optShareTransactions = Some(
+              List(
+                ShareTransaction(
+                  typeOfSharesHeld = Unquoted,
+                  shareIdentification = ShareIdentification(
+                    nameOfSharesCompany = "nameOfSharesCompany",
+                    optCrnNumber = None,
+                    optReasonNoCRN = Some("CRN-No-Reason"),
+                    classOfShares = "classOfShares"
+                  ),
+                  heldSharesTransaction = HeldSharesTransaction(
+                    schemeHoldShare = Contribution,
+                    optDateOfAcqOrContrib = Some(localDate),
+                    totalShares = 123,
+                    optAcquiredFromName = None,
+                    optPropertyAcquiredFrom = None,
+                    optConnectedPartyStatus = Some(false),
+                    costOfShares = money.value,
+                    supportedByIndepValuation = true,
+                    optTotalAssetValue = None,
+                    totalDividendsOrReceipts = money.value
+                  ),
+                  optDisposedSharesTransaction = Some(
+                    Seq(
+                      DisposedSharesTransaction(
+                        methodOfDisposal = Redeemed.name,
+                        optOtherMethod = None,
+                        optSalesQuestions = None,
+                        optRedemptionQuestions = Some(
+                          RedemptionQuestions(
+                            dateOfRedemption = localDate,
+                            noOfSharesRedeemed = 123,
+                            amountReceived = money.value
+                          )
+                        ),
+                        totalSharesNowHeld = 123
+                      )
+                    )
+                  )
+                )
+              )
+            ),
+            optTotalValueQuotedShares = Some(money.value)
+          )
+        )
+      }
     }
   }
 
   "SharesTransformer - From Etmp" - {
-    "when shareTransactionList None" in {
+    "when only recordVersion available" in {
       val userAnswers = emptyUserAnswers
       val result = transformer.transformFromEtmp(
         userAnswers,
         srn,
-        Shares(optShareTransactions = None, optTotalValueQuotedShares = None)
+        Shares(recordVersion = Some("001"), optShareTransactions = None, optTotalValueQuotedShares = None)
       )
-      result.fold(ex => fail(ex.getMessage), userAnswers => userAnswers mustBe userAnswers)
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => userAnswers.get(SharesRecordVersionPage(srn)) mustBe Some("001")
+      )
     }
 
     "when shareTransactionList not empty" in {
@@ -81,6 +181,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
         emptyUserAnswers,
         srn,
         Shares(
+          recordVersion = Some("001"),
           optShareTransactions = Some(
             List(
               ShareTransaction(
@@ -214,6 +315,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
       result.fold(
         ex => fail(ex.getMessage + "\n" + ex.getStackTrace.mkString("\n")),
         userAnswers => {
+          userAnswers.get(SharesRecordVersionPage(srn)) mustBe Some("001")
           userAnswers.get(DidSchemeHoldAnySharesPage(srn)) mustBe Some(true)
 
           // share-index-1

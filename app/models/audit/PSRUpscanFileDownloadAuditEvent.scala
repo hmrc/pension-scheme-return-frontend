@@ -39,7 +39,7 @@ case class PSRUpscanFileDownloadAuditEvent(
       "PensionSchemeTaxReference" -> schemeTaxReference,
       "AffinityGroup" -> affinityGroup,
       "CredentialRole(PSA/PSP)" -> credentialRole,
-      "TaxYear" -> s"${taxYear.from.getYear}-${taxYear.to.getYear}",
+      "TaxYear" -> taxYear.toYearFormat,
       "DownloadStatus" -> downloadStatus,
       "DownloadTime" -> downloadTimeInMilliSeconds.toString
     )

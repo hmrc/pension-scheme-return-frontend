@@ -22,7 +22,7 @@ import play.api.libs.json.JsPath
 
 case class WhyNoBankAccountPage(srn: Srn) extends QuestionPage[String] {
 
-  override def path: JsPath = SchemeDesignatoryPage.path \ toString
+  override def path: JsPath = Paths.schemeDesignatory \ toString
 
   override def toString: String = "reasonNoOpenAccount"
 }

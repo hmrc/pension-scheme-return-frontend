@@ -16,10 +16,10 @@
 
 package controllers.nonsipp
 
-import services.{PsrVersionsService, SchemeDateService}
+import services.PsrVersionsService
 import models.ConditionalYesNo._
-import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
-import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
+import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
+import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, OtherAssetsHeldPage}
 import controllers.ControllerBaseSpec
 import views.html.TaskListView
 import eu.timepit.refined.refineMV
@@ -33,11 +33,11 @@ import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.otherassetsdisposal._
 import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.memberdetails._
-import pages.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldPage
+import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
 import org.mockito.Mockito.when
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
-import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import play.api.inject
 import viewmodels.models.TaskListStatus.TaskListStatus
 import pages.nonsipp.common.IdentityTypePage
@@ -46,37 +46,34 @@ import scala.concurrent.Future
 
 class TaskListControllerSpec extends ControllerBaseSpec {
 
-  val schemeDateRange: DateRange = dateRangeGen.sample.value
   val pensionSchemeId: PensionSchemeId = pensionSchemeIdGen.sample.value
 
-  private val mockSchemeDateService = mock[SchemeDateService]
   private val mockPsrVersionsService = mock[PsrVersionsService]
 
   override val additionalBindings: List[GuiceableModule] =
     List(
-      inject.bind[SchemeDateService].toInstance(mockSchemeDateService),
       inject.bind[PsrVersionsService].toInstance(mockPsrVersionsService)
     )
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(schemeDateRange))
     when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(Future.successful(Seq()))
   }
 
   "TaskListController" - {
+    val populatedUserAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
 
     lazy val viewModel = TaskListController.viewModel(
       srn,
       schemeName,
-      schemeDateRange.from,
-      schemeDateRange.to,
+      dateRange.from,
+      dateRange.to,
       defaultUserAnswers,
       pensionSchemeId
     )
     lazy val onPageLoad = routes.TaskListController.onPageLoad(srn)
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
       val view = injected[TaskListView]
       view(viewModel)
     }.withName("task list renders OK"))
@@ -282,6 +279,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
         .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
         .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
+        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
       "notStarted" in {
         testViewModel(
@@ -594,9 +592,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
 
     "sharesDisposalSection" - {
 
-      "notStarted" in {
+      "notStarted and only visible with a share existing" in {
         testViewModel(
-          defaultUserAnswers,
+          defaultUserAnswers.unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted),
           4,
           1,
           expectedStatus = TaskListStatus.NotStarted,
@@ -608,8 +606,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "completed (with 'No' selection on first page)" in {
+      "completed (with 'No' selection on first page) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), false)
           .unsafeSet(SharesDisposalCompleted(srn), SectionCompleted)
 
@@ -626,8 +625,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "inProgress (with only 1 incomplete disposal)" in {
+      "inProgress (with only 1 incomplete disposal) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), true)
           // Shares 1 - Disposal 1 - Incomplete journey:
           .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Sold)
@@ -646,8 +646,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "inProgress (with 1 complete and 1 incomplete disposal)" in {
+      "inProgress (with 1 complete and 1 incomplete disposal) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), true)
           // Shares 1 - Disposal 1 - Complete journey:
           .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Transferred)
@@ -671,8 +672,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "completed (with only 1 complete disposal)" in {
+      "completed (with only 1 complete disposal) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), true)
           // Shares 1 - Disposal 1 - Complete journey:
           .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Transferred)
@@ -693,8 +695,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "notStarted (with removal of only complete disposal)" in {
+      "notStarted (with removal of only complete disposal) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), true)
           // Shares 1 - Disposal 1 - Complete journey:
           .unsafeSet(HowWereSharesDisposedPage(srn, refineMV(1), refineMV(1)), HowSharesDisposed.Transferred)
@@ -721,34 +724,36 @@ class TaskListControllerSpec extends ControllerBaseSpec {
     }
 
     "quotedSharesSection" - {
-      "notStarted" in {
+      "notStarted and only visible with shares answered" in {
         testViewModel(
-          defaultUserAnswers,
-          4,
-          2,
+          defaultUserAnswers.unsafeSet(DidSchemeHoldAnySharesPage(srn), true),
+          7,
+          0,
           expectedStatus = TaskListStatus.NotStarted,
-          expectedTitleKey = "nonsipp.tasklist.shares.title",
-          expectedLinkContentKey = "nonsipp.tasklist.shares.add.quotedshares.title",
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassets.add.quotedshares.title",
           expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.QuotedSharesManagedFundsHeldController
             .onPageLoad(srn, NormalMode)
             .url
         )
       }
 
-      "completed" in {
+      "completed and only visible with shares answered" in {
         val userAnswersWithData =
           defaultUserAnswers
             .unsafeSet(QuotedSharesManagedFundsHeldPage(srn), true)
+            .unsafeSet(TotalValueQuotedSharesPage(srn), money)
+            .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
 
         testViewModel(
           userAnswersWithData,
-          4,
-          2,
+          7,
+          0,
           expectedStatus = TaskListStatus.Completed,
-          expectedTitleKey = "nonsipp.tasklist.shares.title",
-          expectedLinkContentKey = "nonsipp.tasklist.shares.change.quotedshares.title",
-          expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.QuotedSharesManagedFundsHeldController
-            .onPageLoad(srn, NormalMode)
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassets.change.quotedshares.title",
+          expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
+            .onPageLoad(srn)
             .url
         )
       }
@@ -824,9 +829,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
 
     "otherAssetsDisposalSection" - {
 
-      "notStarted" in {
+      "notStarted and only visible with an asset existing" in {
         testViewModel(
-          defaultUserAnswers,
+          defaultUserAnswers.unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted),
           7,
           1,
           expectedStatus = TaskListStatus.NotStarted,
@@ -838,8 +843,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "completed (with 'No' selection on first page)" in {
+      "completed (with 'No' selection on first page) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(OtherAssetsDisposalPage(srn), false)
           .unsafeSet(OtherAssetsDisposalCompleted(srn), SectionCompleted)
 
@@ -856,8 +862,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "inProgress (with only 1 incomplete disposal)" in {
+      "inProgress (with only 1 incomplete disposal) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
           // Other Assets 1 - Disposal 1 - Incomplete journey:
           .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Sold)
@@ -876,8 +883,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "inProgress (with 1 complete and 1 incomplete disposal)" in {
+      "inProgress (with 1 complete and 1 incomplete disposal) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
           // Other Asset 1 - Disposal 1 - Complete journey:
           .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
@@ -901,8 +909,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "completed (with only 1 complete disposal)" in {
+      "completed (with only 1 complete disposal) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
           // Other Asset 1 - Disposal 1 - Complete journey:
           .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
@@ -923,8 +932,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "notStarted (with removal of only complete disposal)" in {
+      "notStarted (with removal of only complete disposal) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(OtherAssetsDisposalPage(srn), true)
           // Other Asset 1 - Disposal 1 - Complete journey:
           .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
@@ -963,8 +973,8 @@ class TaskListControllerSpec extends ControllerBaseSpec {
     val customViewModel = TaskListController.viewModel(
       srn,
       schemeName,
-      schemeDateRange.from,
-      schemeDateRange.to,
+      dateRange.from,
+      dateRange.to,
       userAnswersPopulated,
       pensionSchemeId
     )

@@ -104,6 +104,15 @@ final case class UserAnswers(
   def removeWhen(bool: UserAnswers => Boolean)(page: Removable[_]*): Try[UserAnswers] =
     if (bool(this)) page.foldLeft(Try(this))((ua, next) => ua.flatMap(_.removeOnly(next))) else Try(this)
 
+  def when(
+    get: UserAnswers => Option[Boolean]
+  )(ifTrue: UserAnswers => Try[UserAnswers], ifFalse: UserAnswers => Try[UserAnswers]): Try[UserAnswers] =
+    get(this) match {
+      case Some(true) => ifTrue(this)
+      case Some(false) => ifFalse(this)
+      case None => Try(this)
+    }
+
   def setOnly[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
     val updatedData = data.decryptedValue.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(jsValue, _) =>

@@ -25,7 +25,7 @@ import scala.util.{Success, Try}
 
 case class ActiveBankAccountPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = SchemeDesignatoryPage.path \ toString
+  override def path: JsPath = Paths.schemeDesignatory \ toString
 
   override def toString: String = "openBankAccount"
 

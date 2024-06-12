@@ -26,23 +26,27 @@ import java.time.LocalDate
 case class SectionDetails(
   made: Boolean,
   completed: Boolean
-)
+) {
+  val started: Boolean = !(!made && !completed)
+}
 
 case class MemberPayments(
+  recordVersion: Option[String],
   memberDetails: List[MemberDetails],
   employerContributionsDetails: SectionDetails,
   transfersInCompleted: Boolean,
   transfersOutCompleted: Boolean,
-  unallocatedContribsMade: Boolean,
+  unallocatedContribsMade: Option[Boolean],
   unallocatedContribAmount: Option[Double],
-  memberContributionMade: Boolean,
-  lumpSumReceived: Boolean,
-  pensionReceived: Boolean,
+  memberContributionMade: Option[Boolean],
+  lumpSumReceived: Option[Boolean],
+  pensionReceived: SectionDetails,
   benefitsSurrenderedDetails: SectionDetails
 )
 
 case class MemberDetails(
   state: MemberState,
+  memberPSRVersion: Option[String],
   personalDetails: MemberPersonalDetails,
   employerContributions: List[EmployerContributions],
   transfersIn: List[TransfersIn],

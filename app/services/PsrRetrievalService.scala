@@ -31,13 +31,10 @@ import javax.inject.Inject
 class PsrRetrievalService @Inject()(
   psrConnector: PSRConnector,
   minimalRequiredSubmissionTransformer: MinimalRequiredSubmissionTransformer,
-  loanTransactionsTransformer: LoanTransactionsTransformer,
-  landOrPropertyTransactionsTransformer: LandOrPropertyTransactionsTransformer,
-  moneyBorrowedTransformer: MoneyBorrowedTransformer,
+  loansTransformer: LoansTransformer,
   memberPaymentsTransformer: MemberPaymentsTransformer,
   sharesTransformer: SharesTransformer,
-  bondTransactionsTransformer: BondTransactionsTransformer,
-  otherAssetTransactionsTransformer: OtherAssetTransactionsTransformer,
+  assetsTransformer: AssetsTransformer,
   declarationTransformer: DeclarationTransformer
 ) {
 
@@ -78,7 +75,7 @@ class PsrRetrievalService @Inject()(
             transformedLoansUa <- psrDetails.loans
               .map(
                 loans =>
-                  loanTransactionsTransformer
+                  loansTransformer
                     .transformFromEtmp(
                       transformedMinimalUa,
                       srn,
@@ -87,76 +84,17 @@ class PsrRetrievalService @Inject()(
               )
               .getOrElse(Try(transformedMinimalUa))
 
-            transformedLandOrPropertyAssetsUa <- psrDetails.assets
+            transformedAssetsUa <- psrDetails.assets
               .map { assets =>
-                assets.optLandOrProperty
-                  .map(
-                    landOrProperty =>
-                      landOrPropertyTransactionsTransformer
-                        .transformFromEtmp(
-                          transformedLoansUa,
-                          srn,
-                          landOrProperty
-                        )
-                  )
-                  .getOrElse(Try(transformedLoansUa))
+                assetsTransformer.transformFromEtmp(transformedLoansUa, srn, assets)
               }
               .getOrElse(Try(transformedLoansUa))
 
-            transformedMoneyBorrowingAssetsUa <- psrDetails.assets
-              .map { asset =>
-                asset.optBorrowing
-                  .map(
-                    borrowing =>
-                      moneyBorrowedTransformer
-                        .transformFromEtmp(
-                          transformedLandOrPropertyAssetsUa,
-                          srn,
-                          borrowing
-                        )
-                  )
-                  .getOrElse(Try(transformedLandOrPropertyAssetsUa))
-              }
-              .getOrElse(Try(transformedLandOrPropertyAssetsUa))
-
-            transformedBondsAssetsUa <- psrDetails.assets
-              .map { asset =>
-                asset.optBonds
-                  .map(
-                    bonds =>
-                      bondTransactionsTransformer
-                        .transformFromEtmp(
-                          transformedMoneyBorrowingAssetsUa,
-                          srn,
-                          bonds
-                        )
-                  )
-                  .getOrElse(Try(transformedMoneyBorrowingAssetsUa))
-              }
-              .getOrElse(Try(transformedMoneyBorrowingAssetsUa))
-
-            transformedOtherAssetsUa <- psrDetails.assets
-              .map { asset =>
-                asset.optOtherAssets
-                  .map(
-                    otherAssets =>
-                      otherAssetTransactionsTransformer
-                        .transformFromEtmp(
-                          transformedBondsAssetsUa,
-                          srn,
-                          otherAssets
-                        )
-                  )
-                  .getOrElse(Try(transformedBondsAssetsUa))
-              }
-              .getOrElse(Try(transformedBondsAssetsUa))
-
             transformedMemberDetailsUa <- psrDetails.membersPayments
               .map(
-                memberPayments =>
-                  memberPaymentsTransformer.transformFromEtmp(transformedOtherAssetsUa, srn, memberPayments)
+                memberPayments => memberPaymentsTransformer.transformFromEtmp(transformedAssetsUa, srn, memberPayments)
               )
-              .getOrElse(Try(transformedOtherAssetsUa))
+              .getOrElse(Try(transformedAssetsUa))
 
             transformedSharesUa <- psrDetails.shares
               .map(sh => sharesTransformer.transformFromEtmp(transformedMemberDetailsUa, srn, sh))

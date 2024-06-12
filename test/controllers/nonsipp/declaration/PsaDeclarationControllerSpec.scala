@@ -17,27 +17,34 @@
 package controllers.nonsipp.declaration
 
 import services.{AuditService, PsrSubmissionService, SchemeDateService}
+import models.audit.PSRSubmissionEmailAuditEvent
 import connectors.EmailConnector
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.ContentPageView
-import org.scalatest.BeforeAndAfterEach
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import models.DateRange
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import pages.nonsipp.FbVersionPage
+import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.Future
 
-class PsaDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfterEach {
+import java.time.LocalDateTime
 
+class PsaDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfterEach {
+  private val populatedUserAnswers = {
+    defaultUserAnswers.unsafeSet(FbVersionPage(srn), version)
+  }
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
-  private implicit val mockEmailConnector = mock[EmailConnector]
+  private implicit val mockEmailConnector: EmailConnector = mock[EmailConnector]
   private val mockAuditService = mock[AuditService]
   private val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private val schemeDatePeriod: DateRange = dateRangeGen.sample.value
-  private val templateId = "pods_event_report_submitted" // TODO change as per PSR-1139
+  private val templateId = "pods_pension_scheme_return_submitted"
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
@@ -60,6 +67,8 @@ class PsaDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfte
 
     lazy val onPageLoad = routes.PsaDeclarationController.onPageLoad(srn)
     lazy val onSubmit = routes.PsaDeclarationController.onSubmit(srn)
+    lazy val emailAuditEventCaptor: ArgumentCaptor[PSRSubmissionEmailAuditEvent] =
+      ArgumentCaptor.forClass(classOf[PSRSubmissionEmailAuditEvent])
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[ContentPageView]
@@ -69,20 +78,23 @@ class PsaDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfte
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(
-      agreeAndContinue(onSubmit)
+      agreeAndContinue(onSubmit, populatedUserAnswers)
         .before({
           when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(schemeDatePeriod))
           when(mockSchemeDateService.returnPeriodsAsJsonString(any())(any())).thenReturn("")
           when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")
-          when(mockAuditService.sendEvent(any)(any(), any())).thenReturn(Future.successful(AuditResult.Success))
+          when(mockSchemeDateService.now()).thenReturn(LocalDateTime.now())
+          when(mockAuditService.sendEvent(emailAuditEventCaptor.capture())(any(), any()))
+            .thenReturn(Future.successful(AuditResult.Success))
           MockPSRSubmissionService.submitPsrDetails()
           MockEmailConnector.sendEmail(email, templateId)
         })
         .after({
           verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
           verify(mockEmailConnector, times(1))
-            .sendEmail(any(), any(), any(), any(), any(), any(), any(), any())(any(), any())
+            .sendEmail(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())(any(), any())
           verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+          emailAuditEventCaptor.getValue.schemeAdministratorOrPractitionerName mustEqual defaultMinimalDetails.individualDetails.get.fullName
         })
     )
 

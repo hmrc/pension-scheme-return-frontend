@@ -123,11 +123,21 @@ object MemberDetailsNavigator extends JourneyNavigator {
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
   }
 
-  private def routeMemberDetailsFirstManualPage(userAnswers: UserAnswers, srn: SchemeId.Srn) =
-    findNextOpenIndex[Max300.Refined](userAnswers.membersDetails(srn).keys.toList.map(_.toInt)) match {
-      case None => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
-      case Some(nextIndex) => routes.MemberDetailsController.onPageLoad(srn, nextIndex, NormalMode)
+  private def routeMemberDetailsFirstManualPage(userAnswers: UserAnswers, srn: SchemeId.Srn) = {
+    val completedMembers = userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty)
+    val membersDetails = userAnswers.membersDetails(srn)
+    val incompleteIndex = (membersDetails.keySet -- completedMembers.keySet).headOption
+
+    incompleteIndex match {
+      case Some(index) =>
+        routes.MemberDetailsController.onPageLoad(srn, refineV[OneTo300](index.toInt + 1).toOption.get, NormalMode)
+      case None =>
+        findNextOpenIndex[Max300.Refined](userAnswers.membersDetails(srn).keys.toList.map(_.toInt)) match {
+          case None => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
+          case Some(nextIndex) => routes.MemberDetailsController.onPageLoad(srn, nextIndex, NormalMode)
+        }
     }
+  }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
     _ =>

@@ -40,8 +40,8 @@ import pages.nonsipp.otherassetsdisposal.{
 }
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import pages.nonsipp.bonds._
-import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
-import pages.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldPage
+import pages.nonsipp.memberdetails._
+import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
 import pages.nonsipp.membercontributions._
 import pages.nonsipp.memberreceivedpcls.{PclsMemberListPage, PensionCommencementLumpSumPage}
 import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, PensionPaymentsReceivedPage}
@@ -87,14 +87,16 @@ object TaskListStatusUtils {
     (membersDetailsPages, ninoPages, noNinoPages) match {
       case (None, _, _) => NotStarted
       case (Some(_), None, None) => InProgress
-      case (Some(memberDetails), ninos, noNinos) =>
+      case (Some(memberDetails), _, _) =>
         if (memberDetails.isEmpty) {
           NotStarted
         } else {
           val countMemberDetails = memberDetails.size
-          val countNinos = ninos.getOrElse(List.empty).size
-          val countNoninos = noNinos.getOrElse(List.empty).size
-          if (countMemberDetails > countNinos + countNoninos) {
+          val countCompletedMembers = userAnswers.get(MembersDetailsCompletedPages(srn)) match {
+            case Some(value) => value.size
+            case None => 0
+          }
+          if (countMemberDetails > countCompletedMembers) {
             InProgress
           } else {
             Completed
@@ -182,7 +184,11 @@ object TaskListStatusUtils {
   }
   def getNotStartedOrCannotStartYetStatus(userAnswers: UserAnswers, srn: Srn): TaskListStatus =
     getMembersTaskListStatus(userAnswers, srn) match {
-      case TaskListStatus.InProgress => TaskListStatus.NotStarted
+      case TaskListStatus.InProgress =>
+        userAnswers.get(MembersDetailsCompletedPages(srn)) match {
+          case Some(completed) => TaskListStatus.NotStarted
+          case None => TaskListStatus.UnableToStart
+        }
       case TaskListStatus.Completed => TaskListStatus.NotStarted
       case TaskListStatus.UnableToStart => TaskListStatus.UnableToStart
       case TaskListStatus.NotStarted => TaskListStatus.UnableToStart
@@ -301,6 +307,7 @@ object TaskListStatusUtils {
   def getSurrenderedBenefitsStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val status = userAnswers.get(SurrenderedBenefitsJourneyStatus(srn))
     val wereSurrenderedBenefits = userAnswers.get(SurrenderedBenefitsPage(srn))
+
     (wereSurrenderedBenefits, status) match {
       case (None, _) =>
         (
@@ -809,14 +816,21 @@ object TaskListStatusUtils {
 
   def getQuotedSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val quotedSharesManagedFundsHeld = userAnswers.get(QuotedSharesManagedFundsHeldPage(srn))
+    val totalValueQuotedShares = userAnswers.get(TotalValueQuotedSharesPage(srn))
     val defaultLink =
       controllers.nonsipp.totalvaluequotedshares.routes.QuotedSharesManagedFundsHeldController
         .onPageLoad(srn, NormalMode)
         .url
 
-    quotedSharesManagedFundsHeld match {
-      case None => (NotStarted, defaultLink)
-      case Some(_) => (Completed, defaultLink)
+    val cyaLink =
+      controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
+        .onPageLoad(srn)
+        .url
+
+    (quotedSharesManagedFundsHeld, totalValueQuotedShares) match {
+      case (Some(false), _) => (Completed, defaultLink)
+      case (_, Some(amount)) => if (amount == Money(0.00)) (Completed, defaultLink) else (Completed, cyaLink)
+      case _ => (NotStarted, defaultLink)
     }
   }
 

@@ -90,6 +90,7 @@ class SurrenderedBenefitsCYAController @Inject()(
         updatedUserAnswers <- Future.fromTry(
           request.userAnswers
             .set(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.InProgress)
+            .set(SurrenderedBenefitsCompletedPage(srn, memberIndex), SectionCompleted)
             .remove(SurrenderedBenefitsMemberListPage(srn))
         )
         _ <- saveService.save(updatedUserAnswers)

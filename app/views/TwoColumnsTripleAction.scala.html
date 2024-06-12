@@ -54,7 +54,11 @@
                 rows = rows.map(
                     otherRows =>
                     otherRows.map( aRow =>
-                        TableRow(HtmlContent(renderMessage(aRow.text)))
+                        (aRow.messageKey, aRow.hiddenText, aRow.url) match {
+                            case (Some(key),Some(hidden), Some(link)) =>
+                                TableRow(HtmlContent(s"<a href='${link}'>${renderMessage(key)}<span class='govuk-visually-hidden'>${hidden.toMessage}</span></a>"))
+                            case (_,_,_) => TableRow(HtmlContent(renderMessage(aRow.text)))
+                        }
                     )
                 ),
                  )

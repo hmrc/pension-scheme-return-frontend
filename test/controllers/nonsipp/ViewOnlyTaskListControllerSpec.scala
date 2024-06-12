@@ -72,21 +72,18 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
 
   // Set up services
   private val mockSaveService: SaveService = mock[SaveService]
-  private val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private val mockPsrVersionsService: PsrVersionsService = mock[PsrVersionsService]
   private val mockPsrRetrievalService: PsrRetrievalService = mock[PsrRetrievalService]
 
   override val additionalBindings: List[GuiceableModule] =
     List(
       inject.bind[SaveService].toInstance(mockSaveService),
-      inject.bind[SchemeDateService].toInstance(mockSchemeDateService),
       inject.bind[PsrVersionsService].toInstance(mockPsrVersionsService),
       inject.bind[PsrRetrievalService].toInstance(mockPsrRetrievalService)
     )
 
   override def beforeEach(): Unit = {
     when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
-    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(dateRange))
     when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(Future.successful(Seq()))
     when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(currentUA))
@@ -939,17 +936,17 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
           }
         }
 
-        "(S5) Quoted Shares" - {
+        "(S8) Quoted Shares" - {
 
           "Completed" in {
             testViewModel(
               currentUA,
               currentUA,
-              4,
-              2,
+              7,
+              0,
               expectedStatus = Completed,
-              expectedTitleKey = "nonsipp.tasklist.shares.title",
-              expectedLinkContentKey = "nonsipp.tasklist.shares.view.quotedshares.title",
+              expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+              expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.quotedshares.title",
               expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
             )
           }
@@ -958,11 +955,11 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             testViewModel(
               currentUA,
               previousUA,
-              4,
-              2,
+              7,
+              0,
               expectedStatus = Updated,
-              expectedTitleKey = "nonsipp.tasklist.shares.title",
-              expectedLinkContentKey = "nonsipp.tasklist.shares.view.quotedshares.title",
+              expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+              expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.quotedshares.title",
               expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
             )
           }
@@ -1100,7 +1097,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               currentUA,
               currentUA,
               7,
-              0,
+              1,
               expectedStatus = Completed,
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.title",
@@ -1113,7 +1110,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               currentUA,
               previousUA,
               7,
-              0,
+              1,
               expectedStatus = Updated,
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.title",
@@ -1129,7 +1126,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               currentUA,
               currentUA,
               7,
-              1,
+              2,
               expectedStatus = Completed,
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.view.title",
@@ -1142,7 +1139,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               currentUA,
               previousUA,
               7,
-              1,
+              2,
               expectedStatus = Updated,
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.view.title",

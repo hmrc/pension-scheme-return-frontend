@@ -16,9 +16,10 @@
 
 package controllers.nonsipp.memberdetails
 
-import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
+import pages.nonsipp.memberdetails._
 import play.api.mvc.Call
 import models.ManualOrUpload.{Manual, Upload}
+import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.OneTo300
 import controllers.ControllerBaseSpec
 import views.html.ListView
@@ -26,7 +27,7 @@ import eu.timepit.refined._
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import controllers.nonsipp.memberdetails.SchemeMembersListController._
-import viewmodels.models.MemberState
+import viewmodels.models.{MemberState, SectionCompleted}
 
 class SchemeMembersListControllerSpec extends ControllerBaseSpec {
 
@@ -38,6 +39,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
   private val userAnswersWithMembersDetails = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.Active)
+    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
   private val userAnswersWith300MembersDetails =
     (1 to 300).foldLeft(defaultUserAnswers)(
@@ -49,6 +51,22 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
   private val index = 1
 
   "SchemeMembersListController" - {
+    "incomplete members must be filtered" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+        .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
+
+      val completedMembers = userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty)
+      val unfilteredMemberDetails = userAnswers.membersDetails(srn)
+      val filteredMemberDetails = completedMembers.keySet
+        .intersect(unfilteredMemberDetails.keySet)
+        .map(k => k -> unfilteredMemberDetails(k))
+        .toMap
+
+      unfilteredMemberDetails.size must be > filteredMemberDetails.size
+    }
+
     "on Manual" - {
       act.like(
         renderView(onPageLoadManual, userAnswersWithMembersDetails)(

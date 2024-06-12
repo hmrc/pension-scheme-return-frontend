@@ -22,9 +22,10 @@ import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import models.{CheckMode, Mode, NormalMode}
+import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito.{reset, times, verify}
 import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
 import eu.timepit.refined.refineMV
@@ -51,6 +52,7 @@ class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec {
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(TotalAmountPensionPaymentsPage(srn, index), money)
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
   "MemberPensionPaymentsCYAController" - {
 

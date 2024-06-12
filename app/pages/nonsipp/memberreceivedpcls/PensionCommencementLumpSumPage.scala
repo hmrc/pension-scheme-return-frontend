@@ -22,13 +22,13 @@ import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.UserAnswers
 import pages.QuestionPage
-import pages.nonsipp.memberreceivedpcls.Paths.memberDetails
+import pages.nonsipp.memberreceivedpcls.Paths.membersPayments
 
 import scala.util.Try
 
 case class PensionCommencementLumpSumPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = memberDetails \ toString
+  override def path: JsPath = membersPayments \ toString
 
   override def toString: String = "lumpSumReceived"
 
@@ -39,6 +39,6 @@ case class PensionCommencementLumpSumPage(srn: Srn) extends QuestionPage[Boolean
     }
 
   private def pages(srn: Srn): List[Removable[_]] =
-    List(AllPensionCommencementLumpSumAmountPages(srn))
+    List(PensionCommencementLumpSumAmountPage.all(srn))
 
 }

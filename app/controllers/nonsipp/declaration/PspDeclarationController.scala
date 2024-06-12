@@ -18,6 +18,7 @@ package controllers.nonsipp.declaration
 
 import services._
 import models.audit.PSRSubmissionEmailAuditEvent
+import utils.DateTimeUtils
 import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -26,10 +27,11 @@ import controllers.PSRController
 import config.FrontendAppConfig
 import config.Constants._
 import controllers.actions._
-import navigation.Navigator
 import models.{DateRange, NormalMode, UserAnswers}
 import views.html.PsaIdInputView
 import models.SchemeId.Srn
+import pages.nonsipp.FbVersionPage
+import navigation.Navigator
 import forms.TextFormProvider
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.i18n.MessagesApi
@@ -73,16 +75,11 @@ class PspDeclarationController @Inject()(
 
   def onSubmit(srn: Srn): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      val fbVersion = request.userAnswers.get(FbVersionPage(srn)).getOrElse("000") // 000 as no versions yet - initial submission
       schemeDateService.schemeDate(srn) match {
         case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         case Some(dates) =>
-          def emailFuture: Future[EmailStatus] =
-            sendEmail(
-              loggedInUserNameOrBlank(request),
-              request.minimalDetails.email,
-              dates,
-              request.schemeDetails.schemeName
-            )
+          val now = schemeDateService.now()
 
           PspDeclarationController
             .form(formProvider, request.schemeDetails.authorisingPSAID)
@@ -107,13 +104,20 @@ class PspDeclarationController @Inject()(
                     isSubmitted = true,
                     fallbackCall = controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
                   )
-                  _ <- emailFuture
+                  _ <- sendEmail(
+                    loggedInUserNameOrBlank(request),
+                    request.minimalDetails.email,
+                    dates,
+                    request.schemeDetails.schemeName,
+                    now,
+                    fbVersion
+                  )
                   _ <- saveService.save(UserAnswers(request.userAnswers.id))
                 } yield {
                   Redirect(navigator.nextPage(PspDeclarationPage(srn), NormalMode, request.userAnswers))
                     .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
                     .addingToSession(
-                      (SUBMISSION_DATE, schemeDateService.submissionDateAsString(schemeDateService.now()))
+                      (SUBMISSION_DATE, schemeDateService.submissionDateAsString(now))
                     )
                 }
               }
@@ -121,39 +125,45 @@ class PspDeclarationController @Inject()(
       }
     }
 
-  private def sendEmail(name: String, email: String, taxYear: DateRange, schemeName: String)(
+  private def sendEmail(
+    name: String,
+    email: String,
+    taxYear: DateRange,
+    schemeName: String,
+    submittedDate: LocalDateTime,
+    reportVersion: String
+  )(
     implicit request: DataRequest[_],
     hc: HeaderCarrier
   ): Future[EmailStatus] = {
     val requestId = hc.requestId.map(_.value).getOrElse(request.headers.get("X-Session-ID").getOrElse(""))
 
-    val submittedDate = LocalDateTime.now().toString // TODO change as per PSR-1139
-
     val templateParams = Map(
-      "psaName" -> name,
       "schemeName" -> schemeName,
-      "taxYear" -> taxYear.toString, //TODO change as per PSR-1139
-      "dateSubmitted" -> submittedDate
+      "periodOfReturn" -> taxYear.toSentenceFormat,
+      "dateSubmitted" -> DateTimeUtils.formatReadable(submittedDate),
+      "psaName" -> name
     )
-
-    val reportVersion = "001" //TODO change as per PSR-1139
 
     emailConnector
       .sendEmail(
         PSP,
         requestId,
-        psaOrPspId = request.getUserId,
+        psaOrPspId = request.pensionSchemeId.value,
         request.schemeDetails.pstr,
         email,
         config.fileReturnTemplateId,
         templateParams,
-        reportVersion
+        reportVersion,
+        schemeName = request.schemeDetails.schemeName,
+        taxYear = taxYear.toYearFormat,
+        userName = name
       )
       .map { emailStatus =>
         auditService.sendEvent(
           PSRSubmissionEmailAuditEvent(
             schemeName = request.schemeDetails.schemeName,
-            request.schemeDetails.establishers.headOption.fold(name)(e => e.name),
+            name,
             psaOrPspId = request.pensionSchemeId.value,
             schemeTaxReference = request.schemeDetails.pstr,
             affinityGroup = if (request.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",

@@ -18,12 +18,12 @@ package pages.nonsipp.membersurrenderedbenefits
 
 import pages.QuestionPage
 import models.SchemeId.Srn
+import pages.nonsipp.membersurrenderedbenefits.Paths.membersPayments
 import play.api.libs.json.JsPath
-import pages.nonsipp.memberpayments.MemberPaymentsPage
 
 case class SurrenderedBenefitsPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = MemberPaymentsPage.path \ toString
+  override def path: JsPath = membersPayments \ toString
 
   override def toString: String = "surrenderMade"
 }

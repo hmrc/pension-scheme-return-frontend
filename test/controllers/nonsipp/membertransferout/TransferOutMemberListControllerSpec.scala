@@ -25,10 +25,11 @@ import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
 import pages.nonsipp.membertransferout.TransferOutMemberListPage
+import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import controllers.nonsipp.membertransferout.TransferOutMemberListController._
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito.{reset, when}
 
 import scala.concurrent.Future
@@ -40,7 +41,9 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
-  val userAnswers: UserAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+  val userAnswers: UserAnswers = defaultUserAnswers
+    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -55,21 +58,7 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
   "TransferOutMemberListController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      val memberMap = userAnswers.membersDetails(srn)
-
-      val maxIndex: Int = memberMap.keys
-        .map(_.toInt)
-        .maxOption
-        .get
-
-      val memberList: List[Option[NameDOB]] =
-        (0 to maxIndex).toList.map { index =>
-          val memberOption = memberMap.get(index.toString)
-          memberOption match {
-            case Some(member) => Some(member)
-            case None => None
-          }
-        }
+      val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
       injected[TwoColumnsTripleAction].apply(
         form(injected[YesNoPageFormProvider]),
@@ -85,21 +74,7 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
 
     act.like(renderPrePopView(onPageLoad, TransferOutMemberListPage(srn), true, userAnswers) {
       implicit app => implicit request =>
-        val memberMap = userAnswers.membersDetails(srn)
-
-        val maxIndex: Int = memberMap.keys
-          .map(_.toInt)
-          .maxOption
-          .get
-
-        val memberList: List[Option[NameDOB]] =
-          (0 to maxIndex).toList.map { index =>
-            val memberOption = memberMap.get(index.toString)
-            memberOption match {
-              case Some(member) => Some(member)
-              case None => None
-            }
-          }
+        val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
         injected[TwoColumnsTripleAction]
           .apply(

@@ -16,19 +16,20 @@
 
 package controllers.nonsipp
 
-import services.{PsrVersionsService, SchemeDateService}
+import services.PsrVersionsService
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import controllers.PSRController
 import cats.implicits.toShow
 import controllers.actions._
-import utils.nonsipp.TaskListUtils._
 import models.backend.responses.ReportStatus
 import viewmodels.models.TaskListStatus._
 import play.api.i18n.MessagesApi
 import views.html.TaskListView
 import models.SchemeId.Srn
+import pages.nonsipp.WhichTaxYearPage
+import utils.nonsipp.TaskListUtils._
 import utils.DateTimeUtils.localDateShow
 import models._
 import viewmodels.DisplayMessage._
@@ -43,13 +44,12 @@ class TaskListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: TaskListView,
-  schemeDateService: SchemeDateService,
   psrVersionsService: PsrVersionsService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
   def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    schemeDateService.schemeDate(srn) match {
+    request.userAnswers.get(WhichTaxYearPage(srn)) match {
       case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       case Some(dates) =>
         for {

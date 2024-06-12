@@ -16,6 +16,7 @@
 
 package pages.nonsipp.totalvaluequotedshares
 
+import pages.nonsipp.shares.Paths
 import pages.QuestionPage
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
@@ -23,7 +24,7 @@ import models.Money
 
 case class TotalValueQuotedSharesPage(srn: Srn) extends QuestionPage[Money] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = Paths.shares \ toString
 
   override def toString: String = "totalValueQuotedShares"
 }

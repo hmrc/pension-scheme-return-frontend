@@ -16,26 +16,30 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import services.SaveService
+import services.{SaveService, SchemeDateService}
 import viewmodels.implicits._
 import models.ConditionalYesNo._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import forms.mappings.Mappings
 import controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController._
 import config.Refined.Max5000
+import cats.implicits.toShow
 import config.Constants.maxCurrencyValue
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, Mode, Money}
-import pages.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanPage
 import viewmodels.models._
-import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
 import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models._
+import pages.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanPage
+import cats.{Id, Monad}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import models.requests.DataRequest
+import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -48,52 +52,73 @@ class OutstandingArrearsOnLoanController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: ConditionalYesNoPageView
+  view: ConditionalYesNoPageView,
+  schemeDateService: SchemeDateService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = OutstandingArrearsOnLoanController.form(formProvider)
-
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val preparedForm = request.userAnswers.fillForm(OutstandingArrearsOnLoanPage(srn, index), form)
-      Ok(view(preparedForm, viewModel(srn, index, mode)))
+      usingSchemeDate[Id](srn) { period =>
+        val form = OutstandingArrearsOnLoanController.form(formProvider, period)
+        val preparedForm = request.userAnswers.fillForm(OutstandingArrearsOnLoanPage(srn, index), form)
+        Ok(view(preparedForm, viewModel(srn, index, mode, period)))
+      }
   }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
-          value =>
-            for {
-              updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo(value)))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(OutstandingArrearsOnLoanPage(srn, index), mode, updatedAnswers))
-        )
+      usingSchemeDate(srn) { period =>
+        val form = OutstandingArrearsOnLoanController.form(formProvider, period)
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, period)))),
+            value =>
+              for {
+                updatedAnswers <- Future
+                  .fromTry(request.userAnswers.set(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo(value)))
+                _ <- saveService.save(updatedAnswers)
+              } yield Redirect(navigator.nextPage(OutstandingArrearsOnLoanPage(srn, index), mode, updatedAnswers))
+          )
+      }
   }
+
+  private def usingSchemeDate[F[_]: Monad](
+    srn: Srn
+  )(body: DateRange => F[Result])(implicit request: DataRequest[_]): F[Result] =
+    schemeDateService.schemeDate(srn) match {
+      case Some(period) => body(period)
+      case None => Monad[F].pure(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
+
 }
 
 object OutstandingArrearsOnLoanController {
 
-  def form(formProvider: YesNoPageFormProvider): Form[Either[Unit, Money]] = formProvider.conditionalYes[Money](
-    "outstandingArrearsOnLoan.error.required",
-    mappingYes = Mappings.money(
-      MoneyFormErrors(
-        "outstandingArrearsOnLoan.yes.error.required",
-        "outstandingArrearsOnLoan.yes.error.nonNumeric",
-        (maxCurrencyValue, "outstandingArrearsOnLoan.yes.error.max")
-      )
+  def form(formProvider: YesNoPageFormProvider, period: DateRange): Form[Either[Unit, Money]] =
+    formProvider.conditionalYes[Money](
+      ("outstandingArrearsOnLoan.error.required"),
+      mappingYes = Mappings.money(
+        MoneyFormErrors(
+          "outstandingArrearsOnLoan.yes.error.required",
+          "outstandingArrearsOnLoan.yes.error.nonNumeric",
+          (maxCurrencyValue, "outstandingArrearsOnLoan.yes.error.max")
+        )
+      ),
+      period.to.show
     )
-  )
 
-  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[ConditionalYesNoPageViewModel] =
+  def viewModel(
+    srn: Srn,
+    index: Max5000,
+    mode: Mode,
+    period: DateRange
+  ): FormPageViewModel[ConditionalYesNoPageViewModel] =
     FormPageViewModel[ConditionalYesNoPageViewModel](
       "outstandingArrearsOnLoan.title",
-      "outstandingArrearsOnLoan.heading",
+      ("outstandingArrearsOnLoan.heading", period.to.show),
       page = ConditionalYesNoPageViewModel(
         yes = YesNoViewModel
           .Conditional("outstandingArrearsOnLoan.yes.conditional", FieldType.Currency),

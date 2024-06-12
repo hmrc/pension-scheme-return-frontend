@@ -17,32 +17,38 @@
 package controllers.nonsipp.declaration
 
 import services.{AuditService, PsrSubmissionService, SchemeDateService}
+import models.audit.PSRSubmissionEmailAuditEvent
 import controllers.nonsipp.declaration.PspDeclarationController._
 import connectors.EmailConnector
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.PsaIdInputView
-import org.scalatest.BeforeAndAfterEach
 import forms.TextFormProvider
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import models.DateRange
 import pages.nonsipp.declaration.PspDeclarationPage
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import pages.nonsipp.FbVersionPage
+import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.Future
+
+import java.time.LocalDateTime
 
 class PspDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfterEach {
   private val populatedUserAnswers = {
     defaultUserAnswers.unsafeSet(PspDeclarationPage(srn), psaId.value)
+    defaultUserAnswers.unsafeSet(FbVersionPage(srn), version)
   }
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
-  private implicit val mockEmailConnector = mock[EmailConnector]
+  private implicit val mockEmailConnector: EmailConnector = mock[EmailConnector]
   private val mockAuditService = mock[AuditService]
   private val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private val schemeDatePeriod: DateRange = dateRangeGen.sample.value
-  private val templateId = "pods_event_report_submitted" // TODO change as per PSR-1139
+  private val templateId = "pods_pension_scheme_return_submitted"
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
@@ -65,6 +71,8 @@ class PspDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfte
 
     lazy val onPageLoad = routes.PspDeclarationController.onPageLoad(srn)
     lazy val onSubmit = routes.PspDeclarationController.onSubmit(srn)
+    lazy val emailAuditEventCaptor: ArgumentCaptor[PSRSubmissionEmailAuditEvent] =
+      ArgumentCaptor.forClass(classOf[PSRSubmissionEmailAuditEvent])
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[PsaIdInputView]
@@ -81,13 +89,17 @@ class PspDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfte
           when(mockSchemeDateService.returnPeriodsAsJsonString(any())(any())).thenReturn("")
           when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")
           when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(schemeDatePeriod))
-          when(mockAuditService.sendEvent(any)(any(), any())).thenReturn(Future.successful(AuditResult.Success))
+          when(mockSchemeDateService.now()).thenReturn(LocalDateTime.now())
+
+          when(mockAuditService.sendEvent(emailAuditEventCaptor.capture())(any(), any()))
+            .thenReturn(Future.successful(AuditResult.Success))
         })
         .after({
           verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
           verify(mockEmailConnector, times(1))
-            .sendEmail(any(), any(), any(), any(), any(), any(), any(), any())(any(), any())
+            .sendEmail(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())(any(), any())
           verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+          emailAuditEventCaptor.getValue.schemeAdministratorOrPractitionerName mustEqual defaultMinimalDetails.individualDetails.get.fullName
         })
     )
 

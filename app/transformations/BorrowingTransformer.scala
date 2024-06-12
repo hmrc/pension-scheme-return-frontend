@@ -18,21 +18,37 @@ package transformations
 
 import com.google.inject.Singleton
 import config.Refined.OneTo5000
-import models.SchemeId.Srn
-import models.requests.psr._
 import eu.timepit.refined.refineV
 import models.{Money, Percentage, UserAnswers}
 import pages.nonsipp.moneyborrowed._
 import models.requests.DataRequest
+import pages.nonsipp.moneyborrowed.Paths.borrowing
+import models.SchemeId.Srn
+import models.requests.psr._
+import models.UserAnswers.implicits.UserAnswersTryOps
 
 import scala.util.Try
 
 import javax.inject.Inject
 
 @Singleton()
-class MoneyBorrowedTransformer @Inject() extends Transformer {
+class BorrowingTransformer @Inject() extends Transformer {
 
-  def transformToEtmp(srn: Srn)(implicit request: DataRequest[_]): List[MoneyBorrowed] =
+  def transformToEtmp(srn: Srn, optMoneyWasBorrowed: Option[Boolean], initialUA: UserAnswers)(
+    implicit request: DataRequest[_]
+  ): Option[Borrowing] =
+    optMoneyWasBorrowed.map(
+      moneyWasBorrowed =>
+        Borrowing(
+          recordVersion = Option.when(request.userAnswers.get(borrowing) == initialUA.get(borrowing))(
+            request.userAnswers.get(BorrowingRecordVersionPage(srn)).get
+          ),
+          moneyWasBorrowed = moneyWasBorrowed,
+          moneyBorrowed = moneyBorrowedTransformToEtmp(srn)
+        )
+    )
+
+  private def moneyBorrowedTransformToEtmp(srn: Srn)(implicit request: DataRequest[_]): List[MoneyBorrowed] =
     request.userAnswers
       .get(LenderNamePages(srn))
       .map { value =>
@@ -68,11 +84,16 @@ class MoneyBorrowedTransformer @Inject() extends Transformer {
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, borrowing: Borrowing): Try[UserAnswers] = {
 
     val initialUserAnswersForBorrowing = userAnswers.set(MoneyBorrowedPage(srn), borrowing.moneyWasBorrowed)
+    val userAnswersWithRecordVersion =
+      borrowing.recordVersion.fold(initialUserAnswersForBorrowing)(
+        initialUserAnswersForBorrowing.set(BorrowingRecordVersionPage(srn), _)
+      )
 
     val moneyBorrowedList = borrowing.moneyBorrowed
+
     for {
       indexes <- buildIndexesForMax5000(moneyBorrowedList.size)
-      resultUA <- indexes.foldLeft(initialUserAnswersForBorrowing) {
+      resultUA <- indexes.foldLeft(userAnswersWithRecordVersion) {
         case (ua, index) =>
           val moneyBorrowed = moneyBorrowedList(index.value - 1)
           val whenBorrowed = WhenBorrowedPage(srn, index) -> moneyBorrowed.dateOfBorrow

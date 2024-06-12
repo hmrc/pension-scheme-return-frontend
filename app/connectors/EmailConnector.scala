@@ -52,28 +52,31 @@ class EmailConnector @Inject()(
     psaOrPspId: String,
     pstr: String,
     email: String,
-    reportVersion: String
+    reportVersion: String,
+    schemeName: String,
+    taxYear: String,
+    userName: String
   ): String = {
-    val encryptedPsaOrPspId = URLEncoder.encode(
-      crypto.QueryParameterCrypto.encrypt(PlainText(psaOrPspId)).value,
-      StandardCharsets.UTF_8.toString
-    )
-    val encryptedPstr =
-      URLEncoder.encode(crypto.QueryParameterCrypto.encrypt(PlainText(pstr)).value, StandardCharsets.UTF_8.toString)
-    val encryptedEmail =
-      URLEncoder.encode(crypto.QueryParameterCrypto.encrypt(PlainText(email)).value, StandardCharsets.UTF_8.toString)
-
     val callbackUrl = appConfig.eventReportingEmailCallback(
       psaOrPsp,
       requestId,
-      encryptedEmail,
-      encryptedPsaOrPspId,
-      encryptedPstr,
-      reportVersion
+      encrypt(email),
+      encrypt(psaOrPspId),
+      encrypt(pstr),
+      reportVersion,
+      encrypt(schemeName),
+      taxYear,
+      encrypt(userName)
     )
     logger.info(s"Callback URL: $callbackUrl")
     callbackUrl
   }
+
+  private def encrypt(psaOrPspId: String): String =
+    URLEncoder.encode(
+      crypto.QueryParameterCrypto.encrypt(PlainText(psaOrPspId)).value,
+      StandardCharsets.UTF_8.toString
+    )
 
   //scalastyle:off parameter.number
   def sendEmail(
@@ -84,7 +87,10 @@ class EmailConnector @Inject()(
     emailAddress: String,
     templateId: String,
     templateParams: Map[String, String],
-    reportVersion: String
+    reportVersion: String,
+    schemeName: String,
+    taxYear: String,
+    userName: String
   )(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[EmailStatus] = {
     val emailServiceUrl = s"${appConfig.emailApiUrl}/hmrc/email"
 
@@ -93,7 +99,7 @@ class EmailConnector @Inject()(
       templateId,
       templateParams,
       appConfig.emailSendForce,
-      callBackUrl(psaOrPsp, requestId, psaOrPspId, pstr, emailAddress, reportVersion)
+      callBackUrl(psaOrPsp, requestId, psaOrPspId, pstr, emailAddress, reportVersion, schemeName, taxYear, userName)
     )
     val jsonData = Json.toJson(sendEmailReq)
 

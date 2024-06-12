@@ -20,7 +20,6 @@ import services._
 import utils.DateTimeUtils
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.{Constants, FrontendAppConfig}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions}
 import controllers.actions._
 import pages.nonsipp.WhichTaxYearPage
 import models.backend.responses._
@@ -30,6 +29,8 @@ import views.html.OverviewView
 import models.SchemeId.Srn
 import cats.implicits.toShow
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import config.Constants.UNCHANGED_SESSION_PREFIX
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions}
 import utils.DateTimeUtils.localDateShow
 import models.{DateRange, Enumerable}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -198,6 +199,7 @@ class OverviewController @Inject()(
           val dateRange = DateRange(yearFrom, yearTo)
           for {
             userAnswers <- Future.fromTry(request.userAnswers.set(WhichTaxYearPage(srn), dateRange))
+            _ <- saveService.save(userAnswers.copy(id = UNCHANGED_SESSION_PREFIX + userAnswers.id))
             _ <- saveService.save(userAnswers)
           } yield {
             Redirect(controllers.routes.WhatYouWillNeedController.onPageLoad(srn, "", taxYear, version))
@@ -220,6 +222,7 @@ class OverviewController @Inject()(
               controllers.routes.OverviewController.onPageLoad(srn)
             )
             _ <- saveService.save(updatedUserAnswers)
+            _ <- saveService.save(updatedUserAnswers.copy(id = UNCHANGED_SESSION_PREFIX + updatedUserAnswers.id))
           } yield {
             Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
           }
@@ -237,6 +240,7 @@ class OverviewController @Inject()(
             updatedUserAnswers <- psrRetrievalService
               .getStandardPsrDetails(Some(fbNumber), None, None, controllers.routes.OverviewController.onPageLoad(srn))
             _ <- saveService.save(updatedUserAnswers)
+            _ <- saveService.save(updatedUserAnswers.copy(id = UNCHANGED_SESSION_PREFIX + updatedUserAnswers.id))
           } yield {
             Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
           }
