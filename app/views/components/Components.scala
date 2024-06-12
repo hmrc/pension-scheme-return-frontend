@@ -31,6 +31,14 @@ object Components {
     HtmlFormat.raw(s"""<a href="$url" class="govuk-link" $attributes>$content</a>""")
   }
 
+  private def anchorWithHiddenText(content: Html, url: String, attrs: Map[String, String], hiddenText: Html): Html = {
+    val attributes = attrs.toList.map { case (key, value) => s"""$key="$value"""" }.mkString(" ")
+
+    HtmlFormat.raw(
+      s"""<a href="$url" class="govuk-link" $attributes >$content<span class="govuk-visually-hidden">$hiddenText</span></a>"""
+    )
+  }
+
   private def anchorDownload(content: Html, url: String): Html =
     HtmlFormat.raw(s"""<a href="$url" class="govuk-link" download>$content</a>""")
 
@@ -96,7 +104,9 @@ object Components {
     message match {
       case Empty => Html("")
       case m @ Message(_, _) => HtmlFormat.escape(m.toMessage)
-      case LinkMessage(content, url, attrs) => anchor(renderMessage(content), url, attrs)
+      case LinkMessage(content, url, attrs, None) => anchor(renderMessage(content), url, attrs)
+      case LinkMessage(content, url, attrs, Some(hiddenText)) =>
+        anchorWithHiddenText(renderMessage(content), url, attrs, renderMessage(hiddenText))
       case DownloadLinkMessage(content, url) => anchorDownload(renderMessage(content), url)
       case ParagraphMessage(content) => paragraph(content.map(renderMessage).reduce(combine(_, _)))
       case ListMessage(content, Bullet) => unorderedList(content.map(renderMessage))

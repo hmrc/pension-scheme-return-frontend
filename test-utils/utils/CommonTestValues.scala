@@ -155,6 +155,20 @@ trait CommonTestValues {
       )
     )
   }
+  val versionsResponseInProgress: Seq[PsrVersionsResponse] = {
+    Seq(
+      PsrVersionsResponse(
+        startDate = None,
+        reportFormBundleNumber = commonFbNumber.replace('1', '3'),
+        reportVersion = commonVersion.toInt + 2,
+        reportStatus = ReportStatus.ReportStatusCompiled,
+        compilationOrSubmissionDate = LocalDateTime.parse("2020-04-08T12:00:00.000"),
+        reportSubmitterDetails = None,
+        psaDetails = None
+      )
+    ) ++ versionsResponse
+  }
+
   val versionsForYearsResponse: Seq[PsrVersionsForYearsResponse] = {
     Seq(
       PsrVersionsForYearsResponse(

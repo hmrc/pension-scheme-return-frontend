@@ -54,30 +54,43 @@ class ReturnsSubmittedController @Inject()(
           response.map { seqPsrVersionsResponse =>
             val reportVersions = seqPsrVersionsResponse.map(_.reportVersion)
             val listRetHistorySummary = seqPsrVersionsResponse
-              .filter(
-                psrVersionsService =>
-                  psrVersionsService.reportStatus == ReportStatus.SubmittedAndInProgress
-                    || psrVersionsService.reportStatus == ReportStatus.SubmittedAndSuccessfullyProcessed
-              )
               .sortBy(_.reportVersion)
               .reverse
               .map { psrVersionsResponse =>
                 val maxReportVersion = reportVersions.max
+                val submitter =
+                  if (psrVersionsResponse.reportVersion == maxReportVersion && psrVersionsResponse.reportStatus == ReportStatus.ReportStatusCompiled) {
+                    "returnsSubmitted.inProgress"
+                  } else {
+                    getSubmitter(psrVersionsResponse)
+                  }
                 List(
                   TableElem(Message(psrVersionsResponse.reportVersion.toString)),
                   TableElem(
                     Message(DateTimeUtils.formatHtml(psrVersionsResponse.compilationOrSubmissionDate.toLocalDate))
                   ),
-                  TableElem(Message(getSubmitter(psrVersionsResponse))),
+                  TableElem(Message(submitter)),
                   if (psrVersionsResponse.reportVersion == maxReportVersion) {
-                    TableElem(
-                      LinkMessage(
-                        Message("site.viewOrChange"),
-                        controllers.routes.ReturnsSubmittedController
-                          .onSelect(srn, psrVersionsResponse.reportFormBundleNumber)
-                          .url
+                    if (psrVersionsResponse.reportStatus == ReportStatus.ReportStatusCompiled) {
+                      TableElem(
+                        LinkMessage(
+                          Message("site.continue"),
+                          controllers.routes.ReturnsSubmittedController
+                            .onSelect(srn, psrVersionsResponse.reportFormBundleNumber)
+                            .url,
+                          hiddenText = Message("returnsSubmitted.continue.hiddenText")
+                        )
                       )
-                    )
+                    } else {
+                      TableElem(
+                        LinkMessage(
+                          Message("site.viewOrChange"),
+                          controllers.routes.ReturnsSubmittedController
+                            .onSelect(srn, psrVersionsResponse.reportFormBundleNumber)
+                            .url
+                        )
+                      )
+                    }
                   } else {
                     TableElem(
                       LinkMessage(
