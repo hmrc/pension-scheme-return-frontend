@@ -17,13 +17,17 @@
 package controllers.nonsipp
 
 import services.{PsrRetrievalService, SaveService}
-import com.google.inject.Inject
+import pages.nonsipp.bonds.BondsCompleted
+import pages.nonsipp.landorproperty.LandOrPropertyCompleted
 import controllers.actions._
 import pages.nonsipp.memberdetails.Paths.personalDetails
 import viewmodels.implicits._
 import pages.nonsipp.accountingperiod.Paths.accountingPeriodDetails
-import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, Paths}
+import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, Paths, SharesCompleted}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import pages.nonsipp.otherassetsheld.OtherAssetsCompleted
+import com.google.inject.Inject
+import cats.data.NonEmptyList
 import views.html.TaskListView
 import models.SchemeId.Srn
 import cats.implicits.toShow
@@ -107,9 +111,9 @@ object ViewOnlyTaskListController {
       membersSection(schemeName, currentUA, previousUA),
       memberPaymentsSection(currentUA, previousUA),
       loansSection(schemeName, currentUA, previousUA),
-      sharesSection(currentUA, previousUA),
-      landOrPropertySection(currentUA, previousUA),
-      bondsSection(currentUA, previousUA),
+      sharesSection(currentUA, previousUA, srn),
+      landOrPropertySection(currentUA, previousUA, srn),
+      bondsSection(currentUA, previousUA, srn),
       otherAssetsSection(currentUA, previousUA, srn)
     )
 
@@ -423,7 +427,7 @@ object ViewOnlyTaskListController {
 
 //--Shares------------------------------------------------------------------------------------------------------------//
 
-  private def sharesSection(currentUA: UserAnswers, previousUA: UserAnswers): TaskListSectionViewModel = {
+  private def sharesSection(currentUA: UserAnswers, previousUA: UserAnswers, srn: Srn): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.shares"
 
     val sharesTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
@@ -439,28 +443,43 @@ object ViewOnlyTaskListController {
       pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction
     )
 
-    TaskListSectionViewModel(
-      s"$prefix.title",
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "sponsoringemployer.title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
-        ),
-        sharesTaskListStatus
+    val sharesItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey(prefix, "sponsoringemployer.title"),
+        controllers.routes.UnauthorisedController.onPageLoad().url
       ),
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey("nonsipp.tasklist.sharesdisposal", "title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
-        ),
-        shareDisposalTaskListStatus
-      )
+      sharesTaskListStatus
     )
+
+    val sharesDisposalItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey("nonsipp.tasklist.sharesdisposal", "title"),
+        controllers.routes.UnauthorisedController.onPageLoad().url
+      ),
+      shareDisposalTaskListStatus
+    )
+
+    val currentSharesCompleted = currentUA.get(SharesCompleted.all(srn)).filter(_.nonEmpty)
+    val previousSharesCompleted = previousUA.get(SharesCompleted.all(srn)).filter(_.nonEmpty)
+
+    val viewModelList = NonEmptyList
+      .fromList((currentSharesCompleted, previousSharesCompleted) match {
+        case (Some(_), _) => List(sharesItem, sharesDisposalItem)
+        case (_, Some(_)) => List(sharesItem, sharesDisposalItem)
+        case (_, _) => List(sharesItem)
+      })
+      .get
+
+    TaskListSectionViewModel(s"$prefix.title", Right(viewModelList), None)
   }
 
 //--Land or property--------------------------------------------------------------------------------------------------//
 
-  private def landOrPropertySection(currentUA: UserAnswers, previousUA: UserAnswers): TaskListSectionViewModel = {
+  private def landOrPropertySection(
+    currentUA: UserAnswers,
+    previousUA: UserAnswers,
+    srn: Srn
+  ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.landorproperty"
 
     val landOrPropertyTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
@@ -476,28 +495,39 @@ object ViewOnlyTaskListController {
       pages.nonsipp.landorpropertydisposal.Paths.disposalPropertyTransaction
     )
 
-    TaskListSectionViewModel(
-      s"$prefix.title",
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
-        ),
-        landOrPropertyTaskListStatus
+    val landOrPropertyItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey(prefix, "title"),
+        controllers.routes.UnauthorisedController.onPageLoad().url
       ),
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey("nonsipp.tasklist.landorpropertydisposal", "title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
-        ),
-        landOrPropertyDisposalTaskListStatus
-      )
+      landOrPropertyTaskListStatus
     )
+
+    val landOrPropertyDisposalItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey("nonsipp.tasklist.landorpropertydisposal", "title"),
+        controllers.routes.UnauthorisedController.onPageLoad().url
+      ),
+      landOrPropertyDisposalTaskListStatus
+    )
+
+    val currentLandOrPropertyCompleted = currentUA.get(LandOrPropertyCompleted.all(srn)).filter(_.nonEmpty)
+    val previousLandOrPropertyCompleted = previousUA.get(LandOrPropertyCompleted.all(srn)).filter(_.nonEmpty)
+
+    val viewModelList = NonEmptyList
+      .fromList((currentLandOrPropertyCompleted, previousLandOrPropertyCompleted) match {
+        case (Some(_), _) => List(landOrPropertyItem, landOrPropertyDisposalItem)
+        case (_, Some(_)) => List(landOrPropertyItem, landOrPropertyDisposalItem)
+        case (_, _) => List(landOrPropertyItem)
+      })
+      .get
+
+    TaskListSectionViewModel(s"$prefix.title", Right(viewModelList), None)
   }
 
 //--Bonds-------------------------------------------------------------------------------------------------------------//
 
-  private def bondsSection(currentUA: UserAnswers, previousUA: UserAnswers): TaskListSectionViewModel = {
+  private def bondsSection(currentUA: UserAnswers, previousUA: UserAnswers, srn: Srn): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.bonds"
 
     val bondsTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
@@ -513,23 +543,34 @@ object ViewOnlyTaskListController {
       pages.nonsipp.bondsdisposal.Paths.bondsDisposed
     )
 
-    TaskListSectionViewModel(
-      s"$prefix.title",
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "unregulatedorconnected.title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
-        ),
-        bondsTaskListStatus
+    val bondsItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey(prefix, "unregulatedorconnected.title"),
+        controllers.routes.UnauthorisedController.onPageLoad().url
       ),
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "bondsdisposal.title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
-        ),
-        bondsDisposalTaskListStatus
-      )
+      bondsTaskListStatus
     )
+
+    val bondsDisposalItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey(prefix, "bondsdisposal.title"),
+        controllers.routes.UnauthorisedController.onPageLoad().url
+      ),
+      bondsDisposalTaskListStatus
+    )
+
+    val currentBondsCompleted = currentUA.get(BondsCompleted.all(srn)).filter(_.nonEmpty)
+    val previousBondsCompleted = previousUA.get(BondsCompleted.all(srn)).filter(_.nonEmpty)
+
+    val viewModelList = NonEmptyList
+      .fromList((currentBondsCompleted, previousBondsCompleted) match {
+        case (Some(_), _) => List(bondsItem, bondsDisposalItem)
+        case (_, Some(_)) => List(bondsItem, bondsDisposalItem)
+        case (_, _) => List(bondsItem)
+      })
+      .get
+
+    TaskListSectionViewModel(s"$prefix.title", Right(viewModelList), None)
   }
 
 //--Other assets------------------------------------------------------------------------------------------------------//
@@ -560,57 +601,47 @@ object ViewOnlyTaskListController {
       pages.nonsipp.otherassetsdisposal.Paths.assetsDisposed
     )
 
-    val sharesExist =
-      (currentUA.get(DidSchemeHoldAnySharesPage(srn)), previousUA.get(DidSchemeHoldAnySharesPage(srn))) match {
-        case (Some(_), _) => true
-        case (_, Some(_)) => true
-        case _ => false
-      }
+    val quotedSharesItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey(prefix, "quotedshares.title"),
+        controllers.routes.UnauthorisedController.onPageLoad().url
+      ),
+      quotedSharesStatusAndLink
+    )
 
-    if (sharesExist) {
-      TaskListSectionViewModel(
-        s"$prefix.title",
-        TaskListItemViewModel(
-          LinkMessage(
-            messageKey(prefix, "quotedshares.title"),
-            controllers.routes.UnauthorisedController.onPageLoad().url
-          ),
-          quotedSharesStatusAndLink
-        ),
-        TaskListItemViewModel(
-          LinkMessage(
-            messageKey(prefix, "title"),
-            controllers.routes.UnauthorisedController.onPageLoad().url
-          ),
-          otherAssetsTaskListStatus
-        ),
-        TaskListItemViewModel(
-          LinkMessage(
-            messageKey("nonsipp.tasklist.otherassetsdisposal", "title"),
-            controllers.routes.UnauthorisedController.onPageLoad().url
-          ),
-          otherAssetsDisposalTaskListStatus
-        )
-      )
-    } else {
-      TaskListSectionViewModel(
-        s"$prefix.title",
-        TaskListItemViewModel(
-          LinkMessage(
-            messageKey(prefix, "title"),
-            controllers.routes.UnauthorisedController.onPageLoad().url
-          ),
-          otherAssetsTaskListStatus
-        ),
-        TaskListItemViewModel(
-          LinkMessage(
-            messageKey("nonsipp.tasklist.otherassetsdisposal", "title"),
-            controllers.routes.UnauthorisedController.onPageLoad().url
-          ),
-          otherAssetsDisposalTaskListStatus
-        )
-      )
-    }
+    val otherAssetsItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey(prefix, "title"),
+        controllers.routes.UnauthorisedController.onPageLoad().url
+      ),
+      otherAssetsTaskListStatus
+    )
+
+    val otherAssetsDisposalItem = TaskListItemViewModel(
+      LinkMessage(
+        messageKey("nonsipp.tasklist.otherassetsdisposal", "title"),
+        controllers.routes.UnauthorisedController.onPageLoad().url
+      ),
+      otherAssetsDisposalTaskListStatus
+    )
+
+    val sharesExist = currentUA.get(DidSchemeHoldAnySharesPage(srn)).isDefined || previousUA
+      .get(DidSchemeHoldAnySharesPage(srn))
+      .isDefined
+
+    val currentOtherAssetsCompleted = currentUA.get(OtherAssetsCompleted.all(srn)).filter(_.nonEmpty)
+    val previousOtherAssetsCompleted = previousUA.get(OtherAssetsCompleted.all(srn)).filter(_.nonEmpty)
+
+    val viewModelList = NonEmptyList
+      .fromList((sharesExist, currentOtherAssetsCompleted.orElse(previousOtherAssetsCompleted)) match {
+        case (true, Some(_)) => List(quotedSharesItem, otherAssetsItem, otherAssetsDisposalItem)
+        case (true, None) => List(quotedSharesItem, otherAssetsItem)
+        case (false, Some(_)) => List(otherAssetsItem, otherAssetsDisposalItem)
+        case (false, None) => List(otherAssetsItem)
+      })
+      .get
+
+    TaskListSectionViewModel(s"$prefix.title", Right(viewModelList), None)
   }
 
 //--Declaration-------------------------------------------------------------------------------------------------------//

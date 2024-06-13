@@ -64,7 +64,7 @@ import pages.nonsipp.membertransferout._
 import pages.nonsipp.moneyborrowed._
 import pages.nonsipp.bondsdisposal._
 import pages.nonsipp.memberpayments._
-import viewmodels.models.{PageViewModel, TaskListViewModel}
+import viewmodels.models._
 
 import scala.concurrent.Future
 
@@ -193,6 +193,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(TotalAssetValuePage(srn, index1of5000), money)
     .unsafeSet(SharesTotalIncomePage(srn, index1of5000), money)
     .unsafeSet(SharesListPage(srn), false)
+    .unsafeSet(SharesCompleted(srn, index1of5000), SectionCompleted)
     // (S5) Shares Disposals
     .unsafeSet(SharesDisposalPage(srn), true)
     .unsafeSet(HowWereSharesDisposedPage(srn, index1of5000, index1of50), Sold)
@@ -227,6 +228,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, index1of5000), (leaseName, money, localDate))
     .unsafeSet(IsLesseeConnectedPartyPage(srn, index1of5000), false)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, index1of5000), money)
+    .unsafeSet(LandOrPropertyCompleted(srn, index1of5000), SectionCompleted)
     // (S6) Land or Property Disposals
     .unsafeSet(LandOrPropertyDisposalPage(srn), true)
     .unsafeSet(HowWasPropertyDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Transferred)
@@ -241,6 +243,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(BondsFromConnectedPartyPage(srn, index1of5000), true)
     .unsafeSet(AreBondsUnregulatedPage(srn, index1of5000), true)
     .unsafeSet(IncomeFromBondsPage(srn, index1of5000), money)
+    .unsafeSet(BondsCompleted(srn, index1of5000), SectionCompleted)
     // (S7) Bonds Disposals
     .unsafeSet(BondsDisposalPage(srn), true)
     .unsafeSet(HowWereBondsDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Other(otherDetails))
@@ -259,6 +262,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(CostOfOtherAssetPage(srn, index1of5000), money)
     .unsafeSet(pages.nonsipp.otherassetsheld.IndependentValuationPage(srn, index1of5000), true)
     .unsafeSet(IncomeFromAssetPage(srn, index1of5000), money)
+    .unsafeSet(OtherAssetsCompleted(srn, index1of5000), SectionCompleted)
     // (S8) Other Assets Disposals
     .unsafeSet(OtherAssetsDisposalPage(srn), true)
     .unsafeSet(HowWasAssetDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Transferred)
@@ -376,6 +380,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(SharesIndependentValuationPage(srn, index1of5000), true)
     .unsafeSet(SharesTotalIncomePage(srn, index1of5000), money)
     .unsafeSet(SharesListPage(srn), false)
+    .unsafeSet(SharesCompleted(srn, index1of5000), SectionCompleted)
     // (S5) Shares Disposals
     .unsafeSet(SharesDisposalPage(srn), true)
     .unsafeSet(HowWereSharesDisposedPage(srn, index1of5000, index1of50), Redeemed)
@@ -399,6 +404,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(IsLandOrPropertyResidentialPage(srn, index1of5000), false)
     .unsafeSet(IsLandPropertyLeasedPage(srn, index1of5000), false)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, index1of5000), money)
+    .unsafeSet(LandOrPropertyCompleted(srn, index1of5000), SectionCompleted)
     // (S6) Land or Property Disposals
     .unsafeSet(LandOrPropertyDisposalPage(srn), true)
     .unsafeSet(HowWasPropertyDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Sold)
@@ -423,6 +429,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(BondsFromConnectedPartyPage(srn, index1of5000), true)
     .unsafeSet(AreBondsUnregulatedPage(srn, index1of5000), true)
     .unsafeSet(IncomeFromBondsPage(srn, index1of5000), money)
+    .unsafeSet(BondsCompleted(srn, index1of5000), SectionCompleted)
     // (S7) Bonds Disposals
     .unsafeSet(BondsDisposalPage(srn), true)
     .unsafeSet(HowWereBondsDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Sold)
@@ -441,6 +448,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(CostOfOtherAssetPage(srn, index1of5000), money)
     .unsafeSet(pages.nonsipp.otherassetsheld.IndependentValuationPage(srn, index1of5000), false)
     .unsafeSet(IncomeFromAssetPage(srn, index1of5000), money)
+    .unsafeSet(OtherAssetsCompleted(srn, index1of5000), SectionCompleted)
     // (S8) Other Assets Disposals
     .unsafeSet(OtherAssetsDisposalPage(srn), true)
     .unsafeSet(HowWasAssetDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Sold)
@@ -909,6 +917,52 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
 
         "(S5) Shares Disposals" - {
 
+          "Not Visible with no shares completed" in {
+            testViewModelVisibility(
+              currentUA.unsafeRemove(SharesCompleted(srn, index1of5000)),
+              currentUA.unsafeRemove(SharesCompleted(srn, index1of5000)),
+              4,
+              1,
+              expectedTitleKey = "nonsipp.tasklist.shares.title",
+              expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.view.title",
+              expectedVisibility = false
+            )
+          }
+
+          "Visible with shares completed in either version" in {
+            testViewModelVisibility(
+              currentUA.unsafeRemove(SharesCompleted(srn, index1of5000)),
+              currentUA,
+              4,
+              1,
+              expectedTitleKey = "nonsipp.tasklist.shares.title",
+              expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.view.title",
+              expectedVisibility = true
+            )
+
+            testViewModelVisibility(
+              currentUA,
+              currentUA.unsafeRemove(SharesCompleted(srn, index1of5000)),
+              4,
+              1,
+              expectedTitleKey = "nonsipp.tasklist.shares.title",
+              expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.view.title",
+              expectedVisibility = true
+            )
+          }
+
+          "Visible with shares completed in both versions" in {
+            testViewModelVisibility(
+              currentUA,
+              currentUA,
+              4,
+              1,
+              expectedTitleKey = "nonsipp.tasklist.shares.title",
+              expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.view.title",
+              expectedVisibility = true
+            )
+          }
+
           "Completed" in {
             testViewModel(
               currentUA,
@@ -999,6 +1053,52 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
 
         "(S6) Land or Property Disposals" - {
 
+          "Not Visible with no land or property completed" in {
+            testViewModelVisibility(
+              currentUA.unsafeRemove(LandOrPropertyCompleted(srn, index1of5000)),
+              currentUA.unsafeRemove(LandOrPropertyCompleted(srn, index1of5000)),
+              5,
+              1,
+              expectedTitleKey = "nonsipp.tasklist.landorproperty.title",
+              expectedLinkContentKey = "nonsipp.tasklist.landorpropertydisposal.view.title",
+              expectedVisibility = false
+            )
+          }
+
+          "Visible with land or property completed in either version" in {
+            testViewModelVisibility(
+              currentUA.unsafeRemove(LandOrPropertyCompleted(srn, index1of5000)),
+              currentUA,
+              5,
+              1,
+              expectedTitleKey = "nonsipp.tasklist.landorproperty.title",
+              expectedLinkContentKey = "nonsipp.tasklist.landorpropertydisposal.view.title",
+              expectedVisibility = true
+            )
+
+            testViewModelVisibility(
+              currentUA,
+              currentUA.unsafeRemove(LandOrPropertyCompleted(srn, index1of5000)),
+              5,
+              1,
+              expectedTitleKey = "nonsipp.tasklist.landorproperty.title",
+              expectedLinkContentKey = "nonsipp.tasklist.landorpropertydisposal.view.title",
+              expectedVisibility = true
+            )
+          }
+
+          "Visible with land or property completed in both versions" in {
+            testViewModelVisibility(
+              currentUA,
+              currentUA,
+              5,
+              1,
+              expectedTitleKey = "nonsipp.tasklist.landorproperty.title",
+              expectedLinkContentKey = "nonsipp.tasklist.landorpropertydisposal.view.title",
+              expectedVisibility = true
+            )
+          }
+
           "Completed" in {
             testViewModel(
               currentUA,
@@ -1060,6 +1160,52 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
 
         "(S7) Bonds Disposals" - {
 
+          "Not Visible with no bonds completed" in {
+            testViewModelVisibility(
+              currentUA.unsafeRemove(BondsCompleted(srn, index1of5000)),
+              currentUA.unsafeRemove(BondsCompleted(srn, index1of5000)),
+              6,
+              1,
+              expectedTitleKey = "nonsipp.tasklist.bonds.title",
+              expectedLinkContentKey = "nonsipp.tasklist.bonds.view.bondsdisposal.title",
+              expectedVisibility = false
+            )
+          }
+
+          "Visible with bonds completed in either version" in {
+            testViewModelVisibility(
+              currentUA.unsafeRemove(BondsCompleted(srn, index1of5000)),
+              currentUA,
+              6,
+              1,
+              expectedTitleKey = "nonsipp.tasklist.bonds.title",
+              expectedLinkContentKey = "nonsipp.tasklist.bonds.view.bondsdisposal.title",
+              expectedVisibility = true
+            )
+
+            testViewModelVisibility(
+              currentUA,
+              currentUA.unsafeRemove(BondsCompleted(srn, index1of5000)),
+              6,
+              1,
+              expectedTitleKey = "nonsipp.tasklist.bonds.title",
+              expectedLinkContentKey = "nonsipp.tasklist.bonds.view.bondsdisposal.title",
+              expectedVisibility = true
+            )
+          }
+
+          "Visible with bonds completed in both versions" in {
+            testViewModelVisibility(
+              currentUA,
+              currentUA,
+              6,
+              1,
+              expectedTitleKey = "nonsipp.tasklist.bonds.title",
+              expectedLinkContentKey = "nonsipp.tasklist.bonds.view.bondsdisposal.title",
+              expectedVisibility = true
+            )
+          }
+
           "Completed" in {
             testViewModel(
               currentUA,
@@ -1120,6 +1266,52 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
         }
 
         "(S8) Other Assets Disposals" - {
+
+          "Not Visible with no other assets completed" in {
+            testViewModelVisibility(
+              currentUA.unsafeRemove(OtherAssetsCompleted(srn, index1of5000)),
+              currentUA.unsafeRemove(OtherAssetsCompleted(srn, index1of5000)),
+              7,
+              2,
+              expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+              expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.view.title",
+              expectedVisibility = false
+            )
+          }
+
+          "Visible with other assets completed in either version" in {
+            testViewModelVisibility(
+              currentUA.unsafeRemove(OtherAssetsCompleted(srn, index1of5000)),
+              currentUA,
+              7,
+              2,
+              expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+              expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.view.title",
+              expectedVisibility = true
+            )
+
+            testViewModelVisibility(
+              currentUA,
+              currentUA.unsafeRemove(OtherAssetsCompleted(srn, index1of5000)),
+              7,
+              2,
+              expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+              expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.view.title",
+              expectedVisibility = true
+            )
+          }
+
+          "Visible with other assets completed in both versions" in {
+            testViewModelVisibility(
+              currentUA,
+              currentUA,
+              7,
+              2,
+              expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+              expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.view.title",
+              expectedVisibility = true
+            )
+          }
 
           "Completed" in {
             testViewModel(
@@ -1198,5 +1390,41 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
         item.link.url mustBe expectedLinkUrl
       }
     )
+  }
+
+  private def testViewModelVisibility(
+    currentUA: UserAnswers,
+    previousUA: UserAnswers,
+    sectionIndex: Int,
+    itemIndex: Int,
+    expectedTitleKey: String,
+    expectedLinkContentKey: String,
+    expectedVisibility: Boolean
+  ): Unit = {
+    val customViewModel = ViewOnlyTaskListController.viewModel(
+      srn,
+      schemeName,
+      dateRange,
+      currentUA,
+      previousUA,
+      submissionNumberTwo
+    )
+    val sections = customViewModel.page.sections.toList
+
+    if (expectedVisibility) {
+      sections(sectionIndex).title.key mustBe expectedTitleKey
+      sections(sectionIndex).items.fold(
+        _ => "",
+        list => {
+          val item = list.toList(itemIndex)
+          item.link.content.key mustBe expectedLinkContentKey
+        }
+      )
+    } else {
+      val section: List[TaskListItemViewModel] = sections(sectionIndex).items.fold(_ => List(), list => {
+        list.toList
+      })
+      section.map(_.link.content.key) must not contain expectedLinkContentKey
+    }
   }
 }
