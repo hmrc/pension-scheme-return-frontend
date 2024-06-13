@@ -26,7 +26,7 @@ import _root_.config.Constants
 import navigation.Navigator
 import models._
 import play.api.i18n.MessagesApi
-import pages.nonsipp.employercontributions.{EmployerContributionsMemberListPage, EmployerContributionsSectionStatus}
+import pages.nonsipp.employercontributions._
 import services.{PsrSubmissionService, SaveService}
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
@@ -122,17 +122,13 @@ class EmployerContributionsMemberListController @Inject()(
                     .set(EmployerContributionsMemberListPage(srn), value)
                 )
                 _ <- saveService.save(updatedUserAnswers)
-                submissionResult <- if (value) {
-                  psrSubmissionService.submitPsrDetailsWithUA(
-                    srn,
-                    updatedUserAnswers,
-                    fallbackCall =
-                      controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-                        .onPageLoad(srn, page, mode)
-                  )
-                } else {
-                  Future.successful(Some(()))
-                }
+                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+                  srn,
+                  updatedUserAnswers,
+                  fallbackCall =
+                    controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+                      .onPageLoad(srn, page, mode)
+                )
               } yield submissionResult.getOrRecoverJourney(
                 _ =>
                   Redirect(

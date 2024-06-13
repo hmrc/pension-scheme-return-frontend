@@ -66,97 +66,64 @@ class MemberPaymentsTransformerSpec
       pensionAmountReceivedTransformer
     )
 
-  private val memberPayments = MemberPayments(
+  private val index = refineMV[Max300.Refined](1)
+  private val employerContribsIndex = refineMV[Max50.Refined](1)
+  private val transfersInIndex = refineMV[Max5.Refined](1)
+  private val transfersOutIndex = refineMV[Max5.Refined](1)
+
+  // Test data: all sections of Member Payments have payments made
+  private val activeMemberAllSections = MemberDetails(
+    state = MemberState.Active,
+    memberPSRVersion = Some("001"),
+    personalDetails = MemberPersonalDetails(
+      firstName = memberDetails.firstName,
+      lastName = memberDetails.lastName,
+      nino = Some(nino.value),
+      reasonNoNINO = None,
+      dateOfBirth = memberDetails.dob
+    ),
+    employerContributions = List(
+      EmployerContributions(
+        employerName = employerName,
+        employerType = EmployerType.UKCompany(Right(crn.value)),
+        totalTransferValue = money.value
+      )
+    ),
+    transfersIn = List(
+      TransfersIn(
+        schemeName = schemeName,
+        dateOfTransfer = localDate,
+        transferSchemeType = PensionSchemeType.RegisteredPS("123"),
+        transferValue = money.value,
+        transferIncludedAsset = true
+      )
+    ),
+    totalContributions = Some(money.value),
+    memberLumpSumReceived = Some(MemberLumpSumReceived(money.value, money.value)),
+    transfersOut = List(
+      TransfersOut(
+        schemeName = schemeName,
+        dateOfTransfer = localDate,
+        transferSchemeType = PensionSchemeType.RegisteredPS("456")
+      )
+    ),
+    benefitsSurrendered = Some(
+      SurrenderedBenefits(
+        totalSurrendered = 12.34,
+        dateOfSurrender = LocalDate.of(2022, 12, 12),
+        surrenderReason = "some reason"
+      )
+    ),
+    pensionAmountReceived = Some(12.34)
+  )
+
+  private val deletedMemberAllSections = activeMemberAllSections.copy(state = MemberState.Deleted)
+
+  private val memberPaymentsAllSections = MemberPayments(
     recordVersion = Some("001"),
     memberDetails = List(
-      MemberDetails(
-        state = MemberState.Active,
-        memberPSRVersion = Some("001"),
-        personalDetails = MemberPersonalDetails(
-          firstName = memberDetails.firstName,
-          lastName = memberDetails.lastName,
-          nino = Some(nino.value),
-          reasonNoNINO = None,
-          dateOfBirth = memberDetails.dob
-        ),
-        employerContributions = List(
-          EmployerContributions(
-            employerName = employerName,
-            employerType = EmployerType.UKCompany(Right(crn.value)),
-            totalTransferValue = money.value
-          )
-        ),
-        transfersIn = List(
-          TransfersIn(
-            schemeName = schemeName,
-            dateOfTransfer = localDate,
-            transferSchemeType = PensionSchemeType.RegisteredPS("123"),
-            transferValue = money.value,
-            transferIncludedAsset = true
-          )
-        ),
-        totalContributions = Some(money.value),
-        memberLumpSumReceived = Some(MemberLumpSumReceived(money.value, money.value)),
-        transfersOut = List(
-          TransfersOut(
-            schemeName = schemeName,
-            dateOfTransfer = localDate,
-            transferSchemeType = PensionSchemeType.RegisteredPS("456")
-          )
-        ),
-        benefitsSurrendered = Some(
-          SurrenderedBenefits(
-            totalSurrendered = 12.34,
-            dateOfSurrender = LocalDate.of(2022, 12, 12),
-            surrenderReason = "some reason"
-          )
-        ),
-        pensionAmountReceived = Some(12.34)
-      ),
-      MemberDetails(
-        state = MemberState.Deleted,
-        memberPSRVersion = Some("001"),
-        personalDetails = MemberPersonalDetails(
-          firstName = memberDetails.firstName,
-          lastName = memberDetails.lastName,
-          nino = Some(nino.value),
-          reasonNoNINO = None,
-          dateOfBirth = memberDetails.dob
-        ),
-        employerContributions = List(
-          EmployerContributions(
-            employerName = employerName,
-            employerType = EmployerType.UKCompany(Right(crn.value)),
-            totalTransferValue = money.value
-          )
-        ),
-        transfersIn = List(
-          TransfersIn(
-            schemeName = schemeName,
-            dateOfTransfer = localDate,
-            transferSchemeType = PensionSchemeType.RegisteredPS("123"),
-            transferValue = money.value,
-            transferIncludedAsset = true
-          )
-        ),
-        totalContributions = Some(money.value),
-        memberLumpSumReceived = Some(MemberLumpSumReceived(money.value, money.value)),
-        transfersOut = List(
-          TransfersOut(
-            schemeName = schemeName,
-            dateOfTransfer = localDate,
-            transferSchemeType = PensionSchemeType.RegisteredPS("456")
-          )
-        ),
-        benefitsSurrendered = Some(
-          SurrenderedBenefits(
-            totalSurrendered = 12.34,
-            dateOfSurrender = LocalDate.of(2022, 12, 12),
-            surrenderReason = "some reason"
-          )
-        ),
-        pensionAmountReceived = Some(12.34)
-      )
+      activeMemberAllSections,
+      deletedMemberAllSections
     ),
     employerContributionsDetails = SectionDetails(made = true, completed = true),
     transfersInCompleted = false,
@@ -169,7 +136,7 @@ class MemberPaymentsTransformerSpec
     pensionReceived = SectionDetails(made = true, completed = true)
   )
 
-  private val softDeletedMember = SoftDeletedMember(
+  private val softDeletedMemberAllSections = SoftDeletedMember(
     memberPSRVersion = Some("001"),
     memberDetails = MemberPersonalDetails(
       firstName = memberDetails.firstName,
@@ -213,12 +180,7 @@ class MemberPaymentsTransformerSpec
     totalAmountPensionPaymentsPage = Some(Money(12.34))
   )
 
-  private val index = refineMV[Max300.Refined](1)
-  private val employerContribsIndex = refineMV[Max50.Refined](1)
-  private val transfersInIndex = refineMV[Max5.Refined](1)
-  private val transfersOutIndex = refineMV[Max5.Refined](1)
-
-  private val userAnswers = defaultUserAnswers
+  private val userAnswersAllSections = defaultUserAnswers
     .unsafeSet(MemberPaymentsRecordVersionPage(srn), "001")
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
     .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
@@ -234,10 +196,15 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(TotalEmployerContributionPage(srn, index, employerContribsIndex), money)
     .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
     .unsafeSet(EmployerContributionsCompleted(srn, index, employerContribsIndex), SectionCompleted)
-    .unsafeSet(UnallocatedEmployerContributionsPage(srn), true)
-    .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
     .unsafeSet(EmployerContributionsMemberListPage(srn), true)
     .unsafeSet(EmployerContributionsProgress(srn, index, employerContribsIndex), SectionJourneyStatus.Completed)
+    // unallocated employer contributions
+    .unsafeSet(UnallocatedEmployerContributionsPage(srn), true)
+    .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
+    // member contributions
+    .unsafeSet(MemberContributionsPage(srn), true)
+    .unsafeSet(MemberContributionsListPage(srn), true)
+    .unsafeSet(TotalMemberContributionPage(srn, index), money)
     // transfers in
     .unsafeSet(TransfersInSectionCompleted(srn, index, transfersInIndex), SectionCompleted)
 //    .unsafeSet(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
@@ -246,11 +213,8 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(TotalValueTransferPage(srn, index, transfersInIndex), money)
     .unsafeSet(DidTransferIncludeAssetPage(srn, index, transfersInIndex), true)
     .unsafeSet(TransferringSchemeTypePage(srn, index, transfersInIndex), PensionSchemeType.RegisteredPS("123"))
-    .unsafeSet(MemberContributionsPage(srn), true)
-    .unsafeSet(MemberContributionsListPage(srn), true)
-    .unsafeSet(TotalMemberContributionPage(srn, index), money)
-//    .unsafeSet(DidSchemeReceiveTransferPage(srn), true)
-//    .unsafeSet(TransferReceivedMemberListPage(srn), false)
+//     .unsafeSet(DidSchemeReceiveTransferPage(srn), true)
+//     .unsafeSet(TransferReceivedMemberListPage(srn), false)
     .unsafeSet(ReportAnotherTransferInPage(srn, index, transfersInIndex), false)
     // pcls
     .unsafeSet(PensionCommencementLumpSumPage(srn), true)
@@ -278,7 +242,105 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(PensionPaymentsJourneyStatus(srn), SectionStatus.Completed)
     .unsafeSet(MemberPensionPaymentsListPage(srn), true)
     // soft deleted
-    .unsafeSet(SoftDeletedMembers(srn), List(softDeletedMember))
+    .unsafeSet(SoftDeletedMembers(srn), List(softDeletedMemberAllSections))
+
+  // Test data: no sections of Member Payments have payments made
+  private val activeMemberNoSections = MemberDetails(
+    state = MemberState.Active,
+    memberPSRVersion = Some("001"),
+    personalDetails = MemberPersonalDetails(
+      firstName = memberDetails.firstName,
+      lastName = memberDetails.lastName,
+      nino = Some(nino.value),
+      reasonNoNINO = None,
+      dateOfBirth = memberDetails.dob
+    ),
+    employerContributions = List.empty,
+    transfersIn = List.empty,
+    totalContributions = None,
+    memberLumpSumReceived = None,
+    transfersOut = List.empty,
+    benefitsSurrendered = None,
+    pensionAmountReceived = None
+  )
+
+  private val deletedMemberNoSections = activeMemberNoSections.copy(state = MemberState.Deleted)
+
+  private val memberPaymentsNoSections = MemberPayments(
+    recordVersion = Some("001"),
+    memberDetails = List(
+      activeMemberNoSections,
+      deletedMemberNoSections
+    ),
+    employerContributionsDetails = SectionDetails(made = false, completed = true),
+    transfersInCompleted = false,
+    transfersOutCompleted = false,
+    unallocatedContribsMade = Some(false),
+    unallocatedContribAmount = None,
+    memberContributionMade = Some(false),
+    lumpSumReceived = Some(false),
+    benefitsSurrenderedDetails = SectionDetails(made = false, completed = true),
+    pensionReceived = SectionDetails(made = false, completed = true)
+  )
+
+  private val softDeletedMemberNoSections = SoftDeletedMember(
+    memberPSRVersion = Some("001"),
+    memberDetails = MemberPersonalDetails(
+      firstName = memberDetails.firstName,
+      lastName = memberDetails.lastName,
+      nino = Some(nino.value),
+      reasonNoNINO = None,
+      dateOfBirth = memberDetails.dob
+    ),
+    employerContributions = List.empty,
+    transfersIn = List.empty,
+    totalMemberContribution = None,
+    memberLumpSumReceived = None,
+    transfersOut = List.empty,
+    pensionSurrendered = None,
+    totalAmountPensionPaymentsPage = None
+  )
+
+  // TODO: when each section is updated, check/update page values for that section
+  private val userAnswersNoSections = defaultUserAnswers
+    .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+    .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
+    .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
+    .unsafeSet(MemberStatus(srn, index), MemberState.Active)
+    .unsafeSet(MemberDetailsCompletedPage(srn, index), SectionCompleted)
+    .unsafeSet(MemberPsrVersionPage(srn, index), "001")
+    .unsafeSet(MemberPaymentsRecordVersionPage(srn), "001")
+    // employer contributions
+    .unsafeSet(EmployerContributionsPage(srn), false)
+    .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
+    .unsafeSet(EmployerContributionsMemberListPage(srn), true)
+    // unallocated employer contributions - to be checked/updated
+    .unsafeSet(UnallocatedEmployerContributionsPage(srn), false)
+    // member contributions - to be checked/updated
+    .unsafeSet(MemberContributionsPage(srn), false)
+    .unsafeSet(MemberContributionsListPage(srn), false)
+    // transfers in - to be checked/updated
+//    .unsafeSet(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
+//    .unsafeSet(DidSchemeReceiveTransferPage(srn), false)
+//    .unsafeSet(TransferReceivedMemberListPage(srn), false)
+    // pcls - to be checked/updated
+    .unsafeSet(PensionCommencementLumpSumPage(srn), false)
+    .unsafeSet(PclsMemberListPage(srn), false)
+    // transfers out - to be checked/updated
+//    .unsafeSet(SchemeTransferOutPage(srn), false)
+//    .unsafeSet(TransferOutMemberListPage(srn), false)
+//    .unsafeSet(TransfersOutJourneyStatus(srn), SectionStatus.InProgress)
+    // pension surrender - to be checked/updated
+//    .unsafeSet(SurrenderedBenefitsCompletedPage(srn, index), SectionCompleted)
+    .unsafeSet(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.Completed)
+    .unsafeSet(SurrenderedBenefitsPage(srn), false)
+    .unsafeSet(SurrenderedBenefitsMemberListPage(srn), true)
+    // pension payments - to be checked/updated
+    .unsafeSet(PensionPaymentsReceivedPage(srn), false)
+    .unsafeSet(PensionPaymentsJourneyStatus(srn), SectionStatus.Completed)
+    .unsafeSet(MemberPensionPaymentsListPage(srn), true)
+    // soft deleted
+    .unsafeSet(SoftDeletedMembers(srn), List(softDeletedMemberNoSections))
 
   "MemberPaymentsTransformer - To Etmp" - {
     "should return empty List when userAnswer is empty" in {
@@ -287,10 +349,10 @@ class MemberPaymentsTransformerSpec
     }
 
     "should return member payments without recordVersion when initial UA and current UA are different" in {
-      val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswers, emptyUserAnswers)
-      val memberDetails = memberPayments.memberDetails
+      val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswersAllSections, emptyUserAnswers)
+      val memberDetails = memberPaymentsAllSections.memberDetails
       result shouldMatchTo Some(
-        memberPayments
+        memberPaymentsAllSections
           .copy(
             recordVersion = None,
             memberDetails = memberDetails.map(md => if (md.state == Deleted) md else md.copy(memberPSRVersion = None))
@@ -299,30 +361,20 @@ class MemberPaymentsTransformerSpec
     }
 
     "should return member payments with recordVersion/memberPsrVersion when initial UA and current UA are same" in {
-      val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswers, userAnswers)
-      result shouldMatchTo Some(memberPayments)
+      val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswersAllSections, userAnswersAllSections)
+      result shouldMatchTo Some(memberPaymentsAllSections)
     }
   }
 
   "MemberPaymentsTransformer - From Etmp" - {
     "should return correct user answers" in {
-      val result = memberPaymentsTransformer.transformFromEtmp(defaultUserAnswers, srn, memberPayments)
-      result shouldMatchTo Try(userAnswers)
+      val result = memberPaymentsTransformer.transformFromEtmp(defaultUserAnswers, srn, memberPaymentsAllSections)
+      result shouldMatchTo Try(userAnswersAllSections)
     }
 
-    "should return employer contributions Completed if no contribution are added" in {
-      val memberPaymentsNoContributions =
-        memberPayments.copy(employerContributionsDetails = SectionDetails(made = false, completed = false))
-      val userAnswersNoContributions = userAnswers
-        .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-        .unsafeSet(EmployerContributionsPage(srn), false)
-        .unsafeSet(EmployerContributionsMemberListPage(srn), false)
-        .removeOnly(EmployerContributionsProgress.all(srn))
-        .get
-
-      val result = memberPaymentsTransformer.transformFromEtmp(defaultUserAnswers, srn, memberPaymentsNoContributions)
-      result shouldMatchTo Try(userAnswersNoContributions)
+    "should return Completed for Employer Contributions if no contributions are added" in {
+      val result = memberPaymentsTransformer.transformFromEtmp(defaultUserAnswers, srn, memberPaymentsNoSections)
+      result shouldMatchTo Try(userAnswersNoSections)
     }
-
   }
 }

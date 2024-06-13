@@ -26,14 +26,14 @@ import navigation.Navigator
 import forms.YesNoPageFormProvider
 import play.api.i18n.MessagesApi
 import play.api.data.Form
-import pages.nonsipp.employercontributions.{ContributionsFromAnotherEmployerPage, EmployerContributionsProgress}
+import pages.nonsipp.employercontributions.ContributionsFromAnotherEmployerPage
 import services.SaveService
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import models.Mode
 import controllers.nonsipp.employercontributions.ContributionsFromAnotherEmployerController._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, SectionJourneyStatus, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -79,7 +79,6 @@ class ContributionsFromAnotherEmployerController @Inject()(
               updatedAnswers <- Future.fromTry(
                 request.userAnswers
                   .set(ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex), value)
-                  .set(EmployerContributionsProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed)
               )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
