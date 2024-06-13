@@ -104,6 +104,7 @@ object OtherBuyerDetailsController {
     "otherAssetsDisposal.otherBuyerDetails.name.error.required",
     "otherAssetsDisposal.otherBuyerDetails.name.error.invalid",
     "otherAssetsDisposal.otherBuyerDetails.name.error.length",
+    "otherAssetsDisposal.otherBuyerDetails.description.error.required",
     "otherAssetsDisposal.otherBuyerDetails.description.error.invalid",
     "otherAssetsDisposal.otherBuyerDetails.description.error.length"
   )

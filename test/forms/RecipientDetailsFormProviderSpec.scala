@@ -28,6 +28,7 @@ class RecipientDetailsFormProviderSpec extends FieldBehaviours {
     "name.error.required",
     "name.error.invalid",
     "name.error.length",
+    "description.error.required",
     "description.error.invalid",
     "description.error.length"
   )
@@ -37,7 +38,7 @@ class RecipientDetailsFormProviderSpec extends FieldBehaviours {
   }
 
   "description" - {
-    behave.like(optionalField(form, "description"))
+    behave.like(mandatoryField(form, "description", "description.error.required"))
   }
 
 }

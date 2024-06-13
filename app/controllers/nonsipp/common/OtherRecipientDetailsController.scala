@@ -94,6 +94,7 @@ object OtherRecipientDetailsController {
     s"${subject.key}.otherRecipientDetails.name.error.required",
     s"${subject.key}.otherRecipientDetails.name.error.invalid",
     s"${subject.key}.otherRecipientDetails.name.error.length",
+    s"${subject.key}.otherRecipientDetails.description.error.required",
     s"${subject.key}.otherRecipientDetails.description.error.invalid",
     s"${subject.key}.otherRecipientDetails.description.error.length"
   )

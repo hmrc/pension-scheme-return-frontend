@@ -102,6 +102,7 @@ object OtherBuyerDetailsController {
     "otherBuyerDetails.name.error.required",
     "otherBuyerDetails.name.error.invalid",
     "otherBuyerDetails.name.error.length",
+    "otherBuyerDetails.description.error.required",
     "otherBuyerDetails.description.error.invalid",
     "otherBuyerDetails.description.error.length"
   )

@@ -36,6 +36,7 @@ class RecipientDetailsFormProvider @Inject() extends Mappings {
     nameRequired: String,
     nameInvalid: String,
     nameLength: String,
+    descriptionRequired: String,
     descriptionInvalid: String,
     descriptionLength: String
   ): Form[RecipientDetails] =
@@ -47,8 +48,8 @@ class RecipientDetailsFormProvider @Inject() extends Mappings {
             maxLength(nameMaxLength, nameLength)
           )
         ),
-        description -> optionalText().verifying(
-          whenNotEmpty(
+        description -> text(descriptionRequired).verifying(
+          firstError(
             regexp(textAreaRegex, descriptionInvalid),
             maxLength(maxOtherDescriptionLength, descriptionLength)
           )

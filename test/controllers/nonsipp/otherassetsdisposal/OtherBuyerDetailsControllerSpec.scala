@@ -38,7 +38,7 @@ class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
 
   private val validForm = List(
     "name" -> "name",
-    "description" -> ""
+    "description" -> "description"
   )
 
   private val invalidForm = List(

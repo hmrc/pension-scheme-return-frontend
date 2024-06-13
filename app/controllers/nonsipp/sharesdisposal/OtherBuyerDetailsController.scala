@@ -112,6 +112,7 @@ object OtherBuyerDetailsController {
     "sharesDisposal.otherBuyerDetails.name.error.required",
     "sharesDisposal.otherBuyerDetails.name.error.invalid",
     "sharesDisposal.otherBuyerDetails.name.error.length",
+    "sharesDisposal.otherBuyerDetails.description.error.required",
     "sharesDisposal.otherBuyerDetails.description.error.invalid",
     "sharesDisposal.otherBuyerDetails.description.error.length"
   )
