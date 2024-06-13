@@ -37,6 +37,21 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
     defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
   }
   private val page = 1
+
+  private def dataItemFirst(srn: Srn): List[TableElem] =
+    List(
+      TableElem(Message("1", List()), None),
+      TableElem(Message("6 April 2020", List()), None),
+      TableElem(Message("pspOrgName", List()), None),
+      TableElem(
+        LinkMessage(
+          Message("View", List()),
+          s"/pension-scheme-return/${srn.value}/pension-scheme-return-view-only-task-list/2020-04-06/1/0"
+        ),
+        None
+      )
+    )
+
   private def data(srn: Srn) =
     List(
       List(
@@ -51,18 +66,36 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
           None
         )
       ),
+      dataItemFirst(srn)
+    )
+  private def dataInProgress(srn: Srn): List[List[TableElem]] =
+    List(
       List(
-        TableElem(Message("1", List()), None),
-        TableElem(Message("6 April 2020", List()), None),
-        TableElem(Message("pspOrgName", List()), None),
+        TableElem(Message("3", List()), None),
+        TableElem(Message("8 April 2020", List()), None),
+        TableElem(Message("Changes in progress", List()), None),
         TableElem(
           LinkMessage(
-            Message("View", List()),
-            s"/pension-scheme-return/${srn.value}/pension-scheme-return-view-only-task-list/2020-04-06/1/0"
+            Message("Continue", List()),
+            s"/pension-scheme-return/${srn.value}/view-change/select-submitted-returns?fbNumber=323456785033",
+            hiddenText = Message("making changes", List())
           ),
           None
         )
-      )
+      ),
+      List(
+        TableElem(Message("2", List()), None),
+        TableElem(Message("7 April 2020", List()), None),
+        TableElem(Message("first last", List()), None),
+        TableElem(
+          LinkMessage(
+            Message("View", List()),
+            s"/pension-scheme-return/${srn.value}/pension-scheme-return-view-only-task-list/2020-04-06/2/1"
+          ),
+          None
+        )
+      ),
+      dataItemFirst(srn)
     )
 
   private implicit val mockPsrVersionsService: PsrVersionsService = mock[PsrVersionsService]
@@ -90,6 +123,19 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
         )
         .after(reset(mockPsrVersionsService))
         .withName("onPageLoad renders ok")
+    )
+
+    act.like(
+      renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
+        injected[ReturnsSubmittedView]
+          .apply(viewModel(srn, page, dataInProgress(srn), fromYearUi, toYearUi, schemeName))
+      }.before(
+          when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(
+            Future.successful(versionsResponseInProgress)
+          )
+        )
+        .after(reset(mockPsrVersionsService))
+        .withName("onPageLoad inProgress renders ok")
     )
 
     act.like(

@@ -28,7 +28,7 @@ trait DisplayMessageUtils {
     case Empty => List()
     case m: Message => List(m)
     case CompoundMessage(left, right) => allMessages(left) ++ allMessages(right)
-    case LinkMessage(message, _, _) => List(message)
+    case LinkMessage(message, _, _, _) => List(message)
     case DownloadLinkMessage(message, _) => List(message)
     case ParagraphMessage(messages) => messages.toList.flatMap(allMessages)
     case TableMessage(contents, heading) =>

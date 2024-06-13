@@ -2782,6 +2782,8 @@ returnsSubmitted.table.header3 = Submitted by
 returnsSubmitted.table.header4 = Action
 returnsSubmitted.link = Return to latest pension scheme return for {0}
 returnsSubmitted.list.pagination.label = Showing {0} - {1} of {2} submissions
+returnsSubmitted.inProgress = Changes in progress
+returnsSubmitted.continue.hiddenText = making changes
 
 removeShares.title = Are you sure you want to remove this share transaction?
 removeShares.heading = Are you sure you want to remove the share transaction for {0}?
