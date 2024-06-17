@@ -273,6 +273,10 @@ GET         /:srn/check-your-answers-basic-details                              
 GET         /:srn/submit-check-your-answers-basic-details                               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-check-your-answers-basic-details                               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 GET         /:srn/change-submit-check-your-answers-basic-details                        controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-submit-check-your-answers-basic-details                        controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = ViewOnlyMode)
+GET         /:srn/check-your-answers-basic-details/view/:year/:current/:previous        controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoadViewOnly(srn: Srn, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/check-your-answers-basic-details/previous/:year/:current/:previous    controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int)
+GET         /:srn/submit-check-your-answers-basic-details/view/:year/:current/:previous controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
 
 GET         /:srn/company-recipient-name                                                controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
 GET         /:srn/company-recipient-name/:index                                         controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
