@@ -27,7 +27,7 @@
 
     @(viewmodel: FormPageViewModel[CheckYourAnswersViewModel])(implicit request: Request[_], messages: Messages)
 
-    @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
+    @layout(pageTitle = titleNoForm( if (viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.title.toMessage else viewmodel.title.toMessage)) {
 
         @if(viewmodel.mode == NormalMode || viewmodel.mode == CheckMode) {
             <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
@@ -35,12 +35,12 @@
         @if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) {
             @if(viewmodel.optViewOnlyDetails.get.updated) {
                 <strong class ="govuk-tag govuk-tag--green govuk-!-margin-bottom-4">Updated</strong><br/>
-            }
 
-            @viewmodel.optViewOnlyDetails.get.link.map { link =>
-                <p class="govuk-body">
-                    <a href=@link.url
-                   class="govuk-link" rel="noreferrer noopener" target="_blank" >@renderMessage(link.content)</a></p>
+                @viewmodel.optViewOnlyDetails.get.link.map { link =>
+                    <p class="govuk-body">
+                        <a href=@link.url
+                       class="govuk-link" rel="noreferrer noopener" target="_blank" >@renderMessage(link.content)</a></p>
+                }
             }
             @viewmodel.optViewOnlyDetails.get.submittedText.map { submittedText =>
                 <span class="govuk-caption-l">@renderMessage(submittedText)</span>
