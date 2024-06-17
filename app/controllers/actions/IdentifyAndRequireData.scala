@@ -19,15 +19,30 @@ package controllers.actions
 import play.api.mvc.{ActionBuilder, AnyContent}
 import com.google.inject.Inject
 import models.SchemeId.Srn
+import models.{Mode, ViewOnlyMode}
 import models.requests.DataRequest
 
 class IdentifyAndRequireData @Inject()(
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
   getData: DataRetrievalAction,
+  getDataToCompare: DataToCompareRetrievalActionProvider,
   requireData: DataRequiredAction
 ) {
 
   def apply(srn: Srn): ActionBuilder[DataRequest, AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData)
+
+  def apply(srn: Srn, mode: Mode, year: String, current: Int, previous: Int): ActionBuilder[DataRequest, AnyContent] =
+    if (mode == ViewOnlyMode) {
+      identify
+        .andThen(allowAccess(srn))
+        .andThen(getDataToCompare(year, current, previous))
+        .andThen(requireData)
+    } else {
+      identify
+        .andThen(allowAccess(srn))
+        .andThen(getData)
+        .andThen(requireData)
+    }
 }

@@ -16,7 +16,7 @@
 
 package services
 
-import play.api.mvc.{AnyContent, Call}
+import play.api.mvc.Call
 import connectors.PSRConnector
 import transformations._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -44,7 +44,7 @@ class PsrRetrievalService @Inject()(
     optPsrVersion: Option[String],
     fallBackCall: Call
   )(
-    implicit request: DataRequest[AnyContent],
+    implicit request: DataRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[UserAnswers] = {

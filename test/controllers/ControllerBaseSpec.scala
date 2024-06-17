@@ -71,7 +71,9 @@ trait ControllerBaseSpec
   protected def applicationBuilder(
     userAnswers: Option[UserAnswers] = Some(emptyUserAnswers),
     schemeDetails: SchemeDetails = defaultSchemeDetails,
-    minimalDetails: MinimalDetails = defaultMinimalDetails
+    minimalDetails: MinimalDetails = defaultMinimalDetails,
+    pureUserAnswers: Option[UserAnswers] = Some(emptyUserAnswers),
+    previousUserAnswers: Option[UserAnswers] = Some(emptyUserAnswers)
   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
@@ -80,6 +82,10 @@ trait ControllerBaseSpec
           bind[IdentifierAction].to[FakeIdentifierAction],
           bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails, minimalDetails)),
           bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
+          bind[DataToCompareRetrievalActionProvider]
+            .toInstance(
+              new FakeDataToCompareRetrievalActionProvider(userAnswers, pureUserAnswers, previousUserAnswers)
+            ),
           bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers)))
         ) ++ additionalBindings: _*
       )
@@ -163,6 +169,13 @@ trait TestValues {
   val otherAssetDescription = "other asset description"
   val fallbackUrl = "fallbackUrl"
   val fallbackCall: Call = Call("GET", fallbackUrl)
+  val submissionNumberTwo: Int = 2
+  val submissionNumberOne: Int = 1
+  val submissionNumberZero: Int = 0
+  val submissionDateTwo: LocalDateTime =
+    LocalDateTime.of(2020, 12, 12, 10, 30, 15)
+  val submissionDateOne: LocalDateTime =
+    LocalDateTime.of(2019, 11, 11, 9, 29, 14)
 
   val address: Address = Address(
     "test-id",

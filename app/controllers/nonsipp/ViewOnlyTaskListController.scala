@@ -16,11 +16,13 @@
 
 package controllers.nonsipp
 
-import services.{PsrRetrievalService, SaveService}
 import pages.nonsipp.bonds.BondsCompleted
+import controllers.PSRController
+import utils.nonsipp.TaskListStatusUtils.{getCompletedOrUpdatedTaskListStatus, getFinancialDetailsTaskListStatus}
 import pages.nonsipp.landorproperty.LandOrPropertyCompleted
 import controllers.actions._
 import pages.nonsipp.memberdetails.Paths.personalDetails
+import play.api.i18n.{I18nSupport, MessagesApi}
 import viewmodels.implicits._
 import pages.nonsipp.accountingperiod.Paths.accountingPeriodDetails
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, Paths, SharesCompleted}
@@ -38,8 +40,6 @@ import utils.DateTimeUtils.localDateShow
 import models._
 import viewmodels.models.TaskListStatus._
 import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
-import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
@@ -49,42 +49,33 @@ class ViewOnlyTaskListController @Inject()(
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: TaskListView,
-  saveService: SaveService,
-  psrRetrievalService: PsrRetrievalService
+  view: TaskListView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+    extends PSRController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async { implicit request =>
+  def onPageLoad(srn: Srn, year: String, currentVersion: Int, previousVersion: Int): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, currentVersion, previousVersion).async { implicit request =>
       request.userAnswers.get(WhichTaxYearPage(srn)) match {
         case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         case Some(dateRange: DateRange) =>
-          val other: Int = if (previous == 0) current else previous
-          for {
-            currentReturn <- psrRetrievalService.getStandardPsrDetails(
-              None,
-              Some(year),
-              Some("%03d".format(current)),
-              controllers.routes.OverviewController.onPageLoad(srn)
-            )
-            _ <- saveService.save(currentReturn)
-            previousReturn <- psrRetrievalService.getStandardPsrDetails(
-              None,
-              Some(year),
-              Some("%03d".format(other)),
-              controllers.routes.OverviewController.onPageLoad(srn)
-            )
-            viewModel = ViewOnlyTaskListController.viewModel(
-              srn,
-              request.schemeDetails.schemeName,
-              dateRange,
-              currentReturn,
-              previousReturn,
-              current
-            )
-          } yield Ok(view(viewModel))
+          val currentReturn = request.userAnswers
+          val optPreviousReturn = if (previousVersion == 0) Some(request.userAnswers) else request.previousUserAnswers
+          optPreviousReturn match {
+            case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            case Some(previousReturn) =>
+              val viewModel = ViewOnlyTaskListController.viewModel(
+                srn,
+                request.schemeDetails.schemeName,
+                dateRange,
+                currentReturn,
+                previousReturn,
+                year,
+                currentVersion,
+                previousVersion
+              )
+              Future.successful(Ok(view(viewModel)))
+          }
       }
     }
 }
@@ -97,7 +88,9 @@ object ViewOnlyTaskListController {
     dateRange: DateRange,
     currentUA: UserAnswers,
     previousUA: UserAnswers,
-    version: Int
+    year: String,
+    currentVersion: Int,
+    previousVersion: Int
   ): PageViewModel[TaskListViewModel] = {
 
     val historyLink =
@@ -107,17 +100,17 @@ object ViewOnlyTaskListController {
       )
 
     val sectionListWithoutDeclaration = List(
-      schemeDetailsSection(schemeName, currentUA, previousUA),
-      membersSection(schemeName, currentUA, previousUA),
-      memberPaymentsSection(currentUA, previousUA),
-      loansSection(schemeName, currentUA, previousUA),
-      sharesSection(currentUA, previousUA, srn),
-      landOrPropertySection(currentUA, previousUA, srn),
-      bondsSection(currentUA, previousUA, srn),
-      otherAssetsSection(currentUA, previousUA, srn)
+      schemeDetailsSection(schemeName, currentUA, previousUA, srn, year, currentVersion, previousVersion),
+      membersSection(schemeName, currentUA, previousUA, srn, year, currentVersion, previousVersion),
+      memberPaymentsSection(currentUA, previousUA, srn, year, currentVersion, previousVersion),
+      loansSection(schemeName, currentUA, previousUA, srn, year, currentVersion, previousVersion),
+      sharesSection(currentUA, previousUA, srn, year, currentVersion, previousVersion),
+      landOrPropertySection(currentUA, previousUA, srn, year, currentVersion, previousVersion),
+      bondsSection(currentUA, previousUA, srn, year, currentVersion, previousVersion),
+      otherAssetsSection(currentUA, previousUA, srn, year, currentVersion, previousVersion)
     )
 
-    val declarationSectionViewModel = declarationSection(srn, schemeName, dateRange, version)
+    val declarationSectionViewModel = declarationSection(srn, schemeName, dateRange, currentVersion)
 
     val viewModel = TaskListViewModel(
       true,
@@ -148,21 +141,6 @@ object ViewOnlyTaskListController {
 
   private def messageKey(prefix: String, suffix: String): String = s"$prefix.view.$suffix"
 
-  private def getCompletedOrUpdatedTaskListStatus(
-    currentUA: UserAnswers,
-    previousUA: UserAnswers,
-    path: JsPath,
-    toExclude: Option[String] = None
-  ): TaskListStatus = {
-    val c = currentUA.get(path).getOrElse(JsObject.empty).as[JsObject] - toExclude.getOrElse("")
-    val p = previousUA.get(path).getOrElse(JsObject.empty).as[JsObject] - toExclude.getOrElse("")
-    if (c == p) {
-      Completed
-    } else {
-      Updated
-    }
-  }
-
 // TODO: implement lower-level journey navigation in future ticket - until then, Unauthorised page used for all links
 
 //--Scheme details----------------------------------------------------------------------------------------------------//
@@ -170,13 +148,35 @@ object ViewOnlyTaskListController {
   private def schemeDetailsSection(
     schemeName: String,
     currentUA: UserAnswers,
-    previousUA: UserAnswers
+    previousUA: UserAnswers,
+    srn: Srn,
+    year: String,
+    currentVersion: Int,
+    previousVersion: Int
   ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.schemedetails"
     TaskListSectionViewModel(
       s"$prefix.title",
-      getBasicSchemeDetailsTaskListItem(schemeName, prefix, currentUA, previousUA),
-      getFinancialDetailsTaskListItem(schemeName, prefix, currentUA, previousUA)
+      getBasicSchemeDetailsTaskListItem(
+        schemeName,
+        prefix,
+        currentUA,
+        previousUA,
+        srn,
+        year,
+        currentVersion,
+        previousVersion
+      ),
+      getFinancialDetailsTaskListItem(
+        schemeName,
+        prefix,
+        currentUA,
+        previousUA,
+        srn,
+        year,
+        currentVersion,
+        previousVersion
+      )
     )
   }
 
@@ -184,7 +184,11 @@ object ViewOnlyTaskListController {
     schemeName: String,
     prefix: String,
     currentUA: UserAnswers,
-    previousUA: UserAnswers
+    previousUA: UserAnswers,
+    srn: Srn,
+    year: String,
+    currentVersion: Int,
+    previousVersion: Int
   ): TaskListItemViewModel = {
 
     val accountingPeriodsSame = currentUA.get(accountingPeriodDetails \ "accountingPeriods") == previousUA.get(
@@ -220,38 +224,32 @@ object ViewOnlyTaskListController {
     schemeName: String,
     prefix: String,
     currentUA: UserAnswers,
-    previousUA: UserAnswers
-  ): TaskListItemViewModel = {
-
-    val financialDetailsTaskListStatus =
-      if (currentUA.get(schemeDesignatory \ "totalAssetValue") ==
-          previousUA.get(schemeDesignatory \ "totalAssetValue")
-        &&
-        currentUA.get(schemeDesignatory \ "totalPayments") ==
-          previousUA.get(schemeDesignatory \ "totalPayments")
-        &&
-        currentUA.get(schemeDesignatory \ "totalCash") ==
-          previousUA.get(schemeDesignatory \ "totalCash")) {
-        Completed
-      } else {
-        Updated
-      }
-
+    previousUA: UserAnswers,
+    srn: Srn,
+    year: String,
+    currentVersion: Int,
+    previousVersion: Int
+  ): TaskListItemViewModel =
     TaskListItemViewModel(
       LinkMessage(
         Message(messageKey(prefix, "finances.title"), schemeName),
-        controllers.routes.UnauthorisedController.onPageLoad().url
+        controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+          .onPageLoadViewOnly(srn, year, currentVersion, previousVersion)
+          .url
       ),
-      financialDetailsTaskListStatus
+      getFinancialDetailsTaskListStatus(currentUA, previousUA)
     )
-  }
 
 //--Members-----------------------------------------------------------------------------------------------------------//
 
   private def membersSection(
     schemeName: String,
     currentUA: UserAnswers,
-    previousUA: UserAnswers
+    previousUA: UserAnswers,
+    srn: Srn,
+    year: String,
+    currentVersion: Int,
+    previousVersion: Int
   ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.members"
     val membersTaskListStatus = getCompletedOrUpdatedTaskListStatus(
@@ -274,7 +272,14 @@ object ViewOnlyTaskListController {
 
 //--Member payments---------------------------------------------------------------------------------------------------//
 
-  private def memberPaymentsSection(currentUA: UserAnswers, previousUA: UserAnswers): TaskListSectionViewModel = {
+  private def memberPaymentsSection(
+    currentUA: UserAnswers,
+    previousUA: UserAnswers,
+    srn: Srn,
+    year: String,
+    currentVersion: Int,
+    previousVersion: Int
+  ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.memberpayments"
 
     val employerContributionsTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
@@ -392,7 +397,11 @@ object ViewOnlyTaskListController {
   private def loansSection(
     schemeName: String,
     currentUA: UserAnswers,
-    previousUA: UserAnswers
+    previousUA: UserAnswers,
+    srn: Srn,
+    year: String,
+    currentVersion: Int,
+    previousVersion: Int
   ): TaskListSectionViewModel = {
     val prefix = s"nonsipp.tasklist.loans"
     val loansTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
@@ -427,7 +436,14 @@ object ViewOnlyTaskListController {
 
 //--Shares------------------------------------------------------------------------------------------------------------//
 
-  private def sharesSection(currentUA: UserAnswers, previousUA: UserAnswers, srn: Srn): TaskListSectionViewModel = {
+  private def sharesSection(
+    currentUA: UserAnswers,
+    previousUA: UserAnswers,
+    srn: Srn,
+    year: String,
+    currentVersion: Int,
+    previousVersion: Int
+  ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.shares"
 
     val sharesTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
@@ -478,7 +494,10 @@ object ViewOnlyTaskListController {
   private def landOrPropertySection(
     currentUA: UserAnswers,
     previousUA: UserAnswers,
-    srn: Srn
+    srn: Srn,
+    year: String,
+    currentVersion: Int,
+    previousVersion: Int
   ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.landorproperty"
 
@@ -527,7 +546,14 @@ object ViewOnlyTaskListController {
 
 //--Bonds-------------------------------------------------------------------------------------------------------------//
 
-  private def bondsSection(currentUA: UserAnswers, previousUA: UserAnswers, srn: Srn): TaskListSectionViewModel = {
+  private def bondsSection(
+    currentUA: UserAnswers,
+    previousUA: UserAnswers,
+    srn: Srn,
+    year: String,
+    currentVersion: Int,
+    previousVersion: Int
+  ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.bonds"
 
     val bondsTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
@@ -578,7 +604,10 @@ object ViewOnlyTaskListController {
   private def otherAssetsSection(
     currentUA: UserAnswers,
     previousUA: UserAnswers,
-    srn: Srn
+    srn: Srn,
+    year: String,
+    currentVersion: Int,
+    previousVersion: Int
   ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.otherassets"
 

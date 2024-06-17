@@ -33,7 +33,7 @@ import pages.nonsipp.otherassetsdisposal._
 import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.totalvaluequotedshares._
-import org.mockito.Mockito.when
+import org.mockito.Mockito._
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds._
@@ -71,24 +71,15 @@ import scala.concurrent.Future
 class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
   // Set up services
-  private val mockSaveService: SaveService = mock[SaveService]
   private val mockPsrVersionsService: PsrVersionsService = mock[PsrVersionsService]
-  private val mockPsrRetrievalService: PsrRetrievalService = mock[PsrRetrievalService]
 
   override val additionalBindings: List[GuiceableModule] =
     List(
-      inject.bind[SaveService].toInstance(mockSaveService),
-      inject.bind[PsrVersionsService].toInstance(mockPsrVersionsService),
-      inject.bind[PsrRetrievalService].toInstance(mockPsrRetrievalService)
+      inject.bind[PsrVersionsService].toInstance(mockPsrVersionsService)
     )
 
-  override def beforeEach(): Unit = {
-    when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
+  override def beforeEach(): Unit =
     when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(Future.successful(Seq()))
-    when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(currentUA))
-      .thenReturn(Future.successful(previousUA))
-  }
 
   // Set test values
   private val index1of300: Max300 = refineMV(1)
@@ -98,8 +89,6 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
   private val name: String = "name"
   private val reason: String = "reason"
   private val numAccountingPeriods: Max3 = refineMV(1)
-  private val submissionNumberTwo: Int = 2
-  private val submissionNumberOne: Int = 1
 
   // Build userAnswers for current version
   private val currentUA: UserAnswers = defaultUserAnswers
@@ -268,13 +257,17 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(HowWasAssetDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Transferred)
     .unsafeSet(AnyPartAssetStillHeldPage(srn, index1of5000, index1of50), true)
 
+  private val pureUA: UserAnswers = currentUA.copy()
+
   lazy val viewModelSubmissionTwo: PageViewModel[TaskListViewModel] = ViewOnlyTaskListController.viewModel(
     srn,
     schemeName,
     dateRange,
     currentUA,
     previousUA,
-    submissionNumberTwo
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
   )
 
   lazy val onPageLoadSubmissionTwo: Call = routes.ViewOnlyTaskListController.onPageLoad(
@@ -469,8 +462,10 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     schemeName,
     dateRange,
     currentUA,
-    previousUA,
-    submissionNumberOne
+    currentUA,
+    yearString,
+    submissionNumberOne,
+    submissionNumberZero
   )
 
   lazy val onPageLoadSubmissionOne: Call = routes.ViewOnlyTaskListController.onPageLoad(
@@ -482,17 +477,21 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
 
   "ViewOnlyTaskListController" - {
 
-    act.like(renderView(onPageLoadSubmissionTwo, currentUA) { implicit app => implicit request =>
-      val view = injected[TaskListView]
-      view(viewModelSubmissionTwo)
-    }.withName("onPageLoad renders ok with indexes /2/1"))
+    act.like(
+      renderView(onPageLoadSubmissionTwo, currentUA, pureUA, Some(previousUA)) { implicit app => implicit request =>
+        val view = injected[TaskListView]
+        view(viewModelSubmissionTwo)
+      }.withName("onPageLoad renders ok with indexes /2/1")
+    )
 
     act.like(journeyRecoveryPage(onPageLoadSubmissionTwo).updateName("onPageLoad " + _))
 
-    act.like(renderView(onPageLoadSubmissionOne, currentUA) { implicit app => implicit request =>
-      val view = injected[TaskListView]
-      view(viewModelVersionOne)
-    }.withName("onPageLoad renders ok with indexes /1/0"))
+    act.like(
+      renderView(onPageLoadSubmissionOne, currentUA, pureUA, None) { implicit app => implicit request =>
+        val view = injected[TaskListView]
+        view(viewModelVersionOne)
+      }.withName("onPageLoad renders ok with indexes /1/0")
+    )
 
     // TODO: implement lower-level journey navigation in future ticket, until then Unauthorised page used for all links
 
@@ -540,7 +539,9 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedStatus = Completed,
               expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
               expectedLinkContentKey = "nonsipp.tasklist.schemedetails.view.finances.title",
-              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+              expectedLinkUrl = controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne)
+                .url
             )
           }
 
@@ -553,7 +554,9 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedStatus = Updated,
               expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
               expectedLinkContentKey = "nonsipp.tasklist.schemedetails.view.finances.title",
-              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+              expectedLinkUrl = controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne)
+                .url
             )
           }
         }
@@ -1377,7 +1380,9 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
       dateRange,
       currentUA,
       previousUA,
-      submissionNumberTwo
+      yearString,
+      submissionNumberTwo,
+      submissionNumberOne
     )
     val sections = customViewModel.page.sections.toList
     sections(sectionIndex).title.key mustBe expectedTitleKey
@@ -1407,7 +1412,9 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
       dateRange,
       currentUA,
       previousUA,
-      submissionNumberTwo
+      yearString,
+      submissionNumberTwo,
+      submissionNumberOne
     )
     val sections = customViewModel.page.sections.toList
 

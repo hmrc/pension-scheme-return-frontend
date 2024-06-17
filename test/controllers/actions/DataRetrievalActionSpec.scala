@@ -21,6 +21,7 @@ import play.api.mvc.AnyContentAsEmpty
 import repositories.SessionRepository
 import models.UserAnswers
 import models.requests.{AllowedAccessRequest, OptionalDataRequest}
+import org.mockito.ArgumentMatchers.any
 import utils.BaseSpec
 import org.mockito.Mockito.when
 
@@ -42,7 +43,7 @@ class DataRetrievalActionSpec extends BaseSpec {
       "there is no data in the cache" in {
 
         val sessionRepository = mock[SessionRepository]
-        when(sessionRepository.get(request.request.getUserId + request.srn)).thenReturn(Future(None))
+        when(sessionRepository.get(any())).thenReturn(Future(None))
         val action = new Harness(sessionRepository)
 
         val result = action.callTransform().futureValue
@@ -55,7 +56,7 @@ class DataRetrievalActionSpec extends BaseSpec {
       "when there is data in the cache" in {
 
         val sessionRepository = mock[SessionRepository]
-        when(sessionRepository.get(request.request.getUserId + request.srn))
+        when(sessionRepository.get(any()))
           .thenReturn(Future(Some(UserAnswers("id"))))
         val action = new Harness(sessionRepository)
 

@@ -97,7 +97,7 @@ class HowWereBondsDisposedOfController @Inject()(
               updatedAnswers <- request.userAnswers
                 .set(page, value)
                 // remove completed flag in NormalMode as we assume a new journey has started
-                .removeWhen(mode.isNormalMode)(BondsDisposalCompleted(srn))
+                .removeWhen(mode == NormalMode)(BondsDisposalCompleted(srn))
                 .mapK[Future]
               hasAnswerChanged = request.userAnswers.exists(page)(_ == value)
               _ <- saveService.save(updatedAnswers)

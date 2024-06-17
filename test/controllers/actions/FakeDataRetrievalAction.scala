@@ -21,10 +21,14 @@ import models.requests.{AllowedAccessRequest, OptionalDataRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeDataRetrievalAction(dataToReturn: Option[UserAnswers]) extends DataRetrievalAction {
+class FakeDataRetrievalAction(
+  userAnswers: Option[UserAnswers],
+  pureUserAnswers: Option[UserAnswers] = None,
+  previousUserAnswers: Option[UserAnswers] = None
+) extends DataRetrievalAction {
 
   override protected def transform[A](request: AllowedAccessRequest[A]): Future[OptionalDataRequest[A]] =
-    Future(OptionalDataRequest(request, dataToReturn))
+    Future(OptionalDataRequest(request, userAnswers, pureUserAnswers, previousUserAnswers))
 
   override protected implicit val executionContext: ExecutionContext =
     scala.concurrent.ExecutionContext.Implicits.global

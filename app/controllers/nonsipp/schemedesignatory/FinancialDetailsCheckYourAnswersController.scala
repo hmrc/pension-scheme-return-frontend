@@ -22,24 +22,29 @@ import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
 import controllers.PSRController
-import cats.implicits.toShow
+import utils.nonsipp.TaskListStatusUtils.getFinancialDetailsTaskListStatus
 import controllers.actions._
-import navigation.Navigator
 import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
+import viewmodels.models.TaskListStatus.Updated
+import models.requests.DataRequest
 import _root_.config.Refined.Max3
 import cats.data.NonEmptyList
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import utils.DateTimeUtils.localDateShow
+import cats.implicits.toShow
+import controllers.nonsipp.routes
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
+import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models._
 import play.api.i18n._
 import viewmodels.Margin
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
 class FinancialDetailsCheckYourAnswersController @Inject()(
@@ -55,6 +60,15 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
     with I18nSupport {
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    onPageLoadCommon(srn: Srn, mode: Mode)(implicitly)
+  }
+
+  def onPageLoadViewOnly(srn: Srn, mode: Mode, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn: Srn, mode: Mode)(implicitly)
+    }
+
+  def onPageLoadCommon(srn: Srn, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
     schemeDateService.taxYearOrAccountingPeriods(srn) match {
       case Some(periods) =>
         val howMuchCashPage = request.userAnswers.get(HowMuchCashPage(srn, mode))
@@ -69,13 +83,21 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
               valueOfAssetsPage,
               feesCommissionsWagesSalariesPage,
               periods,
-              request.schemeDetails
+              request.schemeDetails,
+              if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+                getFinancialDetailsTaskListStatus(request.userAnswers, request.previousUserAnswers.get) == Updated
+              } else {
+                false
+              },
+              optYear = request.year,
+              optCurrentVersion = request.currentVersion,
+              optPreviousVersion = request.previousVersion,
+              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
             )
           )
         )
       case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
-  }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     psrSubmissionService
@@ -90,6 +112,21 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
           Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
       }
   }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+    }
+
+  def onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+            .onPageLoadViewOnly(srn, year, (current - 1).max(0), (previous - 1).max(0))
+        )
+      )
+    }
 }
 
 object FinancialDetailsCheckYourAnswersController {
@@ -100,9 +137,15 @@ object FinancialDetailsCheckYourAnswersController {
     valueOfAssetsPage: Option[MoneyInPeriod],
     feesCommissionsWagesSalariesPage: Option[Money],
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
-    schemeDetails: SchemeDetails
+    schemeDetails: SchemeDetails,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
+      mode = mode,
       title = "financialDetailsCheckYourAnswersController.title",
       heading = "financialDetailsCheckYourAnswersController.heading",
       description = None,
@@ -120,7 +163,47 @@ object FinancialDetailsCheckYourAnswersController {
       refresh = None,
       buttonText = "site.saveAndContinue",
       onSubmit =
-        controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController.onSubmit(srn, mode)
+        controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController.onSubmit(srn, mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion))
+                  if (year.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+                Some(
+                  LinkMessage(
+                    "financialDetailsCheckYourAnswersController.viewOnly.link",
+                    controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+                      .onPreviousViewOnly(
+                        srn,
+                        year,
+                        currentVersion,
+                        previousVersion
+                      )
+                      .url
+                  )
+                )
+              case _ => None
+            },
+            submittedText =
+              compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+            title = "financialDetailsCheckYourAnswersController.viewOnly.title",
+            heading = "financialDetailsCheckYourAnswersController.viewOnly.heading",
+            buttonText = "site.return.to.tasklist",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+                  .onSubmit(srn, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
 
   private def sections(

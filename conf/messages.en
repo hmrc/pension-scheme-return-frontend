@@ -29,6 +29,8 @@ site.returnToFileUpload = Return to file upload
 site.cell = Cell
 site.error = Error
 site.or = or
+site.submittedOn = Submitted on {0}
+site.return.to.tasklist = Return to task list for this version
 
 date.day = Day
 date.day.lower = day
@@ -1496,6 +1498,9 @@ removeLoan.error.required = Select yes if you are sure you want to remove this l
 
 financialDetailsCheckYourAnswersController.title = Check your answers
 financialDetailsCheckYourAnswersController.heading = Check your answers
+financialDetailsCheckYourAnswersController.viewOnly.heading = Financial details
+financialDetailsCheckYourAnswersController.viewOnly.heading = Financial details
+financialDetailsCheckYourAnswersController.viewOnly.link = View previous version of financial details (opens in new tab)
 financialDetailsCheckYourAnswersController.totalCashInStartDate = How much cash did {0} hold in all bank accounts on {1}?
 financialDetailsCheckYourAnswersController.totalCashInStartDate.hidden = total cash in all bank accounts, on {0}
 financialDetailsCheckYourAnswersController.totalCashInEndDate = How much cash did {0} hold in all bank accounts on {1}?
