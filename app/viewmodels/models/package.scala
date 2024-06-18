@@ -18,4 +18,5 @@ package viewmodels
 
 package object models {
   type SectionCompleted = SectionCompleted.type
+  type Flag = Flag.type
 }

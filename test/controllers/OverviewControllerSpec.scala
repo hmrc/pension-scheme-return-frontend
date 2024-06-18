@@ -141,7 +141,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
     }
 
     "onSelectContinue redirects to what you will need page" in runningApplication { implicit app =>
-      when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any(), any())(any(), any(), any()))
+      when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any()))
         .thenReturn(
           Future.successful(defaultUserAnswers)
         )
@@ -155,7 +155,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
     }
 
     "onSelectViewAndChange redirects to the task list page" in runningApplication { implicit app =>
-      when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any(), any())(any(), any(), any()))
+      when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any()))
         .thenReturn(
           Future.successful(defaultUserAnswers)
         )

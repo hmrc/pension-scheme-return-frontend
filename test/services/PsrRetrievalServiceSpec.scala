@@ -96,7 +96,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         verify(mockMinimalRequiredSubmissionTransformer, never).transformFromEtmp(any(), any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
-        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any(), any(), any())
         verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
         result mustBe a[UserAnswers]
@@ -127,7 +127,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
-        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any(), any(), any())
         verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
         result mustBe a[UserAnswers]
@@ -161,7 +161,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockLoansTransformer, times(1)).transformFromEtmp(any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
-        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any(), any(), any())
         verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
         result mustBe a[UserAnswers]
@@ -195,7 +195,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, times(1)).transformFromEtmp(any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
-        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any(), any(), any())
         verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
         result mustBe a[UserAnswers]
@@ -206,7 +206,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
     "should getPsrDetails return data when minimal data and member payments data were found in etmp" in {
       when(mockMinimalRequiredSubmissionTransformer.transformFromEtmp(any(), any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockMemberPaymentsTransformer.transformFromEtmp(any(), any(), any()))
+      when(mockMemberPaymentsTransformer.transformFromEtmp(any(), any(), any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
 
       when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
@@ -230,7 +230,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
-        verify(mockMemberPaymentsTransformer, times(1)).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, times(1)).transformFromEtmp(any(), any(), any(), any(), any())
         verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
         result mustBe a[UserAnswers]
@@ -265,7 +265,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
-        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any(), any(), any())
         verify(mockSharesTransformer, times(1)).transformFromEtmp(any(), any(), any())
         verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
         result mustBe a[UserAnswers]
@@ -299,7 +299,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
-        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+        verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any(), any(), any())
         verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockDeclarationTransformer, times(1)).transformFromEtmp(any(), any(), any())
         result mustBe a[UserAnswers]

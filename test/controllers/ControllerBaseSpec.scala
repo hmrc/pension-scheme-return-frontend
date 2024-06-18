@@ -82,9 +82,9 @@ trait ControllerBaseSpec
           bind[IdentifierAction].to[FakeIdentifierAction],
           bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails, minimalDetails)),
           bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
-          bind[DataToCompareRetrievalActionProvider]
+          bind[DataRetrievalETMPActionProvider]
             .toInstance(
-              new FakeDataToCompareRetrievalActionProvider(userAnswers, pureUserAnswers, previousUserAnswers)
+              new FakeDataRetrievalETMPActionProvider(userAnswers, pureUserAnswers, previousUserAnswers)
             ),
           bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers)))
         ) ++ additionalBindings: _*
@@ -100,6 +100,7 @@ trait ControllerBaseSpec
 
   implicit class UserAnswersOps(ua: UserAnswers) {
     def unsafeSet[A: Writes](page: Settable[A], value: A): UserAnswers = ua.set(page, value).get
+    def unsafeSet(page: Settable[Flag]): UserAnswers = ua.set(page, Flag).get
 
     def unsafeRemove[A: Reads](page: Removable[A]): UserAnswers = ua.remove(page).get
   }

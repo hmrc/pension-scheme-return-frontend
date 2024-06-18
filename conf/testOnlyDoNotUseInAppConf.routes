@@ -25,4 +25,4 @@ GET        /pension-scheme-return/test-only/:srn/add-bonds/:num                 
 GET        /pension-scheme-return/test-only/:srn/add-bonds-disposal/:index/:num                    controllers.testonly.BondsDisposalMongoController.addTestData(srn: Srn, index: Max5000, num: Max50)
 GET        /pension-scheme-return/test-only/:srn/add-other-assets/:num                             controllers.testonly.OtherAssetsMongoController.addTestData(srn: Srn, num: Max5000)
 GET        /pension-scheme-return/test-only/:srn/add-assets-disposals/:index/:num                  controllers.testonly.AssetsDisposalMongoController.addTestData(srn: Srn, index: Max5000, num: Max50)
-GET        /pension-scheme-return/test-only/:srn/print-user-answers                                controllers.testonly.PrintsUserAnswersController.printUserAnswers(srn: Srn)
+GET        /pension-scheme-return/test-only/:srn/print-user-answers                                controllers.testonly.PrintsUserAnswersController.printUserAnswers(srn: Srn, key: Option[String] ?= None)

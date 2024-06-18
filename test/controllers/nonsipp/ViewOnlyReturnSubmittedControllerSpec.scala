@@ -49,7 +49,7 @@ class ViewOnlyReturnSubmittedControllerSpec extends ControllerBaseSpec with Comm
       .thenReturn(Future.successful(versionsResponse))
       .thenReturn(Future.successful(Seq.empty[PsrVersionsResponse]))
       .thenReturn(Future.successful(Seq.empty[PsrVersionsResponse]))
-    when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any(), any())(any(), any(), any()))
+    when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(userAnswers))
       .thenReturn(Future.successful(emptyUserAnswers))
       .thenReturn(Future.successful(userAnswers))

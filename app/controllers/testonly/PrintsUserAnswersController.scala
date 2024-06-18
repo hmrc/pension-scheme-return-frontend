@@ -19,7 +19,7 @@ package controllers.testonly
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import models.SchemeId.Srn
 import controllers.actions.IdentifyAndRequireData
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import play.api.i18n.I18nSupport
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
@@ -31,8 +31,16 @@ class PrintsUserAnswersController @Inject()(
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def printUserAnswers(srn: Srn): Action[AnyContent] =
+  def printUserAnswers(srn: Srn, key: Option[String] = None): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      Ok(Json.prettyPrint(request.userAnswers.data.decryptedValue))
+      key match {
+        case Some(k) =>
+          request.userAnswers.data.decryptedValue.fields
+            .find { case (key, _) => key == k }
+            .fold(BadRequest(s"key $k does not exist in user answers"))(
+              field => Ok(Json.prettyPrint(JsObject(Seq(field))))
+            )
+        case None => Ok(Json.prettyPrint(request.userAnswers.data.decryptedValue))
+      }
     }
 }

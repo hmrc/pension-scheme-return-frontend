@@ -19,6 +19,7 @@ package utils
 import queries.Settable
 import play.api.libs.json.{JsPath, JsValue, Writes}
 import models.UserAnswers
+import viewmodels.models.Flag
 
 object UserAnswersUtils {
 
@@ -26,6 +27,9 @@ object UserAnswersUtils {
 
     def unsafeSet[A](page: Settable[A], value: A)(implicit writes: Writes[A]): UserAnswers =
       userAnswers.set(page, value).get
+
+    def unsafeSet(page: Settable[Flag]): UserAnswers =
+      userAnswers.set(page, Flag).get
 
     def unsafeSet(path: JsPath, value: JsValue): UserAnswers =
       userAnswers.set(path, value).get

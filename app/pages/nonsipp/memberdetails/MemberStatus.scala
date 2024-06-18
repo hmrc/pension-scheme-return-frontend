@@ -19,28 +19,16 @@ package pages.nonsipp.memberdetails
 import utils.RefinedUtils.RefinedIntOps
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import models.UserAnswers
 import viewmodels.models.MemberState
 import config.Refined.Max300
 import pages.QuestionPage
 
-// todo remove in favour of soft deletion
+/**
+ * Used to show the state of a member in ETMP
+ */
 case class MemberStatus(srn: Srn, index: Max300) extends QuestionPage[MemberState] {
 
   override def path: JsPath = Paths.personalDetails \ toString \ index.arrayIndex.toString
 
   override def toString: String = "memberStatus"
-}
-
-case class MemberStatuses(srn: Srn) extends QuestionPage[Map[String, MemberState]] {
-
-  override def path: JsPath = Paths.personalDetails \ toString
-
-  override def toString: String = "memberStatus"
-}
-
-object MemberStatusImplicits {
-  implicit class MembersStatusOps(ua: UserAnswers) {
-    def memberStates(srn: Srn): Map[String, MemberState] = ua.map(MemberStatuses(srn))
-  }
 }

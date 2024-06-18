@@ -27,15 +27,54 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import javax.inject.Inject
 
-class FakeDataToCompareRetrievalActionProvider @Inject()(
+class FakeDataRetrievalETMPActionProvider @Inject()(
   userAnswers: Option[UserAnswers],
   pureUserAnswers: Option[UserAnswers],
   previousUserAnswers: Option[UserAnswers]
-) extends DataToCompareRetrievalActionProvider
+) extends DataRetrievalETMPActionProvider
     with Generators
     with OptionValues {
 
-  override def apply(
+  override def fbNumber(fbNumber: String): ActionTransformer[AllowedAccessRequest, OptionalDataRequest] =
+    new ActionTransformer[AllowedAccessRequest, OptionalDataRequest] {
+      override def transform[A](request: AllowedAccessRequest[A]): Future[OptionalDataRequest[A]] =
+        Future(
+          OptionalDataRequest(
+            request,
+            userAnswers,
+            pureUserAnswers,
+            previousUserAnswers,
+            None,
+            None,
+            None
+          )
+        )
+
+      override protected def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+    }
+
+  override def versionForYear(
+    year: String,
+    current: Int
+  ): ActionTransformer[AllowedAccessRequest, OptionalDataRequest] =
+    new ActionTransformer[AllowedAccessRequest, OptionalDataRequest] {
+      override def transform[A](request: AllowedAccessRequest[A]): Future[OptionalDataRequest[A]] =
+        Future(
+          OptionalDataRequest(
+            request,
+            userAnswers,
+            pureUserAnswers,
+            previousUserAnswers,
+            Some(year),
+            Some(current),
+            if (current - 1 <= 0) None else Some(current - 1)
+          )
+        )
+
+      override protected def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+    }
+
+  override def currentAndPreviousVersionForYear(
     year: String,
     current: Int,
     previous: Int

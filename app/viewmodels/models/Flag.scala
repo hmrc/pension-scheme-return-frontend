@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberdetails
+package viewmodels.models
 
-import pages.QuestionPage
-import models.SchemeId.Srn
-import play.api.libs.json.JsPath
-import models.ManualOrUpload
+import play.api.libs.json.{Json, OFormat}
 
-case class PensionSchemeMembersPage(srn: Srn) extends QuestionPage[ManualOrUpload] {
-  override def path: JsPath = JsPath \ toString
-  override def toString: String = PensionSchemeMembersPage.key
-}
-
-object PensionSchemeMembersPage {
-  val key = "pensionSchemeMembers"
+// Used in UserAnswers as a Unit type - where the value is not important
+case object Flag {
+  implicit val format: OFormat[Flag] = Json.format[Flag]
 }

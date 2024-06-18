@@ -16,16 +16,23 @@
 
 package pages.nonsipp.memberdetails
 
-import pages.QuestionPage
+import utils.RefinedUtils.RefinedIntOps
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import models.ManualOrUpload
+import viewmodels.models.Flag
+import config.Refined.Max300
+import pages.QuestionPage
 
-case class PensionSchemeMembersPage(srn: Srn) extends QuestionPage[ManualOrUpload] {
-  override def path: JsPath = JsPath \ toString
-  override def toString: String = PensionSchemeMembersPage.key
+/**
+ * Used to show when a member has been added in the current submission (have never been through an ETMP declaration) and is safe to hard delete
+ */
+case class SafeToHardDelete(srn: Srn, index: Max300) extends QuestionPage[Flag] {
+
+  override def path: JsPath = Paths.personalDetails \ toString \ index.arrayIndex.toString
+
+  override def toString: String = SafeToHardDelete.key
 }
 
-object PensionSchemeMembersPage {
-  val key = "pensionSchemeMembers"
+object SafeToHardDelete {
+  val key = "safeToHardDelete"
 }

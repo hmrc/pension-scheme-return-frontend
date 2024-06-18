@@ -21,16 +21,22 @@ import play.api.libs.json._
 
 sealed trait MemberState {
   val name: String
+  val active: Boolean = this == MemberState.New || this == MemberState.Changed
+  val changed: Boolean = this == MemberState.Changed
+  val _new: Boolean = this == MemberState.New
 }
 
 object MemberState {
-  case object Active extends WithName("Active") with MemberState
+  case object New extends WithName("New") with MemberState
+
+  case object Changed extends WithName("Changed") with MemberState
 
   case object Deleted extends WithName("Deleted") with MemberState
 
   implicit val format: Format[MemberState] = new Format[MemberState] {
     override def reads(json: JsValue): JsResult[MemberState] = json match {
-      case JsString(MemberState.Active.name) => JsSuccess(MemberState.Active)
+      case JsString(MemberState.New.name) => JsSuccess(MemberState.New)
+      case JsString(MemberState.Changed.name) => JsSuccess(MemberState.Changed)
       case JsString(MemberState.Deleted.name) => JsSuccess(MemberState.Deleted)
       case unknown => JsError(s"Unknown MemberState value $unknown")
     }

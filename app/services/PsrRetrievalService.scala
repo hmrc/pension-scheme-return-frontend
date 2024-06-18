@@ -38,11 +38,13 @@ class PsrRetrievalService @Inject()(
   declarationTransformer: DeclarationTransformer
 ) {
 
+  // todo should return Option.None on 404 instead of empty user answers
   def getStandardPsrDetails(
     optFbNumber: Option[String],
     optPeriodStartDate: Option[String],
     optPsrVersion: Option[String],
-    fallBackCall: Call
+    fallBackCall: Call,
+    fetchingPreviousVersion: Boolean = false
   )(
     implicit request: DataRequest[_],
     hc: HeaderCarrier,
@@ -92,7 +94,15 @@ class PsrRetrievalService @Inject()(
 
             transformedMemberDetailsUa <- psrDetails.membersPayments
               .map(
-                memberPayments => memberPaymentsTransformer.transformFromEtmp(transformedAssetsUa, srn, memberPayments)
+                memberPayments =>
+                  memberPaymentsTransformer
+                    .transformFromEtmp(
+                      transformedAssetsUa,
+                      request.previousUserAnswers,
+                      srn,
+                      memberPayments,
+                      fetchingPreviousVersion
+                    )
               )
               .getOrElse(Try(transformedAssetsUa))
 

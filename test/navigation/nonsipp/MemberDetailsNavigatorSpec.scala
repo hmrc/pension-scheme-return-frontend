@@ -43,7 +43,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateToWithData(
-            PensionSchemeMembersPage,
+            PensionSchemeMembersPage.apply,
             Gen.const(ManualOrUpload.Manual),
             routes.MemberDetailsController.onPageLoad(_, refineMV(1), _)
           )
@@ -53,7 +53,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateToWithData(
-            PensionSchemeMembersPage,
+            PensionSchemeMembersPage.apply,
             Gen.const(ManualOrUpload.Upload),
             (srn, _) => controllers.nonsipp.memberdetails.routes.HowToUploadController.onPageLoad(srn)
           )
