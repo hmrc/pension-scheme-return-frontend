@@ -59,6 +59,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
       // only for loans for now, as this is the first question in the journey
       case IdentitySubject.LoanRecipient =>
         val list = List(
+          IsIndividualRecipientConnectedPartyPage(srn, index),
           DatePeriodLoanPage(srn, index),
           AmountOfTheLoanPage(srn, index),
           AreRepaymentsInstalmentsPage(srn, index),
@@ -72,7 +73,6 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
     }
   private def genericPagesDependentOnIdentitySubject(srn: Srn): List[Removable[_]] =
     List(
-      IsIndividualRecipientConnectedPartyPage(srn, index),
       CompanyRecipientCrnPage(srn, index, this.identitySubject),
       PartnershipRecipientUtrPage(srn, index, this.identitySubject),
       OtherRecipientDetailsPage(srn, index, this.identitySubject)
