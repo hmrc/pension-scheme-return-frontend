@@ -20,6 +20,7 @@ import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.shares._
 import com.google.inject.Singleton
 import config.Refined.{Max5000, OneTo50, OneTo5000}
+import viewmodels.models.SectionStatus.Completed
 import models.SchemeHoldShare.{Acquisition, Transfer}
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import eu.timepit.refined.refineV
@@ -446,7 +447,11 @@ class SharesTransformer @Inject() extends Transformer {
     shares: Shares
   ): Try[UserAnswers] = {
 
-    val userAnswersOfShares = userAnswers.set(DidSchemeHoldAnySharesPage(srn), shares.optShareTransactions.isDefined)
+    val userAnswersOfShares = userAnswers
+      .set(DidSchemeHoldAnySharesPage(srn), shares.optShareTransactions.isDefined)
+      .set(SharesJourneyStatus(srn), Completed)
+      .set(SharesListPage(srn), shares.optShareTransactions.nonEmpty)
+
     val userAnswersWithQuotedShares = shares.optTotalValueQuotedShares.fold(userAnswersOfShares)(
       totalValueQuotedShares => userAnswersOfShares.set(TotalValueQuotedSharesPage(srn), Money(totalValueQuotedShares))
     )
