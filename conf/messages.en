@@ -1225,6 +1225,9 @@ basicDetailsCheckYourAnswersController.memberDetails.deferredMembers = How many 
 basicDetailsCheckYourAnswersController.memberDetails.deferredMembers.hidden = number of deferred members on {0}
 basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers = How many pensioner members did {0} have on {1}?
 basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers.hidden = number of pension members on {0}
+basicDetailsCheckYourAnswersController.viewOnly.title = Basic details
+basicDetailsCheckYourAnswersController.viewOnly.heading = Basic details
+basicDetailsCheckYourAnswersController.viewOnly.link = View previous version of basic details (opens in new tab)
 
 individualRecipientName.title = What is the recipient’s name?
 individualRecipientName.heading = What is the recipient’s name?
@@ -1498,7 +1501,7 @@ removeLoan.error.required = Select yes if you are sure you want to remove this l
 
 financialDetailsCheckYourAnswersController.title = Check your answers
 financialDetailsCheckYourAnswersController.heading = Check your answers
-financialDetailsCheckYourAnswersController.viewOnly.heading = Financial details
+financialDetailsCheckYourAnswersController.viewOnly.title = Financial details
 financialDetailsCheckYourAnswersController.viewOnly.heading = Financial details
 financialDetailsCheckYourAnswersController.viewOnly.link = View previous version of financial details (opens in new tab)
 financialDetailsCheckYourAnswersController.totalCashInStartDate = How much cash did {0} hold in all bank accounts on {1}?

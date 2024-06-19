@@ -20,30 +20,32 @@ import services.{AuditService, PsrSubmissionService, SchemeDateService}
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
-import config.Refined.Max3
 import controllers.{nonsipp, PSRController}
+import utils.nonsipp.TaskListStatusUtils.getBasicDetailsTaskListStatus
 import cats.implicits.toShow
-import config.Constants.{PSA, PSP}
 import controllers.actions._
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
+import _root_.config.Constants.{PSA, PSP}
+import viewmodels.models.TaskListStatus.Updated
 import models.requests.DataRequest
+import _root_.config.Refined.Max3
 import models.audit.PSRStartAuditEvent
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
 import cats.data.NonEmptyList
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import pages.nonsipp.{BasicDetailsCheckYourAnswersPage, WhichTaxYearPage}
+import pages.nonsipp.{BasicDetailsCheckYourAnswersPage, CompilationOrSubmissionDatePage, WhichTaxYearPage}
 import navigation.Navigator
-import utils.DateTimeUtils.localDateShow
+import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models._
 import play.api.i18n._
 import viewmodels.Margin
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
 class BasicDetailsCheckYourAnswersController @Inject()(
@@ -59,6 +61,15 @@ class BasicDetailsCheckYourAnswersController @Inject()(
     extends PSRController {
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    onPageLoadCommon(srn: Srn, mode: Mode)(implicitly)
+  }
+
+  def onPageLoadViewOnly(srn: Srn, mode: Mode, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn: Srn, mode: Mode)(implicitly)
+    }
+
+  def onPageLoadCommon(srn: Srn, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
     schemeDateService.taxYearOrAccountingPeriods(srn) match {
       case Some(periods) =>
         (
@@ -81,14 +92,22 @@ class BasicDetailsCheckYourAnswersController @Inject()(
                 userName,
                 request.schemeDetails,
                 request.pensionSchemeId.value,
-                request.pensionSchemeId.isPSP
+                request.pensionSchemeId.isPSP,
+                viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+                  getBasicDetailsTaskListStatus(request.userAnswers, request.previousUserAnswers.get) == Updated
+                } else {
+                  false
+                },
+                optYear = request.year,
+                optCurrentVersion = request.currentVersion,
+                optPreviousVersion = request.previousVersion,
+                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
               )
             )
           )
         ).merge
       case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
-  }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     psrSubmissionService
@@ -119,6 +138,21 @@ class BasicDetailsCheckYourAnswersController @Inject()(
       }
   }
 
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+    }
+
+  def onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
+            .onPageLoadViewOnly(srn, year, (current - 1).max(0), (previous - 1).max(0))
+        )
+      )
+    }
+
   private def buildAuditEvent(taxYear: DateRange, schemeMemberNumbers: SchemeMemberNumbers, userName: String)(
     implicit req: DataRequest[_]
   ) = PSRStartAuditEvent(
@@ -147,16 +181,25 @@ object BasicDetailsCheckYourAnswersController {
     schemeAdminName: String,
     schemeDetails: SchemeDetails,
     pensionSchemeId: String,
-    isPSP: Boolean
+    isPSP: Boolean,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
   )(implicit messages: Messages): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
+      mode = mode,
       title = "checkYourAnswers.title",
       heading = "checkYourAnswers.heading",
       description = Some(ParagraphMessage("basicDetailsCheckYourAnswers.paragraph")),
       page = CheckYourAnswersViewModel(
         sections(
           srn,
-          mode,
+          mode match {
+            case ViewOnlyMode => NormalMode
+            case _ => mode
+          },
           activeBankAccount,
           whyNoBankAccount,
           whichTaxYearPage,
@@ -170,7 +213,47 @@ object BasicDetailsCheckYourAnswersController {
       ).withMarginBottom(Margin.Fixed60Bottom),
       refresh = None,
       buttonText = "site.saveAndContinue",
-      onSubmit = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, mode)
+      onSubmit = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion))
+                  if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+                Some(
+                  LinkMessage(
+                    "basicDetailsCheckYourAnswersController.viewOnly.link",
+                    controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
+                      .onPreviousViewOnly(
+                        srn,
+                        year,
+                        currentVersion,
+                        previousVersion
+                      )
+                      .url
+                  )
+                )
+              case _ => None
+            },
+            submittedText =
+              compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+            title = "basicDetailsCheckYourAnswersController.viewOnly.title",
+            heading = "basicDetailsCheckYourAnswersController.viewOnly.heading",
+            buttonText = "site.return.to.tasklist",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
+                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
+                  .onSubmit(srn, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
 
   private def sections(

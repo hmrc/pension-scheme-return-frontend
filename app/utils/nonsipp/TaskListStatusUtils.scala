@@ -44,6 +44,7 @@ import pages.nonsipp.bonds._
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
 import pages.nonsipp.membercontributions._
+import pages.nonsipp.accountingperiod.Paths.accountingPeriodDetails
 import pages.nonsipp.memberreceivedpcls.{PclsMemberListPage, PensionCommencementLumpSumPage}
 import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, PensionPaymentsReceivedPage}
 import eu.timepit.refined.{refineMV, refineV}
@@ -1008,4 +1009,26 @@ object TaskListStatusUtils {
     } else {
       Updated
     }
+
+  def getBasicDetailsTaskListStatus(currentUA: UserAnswers, previousUA: UserAnswers): TaskListStatus = {
+    val accountingPeriodsSame = currentUA.get(accountingPeriodDetails \ "accountingPeriods") == previousUA.get(
+      accountingPeriodDetails \ "accountingPeriods"
+    )
+
+    val designatoryCurrent = currentUA
+      .get(schemeDesignatory)
+      .get
+      .as[JsObject] - "totalAssetValue" - "totalPayments" - "totalCash" - "recordVersion"
+    val designatoryPrevious = previousUA
+      .get(schemeDesignatory)
+      .get
+      .as[JsObject] - "totalAssetValue" - "totalPayments" - "totalCash" - "recordVersion"
+    val schemeDesignatoriesSame = designatoryCurrent == designatoryPrevious
+
+    if (accountingPeriodsSame && schemeDesignatoriesSame) {
+      Completed
+    } else {
+      Updated
+    }
+  }
 }

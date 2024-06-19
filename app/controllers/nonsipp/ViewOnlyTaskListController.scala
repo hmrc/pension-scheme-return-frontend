@@ -17,14 +17,15 @@
 package controllers.nonsipp
 
 import pages.nonsipp.bonds.BondsCompleted
+import viewmodels.implicits._
 import controllers.PSRController
-import utils.nonsipp.TaskListStatusUtils.{getCompletedOrUpdatedTaskListStatus, getFinancialDetailsTaskListStatus}
+import utils.nonsipp.TaskListStatusUtils._
 import pages.nonsipp.landorproperty.LandOrPropertyCompleted
 import controllers.actions._
+import pages.nonsipp.WhichTaxYearPage
 import pages.nonsipp.memberdetails.Paths.personalDetails
+import viewmodels.models.TaskListStatus._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import viewmodels.implicits._
-import pages.nonsipp.accountingperiod.Paths.accountingPeriodDetails
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, Paths, SharesCompleted}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.OtherAssetsCompleted
@@ -34,12 +35,8 @@ import views.html.TaskListView
 import models.SchemeId.Srn
 import cats.implicits.toShow
 import pages.nonsipp.memberpensionpayments.Paths.membersPayments
-import pages.nonsipp.WhichTaxYearPage
-import play.api.libs.json._
 import utils.DateTimeUtils.localDateShow
 import models._
-import viewmodels.models.TaskListStatus._
-import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
@@ -189,36 +186,16 @@ object ViewOnlyTaskListController {
     year: String,
     currentVersion: Int,
     previousVersion: Int
-  ): TaskListItemViewModel = {
-
-    val accountingPeriodsSame = currentUA.get(accountingPeriodDetails \ "accountingPeriods") == previousUA.get(
-      accountingPeriodDetails \ "accountingPeriods"
-    )
-
-    val designatoryCurrent = currentUA
-      .get(schemeDesignatory)
-      .get
-      .as[JsObject] - "totalAssetValue" - "totalPayments" - "totalCash"
-    val designatoryPrevious = previousUA
-      .get(schemeDesignatory)
-      .get
-      .as[JsObject] - "totalAssetValue" - "totalPayments" - "totalCash"
-    val schemeDesignatoriesSame = designatoryCurrent == designatoryPrevious
-
-    val basicDetailsTaskListStatus = if (accountingPeriodsSame && schemeDesignatoriesSame) {
-      Completed
-    } else {
-      Updated
-    }
-
+  ): TaskListItemViewModel =
     TaskListItemViewModel(
       LinkMessage(
         Message(messageKey(prefix, "details.title"), schemeName),
-        controllers.routes.UnauthorisedController.onPageLoad().url
+        controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
+          .onPageLoadViewOnly(srn, year, currentVersion, previousVersion)
+          .url
       ),
-      basicDetailsTaskListStatus
+      getBasicDetailsTaskListStatus(currentUA, previousUA)
     )
-  }
 
   private def getFinancialDetailsTaskListItem(
     schemeName: String,

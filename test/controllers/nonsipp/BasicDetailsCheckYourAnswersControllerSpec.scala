@@ -25,14 +25,14 @@ import play.api.inject.bind
 import cats.implicits.toShow
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
-import pages.nonsipp.WhichTaxYearPage
+import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage, WhichTaxYearPage}
 import org.mockito.stubbing.OngoingStubbing
 import models._
 import play.api.i18n.Messages
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import play.api.test.Helpers.stubMessagesApi
-import org.mockito.Mockito.{times, verify, when}
+import org.mockito.Mockito.{never, reset, times, verify, when}
 import cats.data.NonEmptyList
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
@@ -44,6 +44,26 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, NormalMode)
   private lazy val onSubmitInCheckMode = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, CheckMode)
+  private lazy val onPageLoadViewOnly = routes.BasicDetailsCheckYourAnswersController.onPageLoadViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+  private lazy val onSubmitViewOnly = routes.BasicDetailsCheckYourAnswersController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+  private lazy val onPreviousViewOnly = routes.BasicDetailsCheckYourAnswersController.onPreviousViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private val updatedValues = SchemeMemberNumbers(4, 5, 6)
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
@@ -52,6 +72,9 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
     bind[SchemeDateService].toInstance(mockSchemeDateService),
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
+
+  override def beforeEach(): Unit =
+    reset(mockPsrSubmissionService)
 
   "BasicDetailsCheckYourAnswersController" - {
 
@@ -76,7 +99,8 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
           individualDetails.fullName,
           defaultSchemeDetails,
           psaId.value,
-          psaId.isPSP
+          psaId.isPSP,
+          viewOnlyUpdated = false
         )
       )
     }.before(mockTaxYear(dateRange)))
@@ -220,6 +244,98 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
     }
   }
 
+  "BasicDetailsCheckYourAnswersController in view only mode" - {
+
+    val currentUserAnswers = defaultUserAnswers
+      .unsafeSet(WhichTaxYearPage(srn), dateRange)
+      .unsafeSet(HowManyMembersPage(srn, psaId), schemeMemberNumbers)
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(ActiveBankAccountPage(srn), true)
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+      .unsafeSet(ActiveBankAccountPage(srn), true)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              srn,
+              ViewOnlyMode,
+              schemeMemberNumbers,
+              activeBankAccount = true,
+              whyNoBankAccount = None,
+              whichTaxYearPage = Some(dateRange),
+              Left(dateRange),
+              individualDetails.fullName,
+              defaultSchemeDetails,
+              psaId.value,
+              psaId.isPSP,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }.before(mockTaxYear(dateRange))
+        .withName("OnPageLoadViewOnly renders ok with no changed flag")
+    )
+
+    val updatedUserAnswers = currentUserAnswers
+      .unsafeSet(HowManyMembersPage(srn, psaId), updatedValues)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              srn,
+              ViewOnlyMode,
+              updatedValues,
+              activeBankAccount = true,
+              whyNoBankAccount = None,
+              whichTaxYearPage = Some(dateRange),
+              Left(dateRange),
+              individualDetails.fullName,
+              defaultSchemeDetails,
+              psaId.value,
+              psaId.isPSP,
+              viewOnlyUpdated = true,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }.before(mockTaxYear(dateRange))
+        .withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
+
+    act.like(
+      redirectToPage(
+        onPreviousViewOnly,
+        routes.BasicDetailsCheckYourAnswersController
+          .onPageLoadViewOnly(srn, yearString, submissionNumberOne, submissionNumberZero)
+      ).withName(
+        "Submit previous view only redirects to BasicDetailsCheckYourAnswersController for the previous submission"
+      )
+    )
+  }
+
   private def buildViewModel(
     srn: Srn = srn,
     mode: Mode = NormalMode,
@@ -242,7 +358,8 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
     schemeAdminName,
     schemeDetails,
     pensionSchemeId.value,
-    pensionSchemeId.isPSP
+    pensionSchemeId.isPSP,
+    false
   )
 
   private def mockTaxYear(
