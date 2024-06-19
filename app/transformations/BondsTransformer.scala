@@ -19,7 +19,6 @@ package transformations
 import pages.nonsipp.bonds._
 import pages.nonsipp.bonds.Paths.bonds
 import config.Refined.{Max5000, OneTo50, OneTo5000}
-import models.SchemeHoldBond.{Acquisition, Transfer}
 import models.SchemeId.Srn
 import eu.timepit.refined.refineV
 import models.{HowDisposed, Money, UserAnswers}
@@ -29,6 +28,8 @@ import models.requests.DataRequest
 import eu.timepit.refined.api.Refined
 import models.HowDisposed.{Other, Sold}
 import com.google.inject.Singleton
+import viewmodels.models.SectionStatus.Completed
+import models.SchemeHoldBond.{Acquisition, Transfer}
 import models.requests.psr.{BondDisposed, BondTransactions, Bonds}
 import models.UserAnswers.implicits.UserAnswersTryOps
 
@@ -161,7 +162,11 @@ class BondsTransformer @Inject() extends Transformer {
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, bond: Bonds): Try[UserAnswers] = {
     val bondTransactions = bond.bondTransactions
-    val userAnswersOfBondsHeld = userAnswers.set(UnregulatedOrConnectedBondsHeldPage(srn), bond.bondsWereAdded)
+    val userAnswersOfBondsHeld = userAnswers
+      .set(UnregulatedOrConnectedBondsHeldPage(srn), bond.bondsWereAdded)
+      .set(BondsJourneyStatus(srn), Completed)
+      .set(BondsListPage(srn), bond.bondTransactions.nonEmpty)
+
     val userAnswersWithRecordVersion =
       bond.recordVersion.fold(userAnswersOfBondsHeld)(userAnswersOfBondsHeld.set(BondsRecordVersionPage(srn), _))
 
@@ -219,9 +224,11 @@ class BondsTransformer @Inject() extends Transformer {
     val initialUserAnswersOfDisposal = userAnswers.set(BondsDisposalPage(srn), bondsWereDisposed)
     optBondsDisposed
       .map(bondsDisposed => {
+        val initialUserAnswersOfDisposalWithCompleted =
+          initialUserAnswersOfDisposal.set(BondsDisposalCompleted(srn), SectionCompleted)
         for {
           disposalIndexes <- buildIndexesForMax50(bondsDisposed.size)
-          resultDisposalUA <- disposalIndexes.foldLeft(initialUserAnswersOfDisposal) {
+          resultDisposalUA <- disposalIndexes.foldLeft(initialUserAnswersOfDisposalWithCompleted) {
             case (disposalUA, disposalIndex) =>
               val bondDisposed = bondsDisposed(disposalIndex.value - 1)
               val methodOfDisposal = bondDisposed.methodOfDisposal match {
