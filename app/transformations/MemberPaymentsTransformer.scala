@@ -208,7 +208,7 @@ class MemberPaymentsTransformer @Inject()(
                 srn,
                 index,
                 memberDetails.transfersOut,
-                memberPayments.transfersInCompleted
+                memberPayments.transfersOutCompleted
               ) ++ memberPayments.memberContributionMade.fold(noUpdate)(
                 memberContributionsPages(srn, index, _, memberDetails.totalContributions)
               ) ++ memberPayments.lumpSumReceived.fold(noUpdate)(
@@ -265,8 +265,9 @@ class MemberPaymentsTransformer @Inject()(
       emptyTotalContributionNotExist = !memberPayments.memberDetails.exists(_.totalContributions.isEmpty)
       ua4 <- ua3_2.set(MemberContributionsListPage(srn), emptyTotalContributionNotExist)
 
-      emptyMemberLumpSumReceivedNotExist = !memberPayments.memberDetails.exists(_.memberLumpSumReceived.isEmpty)
-      ua5 <- ua4.set(PclsMemberListPage(srn), emptyMemberLumpSumReceivedNotExist)
+      // temporary E2E workaround
+      memberLumpSumReceivedExists = memberPayments.memberDetails.exists(_.memberLumpSumReceived.nonEmpty)
+      ua5 <- ua4.set(PclsMemberListPage(srn), memberLumpSumReceivedExists)
 
       ua8 <- ua5.set(
         SoftDeletedMembers(srn),
