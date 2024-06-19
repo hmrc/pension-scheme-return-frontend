@@ -32,7 +32,7 @@ import play.api.i18n.Messages
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import play.api.test.Helpers.stubMessagesApi
-import org.mockito.Mockito.{never, reset, times, verify, when}
+import org.mockito.Mockito._
 import cats.data.NonEmptyList
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
@@ -359,7 +359,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
     schemeDetails,
     pensionSchemeId.value,
     pensionSchemeId.isPSP,
-    false
+    viewOnlyUpdated = false
   )
 
   private def mockTaxYear(

@@ -608,9 +608,11 @@ class SharesTransformer @Inject() extends Transformer {
     optDisposedSharesTransaction
       .map(
         disposedSharesTransactions => {
+          val initialUserAnswersOfDisposalWithCompleted =
+            initialUserAnswersOfDisposal.set(SharesDisposalCompleted(srn), SectionCompleted)
           for {
             disposalIndexes <- buildIndexesForMax50(disposedSharesTransactions.size)
-            resultDisposalUA <- disposalIndexes.foldLeft(initialUserAnswersOfDisposal) {
+            resultDisposalUA <- disposalIndexes.foldLeft(initialUserAnswersOfDisposalWithCompleted) {
               case (disposalUA, disposalIndex) =>
                 val disposedSharesTransaction = disposedSharesTransactions(disposalIndex.value - 1)
                 val optRedemptionQuestions = disposedSharesTransaction.optRedemptionQuestions
@@ -732,7 +734,6 @@ class SharesTransformer @Inject() extends Transformer {
                   disposalUA0 <- disposalUA
                   disposalUA1 <- disposalUA0
                     .set(SharesDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
-                    .set(SharesDisposalCompleted(srn), SectionCompleted)
                   disposalUA2 <- disposalUA1.set(howWereSharesDisposed._1, howWereSharesDisposed._2)
                   disposalUA3 <- disposalUA2.set(totalSharesNowHeld._1, totalSharesNowHeld._2)
                   disposalUA4 <- optDateOfRedemption

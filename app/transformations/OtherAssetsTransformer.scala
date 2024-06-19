@@ -18,6 +18,7 @@ package transformations
 
 import pages.nonsipp.otherassetsdisposal._
 import config.Refined.{Max5000, OneTo50, OneTo5000}
+import viewmodels.models.SectionStatus.Completed
 import models.SchemeId.Srn
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import eu.timepit.refined.refineV
@@ -426,7 +427,10 @@ class OtherAssetsTransformer @Inject() extends Transformer {
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, otherAssets: OtherAssets): Try[UserAnswers] = {
     val otherAssetTransactions = otherAssets.otherAssetTransactions
-    val userAnswersOfOtherAssetsHeld = userAnswers.set(OtherAssetsHeldPage(srn), otherAssets.otherAssetsWereHeld)
+    val userAnswersOfOtherAssetsHeld = userAnswers
+      .set(OtherAssetsHeldPage(srn), otherAssets.otherAssetsWereHeld)
+      .set(OtherAssetsJourneyStatus(srn), Completed)
+      .set(OtherAssetsListPage(srn), otherAssets.otherAssetTransactions.nonEmpty)
     val userAnswersWithRecordVersion =
       otherAssets.recordVersion.fold(userAnswersOfOtherAssetsHeld)(
         userAnswersOfOtherAssetsHeld.set(OtherAssetsRecordVersionPage(srn), _)
@@ -568,9 +572,11 @@ class OtherAssetsTransformer @Inject() extends Transformer {
     optOtherAssetDisposed
       .map(
         otherAssetDisposedList => {
+          val initialUserAnswersOfDisposalWithCompleted =
+            initialUserAnswersOfDisposal.set(OtherAssetsDisposalCompleted(srn), SectionCompleted)
           for {
             disposalIndexes <- buildIndexesForMax50(otherAssetDisposedList.size)
-            resultDisposalUA <- disposalIndexes.foldLeft(initialUserAnswersOfDisposal) {
+            resultDisposalUA <- disposalIndexes.foldLeft(initialUserAnswersOfDisposalWithCompleted) {
               case (disposalUA, disposalIndex) =>
                 val otherAssetDisposed = otherAssetDisposedList(disposalIndex.value - 1)
 
@@ -667,7 +673,6 @@ class OtherAssetsTransformer @Inject() extends Transformer {
                   disposalUA0 <- disposalUA
                   disposalUA1 <- disposalUA0
                     .set(OtherAssetsDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
-                    .set(OtherAssetsDisposalCompleted(srn), SectionCompleted)
                   disposalUA2 <- disposalUA1.set(howWasAssetDisposed._1, howWasAssetDisposed._2)
                   disposalUA3 <- disposalUA2.set(anyPartAssetStillHeld._1, anyPartAssetStillHeld._2)
                   disposalUA4 <- optPurchaserTyped
