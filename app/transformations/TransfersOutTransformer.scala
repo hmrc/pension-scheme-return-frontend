@@ -58,7 +58,7 @@ class TransfersOutTransformer @Inject() extends Transformer {
     transfersOutCompleted: Boolean
   ): List[Try[UserAnswers] => Try[UserAnswers]] =
     transfersOut.zipWithIndex.flatMap {
-      case (transferIn, zippedIndex) =>
+      case (transferOut, zippedIndex) =>
         refineIndex[Max5.Refined](zippedIndex).fold(List.empty[Try[UserAnswers] => Try[UserAnswers]]) {
           secondaryIndex =>
             List[Try[UserAnswers] => Try[UserAnswers]](
@@ -66,9 +66,9 @@ class TransfersOutTransformer @Inject() extends Transformer {
                 TransfersOutSectionCompleted(srn, index, secondaryIndex),
                 SectionCompleted
               ),
-              _.set(ReceivingSchemeNamePage(srn, index, secondaryIndex), transferIn.schemeName),
-              _.set(WhenWasTransferMadePage(srn, index, secondaryIndex), transferIn.dateOfTransfer),
-              _.set(ReceivingSchemeTypePage(srn, index, secondaryIndex), transferIn.transferSchemeType)
+              _.set(ReceivingSchemeNamePage(srn, index, secondaryIndex), transferOut.schemeName),
+              _.set(WhenWasTransferMadePage(srn, index, secondaryIndex), transferOut.dateOfTransfer),
+              _.set(ReceivingSchemeTypePage(srn, index, secondaryIndex), transferOut.transferSchemeType)
             )
         }
     } ++ List(
