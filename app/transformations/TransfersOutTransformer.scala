@@ -22,7 +22,7 @@ import config.Refined.{Max300, Max5}
 import models.SchemeId.Srn
 import models.UserAnswers
 import pages.nonsipp.membertransferout._
-import viewmodels.models.{SectionCompleted, SectionStatus}
+import viewmodels.models.SectionCompleted
 import models.requests.psr._
 import models.UserAnswers.implicits.UserAnswersTryOps
 
@@ -54,8 +54,7 @@ class TransfersOutTransformer @Inject() extends Transformer {
   def transformFromEtmp(
     srn: Srn,
     index: Max300,
-    transfersOut: List[TransfersOut],
-    transfersOutCompleted: Boolean
+    transfersOut: List[TransfersOut]
   ): List[Try[UserAnswers] => Try[UserAnswers]] =
     transfersOut.zipWithIndex.flatMap {
       case (transferOut, zippedIndex) =>
@@ -71,9 +70,5 @@ class TransfersOutTransformer @Inject() extends Transformer {
               _.set(ReceivingSchemeTypePage(srn, index, secondaryIndex), transferOut.transferSchemeType)
             )
         }
-    } ++ List(
-      _.setWhen(transfersOutCompleted)(SchemeTransferOutPage(srn), transfersOut.nonEmpty),
-      _.setWhen(transfersOutCompleted)(TransferOutMemberListPage(srn), true),
-      _.setWhen(transfersOutCompleted)(TransfersOutJourneyStatus(srn), SectionStatus.Completed)
-    )
+    }
 }

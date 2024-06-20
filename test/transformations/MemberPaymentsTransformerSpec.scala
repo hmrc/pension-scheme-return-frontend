@@ -126,8 +126,8 @@ class MemberPaymentsTransformerSpec
       deletedMemberAllSections
     ),
     employerContributionsDetails = SectionDetails(made = true, completed = true),
-    transfersInCompleted = false,
-    transfersOutCompleted = false,
+    transfersInCompleted = true,
+    transfersOutCompleted = true,
     unallocatedContribsMade = Some(true),
     unallocatedContribAmount = Some(money.value),
     memberContributionMade = Some(true),
@@ -207,23 +207,23 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(TotalMemberContributionPage(srn, index), money)
     // transfers in
     .unsafeSet(TransfersInSectionCompleted(srn, index, transfersInIndex), SectionCompleted)
-//    .unsafeSet(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
+    .unsafeSet(TransfersInJourneyStatus(srn), SectionStatus.Completed)
     .unsafeSet(TransferringSchemeNamePage(srn, index, transfersInIndex), schemeName)
     .unsafeSet(WhenWasTransferReceivedPage(srn, index, transfersInIndex), localDate)
     .unsafeSet(TotalValueTransferPage(srn, index, transfersInIndex), money)
     .unsafeSet(DidTransferIncludeAssetPage(srn, index, transfersInIndex), true)
     .unsafeSet(TransferringSchemeTypePage(srn, index, transfersInIndex), PensionSchemeType.RegisteredPS("123"))
-//     .unsafeSet(DidSchemeReceiveTransferPage(srn), true)
-//     .unsafeSet(TransferReceivedMemberListPage(srn), false)
+    .unsafeSet(DidSchemeReceiveTransferPage(srn), true)
+    .unsafeSet(TransferReceivedMemberListPage(srn), true)
     .unsafeSet(ReportAnotherTransferInPage(srn, index, transfersInIndex), false)
     // pcls
     .unsafeSet(PensionCommencementLumpSumPage(srn), true)
     .unsafeSet(PclsMemberListPage(srn), true)
     .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index), PensionCommencementLumpSum(money, money))
     // transfers out
-//    .unsafeSet(SchemeTransferOutPage(srn), true)
-//    .unsafeSet(TransferOutMemberListPage(srn), false)
-//    .unsafeSet(TransfersOutJourneyStatus(srn), SectionStatus.InProgress)
+    .unsafeSet(SchemeTransferOutPage(srn), true)
+    .unsafeSet(TransferOutMemberListPage(srn), true)
+    .unsafeSet(TransfersOutJourneyStatus(srn), SectionStatus.Completed)
     .unsafeSet(TransfersOutSectionCompleted(srn, index, transfersOutIndex), SectionCompleted)
     .unsafeSet(ReceivingSchemeNamePage(srn, index, transfersOutIndex), schemeName)
     .unsafeSet(WhenWasTransferMadePage(srn, index, transfersOutIndex), localDate)
