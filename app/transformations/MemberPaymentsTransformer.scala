@@ -25,7 +25,7 @@ import pages.nonsipp.memberpensionpayments._
 import uk.gov.hmrc.domain.Nino
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
 import models._
-import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
+import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransferOutMemberListPage, TransfersOutJourneyStatus}
 import models.softdelete.SoftDeletedMember
 import cats.syntax.traverse._
 import pages.nonsipp.employercontributions._
@@ -40,7 +40,11 @@ import pages.nonsipp.memberreceivedpcls.{
   PensionCommencementLumpSumPage
 }
 import pages.nonsipp.memberpensionpayments.Paths.membersPayments
-import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
+import pages.nonsipp.receivetransfer.{
+  DidSchemeReceiveTransferPage,
+  TransferReceivedMemberListPage,
+  TransfersInJourneyStatus
+}
 import models.requests.psr._
 import models.UserAnswers.implicits._
 import pages.nonsipp.memberpayments.{
@@ -202,13 +206,11 @@ class MemberPaymentsTransformer @Inject()(
                 ) ++ transfersInTransformer.transformFromEtmp(
                 srn,
                 index,
-                memberDetails.transfersIn,
-                memberPayments.transfersInCompleted
+                memberDetails.transfersIn
               ) ++ transfersOutTransformer.transformFromEtmp(
                 srn,
                 index,
-                memberDetails.transfersOut,
-                memberPayments.transfersOutCompleted
+                memberDetails.transfersOut
               ) ++ memberPayments.memberContributionMade.fold(noUpdate)(
                 memberContributionsPages(srn, index, _, memberDetails.totalContributions)
               ) ++ memberPayments.lumpSumReceived.fold(noUpdate)(
@@ -262,8 +264,33 @@ class MemberPaymentsTransformer @Inject()(
             )
       }
 
-      emptyTotalContributionNotExist = !memberPayments.memberDetails.exists(_.totalContributions.isEmpty)
-      ua4 <- ua3_2.set(MemberContributionsListPage(srn), emptyTotalContributionNotExist)
+      // temporary E2E workaround
+      memberTransferInExists = memberPayments.memberDetails.exists(_.transfersIn.nonEmpty)
+
+      ua3_3 <- memberTransferInExists match {
+        case false => Try(ua3_2)
+        case true =>
+          ua3_2
+            .set(DidSchemeReceiveTransferPage(srn), true)
+            .set(TransferReceivedMemberListPage(srn), true)
+            .set(TransfersInJourneyStatus(srn), SectionStatus.Completed)
+      }
+
+      // temporary E2E workaround
+      memberTransferOutExists = memberPayments.memberDetails.exists(_.transfersOut.nonEmpty)
+
+      ua3_4 <- memberTransferOutExists match {
+        case false => Try(ua3_3)
+        case true =>
+          ua3_3
+            .set(SchemeTransferOutPage(srn), true)
+            .set(TransferOutMemberListPage(srn), true)
+            .set(TransfersOutJourneyStatus(srn), SectionStatus.Completed)
+      }
+
+      // temporary E2E workaround
+      memberTotalContributionExists = memberPayments.memberDetails.exists(_.totalContributions.nonEmpty)
+      ua4 <- ua3_4.set(MemberContributionsListPage(srn), memberTotalContributionExists)
 
       // temporary E2E workaround
       memberLumpSumReceivedExists = memberPayments.memberDetails.exists(_.memberLumpSumReceived.nonEmpty)

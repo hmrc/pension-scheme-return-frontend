@@ -22,7 +22,7 @@ import config.Refined.{Max300, Max5}
 import models.SchemeId.Srn
 import pages.nonsipp.receivetransfer._
 import models.{Money, UserAnswers}
-import viewmodels.models.{SectionCompleted, SectionStatus}
+import viewmodels.models.SectionCompleted
 import models.requests.psr._
 import models.UserAnswers.implicits.UserAnswersTryOps
 
@@ -58,8 +58,7 @@ class TransfersInTransformer @Inject() extends Transformer {
   def transformFromEtmp(
     srn: Srn,
     index: Max300,
-    transfersIn: List[TransfersIn],
-    transfersInCompleted: Boolean
+    transfersIn: List[TransfersIn]
   ): List[Try[UserAnswers] => Try[UserAnswers]] =
     transfersIn.zipWithIndex.flatMap {
       case (transferIn, zippedIndex) =>
@@ -77,9 +76,5 @@ class TransfersInTransformer @Inject() extends Transformer {
             _.set(ReportAnotherTransferInPage(srn, index, secondaryIndex), false)
           )
         }
-    } ++ List(
-      _.setWhen(transfersInCompleted)(DidSchemeReceiveTransferPage(srn), transfersIn.nonEmpty),
-      _.setWhen(transfersInCompleted)(TransferReceivedMemberListPage(srn), true),
-      _.setWhen(transfersInCompleted)(TransfersInJourneyStatus(srn), SectionStatus.Completed)
-    )
+    }
 }
