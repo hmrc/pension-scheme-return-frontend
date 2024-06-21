@@ -128,7 +128,8 @@ class OverviewController @Inject()(
     srn: Srn,
     response: Seq[PsrVersionsForYearsResponse],
     overview: Option[Seq[OverviewResponse]],
-    label: String,
+    labelView: String,
+    labelContinue: String,
     overviewSummary: Seq[OverviewSummary]
   ): Seq[OverviewSummary] =
     response.flatMap { versionsForYearsResponse =>
@@ -148,26 +149,56 @@ class OverviewController @Inject()(
           val reportType = matchingOverviewResponse.fold(PsrReportType.Standard.name)(
             or => or.psrReportType.getOrElse(PsrReportType.Standard).name
           )
-          List(
-            OverviewSummary(
-              key = Message("site.to", Message(yearFrom.show), Message(yearFrom.plusYears(1).minusDays(1).show)),
-              firstValue = Message(s"overview.status.${last.reportStatus.toString}"),
-              secondValue = getSubmitter(last),
-              yearFrom = yearFrom,
-              actions = Some(
-                Actions(
-                  items = Seq(
-                    ActionItem(
-                      content = Text(label),
-                      href = controllers.routes.OverviewController
-                        .onSelectViewAndChange(srn, last.reportFormBundleNumber, reportType)
-                        .url
+          val key = Message("site.to", Message(yearFrom.show), Message(yearFrom.plusYears(1).minusDays(1).show))
+          if (last.reportStatus == ReportStatus.ReportStatusCompiled) {
+            List(
+              OverviewSummary(
+                key = key,
+                firstValue = Message("overview.previous.compiled.table.status"),
+                secondValue = "",
+                yearFrom = yearFrom,
+                actions = Some(
+                  Actions(
+                    items = Seq(
+                      ActionItem(
+                        content = Text(labelContinue),
+                        href = controllers.routes.OverviewController
+                          .onSelectContinue(
+                            srn,
+                            formatDateForApi(yearFrom),
+                            "%03d".format(last.reportVersion),
+                            reportType
+                          )
+                          .url
+                      )
                     )
                   )
                 )
               )
             )
-          )
+          } else {
+            List(
+              OverviewSummary(
+                key = key,
+                firstValue = Message(getSubmitter(last)),
+                secondValue = "",
+                yearFrom = yearFrom,
+                submitted = true,
+                actions = Some(
+                  Actions(
+                    items = Seq(
+                      ActionItem(
+                        content = Text(labelView),
+                        href = controllers.routes.OverviewController
+                          .onSelectViewAndChange(srn, last.reportFormBundleNumber, reportType)
+                          .url
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          }
       }
     }
   def onPageLoad(srn: Srn): Action[AnyContent] =
@@ -182,7 +213,7 @@ class OverviewController @Inject()(
         getVersionsResponse <- psrVersionsService
           .getVersionsForYears(request.schemeDetails.pstr, allDates.toList.map(dates => dates._2.from.toString))
         outstanding = outstandingData(srn, overviewResponse, labelStart, labelContinue)
-        previous = previousData(srn, getVersionsResponse, overviewResponse, labelView, outstanding)
+        previous = previousData(srn, getVersionsResponse, overviewResponse, labelView, labelContinue, outstanding)
       } yield Ok(view(outstanding, previous, request.schemeDetails.schemeName))
         .addingToSession((Constants.SRN, srn.value))
     }

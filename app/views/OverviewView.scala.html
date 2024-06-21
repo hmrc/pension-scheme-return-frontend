@@ -59,13 +59,24 @@
         } else {
             <h2 class="govuk-heading-l govuk-!-margin-top-4">@messages("overview.previous.heading")</h2>
         }
-        @components.OverviewTable(
-            seqOfPreviousReturns,
-            messages("overview.previous.table.header1"),
-            messages("overview.previous.table.header2"),
-            messages("overview.previous.table.header3"),
-            messages("overview.previous.table.header4"),
-            caption = messages("overview.heading")
-        )
+
+        @if(seqOfPreviousReturns.filter(!_.submitted).nonEmpty) {
+            @components.OverviewTableThreeColumns(
+                seqOfPreviousReturns.filter(!_.submitted),
+                messages("overview.previous.table.header1"),
+                messages("overview.previous.table.header2"),
+                messages("overview.previous.table.header4"),
+                caption = messages("overview.previous.compiled.table.caption")
+            )
+        }
+        @if(seqOfPreviousReturns.filter(_.submitted).nonEmpty) {
+            @components.OverviewTableThreeColumns(
+                seqOfPreviousReturns.filter(_.submitted),
+                messages("overview.previous.table.header1"),
+                messages("overview.previous.table.header3"),
+                messages("overview.previous.table.header4"),
+                caption = messages("overview.previous.submitted.table.caption")
+            )
+        }
     }
 }

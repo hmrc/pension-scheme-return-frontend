@@ -178,6 +178,15 @@ trait CommonTestValues {
     )
   }
 
+  val versionsForYearsInProgressResponse: Seq[PsrVersionsForYearsResponse] = {
+    Seq(
+      PsrVersionsForYearsResponse(
+        startDate = "2020-04-06",
+        data = versionsResponseInProgress
+      )
+    )
+  }
+
   val overviewResponse: Seq[OverviewResponse] = {
     Seq(
       OverviewResponse(
