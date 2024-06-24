@@ -30,10 +30,10 @@ import play.api.data.Form
 import controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController._
 import views.html.YesNoPageView
 import models.SchemeId.Srn
-import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
+import pages.nonsipp.memberpensionpayments._
 import controllers.actions._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -84,7 +84,11 @@ class PensionPaymentsReceivedController @Inject()(
 
             for {
               updatedAnswers <- Future.fromTry(
-                request.userAnswers.set(PensionPaymentsReceivedPage(srn), value).compose(pensionPaymentsPages)
+                request.userAnswers
+                  .set(PensionPaymentsReceivedPage(srn), value)
+                  .compose(pensionPaymentsPages)
+                  .set(MemberPensionPaymentsListPage(srn), true)
+                  .set(PensionPaymentsJourneyStatus(srn), SectionStatus.Completed)
               )
               _ <- saveService.save(updatedAnswers)
               submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
