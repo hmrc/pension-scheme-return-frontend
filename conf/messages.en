@@ -2335,6 +2335,9 @@ MemberContributionCYA.section.memberName.header = Member’s name
 MemberContributionCYA.section.memberName = Total member contribution for {0}
 MemberContributionCYA.section.amount = £ {0}
 MemberContributionCYA.section.hide = total member contribution for {0}
+MemberContributionCYA.viewOnly.title = Member contributions for this member
+MemberContributionCYA.viewOnly.heading = Member contributions for {0}
+MemberContributionCYA.viewOnly.link = View previous version of member contribution (opens in new tab)
 
 removeMemberContributions.title = Are you sure you want to remove the contribution for this member?
 removeMemberContributions.heading = Are you sure you want to remove the contribution of £{0} for {1}?

@@ -683,7 +683,6 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             )
           }
         }
-
         "(S3) Transfers in" - {
 
           "Completed" in {
