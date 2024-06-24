@@ -81,7 +81,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
         contentAsString(result) mustEqual expectedView.toString
     }
 
-    "onPageLoads returns OK and expected content - when non empty responses returned" in runningApplication {
+    "onPageLoads returns OK and expected content - when submitted responses returned" in runningApplication {
       implicit app =>
         when(mockPsrOverviewService.getOverview(any(), any(), any())(any(), any())).thenReturn(
           Future.successful(Some(overviewResponse))
@@ -95,8 +95,32 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
         status(result) mustEqual OK
         val content = contentAsString(result)
-        content must include("<td class=\"govuk-table__cell\">Submitted</td>")
+        content must include("<td class=\"govuk-table__cell\">first last</td>")
+        content must not include("<td class=\"govuk-table__cell\">Changes not submitted</td>")
         content must include("<td class=\"govuk-table__cell\">Not started</td>")
+        content must include("<caption class=\"govuk-table__caption govuk-table__caption--m\">Submitted</caption>")
+        content must not include("<caption class=\"govuk-table__caption govuk-table__caption--m\">Submitted with changes in progress</caption>")
+    }
+
+    "onPageLoads returns OK and expected content - when in progress responses returned" in runningApplication {
+      implicit app =>
+        when(mockPsrOverviewService.getOverview(any(), any(), any())(any(), any())).thenReturn(
+          Future.successful(Some(overviewResponse))
+        )
+        when(mockPsrVersionsService.getVersionsForYears(any(), any())(any(), any())).thenReturn(
+          Future.successful(versionsForYearsInProgressResponse)
+        )
+        val request = FakeRequest(GET, onPageLoad)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual OK
+        val content = contentAsString(result)
+        content must not include("<td class=\"govuk-table__cell\">first last</td>")
+        content must include("<td class=\"govuk-table__cell\">Changes not submitted</td>")
+        content must include("<td class=\"govuk-table__cell\">Not started</td>")
+        content must not include("<caption class=\"govuk-table__caption govuk-table__caption--m\">Submitted</caption>")
+        content must include ("<caption class=\"govuk-table__caption govuk-table__caption--m\">Submitted with changes in progress</caption>")
     }
 
     "onSelectStart redirects to what you will need page" in runningApplication { implicit app =>

@@ -26,5 +26,6 @@ case class OverviewSummary(
   firstValue: Message,
   secondValue: String,
   actions: Option[Actions],
-  yearFrom: LocalDate
+  yearFrom: LocalDate,
+  submitted: Boolean = false
 )
