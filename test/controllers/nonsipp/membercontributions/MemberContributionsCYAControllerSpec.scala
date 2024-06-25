@@ -20,17 +20,37 @@ import services.PsrSubmissionService
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
 import config.Refined.Max300
 import controllers.ControllerBaseSpec
-import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
-import models.{CheckMode, Mode, NormalMode}
+import pages.nonsipp.FbVersionPage
+import models._
 import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
-import org.mockito.Mockito.{reset, times, verify}
+import org.mockito.Mockito._
+import play.api.inject.bind
+import controllers.nonsipp.membercontributions.MemberContributionsCYAController._
 
 class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
+
+  private def onPageLoad(mode: Mode) = routes.MemberContributionsCYAController.onPageLoad(srn, index, mode)
+  private def onSubmit(mode: Mode) = routes.MemberContributionsCYAController.onSubmit(srn, index, mode)
+
+  private lazy val onSubmitViewOnly = routes.MemberContributionsCYAController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private lazy val onPageLoadViewOnly = routes.MemberContributionsCYAController.onPageLoadViewOnly(
+    srn,
+    index,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
 
   private val index = refineMV[Max300.Refined](1)
 
@@ -42,12 +62,6 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
 
   override def beforeEach(): Unit =
     reset(mockPsrSubmissionService)
-
-  private def onPageLoad(mode: Mode) =
-    routes.MemberContributionsCYAController.onPageLoad(srn, index, mode)
-
-  private def onSubmit(mode: Mode) =
-    routes.MemberContributionsCYAController.onSubmit(srn, index, mode)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(TotalMemberContributionPage(srn, index), money)
@@ -61,13 +75,12 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
         renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
             MemberContributionsCYAController.viewModel(
-              ViewModelParameters(
-                srn,
-                memberDetails.fullName,
-                index,
-                money,
-                mode
-              )
+              srn,
+              memberDetails.fullName,
+              index,
+              money,
+              mode,
+              viewOnlyUpdated = true
             )
           )
         }.withName(s"render correct $mode view")
@@ -95,5 +108,48 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
           .withName(s"redirect to journey recovery page on submit when in $mode mode")
       )
     }
+  }
+
+  "MemberContributionsCYAController in view only mode" - {
+
+    val currentUserAnswers = defaultUserAnswers
+      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+      .unsafeSet(TotalMemberContributionPage(srn, index), money)
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              srn,
+              memberDetails.fullName,
+              index,
+              money,
+              ViewOnlyMode,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }
+    )
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
   }
 }
