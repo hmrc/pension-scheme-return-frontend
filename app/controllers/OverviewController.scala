@@ -233,7 +233,7 @@ class OverviewController @Inject()(
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData).async { implicit request =>
       reportType match {
         case PsrReportType.Sipp.name =>
-          val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippViewAndChange}"
+          val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippViewAndChange}?fbNumber=$fbNumber"
           Future.successful(Redirect(sippUrl))
         case _ =>
           for {
