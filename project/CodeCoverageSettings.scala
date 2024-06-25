@@ -9,12 +9,13 @@ object CodeCoverageSettings {
     ".*handlers.*",
     ".*components.*",
     ".*Routes.*",
+    ".*controllers.testonly.*",
     ".*viewmodels.govuk.*;"
   )
 
   val settings: Seq[Setting[?]] = Seq(
     ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimumStmtTotal := 78,
+    ScoverageKeys.coverageMinimumStmtTotal := 80,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true
   )
