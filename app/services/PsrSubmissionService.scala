@@ -51,7 +51,8 @@ class PsrSubmissionService @Inject()(
   assetsTransformer: AssetsTransformer,
   declarationTransformer: DeclarationTransformer,
   sessionRepository: SessionRepository
-) extends I18nSupport {
+) extends PsrBaseService
+    with I18nSupport {
 
   def submitPsrDetailsWithUA(
     srn: Srn,
@@ -94,13 +95,15 @@ class PsrSubmissionService @Inject()(
                           membersPayments = memberPaymentsTransformer.transformToEtmp(srn, currentUA, initialUA),
                           shares = sharesTransformer.transformToEtmp(srn, initialUA),
                           psrDeclaration = Option.when(isSubmitted)(declarationTransformer.transformToEtmp)
-                        )
+                        ),
+                        schemeAdministratorOrPractitionerName,
+                        request.schemeDetails.schemeName
                       )
                       .flatMap {
                         case Left(message: String) =>
                           throw PostPsrException(message, fallbackCall.url)
                         case Right(()) =>
-                          auditService.sendExtendedEvent(buildAuditEvent(taxYear, loggedInUserNameOrBlank(request)))
+                          auditService.sendExtendedEvent(buildAuditEvent(taxYear))
                           Future.unit
                       }
                   }
@@ -113,32 +116,23 @@ class PsrSubmissionService @Inject()(
       )
   }
 
-  private def loggedInUserNameOrBlank(implicit request: DataRequest[_]): String =
-    request.minimalDetails.individualDetails match {
-      case Some(individual) => individual.fullName
-      case None =>
-        request.minimalDetails.organisationName match {
-          case Some(orgName) => orgName
-          case None => ""
-        }
-    }
-
-  private def buildAuditEvent(taxYear: DateRange, userName: String)(
+  private def buildAuditEvent(taxYear: DateRange)(
     implicit req: DataRequest[_]
-  ) = PSRCompileAuditEvent(
-    schemeName = req.schemeDetails.schemeName,
-    req.schemeDetails.establishers.headOption.fold(userName)(e => e.name),
-    psaOrPspId = req.pensionSchemeId.value,
-    schemeTaxReference = req.schemeDetails.pstr,
-    affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
-    credentialRole = if (req.pensionSchemeId.isPSP) PSP else PSA,
-    taxYear = taxYear,
-    taskList = Json
-      .toJson(
-        transformTaskListToCipFormat(
-          getSectionList(req.srn, req.schemeDetails.schemeName, req.userAnswers, req.pensionSchemeId),
-          messagesApi
-        ).list
-      )
-  )
+  ) =
+    PSRCompileAuditEvent(
+      schemeName = req.schemeDetails.schemeName,
+      schemeAdministratorOrPractitionerName,
+      psaOrPspId = req.pensionSchemeId.value,
+      schemeTaxReference = req.schemeDetails.pstr,
+      affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
+      credentialRole = if (req.pensionSchemeId.isPSP) PSP else PSA,
+      taxYear = taxYear,
+      taskList = Json
+        .toJson(
+          transformTaskListToCipFormat(
+            getSectionList(req.srn, req.schemeDetails.schemeName, req.userAnswers, req.pensionSchemeId),
+            messagesApi
+          ).list
+        )
+    )
 }

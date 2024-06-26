@@ -33,6 +33,8 @@ trait CommonTestValues {
   val commonFeedback = "feedbackUrl"
   val commonFallbackUrl = "fallbackUrl"
   val commonFallbackCall: Call = Call("GET", commonFallbackUrl)
+  val commonUserName = "userName"
+  val commonSchemeName = "schemeName"
 
   val minimalSubmissionData: PsrSubmission = PsrSubmission(
     MinimalRequiredSubmission(

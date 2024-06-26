@@ -16,11 +16,20 @@
 
 package services
 
-import uk.gov.hmrc.time.CurrentTaxYear
+import models.requests.DataRequest
 
-import java.time.LocalDate
-import java.time
+trait PsrBaseService {
 
-class FakeTaxYearService(date: LocalDate) extends TaxYearService with CurrentTaxYear {
-  override def now: () => time.LocalDate = () => date
+  private def loggedInUserNameOrBlank(implicit request: DataRequest[_]): String =
+    request.minimalDetails.individualDetails match {
+      case Some(individual) => individual.fullName
+      case None =>
+        request.minimalDetails.organisationName match {
+          case Some(orgName) => orgName
+          case None => ""
+        }
+    }
+
+  def schemeAdministratorOrPractitionerName(implicit req: DataRequest[_]): String =
+    req.schemeDetails.establishers.headOption.fold(loggedInUserNameOrBlank)(e => e.name)
 }

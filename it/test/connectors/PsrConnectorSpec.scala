@@ -76,11 +76,22 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
           "psrVersion" -> commonVersion
         ),
         ok(Json.stringify(minimalSubmissionJson))
+          .withHeader("Content-Type", "application/json")
+          .withHeader("userName", "userName")
+          .withHeader("schemeName", "schemeName")
       )
 
       val result =
         connector
-          .getStandardPsrDetails(commonPstr, None, Some(commonStartDate), Some(commonVersion), commonFallbackCall)
+          .getStandardPsrDetails(
+            commonPstr,
+            None,
+            Some(commonStartDate),
+            Some(commonVersion),
+            commonFallbackCall,
+            commonUserName,
+            commonSchemeName
+          )
           .futureValue
 
       result mustBe Some(minimalSubmissionData)
@@ -93,10 +104,23 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
           "fbNumber" -> commonFbNumber
         ),
         ok(Json.stringify(minimalSubmissionJson))
+          .withHeader("Content-Type", "application/json")
+          .withHeader("userName", "userName")
+          .withHeader("schemeName", "schemeName")
       )
 
       val result =
-        connector.getStandardPsrDetails(commonPstr, Some(commonFbNumber), None, None, commonFallbackCall).futureValue
+        connector
+          .getStandardPsrDetails(
+            commonPstr,
+            Some(commonFbNumber),
+            None,
+            None,
+            commonFallbackCall,
+            commonUserName,
+            commonSchemeName
+          )
+          .futureValue
 
       result mustBe Some(minimalSubmissionData)
     }
@@ -109,10 +133,23 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
           "psrVersion" -> commonVersion
         ),
         notFound()
+          .withHeader("Content-Type", "application/json")
+          .withHeader("userName", "userName")
+          .withHeader("schemeName", "schemeName")
       )
 
       val result =
-        connector.getStandardPsrDetails(commonPstr, Some(commonFbNumber), None, None, commonFallbackCall).futureValue
+        connector
+          .getStandardPsrDetails(
+            commonPstr,
+            Some(commonFbNumber),
+            None,
+            None,
+            commonFallbackCall,
+            commonUserName,
+            commonSchemeName
+          )
+          .futureValue
 
       result mustBe None
     }
@@ -121,9 +158,16 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
   "submitStandardPsrDetails" - {
 
     "submit standard Psr" in runningApplication { implicit app =>
-      stubPost(submitStandardUrl, noContent())
+      stubPost(
+        submitStandardUrl,
+        noContent()
+          .withHeader("Content-Type", "application/json")
+          .withHeader("userName", "userName")
+          .withHeader("schemeName", "schemeName")
+      )
 
-      val result: Either[String, Unit] = connector.submitPsrDetails(minimalSubmissionData).futureValue
+      val result: Either[String, Unit] =
+        connector.submitPsrDetails(minimalSubmissionData, commonUserName, commonSchemeName).futureValue
 
       result mustBe Right(())
     }

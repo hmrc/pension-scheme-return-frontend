@@ -79,7 +79,7 @@ class PsaDeclarationController @Inject()(
               fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
             )
             _ <- sendEmail(
-              loggedInUserNameOrBlank(request),
+              loggedInUserNameOrBlank,
               request.minimalDetails.email,
               dates,
               request.schemeDetails.schemeName,

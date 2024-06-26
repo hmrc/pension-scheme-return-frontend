@@ -84,7 +84,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
   "PSRRetrievalService" - {
 
     "should not getPsrDetails return data when not found" in {
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any()))
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
       whenReady(
         service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
@@ -106,21 +106,22 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
     "should getPsrDetails return data when only minimal data was found in etmp" in {
       when(mockMinimalRequiredSubmissionTransformer.transformFromEtmp(any(), any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
-        Future.successful(
-          Some(
-            PsrSubmission(
-              minimalRequiredSubmission = minimalRequiredSubmission,
-              checkReturnDates = false,
-              loans = None,
-              assets = None,
-              membersPayments = None,
-              shares = None,
-              psrDeclaration = None
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any())(any(), any()))
+        .thenReturn(
+          Future.successful(
+            Some(
+              PsrSubmission(
+                minimalRequiredSubmission = minimalRequiredSubmission,
+                checkReturnDates = false,
+                loans = None,
+                assets = None,
+                membersPayments = None,
+                shares = None,
+                psrDeclaration = None
+              )
             )
           )
         )
-      )
       whenReady(
         service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
       ) { result: UserAnswers =>
@@ -140,21 +141,22 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Try(defaultUserAnswers))
       when(mockLoansTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
-        Future.successful(
-          Some(
-            PsrSubmission(
-              minimalRequiredSubmission = minimalRequiredSubmission,
-              checkReturnDates = false,
-              loans = Some(loans),
-              assets = None,
-              membersPayments = None,
-              shares = None,
-              psrDeclaration = None
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any())(any(), any()))
+        .thenReturn(
+          Future.successful(
+            Some(
+              PsrSubmission(
+                minimalRequiredSubmission = minimalRequiredSubmission,
+                checkReturnDates = false,
+                loans = Some(loans),
+                assets = None,
+                membersPayments = None,
+                shares = None,
+                psrDeclaration = None
+              )
             )
           )
         )
-      )
       whenReady(
         service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
       ) { result: UserAnswers =>
@@ -174,21 +176,22 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Try(defaultUserAnswers))
       when(mockAssetsTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
-        Future.successful(
-          Some(
-            PsrSubmission(
-              minimalRequiredSubmission = minimalRequiredSubmission,
-              checkReturnDates = false,
-              loans = None,
-              assets = Some(assets),
-              membersPayments = None,
-              shares = None,
-              psrDeclaration = None
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any())(any(), any()))
+        .thenReturn(
+          Future.successful(
+            Some(
+              PsrSubmission(
+                minimalRequiredSubmission = minimalRequiredSubmission,
+                checkReturnDates = false,
+                loans = None,
+                assets = Some(assets),
+                membersPayments = None,
+                shares = None,
+                psrDeclaration = None
+              )
             )
           )
         )
-      )
       whenReady(
         service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
       ) { result: UserAnswers =>
@@ -209,21 +212,22 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       when(mockMemberPaymentsTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
 
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
-        Future.successful(
-          Some(
-            PsrSubmission(
-              minimalRequiredSubmission = minimalRequiredSubmission,
-              checkReturnDates = false,
-              loans = None,
-              assets = None,
-              membersPayments = Some(memberPayments),
-              shares = None,
-              psrDeclaration = None
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any())(any(), any()))
+        .thenReturn(
+          Future.successful(
+            Some(
+              PsrSubmission(
+                minimalRequiredSubmission = minimalRequiredSubmission,
+                checkReturnDates = false,
+                loans = None,
+                assets = None,
+                membersPayments = Some(memberPayments),
+                shares = None,
+                psrDeclaration = None
+              )
             )
           )
         )
-      )
       whenReady(
         service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
       ) { result: UserAnswers =>
@@ -244,21 +248,22 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       when(mockSharesTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
 
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
-        Future.successful(
-          Some(
-            PsrSubmission(
-              minimalRequiredSubmission = minimalRequiredSubmission,
-              checkReturnDates = false,
-              loans = None,
-              assets = None,
-              membersPayments = None,
-              shares = Some(shares),
-              psrDeclaration = None
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any())(any(), any()))
+        .thenReturn(
+          Future.successful(
+            Some(
+              PsrSubmission(
+                minimalRequiredSubmission = minimalRequiredSubmission,
+                checkReturnDates = false,
+                loans = None,
+                assets = None,
+                membersPayments = None,
+                shares = Some(shares),
+                psrDeclaration = None
+              )
             )
           )
         )
-      )
       whenReady(
         service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
       ) { result: UserAnswers =>
@@ -278,21 +283,22 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Try(defaultUserAnswers))
       when(mockDeclarationTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any())).thenReturn(
-        Future.successful(
-          Some(
-            PsrSubmission(
-              minimalRequiredSubmission = minimalRequiredSubmission,
-              checkReturnDates = false,
-              loans = None,
-              assets = None,
-              membersPayments = None,
-              shares = None,
-              psrDeclaration = Some(psrDeclaration)
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any())(any(), any()))
+        .thenReturn(
+          Future.successful(
+            Some(
+              PsrSubmission(
+                minimalRequiredSubmission = minimalRequiredSubmission,
+                checkReturnDates = false,
+                loans = None,
+                assets = None,
+                membersPayments = None,
+                shares = None,
+                psrDeclaration = Some(psrDeclaration)
+              )
             )
           )
         )
-      )
       whenReady(
         service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
       ) { result: UserAnswers =>

@@ -44,13 +44,17 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
     s"$baseUrl/pension-scheme-return/psr/versions/$pstr?startDate=$startDate"
 
   def submitPsrDetails(
-    psrSubmission: PsrSubmission
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] =
+    psrSubmission: PsrSubmission,
+    userName: String,
+    schemeName: String
+  )(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] = {
+    val hc: HeaderCarrier = buildHeaders(userName, schemeName, headerCarrier)
+
     http
       .POST[PsrSubmission, HttpResponse](
         submitStandardUrl,
         psrSubmission
-      )
+      )(implicitly, implicitly, hc, implicitly)
       .map { response =>
         response.status match {
           case NO_CONTENT => Right(())
@@ -58,14 +62,17 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
             Left(s"{${response.status}, ${response.json}}")
         }
       }
+  }
 
   def getStandardPsrDetails(
     pstr: String,
     optFbNumber: Option[String],
     optPeriodStartDate: Option[String],
     optPsrVersion: Option[String],
-    fallBackCall: Call
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[PsrSubmission]] = {
+    fallBackCall: Call,
+    userName: String,
+    schemeName: String
+  )(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[PsrSubmission]] = {
     val queryParams = (optPeriodStartDate, optPsrVersion, optFbNumber) match {
       case (Some(startDate), Some(version), _) =>
         Seq(
@@ -77,7 +84,11 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
     }
 
     http
-      .GET[HttpResponse](s"$baseUrl/pension-scheme-return/psr/standard/$pstr", queryParams)
+      .GET[HttpResponse](s"$baseUrl/pension-scheme-return/psr/standard/$pstr", queryParams)(
+        implicitly,
+        buildHeaders(userName, schemeName, headerCarrier),
+        implicitly
+      )
       .map { response =>
         response.status match {
           case OK =>
@@ -189,5 +200,14 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
             None
         }
       }
+  }
+
+  private def buildHeaders(userName: String, schemeName: String, headerCarrier: HeaderCarrier): HeaderCarrier = {
+    val headers: Seq[(String, String)] = Seq(
+      "Content-Type" -> "application/json",
+      "userName" -> userName,
+      "schemeName" -> schemeName
+    )
+    headerCarrier.withExtraHeaders(headers: _*)
   }
 }

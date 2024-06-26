@@ -105,7 +105,7 @@ class PspDeclarationController @Inject()(
                     fallbackCall = controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
                   )
                   _ <- sendEmail(
-                    loggedInUserNameOrBlank(request),
+                    loggedInUserNameOrBlank,
                     request.minimalDetails.email,
                     dates,
                     request.schemeDetails.schemeName,

@@ -72,9 +72,9 @@ class EmailConnector @Inject()(
     callbackUrl
   }
 
-  private def encrypt(psaOrPspId: String): String =
+  private def encrypt(value: String): String =
     URLEncoder.encode(
-      crypto.QueryParameterCrypto.encrypt(PlainText(psaOrPspId)).value,
+      crypto.QueryParameterCrypto.encrypt(PlainText(value)).value,
       StandardCharsets.UTF_8.toString
     )
 
