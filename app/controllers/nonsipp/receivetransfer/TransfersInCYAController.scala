@@ -58,7 +58,7 @@ class TransfersInCYAController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicitly)
+      onPageLoadCommon(srn, index, mode)(implicitly)
     }
 
   def onPageLoadViewOnly(
@@ -70,7 +70,7 @@ class TransfersInCYAController @Inject()(
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicitly)
+      onPageLoadCommon(srn, index, mode)(implicitly)
     }
 
   def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
@@ -198,7 +198,7 @@ object TransfersInCYAController {
         inset = Option.when(journeys.size == 5)("transfersInCYAController.inset")
       ),
       refresh = None,
-      buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
+      buttonText = mode.fold(normal = "site.continue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
       onSubmit = controllers.nonsipp.receivetransfer.routes.TransfersInCYAController.onSubmit(srn, index, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
         Some(
