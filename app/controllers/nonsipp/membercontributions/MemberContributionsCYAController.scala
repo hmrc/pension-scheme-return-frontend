@@ -57,7 +57,7 @@ class MemberContributionsCYAController @Inject()(
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicitly)
+      onPageLoadCommon(srn, index, mode)(implicitly)
     }
 
   def onPageLoadViewOnly(
@@ -69,7 +69,7 @@ class MemberContributionsCYAController @Inject()(
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicitly)
+      onPageLoadCommon(srn, index, mode)(implicitly)
     }
 
   def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =

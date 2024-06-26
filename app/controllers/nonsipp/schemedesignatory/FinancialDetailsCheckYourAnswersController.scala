@@ -60,12 +60,12 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
     with I18nSupport {
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    onPageLoadCommon(srn: Srn, mode: Mode)(implicitly)
+    onPageLoadCommon(srn, mode)(implicitly)
   }
 
   def onPageLoadViewOnly(srn: Srn, mode: Mode, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn: Srn, mode: Mode)(implicitly)
+      onPageLoadCommon(srn, mode)(implicitly)
     }
 
   def onPageLoadCommon(srn: Srn, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =

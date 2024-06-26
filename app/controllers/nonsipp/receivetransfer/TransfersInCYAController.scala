@@ -19,19 +19,22 @@ package controllers.nonsipp.receivetransfer
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import config.Refined._
 import controllers.PSRController
 import controllers.actions._
-import navigation.Navigator
 import play.api.i18n.MessagesApi
+import models.requests.DataRequest
 import controllers.nonsipp.receivetransfer.TransfersInCYAController._
 import utils.ListUtils.ListOps
 import models.PensionSchemeType.PensionSchemeType
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import cats.implicits.{toShow, toTraverseOps}
+import controllers.nonsipp.routes
 import pages.nonsipp.receivetransfer._
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
 import viewmodels.DisplayMessage._
@@ -39,7 +42,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
 class TransfersInCYAController @Inject()(
@@ -55,50 +58,81 @@ class TransfersInCYAController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
-          memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
-          secondaryIndexes <- request.userAnswers
-            .get(TransfersInSectionCompletedForMember(srn, index))
-            .map(_.keys.toList.flatMap(refineStringIndex[Max5.Refined]))
-            .getOrRecoverJourney
-        } yield {
-          secondaryIndexes
-            .traverse(
-              journeyIndex =>
-                for {
-                  schemeName <- request.userAnswers
-                    .get(TransferringSchemeNamePage(srn, index, journeyIndex))
-                    .getOrRecoverJourney
-                  transferType <- request.userAnswers
-                    .get(TransferringSchemeTypePage(srn, index, journeyIndex))
-                    .getOrRecoverJourney
-                  totalValue <- request.userAnswers
-                    .get(TotalValueTransferPage(srn, index, journeyIndex))
-                    .getOrRecoverJourney
-                  transferReceived <- request.userAnswers
-                    .get(WhenWasTransferReceivedPage(srn, index, journeyIndex))
-                    .getOrRecoverJourney
-                  transferIncludeAsset <- request.userAnswers
-                    .get(DidTransferIncludeAssetPage(srn, index, journeyIndex))
-                    .getOrRecoverJourney
-                } yield TransfersInCYA(
-                  journeyIndex,
-                  schemeName,
-                  transferType,
-                  totalValue,
-                  transferReceived,
-                  transferIncludeAsset
-                )
-            )
-            .map {
-              case Nil => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-              case journeys => Ok(view(viewModel(srn, memberDetails.fullName, index, journeys, mode)))
-            }
-            .merge
-        }
-      ).merge
+      onPageLoadCommon(srn, index, mode)(implicitly)
     }
+
+  def onPageLoadViewOnly(
+    srn: Srn,
+    index: Max300,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn, index, mode)(implicitly)
+    }
+
+  def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+    (
+      for {
+        memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
+        secondaryIndexes <- request.userAnswers
+          .get(TransfersInSectionCompletedForMember(srn, index))
+          .map(_.keys.toList.flatMap(refineStringIndex[Max5.Refined]))
+          .getOrRecoverJourney
+      } yield {
+        secondaryIndexes
+          .traverse(
+            journeyIndex =>
+              for {
+                schemeName <- request.userAnswers
+                  .get(TransferringSchemeNamePage(srn, index, journeyIndex))
+                  .getOrRecoverJourney
+                transferType <- request.userAnswers
+                  .get(TransferringSchemeTypePage(srn, index, journeyIndex))
+                  .getOrRecoverJourney
+                totalValue <- request.userAnswers
+                  .get(TotalValueTransferPage(srn, index, journeyIndex))
+                  .getOrRecoverJourney
+                transferReceived <- request.userAnswers
+                  .get(WhenWasTransferReceivedPage(srn, index, journeyIndex))
+                  .getOrRecoverJourney
+                transferIncludeAsset <- request.userAnswers
+                  .get(DidTransferIncludeAssetPage(srn, index, journeyIndex))
+                  .getOrRecoverJourney
+              } yield TransfersInCYA(
+                journeyIndex,
+                schemeName,
+                transferType,
+                totalValue,
+                transferReceived,
+                transferIncludeAsset
+              )
+          )
+          .map {
+            case Nil => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            case journeys =>
+              Ok(
+                view(
+                  viewModel(
+                    srn,
+                    memberDetails.fullName,
+                    index,
+                    journeys,
+                    mode,
+                    viewOnlyUpdated = false, // flag is not displayed on this tier
+                    optYear = request.year,
+                    optCurrentVersion = request.currentVersion,
+                    optPreviousVersion = request.previousVersion,
+                    compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+                  )
+                )
+              )
+          }
+          .merge
+      }
+    ).merge
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -119,6 +153,11 @@ class TransfersInCYAController @Inject()(
         _ => Redirect(navigator.nextPage(TransfersInCYAPage(srn), mode, updatedUserAnswers))
       )
     }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+    }
 }
 
 object TransfersInCYAController {
@@ -127,24 +166,62 @@ object TransfersInCYAController {
     memberName: String,
     index: Max300,
     journeys: List[TransfersInCYA],
-    mode: Mode
+    mode: Mode,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] = {
-    val heading: InlineMessage = mode.fold(
-      normal = "checkYourAnswers.heading",
-      check = Message("transfersInCYAController.heading.check", memberName)
-    )
+    val heading: InlineMessage =
+      mode.fold(
+        normal = "checkYourAnswers.heading",
+        check = Message("transfersInCYAController.heading.check", memberName),
+        viewOnly = "transfersInCYAController.viewOnly.title"
+      )
 
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = "checkYourAnswers.title",
+      mode = mode,
+      title = mode
+        .fold(
+          normal = "checkYourAnswers.title",
+          "",
+          viewOnly = "checkYourAnswers.viewOnly.title"
+        ),
       heading = heading,
       description = Some(ParagraphMessage("transfersInCYA.paragraph")),
       page = CheckYourAnswersViewModel(
-        sections = rows(srn, memberName, index, journeys),
+        sections = rows(srn, memberName, index, journeys, mode match {
+          case ViewOnlyMode => NormalMode
+          case _ => mode
+        }),
         inset = Option.when(journeys.size == 5)("transfersInCYAController.inset")
       ),
       refresh = None,
-      buttonText = "site.continue",
-      onSubmit = routes.TransfersInCYAController.onSubmit(srn, index, mode)
+      buttonText = mode.fold(normal = "site.continue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
+      onSubmit = controllers.nonsipp.receivetransfer.routes.TransfersInCYAController.onSubmit(srn, index, mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = None,
+            submittedText = Some(Message("")),
+            title = "transfersInCYAController.viewOnly.title",
+            heading = Message("transfersInCYAController.viewOnly.heading", memberName),
+            buttonText = "site.return.to.tasklist",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+                  .onSubmit(srn, index, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
   }
 
@@ -152,7 +229,8 @@ object TransfersInCYAController {
     srn: Srn,
     memberName: String,
     index: Max300,
-    journeys: List[TransfersInCYA]
+    journeys: List[TransfersInCYA],
+    mode: Mode
   ): List[CheckYourAnswersSection] =
     journeys.zipWithIndex.map {
       case (journey, rowIndex) =>
