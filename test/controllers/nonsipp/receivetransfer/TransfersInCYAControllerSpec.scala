@@ -23,11 +23,12 @@ import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import pages.nonsipp.receivetransfer._
 import eu.timepit.refined.refineMV
-import models.{NormalMode, PensionSchemeType}
+import pages.nonsipp.FbVersionPage
+import models.{NormalMode, PensionSchemeType, ViewOnlyMode}
 import viewmodels.models.SectionCompleted
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import org.mockito.Mockito.{reset, when}
+import org.mockito.Mockito._
 import controllers.nonsipp.receivetransfer.TransfersInCYAController._
 import org.mockito.ArgumentMatchers.any
 
@@ -39,6 +40,20 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec {
   private val secondaryIndex = refineMV[Max5.Refined](1)
   private lazy val onPageLoad = routes.TransfersInCYAController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.TransfersInCYAController.onSubmit(srn, index, NormalMode)
+  private lazy val onSubmitViewOnly = routes.TransfersInCYAController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private lazy val onPageLoadViewOnly = routes.TransfersInCYAController.onPageLoadViewOnly(
+    srn,
+    index,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
 
   private val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -63,22 +78,29 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec {
       .thenReturn(Future.successful(Some(())))
   }
 
-  "TransfersInCYAController" - {
-
-    val journeys = List(
-      TransfersInCYA(
-        secondaryIndex,
-        transferringSchemeName,
-        pensionSchemeType,
-        money,
-        localDate,
-        transferIncludeAsset = true
-      )
+  private val journeys = List(
+    TransfersInCYA(
+      secondaryIndex,
+      transferringSchemeName,
+      pensionSchemeType,
+      money,
+      localDate,
+      transferIncludeAsset = true
     )
+  )
+
+  "TransfersInCYAController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[CheckYourAnswersView].apply(
-        viewModel(srn, memberDetails.fullName, index, journeys, NormalMode)
+        viewModel(
+          srn,
+          memberDetails.fullName,
+          index,
+          journeys,
+          NormalMode,
+          viewOnlyUpdated = true
+        )
       )
     })
 
@@ -87,5 +109,52 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+  }
+
+  "TransfersInCYAController in view only mode" - {
+
+    val currentUserAnswers = defaultUserAnswers
+      .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(TransfersInSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
+      .unsafeSet(TransferringSchemeNamePage(srn, index, secondaryIndex), transferringSchemeName)
+      .unsafeSet(TransferringSchemeTypePage(srn, index, secondaryIndex), pensionSchemeType)
+      .unsafeSet(TotalValueTransferPage(srn, index, secondaryIndex), money)
+      .unsafeSet(WhenWasTransferReceivedPage(srn, index, secondaryIndex), localDate)
+      .unsafeSet(DidTransferIncludeAssetPage(srn, index, secondaryIndex), true)
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(TransfersInSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              srn,
+              memberDetails.fullName,
+              index,
+              journeys,
+              ViewOnlyMode,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }
+    )
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
   }
 }

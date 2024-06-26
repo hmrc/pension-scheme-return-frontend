@@ -2337,7 +2337,6 @@ MemberContributionCYA.section.amount = £ {0}
 MemberContributionCYA.section.hide = total member contribution for {0}
 MemberContributionCYA.viewOnly.title = Member contributions for this member
 MemberContributionCYA.viewOnly.heading = Member contributions for {0}
-MemberContributionCYA.viewOnly.link = View previous version of member contribution (opens in new tab)
 
 removeMemberContributions.title = Are you sure you want to remove the contribution for this member?
 removeMemberContributions.heading = Are you sure you want to remove the contribution of £{0} for {1}?
@@ -2454,6 +2453,8 @@ transfersInCYAController.rows.transferIncludeAsset = Did the transfer from {0} f
 transfersInCYAController.rows.transferIncludeAsset.hidden = if the transfer from {0} for {1} included an asset
 transfersInCYAController.rows.reportAnotherTransfer = Do you need to report another transfer in for {0}?
 transfersInCYAController.rows.reportAnotherTransfer.hidden =  if you need to report another transfer in for {0}
+transfersInCYAController.viewOnly.title = Transfers in for this member
+transfersInCYAController.viewOnly.heading = Transfers in for {0}
 
 WhatYouWillNeed.TransferOut.title   = Transfers out for members of the scheme
 WhatYouWillNeed.TransferOut.heading = Transfers out for members of {0}
