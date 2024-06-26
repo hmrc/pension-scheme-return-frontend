@@ -20,28 +20,33 @@ import services.{PsrSubmissionService, SaveService}
 import play.api.mvc._
 import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.OneTo300
 import controllers.PSRController
-import config.Constants
+import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import controllers.nonsipp.membercontributions.MemberContributionListController._
-import cats.implicits.{toBifunctorOps, toTraverseOps}
-import navigation.Navigator
+import cats.implicits.{toBifunctorOps, toShow, toTraverseOps}
+import _root_.config.Constants
 import forms.YesNoPageFormProvider
-import models._
+import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
+import _root_.config.Refined.OneTo300
 import viewmodels.implicits._
 import pages.nonsipp.membercontributions.{MemberContributionsListPage, TotalMemberContributionPage}
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.refineV
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
+import utils.DateTimeUtils.localDateTimeShow
+import models._
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
+import java.time.LocalDateTime
 import javax.inject.Named
 
 class MemberContributionListController @Inject()(
@@ -60,14 +65,53 @@ class MemberContributionListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
+      onPageLoadCommon(srn, page, mode)(implicitly)
+  }
 
-      if (optionList.flatten.nonEmpty) {
-        val filledForm = request.userAnswers.get(MemberContributionsListPage(srn)).fold(form)(form.fill)
-        Ok(view(filledForm, viewModel(srn, page, mode, optionList, request.userAnswers)))
-      } else {
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
+  def onPageLoadViewOnly(
+    srn: Srn,
+    page: Int,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    onPageLoadCommon(srn, page, mode)(implicitly)
+  }
+
+  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+    val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
+
+    if (optionList.flatten.nonEmpty) {
+      val filledForm = request.userAnswers.get(MemberContributionsListPage(srn)).fold(form)(form.fill)
+      Ok(
+        view(
+          filledForm,
+          viewModel(
+            srn,
+            page,
+            mode,
+            optionList,
+            request.userAnswers,
+            viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+              getCompletedOrUpdatedTaskListStatus(
+                request.userAnswers,
+                request.previousUserAnswers.get,
+                pages.nonsipp.membercontributions.Paths.memberDetails \ "totalMemberContribution"
+              ) == Updated
+            } else {
+              false
+            },
+            optYear = request.year,
+            optCurrentVersion = request.currentVersion,
+            optPreviousVersion = request.previousVersion,
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          )
+        )
+      )
+    } else {
+      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
@@ -91,7 +135,8 @@ class MemberContributionListController @Inject()(
                 BadRequest(
                   view(
                     errors,
-                    MemberContributionListController.viewModel(srn, page, mode, optionList, userAnswers)
+                    MemberContributionListController
+                      .viewModel(srn, page, mode, optionList, userAnswers, false, None, None, None)
                   )
                 )
               ),
@@ -119,6 +164,23 @@ class MemberContributionListController @Inject()(
           )
       }
   }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+      )
+    }
+
+  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.membercontributions.routes.MemberContributionListController
+            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
+        )
+      )
+    }
 
   private def buildUserAnswerBySelection(srn: Srn, selection: Boolean, memberListSize: Int)(
     implicit request: DataRequest[_]
@@ -161,7 +223,10 @@ object MemberContributionListController {
     srn: Srn,
     mode: Mode,
     memberList: List[Option[NameDOB]],
-    userAnswers: UserAnswers
+    userAnswers: UserAnswers,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None
   ): List[List[TableElem]] =
     memberList.zipWithIndex
       .map {
@@ -174,26 +239,43 @@ object MemberContributionListController {
                 List(
                   TableElem(memberName.fullName),
                   TableElem("Member contributions reported"),
-                  TableElem.change(
-                    controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
-                      .onPageLoad(srn, index, CheckMode),
-                    Message("ReportContribution.MemberList.change.hidden.text", memberName.fullName)
-                  ),
-                  TableElem.remove(
-                    controllers.nonsipp.membercontributions.routes.RemoveMemberContributionController
-                      .onPageLoad(srn, index),
-                    Message("ReportContribution.MemberList.remove.hidden.text", memberName.fullName)
-                  )
+                  (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                    case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                      TableElem.view(
+                        controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
+                          .onPageLoadViewOnly(srn, index, year, currentVersion, previousVersion),
+                        Message("ReportContribution.MemberList.remove.hidden.text", memberName.fullName)
+                      )
+                    case _ =>
+                      TableElem.change(
+                        controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
+                          .onPageLoad(srn, index, CheckMode),
+                        Message("ReportContribution.MemberList.change.hidden.text", memberName.fullName)
+                      )
+                  },
+                  if (mode == ViewOnlyMode) {
+                    TableElem.empty
+                  } else {
+                    TableElem.remove(
+                      controllers.nonsipp.membercontributions.routes.RemoveMemberContributionController
+                        .onPageLoad(srn, index),
+                      Message("ReportContribution.MemberList.remove.hidden.text", memberName.fullName)
+                    )
+                  }
                 )
               } else {
                 List(
                   TableElem(memberName.fullName),
                   TableElem("No member contributions"),
-                  TableElem.add(
-                    controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
-                      .onSubmit(srn, index, mode),
-                    Message("ReportContribution.MemberList.add.hidden.text", memberName.fullName)
-                  ),
+                  if (mode != ViewOnlyMode) {
+                    TableElem.add(
+                      controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
+                        .onSubmit(srn, index, mode),
+                      Message("ReportContribution.MemberList.add.hidden.text", memberName.fullName)
+                    )
+                  } else {
+                    TableElem.empty
+                  },
                   TableElem.empty
                 )
               }
@@ -207,7 +289,12 @@ object MemberContributionListController {
     page: Int,
     mode: Mode,
     memberList: List[Option[NameDOB]],
-    userAnswers: UserAnswers
+    userAnswers: UserAnswers,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[ActionTableViewModel] = {
 
     val (title, heading) =
@@ -217,15 +304,24 @@ object MemberContributionListController {
         ("ReportContribution.MemberList.title.plural", "ReportContribution.MemberList.heading.plural")
       }
 
+    // in view-only mode or with direct url edit page value can be higher than needed
+    val currentPage = if ((page - 1) * Constants.landOrPropertiesSize >= memberList.flatten.size) 1 else page
     val pagination = Pagination(
-      currentPage = page,
+      currentPage = currentPage,
       pageSize = Constants.landOrPropertiesSize,
       memberList.flatten.size,
-      controllers.nonsipp.membercontributions.routes.MemberContributionListController
-        .onPageLoad(srn, _, NormalMode)
+      call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+        case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+          controllers.nonsipp.membercontributions.routes.MemberContributionListController
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
+        case _ =>
+          controllers.nonsipp.membercontributions.routes.MemberContributionListController
+            .onPageLoad(srn, _, NormalMode)
+      }
     )
 
     FormPageViewModel(
+      mode = mode,
       title = Message(title, memberList.flatten.size),
       heading = Message(heading, memberList.flatten.size),
       description = None,
@@ -245,7 +341,7 @@ object MemberContributionListController {
             TableElem.empty
           )
         ),
-        rows = rows(srn, mode, memberList, userAnswers),
+        rows = rows(srn, mode, memberList, userAnswers, optYear, optCurrentVersion, optPreviousVersion),
         radioText = Message("ReportContribution.MemberList.radios"),
         paginatedViewModel = Some(
           PaginatedViewModel(
@@ -263,7 +359,48 @@ object MemberContributionListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit =
-        controllers.nonsipp.membercontributions.routes.MemberContributionListController.onSubmit(srn, page, mode)
+        controllers.nonsipp.membercontributions.routes.MemberContributionListController.onSubmit(srn, page, mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion))
+                  if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+                Some(
+                  LinkMessage(
+                    "ReportContribution.MemberList.viewOnly.link",
+                    controllers.nonsipp.membercontributions.routes.MemberContributionListController
+                      .onPreviousViewOnly(
+                        srn,
+                        page,
+                        year,
+                        currentVersion,
+                        previousVersion
+                      )
+                      .url
+                  )
+                )
+              case _ => None
+            },
+            submittedText =
+              compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+            title = "ReportContribution.MemberList.viewOnly.title",
+            heading = "ReportContribution.MemberList.viewOnly.heading",
+            buttonText = "site.return.to.tasklist",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                controllers.nonsipp.membercontributions.routes.MemberContributionListController
+                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                controllers.nonsipp.membercontributions.routes.MemberContributionListController
+                  .onSubmit(srn, page, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
   }
 }

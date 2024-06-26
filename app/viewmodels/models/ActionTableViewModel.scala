@@ -38,6 +38,8 @@ object TableElem {
     TableElem(Message("site.change"), Some(hiddenText), Some(call.url), Some("site.change"))
   def remove(call: Call, hiddenText: Message): TableElem =
     TableElem(Message("site.remove"), Some(hiddenText), Some(call.url), Some("site.remove"))
+  def view(call: Call, hiddenText: Message): TableElem =
+    TableElem(Message("site.view"), Some(hiddenText), Some(call.url), Some("site.view"))
 }
 
 case class ActionTableViewModel(
