@@ -198,7 +198,7 @@ object TransfersInCYAController {
         inset = Option.when(journeys.size == 5)("transfersInCYAController.inset")
       ),
       refresh = None,
-      buttonText = mode.fold(normal = "site.continue", "", viewOnly = "site.return.to.tasklist"),
+      buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
       onSubmit = controllers.nonsipp.receivetransfer.routes.TransfersInCYAController.onSubmit(srn, index, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
         Some(
