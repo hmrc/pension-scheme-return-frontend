@@ -126,8 +126,8 @@ class MemberPaymentsTransformerSpec
       deletedMemberAllSections
     ),
     employerContributionsDetails = SectionDetails(made = true, completed = true),
-    transfersInCompleted = true,
-    transfersOutCompleted = true,
+    transfersInMade = Some(true),
+    transfersOutMade = Some(true),
     unallocatedContribsMade = Some(true),
     unallocatedContribAmount = Some(money.value),
     memberContributionMade = Some(true),
@@ -273,8 +273,8 @@ class MemberPaymentsTransformerSpec
       deletedMemberNoSections
     ),
     employerContributionsDetails = SectionDetails(made = false, completed = true),
-    transfersInCompleted = false,
-    transfersOutCompleted = false,
+    transfersInMade = Some(false),
+    transfersOutMade = Some(false),
     unallocatedContribsMade = Some(false),
     unallocatedContribAmount = None,
     memberContributionMade = Some(false),
@@ -320,16 +320,16 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(MemberContributionsPage(srn), false)
     .unsafeSet(MemberContributionsListPage(srn), false)
     // transfers in - to be checked/updated
-//    .unsafeSet(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
-//    .unsafeSet(DidSchemeReceiveTransferPage(srn), false)
-//    .unsafeSet(TransferReceivedMemberListPage(srn), false)
+    .unsafeSet(TransfersInJourneyStatus(srn), SectionStatus.Completed)
+    .unsafeSet(DidSchemeReceiveTransferPage(srn), false)
+    .unsafeSet(TransferReceivedMemberListPage(srn), true)
     // pcls - to be checked/updated
     .unsafeSet(PensionCommencementLumpSumPage(srn), false)
     .unsafeSet(PclsMemberListPage(srn), false)
     // transfers out - to be checked/updated
-//    .unsafeSet(SchemeTransferOutPage(srn), false)
-//    .unsafeSet(TransferOutMemberListPage(srn), false)
-//    .unsafeSet(TransfersOutJourneyStatus(srn), SectionStatus.InProgress)
+    .unsafeSet(SchemeTransferOutPage(srn), false)
+    .unsafeSet(TransferOutMemberListPage(srn), true)
+    .unsafeSet(TransfersOutJourneyStatus(srn), SectionStatus.Completed)
     // pension surrender - to be checked/updated
 //    .unsafeSet(SurrenderedBenefitsCompletedPage(srn, index), SectionCompleted)
     .unsafeSet(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.Completed)

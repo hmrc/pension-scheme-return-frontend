@@ -16,19 +16,38 @@
 
 package controllers.nonsipp.receivetransfer
 
+import services.PsrSubmissionService
 import controllers.nonsipp.receivetransfer.routes
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
 import views.html.YesNoPageView
 import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
 import controllers.nonsipp.receivetransfer.DidSchemeReceiveTransferController.{form, viewModel}
 import play.api.libs.json.JsPath
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import org.mockito.Mockito.{reset, when}
+
+import scala.concurrent.Future
 
 class DidSchemeReceiveTransferControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.DidSchemeReceiveTransferController.onSubmit(srn, NormalMode)
+
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
+
+  override val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   "DidSchemeReceiveTransferController" - {
 

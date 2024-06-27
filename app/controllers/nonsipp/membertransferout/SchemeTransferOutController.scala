@@ -16,10 +16,11 @@
 
 package controllers.nonsipp.membertransferout
 
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.nonsipp.membertransferout.SchemeTransferOutController._
+import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -27,11 +28,11 @@ import models.Mode
 import play.api.data.Form
 import views.html.YesNoPageView
 import models.SchemeId.Srn
-import pages.nonsipp.membertransferout.SchemeTransferOutPage
-import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutJourneyStatus}
+import play.api.i18n.MessagesApi
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,14 +41,14 @@ import javax.inject.{Inject, Named}
 class SchemeTransferOutController @Inject()(
   override val messagesApi: MessagesApi,
   saveService: SaveService,
+  psrSubmissionService: PsrSubmissionService,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends PSRController {
 
   private val form = SchemeTransferOutController.form(formProvider)
 
@@ -64,9 +65,24 @@ class SchemeTransferOutController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(SchemeTransferOutPage(srn), value))
+            updatedAnswers <- request.userAnswers
+              .set(SchemeTransferOutPage(srn), value)
+              .setWhen(!value)(TransfersOutJourneyStatus(srn), SectionStatus.Completed)
+              .mapK[Future]
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(SchemeTransferOutPage(srn), mode, updatedAnswers))
+            submissionResult <- if (value) {
+              Future.successful(Some(()))
+            } else {
+              psrSubmissionService.submitPsrDetailsWithUA(
+                srn,
+                updatedAnswers,
+                fallbackCall =
+                  controllers.nonsipp.membertransferout.routes.SchemeTransferOutController.onPageLoad(srn, mode)
+              )
+            }
+          } yield submissionResult.getOrRecoverJourney(
+            _ => Redirect(navigator.nextPage(SchemeTransferOutPage(srn), mode, updatedAnswers))
+          )
       )
   }
 }
