@@ -2431,6 +2431,7 @@ removeTransferIn.title = Are you sure you want to remove this transfer for this 
 removeTransferIn.heading = Are you sure you want to remove the transfer from {0} for {1}?
 removeTransferIn.error.required = Select yes if you are sure you want to remove this transfer for this member
 
+transfersInCYAController.title.check = Change details of transfers in for this member
 transfersInCYAController.heading.check = Change details of transfers in for {0}
 transfersInCYAController.section.heading = Transfer {0}
 transfersInCYAController.inset = You cannot add any more transfers in for this member as you have entered the maximum of 5. If you need to remove one, you can do this on the next page.
@@ -2506,7 +2507,7 @@ reportAnotherTransferOut.heading = Do you need to report another transfer out fo
 reportAnotherTransferOut.hint = You must tell us about all transfers out for this member during the period of this return.
 reportAnotherTransferOut.error.required = Select yes if you need to report another transfer out for this member
 
-
+checkYourAnswers.transferOutCYA.check.title = Change details of transfers out for this member
 transfersOutCYAController.heading.check = Change details of transfers out for {0}
 transfersOutCYAController.section.heading = Transfer {0}
 transfersOutCYAController.inset = You cannot add any more transfers out for this member as you have entered the maximum of 5. If you need to remove one, you can do this on the next page.

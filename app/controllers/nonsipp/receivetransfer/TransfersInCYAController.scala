@@ -185,7 +185,7 @@ object TransfersInCYAController {
       title = mode
         .fold(
           normal = "checkYourAnswers.title",
-          "",
+          check = "transfersInCYAController.title.check",
           viewOnly = "checkYourAnswers.viewOnly.title"
         ),
       heading = heading,

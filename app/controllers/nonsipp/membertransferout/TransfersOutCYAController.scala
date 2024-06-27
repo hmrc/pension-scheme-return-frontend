@@ -183,7 +183,7 @@ object TransfersOutCYAController {
       title = mode
         .fold(
           normal = "checkYourAnswers.title",
-          "",
+          check = "checkYourAnswers.transferOutCYA.check.title",
           viewOnly = "checkYourAnswers.viewOnly.title"
         ),
       heading = heading,
