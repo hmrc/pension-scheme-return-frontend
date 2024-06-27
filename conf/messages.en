@@ -2528,6 +2528,8 @@ transfersOutCYAController.rows.dateOfTransfer = Date the transfer to {0} for {1}
 transfersOutCYAController.rows.dateOfTransfer.hidden = date the transfer to {0} for {1} was made
 transfersOutCYAController.rows.reportAnotherTransfer = Do you need to report another transfer out for {0}?
 transfersOutCYAController.rows.reportAnotherTransfer.hidden =  if you need to report another transfer out for {0}
+transfersOutCYAController.viewOnly.title = Transfers out for this member
+transfersOutCYAController.viewOnly.heading = Transfers out for {0}
 
 transferOut.removeTransferOut.title = Are you sure you want to remove this transfer for this member?
 transferOut.removeTransferOut.heading = Are you sure you want to remove the transfer to {0} for {1}?

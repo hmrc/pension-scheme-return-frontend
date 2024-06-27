@@ -35,10 +35,13 @@ POST       /:srn/when-was-transfer-made/:index/:secondaryIndex                  
 GET        /:srn/change-when-was-transfer-made/:index/:secondaryIndex                   controllers.nonsipp.membertransferout.WhenWasTransferMadeController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = CheckMode)
 POST       /:srn/change-when-was-transfer-made/:index/:secondaryIndex                   controllers.nonsipp.membertransferout.WhenWasTransferMadeController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = CheckMode)
 
-GET        /:srn/check-answers-transfers-out/:index                 controllers.nonsipp.membertransferout.TransfersOutCYAController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
-POST       /:srn/check-answers-transfers-out/:index                 controllers.nonsipp.membertransferout.TransfersOutCYAController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
-GET        /:srn/change-check-answers-transfers-out/:index          controllers.nonsipp.membertransferout.TransfersOutCYAController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
-POST       /:srn/change-check-answers-transfers-out/:index          controllers.nonsipp.membertransferout.TransfersOutCYAController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
+GET        /:srn/check-answers-transfers-out/:index                                                    controllers.nonsipp.membertransferout.TransfersOutCYAController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST       /:srn/check-answers-transfers-out/:index                                                    controllers.nonsipp.membertransferout.TransfersOutCYAController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
+GET        /:srn/change-check-answers-transfers-out/:index                                             controllers.nonsipp.membertransferout.TransfersOutCYAController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST       /:srn/change-check-answers-transfers-out/:index                                             controllers.nonsipp.membertransferout.TransfersOutCYAController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST       /:srn/change-submit-check-answers-transfers-out/:index                                      controllers.nonsipp.membertransferout.TransfersOutCYAController.onSubmit(srn: Srn, index: Max300, mode: Mode = ViewOnlyMode)
+GET        /:srn/check-answers-transfers-out/:index/view/:year/:current/:previous                      controllers.nonsipp.membertransferout.TransfersOutCYAController.onPageLoadViewOnly(srn: Srn, index: Max300, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET        /:srn/submit-check-answers-transfers-out/view/:year/:current/:previous                      controllers.nonsipp.membertransferout.TransfersOutCYAController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
 
 GET        /:srn/remove-transfer-out/:index/:secondaryIndex                             controllers.nonsipp.membertransferout.RemoveTransferOutController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5)
 POST       /:srn/remove-transfer-out/:index/:secondaryIndex                             controllers.nonsipp.membertransferout.RemoveTransferOutController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5)
