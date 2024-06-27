@@ -484,14 +484,14 @@ object TaskListStatusUtils {
         (
           Completed,
           controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-            .onPageLoad(srn, CheckOrChange.Check)
+            .onPageLoad(srn, NormalMode)
             .url
         )
       case (Some(true), None) =>
         (
           InProgress,
           controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-            .onPageLoad(srn, CheckOrChange.Check)
+            .onPageLoad(srn, NormalMode)
             .url
         )
     }

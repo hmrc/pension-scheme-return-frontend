@@ -373,12 +373,12 @@ GET         /:srn/change-amount-of-loan-payments/:index                         
 POST        /:srn/change-amount-of-loan-payments                                        controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 POST        /:srn/change-amount-of-loan-payments/:index                                 controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
-GET         /:srn/check-answers-loan                                                    controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Check)
-GET         /:srn/check-answers-loan/:index                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Check)
-POST        /:srn/submit-check-answers-loan/:index                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Check)
-GET         /:srn/change-check-answers-loan                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Change)
-GET         /:srn/change-check-answers-loan/:index                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Change)
-POST        /:srn/change-submit-check-answers-loan/:index                               controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Change)
+GET         /:srn/check-answers-loan                                                    controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/check-answers-loan/:index                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/submit-check-answers-loan/:index                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-check-answers-loan                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-check-answers-loan/:index                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-submit-check-answers-loan/:index                               controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
 GET         /:srn/outstanding-arrears-on-loan                                           controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
 GET         /:srn/outstanding-arrears-on-loan/:index                                    controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
@@ -425,10 +425,10 @@ POST        /:srn/how-much-unallocated-employer-contributions                   
 GET         /:srn/change-how-much-unallocated-employer-contributions                    controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-how-much-unallocated-employer-contributions                    controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/check-answers-unallocated-employer-contributions                      controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoad(srn: Srn, checkOrChange: CheckOrChange = Check)
-POST        /:srn/submit-check-answers-unallocated-employer-contributions               controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Check)
-GET         /:srn/change-check-answers-unallocated-employer-contributions               controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoad(srn: Srn, checkOrChange: CheckOrChange = Change)
-POST        /:srn/change-submit-answers-unallocated-employer-contributions              controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Change)
+GET         /:srn/check-answers-unallocated-employer-contributions                      controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/submit-check-answers-unallocated-employer-contributions               controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-check-answers-unallocated-employer-contributions               controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-submit-answers-unallocated-employer-contributions              controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/remove-unallocated-employer-contributions                             controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/remove-unallocated-employer-contributions                             controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onSubmit(srn: Srn, mode: Mode = NormalMode)

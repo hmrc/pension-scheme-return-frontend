@@ -19,7 +19,7 @@ package navigation.nonsipp
 import play.api.mvc.Call
 import pages.Page
 import navigation.JourneyNavigator
-import models.{CheckOrChange, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import pages.nonsipp.memberpayments._
 
 object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
@@ -35,7 +35,7 @@ object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
 
     case UnallocatedEmployerAmountPage(srn) =>
       controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-        .onPageLoad(srn, CheckOrChange.Check)
+        .onPageLoad(srn, NormalMode)
 
     case UnallocatedContributionCYAPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
@@ -46,7 +46,7 @@ object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
           .onPageLoad(srn, NormalMode)
       } else {
         controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-          .onPageLoad(srn, CheckOrChange.Check)
+          .onPageLoad(srn, NormalMode)
       }
   }
 
@@ -56,7 +56,7 @@ object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
 
         case UnallocatedEmployerAmountPage(srn) =>
           controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-            .onPageLoad(srn, CheckOrChange.Check)
+            .onPageLoad(srn, NormalMode)
 
       }
 }

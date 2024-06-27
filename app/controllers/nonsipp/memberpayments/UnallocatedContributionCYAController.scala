@@ -46,7 +46,7 @@ class UnallocatedContributionCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    checkOrChange: CheckOrChange
+    mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
@@ -62,7 +62,7 @@ class UnallocatedContributionCYAController @Inject()(
                 srn,
                 schemeName,
                 unallocatedAmount,
-                checkOrChange
+                mode
               )
             )
           )
@@ -70,13 +70,13 @@ class UnallocatedContributionCYAController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, checkOrChange: CheckOrChange): Action[AnyContent] =
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       psrSubmissionService
         .submitPsrDetails(
           srn,
           fallbackCall = controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-            .onPageLoad(srn, checkOrChange)
+            .onPageLoad(srn, mode)
         )
         .map {
           case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
@@ -90,16 +90,16 @@ case class ViewModelParameters(
   srn: Srn,
   schemeName: String,
   unallocatedAmount: Money,
-  checkOrChange: CheckOrChange
+  mode: Mode
 )
 object UnallocatedContributionCYAController {
   def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = parameters.checkOrChange
-        .fold(check = "unallocatedEmployerCYA.title", change = "unallocatedEmployerCYA.change.title"),
-      heading = parameters.checkOrChange.fold(
-        check = "unallocatedEmployerCYA.heading",
-        change = Message(
+      title = parameters.mode
+        .fold(normal = "unallocatedEmployerCYA.title", check = "unallocatedEmployerCYA.change.title"),
+      heading = parameters.mode.fold(
+        normal = "unallocatedEmployerCYA.heading",
+        check = Message(
           "unallocatedEmployerCYA.change.heading",
           parameters.schemeName
         )
@@ -114,9 +114,9 @@ object UnallocatedContributionCYAController {
         )
       ),
       refresh = None,
-      buttonText = parameters.checkOrChange.fold(check = "site.saveAndContinue", change = "site.continue"),
+      buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
       onSubmit = controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-        .onSubmit(parameters.srn, parameters.checkOrChange)
+        .onSubmit(parameters.srn, parameters.mode)
     )
 
   private def sections(

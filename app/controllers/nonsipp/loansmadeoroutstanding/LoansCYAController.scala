@@ -56,7 +56,7 @@ class LoansCYAController @Inject()(
   def onPageLoad(
     srn: Srn,
     index: Max5000,
-    checkOrChange: CheckOrChange
+    mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
@@ -130,7 +130,7 @@ class LoansCYAController @Inject()(
                 loanInterest,
                 outstandingArrearsOnLoan,
                 securityOnLoan,
-                checkOrChange
+                mode
               )
             )
           )
@@ -138,13 +138,13 @@ class LoansCYAController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max5000, checkOrChange: CheckOrChange): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       psrSubmissionService
         .submitPsrDetails(
           srn,
           fallbackCall =
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, index, checkOrChange)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, index, mode)
         )
         .map {
           case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
@@ -169,16 +169,15 @@ case class ViewModelParameters(
   loanInterest: (Money, Percentage, Money),
   outstandingArrearsOnLoan: Option[Money],
   securityOnLoan: Option[Security],
-  checkOrChange: CheckOrChange
+  mode: Mode
 )
 object LoansCYAController {
   def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title =
-        parameters.checkOrChange.fold(check = "checkYourAnswers.title", change = "loanCheckYourAnswers.change.title"),
-      heading = parameters.checkOrChange.fold(
-        check = "checkYourAnswers.heading",
-        change =
+      title = parameters.mode.fold(normal = "checkYourAnswers.title", check = "loanCheckYourAnswers.change.title"),
+      heading = parameters.mode.fold(
+        normal = "checkYourAnswers.heading",
+        check =
           Message("loanCheckYourAnswers.change.heading", parameters.loanAmount._1.displayAs, parameters.recipientName)
       ),
       description = Some(ParagraphMessage("loansCYA.paragraph")),
@@ -203,8 +202,8 @@ object LoansCYAController {
         )
       ),
       refresh = None,
-      buttonText = parameters.checkOrChange.fold(check = "site.saveAndContinue", change = "site.continue"),
-      onSubmit = routes.LoansCYAController.onSubmit(parameters.srn, parameters.index, parameters.checkOrChange)
+      buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
+      onSubmit = routes.LoansCYAController.onSubmit(parameters.srn, parameters.index, parameters.mode)
     )
 
   private def sections(
