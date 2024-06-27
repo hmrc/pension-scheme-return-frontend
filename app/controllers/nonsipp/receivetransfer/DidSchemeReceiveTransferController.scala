@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.receivetransfer
 
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
@@ -41,6 +41,7 @@ import javax.inject.{Inject, Named}
 class DidSchemeReceiveTransferController @Inject()(
   override val messagesApi: MessagesApi,
   saveService: SaveService,
+  psrSubmissionService: PsrSubmissionService,
   @Named("non-sipp") navigator: Navigator,
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
@@ -74,7 +75,19 @@ class DidSchemeReceiveTransferController @Inject()(
                 .setWhen(!value)(TransfersInJourneyStatus(srn), SectionStatus.Completed)
                 .mapK[Future]
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(DidSchemeReceiveTransferPage(srn), mode, updatedAnswers))
+              submissionResult <- if (value) {
+                Future.successful(Some(()))
+              } else {
+                psrSubmissionService.submitPsrDetailsWithUA(
+                  srn,
+                  updatedAnswers,
+                  fallbackCall =
+                    controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController.onPageLoad(srn, mode)
+                )
+              }
+            } yield submissionResult.getOrRecoverJourney(
+              _ => Redirect(navigator.nextPage(DidSchemeReceiveTransferPage(srn), mode, updatedAnswers))
+            )
         )
     }
 }

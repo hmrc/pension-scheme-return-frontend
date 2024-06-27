@@ -124,14 +124,8 @@ class MemberPaymentsTransformer @Inject()(
                 case SectionStatus.Completed => true
               }
             ),
-            transfersInCompleted = userAnswers.get(TransfersInJourneyStatus(srn)).exists {
-              case SectionStatus.InProgress => false
-              case SectionStatus.Completed => true
-            },
-            transfersOutCompleted = userAnswers.get(TransfersOutJourneyStatus(srn)).exists {
-              case SectionStatus.InProgress => false
-              case SectionStatus.Completed => true
-            },
+            transfersInMade = userAnswers.get(DidSchemeReceiveTransferPage(srn)),
+            transfersOutMade = userAnswers.get(SchemeTransferOutPage(srn)),
             unallocatedContribsMade = userAnswers.get(UnallocatedEmployerContributionsPage(srn)),
             unallocatedContribAmount = userAnswers.get(UnallocatedEmployerAmountPage(srn)).map(_.value),
             memberContributionMade = userAnswers.get(MemberContributionsPage(srn)),
@@ -259,33 +253,39 @@ class MemberPaymentsTransformer @Inject()(
               else SectionStatus.InProgress
             )
             .set(
-              EmployerContributionsMemberListPage(srn), // todo: ...maybe don't set this at all?
+              EmployerContributionsMemberListPage(srn),
               memberPayments.employerContributionsDetails.completed
             )
       }
 
-      // temporary E2E workaround
-      memberTransferInExists = memberPayments.memberDetails.exists(_.transfersIn.nonEmpty)
-
-      ua3_3 <- memberTransferInExists match {
-        case false => Try(ua3_2)
-        case true =>
+      // Transfers In section-wide user answers
+      ua3_3 <- memberPayments.transfersInMade match {
+        case Some(true) =>
           ua3_2
             .set(DidSchemeReceiveTransferPage(srn), true)
-            .set(TransferReceivedMemberListPage(srn), true)
-            .set(TransfersInJourneyStatus(srn), SectionStatus.Completed)
+            .set(TransferReceivedMemberListPage(srn), true) // temporary E2E workaround
+            .set(TransfersInJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
+        case Some(false) =>
+          ua3_2
+            .set(DidSchemeReceiveTransferPage(srn), false)
+            .set(TransferReceivedMemberListPage(srn), true) // temporary E2E workaround
+            .set(TransfersInJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
+        case None => Try(ua3_2)
       }
 
-      // temporary E2E workaround
-      memberTransferOutExists = memberPayments.memberDetails.exists(_.transfersOut.nonEmpty)
-
-      ua3_4 <- memberTransferOutExists match {
-        case false => Try(ua3_3)
-        case true =>
+      // Transfers Out section-wide user answers
+      ua3_4 <- memberPayments.transfersOutMade match {
+        case Some(true) =>
           ua3_3
             .set(SchemeTransferOutPage(srn), true)
-            .set(TransferOutMemberListPage(srn), true)
-            .set(TransfersOutJourneyStatus(srn), SectionStatus.Completed)
+            .set(TransferOutMemberListPage(srn), true) // temporary E2E workaround
+            .set(TransfersOutJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
+        case Some(false) =>
+          ua3_3
+            .set(SchemeTransferOutPage(srn), false)
+            .set(TransferOutMemberListPage(srn), true) // temporary E2E workaround
+            .set(TransfersOutJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
+        case None => Try(ua3_3)
       }
 
       // temporary E2E workaround
