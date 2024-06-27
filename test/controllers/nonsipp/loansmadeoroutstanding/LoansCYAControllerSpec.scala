@@ -50,9 +50,9 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
   private val taxYear = Some(Left(dateRange))
   private val subject = IdentitySubject.LoanRecipient
 
-  private def onPageLoad(checkOrChange: CheckOrChange) = routes.LoansCYAController.onPageLoad(srn, index, checkOrChange)
+  private def onPageLoad(mode: Mode) = routes.LoansCYAController.onPageLoad(srn, index, mode)
 
-  private def onSubmit(checkOrChange: CheckOrChange) = routes.LoansCYAController.onSubmit(srn, index, checkOrChange)
+  private def onSubmit(mode: Mode) = routes.LoansCYAController.onSubmit(srn, index, mode)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
@@ -67,9 +67,9 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.yes[Unit, Money](money))
 
   "LoansCYAController" - {
-    List(CheckOrChange.Check, CheckOrChange.Change).foreach { checkOrChange =>
+    List(NormalMode, CheckMode).foreach { mode =>
       act.like(
-        renderView(onPageLoad(checkOrChange), filledUserAnswers) { implicit app => implicit request =>
+        renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
             viewModel(
               ViewModelParameters(
@@ -88,34 +88,34 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
                 loanInterest = (money, percentage, money),
                 outstandingArrearsOnLoan = Some(money),
                 securityOnLoan = Some(security),
-                checkOrChange
+                mode
               )
             )
           )
         }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
-          .withName(s"render correct ${checkOrChange.name} view")
+          .withName(s"render correct ${mode} view")
       )
 
       act.like(
-        redirectNextPage(onSubmit(checkOrChange))
+        redirectNextPage(onSubmit(mode))
           .before(MockPSRSubmissionService.submitPsrDetails())
           .after({
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
-          .withName(s"redirect to next page when in ${checkOrChange.name} mode")
+          .withName(s"redirect to next page when in ${mode.toString} mode")
       )
 
       act.like(
-        journeyRecoveryPage(onPageLoad(checkOrChange))
+        journeyRecoveryPage(onPageLoad(mode))
           .updateName("onPageLoad" + _)
-          .withName(s"redirect to journey recovery page on page load when in ${checkOrChange.name} mode")
+          .withName(s"redirect to journey recovery page on page load when in ${mode.toString} mode")
       )
 
       act.like(
-        journeyRecoveryPage(onSubmit(checkOrChange))
+        journeyRecoveryPage(onSubmit(mode))
           .updateName("onSubmit" + _)
-          .withName(s"redirect to journey recovery page on submit when in ${checkOrChange.name} mode")
+          .withName(s"redirect to journey recovery page on submit when in ${mode.toString} mode")
       )
     }
   }

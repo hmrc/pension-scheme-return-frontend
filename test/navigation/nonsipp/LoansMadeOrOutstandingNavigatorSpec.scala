@@ -26,7 +26,6 @@ import navigation.{Navigator, NavigatorBehaviours}
 import models._
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
-import models.CheckOrChange.Check
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
 
@@ -462,7 +461,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           srn => IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient),
           Gen.const(IdentityType.UKCompany),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check),
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode),
           (srn: Srn) =>
             defaultUserAnswers
               .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
@@ -477,7 +477,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           srn => IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient),
           Gen.const(IdentityType.Individual),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check),
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode),
           (srn: Srn) =>
             defaultUserAnswers
               .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
@@ -492,7 +493,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           srn => IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient),
           Gen.const(IdentityType.UKPartnership),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check),
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode),
           (srn: Srn) =>
             defaultUserAnswers
               .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKPartnership)
@@ -507,7 +509,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           srn => IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient),
           Gen.const(IdentityType.Other),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check),
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode),
           (srn: Srn) =>
             defaultUserAnswers
               .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Other)
@@ -524,7 +527,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateTo(
           IndividualRecipientNamePage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from Individual Recipient Name page to check your answers page")
     )
@@ -534,7 +538,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateTo(
           CompanyRecipientNamePage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from Company Recipient Name page to check your answers page")
     )
@@ -544,7 +549,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateTo(
           PartnershipRecipientNamePage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from Partnership Recipient Name page to check your answers page")
     )
@@ -554,7 +560,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateTo(
           OtherRecipientDetailsPage(_, refineMV(1), subject),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from Other Recipient Details page to check your answers page")
     )
@@ -564,7 +571,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateTo(
           IndividualRecipientNinoPage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from Individual Recipient Nino page to check your answers page")
     )
@@ -574,7 +582,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateTo(
           CompanyRecipientCrnPage(_, refineMV(1), subject),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from Company Recipient Crn page to check your answers page")
     )
@@ -584,7 +593,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateTo(
           PartnershipRecipientUtrPage(_, refineMV(1), subject),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from Partnership Recipient Utr page to check your answers page")
     )
@@ -594,7 +604,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateTo(
           IsIndividualRecipientConnectedPartyPage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from Is Individual Recipient Connected Party page to check your answers page")
     )
@@ -604,7 +615,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateTo(
           RecipientSponsoringEmployerConnectedPartyPage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from Recipient Sponsoring Employer Connected Party page to check your answers page")
     )
@@ -614,7 +626,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateTo(
           DatePeriodLoanPage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from Date Period Loan page to check your answers page")
     )
@@ -624,7 +637,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateTo(
           AmountOfTheLoanPage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from Amount Of The Loan page to check your answers page")
     )
@@ -634,7 +648,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateTo(
           AreRepaymentsInstalmentsPage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from Are Repayments Instalments page to check your answers page")
     )
@@ -644,7 +659,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateTo(
           InterestOnLoanPage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from Are Interest On Loan page to check your answers page")
     )
@@ -654,7 +670,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateTo(
           SecurityGivenForLoanPage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from Are Security Given For Loan page to check your answers page")
     )
@@ -664,7 +681,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateTo(
           OutstandingArrearsOnLoanPage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+              .onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from Outstanding Arrears On Loan page to check your answers page")
     )

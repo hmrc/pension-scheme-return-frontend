@@ -31,7 +31,6 @@ import pages.nonsipp.common.{IdentityTypes, OtherRecipientDetailsPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n.MessagesApi
 import eu.timepit.refined.api.Refined
-import models.CheckOrChange.Change
 import utils.nonsipp.TaskListStatusUtils.{getIncompleteLoansLink, getLoansTaskListStatus}
 import config.Constants
 import views.html.ListView
@@ -139,7 +138,7 @@ object LoansListController {
         List(
           ListRow(
             Message("loansList.row", totalLoan.displayAs, recipientName),
-            changeUrl = routes.LoansCYAController.onPageLoad(srn, index, Change).url,
+            changeUrl = routes.LoansCYAController.onPageLoad(srn, index, NormalMode).url,
             changeHiddenText = Message("loansList.row.change.hidden", totalLoan.displayAs, recipientName),
             removeUrl = routes.RemoveLoanController.onPageLoad(srn, index, mode).url,
             removeHiddenText = Message("loansList.row.remove.hidden", totalLoan.displayAs, recipientName)

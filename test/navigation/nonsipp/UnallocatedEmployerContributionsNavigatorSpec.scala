@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import utils.BaseSpec
 import navigation.{Navigator, NavigatorBehaviours}
-import models.CheckOrChange
+import models.NormalMode
 import pages.nonsipp.memberpayments._
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
@@ -58,7 +58,7 @@ class UnallocatedEmployerContributionsNavigatorSpec extends BaseSpec with Naviga
           Gen.const(money),
           (srn, _) =>
             controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-              .onPageLoad(srn, CheckOrChange.Check)
+              .onPageLoad(srn, NormalMode)
         )
         .withName("go from Unallocated amount page to CYA and Remove page ")
     )
@@ -83,7 +83,7 @@ class UnallocatedEmployerContributionsNavigatorSpec extends BaseSpec with Naviga
           Gen.const(false),
           (srn, _) =>
             controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-              .onPageLoad(srn, CheckOrChange.Check),
+              .onPageLoad(srn, NormalMode),
           srn =>
             defaultUserAnswers
               .unsafeSet(UnallocatedEmployerContributionsPage(srn), true)

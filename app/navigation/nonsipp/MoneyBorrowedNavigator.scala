@@ -20,7 +20,7 @@ import play.api.mvc.Call
 import cats.implicits.toTraverseOps
 import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
-import models.{CheckOrChange, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import pages.nonsipp.moneyborrowed._
 import config.Refined.Max5000
 import pages.Page
@@ -55,7 +55,7 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
       controllers.nonsipp.moneyborrowed.routes.WhySchemeBorrowedMoneyController.onPageLoad(srn, index, NormalMode)
 
     case WhySchemeBorrowedMoneyPage(srn, index) =>
-      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, NormalMode)
 
     case MoneyBorrowedCYAPage(srn) =>
       controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, page = 1, NormalMode)
@@ -92,26 +92,26 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
 
         case LenderNamePage(srn, index) =>
           controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-            .onPageLoad(srn, index, CheckOrChange.Check)
+            .onPageLoad(srn, index, NormalMode)
 
         case IsLenderConnectedPartyPage(srn, index) =>
           controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-            .onPageLoad(srn, index, CheckOrChange.Check)
+            .onPageLoad(srn, index, NormalMode)
 
         case BorrowedAmountAndRatePage(srn, index) =>
           controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-            .onPageLoad(srn, index, CheckOrChange.Check)
+            .onPageLoad(srn, index, NormalMode)
 
         case WhenBorrowedPage(srn, index) =>
           controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-            .onPageLoad(srn, index, CheckOrChange.Check)
+            .onPageLoad(srn, index, NormalMode)
 
         case ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index) =>
           controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-            .onPageLoad(srn, index, CheckOrChange.Check)
+            .onPageLoad(srn, index, NormalMode)
 
         case WhySchemeBorrowedMoneyPage(srn, index) =>
           controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-            .onPageLoad(srn, index, CheckOrChange.Check)
+            .onPageLoad(srn, index, NormalMode)
       }
 }

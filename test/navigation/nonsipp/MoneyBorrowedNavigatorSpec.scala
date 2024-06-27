@@ -21,9 +21,8 @@ import config.Refined.{Max5000, OneTo5000}
 import models.SchemeId.Srn
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
-import models.{CheckOrChange, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import pages.nonsipp.moneyborrowed._
-import models.CheckOrChange.Check
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
 
@@ -128,7 +127,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           WhySchemeBorrowedMoneyPage,
           (srn, _: Max5000, _) =>
             controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-              .onPageLoad(srn, index, CheckOrChange.Check)
+              .onPageLoad(srn, index, NormalMode)
         )
         .withName("go from why scheme borrowed amount page to money borrowed CYA page")
     )
@@ -211,7 +210,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateTo(
           LenderNamePage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from lender name page to money borrowed CYA page")
     )
@@ -221,7 +220,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateTo(
           IsLenderConnectedPartyPage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from is lender connected party page to money borrowed CYA page")
     )
@@ -231,7 +230,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateTo(
           BorrowedAmountAndRatePage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from borrowed amount and interest rate page to money borrowed CYA page")
     )
@@ -241,7 +240,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateTo(
           WhenBorrowedPage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from when amount was borrowed rate page to money borrowed CYA page")
     )
@@ -251,7 +250,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateTo(
           ValueOfSchemeAssetsWhenMoneyBorrowedPage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from value of scheme assets when money borrowed page to money borrowed CYA page")
     )
@@ -261,7 +260,7 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateTo(
           WhySchemeBorrowedMoneyPage(_, refineMV(1)),
           (srn, _) =>
-            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), Check)
+            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from why scheme borrowed amount page to money borrowed CYA page")
     )

@@ -21,7 +21,7 @@ import config.Refined.OneTo5000
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
-import models.CheckOrChange
+import models.{CheckMode, Mode, NormalMode}
 import pages.nonsipp.moneyborrowed._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
@@ -42,11 +42,11 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  private def onPageLoad(checkOrChange: CheckOrChange) =
-    routes.MoneyBorrowedCYAController.onPageLoad(srn, index, checkOrChange)
+  private def onPageLoad(mode: Mode) =
+    routes.MoneyBorrowedCYAController.onPageLoad(srn, index, mode)
 
-  private def onSubmit(checkOrChange: CheckOrChange) =
-    routes.MoneyBorrowedCYAController.onSubmit(srn, index, checkOrChange)
+  private def onSubmit(mode: Mode) =
+    routes.MoneyBorrowedCYAController.onSubmit(srn, index, mode)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(LenderNamePage(srn, index), lenderName)
@@ -58,9 +58,9 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
 
   "MoneyBorrowedCYAController" - {
 
-    List(CheckOrChange.Check, CheckOrChange.Change).foreach { checkOrChange =>
+    List(NormalMode, CheckMode).foreach { mode =>
       act.like(
-        renderView(onPageLoad(checkOrChange), filledUserAnswers) { implicit app => implicit request =>
+        renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
             viewModel(
               ViewModelParameters(
@@ -73,33 +73,33 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
                 whenBorrowed = localDate,
                 schemeAssets = money,
                 schemeBorrowed = schemeName,
-                checkOrChange
+                mode
               )
             )
           )
-        }.withName(s"render correct ${checkOrChange.name} view")
+        }.withName(s"render correct ${mode.toString} view")
       )
 
       act.like(
-        redirectNextPage(onSubmit(checkOrChange))
+        redirectNextPage(onSubmit(mode))
           .before(MockPSRSubmissionService.submitPsrDetails())
           .after({
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
-          .withName(s"redirect to next page when in ${checkOrChange.name} mode")
+          .withName(s"redirect to next page when in ${mode.toString} mode")
       )
 
       act.like(
-        journeyRecoveryPage(onPageLoad(checkOrChange))
+        journeyRecoveryPage(onPageLoad(mode))
           .updateName("onPageLoad" + _)
-          .withName(s"redirect to journey recovery page on page load when in ${checkOrChange.name} mode")
+          .withName(s"redirect to journey recovery page on page load when in ${mode.toString} mode")
       )
 
       act.like(
-        journeyRecoveryPage(onSubmit(checkOrChange))
+        journeyRecoveryPage(onSubmit(mode))
           .updateName("onSubmit" + _)
-          .withName(s"redirect to journey recovery page on submit when in ${checkOrChange.name} mode")
+          .withName(s"redirect to journey recovery page on submit when in ${mode.toString} mode")
       )
     }
   }
