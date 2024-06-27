@@ -183,16 +183,13 @@ object TransfersOutCYAController {
       title = mode
         .fold(
           normal = "checkYourAnswers.title",
-          check = "checkYourAnswers.transferOutCYA.check.title",
+          check = "transfersOutCYAController.title.check",
           viewOnly = "checkYourAnswers.viewOnly.title"
         ),
       heading = heading,
       description = Some(ParagraphMessage("transfersOutCYA.paragraph")),
       page = CheckYourAnswersViewModel(
-        sections = rows(srn, memberName, index, journeys, mode match {
-          case ViewOnlyMode => NormalMode
-          case _ => mode
-        }),
+        sections = rows(srn, memberName, index, journeys),
         inset = Option.when(journeys.size == 5)("transfersOutCYAController.inset")
       ),
       refresh = None,
@@ -227,8 +224,7 @@ object TransfersOutCYAController {
     srn: Srn,
     memberName: String,
     index: Max300,
-    journeys: List[TransfersOutCYA],
-    mode: Mode
+    journeys: List[TransfersOutCYA]
   ): List[CheckYourAnswersSection] =
     journeys.zipWithIndex.map {
       case (journey, rowIndex) =>

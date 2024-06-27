@@ -191,10 +191,7 @@ object TransfersInCYAController {
       heading = heading,
       description = Some(ParagraphMessage("transfersInCYA.paragraph")),
       page = CheckYourAnswersViewModel(
-        sections = rows(srn, memberName, index, journeys, mode match {
-          case ViewOnlyMode => NormalMode
-          case _ => mode
-        }),
+        sections = rows(srn, memberName, index, journeys),
         inset = Option.when(journeys.size == 5)("transfersInCYAController.inset")
       ),
       refresh = None,
@@ -229,8 +226,7 @@ object TransfersInCYAController {
     srn: Srn,
     memberName: String,
     index: Max300,
-    journeys: List[TransfersInCYA],
-    mode: Mode
+    journeys: List[TransfersInCYA]
   ): List[CheckYourAnswersSection] =
     journeys.zipWithIndex.map {
       case (journey, rowIndex) =>
