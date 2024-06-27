@@ -27,16 +27,32 @@
 )
 @(form: Form[Boolean], viewmodel: FormPageViewModel[ActionTableViewModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, viewmodel.title.toMessage)) {
+@layout(pageTitle = title(form, if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.title.toMessage else viewmodel.title.toMessage)) {
 
-    @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
+    @formHelper(action = if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.onSubmit else viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
 
         @if(form.hasErrors) {
           @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+        @if(viewmodel.mode == NormalMode || viewmodel.mode == CheckMode) {
+            <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+        }
+        @if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) {
+            @if(viewmodel.optViewOnlyDetails.get.updated) {
+                <strong class ="govuk-tag govuk-tag--green govuk-!-margin-bottom-4">Updated</strong><br/>
 
-        <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+                @viewmodel.optViewOnlyDetails.get.link.map { link =>
+                    <p class="govuk-body">
+                        <a href=@link.url
+                       class="govuk-link" rel="noreferrer noopener" target="_blank" >@renderMessage(link.content)</a></p>
+                }
+            }
+            @viewmodel.optViewOnlyDetails.get.submittedText.map { submittedText =>
+                <span class="govuk-caption-l">@renderMessage(submittedText)</span>
+            }
+            <h1 class="govuk-heading-l">@renderMessage(viewmodel.optViewOnlyDetails.get.heading)</h1>
+        }
 
         @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.rows)(paginatedViewModel =>
             viewmodel.page.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
@@ -80,7 +96,7 @@
             @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.page.inset)))
         }
 
-        @if(viewmodel.page.showRadios && viewmodel.page.showInsetWithRadios) {
+        @if(viewmodel.mode != ViewOnlyMode && viewmodel.page.showRadios && viewmodel.page.showInsetWithRadios) {
             @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.page.inset)))
             @govukRadios(
                 RadiosViewModel.yesNo(
@@ -90,7 +106,7 @@
                 )
             )
         }
-        @if(viewmodel.page.showRadios && !viewmodel.page.showInsetWithRadios){
+        @if(viewmodel.mode != ViewOnlyMode && viewmodel.page.showRadios && !viewmodel.page.showInsetWithRadios){
             @govukRadios(
                 RadiosViewModel.yesNo(
                     field = form("value"),
@@ -105,7 +121,10 @@
 
 
         @govukButton(
-            ButtonViewModel(renderMessage(viewmodel.buttonText))
+            if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty)
+                ButtonViewModel(renderMessage(viewmodel.optViewOnlyDetails.get.buttonText))
+            else
+                ButtonViewModel(renderMessage(viewmodel.buttonText))
         )
     }
 }

@@ -2326,6 +2326,9 @@ ReportContribution.MemberList.pagination.label = Showing {0} - {1} of {2} member
 ReportContribution.MemberList.add.hidden.text = member contributions for {0}
 ReportContribution.MemberList.change.hidden.text = member contributions for {0}
 ReportContribution.MemberList.remove.hidden.text = member contributions for {0}
+ReportContribution.MemberList.viewOnly.title = Member contributions
+ReportContribution.MemberList.viewOnly.heading = Member contributions
+ReportContribution.MemberList.viewOnly.link = View previous version of member contributions (opens in new tab)
 
 MemberContributionCYA.title = Check your answers
 MemberContributionCYA.change.title = Change details of member contributions
