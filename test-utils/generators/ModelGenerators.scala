@@ -246,9 +246,10 @@ trait ModelGenerators extends BasicGenerators {
   }
 
   implicit val utrGen: Gen[Utr] = for {
-    numbers <- Gen.listOfN(10, Gen.numChar).map(_.mkString)
+    firstSetOfNumbers <- Gen.listOfN(5, Gen.numChar).map(_.mkString)
+    secondSetOfNumbers <- Gen.listOfN(5, Gen.numChar).map(_.mkString)
   } yield {
-    Utr(s"$numbers")
+    Utr(s"$firstSetOfNumbers $secondSetOfNumbers")
   }
 
   val crnPrefix: Gen[String] = {
