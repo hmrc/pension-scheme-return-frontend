@@ -22,6 +22,7 @@ import config.Refined._
 import controllers.ControllerBaseSpec
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
+import pages.nonsipp.FbVersionPage
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
@@ -37,6 +38,20 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[Max300.Refined](1)
   private lazy val onPageLoad = routes.PclsCYAController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.PclsCYAController.onSubmit(srn, index, NormalMode)
+  private lazy val onSubmitViewOnly = routes.PclsCYAController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private lazy val onPageLoadViewOnly = routes.PclsCYAController.onPageLoadViewOnly(
+    srn,
+    index,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -60,7 +75,14 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[CheckYourAnswersView].apply(
-        viewModel(srn, memberDetails.fullName, index, lumpSumAmounts, NormalMode)
+        viewModel(
+          srn,
+          memberDetails.fullName,
+          index,
+          lumpSumAmounts,
+          NormalMode,
+          viewOnlyUpdated = true
+        )
       )
     })
 
@@ -73,4 +95,48 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
+
+  "TransfersOutCYAController in view only mode" - {
+
+    val currentUserAnswers = defaultUserAnswers
+      .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index), lumpSumAmounts)
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index), lumpSumAmounts)
+
+//    act.like(
+//      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+//        implicit app => implicit request =>
+//          injected[CheckYourAnswersView].apply(
+//            viewModel(
+//              srn,
+//              memberDetails.fullName,
+//              index,
+//              lumpSumAmounts,
+//              ViewOnlyMode,
+//              viewOnlyUpdated = false,
+//              optYear = Some(yearString),
+//              optCurrentVersion = Some(submissionNumberTwo),
+//              optPreviousVersion = Some(submissionNumberOne),
+//              compilationOrSubmissionDate = Some(submissionDateOne)
+//            )
+//          )
+//      }
+//    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
+  }
+
 }

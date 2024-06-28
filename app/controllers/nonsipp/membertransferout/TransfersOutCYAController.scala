@@ -175,7 +175,7 @@ object TransfersOutCYAController {
         .fold(
           normal = "checkYourAnswers.heading",
           check = Message("transfersOutCYAController.heading.check", memberName),
-          viewOnly = "transfersOutCYAController.viewOnly.title"
+          viewOnly = "transfersOutCYAController.viewOnly.heading"
         )
 
     FormPageViewModel[CheckYourAnswersViewModel](
@@ -184,7 +184,7 @@ object TransfersOutCYAController {
         .fold(
           normal = "checkYourAnswers.title",
           check = "transfersOutCYAController.title.check",
-          viewOnly = "checkYourAnswers.viewOnly.title"
+          viewOnly = "transfersOutCYAController.viewOnly.title"
         ),
       heading = heading,
       description = Some(ParagraphMessage("transfersOutCYA.paragraph")),
