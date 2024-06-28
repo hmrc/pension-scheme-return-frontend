@@ -18,23 +18,27 @@ package controllers.nonsipp.memberreceivedpcls
 
 import services.PsrSubmissionService
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import config.Refined._
 import controllers.PSRController
 import controllers.nonsipp.memberreceivedpcls.PclsCYAController._
+import controllers.nonsipp.routes
 import controllers.actions._
-import navigation.Navigator
 import models._
 import play.api.i18n.MessagesApi
+import models.requests.DataRequest
 import viewmodels.implicits._
 import pages.nonsipp.memberreceivedpcls.{PclsCYAPage, PensionCommencementLumpSumAmountPage}
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
+import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
 class PclsCYAController @Inject()(
@@ -49,17 +53,47 @@ class PclsCYAController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
-          memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
-          amounts <- request.userAnswers
-            .get(PensionCommencementLumpSumAmountPage(srn, index))
-            .getOrRecoverJourney
-        } yield {
-          Ok(view(viewModel(srn, memberDetails.fullName, index, amounts, mode)))
-        }
-      ).merge
+      onPageLoadCommon(srn, index, mode)(implicitly)
     }
+
+  def onPageLoadViewOnly(
+    srn: Srn,
+    index: Max300,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn, index, mode)(implicitly)
+    }
+
+  def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+    (
+      for {
+        memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
+        amounts <- request.userAnswers
+          .get(PensionCommencementLumpSumAmountPage(srn, index))
+          .getOrRecoverJourney
+      } yield {
+        Ok(
+          view(
+            viewModel(
+              srn,
+              memberDetails.fullName,
+              index,
+              amounts,
+              mode,
+              viewOnlyUpdated = false, // flag is not displayed on this tier
+              optYear = request.year,
+              optCurrentVersion = request.currentVersion,
+              optPreviousVersion = request.previousVersion,
+              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+            )
+          )
+        )
+      }
+    ).merge
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -74,6 +108,12 @@ class PclsCYAController @Inject()(
             Redirect(navigator.nextPage(PclsCYAPage(srn, index), mode, request.userAnswers))
         }
     }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+    }
+
 }
 
 object PclsCYAController {
@@ -82,24 +122,53 @@ object PclsCYAController {
     memberName: String,
     index: Max300,
     amounts: PensionCommencementLumpSum,
-    mode: Mode
+    mode: Mode,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       title = mode.fold(
         normal = "checkYourAnswers.title",
-        check = Message("pclsCYA.change.title.check", memberName)
+        check = Message("pclsCYA.change.title.check", memberName),
+        viewOnly = "pclsCYA.viewOnly.title"
       ),
       heading = mode.fold(
         normal = "checkYourAnswers.heading",
-        check = Message("pclsCYA.heading.check", memberName)
+        check = Message("pclsCYA.heading.check", memberName),
+        viewOnly = "pclsCYA.viewOnly.heading"
       ),
       description = None,
       page = CheckYourAnswersViewModel(
         sections = rows(srn, memberName, index, amounts, mode)
       ),
       refresh = None,
-      buttonText = "site.saveAndContinue",
-      onSubmit = routes.PclsCYAController.onSubmit(srn, index, mode)
+      buttonText = mode.fold(normal = "site.continue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
+      onSubmit = controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController.onSubmit(srn, index, mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = None,
+            submittedText = Some(Message("")),
+            title = "pclsCYA.viewOnly.title",
+            heading = Message("pclsCYA.viewOnly.heading", memberName),
+            buttonText = "site.return.to.tasklist",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
+                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
+                  .onSubmit(srn, index, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
 
   private def rows(
