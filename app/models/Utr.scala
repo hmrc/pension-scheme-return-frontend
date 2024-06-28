@@ -24,7 +24,7 @@ case class Utr(utr: String) extends TaxIdentifier with SimpleName {
 
   override def toString = utr
 
-  def value = utr
+  def value: String = utr.filterNot(_.isWhitespace)
 
   val name = "utr"
 }
