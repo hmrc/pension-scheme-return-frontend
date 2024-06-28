@@ -87,7 +87,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
       whenReady(
-        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
+        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
           mockReq,
           implicitly,
           implicitly
@@ -122,7 +122,11 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         )
       )
       whenReady(
-        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
+        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
+          mockReq,
+          implicitly,
+          implicitly
+        )
       ) { result: UserAnswers =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
@@ -156,7 +160,11 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         )
       )
       whenReady(
-        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
+        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
+          mockReq,
+          implicitly,
+          implicitly
+        )
       ) { result: UserAnswers =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockLoansTransformer, times(1)).transformFromEtmp(any(), any(), any())
@@ -190,7 +198,11 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         )
       )
       whenReady(
-        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
+        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
+          mockReq,
+          implicitly,
+          implicitly
+        )
       ) { result: UserAnswers =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, times(1)).transformFromEtmp(any(), any(), any())
@@ -225,7 +237,11 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         )
       )
       whenReady(
-        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
+        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
+          mockReq,
+          implicitly,
+          implicitly
+        )
       ) { result: UserAnswers =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
@@ -260,7 +276,11 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         )
       )
       whenReady(
-        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
+        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
+          mockReq,
+          implicitly,
+          implicitly
+        )
       ) { result: UserAnswers =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
@@ -294,7 +314,11 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         )
       )
       whenReady(
-        service.getStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(mockReq, implicitly, implicitly)
+        service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
+          mockReq,
+          implicitly,
+          implicitly
+        )
       ) { result: UserAnswers =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())

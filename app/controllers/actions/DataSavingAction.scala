@@ -20,7 +20,6 @@ import play.api.mvc.ActionTransformer
 import com.google.inject.ImplementedBy
 import config.Constants.{PREVIOUS_SUBMITTED_PREFIX, UNCHANGED_SESSION_PREFIX}
 import repositories.SessionRepository
-import models.UserAnswers
 import models.requests.DataRequest
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,9 +30,7 @@ class DataSavingActionImpl @Inject()(sessionRepository: SessionRepository)(
   implicit val executionContext: ExecutionContext
 ) extends DataSavingAction {
 
-  override protected def transform[A](request: DataRequest[A]): Future[DataRequest[A]] = {
-    val userAnswersKey = request.getUserId + request.srn
-    val userAnswers = UserAnswers(userAnswersKey)
+  override protected def transform[A](request: DataRequest[A]): Future[DataRequest[A]] =
     for {
       _ <- sessionRepository.set(request.userAnswers)
       _ <- sessionRepository.set(request.userAnswers.copy(id = UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
@@ -41,8 +38,7 @@ class DataSavingActionImpl @Inject()(sessionRepository: SessionRepository)(
         previousUserAnswers =>
           sessionRepository.set(previousUserAnswers.copy(id = PREVIOUS_SUBMITTED_PREFIX + previousUserAnswers.id))
       )
-    } yield DataRequest(request.request, userAnswers)
-  }
+    } yield request
 }
 
 @ImplementedBy(classOf[DataSavingActionImpl])

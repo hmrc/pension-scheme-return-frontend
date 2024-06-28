@@ -62,11 +62,19 @@ class IdentifyAndRequireData @Inject()(
    **/
   def apply(srn: Srn, mode: Mode, year: String, current: Int, previous: Int): ActionBuilder[DataRequest, AnyContent] =
     if (mode == ViewOnlyMode) {
-      identify
-        .andThen(allowAccess(srn))
-        .andThen(getDataFromETMP.currentAndPreviousVersionForYear(year, current, previous))
-        .andThen(requireData)
-        .andThen(saveData)
+      if (previous == 0) {
+        identify
+          .andThen(allowAccess(srn))
+          .andThen(getDataFromETMP.versionForYear(year, current))
+          .andThen(requireData)
+          .andThen(saveData)
+      } else {
+        identify
+          .andThen(allowAccess(srn))
+          .andThen(getDataFromETMP.currentAndPreviousVersionForYear(year, current, previous))
+          .andThen(requireData)
+          .andThen(saveData)
+      }
     } else {
       apply(srn)
     }
@@ -93,7 +101,7 @@ class IdentifyAndRequireData @Inject()(
           .andThen(getDataFromETMP.versionForYear(year, 1))
           .andThen(requireData)
           .andThen(saveData)
-      case Some(currentVersion) if currentVersion > 0 =>
+      case Some(currentVersion) if currentVersion > 1 =>
         identify
           .andThen(allowAccess(srn))
           .andThen(getDataFromETMP.currentAndPreviousVersionForYear(year, currentVersion, currentVersion - 1))

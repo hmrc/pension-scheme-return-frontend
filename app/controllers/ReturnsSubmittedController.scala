@@ -127,7 +127,7 @@ class ReturnsSubmittedController @Inject()(
     }
 
   def onSelect(srn: Srn, fbNumber: String): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
+    identifyAndRequireData(srn, fbNumber).async {
       Future.successful(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
     }
 }

@@ -76,6 +76,12 @@ class SchemeMemberDetailsAnswersController @Inject()(
         !_.sameAs(request.userAnswers, membersPayments, Omitted.membersPayments: _*)
       )
 
+      lazy val justAdded = checkOrChange.isCheck &&
+        (
+          request.userAnswers.get(MemberStatus(srn, index)).isEmpty ||
+            !request.userAnswers.get(MemberStatus(srn, index)).exists(_.changed)
+        )
+
       for {
         updatedUserAnswers <- request.userAnswers
         // Only set member state to CHANGED if something has actually changed
@@ -89,9 +95,8 @@ class SchemeMemberDetailsAnswersController @Inject()(
             }
           )
           // If member is already CHANGED, do not override with NEW if user goes back to CYA page on check mode
-          .setWhen(
-            checkOrChange.isCheck && !request.userAnswers.get(MemberStatus(srn, index)).exists(_.changed)
-          )(MemberStatus(srn, index), MemberState.New)
+          .setWhen(justAdded)(MemberStatus(srn, index), MemberState.New)
+          .setWhen(justAdded)(SafeToHardDelete(srn, index), Flag)
           .set(MemberDetailsCompletedPage(srn, index), SectionCompleted)
           .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)

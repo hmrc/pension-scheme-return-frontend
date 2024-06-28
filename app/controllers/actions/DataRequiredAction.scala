@@ -35,13 +35,13 @@ class DataRequiredActionImpl @Inject()(implicit val executionContext: ExecutionC
         Future.successful(
           Right(
             DataRequest(
-              request.request,
-              data,
-              request.pureUserAnswers,
-              request.previousUserAnswers,
-              request.year,
-              request.currentVersion,
-              request.previousVersion
+              request = request.request,
+              userAnswers = data,
+              pureUserAnswers = request.pureUserAnswers,
+              previousUserAnswers = request.previousUserAnswers,
+              year = request.year,
+              currentVersion = request.currentVersion,
+              previousVersion = request.previousVersion
             )
           )
         )

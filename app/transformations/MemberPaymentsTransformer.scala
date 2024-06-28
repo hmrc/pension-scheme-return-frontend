@@ -348,6 +348,7 @@ class MemberPaymentsTransformer @Inject()(
       ua5 <- ua4.set(PclsMemberListPage(srn), memberLumpSumReceivedExists)
 
       // new members can be safely hard deleted
+      // todo: probably don't call when fetchingPreviousVersion = true, no point
       newMembers <- identifyNewMembers(srn, ua5, previousVersionUA, fetchingPreviousVersion)
       ua5_1 <- newMembers.foldLeft(Try(ua5)) {
         case (ua, index) =>
@@ -400,19 +401,6 @@ class MemberPaymentsTransformer @Inject()(
     fetchingPreviousVersion: Boolean
   ): Try[List[Max300]] =
     buildMemberDetails(srn, ua).left.map(new Exception(_)).toTry.flatMap { currentMemberDetails =>
-      lazy val fbVersion: Option[String] = ua.get(FbVersionPage(srn))
-      lazy val fbVersionAsInt: Try[Int] = fbVersion.fold[Try[Int]](
-        Failure(
-          new Exception(
-            "No previous version and fbVersion is greater than 001. Probably an error with retrieving the previous version"
-          )
-        )
-      )(
-        version =>
-          version.toIntOption
-            .fold[Try[Int]](Failure(new Exception(s"fbVersion was not a number. Actual: $version")))(Success(_))
-      )
-
       previousVersionUA match {
         case Some(_) if fetchingPreviousVersion =>
           Failure(
@@ -421,7 +409,7 @@ class MemberPaymentsTransformer @Inject()(
             )
           )
         case Some(previousUA) =>
-          logger.info(s"Previous PSR version found for srn $srn")
+          logger.info(s"[identifyNewMembers] Previous PSR version found for srn $srn")
           buildMemberDetails(srn, previousUA).left.map(new Exception(_)).toTry.flatMap { previousMemberDetails =>
             Success(
               currentMemberDetails.toList.flatMap {
@@ -448,8 +436,8 @@ class MemberPaymentsTransformer @Inject()(
           Success(
             versionedMembersWithETMPStatus.flatMap {
               // Added in current version of the submission, safe to soft delete
-              case (index, memberVersion, Some(MemberState.New | MemberState.Changed))
-                  if fbVersion.contains(memberVersion) =>
+              case (index, memberVersion, Some(MemberState.New | MemberState.Changed)) // todo have a look at this
+                  if ua.get(FbVersionPage(srn)).contains(memberVersion) =>
                 Some(index)
               case _ => None
             } ++ membersWithNoVersions

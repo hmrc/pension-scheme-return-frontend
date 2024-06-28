@@ -22,7 +22,6 @@ import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils._
 import pages.nonsipp.landorproperty.LandOrPropertyCompleted
 import controllers.actions._
-import pages.nonsipp.WhichTaxYearPage
 import pages.nonsipp.memberdetails.Paths.personalDetails
 import viewmodels.models.TaskListStatus._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -35,6 +34,8 @@ import views.html.TaskListView
 import models.SchemeId.Srn
 import cats.implicits.toShow
 import pages.nonsipp.memberpensionpayments.Paths.membersPayments
+import pages.nonsipp.WhichTaxYearPage
+import play.api.Logger
 import utils.DateTimeUtils.localDateShow
 import models._
 import viewmodels.DisplayMessage._
@@ -51,15 +52,21 @@ class ViewOnlyTaskListController @Inject()(
     extends PSRController
     with I18nSupport {
 
+  private val logger = Logger(getClass)
+
   def onPageLoad(srn: Srn, year: String, currentVersion: Int, previousVersion: Int): Action[AnyContent] =
     identifyAndRequireData(srn, ViewOnlyMode, year, currentVersion, previousVersion).async { implicit request =>
       request.userAnswers.get(WhichTaxYearPage(srn)) match {
-        case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        case None =>
+          logger.error(s"WhichTaxYearPage not found for srn $srn, redirecting to journey recovery")
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         case Some(dateRange: DateRange) =>
           val currentReturn = request.userAnswers
           val optPreviousReturn = if (previousVersion == 0) Some(request.userAnswers) else request.previousUserAnswers
           optPreviousReturn match {
-            case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            case None =>
+              logger.error(s"previousVersion is $previousVersion but previousUserAnswers is empty")
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             case Some(previousReturn) =>
               val viewModel = ViewOnlyTaskListController.viewModel(
                 srn,

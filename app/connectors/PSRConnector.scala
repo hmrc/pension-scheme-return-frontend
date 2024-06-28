@@ -88,7 +88,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
             }
           case NOT_FOUND =>
             logger.info(
-              s"Getting standard PSR for pstr $pstr returned NOT_FOUND.\nfbNumber $optFbNumber\nperiodStartDate $optPeriodStartDate\npsrVersion $optPsrVersion\n"
+              s"Getting standard PSR for pstr $pstr returned NOT_FOUND. fbNumber $optFbNumber - periodStartDate $optPeriodStartDate - psrVersion $optPsrVersion"
             )
             None
           case _ =>

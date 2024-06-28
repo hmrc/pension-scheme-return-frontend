@@ -19,9 +19,11 @@ package controllers.actions
 import services.PsrRetrievalService
 import play.api.mvc.ActionTransformer
 import com.google.inject.ImplementedBy
-import config.Constants.UNCHANGED_SESSION_PREFIX
+import cats.implicits.toTraverseFilterOps
 import play.api.Logger
 import models.UserAnswers
+import models.requests.psr.ReportDetails
+import config.Constants.UNCHANGED_SESSION_PREFIX
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -38,21 +40,24 @@ class DataRetrievalETMPAction(
 
   private val logger = Logger(getClass)
 
+  // value of UserAnswers in DataRequest is not referenced in the psrRetrievalService
+  private def emptyUserAnswers(request: AllowedAccessRequest[_]): UserAnswers =
+    UserAnswers(request.getUserId + request.srn)
+
   def versionForYear(year: String, current: Int): ActionTransformer[AllowedAccessRequest, OptionalDataRequest] =
     new ActionTransformer[AllowedAccessRequest, OptionalDataRequest] {
       override protected def executionContext: ExecutionContext = ec
 
       override protected def transform[A](request: AllowedAccessRequest[A]): Future[OptionalDataRequest[A]] = {
         implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-        val emptyUserAnswers = UserAnswers(request.getUserId + request.srn) // value of UserAnswers in DataRequest is not referenced in the psrRetrievalService
-        val dataRequest: DataRequest[A] = DataRequest[A](request, emptyUserAnswers)
+        val dataRequest: DataRequest[A] = DataRequest[A](request, emptyUserAnswers(request))
         val userAnswersKey = request.getUserId + request.srn
         for {
           pureUa <- sessionRepository.get(UNCHANGED_SESSION_PREFIX + userAnswersKey)
           _ = logger.info(
-            s"[YearAndVersion] Fetching current PSR version by year $year and version ${"%03d".format(current)}"
+            s"[VersionForYear] Fetching current PSR version by year $year and version ${"%03d".format(current)}"
           )
-          currentReturn <- psrRetrievalService.getStandardPsrDetails(
+          currentReturn <- psrRetrievalService.getAndTransformStandardPsrDetails(
             None,
             Some(year),
             Some("%03d".format(current)),
@@ -65,7 +70,7 @@ class DataRetrievalETMPAction(
           previousUserAnswers = None,
           Some(year),
           Some(current),
-          previousVersion = None
+          previousVersion = Some(0) // this function is only ever called when a the current version is 1 so this is safe
         )
       }
     }
@@ -80,20 +85,18 @@ class DataRetrievalETMPAction(
 
       override protected def transform[A](request: AllowedAccessRequest[A]): Future[OptionalDataRequest[A]] = {
         implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-        val emptyUserAnswers = UserAnswers(request.getUserId + request.srn) // value of UserAnswers in DataRequest is not referenced in the psrRetrievalService
-        val dataRequest: DataRequest[A] = DataRequest[A](request, emptyUserAnswers)
+        val dataRequest: DataRequest[A] = DataRequest[A](request, emptyUserAnswers(request))
         val userAnswersKey = request.getUserId + request.srn
         for {
           pureUa <- sessionRepository.get(UNCHANGED_SESSION_PREFIX + userAnswersKey)
           _ = logger.info(s"[Compare] Fetching previous PSR version ${"%03d".format(previous)}")
-          previousReturn <- psrRetrievalService.getStandardPsrDetails(
-            None,
-            Some(year),
-            Some("%03d".format(previous)),
-            controllers.routes.OverviewController.onPageLoad(request.srn),
+          previousReturn <- psrRetrievalService.getAndTransformStandardPsrDetails(
+            optPeriodStartDate = Some(year),
+            optPsrVersion = Some("%03d".format(previous)),
+            fallBackCall = controllers.routes.OverviewController.onPageLoad(request.srn),
             fetchingPreviousVersion = true
           )(hc = implicitly, ec = implicitly, request = dataRequest)
-          previousUa = if (previousReturn.data == emptyUserAnswers.data) {
+          previousUa = if (previousReturn.data == emptyUserAnswers(request).data) {
             logger.info("[Compare] Fetching previous return was empty, setting previousUserAnswers to None")
             None
           } else {
@@ -101,11 +104,10 @@ class DataRetrievalETMPAction(
             Some(previousReturn)
           }
           _ = logger.info(s"[Compare] Fetching current PSR version ${"%03d".format(current)}")
-          currentReturn <- psrRetrievalService.getStandardPsrDetails(
-            None,
-            Some(year),
-            Some("%03d".format(current)),
-            controllers.routes.OverviewController.onPageLoad(request.srn)
+          currentReturn <- psrRetrievalService.getAndTransformStandardPsrDetails(
+            optPeriodStartDate = Some(year),
+            optPsrVersion = Some("%03d".format(current)),
+            fallBackCall = controllers.routes.OverviewController.onPageLoad(request.srn)
           )(hc = implicitly, ec = implicitly, request = dataRequest.copy(previousUserAnswers = previousUa))
         } yield OptionalDataRequest(
           request,
@@ -119,29 +121,59 @@ class DataRetrievalETMPAction(
       }
     }
 
+  /**
+   * Fetch return with fbNumber. If return exists, check if fbNumber is > 1:
+   * - if it is, fetch and transform previous version and then transform current version
+   * - if not, just transform current version
+   */
   def fbNumber(fbNumber: String): ActionTransformer[AllowedAccessRequest, OptionalDataRequest] =
     new ActionTransformer[AllowedAccessRequest, OptionalDataRequest] {
       override protected def executionContext: ExecutionContext = ec
 
       override protected def transform[A](request: AllowedAccessRequest[A]): Future[OptionalDataRequest[A]] = {
         implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-        val emptyUserAnswers = UserAnswers(request.getUserId + request.srn) // value of UserAnswers in DataRequest is not referenced in the psrRetrievalService
-        val dataRequest: DataRequest[A] = DataRequest[A](request, emptyUserAnswers)
+        val dataRequest: DataRequest[A] = DataRequest[A](request, emptyUserAnswers(request))
         val userAnswersKey = request.getUserId + request.srn
         for {
           pureUa <- sessionRepository.get(UNCHANGED_SESSION_PREFIX + userAnswersKey)
           _ = logger.info(s"[FBNumber] Fetching current PSR version by fbNumber $fbNumber")
-          currentReturn <- psrRetrievalService.getStandardPsrDetails(
+          maybePsrDetails <- psrRetrievalService.getStandardPsrDetails(
             optFbNumber = Some(fbNumber),
-            optPeriodStartDate = None,
-            optPsrVersion = None,
-            controllers.routes.OverviewController.onPageLoad(request.srn)
+            fallBackCall = controllers.routes.OverviewController.onPageLoad(request.srn)
           )(hc = implicitly, ec = implicitly, request = dataRequest)
+          maybeReportDetails = maybePsrDetails.map(_.minimalRequiredSubmission.reportDetails)
+          maybePreviousReturn <- maybeReportDetails
+            .traverseCollect {
+              case ReportDetails(Some(fbVersion), _, _, periodStart, _, _) =>
+                fbVersion.toIntOption.traverseCollect {
+                  case fbVersionAsInt if fbVersionAsInt > 1 =>
+                    logger.info(
+                      s"[FBNumber] Fetching previous PSR version ${fbVersionAsInt - 1} and year ${periodStart.getYear.toString}"
+                    )
+                    psrRetrievalService
+                      .getAndTransformStandardPsrDetails(
+                        optPeriodStartDate = Some(periodStart.toString),
+                        optPsrVersion = Some("%03d".format(fbVersionAsInt - 1)),
+                        fallBackCall = controllers.routes.OverviewController.onPageLoad(request.srn),
+                        fetchingPreviousVersion = true
+                      )(hc = implicitly, ec = implicitly, request = dataRequest)
+                }
+            }
+            .map(_.flatten)
+          currentReturn <- maybePsrDetails match {
+            case Some(psrDetails) =>
+              logger.info(s"[FBNumber] Transforming current PSR version with fbNumber $fbNumber")
+              psrRetrievalService.transformPsrDetails(psrDetails)(
+                request = dataRequest.copy(previousUserAnswers = maybePreviousReturn)
+              )
+            case None =>
+              Future.successful(UserAnswers(request.getUserId + request.srn))
+          }
         } yield OptionalDataRequest(
           request,
           Some(currentReturn),
           pureUa,
-          previousUserAnswers = None,
+          previousUserAnswers = maybePreviousReturn,
           None,
           None,
           previousVersion = None

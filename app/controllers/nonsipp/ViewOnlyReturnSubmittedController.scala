@@ -53,7 +53,7 @@ class ViewOnlyReturnSubmittedController @Inject()(
   def onPageLoad(srn: Srn, year: String, version: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
-        retrievedUserAnswers <- psrRetrievalService.getStandardPsrDetails(
+        retrievedUserAnswers <- psrRetrievalService.getAndTransformStandardPsrDetails(
           None,
           Some(year),
           Some("%03d".format(version)),

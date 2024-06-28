@@ -86,7 +86,7 @@ class FakeDataRetrievalETMPActionProvider @Inject()(
             request,
             userAnswers,
             pureUserAnswers,
-            previousUserAnswers,
+            if (previous == 0) None else previousUserAnswers,
             Some(year),
             Some(current),
             Some(previous)

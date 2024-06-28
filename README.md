@@ -74,17 +74,6 @@ At the time of writing, v18.19.0 is being used.
 
 ***
 
-## ETMP
-This section will cover the nuances behind our PSR ETMP submission and why we have chosen to take certain technical approaches as well as demystifying some of the behaviour when parsing data to and from ETMP (transformers)
-
-##### ETMP versions
-
-Section versions like `recordVersion` in member payments must either be omitted or set to the current version based on whether a change has been made to the section.
-
-Info and nuances on this can be found [here](https://confluence.tools.tax.service.gov.uk/pages/viewpage.action?spaceKey=PSR&title=Understanding+versioning+in+PSR)
-
-
-
 ## Licence
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").

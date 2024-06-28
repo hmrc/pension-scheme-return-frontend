@@ -88,14 +88,7 @@ final case class UserAnswers(
     }
 
     val sanitisedObject = omit.foldLeft(removeEmptyObjects)((a, toOmit) => a.andThen(_ - toOmit))
-
-    val a = this.get(path).map(sanitisedObject)
-    val b = other.get(path).map(sanitisedObject)
-//    println(s"=============== ${a.map(Json.prettyPrint(_))}")
-//    println(s"=============== ${b.map(Json.prettyPrint(_))}")
-//    println(s"=============== ${a == b}")
-
-    a == b
+    this.get(path).map(sanitisedObject) == other.get(path).map(sanitisedObject)
   }
 
   def compose(c: List[UserAnswers.Compose]): Try[UserAnswers] = c.foldLeft(Try(this))((ua, next) => next(ua))
