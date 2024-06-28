@@ -19,17 +19,20 @@ package controllers.nonsipp.membertransferout
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import config.Refined._
-import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
-import navigation.Navigator
+import models.requests.DataRequest
 import utils.ListUtils.ListOps
 import models.PensionSchemeType.PensionSchemeType
 import controllers.PSRController
 import controllers.nonsipp.membertransferout.TransfersOutCYAController._
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import cats.implicits.{toShow, toTraverseOps}
+import controllers.nonsipp.routes
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
 import pages.nonsipp.membertransferout._
@@ -39,7 +42,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
 class TransfersOutCYAController @Inject()(
@@ -55,43 +58,74 @@ class TransfersOutCYAController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
-          memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
-          secondaryIndexes <- request.userAnswers
-            .get(TransfersOutCompletedPages(srn, index))
-            .map(_.keys.toList.flatMap(refineStringIndex[Max5.Refined]))
-            .getOrRecoverJourney
-        } yield {
-          secondaryIndexes
-            .traverse(
-              journeyIndex =>
-                for {
-                  schemeName <- request.userAnswers
-                    .get(ReceivingSchemeNamePage(srn, index, journeyIndex))
-                    .getOrRecoverJourney
-                  receiveType <- request.userAnswers
-                    .get(ReceivingSchemeTypePage(srn, index, journeyIndex))
-                    .getOrRecoverJourney
-                  transferOut <- request.userAnswers
-                    .get(WhenWasTransferMadePage(srn, index, journeyIndex))
-                    .getOrRecoverJourney
-
-                } yield TransfersOutCYA(
-                  journeyIndex,
-                  schemeName,
-                  receiveType,
-                  transferOut
-                )
-            )
-            .map {
-              case Nil => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-              case journeys => Ok(view(viewModel(srn, memberDetails.fullName, index, journeys, mode)))
-            }
-            .merge
-        }
-      ).merge
+      onPageLoadCommon(srn, index, mode)(implicitly)
     }
+
+  def onPageLoadViewOnly(
+    srn: Srn,
+    index: Max300,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn, index, mode)(implicitly)
+    }
+
+  def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+    (
+      for {
+        memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
+        secondaryIndexes <- request.userAnswers
+          .get(TransfersOutCompletedPages(srn, index))
+          .map(_.keys.toList.flatMap(refineStringIndex[Max5.Refined]))
+          .getOrRecoverJourney
+      } yield {
+        secondaryIndexes
+          .traverse(
+            journeyIndex =>
+              for {
+                schemeName <- request.userAnswers
+                  .get(ReceivingSchemeNamePage(srn, index, journeyIndex))
+                  .getOrRecoverJourney
+                receiveType <- request.userAnswers
+                  .get(ReceivingSchemeTypePage(srn, index, journeyIndex))
+                  .getOrRecoverJourney
+                transferOut <- request.userAnswers
+                  .get(WhenWasTransferMadePage(srn, index, journeyIndex))
+                  .getOrRecoverJourney
+
+              } yield TransfersOutCYA(
+                journeyIndex,
+                schemeName,
+                receiveType,
+                transferOut
+              )
+          )
+          .map {
+            case Nil => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            case journeys =>
+              Ok(
+                view(
+                  viewModel(
+                    srn,
+                    memberDetails.fullName,
+                    index,
+                    journeys,
+                    mode,
+                    viewOnlyUpdated = false,
+                    optYear = request.year,
+                    optCurrentVersion = request.currentVersion,
+                    optPreviousVersion = request.previousVersion,
+                    compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+                  )
+                )
+              )
+          }
+          .merge
+      }
+    ).merge
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -115,6 +149,12 @@ class TransfersOutCYAController @Inject()(
           )
       )
     }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+    }
+
 }
 
 object TransfersOutCYAController {
@@ -123,15 +163,29 @@ object TransfersOutCYAController {
     memberName: String,
     index: Max300,
     journeys: List[TransfersOutCYA],
-    mode: Mode
+    mode: Mode,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] = {
-    val heading: InlineMessage = mode.fold(
-      normal = "checkYourAnswers.heading",
-      check = Message("transfersOutCYAController.heading.check", memberName)
-    )
+    val heading: InlineMessage =
+      mode
+        .fold(
+          normal = "checkYourAnswers.heading",
+          check = Message("transfersOutCYAController.heading.check", memberName),
+          viewOnly = "transfersOutCYAController.viewOnly.title"
+        )
 
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = "checkYourAnswers.title",
+      mode = mode,
+      title = mode
+        .fold(
+          normal = "checkYourAnswers.title",
+          check = "transfersOutCYAController.title.check",
+          viewOnly = "checkYourAnswers.viewOnly.title"
+        ),
       heading = heading,
       description = Some(ParagraphMessage("transfersOutCYA.paragraph")),
       page = CheckYourAnswersViewModel(
@@ -139,8 +193,30 @@ object TransfersOutCYAController {
         inset = Option.when(journeys.size == 5)("transfersOutCYAController.inset")
       ),
       refresh = None,
-      buttonText = "site.continue",
-      onSubmit = routes.TransfersOutCYAController.onSubmit(srn, index, mode)
+      buttonText = mode.fold(normal = "site.continue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
+      onSubmit = controllers.nonsipp.membertransferout.routes.TransfersOutCYAController.onSubmit(srn, index, mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = None,
+            submittedText = Some(Message("")),
+            title = "transfersOutCYAController.viewOnly.title",
+            heading = Message("transfersOutCYAController.viewOnly.heading", memberName),
+            buttonText = "site.return.to.tasklist",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
+                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
+                  .onSubmit(srn, index, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
   }
 
