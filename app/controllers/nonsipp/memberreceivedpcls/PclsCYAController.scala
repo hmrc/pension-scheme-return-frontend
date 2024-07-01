@@ -130,6 +130,7 @@ object PclsCYAController {
     compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
+      mode = mode,
       title = mode.fold(
         normal = "checkYourAnswers.title",
         check = Message("pclsCYA.change.title.check", memberName),
@@ -142,7 +143,16 @@ object PclsCYAController {
       ),
       description = None,
       page = CheckYourAnswersViewModel(
-        sections = rows(srn, memberName, index, amounts, mode)
+        sections = rows(
+          srn,
+          memberName,
+          index,
+          amounts,
+          mode match {
+            case ViewOnlyMode => NormalMode
+            case _ => mode
+          }
+        )
       ),
       refresh = None,
       buttonText = mode.fold(normal = "site.continue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
