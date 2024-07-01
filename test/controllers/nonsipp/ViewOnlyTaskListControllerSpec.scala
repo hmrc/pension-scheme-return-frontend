@@ -19,6 +19,7 @@ package controllers.nonsipp
 import models.ConditionalYesNo._
 import pages.nonsipp.otherassetsheld._
 import config.Refined._
+import controllers.ControllerBaseSpec
 import models.SchemeHoldShare._
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer._
@@ -44,8 +45,6 @@ import play.api.mvc.Call
 import models.ManualOrUpload._
 import models.PensionSchemeType._
 import models.IdentityType._
-import viewmodels.models.MemberState.Active
-import controllers.ControllerBaseSpec
 import views.html.TaskListView
 import models.TypeOfShares._
 import pages.nonsipp.memberpensionpayments._
@@ -107,7 +106,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(MemberDetailsPage(srn, index1of300), memberDetails)
     .unsafeSet(DoesMemberHaveNinoPage(srn, index1of300), true)
     .unsafeSet(MemberDetailsNinoPage(srn, index1of300), nino)
-    .unsafeSet(MemberStatus(srn, index1of300), Active)
+    .unsafeSet(MemberStatus(srn, index1of300), MemberState.New)
     // Section 3 - Member Payments
     // (S3) Employer Contributions
     .unsafeSet(EmployerContributionsPage(srn), true)
@@ -297,7 +296,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(MemberDetailsPage(srn, index1of300), memberDetails)
     .unsafeSet(DoesMemberHaveNinoPage(srn, index1of300), false)
     .unsafeSet(NoNINOPage(srn, index1of300), reason)
-    .unsafeSet(MemberStatus(srn, index1of300), Active)
+    .unsafeSet(MemberStatus(srn, index1of300), MemberState.New)
     // Section 3 - Member Payments
     // (S3) Employer Contributions
     .unsafeSet(EmployerContributionsPage(srn), true)

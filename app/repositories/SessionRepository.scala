@@ -18,7 +18,7 @@ package repositories
 
 import uk.gov.hmrc.mongo.MongoComponent
 import org.mongodb.scala.model._
-import config.Constants.UNCHANGED_SESSION_PREFIX
+import config.Constants.{PREVIOUS_SUBMITTED_PREFIX, UNCHANGED_SESSION_PREFIX}
 import org.mongodb.scala.bson.conversions.Bson
 import play.api.libs.json.Format
 import models.UserAnswers
@@ -59,15 +59,15 @@ class SessionRepository @Inject()(
 
   private def byId(id: String): Bson = Filters.equal("_id", id)
 
-  private def byIdWithPureSession(id: String): Bson = {
-    val filters = List(id, UNCHANGED_SESSION_PREFIX + id).map(byId)
+  private def bySessionIds(id: String): Bson = {
+    val filters = List(id, UNCHANGED_SESSION_PREFIX + id, PREVIOUS_SUBMITTED_PREFIX + id).map(byId)
     Filters.or(filters: _*)
   }
 
   def keepAlive(id: String): Future[Unit] =
     collection
       .updateMany(
-        filter = byIdWithPureSession(id),
+        filter = bySessionIds(id),
         update = Updates.set("lastUpdated", Instant.now(clock))
       )
       .toFuture()
@@ -96,7 +96,7 @@ class SessionRepository @Inject()(
 
   def clear(id: String): Future[Unit] =
     collection
-      .deleteMany(byIdWithPureSession(id))
+      .deleteMany(bySessionIds(id))
       .toFuture()
       .as(())
 }

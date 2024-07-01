@@ -17,7 +17,7 @@
 package controllers.actions
 
 import play.api.mvc.ActionTransformer
-import config.Constants.UNCHANGED_SESSION_PREFIX
+import config.Constants._
 import repositories.SessionRepository
 import models.requests.{AllowedAccessRequest, OptionalDataRequest}
 
@@ -35,7 +35,8 @@ class DataRetrievalActionImpl @Inject()(
     for {
       ua <- sessionRepository.get(userAnswersKey)
       pureUa <- sessionRepository.get(UNCHANGED_SESSION_PREFIX + userAnswersKey)
-    } yield OptionalDataRequest(request, ua, pureUa, None)
+      maybePreviousUa <- sessionRepository.get(PREVIOUS_SUBMITTED_PREFIX + userAnswersKey)
+    } yield OptionalDataRequest(request, ua, pureUa, previousUserAnswers = maybePreviousUa)
   }
 }
 

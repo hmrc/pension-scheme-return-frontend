@@ -114,7 +114,8 @@ class FileUploadSuccessController @Inject()(
             UserAnswers.set(NoNINOPage(srn, index), _),
             UserAnswers.set(MemberDetailsNinoPage(srn, index), _)
           ),
-          UserAnswers.set(MemberStatus(srn, index), MemberState.Active),
+          UserAnswers.set(MemberStatus(srn, index), MemberState.New),
+          UserAnswers.set(SafeToHardDelete(srn, index)),
           UserAnswers.set(MemberDetailsCompletedPage(srn, index), SectionCompleted)
         )
       }

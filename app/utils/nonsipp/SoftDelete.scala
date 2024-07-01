@@ -56,6 +56,10 @@ trait SoftDelete { _: PSRController =>
   /**
    * Moves member payments user answers to a "soft deleted" array and hard deletes the original answers
    *
+   * Member is only soft deleted when a NewMember flag is NOT set against a member index. This is set when:
+   * - a member is newly added in a journey (manual or upload), prior to declaration
+   * - during GET from ETMP in the member transformer (new members are identified)
+   *
    * - Only remove completed flags when the member is soft deleted
    * - Return None when something has gone wrong - todo: change to type that can store the error for logging
    * - When hard deleting members after moving them to the soft delete group, the function checks
@@ -213,22 +217,22 @@ trait SoftDelete { _: PSRController =>
         )
     )
 
-    val softDeletedMember = (
-      get(MemberPsrVersionPage).some,
-      memberDetails,
-      employerContributions.some,
-      transfersIn.some,
-      transfersOut.some,
-      surrenderedBenefits.some,
-      memberLumpSumReceived.some,
-      get(TotalMemberContributionPage).some,
-      get(TotalAmountPensionPaymentsPage.apply).some
-    ).mapN(SoftDeletedMember.apply)
+    val memberToDelete = memberDetails.map(
+      SoftDeletedMember(
+        memberPSRVersion = None, // do not set member PSR version when soft deleting
+        _,
+        employerContributions,
+        transfersIn,
+        transfersOut,
+        surrenderedBenefits,
+        memberLumpSumReceived,
+        get(TotalMemberContributionPage),
+        get(TotalAmountPensionPaymentsPage.apply)
+      )
+    )
 
-    val existingSoftDeletedMembers = userAnswers.get(SoftDeletedMembers(srn)).getOrElse(Nil)
-
-    softDeletedMember.fold[Try[UserAnswers]](
-      Failure[UserAnswers] {
+    memberToDelete.fold[Try[UserAnswers]](
+      Failure[UserAnswers](
         new Exception(
           "Failure when building soft deleted member. Checks:" +
             s"memberDetails empty = ${memberDetails.isEmpty}\n" +
@@ -237,11 +241,16 @@ trait SoftDelete { _: PSRController =>
             s"transfersIn empty = ${transfersIn.size}\n" +
             s"transfersOut size = ${transfersOut.size}\n"
         )
-      }: Try[UserAnswers]
+      )
     )(
-      sdm =>
+      member =>
         userAnswers
-          .set(SoftDeletedMembers(srn), existingSoftDeletedMembers :+ sdm)
+          .setWhen(userAnswers.get(SafeToHardDelete(srn, index)).isEmpty)(
+            SoftDeletedMembers(srn), {
+              val existingSoftDeletedMembers = userAnswers.get(SoftDeletedMembers(srn)).getOrElse(Nil)
+              existingSoftDeletedMembers :+ member
+            }
+          )
           .remove(memberDetailsPages)
           .flatMap { ua =>
             ua.employerContributionsCompleted(srn, index)
@@ -346,6 +355,7 @@ trait SoftDelete { _: PSRController =>
             )
           }
           .remove(MemberStatus(srn, index))
+          .remove(MemberPsrVersionPage(srn, index))
     )
   }
 }

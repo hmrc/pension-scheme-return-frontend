@@ -43,7 +43,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateToWithData(
-            PensionSchemeMembersPage,
+            PensionSchemeMembersPage.apply,
             Gen.const(ManualOrUpload.Manual),
             routes.MemberDetailsController.onPageLoad(_, refineMV(1), _)
           )
@@ -53,7 +53,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateToWithData(
-            PensionSchemeMembersPage,
+            PensionSchemeMembersPage.apply,
             Gen.const(ManualOrUpload.Upload),
             (srn, _) => controllers.nonsipp.memberdetails.routes.HowToUploadController.onPageLoad(srn)
           )
@@ -294,7 +294,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         checkmode
           .navigateTo(
             MemberDetailsPage(_, refineMV(1)),
-            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check)
+            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Change)
           )
           .withName("go from member details page to check answers page")
       )
@@ -303,7 +303,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         checkmode
           .navigateTo(
             MemberDetailsNinoPage(_, refineMV(1)),
-            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check)
+            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Change)
           )
           .withName("go from member details nino page to check your answers page")
       )
@@ -312,7 +312,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         checkmode
           .navigateTo(
             NoNINOPage(_, refineMV(1)),
-            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check)
+            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Change)
           )
           .withName("go from no nino page to check your answers page")
       )
@@ -320,9 +320,9 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       "does member have nino page should go to" - {
 
         val userAnswersWithNino =
-          (srn: Srn) => defaultUserAnswers.unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), ninoGen.sample.value)
+          (srn: Srn) => defaultUserAnswers.unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
         val userAnswersWithNoNinoReason =
-          (srn: Srn) => defaultUserAnswers.unsafeSet(NoNINOPage(srn, refineMV(1)), nonEmptyAlphaString.sample.value)
+          (srn: Srn) => defaultUserAnswers.unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
 
         act.like(
           checkmode
@@ -349,7 +349,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithData(
               DoesMemberHaveNinoPage(_, refineMV(1)),
               Gen.const(true),
-              (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check),
+              (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Change),
               userAnswersWithNino
             )
             .withName("check answers page when yes selected and nino exists")
@@ -360,7 +360,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithData(
               DoesMemberHaveNinoPage(_, refineMV(1)),
               Gen.const(false),
-              (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check),
+              (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Change),
               userAnswersWithNoNinoReason
             )
             .withName("check answers page when no selected and no nino reason exists")

@@ -62,7 +62,7 @@ class PsrSubmissionService @Inject()(
     submitPsrDetails(srn, fallbackCall = fallbackCall)(
       implicitly,
       implicitly,
-      DataRequest(request.request, userAnswers)
+      DataRequest(request.request, userAnswers, previousUserAnswers = request.previousUserAnswers)
     )
 
   def submitPsrDetails(
@@ -92,7 +92,8 @@ class PsrSubmissionService @Inject()(
                           checkReturnDates = checkReturnDates,
                           loans = loansTransformer.transformToEtmp(srn, initialUA),
                           assets = assetsTransformer.transformToEtmp(srn, initialUA),
-                          membersPayments = memberPaymentsTransformer.transformToEtmp(srn, currentUA, initialUA),
+                          membersPayments = memberPaymentsTransformer
+                            .transformToEtmp(srn, currentUA, initialUA, request.previousUserAnswers),
                           shares = sharesTransformer.transformToEtmp(srn, initialUA),
                           psrDeclaration = Option.when(isSubmitted)(declarationTransformer.transformToEtmp)
                         ),

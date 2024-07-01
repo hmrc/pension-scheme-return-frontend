@@ -23,6 +23,9 @@ import play.api.mvc.JavascriptLiteral
 sealed trait CheckOrChange extends Product with Serializable {
   val name: String
 
+  val isCheck: Boolean = this == CheckOrChange.Check
+  val isChange: Boolean = this == CheckOrChange.Change
+
   def fold[A](check: => A, change: => A): A = this match {
     case CheckOrChange.Check => check
     case CheckOrChange.Change => change

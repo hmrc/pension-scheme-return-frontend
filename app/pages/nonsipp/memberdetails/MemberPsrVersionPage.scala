@@ -21,11 +21,20 @@ import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import pages.nonsipp.memberdetails.Paths.memberDetails
 import config.Refined.Max300
-import pages.QuestionPage
+import pages.{IndexedQuestionPage, QuestionPage}
 
 case class MemberPsrVersionPage(srn: Srn, index: Max300) extends QuestionPage[String] {
 
   override def path: JsPath = memberDetails \ toString \ index.arrayIndex.toString
 
   override def toString: String = "memberPSRVersion"
+}
+
+object MemberPsrVersionPage {
+  def all(srn: Srn): IndexedQuestionPage[String] = new IndexedQuestionPage[String] {
+
+    override def path: JsPath = memberDetails \ toString
+
+    override def toString: String = "memberPSRVersion"
+  }
 }

@@ -18,6 +18,7 @@ package services
 
 import play.api.mvc.Call
 import connectors.PSRConnector
+import models.requests.psr.PsrSubmission
 import transformations._
 import uk.gov.hmrc.http.HeaderCarrier
 import models.UserAnswers
@@ -38,11 +39,13 @@ class PsrRetrievalService @Inject()(
   declarationTransformer: DeclarationTransformer
 ) extends PsrBaseService {
 
-  def getStandardPsrDetails(
-    optFbNumber: Option[String],
-    optPeriodStartDate: Option[String],
-    optPsrVersion: Option[String],
-    fallBackCall: Call
+  // todo should return Option.None on 404 instead of empty user answers
+  def getAndTransformStandardPsrDetails(
+    optFbNumber: Option[String] = None,
+    optPeriodStartDate: Option[String] = None,
+    optPsrVersion: Option[String] = None,
+    fallBackCall: Call,
+    fetchingPreviousVersion: Boolean = false
   )(
     implicit request: DataRequest[_],
     hc: HeaderCarrier,
@@ -53,6 +56,27 @@ class PsrRetrievalService @Inject()(
 
     val emptyUserAnswers = UserAnswers(request.getUserId + srn)
 
+    getStandardPsrDetails(
+      optFbNumber,
+      optPeriodStartDate,
+      optPsrVersion,
+      fallBackCall
+    ).flatMap {
+      case Some(psrDetails) => transformPsrDetails(psrDetails, fetchingPreviousVersion)
+      case _ => Future(emptyUserAnswers)
+    }
+  }
+
+  def getStandardPsrDetails(
+    optFbNumber: Option[String] = None,
+    optPeriodStartDate: Option[String] = None,
+    optPsrVersion: Option[String] = None,
+    fallBackCall: Call
+  )(
+    implicit request: DataRequest[_],
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Option[PsrSubmission]] =
     psrConnector
       .getStandardPsrDetails(
         request.schemeDetails.pstr,
@@ -63,54 +87,67 @@ class PsrRetrievalService @Inject()(
         schemeAdministratorOrPractitionerName,
         request.schemeDetails.schemeName
       )
-      .flatMap {
-        case Some(psrDetails) =>
-          val result = for {
-            transformedMinimalUa <- minimalRequiredSubmissionTransformer
-              .transformFromEtmp(
-                emptyUserAnswers,
-                srn,
-                request.pensionSchemeId,
-                psrDetails.minimalRequiredSubmission
-              )
 
-            transformedLoansUa <- psrDetails.loans
-              .map(
-                loans =>
-                  loansTransformer
-                    .transformFromEtmp(
-                      transformedMinimalUa,
-                      srn,
-                      loans
-                    )
-              )
-              .getOrElse(Try(transformedMinimalUa))
+  def transformPsrDetails(
+    psrDetails: PsrSubmission,
+    fetchingPreviousVersion: Boolean = false
+  )(
+    implicit request: DataRequest[_]
+  ): Future[UserAnswers] =
+    Future.fromTry {
+      val srn = request.srn
+      val emptyUserAnswers = UserAnswers(request.getUserId + srn)
 
-            transformedAssetsUa <- psrDetails.assets
-              .map { assets =>
-                assetsTransformer.transformFromEtmp(transformedLoansUa, srn, assets)
-              }
-              .getOrElse(Try(transformedLoansUa))
+      for {
+        transformedMinimalUa <- minimalRequiredSubmissionTransformer
+          .transformFromEtmp(
+            emptyUserAnswers,
+            srn,
+            request.pensionSchemeId,
+            psrDetails.minimalRequiredSubmission
+          )
 
-            transformedMemberDetailsUa <- psrDetails.membersPayments
-              .map(
-                memberPayments => memberPaymentsTransformer.transformFromEtmp(transformedAssetsUa, srn, memberPayments)
-              )
-              .getOrElse(Try(transformedAssetsUa))
+        transformedLoansUa <- psrDetails.loans
+          .map(
+            loans =>
+              loansTransformer
+                .transformFromEtmp(
+                  transformedMinimalUa,
+                  srn,
+                  loans
+                )
+          )
+          .getOrElse(Try(transformedMinimalUa))
 
-            transformedSharesUa <- psrDetails.shares
-              .map(sh => sharesTransformer.transformFromEtmp(transformedMemberDetailsUa, srn, sh))
-              .getOrElse(Try(transformedMemberDetailsUa))
-
-            transformedPsrDeclarationUa <- psrDetails.psrDeclaration
-              .map(pd => declarationTransformer.transformFromEtmp(transformedSharesUa, srn, pd))
-              .getOrElse(Try(transformedSharesUa))
-
-          } yield {
-            transformedPsrDeclarationUa
+        transformedAssetsUa <- psrDetails.assets
+          .map { assets =>
+            assetsTransformer.transformFromEtmp(transformedLoansUa, srn, assets)
           }
-          Future.fromTry(result)
-        case _ => Future(emptyUserAnswers)
+          .getOrElse(Try(transformedLoansUa))
+
+        transformedMemberDetailsUa <- psrDetails.membersPayments
+          .map(
+            memberPayments =>
+              memberPaymentsTransformer
+                .transformFromEtmp(
+                  transformedAssetsUa,
+                  request.previousUserAnswers,
+                  srn,
+                  memberPayments,
+                  fetchingPreviousVersion
+                )
+          )
+          .getOrElse(Try(transformedAssetsUa))
+
+        transformedSharesUa <- psrDetails.shares
+          .map(sh => sharesTransformer.transformFromEtmp(transformedMemberDetailsUa, srn, sh))
+          .getOrElse(Try(transformedMemberDetailsUa))
+
+        transformedPsrDeclarationUa <- psrDetails.psrDeclaration
+          .map(pd => declarationTransformer.transformFromEtmp(transformedSharesUa, srn, pd))
+          .getOrElse(Try(transformedSharesUa))
+      } yield {
+        transformedPsrDeclarationUa
       }
-  }
+    }
 }

@@ -65,7 +65,7 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
 
   def onPageLoadViewOnly(srn: Srn, mode: Mode, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, mode)(implicitly)
+      onPageLoadCommon(srn, mode)
     }
 
   def onPageLoadCommon(srn: Srn, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
@@ -84,7 +84,7 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
               feesCommissionsWagesSalariesPage,
               periods,
               request.schemeDetails,
-              if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+              viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
                 getFinancialDetailsTaskListStatus(request.userAnswers, request.previousUserAnswers.get) == Updated
               } else {
                 false
@@ -114,12 +114,12 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
+    identifyAndRequireData(srn, ViewOnlyMode, year, current, previous).async {
       Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
     }
 
   def onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
+    identifyAndRequireData(srn, ViewOnlyMode, year, current, previous).async {
       Future.successful(
         Redirect(
           controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
@@ -164,46 +164,42 @@ object FinancialDetailsCheckYourAnswersController {
       buttonText = "site.saveAndContinue",
       onSubmit =
         controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController.onSubmit(srn, mode),
-      optViewOnlyDetails = if (mode == ViewOnlyMode) {
-        Some(
-          ViewOnlyDetailsViewModel(
-            updated = viewOnlyUpdated,
-            link = (optYear, optCurrentVersion, optPreviousVersion) match {
-              case (Some(year), Some(currentVersion), Some(previousVersion))
-                  if (year.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
-                Some(
-                  LinkMessage(
-                    "financialDetailsCheckYourAnswersController.viewOnly.link",
-                    controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
-                      .onPreviousViewOnly(
-                        srn,
-                        year,
-                        currentVersion,
-                        previousVersion
-                      )
-                      .url
-                  )
+      optViewOnlyDetails = Option.when(mode == ViewOnlyMode)(
+        ViewOnlyDetailsViewModel(
+          updated = viewOnlyUpdated,
+          link = (optYear, optCurrentVersion, optPreviousVersion) match {
+            case (Some(year), Some(currentVersion), Some(previousVersion))
+                if (year.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+              Some(
+                LinkMessage(
+                  "financialDetailsCheckYourAnswersController.viewOnly.link",
+                  controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+                    .onPreviousViewOnly(
+                      srn,
+                      year,
+                      currentVersion,
+                      previousVersion
+                    )
+                    .url
                 )
-              case _ => None
-            },
-            submittedText =
-              compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
-            title = "financialDetailsCheckYourAnswersController.viewOnly.title",
-            heading = "financialDetailsCheckYourAnswersController.viewOnly.heading",
-            buttonText = "site.return.to.tasklist",
-            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-                controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
-                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
-              case _ =>
-                controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
-                  .onSubmit(srn, mode)
-            }
-          )
+              )
+            case _ => None
+          },
+          submittedText =
+            compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+          title = "financialDetailsCheckYourAnswersController.viewOnly.title",
+          heading = "financialDetailsCheckYourAnswersController.viewOnly.heading",
+          buttonText = "site.return.to.tasklist",
+          onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+            case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+              controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+                .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+            case _ =>
+              controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+                .onSubmit(srn, mode)
+          }
         )
-      } else {
-        None
-      }
+      )
     )
 
   private def sections(

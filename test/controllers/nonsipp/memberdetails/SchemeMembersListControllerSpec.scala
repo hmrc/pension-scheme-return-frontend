@@ -38,14 +38,14 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
 
   private val userAnswersWithMembersDetails = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.Active)
+    .unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New)
     .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
   private val userAnswersWith300MembersDetails =
     (1 to 300).foldLeft(defaultUserAnswers)(
       (ua, i) =>
         ua.unsafeSet(MemberDetailsPage(srn, refineV[OneTo300](i).value), memberDetails)
-          .unsafeSet(MemberStatus(srn, refineV[OneTo300](i).value), MemberState.Active)
+          .unsafeSet(MemberStatus(srn, refineV[OneTo300](i).value), MemberState.New)
     )
 
   private val index = 1

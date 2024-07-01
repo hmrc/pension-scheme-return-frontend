@@ -25,15 +25,19 @@ import config.Refined.Max300
 import controllers.PSRController
 import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
+import pages.nonsipp.memberpayments.Paths.membersPayments
 import play.api.i18n.MessagesApi
 import viewmodels.implicits._
 import utils.MessageUtils.booleanToMessage
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import navigation.Navigator
 import uk.gov.hmrc.domain.Nino
+import play.api.Logger
+import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
+import pages.nonsipp.memberpayments.Omitted
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -52,6 +56,8 @@ class SchemeMemberDetailsAnswersController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
+  private val logger = Logger(getClass)
+
   def onPageLoad(srn: Srn, index: Max300, checkOrChange: CheckOrChange): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val result = for {
@@ -66,12 +72,33 @@ class SchemeMemberDetailsAnswersController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, checkOrChange: CheckOrChange): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      for {
-        updatedUserAnswers <- Future.fromTry(
-          request.userAnswers
-            .set(MemberStatus(srn, index), MemberState.Active)
-            .set(MemberDetailsCompletedPage(srn, index), SectionCompleted)
+      lazy val memberPaymentsChanged = request.pureUserAnswers.exists(
+        !_.sameAs(request.userAnswers, membersPayments, Omitted.membersPayments: _*)
+      )
+
+      lazy val justAdded = checkOrChange.isCheck &&
+        (
+          request.userAnswers.get(MemberStatus(srn, index)).isEmpty ||
+            !request.userAnswers.get(MemberStatus(srn, index)).exists(_.changed)
         )
+
+      for {
+        updatedUserAnswers <- request.userAnswers
+        // Only set member state to CHANGED if something has actually changed
+        // CHANGED status is checked in the transformer later on to make sure this is the status we want to send to ETMP
+          .setWhen(
+            checkOrChange.isChange && memberPaymentsChanged
+          )(
+            MemberStatus(srn, index), {
+              logger.info(s"Something has changed for member index $index, setting state to CHANGED")
+              MemberState.Changed
+            }
+          )
+          // If member is already CHANGED, do not override with NEW if user goes back to CYA page on check mode
+          .setWhen(justAdded)(MemberStatus(srn, index), MemberState.New)
+          .setWhen(justAdded)(SafeToHardDelete(srn, index), Flag)
+          .set(MemberDetailsCompletedPage(srn, index), SectionCompleted)
+          .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
           srn,

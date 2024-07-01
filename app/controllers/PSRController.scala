@@ -27,6 +27,7 @@ import play.api.libs.json.{Reads, Writes}
 import models.backend.responses.{IndividualDetails, PsrVersionsResponse}
 import models.{DateRange, UserAnswers}
 import cats.Applicative
+import viewmodels.models.Flag
 import models.requests.DataRequest
 import eu.timepit.refined.api.{Refined, Validate}
 import cats.syntax.either._
@@ -159,6 +160,7 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
 
   implicit class UserAnswersTryOps(userAnswers: Try[UserAnswers]) {
     def set[A: Writes](page: Settable[A], value: A): Try[UserAnswers] = userAnswers.flatMap(_.set(page, value))
+    def set(page: Settable[Flag]): Try[UserAnswers] = userAnswers.flatMap(_.set(page, Flag))
     def setWhen[A: Writes](bool: Boolean)(page: Settable[A], value: A): Try[UserAnswers] =
       userAnswers.flatMap(_.setWhen(bool)(page, value))
     def compose(c: List[UserAnswers.Compose]): Try[UserAnswers] = userAnswers.flatMap(_.compose(c))

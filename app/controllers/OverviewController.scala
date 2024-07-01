@@ -48,6 +48,7 @@ class OverviewController @Inject()(
   allowAccess: AllowAccessActionProvider,
   getData: DataRetrievalAction,
   createData: DataCreationAction,
+  identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   psrOverviewService: PsrOverviewService,
   psrVersionsService: PsrVersionsService,
@@ -201,6 +202,7 @@ class OverviewController @Inject()(
           }
       }
     }
+
   def onPageLoad(srn: Srn): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).async { implicit request =>
       val toDate = formatDateForApi(allDates.toList.head._2.from)
@@ -239,42 +241,24 @@ class OverviewController @Inject()(
     }
 
   def onSelectContinue(srn: Srn, taxYear: String, version: String, reportType: String): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData).async { implicit request =>
+    identifyAndRequireData(srn, taxYear, version).async { _ =>
       reportType match {
         case PsrReportType.Sipp.name =>
           val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippContinueJourney}"
           Future.successful(Redirect(sippUrl))
         case _ =>
-          for {
-            updatedUserAnswers <- psrRetrievalService.getStandardPsrDetails(
-              None,
-              Some(taxYear),
-              Some(version),
-              controllers.routes.OverviewController.onPageLoad(srn)
-            )
-            _ <- saveService.save(updatedUserAnswers)
-            _ <- saveService.save(updatedUserAnswers.copy(id = UNCHANGED_SESSION_PREFIX + updatedUserAnswers.id))
-          } yield {
-            Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
-          }
+          Future.successful(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
       }
     }
 
   def onSelectViewAndChange(srn: Srn, fbNumber: String, reportType: String): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData).async { implicit request =>
+    identifyAndRequireData(srn, fbNumber).async { _ =>
       reportType match {
         case PsrReportType.Sipp.name =>
           val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippViewAndChange}?fbNumber=$fbNumber"
           Future.successful(Redirect(sippUrl))
         case _ =>
-          for {
-            updatedUserAnswers <- psrRetrievalService
-              .getStandardPsrDetails(Some(fbNumber), None, None, controllers.routes.OverviewController.onPageLoad(srn))
-            _ <- saveService.save(updatedUserAnswers)
-            _ <- saveService.save(updatedUserAnswers.copy(id = UNCHANGED_SESSION_PREFIX + updatedUserAnswers.id))
-          } yield {
-            Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
-          }
+          Future.successful(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
       }
     }
 }

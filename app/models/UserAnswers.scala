@@ -22,6 +22,7 @@ import models.UserAnswers.SensitiveJsObject
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive}
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import viewmodels.models.Flag
 import play.api.data.Form
 import uk.gov.hmrc.crypto.json.JsonEncryption
 
@@ -56,6 +57,8 @@ final case class UserAnswers(
   def fillForm[A, B](page: Gettable[B], form: Form[A])(implicit reads: Reads[B], transform: Transform[A, B]): Form[A] =
     get(page).fold(form)(b => form.fill(transform.from(b)))
 
+  def set(page: Settable[Flag]): Try[UserAnswers] = set[Flag](page, Flag)
+
   def set[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] =
     page
       .cleanup(Some(value), self)
@@ -78,6 +81,16 @@ final case class UserAnswers(
     }
   }
 
+  def sameAs(other: UserAnswers, path: JsPath, omit: String*): Boolean = {
+    val removeEmptyObjects: JsValue => JsObject = _.as[JsObject].value.foldLeft(JsObject.empty) {
+      case (obj, (_, JsObject(value))) if value.isEmpty => obj
+      case (obj, (key, newObj)) => obj ++ Json.obj(key -> newObj)
+    }
+
+    val sanitisedObject = omit.foldLeft(removeEmptyObjects)((a, toOmit) => a.andThen(_ - toOmit))
+    this.get(path).map(sanitisedObject) == other.get(path).map(sanitisedObject)
+  }
+
   def compose(c: List[UserAnswers.Compose]): Try[UserAnswers] = c.foldLeft(Try(this))((ua, next) => next(ua))
 
   def remove(page: Removable[_]): Try[UserAnswers] =
@@ -95,7 +108,7 @@ final case class UserAnswers(
   def remove(pages: List[Removable[_]]): Try[UserAnswers] =
     pages.foldLeft(Try(this))((ua, page) => ua.flatMap(_.removeOnly(page)))
 
-  def setWhen[A](bool: Boolean)(page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] =
+  def setWhen[A](bool: Boolean)(page: Settable[A], value: => A)(implicit writes: Writes[A]): Try[UserAnswers] =
     if (bool) setOnly(page, value) else Try(this)
 
   def removeWhen(bool: Boolean)(page: Removable[_]*): Try[UserAnswers] =
@@ -169,6 +182,8 @@ object UserAnswers {
 
   def set[A: Writes](page: Settable[A], value: A): UserAnswers => Try[UserAnswers] = _.set(page, value)
 
+  def set(page: Settable[Flag]): UserAnswers => Try[UserAnswers] = set[Flag](page, Flag)
+
   def remove[A](page: Removable[A]): UserAnswers => Try[UserAnswers] = _.remove(page)
 
   def softRemove[A: Reads: Writes](page: SoftRemovable[A]): UserAnswers => Try[UserAnswers] = _.softRemove(page)
@@ -209,6 +224,8 @@ object UserAnswers {
   object implicits {
     implicit class UserAnswersTryOps(ua: Try[UserAnswers]) {
       def set[A: Writes](page: Settable[A], value: A): Try[UserAnswers] = ua.flatMap(_.set(page, value))
+
+      def set(page: Settable[Flag]): Try[UserAnswers] = ua.flatMap(_.set(page))
 
       def remove(page: Removable[_]): Try[UserAnswers] = ua.flatMap(_.remove(page))
 

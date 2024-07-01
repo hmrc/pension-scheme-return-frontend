@@ -92,11 +92,16 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
       .map { response =>
         response.status match {
           case OK =>
+            logger.info(s"Getting standard PSR for pstr $pstr with params $queryParams returned OK.")
             Json.parse(response.body).validate[PsrSubmission] match {
               case JsSuccess(data, _) => Some(data)
               case JsError(errors) => throw JsResultException(errors)
             }
-          case NOT_FOUND => None
+          case NOT_FOUND =>
+            logger.info(
+              s"Getting standard PSR for pstr $pstr returned NOT_FOUND. fbNumber $optFbNumber - periodStartDate $optPeriodStartDate - psrVersion $optPsrVersion"
+            )
+            None
           case _ =>
             throw GetPsrException(s"${response.body}", fallBackCall.url, AnswersSavedDisplayVersion.NoDisplay)
         }

@@ -25,5 +25,9 @@ case class MemberPaymentsRecordVersionPage(srn: Srn) extends QuestionPage[String
 
   override def path: JsPath = membersPayments \ toString
 
-  override def toString: String = "recordVersion"
+  override def toString: String = MemberPaymentsRecordVersionPage.key
+}
+
+object MemberPaymentsRecordVersionPage {
+  val key = "recordVersion"
 }
