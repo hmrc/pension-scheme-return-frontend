@@ -23,7 +23,7 @@ import controllers.ControllerBaseSpec
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
-import models.NormalMode
+import models.{NormalMode, ViewOnlyMode}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
@@ -96,7 +96,7 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 
-  "TransfersOutCYAController in view only mode" - {
+  "PclsCYAController in view only mode" - {
 
     val currentUserAnswers = defaultUserAnswers
       .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
@@ -107,25 +107,25 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index), lumpSumAmounts)
 
-//    act.like(
-//      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-//        implicit app => implicit request =>
-//          injected[CheckYourAnswersView].apply(
-//            viewModel(
-//              srn,
-//              memberDetails.fullName,
-//              index,
-//              lumpSumAmounts,
-//              ViewOnlyMode,
-//              viewOnlyUpdated = false,
-//              optYear = Some(yearString),
-//              optCurrentVersion = Some(submissionNumberTwo),
-//              optPreviousVersion = Some(submissionNumberOne),
-//              compilationOrSubmissionDate = Some(submissionDateOne)
-//            )
-//          )
-//      }
-//    )
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              srn,
+              memberDetails.fullName,
+              index,
+              lumpSumAmounts,
+              ViewOnlyMode,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateOne)
+            )
+          )
+      }
+    )
 
     act.like(
       redirectToPage(
