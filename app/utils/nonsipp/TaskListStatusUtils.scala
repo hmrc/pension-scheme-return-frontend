@@ -710,34 +710,6 @@ object TaskListStatusUtils {
         }
     }
 
-  private def getDisposalIncompleteIndex[A, B](
-    firstPages: Option[Map[String, Map[String, A]]],
-    lastPages: Option[Map[String, Map[String, B]]]
-  ): (Int, Int) =
-    (firstPages, lastPages) match {
-      case (None, _) => (1, 1)
-      case (Some(_), None) => (1, 1)
-      case (Some(first), Some(last)) =>
-        if (first.isEmpty) {
-          (1, 1)
-        } else {
-          val firstPageIndexes = first.map(x => x._2.map(_._1.toInt)).zipWithIndex.toList
-          val lastPageIndexes = last.map(x => x._2.map(_._1.toInt)).zipWithIndex.toList
-          val filtered = firstPageIndexes.filter(lastPageIndexes.indexOf(_) < 0)
-
-          if (filtered.isEmpty) {
-            (0, 0)
-          } else {
-            // compare second index
-            val firstPageDisposalIndexes = filtered.head._1.toList
-            val firstPageIndex = filtered.head._2
-            val lastPageDisposalIndexes = lastPageIndexes(firstPageIndex)._1.toList
-            val diff = firstPageDisposalIndexes.filter(lastPageDisposalIndexes.indexOf(_) < 0)
-            (firstPageIndex + 1, diff.head + 1)
-          }
-        }
-    }
-
   def getSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val defaultLink =
       controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController

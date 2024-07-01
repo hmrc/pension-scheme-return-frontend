@@ -36,7 +36,7 @@ class PsrRetrievalService @Inject()(
   sharesTransformer: SharesTransformer,
   assetsTransformer: AssetsTransformer,
   declarationTransformer: DeclarationTransformer
-) {
+) extends PsrBaseService {
 
   def getStandardPsrDetails(
     optFbNumber: Option[String],
@@ -59,7 +59,9 @@ class PsrRetrievalService @Inject()(
         optFbNumber,
         optPeriodStartDate,
         optPsrVersion,
-        fallBackCall
+        fallBackCall,
+        schemeAdministratorOrPractitionerName,
+        request.schemeDetails.schemeName
       )
       .flatMap {
         case Some(psrDetails) =>
