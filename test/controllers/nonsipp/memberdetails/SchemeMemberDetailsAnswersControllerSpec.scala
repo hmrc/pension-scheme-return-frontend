@@ -18,31 +18,49 @@ package controllers.nonsipp.memberdetails
 
 import services.PsrSubmissionService
 import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
+import config.Refined.Max300
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import cats.implicits.catsSyntaxOptionId
 import eu.timepit.refined.refineMV
-import models.{CheckMode, Mode, NormalMode}
-import models.UserAnswers
+import pages.nonsipp.FbVersionPage
+import models._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails._
-import org.mockito.Mockito.{reset, when}
+import org.mockito.Mockito._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.MemberState
+import viewmodels.models.{MemberState, SectionCompleted}
 
 import scala.concurrent.Future
 
 class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
-  private def onPageLoad(mode: Mode) =
-    routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), mode)
-
-  private def onSubmit(mode: Mode) =
-    routes.SchemeMemberDetailsAnswersController.onSubmit(srn, refineMV(1), mode)
+  private val index = refineMV[Max300.Refined](1)
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  private def onPageLoad(mode: Mode) =
+    routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, mode)
+
+  private def onSubmit(mode: Mode) =
+    routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index, mode)
+
+  private lazy val onPageLoadViewOnly = routes.SchemeMemberDetailsAnswersController.onPageLoadViewOnly(
+    srn,
+    index,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private lazy val onSubmitViewOnly = routes.SchemeMemberDetailsAnswersController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -57,14 +75,18 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
   private val noNinoReason = "test reason"
 
   private val userAnswersWithNino = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
-    .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
+    .unsafeSet(FbVersionPage(srn), "002")
+    .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, index), SectionCompleted)
+    .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
+    .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
 
   private val userAnswersWithoutNino = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-    .unsafeSet(NoNINOPage(srn, refineMV(1)), noNinoReason)
+    .unsafeSet(FbVersionPage(srn), "001")
+    .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(DoesMemberHaveNinoPage(srn, index), false)
+    .unsafeSet(NoNINOPage(srn, index), noNinoReason)
 
   "SchemeMemberDetailsCYAController" - {
 
@@ -74,7 +96,16 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
           implicit app =>
             implicit request =>
               injected[CheckYourAnswersView].apply(
-                viewModel(refineMV(1), srn, mode, memberDetails, hasNINO = true, Some(nino), None)
+                viewModel(
+                  index,
+                  srn,
+                  mode,
+                  memberDetails,
+                  hasNINO = true,
+                  Some(nino),
+                  None,
+                  viewOnlyUpdated = true
+                )
               )
         ).withName(s"render correct $mode view when nino provided")
       )
@@ -85,13 +116,14 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
             implicit request =>
               injected[CheckYourAnswersView].apply(
                 viewModel(
-                  refineMV(1),
+                  index,
                   srn,
                   mode,
                   memberDetails,
                   hasNINO = false,
                   None,
-                  Some(noNinoReason)
+                  Some(noNinoReason),
+                  viewOnlyUpdated = true
                 )
               )
         ).withName(s"render the correct $mode view when no nino provided")
@@ -101,7 +133,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
         redirectToPage(
           onPageLoad(mode),
           controllers.routes.JourneyRecoveryController.onPageLoad(),
-          userAnswersWithNino.remove(MemberDetailsPage(srn, refineMV(1))).success.value
+          userAnswersWithNino.remove(MemberDetailsPage(srn, index)).success.value
         ).withName(s"when member details are missing in $mode")
       )
 
@@ -109,7 +141,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
         redirectToPage(
           onPageLoad(mode),
           controllers.routes.JourneyRecoveryController.onPageLoad(),
-          userAnswersWithNino.remove(DoesMemberHaveNinoPage(srn, refineMV(1))).success.value
+          userAnswersWithNino.remove(DoesMemberHaveNinoPage(srn, index)).success.value
         ).withName(s"when does member have NINO is missing in $mode")
       )
 
@@ -117,7 +149,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
         redirectToPage(
           onPageLoad(mode),
           controllers.routes.JourneyRecoveryController.onPageLoad(),
-          userAnswersWithNino.remove(MemberDetailsNinoPage(srn, refineMV(1))).success.value
+          userAnswersWithNino.remove(MemberDetailsNinoPage(srn, index)).success.value
         ).withName(s"when NINO is missing in $mode")
       )
 
@@ -125,7 +157,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
         redirectToPage(
           onPageLoad(mode),
           controllers.routes.JourneyRecoveryController.onPageLoad(),
-          userAnswersWithoutNino.remove(NoNINOPage(srn, refineMV(1))).success.value
+          userAnswersWithoutNino.remove(NoNINOPage(srn, index)).success.value
         ).withName(s"when no NINO reason is missing in $mode")
       )
 
@@ -199,13 +231,14 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
       def buildViewModel(mode: Mode) =
         viewModel(
-          refineMV(1),
+          index,
           srn,
           mode,
           memberDetails,
           hasNINO = true,
           Some(nino),
-          None
+          None,
+          viewOnlyUpdated = true
         )
 
       "contain the correct title" - {
@@ -231,23 +264,81 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
       "contain all rows if has nino is true and nino is present" in {
         val vm =
-          viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = true, Some(nino), None)
+          viewModel(
+            index,
+            srn,
+            NormalMode,
+            memberDetails,
+            hasNINO = true,
+            Some(nino),
+            None,
+            viewOnlyUpdated = true
+          )
         vm.page.sections.map(_.rows.size).sum mustBe 5
       }
 
       "contain all rows if has nino is false and no nino reason is present" in {
         val vm =
           viewModel(
-            refineMV(1),
+            index,
             srn,
             NormalMode,
             memberDetails,
             hasNINO = false,
             None,
-            Some("test reason")
+            Some("test reason"),
+            viewOnlyUpdated = true
           )
         vm.page.sections.map(_.rows.size).sum mustBe 5
       }
     }
+  }
+
+  "SchemeMemberDetailsAnswersController in view only mode" - {
+
+    val currentUserAnswers = defaultUserAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+      .unsafeSet(MemberDetailsCompletedPage(srn, index), SectionCompleted)
+      .unsafeSet(DoesMemberHaveNinoPage(srn, index), false)
+      .unsafeSet(NoNINOPage(srn, index), noNinoReason)
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+
+    act.like(
+      renderView(
+        onPageLoadViewOnly,
+        userAnswers = currentUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[CheckYourAnswersView].apply(
+          viewModel(
+            index,
+            srn,
+            ViewOnlyMode,
+            memberDetails,
+            false,
+            None,
+            Some("test reason"),
+            viewOnlyUpdated = false,
+            optYear = Some(yearString),
+            optCurrentVersion = Some(submissionNumberTwo),
+            optPreviousVersion = Some(submissionNumberOne),
+            compilationOrSubmissionDate = Some(submissionDateTwo)
+          )
+        )
+      }
+    )
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
   }
 }
