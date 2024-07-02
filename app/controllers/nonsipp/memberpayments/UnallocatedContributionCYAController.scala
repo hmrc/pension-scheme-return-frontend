@@ -51,16 +51,13 @@ class UnallocatedContributionCYAController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-
           unallocatedAmount <- request.userAnswers.get(UnallocatedEmployerAmountPage(srn)).getOrRecoverJourney
-
-          schemeName = request.schemeDetails.schemeName
         } yield Ok(
           view(
             UnallocatedContributionCYAController.viewModel(
               ViewModelParameters(
                 srn,
-                schemeName,
+                request.schemeDetails.schemeName,
                 unallocatedAmount,
                 mode
               )
