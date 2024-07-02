@@ -19,10 +19,11 @@ package controllers.nonsipp.memberdetails
 import services.{PsrSubmissionService, SaveService}
 import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
 import pages.nonsipp.memberdetails._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import com.google.inject.Inject
 import config.Refined.Max300
 import controllers.PSRController
+import controllers.nonsipp.routes
 import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
 import pages.nonsipp.memberpayments.Paths.membersPayments
@@ -36,13 +37,15 @@ import play.api.Logger
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
+import models.requests.DataRequest
+import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import pages.nonsipp.memberpayments.Omitted
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
+import java.time.LocalDateTime
 import scala.concurrent.{ExecutionContext, Future}
-
 import javax.inject.Named
 
 class SchemeMemberDetailsAnswersController @Inject()(
@@ -58,7 +61,27 @@ class SchemeMemberDetailsAnswersController @Inject()(
 
   private val logger = Logger(getClass)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(
+                  srn: Srn,
+                  index: Max300,
+                  mode: Mode
+                ): Action[AnyContent] =
+    identifyAndRequireData(srn) { implicit request =>
+      onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicitly)
+    }
+  def onPageLoadViewOnly(
+                          srn: Srn,
+                          index: Max300,
+                          mode: Mode,
+                          year: String,
+                          current: Int,
+                          previous: Int
+                        ): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicitly)
+    }
+
+  def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val result = for {
         memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index))
@@ -69,6 +92,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
 
       result.getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
+
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -109,6 +133,11 @@ class SchemeMemberDetailsAnswersController @Inject()(
       } yield submissionResult.fold(
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       )(_ => Redirect(navigator.nextPage(SchemeMemberDetailsAnswersPage(srn), NormalMode, request.userAnswers)))
+    }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
     }
 }
 
@@ -190,7 +219,12 @@ object SchemeMemberDetailsAnswersController {
     memberDetails: NameDOB,
     hasNINO: Boolean,
     maybeNino: Option[Nino],
-    maybeNoNinoReason: Option[String]
+    maybeNoNinoReason: Option[String],
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel(
       title = mode.fold(normal = "checkYourAnswers.title", check = "changeMemberDetails.title"),
