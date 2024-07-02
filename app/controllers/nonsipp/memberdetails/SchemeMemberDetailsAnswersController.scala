@@ -58,25 +58,25 @@ class SchemeMemberDetailsAnswersController @Inject()(
 
   private val logger = Logger(getClass)
 
-  def onPageLoad(srn: Srn, index: Max300, checkOrChange: CheckOrChange): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val result = for {
         memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index))
         hasNINO <- request.userAnswers.get(DoesMemberHaveNinoPage(srn, index))
         maybeNino <- Option.when(hasNINO)(request.userAnswers.get(MemberDetailsNinoPage(srn, index))).sequence
         maybeNoNinoReason <- Option.when(!hasNINO)(request.userAnswers.get(NoNINOPage(srn, index))).sequence
-      } yield Ok(view(viewModel(index, srn, checkOrChange, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)))
+      } yield Ok(view(viewModel(index, srn, mode, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)))
 
       result.getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(srn: Srn, index: Max300, checkOrChange: CheckOrChange): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       lazy val memberPaymentsChanged = request.pureUserAnswers.exists(
         !_.sameAs(request.userAnswers, membersPayments, Omitted.membersPayments: _*)
       )
 
-      lazy val justAdded = checkOrChange.isCheck &&
+      lazy val justAdded = mode.isNormalMode &&
         (
           request.userAnswers.get(MemberStatus(srn, index)).isEmpty ||
             !request.userAnswers.get(MemberStatus(srn, index)).exists(_.changed)
@@ -87,7 +87,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
         // Only set member state to CHANGED if something has actually changed
         // CHANGED status is checked in the transformer later on to make sure this is the status we want to send to ETMP
           .setWhen(
-            checkOrChange.isChange && memberPaymentsChanged
+            mode.isCheckMode && memberPaymentsChanged
           )(
             MemberStatus(srn, index), {
               logger.info(s"Something has changed for member index $index, setting state to CHANGED")
@@ -104,7 +104,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
           srn,
           updatedUserAnswers,
           fallbackCall = controllers.nonsipp.memberdetails.routes.SchemeMemberDetailsAnswersController
-            .onPageLoad(srn, index, checkOrChange)
+            .onPageLoad(srn, index, mode)
         )
       } yield submissionResult.fold(
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
@@ -186,21 +186,21 @@ object SchemeMemberDetailsAnswersController {
   def viewModel(
     index: Max300,
     srn: Srn,
-    checkOrChange: CheckOrChange,
+    mode: Mode,
     memberDetails: NameDOB,
     hasNINO: Boolean,
     maybeNino: Option[Nino],
     maybeNoNinoReason: Option[String]
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel(
-      title = checkOrChange.fold(check = "checkYourAnswers.title", change = "changeMemberDetails.title"),
-      heading = checkOrChange.fold(
-        check = "checkYourAnswers.heading",
-        change = Message("changeMemberDetails.heading", memberDetails.fullName)
+      title = mode.fold(normal = "checkYourAnswers.title", check = "changeMemberDetails.title"),
+      heading = mode.fold(
+        normal = "checkYourAnswers.heading",
+        check = Message("changeMemberDetails.heading", memberDetails.fullName)
       ),
       CheckYourAnswersViewModel.singleSection(
         rows(index, srn, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)
       ),
-      routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index, checkOrChange)
+      routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index, mode)
     ).withButtonText(Message("site.continue"))
 }

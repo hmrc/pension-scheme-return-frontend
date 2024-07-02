@@ -21,16 +21,16 @@ import pages.nonsipp.memberdetails._
 import controllers.ControllerBaseSpec
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
-import models.CheckOrChange
+import models.{CheckMode, Mode, NormalMode}
 import viewmodels.DisplayMessage.Message
 
 class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
-  private def onPageLoad(checkOrChange: CheckOrChange) =
-    routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), checkOrChange)
+  private def onPageLoad(mode: Mode) =
+    routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), mode)
 
-  private def onSubmit(checkOrChange: CheckOrChange) =
-    routes.SchemeMemberDetailsAnswersController.onSubmit(srn, refineMV(1), checkOrChange)
+  private def onSubmit(mode: Mode) =
+    routes.SchemeMemberDetailsAnswersController.onSubmit(srn, refineMV(1), mode)
 
   private val noNinoReason = "test reason"
 
@@ -46,78 +46,78 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
   "SchemeMemberDetailsCYAController" - {
 
-    List(CheckOrChange.Check, CheckOrChange.Change).foreach { checkOrChange =>
+    List(NormalMode, CheckMode).foreach { mode =>
       act.like(
-        renderView(onPageLoad(checkOrChange), userAnswersWithNino)(
+        renderView(onPageLoad(mode), userAnswersWithNino)(
           implicit app =>
             implicit request =>
               injected[CheckYourAnswersView].apply(
-                viewModel(refineMV(1), srn, checkOrChange, memberDetails, hasNINO = true, Some(nino), None)
+                viewModel(refineMV(1), srn, mode, memberDetails, hasNINO = true, Some(nino), None)
               )
-        ).withName(s"render correct ${checkOrChange.name} view when nino provided")
+        ).withName(s"render correct $mode view when nino provided")
       )
 
       act.like(
-        renderView(onPageLoad(checkOrChange), userAnswersWithoutNino)(
+        renderView(onPageLoad(mode), userAnswersWithoutNino)(
           implicit app =>
             implicit request =>
               injected[CheckYourAnswersView].apply(
                 viewModel(
                   refineMV(1),
                   srn,
-                  checkOrChange,
+                  mode,
                   memberDetails,
                   hasNINO = false,
                   None,
                   Some(noNinoReason)
                 )
               )
-        ).withName(s"render the correct ${checkOrChange.name} view when no nino provided")
+        ).withName(s"render the correct $mode view when no nino provided")
       )
 
       act.like(
         redirectToPage(
-          onPageLoad(checkOrChange),
+          onPageLoad(mode),
           controllers.routes.JourneyRecoveryController.onPageLoad(),
           userAnswersWithNino.remove(MemberDetailsPage(srn, refineMV(1))).success.value
-        ).withName(s"when member details are missing on ${checkOrChange.name}")
+        ).withName(s"when member details are missing in $mode")
       )
 
       act.like(
         redirectToPage(
-          onPageLoad(checkOrChange),
+          onPageLoad(mode),
           controllers.routes.JourneyRecoveryController.onPageLoad(),
           userAnswersWithNino.remove(DoesMemberHaveNinoPage(srn, refineMV(1))).success.value
-        ).withName(s"when does member have NINO is missing on ${checkOrChange.name}")
+        ).withName(s"when does member have NINO is missing in $mode")
       )
 
       act.like(
         redirectToPage(
-          onPageLoad(checkOrChange),
+          onPageLoad(mode),
           controllers.routes.JourneyRecoveryController.onPageLoad(),
           userAnswersWithNino.remove(MemberDetailsNinoPage(srn, refineMV(1))).success.value
-        ).withName(s"when NINO is missing on ${checkOrChange.name}")
+        ).withName(s"when NINO is missing in $mode")
       )
 
       act.like(
         redirectToPage(
-          onPageLoad(checkOrChange),
+          onPageLoad(mode),
           controllers.routes.JourneyRecoveryController.onPageLoad(),
           userAnswersWithoutNino.remove(NoNINOPage(srn, refineMV(1))).success.value
-        ).withName(s"when no NINO reason is missing on ${checkOrChange.name}")
+        ).withName(s"when no NINO reason is missing in $mode")
       )
 
-      act.like(journeyRecoveryPage(onPageLoad(checkOrChange)).updateName(s"onPageLoad on ${checkOrChange.name}" + _))
-      act.like(journeyRecoveryPage(onSubmit(checkOrChange)).updateName(s"onSubmit on ${checkOrChange.name}" + _))
+      act.like(journeyRecoveryPage(onPageLoad(mode)).updateName(s"onPageLoad on $mode " + _))
+      act.like(journeyRecoveryPage(onSubmit(mode)).updateName(s"onSubmit on $mode " + _))
     }
 
     "viewModel" - {
 
-      def buildViewModel(checkOrChange: CheckOrChange) =
+      def buildViewModel(mode: Mode) =
         viewModel(
           refineMV(1),
           srn,
-          checkOrChange,
+          mode,
           memberDetails,
           hasNINO = true,
           Some(nino),
@@ -125,20 +125,20 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
         )
 
       "contain the correct title" - {
-        "CheckOrChange is Check" in {
-          buildViewModel(CheckOrChange.Check).title mustBe Message("checkYourAnswers.title")
+        "NormalMode" in {
+          buildViewModel(NormalMode).title mustBe Message("checkYourAnswers.title")
         }
-        "CheckOrChange is Change" in {
-          buildViewModel(CheckOrChange.Change).title mustBe Message("changeMemberDetails.title")
+        "CheckMode" in {
+          buildViewModel(CheckMode).title mustBe Message("changeMemberDetails.title")
         }
       }
 
       "contain the correct heading" - {
-        "CheckOrChange is Check" in {
-          buildViewModel(CheckOrChange.Check).heading mustBe Message("checkYourAnswers.heading")
+        "NormalMode" in {
+          buildViewModel(NormalMode).heading mustBe Message("checkYourAnswers.heading")
         }
-        "CheckOrChange is Change" in {
-          buildViewModel(CheckOrChange.Change).heading mustBe Message(
+        "CheckMode" in {
+          buildViewModel(CheckMode).heading mustBe Message(
             "changeMemberDetails.heading",
             Message(memberDetails.fullName)
           )
@@ -147,7 +147,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
       "contain all rows if has nino is true and nino is present" in {
         val vm =
-          viewModel(refineMV(1), srn, CheckOrChange.Check, memberDetails, hasNINO = true, Some(nino), None)
+          viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = true, Some(nino), None)
         vm.page.sections.map(_.rows.size).sum mustBe 5
       }
 
@@ -156,7 +156,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
           viewModel(
             refineMV(1),
             srn,
-            CheckOrChange.Check,
+            NormalMode,
             memberDetails,
             hasNINO = false,
             None,

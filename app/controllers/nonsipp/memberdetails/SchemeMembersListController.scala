@@ -28,11 +28,10 @@ import config.Constants
 import cats.implicits.catsSyntaxApplicativeId
 import config.Constants.maxSchemeMembers
 import forms.YesNoPageFormProvider
-import models.{ManualOrUpload, Mode, Pagination}
+import models._
 import controllers.nonsipp.memberdetails.SchemeMembersListController._
 import play.api.i18n.MessagesApi
 import play.api.data.Form
-import models.CheckOrChange.Change
 import views.html.ListView
 import models.SchemeId.Srn
 import controllers.actions._
@@ -166,7 +165,7 @@ object SchemeMembersListController {
           val index = refineV[Max300.Refined](unrefinedIndex.toInt + 1).toOption.get
           ListRow(
             memberFullName,
-            changeUrl = routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Change).url,
+            changeUrl = routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckMode).url,
             changeHiddenText = Message("schemeMembersList.change.hidden", memberFullName),
             removeUrl = routes.RemoveMemberDetailsController.onPageLoad(srn, index, mode).url,
             removeHiddenText = Message("schemeMembersList.remove.hidden", memberFullName)

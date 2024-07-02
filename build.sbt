@@ -25,7 +25,6 @@ lazy val root = Project(appName, file("."))
     scalafixScalaBinaryVersion := "2.13",
     RoutesKeys.routesImport ++= Seq(
       "models._",
-      "models.CheckOrChange._",
       "models.ManualOrUpload._",
       "models.SchemeId._",
       "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl",
