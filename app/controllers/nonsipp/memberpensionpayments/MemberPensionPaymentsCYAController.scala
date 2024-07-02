@@ -23,18 +23,22 @@ import controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAControl
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.Max300
 import controllers.PSRController
-import navigation.Navigator
+import controllers.nonsipp.routes
 import models._
 import play.api.i18n.MessagesApi
+import models.requests.DataRequest
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsCYAPage, TotalAmountPensionPaymentsPage}
 import controllers.actions.IdentifyAndRequireData
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
+import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
 class MemberPensionPaymentsCYAController @Inject()(
@@ -53,32 +57,50 @@ class MemberPensionPaymentsCYAController @Inject()(
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
-          pensionPayment <- request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index))
-          optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
-        } yield optionList(index.value - 1)
-          .map(_.fullName)
-          .getOrRecoverJourney
-          .map(
-            memberName =>
-              Ok(
-                view(
-                  viewModel(
-                    ViewModelParameters(
-                      srn,
-                      memberName,
-                      index,
-                      pensionPayment,
-                      mode
-                    )
-                  )
+      onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicitly)
+    }
+
+  def onPageLoadViewOnly(
+    srn: Srn,
+    index: Max300,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicitly)
+    }
+
+  def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+    (
+      for {
+        pensionPayment <- request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index))
+        optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
+      } yield optionList(index.value - 1)
+        .map(_.fullName)
+        .getOrRecoverJourney
+        .map(
+          memberName =>
+            Ok(
+              view(
+                viewModel(
+                  srn,
+                  memberName,
+                  index,
+                  pensionPayment,
+                  mode,
+                  viewOnlyUpdated = false,
+                  optYear = request.year,
+                  optCurrentVersion = request.currentVersion,
+                  optPreviousVersion = request.previousVersion,
+                  compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
                 )
               )
-          )
-          .merge
-      ).get
-    }
+            )
+        )
+        .merge
+    ).get
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -94,41 +116,81 @@ class MemberPensionPaymentsCYAController @Inject()(
             Redirect(navigator.nextPage(MemberPensionPaymentsCYAPage(srn), mode, request.userAnswers))
         }
     }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+    }
 }
 
-case class ViewModelParameters(
-  srn: Srn,
-  memberName: String,
-  index: Max300,
-  pensionPayments: Money,
-  mode: Mode
-)
 object MemberPensionPaymentsCYAController {
-  def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
+  def viewModel(
+    srn: Srn,
+    memberName: String,
+    index: Max300,
+    pensionPayments: Money,
+    mode: Mode,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = parameters.mode
-        .fold(normal = "MemberPensionPaymentsCYA.title", check = "MemberPensionPaymentsCYA.change.title"),
-      heading = parameters.mode.fold(
+      mode = mode,
+      title = mode.fold(
+        normal = "MemberPensionPaymentsCYA.title",
+        check = "MemberPensionPaymentsCYA.change.title",
+        viewOnly = "MemberPensionPaymentsCYA.viewOnly.title"
+      ),
+      heading = mode.fold(
         normal = "MemberPensionPaymentsCYA.heading",
         check = Message(
           "MemberPensionPaymentsCYA.change.heading",
-          parameters.memberName
-        )
+          memberName
+        ),
+        viewOnly = Message("MemberPensionPaymentsCYA.viewOnly.heading", memberName)
       ),
       description = None,
       page = CheckYourAnswersViewModel(
         sections(
-          parameters.srn,
-          parameters.memberName,
-          parameters.index,
-          parameters.pensionPayments,
-          CheckMode
+          srn,
+          memberName,
+          index,
+          pensionPayments,
+          mode match {
+            case ViewOnlyMode => NormalMode
+            case _ => mode
+          }
         )
       ),
       refresh = None,
-      buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
+      buttonText =
+        mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
       onSubmit = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-        .onSubmit(parameters.srn, parameters.index, parameters.mode)
+        .onSubmit(srn, index, mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = None,
+            submittedText = Some(Message("")),
+            title = "MemberPensionPaymentsCYA.viewOnly.title",
+            heading = Message("MemberPensionPaymentsCYA.viewOnly.heading", memberName),
+            buttonText = "site.return.to.tasklist",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
+                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
+                  .onSubmit(srn, index, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
 
   private def sections(

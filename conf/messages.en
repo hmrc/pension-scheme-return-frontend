@@ -2574,9 +2574,12 @@ MemberPensionPaymentsCYA.change.title = Change details of taxable pension paymen
 MemberPensionPaymentsCYA.heading = Check your answers
 MemberPensionPaymentsCYA.change.heading = Change details of taxable pension payments for {0}
 MemberPensionPaymentsCYA.section.memberName.header = Member’s name
-MemberPensionPaymentsCYA.section.memberName = Taxable amount of pension payments received by {0}
+MemberPensionPaymentsCYA.section.memberName = Gross amount of pension payments received by {0}
 MemberPensionPaymentsCYA.section.amount = £ {0}
-MemberPensionPaymentsCYA.section.hide = Taxable amount of pension payments received by {0}
+MemberPensionPaymentsCYA.section.hide = Gross amount of pension payments received by {0}
+MemberPensionPaymentsCYA.viewOnly.title = Pension payments for this member
+MemberPensionPaymentsCYA.viewOnly.heading = Pension payments for {0}
+MemberPensionPaymentsCYA.viewOnly.link = View previous version of member contribution (opens in new tab)
 
 removePensionPayments.title = Are you sure you want to remove the pension payments for this member?
 removePensionPayments.heading = Are you sure you want to remove the pension payments of £{0} for {1}?
