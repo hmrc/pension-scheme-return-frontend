@@ -17,7 +17,7 @@
 package controllers.nonsipp.membertransferout
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc._
 import config.Refined._
@@ -37,6 +37,7 @@ import utils.DateTimeUtils.localDateShow
 import models._
 import pages.nonsipp.membertransferout._
 import play.api.i18n.MessagesApi
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
@@ -130,11 +131,11 @@ class TransfersOutCYAController @Inject()(
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
-        updatedUserAnswers <- Future.fromTry(
-          request.userAnswers
-            .set(TransfersOutJourneyStatus(srn), SectionStatus.InProgress)
-            .remove(TransferOutMemberListPage(srn))
-        )
+        updatedUserAnswers <- request.userAnswers
+          .set(TransfersOutJourneyStatus(srn), SectionStatus.InProgress)
+          .setWhen(memberPaymentsChanged)(MemberStatus(srn, index), MemberState.Changed)
+          .remove(TransferOutMemberListPage(srn))
+          .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
           srn,

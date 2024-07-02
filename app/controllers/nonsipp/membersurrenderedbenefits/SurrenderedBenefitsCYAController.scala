@@ -17,7 +17,7 @@
 package controllers.nonsipp.membersurrenderedbenefits
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max300
@@ -33,6 +33,7 @@ import utils.DateTimeUtils.localDateShow
 import models.{CheckMode, Mode, Money}
 import play.api.i18n.MessagesApi
 import viewmodels.Margin
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -87,12 +88,12 @@ class SurrenderedBenefitsCYAController @Inject()(
   def onSubmit(srn: Srn, memberIndex: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
-        updatedUserAnswers <- Future.fromTry(
-          request.userAnswers
-            .set(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.InProgress)
-            .set(SurrenderedBenefitsCompletedPage(srn, memberIndex), SectionCompleted)
-            .remove(SurrenderedBenefitsMemberListPage(srn))
-        )
+        updatedUserAnswers <- request.userAnswers
+          .set(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.InProgress)
+          .set(SurrenderedBenefitsCompletedPage(srn, memberIndex), SectionCompleted)
+          .setWhen(memberPaymentsChanged)(MemberStatus(srn, memberIndex), MemberState.Changed)
+          .remove(SurrenderedBenefitsMemberListPage(srn))
+          .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
           srn,

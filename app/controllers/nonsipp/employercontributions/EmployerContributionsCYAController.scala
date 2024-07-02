@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.employercontributions
 
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
@@ -35,6 +35,7 @@ import cats.data.EitherT
 import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.{Heading2, Message}
 import viewmodels.models._
 
@@ -82,7 +83,10 @@ class EmployerContributionsCYAController @Inject()(
       (
         for {
           userAnswers <- EitherT(userAnswersWithJourneysCompleted.pure[Future])
-          updatedAnswers <- Future.fromTry(userAnswers).liftF
+          updatedAnswers <- userAnswers
+            .setWhen(memberPaymentsChanged)(MemberStatus(srn, index), MemberState.Changed)
+            .mapK[Future]
+            .liftF
           _ <- saveService.save(updatedAnswers).liftF
           submissionResult <- psrSubmissionService
             .submitPsrDetailsWithUA(
