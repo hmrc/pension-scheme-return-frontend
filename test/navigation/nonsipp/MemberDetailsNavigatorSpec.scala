@@ -23,7 +23,7 @@ import generators.IndexGen
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
-import models.{CheckOrChange, ManualOrUpload, UploadFormatError}
+import models._
 import eu.timepit.refined.api.Refined
 import utils.BaseSpec
 import pages.nonsipp.memberdetails._
@@ -102,7 +102,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             MemberDetailsNinoPage(_, refineMV(1)),
-            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check)
+            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), NormalMode)
           )
           .withName("go from nino page to check answers page")
       )
@@ -111,7 +111,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             NoNINOPage(_, refineMV(1)),
-            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check)
+            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), NormalMode)
           )
           .withName("go from no nino page to scheme member details answers page")
       )
@@ -294,7 +294,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         checkmode
           .navigateTo(
             MemberDetailsPage(_, refineMV(1)),
-            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Change)
+            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckMode)
           )
           .withName("go from member details page to check answers page")
       )
@@ -303,7 +303,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         checkmode
           .navigateTo(
             MemberDetailsNinoPage(_, refineMV(1)),
-            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Change)
+            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckMode)
           )
           .withName("go from member details nino page to check your answers page")
       )
@@ -312,7 +312,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         checkmode
           .navigateTo(
             NoNINOPage(_, refineMV(1)),
-            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Change)
+            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckMode)
           )
           .withName("go from no nino page to check your answers page")
       )
@@ -349,7 +349,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithData(
               DoesMemberHaveNinoPage(_, refineMV(1)),
               Gen.const(true),
-              (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Change),
+              (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckMode),
               userAnswersWithNino
             )
             .withName("check answers page when yes selected and nino exists")
@@ -360,7 +360,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithData(
               DoesMemberHaveNinoPage(_, refineMV(1)),
               Gen.const(false),
-              (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Change),
+              (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckMode),
               userAnswersWithNoNinoReason
             )
             .withName("check answers page when no selected and no nino reason exists")
