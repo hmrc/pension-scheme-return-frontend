@@ -16,13 +16,23 @@
 
 package controllers.nonsipp.memberdetails
 
+import services.PsrSubmissionService
 import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
-import pages.nonsipp.memberdetails._
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
 import views.html.CheckYourAnswersView
+import cats.implicits.catsSyntaxOptionId
 import eu.timepit.refined.refineMV
 import models.{CheckMode, Mode, NormalMode}
+import models.UserAnswers
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.memberdetails._
+import org.mockito.Mockito.{reset, when}
 import viewmodels.DisplayMessage.Message
+import viewmodels.models.MemberState
+
+import scala.concurrent.Future
 
 class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
@@ -31,6 +41,18 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
   private def onSubmit(mode: Mode) =
     routes.SchemeMemberDetailsAnswersController.onSubmit(srn, refineMV(1), mode)
+
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   private val noNinoReason = "test reason"
 
@@ -109,6 +131,68 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
       act.like(journeyRecoveryPage(onPageLoad(mode)).updateName(s"onPageLoad on $mode " + _))
       act.like(journeyRecoveryPage(onSubmit(mode)).updateName(s"onSubmit on $mode " + _))
+    }
+
+    "Member status" - {
+
+      "on Check" - {
+
+        act.like(
+          saveAndContinue(
+            onSubmit(NormalMode),
+            userAnswersWithNino,
+            (ua: UserAnswers) => List(ua.get(MemberStatus(srn, refineMV(1))).exists(_._new))
+          ).withName(s"Set Member status to New when Status is Check and its a new member (no previous member state)")
+        )
+
+        act.like(
+          saveAndContinue(
+            onSubmit(NormalMode),
+            userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.Changed),
+            (ua: UserAnswers) => List(ua.get(MemberStatus(srn, refineMV(1))).exists(_.changed))
+          ).withName(s"DO NOT Set Member status to New when Status is Check and member already has a state of Changed")
+        )
+      }
+
+      "on Change" - {
+
+        act.like(
+          saveAndContinue(
+            call = onSubmit(CheckMode),
+            userAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New),
+            pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New).some,
+            expectations = (ua: UserAnswers) =>
+              List(
+                ua.get(MemberStatus(srn, refineMV(1))).exists(_._new),
+                ua.get(SafeToHardDelete(srn, refineMV(1))).isEmpty
+              )
+          ).withName(s"DO NOT Set Member status to Changed when member details have not changed")
+        )
+
+        act.like(
+          saveAndContinue(
+            call = onSubmit(CheckMode),
+            userAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.Changed),
+            pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New).some,
+            expectations = (ua: UserAnswers) =>
+              List(
+                ua.get(MemberStatus(srn, refineMV(1))).exists(_.changed),
+                ua.get(SafeToHardDelete(srn, refineMV(1))).isEmpty
+              )
+          ).withName(s"Set Member status to Changed when a member detail has changed")
+        )
+
+        act.like(
+          saveAndContinue(
+            onSubmit(CheckMode),
+            userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New),
+            pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New).some,
+            (ua: UserAnswers) => List(ua.get(MemberStatus(srn, refineMV(1))).exists(_._new))
+          ).withName(
+            s"Keep Member status as New when member state is New and member details have not changed"
+          )
+        )
+      }
     }
 
     "viewModel" - {

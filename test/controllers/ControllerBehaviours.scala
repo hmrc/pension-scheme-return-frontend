@@ -182,7 +182,9 @@ trait ControllerBehaviours {
   def saveAndContinue(
     call: => Call,
     userAnswers: UserAnswers,
+    pureUserAnswers: Option[UserAnswers],
     expectedDataPath: Option[JsPath],
+    expectations: UserAnswers => List[Boolean],
     form: (String, String)*
   ): BehaviourTest =
     s"save data and continue to next page with ${form.toList.toString()}".hasBehaviour {
@@ -191,7 +193,7 @@ trait ControllerBehaviours {
       val userDetailsCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(saveService.save(userDetailsCaptor.capture())(any(), any())).thenReturn(Future.successful(()))
 
-      val appBuilder = applicationBuilder(Some(userAnswers))
+      val appBuilder = applicationBuilder(Some(userAnswers), pureUserAnswers = pureUserAnswers)
         .overrides(
           bind[SaveService].toInstance(saveService)
         )
@@ -212,17 +214,43 @@ trait ControllerBehaviours {
           val data = userDetailsCaptor.getValue.data.decryptedValue
           assert(expectedDataPath.get(data).nonEmpty)
         }
+
+        expectations(userDetailsCaptor.getValue).foreach(e => assert(e))
       }
     }
 
+  def saveAndContinue(
+    call: => Call,
+    userAnswers: UserAnswers,
+    expectedDataPath: Option[JsPath],
+    form: (String, String)*
+  ): BehaviourTest =
+    saveAndContinue(call, userAnswers, None, expectedDataPath, _ => Nil, form: _*)
+
+  def saveAndContinue(
+    call: => Call,
+    userAnswers: UserAnswers = defaultUserAnswers,
+    pureUserAnswers: Option[UserAnswers] = None,
+    expectations: UserAnswers => List[Boolean] = _ => Nil,
+    form: List[(String, String)] = Nil
+  ): BehaviourTest =
+    saveAndContinue(call, userAnswers, pureUserAnswers, None, expectations, form: _*)
+
+  def saveAndContinue(
+    call: => Call,
+    userAnswers: UserAnswers,
+    expectations: UserAnswers => List[Boolean]
+  ): BehaviourTest =
+    saveAndContinue(call, userAnswers, None, None, expectations, Nil: _*)
+
   def saveAndContinue(call: => Call, form: (String, String)*): BehaviourTest =
-    saveAndContinue(call, defaultUserAnswers, defaultExpectedDataPath, form: _*)
+    saveAndContinue(call, defaultUserAnswers, None, defaultExpectedDataPath, _ => Nil, form: _*)
 
   def saveAndContinue(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
-    saveAndContinue(call, userAnswers, defaultExpectedDataPath, form: _*)
+    saveAndContinue(call, userAnswers, None, defaultExpectedDataPath, _ => Nil, form: _*)
 
   def saveAndContinue(call: => Call, jsPathOption: Option[JsPath], form: (String, String)*): BehaviourTest =
-    saveAndContinue(call, defaultUserAnswers, jsPathOption, form: _*)
+    saveAndContinue(call, defaultUserAnswers, None, jsPathOption, _ => Nil, form: _*)
 
   def continueNoSave(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
     "continue to the next page without saving".hasBehaviour {

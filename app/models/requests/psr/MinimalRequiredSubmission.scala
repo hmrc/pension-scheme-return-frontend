@@ -18,6 +18,7 @@ package models.requests.psr
 
 import cats.data.NonEmptyList
 import play.api.libs.json._
+import viewmodels.models.PSRStatus
 
 import java.time.{LocalDate, LocalDateTime}
 
@@ -29,7 +30,7 @@ case class MinimalRequiredSubmission(
 
 case class ReportDetails(
   fbVersion: Option[String],
-  fbstatus: Option[String],
+  fbstatus: Option[PSRStatus],
   pstr: String,
   periodStart: LocalDate,
   periodEnd: LocalDate,

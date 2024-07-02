@@ -181,10 +181,13 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
       ua11 <- minimalRequiredSubmission.reportDetails.fbVersion
         .map(rv => ua10.set(FbVersionPage(srn), rv))
         .getOrElse(Try(ua10))
-      ua12 <- minimalRequiredSubmission.reportDetails.compilationOrSubmissionDate
-        .map(rv => ua11.set(CompilationOrSubmissionDatePage(srn), rv))
+      ua12 <- minimalRequiredSubmission.reportDetails.fbstatus
+        .map(rv => ua11.set(FbStatus(srn), rv))
         .getOrElse(Try(ua11))
+      ua13 <- minimalRequiredSubmission.reportDetails.compilationOrSubmissionDate
+        .map(rv => ua12.set(CompilationOrSubmissionDatePage(srn), rv))
+        .getOrElse(Try(ua12))
     } yield {
-      ua12
+      ua13
     }
 }

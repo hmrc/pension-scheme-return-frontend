@@ -46,14 +46,14 @@ import pages.nonsipp.receivetransfer.{
 }
 import models.requests.psr._
 import models.UserAnswers.implicits._
-import pages.nonsipp.FbVersionPage
+import pages.nonsipp.{FbStatus, FbVersionPage}
 import play.api.Logger
 import uk.gov.hmrc.domain.Nino
 import pages.nonsipp.memberpayments._
 import config.Refined.Max300.Refined
 import viewmodels.models._
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 
 import javax.inject.Inject
 
@@ -106,6 +106,8 @@ class MemberPaymentsTransformer @Inject()(
           }
         )
 
+      val psrState: Option[PSRStatus] = userAnswers.get(FbStatus(srn))
+
       /**
        * if member state is CHANGED, check if the status was set in this session by comparing to initial UserAnswers (ETMP GET snapshot)
        * if it was, check if there is a previous version of the member. If previous member state exists:
@@ -113,14 +115,21 @@ class MemberPaymentsTransformer @Inject()(
        * - else change to NEW as the member has not been part of a declaration yet
        */
       val memberDetailsWithCorrectState = currentMemberDetails.map {
-        _ -> previousVersionUA match {
-          case ((index, currentMemberDetail), _)
+        _ -> psrState -> previousVersionUA match {
+          // new member created and changed while in interim Submitted state
+          case (((index, currentMemberDetail), Some(Submitted)), None)
+              if currentMemberDetail.state.changed && currentMemberDetail.memberPSRVersion.isEmpty =>
+            (index, currentMemberDetail.copy(state = MemberState.New))
+          // member created before first submission and changed before first POST since first submission (interim Submitted state)
+          case (((index, currentMemberDetail), Some(Submitted)), None) if currentMemberDetail.state.changed =>
+            (index, currentMemberDetail)
+          case (((index, currentMemberDetail), _), _)
               if currentMemberDetail.state.changed && initialMemberDetails.get(index).exists(_.state.changed) =>
             (index, currentMemberDetail)
-          case ((index, currentMemberDetail), Some(previousUA))
+          case (((index, currentMemberDetail), _), Some(previousUA))
               if currentMemberDetail.state.changed && previousUA.get(MemberStatus(srn, index)).nonEmpty =>
             (index, currentMemberDetail)
-          case ((index, currentMemberDetail), _) =>
+          case (((index, currentMemberDetail), _), _) =>
             (index, currentMemberDetail.copy(state = MemberState.New))
         }
       }
@@ -347,9 +356,13 @@ class MemberPaymentsTransformer @Inject()(
       memberLumpSumReceivedExists = memberPayments.memberDetails.exists(_.memberLumpSumReceived.nonEmpty)
       ua5 <- ua4.set(PclsMemberListPage(srn), memberLumpSumReceivedExists)
 
-      // new members can be safely hard deleted
-      // todo: probably don't call when fetchingPreviousVersion = true, no point
-      newMembers <- identifyNewMembers(srn, ua5, previousVersionUA, fetchingPreviousVersion)
+      // new members can be safely hard deleted - don't run when fetching previous user answers as there is no point
+      newMembers <- if (!fetchingPreviousVersion) {
+        identifyNewMembers(srn, ua5, previousVersionUA)
+      } else {
+        Success(Nil)
+      }
+
       ua5_1 <- newMembers.foldLeft(Try(ua5)) {
         case (ua, index) =>
           logger.info(s"New member identified at index $index")
@@ -386,7 +399,7 @@ class MemberPaymentsTransformer @Inject()(
    *     - if they are different, they are not new members.
    *   - if there are previous user answers, compare members:
    *    - if they are the same, they are not new members.
-   *    - if they are different, check if they were added in the latest version of the return (memberStatus is NEW and return’s fbVersion == memberPSRVersion)
+   *    - if they are different, check if they were added in the latest version of the return (memberStatus is NEW, psrStatus is Compiled and return’s fbVersion == memberPSRVersion)
    *      - if so, they are changed members.
    *      - if not, they are new members.
    *
@@ -397,17 +410,16 @@ class MemberPaymentsTransformer @Inject()(
   private def identifyNewMembers(
     srn: Srn,
     ua: UserAnswers,
-    previousVersionUA: Option[UserAnswers],
-    fetchingPreviousVersion: Boolean
+    previousVersionUA: Option[UserAnswers]
   ): Try[List[Max300]] =
     buildMemberDetails(srn, ua).left.map(new Exception(_)).toTry.flatMap { currentMemberDetails =>
+      val psrStatus = ua.get(FbStatus(srn))
+      val psrVersion = ua.get(FbVersionPage(srn))
+      logger.info(
+        s"""[identifyNewMembers] identifying members that are safe to hard delete with PSR version $psrVersion, psrStatus ${psrStatus} and previous version useranswers are ${previousVersionUA
+          .fold("empty")(_ => "non-empty")}"""
+      )
       previousVersionUA match {
-        case Some(_) if fetchingPreviousVersion =>
-          Failure(
-            new Exception(
-              "fetchingPreviousVersion flag is true but previous PSR version already exists. Something went wrong"
-            )
-          )
         case Some(previousUA) =>
           logger.info(s"[identifyNewMembers] Previous PSR version found for srn $srn")
           buildMemberDetails(srn, previousUA).left.map(new Exception(_)).toTry.flatMap { previousMemberDetails =>
@@ -416,13 +428,15 @@ class MemberPaymentsTransformer @Inject()(
                 case (index, currentMemberDetail) if previousMemberDetails.get(index).contains(currentMemberDetail) =>
                   None
                 case (_, currentMemberDetail) if currentMemberDetail.state.changed => None
-                case (index, currentMemberDetail) if currentMemberDetail.state._new => Some(index)
+                case (index, currentMemberDetail) if currentMemberDetail.state._new && psrStatus.exists(_.isCompiled) =>
+                  Some(index)
                 case _ => None
               }
             )
           }
         // No previous version UserAnswers so this must be either pre-first submission or just after the first submission
         case None =>
+          logger.info(s"[identifyNewMembers] Previous PSR version NOT found for srn $srn")
           val (membersWithNoVersions, membersWithVersions): (List[Max300], List[(Max300, String)]) =
             currentMemberDetails.toList.partitionMap {
               case (index, memberDetails) if memberDetails.memberPSRVersion.isEmpty => Left(index)
@@ -435,11 +449,23 @@ class MemberPaymentsTransformer @Inject()(
 
           Success(
             versionedMembersWithETMPStatus.flatMap {
+              // Added in current version of the submission but return has just been submitted
+              case (index, memberVersion, Some(MemberState.New))
+                  if ua.get(FbVersionPage(srn)).contains(memberVersion) &&
+                    ua.get(FbStatus(srn)).exists(_.isSubmitted) =>
+                logger.info(
+                  s"[identifyNewMembers] member at index $index is part of a freshly made submission. Not safe to hard delete"
+                )
+                None
               // Added in current version of the submission, safe to soft delete
-              case (index, memberVersion, Some(MemberState.New | MemberState.Changed)) // todo have a look at this
-                  if ua.get(FbVersionPage(srn)).contains(memberVersion) =>
+              case (index, memberVersion, Some(MemberState.New | MemberState.Changed))
+                  if ua.get(FbVersionPage(srn)).contains(memberVersion) && psrStatus.exists(_.isCompiled) =>
+                logger.info(
+                  s"[identifyNewMembers] member at index $index was added in the current version of the submission without a previous version. safe to hard delete"
+                )
                 Some(index)
               case _ => None
+              // members with no versions have never been part of an ETMP POST so safe to hard delete
             } ++ membersWithNoVersions
           )
       }

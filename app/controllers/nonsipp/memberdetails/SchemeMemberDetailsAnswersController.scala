@@ -76,11 +76,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
         !_.sameAs(request.userAnswers, membersPayments, Omitted.membersPayments: _*)
       )
 
-      lazy val justAdded = mode.isNormalMode &&
-        (
-          request.userAnswers.get(MemberStatus(srn, index)).isEmpty ||
-            !request.userAnswers.get(MemberStatus(srn, index)).exists(_.changed)
-        )
+      lazy val justAdded = mode.isNormalMode && request.userAnswers.get(MemberStatus(srn, index)).isEmpty
 
       for {
         updatedUserAnswers <- request.userAnswers
@@ -90,7 +86,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
             mode.isCheckMode && memberPaymentsChanged
           )(
             MemberStatus(srn, index), {
-              logger.info(s"Something has changed for member index $index, setting state to CHANGED")
+              logger.info(s"Something has changed in member payments for member index $index, setting state to CHANGED")
               MemberState.Changed
             }
           )

@@ -36,7 +36,7 @@ import cats.implicits.catsSyntaxEitherId
 import pages.nonsipp.receivetransfer._
 import pages.nonsipp.memberpensionpayments._
 import eu.timepit.refined.refineMV
-import pages.nonsipp.FbVersionPage
+import pages.nonsipp.{FbStatus, FbVersionPage}
 import org.scalatest.OptionValues
 import pages.nonsipp.memberpayments._
 import com.softwaremill.diffx.generic.AutoDerivation
@@ -284,6 +284,20 @@ class MemberPaymentsTransformerSpec
     pensionReceived = SectionDetails(made = false, completed = true)
   )
 
+  private val emptyMemberPayments = MemberPayments(
+    recordVersion = None,
+    memberDetails = Nil,
+    employerContributionsDetails = SectionDetails(made = false, completed = false),
+    transfersInMade = None,
+    transfersOutMade = None,
+    unallocatedContribsMade = None,
+    unallocatedContribAmount = None,
+    memberContributionMade = None,
+    lumpSumReceived = None,
+    benefitsSurrenderedDetails = SectionDetails(made = false, completed = false),
+    pensionReceived = SectionDetails(made = false, completed = false)
+  )
+
   private val softDeletedMemberNoSections = SoftDeletedMember(
     memberPSRVersion = Some("001"),
     memberDetails = MemberPersonalDetails(
@@ -365,6 +379,85 @@ class MemberPaymentsTransformerSpec
       val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswersAllSections, userAnswersAllSections)
       result shouldMatchTo Some(memberPaymentsAllSections)
     }
+
+    "Member state" - {
+      "should return member state New when member was just added" in {
+        val userAnswersNewMember = defaultUserAnswers
+          .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+          .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
+          .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
+          .unsafeSet(MemberDetailsCompletedPage(srn, index), SectionCompleted)
+          .unsafeSet(MemberStatus(srn, index), MemberState.New)
+
+        val expected = emptyMemberPayments.copy(
+          memberDetails = List(
+            activeMemberNoSections.copy(memberPSRVersion = None)
+          )
+        )
+
+        val result =
+          memberPaymentsTransformer.transformToEtmp(srn, userAnswersNewMember, initialUA = defaultUserAnswers)
+        result shouldMatchTo Some(expected)
+      }
+
+      "should return member state New when PSR state is Submitted and member was just added before first POST since submitted" in {
+        val userAnswersNewMember = defaultUserAnswers
+          .unsafeSet(FbStatus(srn), Submitted)
+          .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+          .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
+          .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
+          .unsafeSet(MemberDetailsCompletedPage(srn, index), SectionCompleted)
+          .unsafeSet(MemberStatus(srn, index), MemberState.New)
+
+        val expected = emptyMemberPayments.copy(
+          memberDetails = List(
+            activeMemberNoSections.copy(
+              memberPSRVersion = None,
+              state = MemberState.New
+            )
+          )
+        )
+
+        val result =
+          memberPaymentsTransformer.transformToEtmp(
+            srn,
+            userAnswersNewMember,
+            initialUA = defaultUserAnswers,
+            previousVersionUA = None
+          )
+
+        result shouldMatchTo Some(expected)
+      }
+
+//      "should return member state New when PSR state is Submitted and member was just added and amended before first POST since submitted" in {
+//        val userAnswersNewMember = defaultUserAnswers
+//          .unsafeSet(FbStatus(srn), Submitted)
+//          .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+//          .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
+//          .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
+//          .unsafeSet(MemberDetailsCompletedPage(srn, index), SectionCompleted)
+//          .unsafeSet(MemberStatus(srn, index), MemberState.Changed)
+//
+//        val expected = emptyMemberPayments.copy(
+//          memberDetails = List(
+//            activeMemberNoSections.copy(
+//              memberPSRVersion = None,
+//              state = MemberState.Changed
+//            )
+//          )
+//        )
+//
+//        val result =
+//          memberPaymentsTransformer.transformToEtmp(
+//            srn,
+//            userAnswersNewMember,
+//            initialUA = defaultUserAnswers,
+//            previousVersionUA = None
+//          )
+//
+//        result shouldMatchTo Some(expected)
+//      }
+    }
   }
 
   "MemberPaymentsTransformer - From Etmp" - {
@@ -378,99 +471,9 @@ class MemberPaymentsTransformerSpec
       result shouldMatchTo Try(userAnswersNoSections)
     }
 
-    "NewMember" - {
+    "SafeToHardDelete" - {
 
-      "should not set NewMember when member version is lower than fb version and MemberState is New - this member was added in the previous submission" in {
-        val previousUserAnswers = defaultUserAnswers
-          .unsafeSet(FbVersionPage(srn), "001")
-          .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
-          .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
-          .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
-          .unsafeSet(MemberStatus(srn, index), MemberState.New)
-          .unsafeSet(MemberPsrVersionPage(srn, index), "001")
-
-        val userAnswers = defaultUserAnswers
-          .set(FbVersionPage(srn), "002")
-          .get
-
-        val existingMember = memberPaymentsNoSections.copy(
-          memberDetails = List(
-            activeMemberNoSections.copy(
-              state = MemberState.New,
-              memberPSRVersion = Some("001")
-            )
-          )
-        )
-
-        val result =
-          memberPaymentsTransformer.transformFromEtmp(userAnswers, Some(previousUserAnswers), srn, existingMember).get
-
-        result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
-        result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo None
-      }
-
-      "should set NewMember when member version is the same as fb version and MemberState is New - this member was added in the current version" in {
-        val previousUserAnswers = defaultUserAnswers
-          .unsafeSet(FbVersionPage(srn), "001")
-          .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
-          .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
-          .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
-          .unsafeSet(MemberStatus(srn, index), MemberState.New)
-          .unsafeSet(MemberPsrVersionPage(srn, index), "001")
-
-        val userAnswers = defaultUserAnswers
-          .set(FbVersionPage(srn), "002")
-          .get
-
-        val existingMember = memberPaymentsNoSections.copy(
-          memberDetails = List(
-            activeMemberNoSections.copy(
-              state = MemberState.New,
-              memberPSRVersion = Some("002")
-            )
-          )
-        )
-
-        val result =
-          memberPaymentsTransformer.transformFromEtmp(userAnswers, Some(previousUserAnswers), srn, existingMember).get
-
-        result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
-        result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo Some(Flag)
-      }
-
-      "should NOT set NewMember when member version is the same as fb version and MemberState is Changed - this member has been a part of a declaration" in {
-        val previousUserAnswers = defaultUserAnswers
-          .unsafeSet(FbVersionPage(srn), "001")
-          .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
-          .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
-          .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
-          .unsafeSet(MemberStatus(srn, index), MemberState.New)
-          .unsafeSet(MemberPsrVersionPage(srn, index), "001")
-
-        val userAnswers = defaultUserAnswers
-          .set(FbVersionPage(srn), "002")
-          .get
-
-        val existingMember = memberPaymentsNoSections.copy(
-          memberDetails = List(
-            activeMemberNoSections.copy(
-              state = MemberState.Changed,
-              memberPSRVersion = Some("002")
-            )
-          )
-        )
-
-        val result =
-          memberPaymentsTransformer.transformFromEtmp(userAnswers, Some(previousUserAnswers), srn, existingMember).get
-
-        result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.Changed)
-        result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo None
-      }
-
-      "should set NewMember when member version is missing - this member was added before the first submission" in {
-        val userAnswers = defaultUserAnswers
-          .set(FbVersionPage(srn), "001")
-          .get
+      "should set SafeToHardDelete when member version and PSR version are missing - this member was added before the first POST to ETMP" in {
 
         val newMember = memberPaymentsNoSections.copy(
           memberDetails = List(
@@ -481,49 +484,211 @@ class MemberPaymentsTransformerSpec
           )
         )
 
-        val result = memberPaymentsTransformer.transformFromEtmp(userAnswers, None, srn, newMember).get
+        val result = memberPaymentsTransformer.transformFromEtmp(defaultUserAnswers, None, srn, newMember).get
         result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
         result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo Some(Flag)
       }
 
-      "should set correct MemberStatus and set NewMember when member version is the same as fb version -" +
-        "this member was added in the current version and submitted to ETMP prior to the first submission" in {
-        val userAnswers = defaultUserAnswers
-          .set(FbVersionPage(srn), "001")
-          .get
+      "PSR status is Compiled" - {
 
-        val newMember = memberPaymentsNoSections.copy(
-          memberDetails = List(
-            activeMemberNoSections.copy(
-              state = MemberState.New,
-              memberPSRVersion = Some("001")
+        "should set SafeToHardDelete when member version is the same as PSR version and MemberState is New -" +
+          "this member was added in the current version" in {
+          val previousUserAnswers = defaultUserAnswers
+            .unsafeSet(FbVersionPage(srn), "001")
+            .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
+            .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
+            .unsafeSet(MemberStatus(srn, index), MemberState.New)
+            .unsafeSet(MemberPsrVersionPage(srn, index), "001")
+
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(FbVersionPage(srn), "002")
+            .unsafeSet(FbStatus(srn), Compiled)
+
+          val existingMember = memberPaymentsNoSections.copy(
+            memberDetails = List(
+              activeMemberNoSections.copy(
+                state = MemberState.New,
+                memberPSRVersion = Some("002")
+              )
             )
           )
-        )
 
-        val result = memberPaymentsTransformer.transformFromEtmp(userAnswers, None, srn, newMember).get
-        result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
-        result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo Some(Flag)
+          val result =
+            memberPaymentsTransformer.transformFromEtmp(userAnswers, Some(previousUserAnswers), srn, existingMember).get
+
+          result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
+          result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo Some(Flag)
+        }
+
+        "should set SafeToHardDelete when member version is the same as PSR version -" +
+          "this member was added in the current version and submitted to ETMP prior to the first submission" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(FbVersionPage(srn), "001")
+            .unsafeSet(FbStatus(srn), Compiled)
+
+          val newMember = memberPaymentsNoSections.copy(
+            memberDetails = List(
+              activeMemberNoSections.copy(
+                state = MemberState.New,
+                memberPSRVersion = Some("001")
+              )
+            )
+          )
+
+          val result = memberPaymentsTransformer.transformFromEtmp(userAnswers, None, srn, newMember).get
+          result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
+          result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo Some(Flag)
+        }
+
+        "should set SafeToHardDelete when member version is the same as fb version and MemberStatus is Changed-" +
+          "this member was added in the current version and submitted to ETMP prior to the first submission so Changed status doesn't matter" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(FbVersionPage(srn), "001")
+            .unsafeSet(FbStatus(srn), Compiled)
+
+          val newMember = memberPaymentsNoSections.copy(
+            memberDetails = List(
+              activeMemberNoSections.copy(
+                state = MemberState.Changed,
+                memberPSRVersion = Some("001")
+              )
+            )
+          )
+
+          val result = memberPaymentsTransformer.transformFromEtmp(userAnswers, None, srn, newMember).get
+          result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.Changed)
+          result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo Some(Flag)
+        }
+
+        "should NOT set SafeToHardDelete when member version is lower than PSR version and MemberState is New -" +
+          "this member was added in the previous submission" in {
+          val previousUserAnswers = defaultUserAnswers
+            .unsafeSet(FbVersionPage(srn), "001")
+            .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
+            .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
+            .unsafeSet(MemberStatus(srn, index), MemberState.New)
+            .unsafeSet(MemberPsrVersionPage(srn, index), "001")
+
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(FbVersionPage(srn), "002")
+            .unsafeSet(FbStatus(srn), Compiled)
+
+          val existingMember = memberPaymentsNoSections.copy(
+            memberDetails = List(
+              activeMemberNoSections.copy(
+                state = MemberState.New,
+                memberPSRVersion = Some("001")
+              )
+            )
+          )
+
+          val result =
+            memberPaymentsTransformer.transformFromEtmp(userAnswers, Some(previousUserAnswers), srn, existingMember).get
+
+          result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
+          result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo None
+        }
+
+        "should NOT set SafeToHardDelete when member version is the same as PSR version and MemberState is Changed -" +
+          "this member has been a part of a declaration" in {
+          val previousUserAnswers = defaultUserAnswers
+            .unsafeSet(FbVersionPage(srn), "001")
+            .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
+            .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
+            .unsafeSet(MemberStatus(srn, index), MemberState.New)
+            .unsafeSet(MemberPsrVersionPage(srn, index), "001")
+
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(FbVersionPage(srn), "002")
+            .unsafeSet(FbStatus(srn), Compiled)
+
+          val existingMember = memberPaymentsNoSections.copy(
+            memberDetails = List(
+              activeMemberNoSections.copy(
+                state = MemberState.Changed,
+                memberPSRVersion = Some("002")
+              )
+            )
+          )
+
+          val result =
+            memberPaymentsTransformer.transformFromEtmp(userAnswers, Some(previousUserAnswers), srn, existingMember).get
+
+          result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.Changed)
+          result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo None
+        }
       }
 
-      "should set NewMember when member version is the same as fb version and MemberStatus is Changed-" +
-        "this member was added in the current version and submitted to ETMP prior to the first submission so Changed status doesn't matter" in {
-        val userAnswers = defaultUserAnswers
-          .set(FbVersionPage(srn), "001")
-          .get
+      "PSR status is Submitted" - {
 
-        val newMember = memberPaymentsNoSections.copy(
-          memberDetails = List(
-            activeMemberNoSections.copy(
-              state = MemberState.Changed,
-              memberPSRVersion = Some("001")
+        "should NOT set SafeToHardDelete when member and PSR version are 001 and MemberStatus is New -" +
+          "this member was added in the previous version but since the state is Submitted," +
+          "a change must first be sent to ETMP to update the version to current + 1 and state to Compiled" in {
+
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(FbVersionPage(srn), "001")
+            .unsafeSet(FbStatus(srn), Submitted)
+
+          val newMember = memberPaymentsNoSections.copy(
+            memberDetails = List(
+              activeMemberNoSections.copy(
+                state = MemberState.New,
+                memberPSRVersion = Some("001")
+              )
             )
           )
-        )
 
-        val result = memberPaymentsTransformer.transformFromEtmp(userAnswers, None, srn, newMember).get
-        result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.Changed)
-        result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo Some(Flag)
+          val result = memberPaymentsTransformer.transformFromEtmp(userAnswers, None, srn, newMember).get
+          result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
+          result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo None
+        }
+
+        "should NOT set SafeToHardDelete when member and PSR version are 001 and MemberStatus is Changed -" +
+          "this member was added in the previous version but since the state is Submitted," +
+          "a change must first be sent to ETMP to update the version to current + 1 and state to Compiled" in {
+
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(FbVersionPage(srn), "001")
+            .unsafeSet(FbStatus(srn), Submitted)
+
+          val newMember = memberPaymentsNoSections.copy(
+            memberDetails = List(
+              activeMemberNoSections.copy(
+                state = MemberState.Changed,
+                memberPSRVersion = Some("001")
+              )
+            )
+          )
+
+          val result = memberPaymentsTransformer.transformFromEtmp(userAnswers, None, srn, newMember).get
+          result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.Changed)
+          result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo None
+        }
+
+        "should NOT set SafeToHardDelete when member and PSR version are the same and greater than 001 and MemberStatus is New -" +
+          "this member was added in the previous version but since the state is Submitted," +
+          "a change must first be sent to ETMP to update the version to current + 1 and state to Compiled" in {
+
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(FbVersionPage(srn), "002")
+            .unsafeSet(FbStatus(srn), Submitted)
+
+          val newMember = memberPaymentsNoSections.copy(
+            memberDetails = List(
+              activeMemberNoSections.copy(
+                state = MemberState.New,
+                memberPSRVersion = Some("002")
+              )
+            )
+          )
+
+          val result = memberPaymentsTransformer.transformFromEtmp(userAnswers, None, srn, newMember).get
+          result.get(MemberStatus(srn, refineMV(1))) shouldMatchTo Some(MemberState.New)
+          result.get(SafeToHardDelete(srn, refineMV(1))) shouldMatchTo None
+        }
       }
     }
   }
