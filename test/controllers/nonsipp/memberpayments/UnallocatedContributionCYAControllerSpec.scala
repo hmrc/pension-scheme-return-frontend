@@ -16,16 +16,21 @@
 
 package controllers.nonsipp.memberpayments
 
-import services.PsrSubmissionService
+import services.{PsrSubmissionService, SchemeDateService}
 import play.api.mvc.Call
+import controllers.nonsipp.memberpayments.UnallocatedContributionCYAController._
+import config.Refined.Max3
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
-import views.html.CYAWithRemove
-import models.{CheckMode, Mode, NormalMode}
+import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
+import org.mockito.stubbing.OngoingStubbing
+import models._
 import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import org.mockito.Mockito.{reset, times, verify}
+import org.mockito.Mockito._
+import cats.data.NonEmptyList
+import views.html.CYAWithRemove
 
 class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
 
@@ -39,10 +44,34 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
     reset(mockPsrSubmissionService)
 
   private def onPageLoad(mode: Mode): Call =
-    routes.UnallocatedContributionCYAController.onPageLoad(srn, mode)
+    controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController.onPageLoad(srn, mode)
 
   private def onSubmit(mode: Mode): Call =
-    routes.UnallocatedContributionCYAController.onSubmit(srn, mode)
+    controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController.onSubmit(srn, mode)
+
+  private lazy val onPageLoadViewOnly =
+    controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController.onPageLoadViewOnly(
+      srn,
+      yearString,
+      submissionNumberTwo,
+      submissionNumberOne
+    )
+  private lazy val onSubmitViewOnly =
+    controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController.onSubmitViewOnly(
+      srn,
+      yearString,
+      submissionNumberTwo,
+      submissionNumberOne
+    )
+  private lazy val onPreviousViewOnly =
+    controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController.onPreviousViewOnly(
+      srn,
+      yearString,
+      submissionNumberTwo,
+      submissionNumberOne
+    )
+
+  private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
@@ -54,12 +83,11 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
         renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CYAWithRemove].apply(
             UnallocatedContributionCYAController.viewModel(
-              ViewModelParameters(
-                srn,
-                schemeName,
-                money,
-                mode
-              )
+              srn,
+              schemeName,
+              money,
+              mode,
+              viewOnlyUpdated = false
             )
           )
         }.withName(s"render correct ${mode.toString} view")
@@ -88,4 +116,64 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
       )
     }
   }
+
+  "UnallocatedContributionCYAController in view only mode" - {
+
+    val currentUserAnswers = defaultUserAnswers
+      .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+      .unsafeSet(FbVersionPage(srn), "002")
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+      .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[CYAWithRemove].apply(
+            viewModel(
+              srn,
+              schemeName,
+              money,
+              ViewOnlyMode,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }.before(mockTaxYear(dateRange))
+        .withName("OnPageLoadViewOnly renders ok with no changed flag")
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
+
+    act.like(
+      redirectToPage(
+        onPreviousViewOnly,
+        controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+          .onPageLoadViewOnly(srn, yearString, submissionNumberOne, submissionNumberZero)
+      ).withName(
+        "Submit previous view only redirects to UnallocatedContributionCYAController for the previous submission"
+      )
+    )
+  }
+
+  private def mockTaxYear(
+    taxYear: DateRange
+  ): OngoingStubbing[Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]] =
+    when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(any())).thenReturn(Some(Left(taxYear)))
+
 }
