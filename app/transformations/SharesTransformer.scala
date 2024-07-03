@@ -458,142 +458,162 @@ class SharesTransformer @Inject() extends Transformer {
     val userAnswersWithRecordVersion = shares.recordVersion.fold(userAnswersWithQuotedShares)(
       recordVersion => userAnswersWithQuotedShares.set(SharesRecordVersionPage(srn), recordVersion)
     )
+    val userAnswersWithTransactions = shares.optShareTransactions.fold(userAnswersWithRecordVersion) {
+      shareTransactions =>
+        for {
+          indexes <- buildIndexesForMax5000(shareTransactions.size)
+          resultUA <- indexes.foldLeft(userAnswersWithRecordVersion) {
+            case (ua, index) =>
+              val shareTransaction = shareTransactions(index.value - 1)
 
-    shares.optShareTransactions.fold(userAnswersWithRecordVersion) { shareTransactions =>
-      for {
-        indexes <- buildIndexesForMax5000(shareTransactions.size)
-        resultUA <- indexes.foldLeft(userAnswersWithRecordVersion) {
-          case (ua, index) =>
-            val shareTransaction = shareTransactions(index.value - 1)
+              val typeOfSharesHeld = shareTransaction.typeOfSharesHeld
+              val shareIdentification = shareTransaction.shareIdentification
+              val heldSharesTransaction = shareTransaction.heldSharesTransaction
 
-            val typeOfSharesHeld = shareTransaction.typeOfSharesHeld
-            val shareIdentification = shareTransaction.shareIdentification
-            val heldSharesTransaction = shareTransaction.heldSharesTransaction
-
-            val optDateOfAcqOrContrib = heldSharesTransaction.optDateOfAcqOrContrib.map(
-              dateOfAcqOrContrib => WhenDidSchemeAcquireSharesPage(srn, index) -> dateOfAcqOrContrib
-            )
-
-            val ukCompanyCrn = shareIdentification.optCrnNumber
-              .map(id => ConditionalYesNo.yes[String, Crn](Crn(id)))
-              .getOrElse(
-                ConditionalYesNo.no[String, Crn](
-                  shareIdentification.optReasonNoCRN.get
-                )
+              val optDateOfAcqOrContrib = heldSharesTransaction.optDateOfAcqOrContrib.map(
+                dateOfAcqOrContrib => WhenDidSchemeAcquireSharesPage(srn, index) -> dateOfAcqOrContrib
               )
 
-            val optIdentityType = heldSharesTransaction.optPropertyAcquiredFrom.map(
-              prop => {
-                IdentityTypePage(srn, index, IdentitySubject.SharesSeller) -> prop.identityType
-              }
-            )
-
-            val optIndividualTuple = heldSharesTransaction.optPropertyAcquiredFrom
-              .filter(prop => prop.identityType == IdentityType.Individual)
-              .map(
-                prop => {
-                  val name = IndividualNameOfSharesSellerPage(srn, index) -> heldSharesTransaction.optAcquiredFromName.get
-                  val yesNoValue = prop.idNumber
-                    .map(id => ConditionalYesNo.yes[String, Nino](Nino(id)))
-                    .getOrElse(
-                      ConditionalYesNo.no[String, Nino](
-                        prop.reasonNoIdNumber.get
-                      )
-                    )
-
-                  (name, SharesIndividualSellerNINumberPage(srn, index) -> yesNoValue)
-                }
-              )
-
-            val optUKCompanyTuple = heldSharesTransaction.optPropertyAcquiredFrom
-              .filter(prop => prop.identityType == IdentityType.UKCompany)
-              .map(
-                prop => {
-                  val name = CompanyNameOfSharesSellerPage(srn, index) -> heldSharesTransaction.optAcquiredFromName.get
-                  val yesNoValue = prop.idNumber
-                    .map(id => ConditionalYesNo.yes[String, Crn](Crn(id)))
-                    .getOrElse(
-                      ConditionalYesNo.no[String, Crn](
-                        prop.reasonNoIdNumber.get
-                      )
-                    )
-                  (name, CompanyRecipientCrnPage(srn, index, SharesSeller) -> yesNoValue)
-                }
-              )
-
-            val optUKPartnershipTuple = heldSharesTransaction.optPropertyAcquiredFrom
-              .filter(prop => prop.identityType == IdentityType.UKPartnership)
-              .map(
-                prop => {
-                  val name = PartnershipShareSellerNamePage(srn, index) -> heldSharesTransaction.optAcquiredFromName.get
-                  val yesNoValue = prop.idNumber
-                    .map(id => ConditionalYesNo.yes[String, Utr](Utr(id)))
-                    .getOrElse(
-                      ConditionalYesNo.no[String, Utr](
-                        prop.reasonNoIdNumber.get
-                      )
-                    )
-
-                  (name, PartnershipRecipientUtrPage(srn, index, SharesSeller) -> yesNoValue)
-                }
-              )
-
-            val optOther = heldSharesTransaction.optPropertyAcquiredFrom
-              .filter(prop => prop.identityType == IdentityType.Other)
-              .map(
-                prop => {
-                  OtherRecipientDetailsPage(srn, index, SharesSeller) -> RecipientDetails(
-                    heldSharesTransaction.optAcquiredFromName.get,
-                    prop.otherDescription.get
+              val ukCompanyCrn = shareIdentification.optCrnNumber
+                .map(id => ConditionalYesNo.yes[String, Crn](Crn(id)))
+                .getOrElse(
+                  ConditionalYesNo.no[String, Crn](
+                    shareIdentification.optReasonNoCRN.get
                   )
+                )
+
+              val optIdentityType = heldSharesTransaction.optPropertyAcquiredFrom.map(
+                prop => {
+                  IdentityTypePage(srn, index, IdentitySubject.SharesSeller) -> prop.identityType
                 }
               )
 
-            val optConnectedPartyStatus = heldSharesTransaction.optConnectedPartyStatus.map(
-              connectedPartyStatus => SharesFromConnectedPartyPage(srn, index) -> connectedPartyStatus
-            )
+              val optIndividualTuple = heldSharesTransaction.optPropertyAcquiredFrom
+                .filter(prop => prop.identityType == IdentityType.Individual)
+                .map(
+                  prop => {
+                    val name = IndividualNameOfSharesSellerPage(srn, index) -> heldSharesTransaction.optAcquiredFromName.get
+                    val yesNoValue = prop.idNumber
+                      .map(id => ConditionalYesNo.yes[String, Nino](Nino(id)))
+                      .getOrElse(
+                        ConditionalYesNo.no[String, Nino](
+                          prop.reasonNoIdNumber.get
+                        )
+                      )
 
-            val optTotalAssetValue = heldSharesTransaction.optTotalAssetValue.map(
-              totalAssetValue => TotalAssetValuePage(srn, index) -> Money(totalAssetValue)
-            )
+                    (name, SharesIndividualSellerNINumberPage(srn, index) -> yesNoValue)
+                  }
+                )
 
-            val triedUA = for {
-              ua0 <- ua
-              ua1 <- ua0.set(TypeOfSharesHeldPage(srn, index), typeOfSharesHeld)
-              ua2 <- ua1.set(WhyDoesSchemeHoldSharesPage(srn, index), heldSharesTransaction.schemeHoldShare)
-              ua3 <- optDateOfAcqOrContrib.map(t => ua2.set(t._1, t._2)).getOrElse(Try(ua2))
-              ua4 <- ua3.set(CompanyNameRelatedSharesPage(srn, index), shareIdentification.nameOfSharesCompany)
-              ua5 <- ua4.set(SharesCompanyCrnPage(srn, index), ukCompanyCrn)
-              ua6 <- ua5.set(ClassOfSharesPage(srn, index), shareIdentification.classOfShares)
-              ua7 <- ua6.set(HowManySharesPage(srn, index), heldSharesTransaction.totalShares)
-              ua8 <- optIdentityType.map(t => ua7.set(t._1, t._2)).getOrElse(Try(ua7))
-              ua9 <- optIndividualTuple.map(t => ua8.set(t._1._1, t._1._2)).getOrElse(Try(ua8))
-              ua10 <- optIndividualTuple.map(t => ua9.set(t._2._1, t._2._2)).getOrElse(Try(ua9))
-              ua11 <- optUKCompanyTuple.map(t => ua10.set(t._1._1, t._1._2)).getOrElse(Try(ua10))
-              ua12 <- optUKCompanyTuple.map(t => ua11.set(t._2._1, t._2._2)).getOrElse(Try(ua11))
-              ua13 <- optUKPartnershipTuple.map(t => ua12.set(t._1._1, t._1._2)).getOrElse(Try(ua12))
-              ua14 <- optUKPartnershipTuple.map(t => ua13.set(t._2._1, t._2._2)).getOrElse(Try(ua13))
-              ua15 <- optOther.map(t => ua14.set(t._1, t._2)).getOrElse(Try(ua14))
-              ua16 <- optConnectedPartyStatus.map(t => ua15.set(t._1, t._2)).getOrElse(Try(ua15))
-              ua17 <- ua16.set(CostOfSharesPage(srn, index), Money(heldSharesTransaction.costOfShares))
-              ua18 <- ua17.set(
-                SharesIndependentValuationPage(srn, index),
-                heldSharesTransaction.supportedByIndepValuation
+              val optUKCompanyTuple = heldSharesTransaction.optPropertyAcquiredFrom
+                .filter(prop => prop.identityType == IdentityType.UKCompany)
+                .map(
+                  prop => {
+                    val name = CompanyNameOfSharesSellerPage(srn, index) -> heldSharesTransaction.optAcquiredFromName.get
+                    val yesNoValue = prop.idNumber
+                      .map(id => ConditionalYesNo.yes[String, Crn](Crn(id)))
+                      .getOrElse(
+                        ConditionalYesNo.no[String, Crn](
+                          prop.reasonNoIdNumber.get
+                        )
+                      )
+                    (name, CompanyRecipientCrnPage(srn, index, SharesSeller) -> yesNoValue)
+                  }
+                )
+
+              val optUKPartnershipTuple = heldSharesTransaction.optPropertyAcquiredFrom
+                .filter(prop => prop.identityType == IdentityType.UKPartnership)
+                .map(
+                  prop => {
+                    val name = PartnershipShareSellerNamePage(srn, index) -> heldSharesTransaction.optAcquiredFromName.get
+                    val yesNoValue = prop.idNumber
+                      .map(id => ConditionalYesNo.yes[String, Utr](Utr(id)))
+                      .getOrElse(
+                        ConditionalYesNo.no[String, Utr](
+                          prop.reasonNoIdNumber.get
+                        )
+                      )
+
+                    (name, PartnershipRecipientUtrPage(srn, index, SharesSeller) -> yesNoValue)
+                  }
+                )
+
+              val optOther = heldSharesTransaction.optPropertyAcquiredFrom
+                .filter(prop => prop.identityType == IdentityType.Other)
+                .map(
+                  prop => {
+                    OtherRecipientDetailsPage(srn, index, SharesSeller) -> RecipientDetails(
+                      heldSharesTransaction.optAcquiredFromName.get,
+                      prop.otherDescription.get
+                    )
+                  }
+                )
+
+              val optConnectedPartyStatus = heldSharesTransaction.optConnectedPartyStatus.map(
+                connectedPartyStatus => SharesFromConnectedPartyPage(srn, index) -> connectedPartyStatus
               )
-              ua19 <- optTotalAssetValue.map(t => ua18.set(t._1, t._2)).getOrElse(Try(ua18))
-              ua20 <- ua19.set(SharesTotalIncomePage(srn, index), Money(heldSharesTransaction.totalDividendsOrReceipts))
-              ua21 <- ua20.set(SharesCompleted(srn, index), SectionCompleted)
-            } yield {
-              buildOptDisposedShareTransactionUA(
-                index,
-                srn,
-                ua21,
-                shareTransaction.optDisposedSharesTransaction
+
+              val optTotalAssetValue = heldSharesTransaction.optTotalAssetValue.map(
+                totalAssetValue => TotalAssetValuePage(srn, index) -> Money(totalAssetValue)
               )
-            }
-            triedUA.flatten
-        }
-      } yield resultUA
+
+              val triedUA = for {
+                ua0 <- ua
+                ua1 <- ua0.set(TypeOfSharesHeldPage(srn, index), typeOfSharesHeld)
+                ua2 <- ua1.set(WhyDoesSchemeHoldSharesPage(srn, index), heldSharesTransaction.schemeHoldShare)
+                ua3 <- optDateOfAcqOrContrib.map(t => ua2.set(t._1, t._2)).getOrElse(Try(ua2))
+                ua4 <- ua3.set(CompanyNameRelatedSharesPage(srn, index), shareIdentification.nameOfSharesCompany)
+                ua5 <- ua4.set(SharesCompanyCrnPage(srn, index), ukCompanyCrn)
+                ua6 <- ua5.set(ClassOfSharesPage(srn, index), shareIdentification.classOfShares)
+                ua7 <- ua6.set(HowManySharesPage(srn, index), heldSharesTransaction.totalShares)
+                ua8 <- optIdentityType.map(t => ua7.set(t._1, t._2)).getOrElse(Try(ua7))
+                ua9 <- optIndividualTuple.map(t => ua8.set(t._1._1, t._1._2)).getOrElse(Try(ua8))
+                ua10 <- optIndividualTuple.map(t => ua9.set(t._2._1, t._2._2)).getOrElse(Try(ua9))
+                ua11 <- optUKCompanyTuple.map(t => ua10.set(t._1._1, t._1._2)).getOrElse(Try(ua10))
+                ua12 <- optUKCompanyTuple.map(t => ua11.set(t._2._1, t._2._2)).getOrElse(Try(ua11))
+                ua13 <- optUKPartnershipTuple.map(t => ua12.set(t._1._1, t._1._2)).getOrElse(Try(ua12))
+                ua14 <- optUKPartnershipTuple.map(t => ua13.set(t._2._1, t._2._2)).getOrElse(Try(ua13))
+                ua15 <- optOther.map(t => ua14.set(t._1, t._2)).getOrElse(Try(ua14))
+                ua16 <- optConnectedPartyStatus.map(t => ua15.set(t._1, t._2)).getOrElse(Try(ua15))
+                ua17 <- ua16.set(CostOfSharesPage(srn, index), Money(heldSharesTransaction.costOfShares))
+                ua18 <- ua17.set(
+                  SharesIndependentValuationPage(srn, index),
+                  heldSharesTransaction.supportedByIndepValuation
+                )
+                ua19 <- optTotalAssetValue.map(t => ua18.set(t._1, t._2)).getOrElse(Try(ua18))
+                ua20 <- ua19.set(
+                  SharesTotalIncomePage(srn, index),
+                  Money(heldSharesTransaction.totalDividendsOrReceipts)
+                )
+                ua21 <- ua20.set(SharesCompleted(srn, index), SectionCompleted)
+              } yield {
+                buildOptDisposedShareTransactionUA(
+                  index,
+                  srn,
+                  ua21,
+                  shareTransaction.optDisposedSharesTransaction
+                )
+              }
+              triedUA.flatten
+          }
+        } yield resultUA
+    }
+
+    // temporary E2E workaround
+    val sharesDisposalMade =
+      userAnswersWithTransactions
+        .getOrElse(userAnswers)
+        .map(SharesDisposalProgress.all(srn))
+        .nonEmpty
+
+    if (sharesDisposalMade) {
+      userAnswersWithTransactions
+        .set(SharesDisposalPage(srn), true)
+        .set(SharesDisposalCompleted(srn), SectionCompleted)
+    } else {
+      userAnswersWithTransactions
+        .set(SharesDisposalPage(srn), false)
+        .set(SharesDisposalCompleted(srn), SectionCompleted)
     }
   }
 
@@ -603,16 +623,12 @@ class SharesTransformer @Inject() extends Transformer {
     userAnswers: UserAnswers,
     optDisposedSharesTransaction: Option[Seq[DisposedSharesTransaction]]
   ): Try[UserAnswers] = {
-    val initialUserAnswersOfDisposal = userAnswers.set(SharesDisposalPage(srn), optDisposedSharesTransaction.isDefined)
-
     optDisposedSharesTransaction
       .map(
         disposedSharesTransactions => {
-          val initialUserAnswersOfDisposalWithCompleted =
-            initialUserAnswersOfDisposal.set(SharesDisposalCompleted(srn), SectionCompleted)
           for {
             disposalIndexes <- buildIndexesForMax50(disposedSharesTransactions.size)
-            resultDisposalUA <- disposalIndexes.foldLeft(initialUserAnswersOfDisposalWithCompleted) {
+            resultDisposalUA <- disposalIndexes.foldLeft(Try(userAnswers)) {
               case (disposalUA, disposalIndex) =>
                 val disposedSharesTransaction = disposedSharesTransactions(disposalIndex.value - 1)
                 val optRedemptionQuestions = disposedSharesTransaction.optRedemptionQuestions
@@ -789,6 +805,6 @@ class SharesTransformer @Inject() extends Transformer {
           } yield resultDisposalUA
         }
       )
-      .getOrElse(initialUserAnswersOfDisposal)
+      .getOrElse(Try(userAnswers))
   }
 }
