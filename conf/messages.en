@@ -811,6 +811,8 @@ pclsCYA.rows.amount.received = Total amount of PCLS received by {0}
 pclsCYA.rows.amount.received.hidden = total amount of PCLS received by {0}
 pclsCYA.rows.amount.relevant = Relevant pension in respect of PCLS for {0}
 pclsCYA.rows.amount.relevant.hidden = relevant pension in respect of PCLS for {0}
+pclsCYA.viewOnly.title = PCLS for this member
+pclsCYA.viewOnly.heading = PCLS for {0}
 
 pensionCommencementLumpSumAmount.title = Amount of PCLS and relevant pension for this member
 pensionCommencementLumpSumAmount.heading = Amount of PCLS and relevant pension for {0}
