@@ -24,14 +24,12 @@ import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models.{NormalMode, ViewOnlyMode}
-import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito._
 import play.api.inject.bind
 import controllers.nonsipp.memberreceivedpcls.PclsCYAController._
-
-import scala.concurrent.Future
+import org.mockito.ArgumentMatchers.any
 
 class PclsCYAControllerSpec extends ControllerBaseSpec {
 
@@ -62,8 +60,7 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetails(any(), any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(())))
+    MockPsrSubmissionService.submitPsrDetailsWithUA()
   }
 
   private val lumpSumAmounts = pensionCommencementLumpSumGen.sample.value
@@ -89,7 +86,7 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
 
     act.like(
       redirectNextPage(onSubmit)
-        .after(verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any()))
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(1)))
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
@@ -134,7 +131,7 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
           .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
         )
         .withName("Submit redirects to Pcls MemberL ist Controller page")
     )

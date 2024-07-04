@@ -84,7 +84,7 @@ class PspDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfte
     act.like(
       agreeAndContinue(onSubmit, populatedUserAnswers, "value" -> psaId.value)
         .before({
-          MockPSRSubmissionService.submitPsrDetails()
+          MockPsrSubmissionService.submitPsrDetails()
           MockEmailConnector.sendEmail(email, templateId)
           when(mockSchemeDateService.returnPeriodsAsJsonString(any())(any())).thenReturn("")
           when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")

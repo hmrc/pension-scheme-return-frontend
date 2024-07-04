@@ -17,7 +17,7 @@
 package controllers.nonsipp.membercontributions
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max300
 import controllers.PSRController
@@ -31,8 +31,9 @@ import viewmodels.implicits._
 import pages.nonsipp.membercontributions.{RemoveMemberContributionPage, TotalMemberContributionPage}
 import views.html.YesNoPageView
 import models.SchemeId.Srn
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, MemberState, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -103,8 +104,10 @@ class RemoveMemberContributionController @Inject()(
           removeDetails => {
             if (removeDetails) {
               for {
-                updatedAnswers <- Future
-                  .fromTry(request.userAnswers.remove(TotalMemberContributionPage(srn, index)))
+                updatedAnswers <- request.userAnswers
+                  .remove(TotalMemberContributionPage(srn, index))
+                  .set(MemberStatus(srn, index), MemberState.Changed)
+                  .mapK[Future]
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                   srn,

@@ -16,7 +16,8 @@
 
 package controllers.nonsipp.memberpensionpayments
 
-import services.PsrSubmissionService
+import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails.MemberStatus
 import viewmodels.implicits._
 import play.api.mvc._
 import controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController._
@@ -32,7 +33,9 @@ import models.SchemeId.Srn
 import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsCYAPage, TotalAmountPensionPaymentsPage}
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.CompilationOrSubmissionDatePage
+import play.api.Logger
 import navigation.Navigator
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -47,9 +50,12 @@ class MemberPensionPaymentsCYAController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   psrSubmissionService: PsrSubmissionService,
+  saveService: SaveService,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
     extends PSRController {
+
+  private val logger = Logger(getClass)
 
   def onPageLoad(
     srn: Srn,
@@ -104,17 +110,24 @@ class MemberPensionPaymentsCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      psrSubmissionService
-        .submitPsrDetails(
-          srn,
-          fallbackCall = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-            .onPageLoad(srn, index, mode)
-        )
-        .map {
-          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          case Some(_) =>
-            Redirect(navigator.nextPage(MemberPensionPaymentsCYAPage(srn), mode, request.userAnswers))
-        }
+      for {
+        updatedAnswers <- request.userAnswers
+          .setWhen(memberPaymentsChanged)(MemberStatus(srn, index), {
+            logger.info(s"Setting member $index MemberStatus to Changed")
+            MemberState.Changed
+          })
+          .mapK[Future]
+        _ <- saveService.save(updatedAnswers)
+        submissionResult <- psrSubmissionService
+          .submitPsrDetailsWithUA(
+            srn,
+            updatedAnswers,
+            fallbackCall = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
+              .onPageLoad(srn, index, mode)
+          )
+      } yield submissionResult.getOrRecoverJourney(
+        _ => Redirect(navigator.nextPage(MemberPensionPaymentsCYAPage(srn), mode, request.userAnswers))
+      )
     }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =

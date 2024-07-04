@@ -97,7 +97,7 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
 
       act.like(
         redirectNextPage(onSubmit(mode))
-          .before(MockPSRSubmissionService.submitPsrDetails())
+          .before(MockPsrSubmissionService.submitPsrDetails())
           .after({
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)

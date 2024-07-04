@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberpensionpayments
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max300
@@ -32,7 +32,7 @@ import models.SchemeId.Srn
 import pages.nonsipp.memberpensionpayments.{RemovePensionPaymentsPage, TotalAmountPensionPaymentsPage}
 import controllers.actions.IdentifyAndRequireData
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, MemberState, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -104,7 +104,11 @@ class RemovePensionPaymentsController @Inject()(
             if (removeDetails) {
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.remove(TotalAmountPensionPaymentsPage(srn, index)))
+                  .fromTry(
+                    request.userAnswers
+                      .remove(TotalAmountPensionPaymentsPage(srn, index))
+                      .set(MemberStatus(srn, index), MemberState.Changed)
+                  )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                   srn,

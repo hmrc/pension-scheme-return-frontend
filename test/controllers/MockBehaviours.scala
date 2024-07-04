@@ -17,13 +17,14 @@
 package controllers
 
 import services.{PsrSubmissionService, SchemeDateService}
+import org.mockito.verification.VerificationMode
 import org.mockito.Mockito.when
 import connectors.{EmailConnector, EmailSent, EmailStatus}
 import config.Refined.Max3
 import cats.data.NonEmptyList
 import org.mockito.stubbing.OngoingStubbing
 import models.DateRange
-import org.mockito.ArgumentMatchers
+import org.mockito.{ArgumentMatchers, Mockito}
 import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
@@ -44,11 +45,20 @@ trait MockBehaviours {
       when(mock.returnPeriods(any())(any())).thenReturn(returns)
   }
 
-  object MockPSRSubmissionService {
+  object MockPsrSubmissionService {
 
     def submitPsrDetails()(implicit mock: PsrSubmissionService): OngoingStubbing[Future[Option[Unit]]] =
       when(mock.submitPsrDetails(any(), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(())))
+
+    def submitPsrDetailsWithUA()(implicit mock: PsrSubmissionService): OngoingStubbing[Future[Option[Unit]]] =
+      when(mock.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(())))
+
+    object verify {
+      def submitPsrDetailsWithUA(v: VerificationMode)(implicit mock: PsrSubmissionService): Future[Option[Unit]] =
+        Mockito.verify(mock, v).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+    }
   }
 
   object MockEmailConnector {

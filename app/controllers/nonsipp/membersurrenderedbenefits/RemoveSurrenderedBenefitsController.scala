@@ -17,7 +17,7 @@
 package controllers.nonsipp.membersurrenderedbenefits
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max300
@@ -32,7 +32,7 @@ import play.api.data.Form
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
+import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -110,6 +110,7 @@ class RemoveSurrenderedBenefitsController @Inject()(
                         surrenderBenefitsPages(srn, index)
                       )
                       .set(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.InProgress)
+                      .set(MemberStatus(srn, index), MemberState.Changed)
                   )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(

@@ -25,15 +25,17 @@ import cats.implicits.toTraverseOps
 import cats.syntax.applicative._
 import play.api.libs.json.{Reads, Writes}
 import models.backend.responses.{IndividualDetails, PsrVersionsResponse}
+import pages.nonsipp.memberpayments.Paths.membersPayments
 import models.{DateRange, UserAnswers}
 import cats.Applicative
-import viewmodels.models.Flag
 import models.requests.DataRequest
 import eu.timepit.refined.api.{Refined, Validate}
 import cats.syntax.either._
 import eu.timepit.refined.refineV
 import play.api.i18n.I18nSupport
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import pages.nonsipp.memberpayments.Omitted
+import viewmodels.models.Flag
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -104,6 +106,10 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
           case None => ""
         }
     }
+
+  def memberPaymentsChanged(implicit request: DataRequest[_]): Boolean = request.pureUserAnswers.exists(
+    !_.sameAs(request.userAnswers, membersPayments, Omitted.membersPayments: _*)
+  )
 
   implicit class OptionOps[A](maybe: Option[A]) {
     def getOrRecoverJourney[F[_]: Applicative](f: A => F[Result]): F[Result] = maybe match {

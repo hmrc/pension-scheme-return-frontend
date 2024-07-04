@@ -16,8 +16,8 @@
 
 package controllers.nonsipp.memberreceivedpcls
 
-import services.PsrSubmissionService
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc._
 import config.Refined._
 import controllers.PSRController
@@ -32,6 +32,7 @@ import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -46,6 +47,7 @@ class PclsCYAController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView,
+  saveService: SaveService,
   psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -96,16 +98,20 @@ class PclsCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      psrSubmissionService
-        .submitPsrDetails(
-          srn,
-          fallbackCall = controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController.onPageLoad(srn, index, mode)
-        )
-        .map {
-          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          case Some(_) =>
-            Redirect(navigator.nextPage(PclsCYAPage(srn, index), mode, request.userAnswers))
-        }
+      for {
+        updatedAnswers <- request.userAnswers
+          .setWhen(memberPaymentsChanged)(MemberStatus(srn, index), MemberState.Changed)
+          .mapK[Future]
+        _ <- saveService.save(updatedAnswers)
+        submissionResult <- psrSubmissionService
+          .submitPsrDetailsWithUA(
+            srn,
+            updatedAnswers,
+            fallbackCall = controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController.onPageLoad(srn, index, mode)
+          )
+      } yield submissionResult.getOrRecoverJourney(
+        _ => Redirect(navigator.nextPage(PclsCYAPage(srn, index), mode, request.userAnswers))
+      )
     }
 
   def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =

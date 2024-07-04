@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.employercontributions
 
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
@@ -33,7 +33,7 @@ import controllers.nonsipp.employercontributions.RemoveEmployerContributionsCont
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, MemberState, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -92,6 +92,7 @@ class RemoveEmployerContributionsController @Inject()(
                   request.userAnswers
                     .remove(EmployerNamePage(srn, memberIndex, index))
                     .remove(EmployerContributionsProgress(srn, memberIndex, index))
+                    .set(MemberStatus(srn, memberIndex), MemberState.Changed)
                 )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(

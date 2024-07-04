@@ -27,12 +27,16 @@ case class MemberDetailsCompletedPage(srn: Srn, index: Max300) extends QuestionP
 
   override def path: JsPath = Paths.personalDetails \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "memberDetailsSectionCompleted"
+  override def toString: String = MemberDetailsCompletedPage.key
 }
 
 case class MembersDetailsCompletedPages(srn: Srn) extends IndexedQuestionPage[SectionCompleted] {
 
   override def path: JsPath = Paths.personalDetails \ toString
 
-  override def toString: String = "memberDetailsSectionCompleted"
+  override def toString: String = MemberDetailsCompletedPage.key
+}
+
+object MemberDetailsCompletedPage {
+  val key = "memberDetailsSectionCompleted"
 }

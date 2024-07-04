@@ -91,7 +91,7 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
     act.like(
       redirectNextPage(onSubmit)
         .before(
-          MockPSRSubmissionService.submitPsrDetails()
+          MockPsrSubmissionService.submitPsrDetails()
         )
         .after(
           verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())

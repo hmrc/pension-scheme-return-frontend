@@ -79,6 +79,7 @@ class MemberPaymentsTransformer @Inject()(
     for {
       currentMemberDetails <- buildMemberDetails(srn, userAnswers)
       initialMemberDetails <- buildMemberDetails(srn, initialUA)
+      maybePreviousMemberDetails <- previousVersionUA.traverse(buildMemberDetails(srn, _))
     } yield {
 
       val softDeletedMembers: List[MemberDetails] = userAnswers.get(SoftDeletedMembers(srn)).toList.flatten.map {
@@ -115,43 +116,85 @@ class MemberPaymentsTransformer @Inject()(
        * - else change to NEW as the member has not been part of a declaration yet
        */
       val memberDetailsWithCorrectState = currentMemberDetails.map {
-        _ -> psrState -> previousVersionUA match {
+        _ -> psrState -> maybePreviousMemberDetails match {
           // new member created and changed while in interim Submitted state
           case (((index, currentMemberDetail), Some(Submitted)), None)
               if currentMemberDetail.state.changed && currentMemberDetail.memberPSRVersion.isEmpty =>
+            logger.info(
+              s"PSR is Submitted - Member $index state is Changed but no member PSR version and no previous version - newly added member, setting to New"
+            )
             (index, currentMemberDetail.copy(state = MemberState.New))
           // member created before first submission and changed before first POST since first submission (interim Submitted state)
           case (((index, currentMemberDetail), Some(Submitted)), None) if currentMemberDetail.state.changed =>
+            logger.info(
+              s"PSR is Submitted - Member $index state is Changed but has a member PSR version and no previous version - existing member, leaving status as Changed"
+            )
             (index, currentMemberDetail)
           case (((index, currentMemberDetail), _), _)
               if currentMemberDetail.state.changed && initialMemberDetails.get(index).exists(_.state.changed) =>
+            logger.info(
+              s"Member $index state is Changed but initial UA shows the same member as Changed - leaving status as Changed"
+            )
             (index, currentMemberDetail)
-          case (((index, currentMemberDetail), _), Some(previousUA))
-              if currentMemberDetail.state.changed && previousUA.get(MemberStatus(srn, index)).nonEmpty =>
+          case (((index, currentMemberDetail), _), Some(previousMemberDetails))
+              if currentMemberDetail.state.changed && previousMemberDetails.contains(index) =>
+            logger.info(
+              s"Member $index state is Changed and previous version member details shows the same member exists - leaving status as Changed"
+            )
             (index, currentMemberDetail)
-          case (((index, currentMemberDetail), _), _) =>
+          case (((index, currentMemberDetail), Some(Compiled)), Some(previousMemberDetails))
+              if currentMemberDetail.state.changed && previousMemberDetails.contains(index) =>
+            logger.info(
+              s"PSR is Compiled - Member $index state is Changed and previous version member details shows the same member exists - leaving status as Changed"
+            )
+            (index, currentMemberDetail)
+          case (((index, currentMemberDetail), state), previousMemberDetails) =>
+            logger.info(
+              s"Member $index state has not matched any of the previous statements. member state (${currentMemberDetail.state}), PSR state ($state), previous version member details exists (${previousMemberDetails.nonEmpty}) - setting state to New"
+            )
             (index, currentMemberDetail.copy(state = MemberState.New))
         }
       }
 
       // Omit memberPSRVersion if member has changed
+      // Check for empty member payment sections before comparing members
+      // (this is because we send empty records in certain sections for members)
       val memberDetailsWithCorrectVersion: List[MemberDetails] = memberDetailsWithCorrectState.map {
         case (index, currentMemberDetail) =>
           val optInitialMemberDetail = initialMemberDetails.get(index)
+          val refinedCurrentMember =
+            currentMemberDetail
+              .copy(
+                memberLumpSumReceived =
+                  if (currentMemberDetail.memberLumpSumReceived.exists(_.empty)) None
+                  else currentMemberDetail.memberLumpSumReceived,
+                pensionAmountReceived =
+                  if (currentMemberDetail.pensionAmountReceived.contains(0.0)) None
+                  else currentMemberDetail.pensionAmountReceived,
+                totalContributions =
+                  if (currentMemberDetail.totalContributions.contains(0.0)) None
+                  else currentMemberDetail.totalContributions
+              )
+          val same = optInitialMemberDetail.contains(refinedCurrentMember)
+          if (!same) {
+            logger.info(s"member $index has changed, removing memberPSRVersion")
+          }
           currentMemberDetail.copy(
-            memberPSRVersion =
-              if (optInitialMemberDetail.contains(currentMemberDetail)) currentMemberDetail.memberPSRVersion else None
+            memberPSRVersion = if (same) currentMemberDetail.memberPSRVersion else None
           )
       }.toList
 
+      // Bug: Currently
       (memberDetailsWithCorrectVersion, softDeletedMembers) match {
         case (Nil, Nil) => None
         case _ =>
+          val sameMemberPayments: Boolean = userAnswers.sameAs(initialUA, membersPayments, Omitted.membersPayments: _*)
+          if (!sameMemberPayments) {
+            logger.info(s"member payments has changed, removing recordVersion")
+          }
           Some(
             MemberPayments(
-              recordVersion = Option.when(
-                userAnswers.sameAs(initialUA, membersPayments, Omitted.membersPayments: _*)
-              )(
+              recordVersion = Option.when(sameMemberPayments)(
                 userAnswers.get(MemberPaymentsRecordVersionPage(srn)).get
               ),
               memberDetails = memberDetailsWithCorrectVersion ++ softDeletedMembers,

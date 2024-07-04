@@ -74,7 +74,9 @@ case class EmployerContributions(
 case class MemberLumpSumReceived(
   lumpSumAmount: Double,
   designatedPensionAmount: Double
-)
+) {
+  val empty: Boolean = lumpSumAmount == 0.0 && designatedPensionAmount == 0.0
+}
 
 sealed trait EmployerType
 

@@ -17,7 +17,7 @@
 package controllers.nonsipp.receivetransfer
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max300, Max5}
@@ -33,7 +33,7 @@ import play.api.data.Form
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
+import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -95,6 +95,7 @@ class RemoveTransferInController @Inject()(
                         transferInPages(srn, memberIndex, index)
                       )
                       .set(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
+                      .set(MemberStatus(srn, memberIndex), MemberState.Changed)
                   )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
