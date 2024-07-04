@@ -425,10 +425,14 @@ POST        /:srn/how-much-unallocated-employer-contributions                   
 GET         /:srn/change-how-much-unallocated-employer-contributions                    controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-how-much-unallocated-employer-contributions                    controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/check-answers-unallocated-employer-contributions                      controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/submit-check-answers-unallocated-employer-contributions               controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-check-answers-unallocated-employer-contributions               controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-submit-answers-unallocated-employer-contributions              controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/check-answers-unallocated-employer-contributions                                                  controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/submit-check-answers-unallocated-employer-contributions                                           controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-check-answers-unallocated-employer-contributions                                           controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-submit-answers-unallocated-employer-contributions                                          controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-submit-check-answers-unallocated-employer-contributions                                    controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, mode: Mode = ViewOnlyMode)
+GET         /:srn/check-answers-unallocated-employer-contributions/view/:year/:current/:previous                    controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoadViewOnly(srn: Srn, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/check-answers-unallocated-employer-contributions/previous/:year/:current/:previous                controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int)
+GET         /:srn/submit-check-answers-unallocated-employer-contributions/view/:year/:current/:previous             controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
 
 GET         /:srn/remove-unallocated-employer-contributions                             controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/remove-unallocated-employer-contributions                             controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onSubmit(srn: Srn, mode: Mode = NormalMode)

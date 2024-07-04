@@ -327,7 +327,9 @@ object ViewOnlyTaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "unallocatedcontributions.title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
+          controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+            .onPageLoadViewOnly(srn, year, currentVersion, previousVersion)
+            .url
         ),
         unallocatedEmployerContributionsTaskListStatus
       ),
