@@ -30,5 +30,9 @@ case class MemberStatus(srn: Srn, index: Max300) extends QuestionPage[MemberStat
 
   override def path: JsPath = Paths.personalDetails \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "memberStatus"
+  override def toString: String = MemberStatus.key
+}
+
+object MemberStatus {
+  val key = "memberStatus"
 }
