@@ -23,13 +23,14 @@ import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
+import pages.nonsipp.FbVersionPage
 import models._
 import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
 import pages.nonsipp.loansmadeoroutstanding._
 import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import org.mockito.Mockito.{reset, times, verify}
+import org.mockito.Mockito._
 
 class LoansCYAControllerSpec extends ControllerBaseSpec {
 
@@ -54,6 +55,21 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
 
   private def onSubmit(mode: Mode) = routes.LoansCYAController.onSubmit(srn, index, mode)
 
+  private lazy val onPageLoadViewOnly = routes.LoansCYAController.onPageLoadViewOnly(
+    srn,
+    index,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private lazy val onSubmitViewOnly = routes.LoansCYAController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
     .unsafeSet(CompanyRecipientNamePage(srn, index), recipientName)
@@ -72,24 +88,23 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
         renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
             viewModel(
-              ViewModelParameters(
-                srn,
-                index,
-                schemeName,
-                IdentityType.UKCompany,
-                recipientName,
-                recipientDetails = Some(crn.value),
-                recipientReasonNoDetails = None,
-                connectedParty = Right(SponsoringOrConnectedParty.ConnectedParty),
-                datePeriodLoan = (localDate, money, loanPeriod),
-                loanAmount = (money, money, money),
-                returnEndDate = dateRange.to,
-                repaymentInstalments = true,
-                loanInterest = (money, percentage, money),
-                outstandingArrearsOnLoan = Some(money),
-                securityOnLoan = Some(security),
-                mode
-              )
+              srn,
+              index,
+              schemeName,
+              IdentityType.UKCompany,
+              recipientName,
+              recipientDetails = Some(crn.value),
+              recipientReasonNoDetails = None,
+              connectedParty = Right(SponsoringOrConnectedParty.ConnectedParty),
+              datePeriodLoan = (localDate, money, loanPeriod),
+              loanAmount = (money, money, money),
+              returnEndDate = dateRange.to,
+              repaymentInstalments = true,
+              loanInterest = (money, percentage, money),
+              outstandingArrearsOnLoan = Some(money),
+              securityOnLoan = Some(security),
+              mode,
+              viewOnlyUpdated = true
             )
           )
         }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
@@ -118,5 +133,75 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
           .withName(s"redirect to journey recovery page on submit when in ${mode.toString} mode")
       )
     }
+  }
+
+  "LoansCYAController in view only mode" - {
+
+    val currentUserAnswers = defaultUserAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
+      .unsafeSet(CompanyRecipientNamePage(srn, index), recipientName)
+      .unsafeSet(CompanyRecipientCrnPage(srn, index, subject), ConditionalYesNo.yes[String, Crn](crn))
+      .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.ConnectedParty)
+      .unsafeSet(DatePeriodLoanPage(srn, index), (localDate, money, loanPeriod))
+      .unsafeSet(AmountOfTheLoanPage(srn, index), (money, money, money))
+      .unsafeSet(AreRepaymentsInstalmentsPage(srn, index), true)
+      .unsafeSet(InterestOnLoanPage(srn, index), (money, percentage, money))
+      .unsafeSet(SecurityGivenForLoanPage(srn, index), ConditionalYesNo.yes[Unit, Security](security))
+      .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.yes[Unit, Money](money))
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
+      .unsafeSet(CompanyRecipientNamePage(srn, index), recipientName)
+      .unsafeSet(CompanyRecipientCrnPage(srn, index, subject), ConditionalYesNo.yes[String, Crn](crn))
+      .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.ConnectedParty)
+      .unsafeSet(DatePeriodLoanPage(srn, index), (localDate, money, loanPeriod))
+      .unsafeSet(AmountOfTheLoanPage(srn, index), (money, money, money))
+      .unsafeSet(AreRepaymentsInstalmentsPage(srn, index), true)
+      .unsafeSet(InterestOnLoanPage(srn, index), (money, percentage, money))
+      .unsafeSet(SecurityGivenForLoanPage(srn, index), ConditionalYesNo.yes[Unit, Security](security))
+      .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.yes[Unit, Money](money))
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              srn,
+              index,
+              schemeName,
+              IdentityType.UKCompany,
+              recipientName,
+              recipientDetails = Some(crn.value),
+              recipientReasonNoDetails = None,
+              connectedParty = Right(SponsoringOrConnectedParty.ConnectedParty),
+              datePeriodLoan = (localDate, money, loanPeriod),
+              loanAmount = (money, money, money),
+              returnEndDate = dateRange.to,
+              repaymentInstalments = true,
+              loanInterest = (money, percentage, money),
+              outstandingArrearsOnLoan = Some(money),
+              securityOnLoan = Some(security),
+              ViewOnlyMode,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }
+    )
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
   }
 }
