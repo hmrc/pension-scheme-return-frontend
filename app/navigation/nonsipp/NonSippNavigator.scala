@@ -51,18 +51,10 @@ class NonSippNavigator @Inject()() extends Navigator {
       case FinancialDetailsCheckYourAnswersPage(srn) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
       case page @ HowManyMembersPage(srn, PsaId(_)) =>
-        if (userAnswers.get(page).exists(_.total > 99)) {
-          nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
-        } else {
-          controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
-        }
+        controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
 
       case page @ HowManyMembersPage(srn, PspId(_)) =>
-        if (userAnswers.get(page).exists(_.total > 99)) {
-          nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
-        } else {
-          controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
-        }
+        controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
     }
 
     override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
@@ -77,18 +69,10 @@ class NonSippNavigator @Inject()() extends Navigator {
             }
 
           case page @ HowManyMembersPage(srn, PsaId(_)) =>
-            if (userAnswers.get(page).exists(_.total > 99)) {
-              nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
-            } else {
-              controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode)
-            }
+            controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode)
 
           case page @ HowManyMembersPage(srn, PspId(_)) =>
-            if (userAnswers.get(page).exists(_.total > 99)) {
-              nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
-            } else {
-              controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode)
-            }
+            controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode)
 
           case HowMuchCashPage(srn, mode) =>
             nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController.onPageLoad(srn, mode)

@@ -143,7 +143,7 @@ class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         call = onSubmitViewOnly,
-        expected = controllers.nonsipp.routes.ViewOnlyTaskListController
+        page = controllers.nonsipp.routes.ViewOnlyTaskListController
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(never))
         .withName("Submit redirects to view only tasklist")

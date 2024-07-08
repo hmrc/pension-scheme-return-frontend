@@ -53,8 +53,9 @@ class WhatYouWillNeedController @Inject()(
 
   def onSubmit(srn: Srn, fbNumber: String, taxYear: String, version: String): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
+      // as we cannot access pensionSchemeId in the navigator
       val members = request.userAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
-      if (members.exists(_.total > 99)) { // as we cannot access pensionSchemeId in the navigator
+      if (members.exists(_.totalActiveAndDeferred > 99)) {
         Future.successful(
           Redirect(controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode))
         )
