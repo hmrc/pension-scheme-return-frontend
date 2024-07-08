@@ -19,7 +19,7 @@ package controllers.nonsipp.memberdetails
 import services.{PsrSubmissionService, SaveService}
 import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
 import pages.nonsipp.memberdetails._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import com.google.inject.Inject
 import config.Refined.Max300
 import controllers.PSRController
@@ -27,10 +27,12 @@ import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
 import pages.nonsipp.memberpayments.Paths.membersPayments
 import play.api.i18n.MessagesApi
+import models.requests.DataRequest
 import viewmodels.implicits._
 import utils.MessageUtils.booleanToMessage
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import pages.nonsipp.CompilationOrSubmissionDatePage
 import uk.gov.hmrc.domain.Nino
 import play.api.Logger
 import navigation.Navigator
@@ -43,6 +45,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
+import java.time.LocalDateTime
 import javax.inject.Named
 
 class SchemeMemberDetailsAnswersController @Inject()(
@@ -58,17 +61,52 @@ class SchemeMemberDetailsAnswersController @Inject()(
 
   private val logger = Logger(getClass)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(
+    srn: Srn,
+    index: Max300,
+    mode: Mode
+  ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val result = for {
+      onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicitly)
+    }
+  def onPageLoadViewOnly(
+    srn: Srn,
+    index: Max300,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicitly)
+    }
+
+  def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+    (
+      for {
         memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index))
         hasNINO <- request.userAnswers.get(DoesMemberHaveNinoPage(srn, index))
         maybeNino <- Option.when(hasNINO)(request.userAnswers.get(MemberDetailsNinoPage(srn, index))).sequence
         maybeNoNinoReason <- Option.when(!hasNINO)(request.userAnswers.get(NoNINOPage(srn, index))).sequence
-      } yield Ok(view(viewModel(index, srn, mode, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)))
-
-      result.getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-    }
+      } yield Ok(
+        view(
+          viewModel(
+            index,
+            srn,
+            mode,
+            memberDetails,
+            hasNINO,
+            maybeNino,
+            maybeNoNinoReason,
+            viewOnlyUpdated = false,
+            optYear = request.year,
+            optCurrentVersion = request.currentVersion,
+            optPreviousVersion = request.previousVersion,
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          )
+        )
+      )
+    ).getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -105,6 +143,13 @@ class SchemeMemberDetailsAnswersController @Inject()(
       } yield submissionResult.fold(
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       )(_ => Redirect(navigator.nextPage(SchemeMemberDetailsAnswersPage(srn), NormalMode, request.userAnswers)))
+    }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+      )
     }
 }
 
@@ -186,17 +231,54 @@ object SchemeMemberDetailsAnswersController {
     memberDetails: NameDOB,
     hasNINO: Boolean,
     maybeNino: Option[Nino],
-    maybeNoNinoReason: Option[String]
+    maybeNoNinoReason: Option[String],
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel(
-      title = mode.fold(normal = "checkYourAnswers.title", check = "changeMemberDetails.title"),
+      mode = mode,
+      title = mode.fold(
+        normal = "checkYourAnswers.title",
+        check = "changeMemberDetails.title",
+        viewOnly = "memberDetailsCYA.viewOnly.title"
+      ),
       heading = mode.fold(
         normal = "checkYourAnswers.heading",
-        check = Message("changeMemberDetails.heading", memberDetails.fullName)
+        check = Message("changeMemberDetails.heading", memberDetails.fullName),
+        viewOnly = Message("memberDetailsCYA.viewOnly.title", memberDetails.fullName)
       ),
-      CheckYourAnswersViewModel.singleSection(
+      description = None,
+      page = CheckYourAnswersViewModel.singleSection(
         rows(index, srn, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)
       ),
-      routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index, mode)
-    ).withButtonText(Message("site.continue"))
+      refresh = None,
+      buttonText =
+        mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
+      onSubmit = routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index, mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = None,
+            submittedText = Some(Message("")),
+            title = "memberDetailsCYA.viewOnly.title",
+            heading = Message("memberDetailsCYA.viewOnly.heading", memberDetails.fullName),
+            buttonText = "site.return.to.tasklist",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                routes.SchemeMemberDetailsAnswersController
+                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                routes.SchemeMemberDetailsAnswersController
+                  .onSubmit(srn, index, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
+    )
 }

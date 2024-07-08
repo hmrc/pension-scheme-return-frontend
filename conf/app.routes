@@ -115,9 +115,12 @@ POST        /:srn/national-insurance-number/:index                              
 GET         /:srn/change-national-insurance-number/:index                               controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
 POST        /:srn/change-national-insurance-number/:index                               controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
-GET         /:srn/check-member-details                                                  controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
-GET         /:srn/check-member-details/:index                                           controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
-POST        /:srn/check-member-details/:index                                           controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
+GET         /:srn/check-member-details                                                      controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
+GET         /:srn/check-member-details/:index                                               controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/check-member-details/:index                                               controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/change-submit-check-member-details/:index                         controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, mode: Mode = ViewOnlyMode)
+GET         /:srn/check-member-details/:index/view/:year/:current/:previous         controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoadViewOnly(srn: Srn, index: Max300, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/submit-check-member-details/view/:year/:current/:previous         controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
 
 GET         /:srn/change-member-details                                                 controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = CheckMode)
 GET         /:srn/change-member-details/:index                                          controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
