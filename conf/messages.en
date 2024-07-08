@@ -2789,6 +2789,8 @@ sharesCYA.section4.totalAssetValue = Total value of {0}’s assets on the date t
 sharesCYA.section4.totalAssetValue.hidden =  total value of {0}’s assets on the date these shares were acquired
 sharesCYA.section4.sharesTotalIncome = Total income from these shares in the period of this return
 sharesCYA.section4.sharesTotalIncome.hidden =  total income from these shares in the period of this return
+sharesCYA.viewOnly.title = View details of this share transaction
+sharesCYA.viewOnly.heading = Share transaction for {0}
 
 overview.title = Pension scheme return overview
 overview.heading =  Pension scheme return overview
