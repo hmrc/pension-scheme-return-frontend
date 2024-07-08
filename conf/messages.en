@@ -2098,7 +2098,7 @@ moneyBorrowedCheckYourAnswers.section.schemeBorrowed = Reason {0} borrowed this 
 moneyBorrowedCheckYourAnswers.section.schemeBorrowed.hidden = the reason the scheme borrowed this money
 
 moneyBorrowedCheckYourAnswers.viewOnly.title = Money borrowed
-moneyBorrowedCheckYourAnswers.viewOnly.heading = {0} borrowed from {1}
+moneyBorrowedCheckYourAnswers.viewOnly.heading = £{0} borrowed from {1}
 
 moneyBorrowedCheckYourAnswers.change.title = Change details for money borrowed
 moneyBorrowedCheckYourAnswers.change.heading = Change details for £{0} borrowed from {1}

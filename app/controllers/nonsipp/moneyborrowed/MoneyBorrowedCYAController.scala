@@ -52,14 +52,10 @@ class MoneyBorrowedCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(
-    srn: Srn,
-    index: Max5000,
-    mode: Mode
-  ): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
       onPageLoadCommon(srn, index, mode)(implicitly)
-    }
+  }
 
   def onPageLoadViewOnly(
     srn: Srn,
@@ -150,6 +146,7 @@ object MoneyBorrowedCYAController {
     compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
+      mode = mode,
       title = mode
         .fold(
           normal = "moneyBorrowedCheckYourAnswers.title",
@@ -184,8 +181,7 @@ object MoneyBorrowedCYAController {
         )
       ),
       refresh = None,
-      buttonText =
-        mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
+      buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
       onSubmit = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onSubmit(srn, index, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
         Some(
@@ -196,7 +192,7 @@ object MoneyBorrowedCYAController {
             title = "moneyBorrowedCheckYourAnswers.viewOnly.title",
             heading =
               Message("moneyBorrowedCheckYourAnswers.viewOnly.heading", borrowedAmountAndRate._1.displayAs, lenderName),
-            buttonText = "site.return.to.tasklist",
+            buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
