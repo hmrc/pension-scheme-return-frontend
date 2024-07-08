@@ -165,8 +165,7 @@ object MemberPensionPaymentsCYAController {
         )
       ),
       refresh = None,
-      buttonText =
-        mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
+      buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
       onSubmit = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
         .onSubmit(srn, index, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {

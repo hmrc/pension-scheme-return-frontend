@@ -168,8 +168,7 @@ object MemberContributionsCYAController {
         )
       ),
       refresh = None,
-      buttonText =
-        mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
+      buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
       onSubmit = controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
         .onSubmit(srn, index, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
@@ -180,7 +179,7 @@ object MemberContributionsCYAController {
             submittedText = Some(Message("")),
             title = "MemberContributionCYA.viewOnly.title",
             heading = Message("MemberContributionCYA.viewOnly.heading", memberName),
-            buttonText = "site.return.to.tasklist",
+            buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
