@@ -22,7 +22,6 @@ import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.Max300
 import controllers.PSRController
 import controllers.nonsipp.membercontributions.MemberContributionsCYAController._
-import controllers.nonsipp.routes
 import controllers.actions.IdentifyAndRequireData
 import models._
 import play.api.i18n.MessagesApi
@@ -118,11 +117,15 @@ class MemberContributionsCYAController @Inject()(
         }
     }
 
-  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
-      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.membercontributions.routes.MemberContributionListController
+            .onPageLoadViewOnly(srn, page, year, current, previous)
+        )
+      )
     }
-
 }
 
 object MemberContributionsCYAController {
@@ -183,7 +186,7 @@ object MemberContributionsCYAController {
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
-                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+                  .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
                   .onSubmit(srn, index, mode)

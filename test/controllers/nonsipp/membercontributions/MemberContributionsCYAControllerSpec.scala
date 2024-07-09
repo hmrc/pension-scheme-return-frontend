@@ -39,6 +39,7 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onSubmitViewOnly = routes.MemberContributionsCYAController.onSubmitViewOnly(
     srn,
+    1,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -144,8 +145,8 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+        controllers.nonsipp.membercontributions.routes.MemberContributionListController
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )
