@@ -252,11 +252,11 @@ class OverviewController @Inject()(
     }
 
   def onSelectViewAndChange(srn: Srn, fbNumber: String, reportType: String): Action[AnyContent] =
-    identifyAndRequireData(srn, fbNumber).async { _ =>
+    identifyAndRequireData(srn, fbNumber).async { implicit request =>
       reportType match {
         case PsrReportType.Sipp.name =>
-          val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippViewAndChange}?fbNumber=$fbNumber"
-          Future.successful(Redirect(sippUrl))
+          val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippViewAndChange}"
+          Future.successful(Redirect(sippUrl).addingToSession("fbNumber" -> fbNumber))
         case _ =>
           Future.successful(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
       }
