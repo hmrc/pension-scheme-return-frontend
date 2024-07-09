@@ -22,6 +22,7 @@ import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.shares.SharesCYAController._
+import pages.nonsipp.FbVersionPage
 import models._
 import pages.nonsipp.common.IdentityTypePage
 import org.mockito.ArgumentMatchers.any
@@ -61,6 +62,21 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
     routes.SharesCYAController.onPageLoad(srn, index, mode)
   private def onSubmit(mode: Mode) = routes.SharesCYAController.onSubmit(srn, index, mode)
 
+  private lazy val onPageLoadViewOnly = routes.SharesCYAController.onPageLoadViewOnly(
+    srn,
+    index,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private lazy val onSubmitViewOnly = routes.SharesCYAController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(TypeOfSharesHeldPage(srn, index), ConnectedParty)
     .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), Contribution)
@@ -83,28 +99,27 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
         renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
             viewModel(
-              ViewModelParameters(
-                srn,
-                index,
-                schemeName,
-                typeOfShare = ConnectedParty,
-                holdShares = Contribution,
-                whenDidSchemeAcquire = Some(localDate),
-                companyNameRelatedShares = companyName,
-                companySharesCrn = ConditionalYesNo.yes[String, Crn](crn),
-                companyName,
-                howManyShares = totalShares,
-                identityType = Some(IdentityType.UKPartnership),
-                recipientName = Some(companyName),
-                recipientDetails = None,
-                recipientReasonNoDetails = None,
-                sharesFromConnectedParty = None,
-                costOfShares = money,
-                shareIndependentValue = true,
-                totalAssetValue = None,
-                sharesTotalIncome = money,
-                mode = mode
-              )
+              srn,
+              index,
+              schemeName,
+              typeOfShare = ConnectedParty,
+              holdShares = Contribution,
+              whenDidSchemeAcquire = Some(localDate),
+              companyNameRelatedShares = companyName,
+              companySharesCrn = ConditionalYesNo.yes[String, Crn](crn),
+              companyName,
+              howManyShares = totalShares,
+              identityType = Some(IdentityType.UKPartnership),
+              recipientName = Some(companyName),
+              recipientDetails = None,
+              recipientReasonNoDetails = None,
+              sharesFromConnectedParty = None,
+              costOfShares = money,
+              shareIndependentValue = true,
+              totalAssetValue = None,
+              sharesTotalIncome = money,
+              mode = mode,
+              viewOnlyUpdated = true
             )
           )
         }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
@@ -135,5 +150,59 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
           .withName(s"redirect to journey recovery page on submit when in $mode mode")
       )
     }
+  }
+
+  "SharesCYAController in view only mode" - {
+
+    val currentUserAnswers = filledUserAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              srn,
+              index,
+              schemeName,
+              typeOfShare = ConnectedParty,
+              holdShares = Contribution,
+              whenDidSchemeAcquire = Some(localDate),
+              companyNameRelatedShares = companyName,
+              companySharesCrn = ConditionalYesNo.yes[String, Crn](crn),
+              companyName,
+              howManyShares = totalShares,
+              identityType = Some(IdentityType.UKPartnership),
+              recipientName = Some(companyName),
+              recipientDetails = None,
+              recipientReasonNoDetails = None,
+              sharesFromConnectedParty = None,
+              costOfShares = money,
+              shareIndependentValue = true,
+              totalAssetValue = None,
+              sharesTotalIncome = money,
+              ViewOnlyMode,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }
+    )
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
   }
 }

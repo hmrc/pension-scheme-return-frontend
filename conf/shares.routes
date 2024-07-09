@@ -129,6 +129,9 @@ POST        /:srn/submit-check-answers-shares/:index                            
 GET         /:srn/change-check-answers-shares                                      controllers.nonsipp.shares.SharesCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 GET         /:srn/change-check-answers-shares/:index                               controllers.nonsipp.shares.SharesCYAController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-submit-check-answers-shares/:index                        controllers.nonsipp.shares.SharesCYAController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-submit-check-answers-shares/:index                        controllers.nonsipp.shares.SharesCYAController.onSubmit(srn: Srn, index: Max5000, mode: Mode = ViewOnlyMode)
+GET         /:srn/check-answers-shares/:index/view/:year/:current/:previous        controllers.nonsipp.shares.SharesCYAController.onPageLoadViewOnly(srn: Srn, index: Max5000, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/submit-check-answers-shares/view/:year/:current/:previous        controllers.nonsipp.shares.SharesCYAController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
 
 GET         /:srn/remove-shares/:index                                             controllers.nonsipp.shares.RemoveSharesController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 POST        /:srn/remove-shares/:index                                             controllers.nonsipp.shares.RemoveSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
