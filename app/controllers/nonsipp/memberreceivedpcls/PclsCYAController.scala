@@ -155,7 +155,7 @@ object PclsCYAController {
         )
       ),
       refresh = None,
-      buttonText = mode.fold(normal = "site.continue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
+      buttonText = mode.fold(normal = "site.continue", check = "site.continue", viewOnly = "site.continue"),
       onSubmit = controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController.onSubmit(srn, index, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
         Some(
@@ -165,7 +165,7 @@ object PclsCYAController {
             submittedText = Some(Message("")),
             title = "pclsCYA.viewOnly.title",
             heading = Message("pclsCYA.viewOnly.heading", memberName),
-            buttonText = "site.return.to.tasklist",
+            buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController

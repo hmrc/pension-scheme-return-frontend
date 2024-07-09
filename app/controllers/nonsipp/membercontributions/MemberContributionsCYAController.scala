@@ -22,7 +22,6 @@ import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.Max300
 import controllers.PSRController
 import controllers.nonsipp.membercontributions.MemberContributionsCYAController._
-import controllers.nonsipp.routes
 import controllers.actions.IdentifyAndRequireData
 import models._
 import play.api.i18n.MessagesApi
@@ -118,11 +117,15 @@ class MemberContributionsCYAController @Inject()(
         }
     }
 
-  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
-      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.membercontributions.routes.MemberContributionListController
+            .onPageLoadViewOnly(srn, page, year, current, previous)
+        )
+      )
     }
-
 }
 
 object MemberContributionsCYAController {
@@ -168,8 +171,7 @@ object MemberContributionsCYAController {
         )
       ),
       refresh = None,
-      buttonText =
-        mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
+      buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
       onSubmit = controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
         .onSubmit(srn, index, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
@@ -180,11 +182,11 @@ object MemberContributionsCYAController {
             submittedText = Some(Message("")),
             title = "MemberContributionCYA.viewOnly.title",
             heading = Message("MemberContributionCYA.viewOnly.heading", memberName),
-            buttonText = "site.return.to.tasklist",
+            buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
-                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+                  .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
                   .onSubmit(srn, index, mode)

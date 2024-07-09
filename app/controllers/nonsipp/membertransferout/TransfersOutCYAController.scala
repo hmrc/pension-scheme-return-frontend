@@ -193,7 +193,7 @@ object TransfersOutCYAController {
         inset = Option.when(journeys.size == 5)("transfersOutCYAController.inset")
       ),
       refresh = None,
-      buttonText = mode.fold(normal = "site.continue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
+      buttonText = mode.fold(normal = "site.continue", check = "site.continue", viewOnly = "site.continue"),
       onSubmit = controllers.nonsipp.membertransferout.routes.TransfersOutCYAController.onSubmit(srn, index, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
         Some(
@@ -203,7 +203,7 @@ object TransfersOutCYAController {
             submittedText = Some(Message("")),
             title = "transfersOutCYAController.viewOnly.title",
             heading = Message("transfersOutCYAController.viewOnly.heading", memberName),
-            buttonText = "site.return.to.tasklist",
+            buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 controllers.nonsipp.membertransferout.routes.TransfersOutCYAController

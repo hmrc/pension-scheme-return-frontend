@@ -195,7 +195,7 @@ object TransfersInCYAController {
         inset = Option.when(journeys.size == 5)("transfersInCYAController.inset")
       ),
       refresh = None,
-      buttonText = mode.fold(normal = "site.continue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
+      buttonText = mode.fold(normal = "site.continue", check = "site.continue", viewOnly = "site.continue"),
       onSubmit = controllers.nonsipp.receivetransfer.routes.TransfersInCYAController.onSubmit(srn, index, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
         Some(
@@ -205,7 +205,7 @@ object TransfersInCYAController {
             submittedText = Some(Message("")),
             title = "transfersInCYAController.viewOnly.title",
             heading = Message("transfersInCYAController.viewOnly.heading", memberName),
-            buttonText = "site.return.to.tasklist",
+            buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
