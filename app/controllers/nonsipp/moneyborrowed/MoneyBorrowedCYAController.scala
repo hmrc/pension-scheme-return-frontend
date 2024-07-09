@@ -20,13 +20,16 @@ import services.PsrSubmissionService
 import viewmodels.implicits._
 import play.api.mvc._
 import config.Refined.Max5000
-import cats.implicits.toShow
 import controllers.actions._
-import navigation.Navigator
+import models.requests.DataRequest
 import controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController._
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import cats.implicits.toShow
+import controllers.nonsipp.routes
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
 import play.api.i18n._
@@ -34,9 +37,9 @@ import pages.nonsipp.moneyborrowed._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
 class MoneyBorrowedCYAController @Inject()(
@@ -49,45 +52,59 @@ class MoneyBorrowedCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      onPageLoadCommon(srn, index, mode)(implicitly)
+  }
+
+  def onPageLoadViewOnly(
     srn: Srn,
     index: Max5000,
-    mode: Mode
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
   ): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn, index, mode)(implicitly)
+    }
 
-          lenderName <- request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney
-          lenderConnectedParty <- request.userAnswers.get(IsLenderConnectedPartyPage(srn, index)).getOrRecoverJourney
-          borrowedAmountAndRate <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney
-          whenBorrowed <- request.userAnswers.get(WhenBorrowedPage(srn, index)).getOrRecoverJourney
-          schemeAssets <- request.userAnswers
-            .get(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index))
-            .getOrRecoverJourney
-          schemeBorrowed <- request.userAnswers.get(WhySchemeBorrowedMoneyPage(srn, index)).getOrRecoverJourney
+  def onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+    (
+      for {
 
-          schemeName = request.schemeDetails.schemeName
-        } yield Ok(
-          view(
-            viewModel(
-              ViewModelParameters(
-                srn,
-                index,
-                schemeName,
-                lenderName,
-                lenderConnectedParty,
-                borrowedAmountAndRate,
-                whenBorrowed,
-                schemeAssets,
-                schemeBorrowed,
-                mode
-              )
-            )
+        lenderName <- request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney
+        lenderConnectedParty <- request.userAnswers.get(IsLenderConnectedPartyPage(srn, index)).getOrRecoverJourney
+        borrowedAmountAndRate <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney
+        whenBorrowed <- request.userAnswers.get(WhenBorrowedPage(srn, index)).getOrRecoverJourney
+        schemeAssets <- request.userAnswers
+          .get(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index))
+          .getOrRecoverJourney
+        schemeBorrowed <- request.userAnswers.get(WhySchemeBorrowedMoneyPage(srn, index)).getOrRecoverJourney
+
+        schemeName = request.schemeDetails.schemeName
+      } yield Ok(
+        view(
+          viewModel(
+            srn,
+            index,
+            schemeName,
+            lenderName,
+            lenderConnectedParty,
+            borrowedAmountAndRate,
+            whenBorrowed,
+            schemeAssets,
+            schemeBorrowed,
+            mode,
+            viewOnlyUpdated = false, // flag is not displayed on this tier
+            optYear = request.year,
+            optCurrentVersion = request.currentVersion,
+            optPreviousVersion = request.previousVersion,
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
           )
         )
-      ).merge
-    }
+      )
+    ).merge
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -102,51 +119,93 @@ class MoneyBorrowedCYAController @Inject()(
           case Some(_) => Redirect(navigator.nextPage(MoneyBorrowedCYAPage(srn), NormalMode, request.userAnswers))
         }
     }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+    }
+
 }
 
-case class ViewModelParameters(
-  srn: Srn,
-  index: Max5000,
-  schemeName: String,
-  lenderName: String,
-  lenderConnectedParty: Boolean,
-  borrowedAmountAndRate: (Money, Percentage),
-  whenBorrowed: LocalDate,
-  schemeAssets: Money,
-  schemeBorrowed: String,
-  mode: Mode
-)
 object MoneyBorrowedCYAController {
-  def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
+  def viewModel(
+    srn: Srn,
+    index: Max5000,
+    schemeName: String,
+    lenderName: String,
+    lenderConnectedParty: Boolean,
+    borrowedAmountAndRate: (Money, Percentage),
+    whenBorrowed: LocalDate,
+    schemeAssets: Money,
+    schemeBorrowed: String,
+    mode: Mode,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = parameters.mode
-        .fold(normal = "moneyBorrowedCheckYourAnswers.title", check = "moneyBorrowedCheckYourAnswers.change.title"),
-      heading = parameters.mode.fold(
+      mode = mode,
+      title = mode
+        .fold(
+          normal = "moneyBorrowedCheckYourAnswers.title",
+          check = "moneyBorrowedCheckYourAnswers.change.title",
+          viewOnly = "moneyBorrowedCheckYourAnswers.viewOnly.title"
+        ),
+      heading = mode.fold(
         normal = "moneyBorrowedCheckYourAnswers.heading",
         check = Message(
           "moneyBorrowedCheckYourAnswers.change.heading",
-          parameters.borrowedAmountAndRate._1.displayAs,
-          parameters.lenderName
-        )
+          borrowedAmountAndRate._1.displayAs,
+          lenderName
+        ),
+        viewOnly = "moneyBorrowedCheckYourAnswers.viewOnly.heading"
       ),
       description = None,
       page = CheckYourAnswersViewModel(
         sections(
-          parameters.srn,
-          parameters.index,
-          parameters.schemeName,
-          parameters.lenderName,
-          parameters.lenderConnectedParty,
-          parameters.borrowedAmountAndRate,
-          parameters.whenBorrowed,
-          parameters.schemeAssets,
-          parameters.schemeBorrowed,
-          CheckMode
+          srn,
+          index,
+          schemeName,
+          lenderName,
+          lenderConnectedParty,
+          borrowedAmountAndRate,
+          whenBorrowed,
+          schemeAssets,
+          schemeBorrowed,
+          mode match {
+            case ViewOnlyMode => NormalMode
+            case _ => mode
+          }
         )
       ),
       refresh = None,
-      buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
-      onSubmit = routes.MoneyBorrowedCYAController.onSubmit(parameters.srn, parameters.index, parameters.mode)
+      buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
+      onSubmit = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onSubmit(srn, index, mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = None,
+            submittedText = Some(Message("")),
+            title = "moneyBorrowedCheckYourAnswers.viewOnly.title",
+            heading =
+              Message("moneyBorrowedCheckYourAnswers.viewOnly.heading", borrowedAmountAndRate._1.displayAs, lenderName),
+            buttonText = "site.continue",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
+                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
+                  .onSubmit(srn, index, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
 
   private def sections(
@@ -199,7 +258,7 @@ object MoneyBorrowedCYAController {
             .withAction(
               SummaryAction(
                 "site.change",
-                routes.LenderNameController.onSubmit(srn, index, mode).url
+                controllers.nonsipp.moneyborrowed.routes.LenderNameController.onSubmit(srn, index, mode).url
               ).withVisuallyHiddenContent("moneyBorrowedCheckYourAnswers.section.lenderName.hidden")
             ),
           CheckYourAnswersRowViewModel(
@@ -208,7 +267,9 @@ object MoneyBorrowedCYAController {
           ).withAction(
             SummaryAction(
               "site.change",
-              routes.IsLenderConnectedPartyController.onSubmit(srn, index, mode).url + "#connected"
+              controllers.nonsipp.moneyborrowed.routes.IsLenderConnectedPartyController
+                .onSubmit(srn, index, mode)
+                .url + "#connected"
             ).withVisuallyHiddenContent("moneyBorrowedCheckYourAnswers.section.lenderConnectedParty.hidden")
           ),
           CheckYourAnswersRowViewModel(
@@ -248,7 +309,9 @@ object MoneyBorrowedCYAController {
           ).withAction(
             SummaryAction(
               "site.change",
-              routes.ValueOfSchemeAssetsWhenMoneyBorrowedController.onSubmit(srn, index, mode).url
+              controllers.nonsipp.moneyborrowed.routes.ValueOfSchemeAssetsWhenMoneyBorrowedController
+                .onSubmit(srn, index, mode)
+                .url
             ).withVisuallyHiddenContent("moneyBorrowedCheckYourAnswers.section.schemeAssets.hidden")
           ),
           CheckYourAnswersRowViewModel(

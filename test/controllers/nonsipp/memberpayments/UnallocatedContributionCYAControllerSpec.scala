@@ -71,6 +71,8 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
       submissionNumberOne
     )
 
+  private val updatedValues = SchemeMemberNumbers(4, 5, 6)
+
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 
   private val filledUserAnswers = defaultUserAnswers
@@ -147,6 +149,29 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
           )
       }.before(mockTaxYear(dateRange))
         .withName("OnPageLoadViewOnly renders ok with no changed flag")
+    )
+
+    val updatedUserAnswers = currentUserAnswers
+      .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[CYAWithRemove].apply(
+            viewModel(
+              srn,
+              schemeName,
+              money,
+              ViewOnlyMode,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }.before(mockTaxYear(dateRange))
+        .withName("OnPageLoadViewOnly renders ok with changed flag")
     )
 
     act.like(

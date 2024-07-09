@@ -21,11 +21,12 @@ import config.Refined.OneTo5000
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
-import models.{CheckMode, Mode, NormalMode}
+import pages.nonsipp.FbVersionPage
+import models._
 import pages.nonsipp.moneyborrowed._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import org.mockito.Mockito.{reset, times, verify}
+import org.mockito.Mockito._
 import controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController._
 import controllers.ControllerBaseSpec
 
@@ -48,6 +49,21 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
   private def onSubmit(mode: Mode) =
     routes.MoneyBorrowedCYAController.onSubmit(srn, index, mode)
 
+  private lazy val onSubmitViewOnly = routes.MoneyBorrowedCYAController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private lazy val onPageLoadViewOnly = routes.MoneyBorrowedCYAController.onPageLoadViewOnly(
+    srn,
+    index,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(LenderNamePage(srn, index), lenderName)
     .unsafeSet(IsLenderConnectedPartyPage(srn, index), true)
@@ -63,18 +79,17 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
         renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
             viewModel(
-              ViewModelParameters(
-                srn,
-                index,
-                schemeName,
-                lenderName,
-                lenderConnectedParty = true,
-                borrowedAmountAndRate = (money, percentage),
-                whenBorrowed = localDate,
-                schemeAssets = money,
-                schemeBorrowed = schemeName,
-                mode
-              )
+              srn,
+              index,
+              schemeName,
+              lenderName,
+              lenderConnectedParty = true,
+              borrowedAmountAndRate = (money, percentage),
+              whenBorrowed = localDate,
+              schemeAssets = money,
+              schemeBorrowed = schemeName,
+              mode,
+              viewOnlyUpdated = true
             )
           )
         }.withName(s"render correct ${mode.toString} view")
@@ -103,4 +118,55 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
       )
     }
   }
+
+  "MoneyBorrowedCYAController in view only mode" - {
+
+    val currentUserAnswers = defaultUserAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(LenderNamePage(srn, index), lenderName)
+      .unsafeSet(IsLenderConnectedPartyPage(srn, index), true)
+      .unsafeSet(BorrowedAmountAndRatePage(srn, index), (money, percentage))
+      .unsafeSet(WhenBorrowedPage(srn, index), localDate)
+      .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index), money)
+      .unsafeSet(WhySchemeBorrowedMoneyPage(srn, index), schemeName)
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index), money)
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              srn,
+              index,
+              schemeName,
+              lenderName,
+              lenderConnectedParty = true,
+              borrowedAmountAndRate = (money, percentage),
+              whenBorrowed = localDate,
+              schemeAssets = money,
+              schemeBorrowed = schemeName,
+              ViewOnlyMode,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }
+    )
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
+  }
+
 }
