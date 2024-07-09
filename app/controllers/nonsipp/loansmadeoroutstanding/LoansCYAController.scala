@@ -25,21 +25,23 @@ import config.Refined.Max5000
 import controllers.PSRController
 import cats.implicits.toShow
 import controllers.actions._
-import navigation.Navigator
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n._
-import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models.{Security, _}
 import viewmodels.DisplayMessage._
 import viewmodels.models._
+import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
+import models.requests.DataRequest
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
 class LoansCYAController @Inject()(
@@ -59,84 +61,102 @@ class LoansCYAController @Inject()(
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
-          receivedLoanType <- requiredPage(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
-          recipientName <- List(
-            request.userAnswers.get(IndividualRecipientNamePage(srn, index)),
-            request.userAnswers.get(CompanyRecipientNamePage(srn, index)),
-            request.userAnswers.get(PartnershipRecipientNamePage(srn, index)),
-            request.userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient)).map(_.name)
-          ).flatten.headOption.getOrRecoverJourney
-          recipientDetails = List(
-            request.userAnswers.get(IndividualRecipientNinoPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
-              .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
-              .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
-              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
-              .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
-              .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient))
-              .map(_.description)
-          ).flatten.headOption
-          recipientReasonNoDetails = List(
-            request.userAnswers
-              .get(IndividualRecipientNinoPage(srn, index))
-              .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
-              .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
-              .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
-              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
-              .flatMap(_.value.swap.toOption.map(_.value))
-          ).flatten.headOption
-          connectedParty = if (request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).isEmpty) {
-            Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).get)
-          } else {
-            Left(request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).get)
-          }
-          datePeriodLoan <- request.userAnswers.get(DatePeriodLoanPage(srn, index)).getOrRecoverJourney
-          loanAmount <- request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrRecoverJourney
-          returnEndDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney.map(_.to)
-          repaymentInstalments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)).getOrRecoverJourney
-          loanInterest <- request.userAnswers.get(InterestOnLoanPage(srn, index)).getOrRecoverJourney
-          outstandingArrearsOnLoan <- request.userAnswers
-            .get(OutstandingArrearsOnLoanPage(srn, index))
-            .map(_.value.toOption)
-            .getOrRecoverJourney
-          securityOnLoan <- request.userAnswers
-            .get(SecurityGivenForLoanPage(srn, index))
-            .map(_.value.toOption)
-            .getOrRecoverJourney
+      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicitly)
+    }
 
-          schemeName = request.schemeDetails.schemeName
-        } yield Ok(
-          view(
-            viewModel(
-              ViewModelParameters(
-                srn,
-                index,
-                schemeName,
-                receivedLoanType,
-                recipientName,
-                recipientDetails,
-                recipientReasonNoDetails,
-                connectedParty,
-                datePeriodLoan,
-                loanAmount,
-                returnEndDate,
-                repaymentInstalments,
-                loanInterest,
-                outstandingArrearsOnLoan,
-                securityOnLoan,
-                mode
-              )
-            )
+  def onPageLoadViewOnly(
+    srn: Srn,
+    index: Max5000,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicitly)
+    }
+
+  def onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+    (
+      for {
+        receivedLoanType <- requiredPage(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
+        recipientName <- List(
+          request.userAnswers.get(IndividualRecipientNamePage(srn, index)),
+          request.userAnswers.get(CompanyRecipientNamePage(srn, index)),
+          request.userAnswers.get(PartnershipRecipientNamePage(srn, index)),
+          request.userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient)).map(_.name)
+        ).flatten.headOption.getOrRecoverJourney
+        recipientDetails = List(
+          request.userAnswers.get(IndividualRecipientNinoPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
+          request.userAnswers
+            .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
+            .flatMap(_.value.toOption.map(_.value)),
+          request.userAnswers
+            .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
+            .flatMap(_.value.toOption.map(_.value)),
+          request.userAnswers
+            .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient))
+            .map(_.description)
+        ).flatten.headOption
+        recipientReasonNoDetails = List(
+          request.userAnswers
+            .get(IndividualRecipientNinoPage(srn, index))
+            .flatMap(_.value.swap.toOption.map(_.value)),
+          request.userAnswers
+            .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
+            .flatMap(_.value.swap.toOption.map(_.value)),
+          request.userAnswers
+            .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
+            .flatMap(_.value.swap.toOption.map(_.value))
+        ).flatten.headOption
+        connectedParty = if (request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).isEmpty) {
+          Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).get)
+        } else {
+          Left(request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).get)
+        }
+        datePeriodLoan <- request.userAnswers.get(DatePeriodLoanPage(srn, index)).getOrRecoverJourney
+        loanAmount <- request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrRecoverJourney
+        returnEndDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney.map(_.to)
+        repaymentInstalments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)).getOrRecoverJourney
+        loanInterest <- request.userAnswers.get(InterestOnLoanPage(srn, index)).getOrRecoverJourney
+        outstandingArrearsOnLoan <- request.userAnswers
+          .get(OutstandingArrearsOnLoanPage(srn, index))
+          .map(_.value.toOption)
+          .getOrRecoverJourney
+        securityOnLoan <- request.userAnswers
+          .get(SecurityGivenForLoanPage(srn, index))
+          .map(_.value.toOption)
+          .getOrRecoverJourney
+
+        schemeName = request.schemeDetails.schemeName
+      } yield Ok(
+        view(
+          viewModel(
+            srn,
+            index,
+            schemeName,
+            receivedLoanType,
+            recipientName,
+            recipientDetails,
+            recipientReasonNoDetails,
+            connectedParty,
+            datePeriodLoan,
+            loanAmount,
+            returnEndDate,
+            repaymentInstalments,
+            loanInterest,
+            outstandingArrearsOnLoan,
+            securityOnLoan,
+            mode,
+            viewOnlyUpdated = false,
+            optYear = request.year,
+            optCurrentVersion = request.currentVersion,
+            optPreviousVersion = request.previousVersion,
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
           )
         )
-      ).merge
-    }
+      )
+    ).merge
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -151,59 +171,99 @@ class LoansCYAController @Inject()(
           case Some(_) => Redirect(navigator.nextPage(LoansCYAPage(srn), NormalMode, request.userAnswers))
         }
     }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+      )
+    }
 }
 
-case class ViewModelParameters(
-  srn: Srn,
-  index: Max5000,
-  schemeName: String,
-  receivedLoanType: IdentityType,
-  recipientName: String,
-  recipientDetails: Option[String],
-  recipientReasonNoDetails: Option[String],
-  connectedParty: Either[Boolean, SponsoringOrConnectedParty],
-  datePeriodLoan: (LocalDate, Money, Int),
-  loanAmount: (Money, Money, Money),
-  returnEndDate: LocalDate,
-  repaymentInstalments: Boolean,
-  loanInterest: (Money, Percentage, Money),
-  outstandingArrearsOnLoan: Option[Money],
-  securityOnLoan: Option[Security],
-  mode: Mode
-)
 object LoansCYAController {
-  def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
+  def viewModel(
+    srn: Srn,
+    index: Max5000,
+    schemeName: String,
+    receivedLoanType: IdentityType,
+    recipientName: String,
+    recipientDetails: Option[String],
+    recipientReasonNoDetails: Option[String],
+    connectedParty: Either[Boolean, SponsoringOrConnectedParty],
+    datePeriodLoan: (LocalDate, Money, Int),
+    loanAmount: (Money, Money, Money),
+    returnEndDate: LocalDate,
+    repaymentInstalments: Boolean,
+    loanInterest: (Money, Percentage, Money),
+    outstandingArrearsOnLoan: Option[Money],
+    securityOnLoan: Option[Security],
+    mode: Mode,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = parameters.mode.fold(normal = "checkYourAnswers.title", check = "loanCheckYourAnswers.change.title"),
-      heading = parameters.mode.fold(
+      mode = mode,
+      title = mode.fold(
+        normal = "checkYourAnswers.title",
+        check = "loanCheckYourAnswers.change.title",
+        viewOnly = "loanCheckYourAnswers.viewOnly.title"
+      ),
+      heading = mode.fold(
         normal = "checkYourAnswers.heading",
-        check =
-          Message("loanCheckYourAnswers.change.heading", parameters.loanAmount._1.displayAs, parameters.recipientName)
+        check = Message("loanCheckYourAnswers.change.heading", loanAmount._1.displayAs, recipientName),
+        viewOnly = Message("loanCheckYourAnswers.viewOnly.heading", loanAmount._1.displayAs, recipientName)
       ),
       description = Some(ParagraphMessage("loansCYA.paragraph")),
       page = CheckYourAnswersViewModel(
         sections(
-          parameters.srn,
-          parameters.index,
-          parameters.schemeName,
-          parameters.receivedLoanType,
-          parameters.recipientName,
-          parameters.recipientDetails,
-          parameters.recipientReasonNoDetails,
-          parameters.connectedParty,
-          parameters.datePeriodLoan,
-          parameters.loanAmount,
-          parameters.returnEndDate,
-          parameters.repaymentInstalments,
-          parameters.loanInterest,
-          parameters.outstandingArrearsOnLoan,
-          parameters.securityOnLoan,
-          CheckMode
+          srn,
+          index,
+          schemeName,
+          receivedLoanType,
+          recipientName,
+          recipientDetails,
+          recipientReasonNoDetails,
+          connectedParty,
+          datePeriodLoan,
+          loanAmount,
+          returnEndDate,
+          repaymentInstalments,
+          loanInterest,
+          outstandingArrearsOnLoan,
+          securityOnLoan,
+          mode match {
+            case ViewOnlyMode => NormalMode
+            case _ => mode
+          }
         )
       ),
       refresh = None,
-      buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
-      onSubmit = routes.LoansCYAController.onSubmit(parameters.srn, parameters.index, parameters.mode)
+      buttonText =
+        mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
+      onSubmit = routes.LoansCYAController.onSubmit(srn, index, mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = None,
+            submittedText = Some(Message("")),
+            title = "loanCheckYourAnswers.viewOnly.title",
+            heading = Message("loanCheckYourAnswers.viewOnly.heading", loanAmount._1.displayAs, recipientName),
+            buttonText = "site.return.to.tasklist",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                routes.LoansCYAController.onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                routes.LoansCYAController.onSubmit(srn, index, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
 
   private def sections(
