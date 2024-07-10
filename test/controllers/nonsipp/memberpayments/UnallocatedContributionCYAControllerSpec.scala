@@ -71,8 +71,6 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
       submissionNumberOne
     )
 
-  private val updatedValues = SchemeMemberNumbers(4, 5, 6)
-
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 
   private val filledUserAnswers = defaultUserAnswers

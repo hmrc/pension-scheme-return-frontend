@@ -25,11 +25,12 @@ import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal._
-import uk.gov.hmrc.domain.Nino
 import models._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import pages.nonsipp.FbVersionPage
+import uk.gov.hmrc.domain.Nino
 
 import scala.concurrent.Future
 
@@ -50,6 +51,22 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
     routes.SharesDisposalCYAController.onPageLoad(srn, shareIndex, disposalIndex, mode)
   private def onSubmit(mode: Mode) =
     routes.SharesDisposalCYAController.onSubmit(srn, shareIndex, disposalIndex, mode)
+
+  private lazy val onSubmitViewOnly = routes.SharesDisposalCYAController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private lazy val onPageLoadViewOnly = routes.SharesDisposalCYAController.onPageLoadViewOnly(
+    srn,
+    shareIndex,
+    disposalIndex,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
 
   private val shareIndex = refineMV[OneTo5000](1)
   private val disposalIndex = refineMV[OneTo50](1)
@@ -159,7 +176,10 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
                 sharesStillHeld,
                 schemeName,
                 mode
-              )
+              ),
+              srn,
+              mode,
+              viewOnlyUpdated = true
             )
           )
         }.withName(s"render correct $mode view for Sold journey")
@@ -194,7 +214,10 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
                 sharesStillHeld,
                 schemeName,
                 mode
-              )
+              ),
+              srn,
+              mode,
+              viewOnlyUpdated = true
             )
           )
         }.withName(s"render correct $mode view for Redeemed journey")
@@ -229,7 +252,10 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
                 sharesStillHeld,
                 schemeName,
                 mode
-              )
+              ),
+              srn,
+              mode,
+              viewOnlyUpdated = true
             )
           )
         }.withName(s"render correct $mode view for Transferred journey")
@@ -264,7 +290,10 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
                 sharesStillHeld,
                 schemeName,
                 mode
-              )
+              ),
+              srn,
+              mode,
+              viewOnlyUpdated = true
             )
           )
         }.withName(s"render correct $mode view for Other journey")
@@ -292,4 +321,86 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
       )
     }
   }
+
+  "SharesDisposalCYAController in view only mode" - {
+
+    val currentUserAnswers = defaultUserAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+      // Shares pages
+      .unsafeSet(TypeOfSharesHeldPage(srn, shareIndex), TypeOfShares.SponsoringEmployer)
+      .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndex), nameOfCompany.get)
+      .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, shareIndex), SchemeHoldShare.Acquisition)
+      .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, shareIndex), acquisitionDate.get)
+      // Shares Disposal pages
+      .unsafeSet(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex), HowSharesDisposed.Sold)
+      .unsafeSet(WhenWereSharesSoldPage(srn, shareIndex, disposalIndex), dateSharesSold.get)
+      .unsafeSet(HowManySharesSoldPage(srn, shareIndex, disposalIndex), numberSharesSold.get)
+      .unsafeSet(TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex), considerationSharesSold.get)
+      .unsafeSet(WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex), buyerIdentity.get)
+      .unsafeSet(SharesIndividualBuyerNamePage(srn, shareIndex, disposalIndex), nameOfBuyer.get)
+      .unsafeSet(
+        IndividualBuyerNinoNumberPage(srn, shareIndex, disposalIndex),
+        ConditionalYesNo.yes[String, Nino](buyerDetails)
+      )
+      .unsafeSet(IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex), isBuyerConnectedParty.get)
+      .unsafeSet(IndependentValuationPage(srn, shareIndex, disposalIndex), isIndependentValuation.get)
+      .unsafeSet(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex), sharesStillHeld)
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndex), nameOfCompany.get)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                shareIndex,
+                disposalIndex,
+                TypeOfShares.SponsoringEmployer,
+                companyName,
+                SchemeHoldShare.Acquisition,
+                acquisitionDate,
+                HowSharesDisposed.Sold,
+                dateSharesSold,
+                numberSharesSold,
+                considerationSharesSold,
+                buyerIdentity,
+                Some(buyerName),
+                Some(buyerDetails.toString),
+                buyerReasonNoDetails,
+                isBuyerConnectedParty,
+                isIndependentValuation,
+                None,
+                None,
+                None,
+                sharesStillHeld,
+                schemeName,
+                ViewOnlyMode
+              ),
+              srn,
+              ViewOnlyMode,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
+    )
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
+  }
+
 }
