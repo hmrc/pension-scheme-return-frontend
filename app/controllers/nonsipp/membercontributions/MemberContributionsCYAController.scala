@@ -155,7 +155,7 @@ object MemberContributionsCYAController {
           "MemberContributionCYA.change.heading",
           memberName
         ),
-        viewOnly = "MemberContributionCYA.viewOnly.title"
+        viewOnly = "MemberContributionCYA.viewOnly.heading"
       ),
       description = None,
       page = CheckYourAnswersViewModel(

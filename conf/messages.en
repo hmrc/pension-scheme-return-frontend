@@ -764,6 +764,9 @@ sharesDisposal.cya.crn = Company Registration Number (CRN)
 sharesDisposal.cya.utr = Unique Taxpayer Reference (UTR)
 sharesDisposal.cya.details = details
 
+sharesDisposal.viewOnly.title = View details of the disposal of shares in this company
+sharesDisposal.viewOnly.heading = Disposal of shares in {0}
+
 sharesDisposal.change.title = Change details of the disposal of shares in this company
 sharesDisposal.change.heading = Change details of the disposal of shares in {0}
 
