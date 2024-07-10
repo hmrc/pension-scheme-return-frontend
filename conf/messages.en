@@ -1831,6 +1831,9 @@ landOrPropertyCYA.section5.leaseConnected.hidden = if {0} is a connected party
 landOrPropertyCYA.change.title = Change details for land or property
 landOrPropertyCYA.change.heading = Change details for {0}
 
+landOrPropertyCYA.viewOnly.title = Details for land or property
+landOrPropertyCYA.viewOnly.heading = {0}
+
 removeLandOrProperty.title = Are you sure you want to remove this land or property?
 removeLandOrProperty.heading = Are you sure you want to remove {0}?
 removeLandOrProperty.error.required = Select yes if you are sure you want to remove this land or property
