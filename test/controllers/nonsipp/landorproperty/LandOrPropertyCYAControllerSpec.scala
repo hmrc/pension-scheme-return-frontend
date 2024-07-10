@@ -23,10 +23,11 @@ import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
+import pages.nonsipp.FbVersionPage
 import models._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import org.mockito.Mockito.{reset, times, verify}
+import org.mockito.Mockito._
 import config.Refined.OneTo5000
 import models.SchemeHoldLandProperty.Transfer
 
@@ -48,6 +49,21 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
 
   private def onSubmit(mode: Mode) = routes.LandOrPropertyCYAController.onSubmit(srn, index, mode)
 
+  private lazy val onPageLoadViewOnly = routes.LandOrPropertyCYAController.onPageLoadViewOnly(
+    srn,
+    index,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private lazy val onSubmitViewOnly = routes.LandOrPropertyCYAController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(LandPropertyInUKPage(srn, index), true)
     .unsafeSet(LandRegistryTitleNumberPage(srn, index), ConditionalYesNo.yes[String, String]("landRegistryTitleNumber"))
@@ -64,28 +80,27 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
         renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
             LandOrPropertyCYAController.viewModel(
-              ViewModelParameters(
-                srn = srn,
-                index = index,
-                schemeName = schemeName,
-                landOrPropertyInUk = true,
-                landRegistryTitleNumber = ConditionalYesNo(Right("landRegistryTitleNumber")),
-                holdLandProperty = Transfer,
-                landOrPropertyAcquire = None,
-                landOrPropertyTotalCost = money,
-                landPropertyIndependentValuation = None,
-                receivedLandType = None,
-                recipientName = None,
-                recipientDetails = None,
-                recipientReasonNoDetails = None,
-                landOrPropertySellerConnectedParty = None,
-                landOrPropertyResidential = false,
-                landOrPropertyLease = false,
-                landOrPropertyTotalIncome = money,
-                addressLookUpPage = address,
-                leaseDetails = None,
-                mode = mode
-              )
+              srn = srn,
+              index = index,
+              schemeName = schemeName,
+              landOrPropertyInUk = true,
+              landRegistryTitleNumber = ConditionalYesNo(Right("landRegistryTitleNumber")),
+              holdLandProperty = Transfer,
+              landOrPropertyAcquire = None,
+              landOrPropertyTotalCost = money,
+              landPropertyIndependentValuation = None,
+              receivedLandType = None,
+              recipientName = None,
+              recipientDetails = None,
+              recipientReasonNoDetails = None,
+              landOrPropertySellerConnectedParty = None,
+              landOrPropertyResidential = false,
+              landOrPropertyLease = false,
+              landOrPropertyTotalIncome = money,
+              addressLookUpPage = address,
+              leaseDetails = None,
+              mode = mode,
+              viewOnlyUpdated = true
             )
           )
         }.withName(s"render correct ${mode.toString} view")
@@ -113,5 +128,62 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
           .withName(s"redirect to journey recovery page on submit when in $mode mode")
       )
     }
+  }
+
+  "LandOrPropertyCYAController in view only mode" - {
+
+    val currentUserAnswers = filledUserAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+
+    val previousUserAnswers = filledUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+
+    act.like(
+      renderView(
+        onPageLoadViewOnly,
+        userAnswers = currentUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[CheckYourAnswersView].apply(
+          LandOrPropertyCYAController.viewModel(
+            srn = srn,
+            index = index,
+            schemeName = schemeName,
+            landOrPropertyInUk = true,
+            landRegistryTitleNumber = ConditionalYesNo(Right("landRegistryTitleNumber")),
+            holdLandProperty = Transfer,
+            landOrPropertyAcquire = None,
+            landOrPropertyTotalCost = money,
+            landPropertyIndependentValuation = None,
+            receivedLandType = None,
+            recipientName = None,
+            recipientDetails = None,
+            recipientReasonNoDetails = None,
+            landOrPropertySellerConnectedParty = None,
+            landOrPropertyResidential = false,
+            landOrPropertyLease = false,
+            landOrPropertyTotalIncome = money,
+            addressLookUpPage = address,
+            leaseDetails = None,
+            ViewOnlyMode,
+            viewOnlyUpdated = false,
+            optYear = Some(yearString),
+            optCurrentVersion = Some(submissionNumberTwo),
+            optPreviousVersion = Some(submissionNumberOne),
+            compilationOrSubmissionDate = Some(submissionDateTwo)
+          )
+        )
+      }
+    )
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
   }
 }

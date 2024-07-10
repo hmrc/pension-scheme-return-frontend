@@ -24,22 +24,24 @@ import controllers.PSRController
 import pages.nonsipp.landorproperty._
 import cats.implicits.toShow
 import controllers.actions._
-import navigation.Navigator
 import controllers.nonsipp.landorproperty.LandOrPropertyCYAController._
 import pages.nonsipp.common._
 import play.api.i18n._
+import models.requests.DataRequest
 import config.Refined.Max5000
 import models.SchemeHoldLandProperty.{Acquisition, Transfer}
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
 class LandOrPropertyCYAController @Inject()(
@@ -58,117 +60,136 @@ class LandOrPropertyCYAController @Inject()(
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
-          landOrPropertyInUk <- requiredPage(LandPropertyInUKPage(srn, index))
-          landRegistryTitleNumber <- requiredPage(LandRegistryTitleNumberPage(srn, index))
-          addressLookUpPage <- requiredPage(LandOrPropertyChosenAddressPage(srn, index))
-          holdLandProperty <- requiredPage(WhyDoesSchemeHoldLandPropertyPage(srn, index))
-          landOrPropertyTotalCost <- requiredPage(LandOrPropertyTotalCostPage(srn, index))
+      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicitly)
+    }
 
-          landPropertyIndependentValuation = Option.when(holdLandProperty != Transfer)(
-            request.userAnswers.get(LandPropertyIndependentValuationPage(srn, index)).get
+  def onPageLoadViewOnly(
+    srn: Srn,
+    index: Max5000,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicitly)
+    }
+
+  def onPageLoadCommon(srn: SchemeId.Srn, index: Max5000, mode: Mode)(
+    implicit request: DataRequest[AnyContent]
+  ): Result =
+    (
+      for {
+        landOrPropertyInUk <- requiredPage(LandPropertyInUKPage(srn, index))
+        landRegistryTitleNumber <- requiredPage(LandRegistryTitleNumberPage(srn, index))
+        addressLookUpPage <- requiredPage(LandOrPropertyChosenAddressPage(srn, index))
+        holdLandProperty <- requiredPage(WhyDoesSchemeHoldLandPropertyPage(srn, index))
+        landOrPropertyTotalCost <- requiredPage(LandOrPropertyTotalCostPage(srn, index))
+
+        landPropertyIndependentValuation = Option.when(holdLandProperty != Transfer)(
+          request.userAnswers.get(LandPropertyIndependentValuationPage(srn, index)).get
+        )
+        landOrPropertyAcquire = Option.when(holdLandProperty != Transfer)(
+          request.userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, index)).get
+        )
+
+        receivedLandType = Option.when(holdLandProperty == Acquisition)(
+          request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller)).get
+        )
+
+        landOrPropertySellerConnectedParty = Option.when(holdLandProperty == Acquisition)(
+          request.userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, index)).get
+        )
+
+        recipientName = Option.when(holdLandProperty == Acquisition)(
+          List(
+            request.userAnswers.get(LandPropertyIndividualSellersNamePage(srn, index)),
+            request.userAnswers.get(CompanySellerNamePage(srn, index)),
+            request.userAnswers.get(PartnershipSellerNamePage(srn, index)),
+            request.userAnswers
+              .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
+              .map(_.name)
+          ).flatten.head
+        )
+
+        recipientDetails = Option.when(holdLandProperty == Acquisition)(
+          List(
+            request.userAnswers.get(IndividualSellerNiPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
+            request.userAnswers
+              .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller))
+              .flatMap(_.value.toOption.map(_.value)),
+            request.userAnswers
+              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller))
+              .flatMap(_.value.toOption.map(_.value)),
+            request.userAnswers
+              .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
+              .map(_.description)
+          ).flatten.headOption
+        )
+
+        recipientReasonNoDetails = Option.when(holdLandProperty == Acquisition)(
+          List(
+            request.userAnswers
+              .get(IndividualSellerNiPage(srn, index))
+              .flatMap(_.value.swap.toOption.map(_.value)),
+            request.userAnswers
+              .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller))
+              .flatMap(_.value.swap.toOption.map(_.value)),
+            request.userAnswers
+              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller))
+              .flatMap(_.value.swap.toOption.map(_.value))
+          ).flatten.headOption
+        )
+
+        landOrPropertyResidential <- requiredPage(IsLandOrPropertyResidentialPage(srn, index))
+        landOrPropertyLease <- requiredPage(IsLandPropertyLeasedPage(srn, index))
+        landOrPropertyTotalIncome <- requiredPage(LandOrPropertyTotalIncomePage(srn, index))
+
+        leaseDetails = Option.when(landOrPropertyLease) {
+          val landOrPropertyLeaseDetailsPage = request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).get
+          val leaseConnectedParty = request.userAnswers.get(IsLesseeConnectedPartyPage(srn, index)).get
+
+          Tuple4(
+            landOrPropertyLeaseDetailsPage._1,
+            landOrPropertyLeaseDetailsPage._2,
+            landOrPropertyLeaseDetailsPage._3,
+            leaseConnectedParty
           )
-          landOrPropertyAcquire = Option.when(holdLandProperty != Transfer)(
-            request.userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, index)).get
-          )
+        }
 
-          receivedLandType = Option.when(holdLandProperty == Acquisition)(
-            request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller)).get
-          )
-
-          landOrPropertySellerConnectedParty = Option.when(holdLandProperty == Acquisition)(
-            request.userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, index)).get
-          )
-
-          recipientName = Option.when(holdLandProperty == Acquisition)(
-            List(
-              request.userAnswers.get(LandPropertyIndividualSellersNamePage(srn, index)),
-              request.userAnswers.get(CompanySellerNamePage(srn, index)),
-              request.userAnswers.get(PartnershipSellerNamePage(srn, index)),
-              request.userAnswers
-                .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
-                .map(_.name)
-            ).flatten.head
-          )
-
-          recipientDetails = Option.when(holdLandProperty == Acquisition)(
-            List(
-              request.userAnswers.get(IndividualSellerNiPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
-              request.userAnswers
-                .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller))
-                .flatMap(_.value.toOption.map(_.value)),
-              request.userAnswers
-                .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller))
-                .flatMap(_.value.toOption.map(_.value)),
-              request.userAnswers
-                .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
-                .map(_.description)
-            ).flatten.headOption
-          )
-
-          recipientReasonNoDetails = Option.when(holdLandProperty == Acquisition)(
-            List(
-              request.userAnswers
-                .get(IndividualSellerNiPage(srn, index))
-                .flatMap(_.value.swap.toOption.map(_.value)),
-              request.userAnswers
-                .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller))
-                .flatMap(_.value.swap.toOption.map(_.value)),
-              request.userAnswers
-                .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller))
-                .flatMap(_.value.swap.toOption.map(_.value))
-            ).flatten.headOption
-          )
-
-          landOrPropertyResidential <- requiredPage(IsLandOrPropertyResidentialPage(srn, index))
-          landOrPropertyLease <- requiredPage(IsLandPropertyLeasedPage(srn, index))
-          landOrPropertyTotalIncome <- requiredPage(LandOrPropertyTotalIncomePage(srn, index))
-
-          leaseDetails = Option.when(landOrPropertyLease) {
-            val landOrPropertyLeaseDetailsPage = request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).get
-            val leaseConnectedParty = request.userAnswers.get(IsLesseeConnectedPartyPage(srn, index)).get
-
-            Tuple4(
-              landOrPropertyLeaseDetailsPage._1,
-              landOrPropertyLeaseDetailsPage._2,
-              landOrPropertyLeaseDetailsPage._3,
-              leaseConnectedParty
-            )
-          }
-
-          schemeName = request.schemeDetails.schemeName
-        } yield Ok(
-          view(
-            viewModel(
-              ViewModelParameters(
-                srn,
-                index,
-                schemeName,
-                landOrPropertyInUk,
-                landRegistryTitleNumber,
-                holdLandProperty,
-                landOrPropertyAcquire,
-                landOrPropertyTotalCost,
-                landPropertyIndependentValuation,
-                receivedLandType,
-                recipientName,
-                recipientDetails.flatten,
-                recipientReasonNoDetails.flatten,
-                landOrPropertySellerConnectedParty,
-                landOrPropertyResidential,
-                landOrPropertyLease,
-                landOrPropertyTotalIncome,
-                addressLookUpPage,
-                leaseDetails,
-                mode
-              )
-            )
+        schemeName = request.schemeDetails.schemeName
+      } yield Ok(
+        view(
+          viewModel(
+            srn,
+            index,
+            schemeName,
+            landOrPropertyInUk,
+            landRegistryTitleNumber,
+            holdLandProperty,
+            landOrPropertyAcquire,
+            landOrPropertyTotalCost,
+            landPropertyIndependentValuation,
+            receivedLandType,
+            recipientName,
+            recipientDetails.flatten,
+            recipientReasonNoDetails.flatten,
+            landOrPropertySellerConnectedParty,
+            landOrPropertyResidential,
+            landOrPropertyLease,
+            landOrPropertyTotalIncome,
+            addressLookUpPage,
+            leaseDetails,
+            mode,
+            viewOnlyUpdated = false,
+            optYear = request.year,
+            optCurrentVersion = request.currentVersion,
+            optPreviousVersion = request.previousVersion,
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
           )
         )
-      ).merge
-
-    }
+      )
+    ).merge
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -183,66 +204,108 @@ class LandOrPropertyCYAController @Inject()(
           case Some(_) => Redirect(navigator.nextPage(LandOrPropertyCYAPage(srn), NormalMode, request.userAnswers))
         }
     }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+      )
+    }
 }
 
 case class ViewModelParameters(
-  srn: Srn,
-  index: Max5000,
-  schemeName: String,
-  landOrPropertyInUk: Boolean,
-  landRegistryTitleNumber: ConditionalYesNo[String, String],
-  holdLandProperty: SchemeHoldLandProperty,
-  landOrPropertyAcquire: Option[LocalDate],
-  landOrPropertyTotalCost: Money,
-  landPropertyIndependentValuation: Option[Boolean],
-  receivedLandType: Option[IdentityType],
-  recipientName: Option[String],
-  recipientDetails: Option[String],
-  recipientReasonNoDetails: Option[String],
-  landOrPropertySellerConnectedParty: Option[Boolean],
-  landOrPropertyResidential: Boolean,
-  landOrPropertyLease: Boolean,
-  landOrPropertyTotalIncome: Money,
-  addressLookUpPage: Address,
-  leaseDetails: Option[(String, Money, LocalDate, Boolean)],
-  mode: Mode
-)
+  )
 object LandOrPropertyCYAController {
-  def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
+  def viewModel(
+    srn: Srn,
+    index: Max5000,
+    schemeName: String,
+    landOrPropertyInUk: Boolean,
+    landRegistryTitleNumber: ConditionalYesNo[String, String],
+    holdLandProperty: SchemeHoldLandProperty,
+    landOrPropertyAcquire: Option[LocalDate],
+    landOrPropertyTotalCost: Money,
+    landPropertyIndependentValuation: Option[Boolean],
+    receivedLandType: Option[IdentityType],
+    recipientName: Option[String],
+    recipientDetails: Option[String],
+    recipientReasonNoDetails: Option[String],
+    landOrPropertySellerConnectedParty: Option[Boolean],
+    landOrPropertyResidential: Boolean,
+    landOrPropertyLease: Boolean,
+    landOrPropertyTotalIncome: Money,
+    addressLookUpPage: Address,
+    leaseDetails: Option[(String, Money, LocalDate, Boolean)],
+    mode: Mode,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = parameters.mode.fold(normal = "checkYourAnswers.title", check = "landOrPropertyCYA.change.title"),
-      heading = parameters.mode.fold(
+      mode = mode,
+      title = mode.fold(
+        normal = "checkYourAnswers.title",
+        check = "landOrPropertyCYA.change.title",
+        viewOnly = "landOrPropertyCYA.viewOnly.title"
+      ),
+      heading = mode.fold(
         normal = "checkYourAnswers.heading",
-        check = Message("landOrPropertyCYA.change.heading", parameters.addressLookUpPage.addressLine1)
+        check = Message("landOrPropertyCYA.change.heading", addressLookUpPage.addressLine1),
+        viewOnly = Message("landOrPropertyCYA.viewOnly.heading", addressLookUpPage.addressLine1)
       ),
       description = Some(ParagraphMessage("landOrPropertyCYA.paragraph")),
       page = CheckYourAnswersViewModel(
         sections(
-          parameters.srn,
-          parameters.index,
-          parameters.schemeName,
-          parameters.landOrPropertyInUk,
-          parameters.landRegistryTitleNumber,
-          parameters.holdLandProperty,
-          parameters.landOrPropertyAcquire,
-          parameters.landOrPropertyTotalCost,
-          parameters.receivedLandType,
-          parameters.recipientName,
-          parameters.recipientDetails,
-          parameters.recipientReasonNoDetails,
-          parameters.landOrPropertySellerConnectedParty,
-          parameters.landPropertyIndependentValuation,
-          parameters.leaseDetails,
-          parameters.landOrPropertyResidential,
-          parameters.landOrPropertyLease,
-          parameters.landOrPropertyTotalIncome,
-          parameters.addressLookUpPage,
-          CheckMode
+          srn,
+          index,
+          schemeName,
+          landOrPropertyInUk,
+          landRegistryTitleNumber,
+          holdLandProperty,
+          landOrPropertyAcquire,
+          landOrPropertyTotalCost,
+          receivedLandType,
+          recipientName,
+          recipientDetails,
+          recipientReasonNoDetails,
+          landOrPropertySellerConnectedParty,
+          landPropertyIndependentValuation,
+          leaseDetails,
+          landOrPropertyResidential,
+          landOrPropertyLease,
+          landOrPropertyTotalIncome,
+          addressLookUpPage,
+          mode match {
+            case ViewOnlyMode => NormalMode
+            case _ => mode
+          }
         )
       ),
       refresh = None,
-      buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
-      onSubmit = routes.LandOrPropertyCYAController.onSubmit(parameters.srn, parameters.index, parameters.mode)
+      buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
+      onSubmit = routes.LandOrPropertyCYAController.onSubmit(srn, index, mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = None,
+            submittedText = Some(Message("")),
+            title = "landOrPropertyCYA.viewOnly.title",
+            heading = Message("landOrPropertyCYA.viewOnly.heading", addressLookUpPage.addressLine1),
+            buttonText = "site.continue",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                routes.LandOrPropertyCYAController.onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                routes.LandOrPropertyCYAController.onSubmit(srn, index, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
 
   private def sections(
