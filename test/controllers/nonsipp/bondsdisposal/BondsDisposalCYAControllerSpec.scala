@@ -23,6 +23,7 @@ import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
+import pages.nonsipp.FbVersionPage
 import models._
 import pages.nonsipp.bondsdisposal._
 import org.mockito.ArgumentMatchers.any
@@ -49,6 +50,22 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
     routes.BondsDisposalCYAController.onPageLoad(srn, bondIndex, disposalIndex, mode)
   private def onSubmit(mode: Mode) =
     routes.BondsDisposalCYAController.onSubmit(srn, bondIndex, disposalIndex, mode)
+
+  private lazy val onSubmitViewOnly = routes.BondsDisposalCYAController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private lazy val onPageLoadViewOnly = routes.BondsDisposalCYAController.onPageLoadViewOnly(
+    srn,
+    bondIndex,
+    disposalIndex,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
 
   private val bondIndex = refineMV[OneTo5000](1)
   private val disposalIndex = refineMV[OneTo50](1)
@@ -91,7 +108,10 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
                 bondsStillHeld,
                 schemeName,
                 mode
-              )
+              ),
+              srn,
+              mode,
+              viewOnlyUpdated = true
             )
           )
         }.withName(s"render correct $mode view for Sold journey")
@@ -119,4 +139,67 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
       )
     }
   }
+
+  "BondsDisposalCYAController in view only mode" - {
+
+    val currentUserAnswers = defaultUserAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(NameOfBondsPage(srn, bondIndex), "name")
+      .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, bondIndex), SchemeHoldBond.Acquisition)
+      .unsafeSet(CostOfBondsPage(srn, bondIndex), money)
+      .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex), HowDisposed.Sold)
+      .unsafeSet(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex), dateBondsSold.get)
+      .unsafeSet(TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex), considerationBondsSold.get)
+      .unsafeSet(BuyerNamePage(srn, bondIndex, disposalIndex), nameOfBuyer.get)
+      .unsafeSet(IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex), isBuyerConnectedParty.get)
+      .unsafeSet(BondsStillHeldPage(srn, bondIndex, disposalIndex), bondsStillHeld)
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(NameOfBondsPage(srn, bondIndex), "name")
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                bondIndex,
+                disposalIndex,
+                "name",
+                acquisitionType = SchemeHoldBond.Acquisition,
+                costOfBonds = money,
+                howBondsDisposed = HowDisposed.Sold,
+                dateBondsSold,
+                considerationBondsSold,
+                Some(buyerName),
+                isBuyerConnectedParty,
+                bondsStillHeld,
+                schemeName,
+                ViewOnlyMode
+              ),
+              srn,
+              ViewOnlyMode,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
+    )
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
+  }
+
 }

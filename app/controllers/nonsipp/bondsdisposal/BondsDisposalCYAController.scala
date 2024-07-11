@@ -19,17 +19,20 @@ package controllers.nonsipp.bondsdisposal
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.bonds._
 import viewmodels.implicits._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
-import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
-import navigation.Navigator
+import models.requests.DataRequest
 import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
 import models.PointOfEntry.NoPointOfEntry
 import models.HowDisposed._
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import cats.implicits.toShow
+import controllers.nonsipp.routes
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
 import play.api.i18n.MessagesApi
@@ -40,7 +43,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
 class BondsDisposalCYAController @Inject()(
@@ -61,67 +64,91 @@ class BondsDisposalCYAController @Inject()(
           .set(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex), NoPointOfEntry)
           .getOrElse(request.userAnswers)
       )
+      onPageLoadCommon(srn, bondIndex, disposalIndex, mode)(implicitly)
+    }
 
-      (
-        for {
-          bondsName <- request.userAnswers
-            .get(NameOfBondsPage(srn, bondIndex))
-            .getOrRecoverJourney
-          acquisitionType <- request.userAnswers
-            .get(WhyDoesSchemeHoldBondsPage(srn, bondIndex))
-            .getOrRecoverJourney
-          costOfBonds <- request.userAnswers
-            .get(CostOfBondsPage(srn, bondIndex))
-            .getOrRecoverJourney
+  def onPageLoadViewOnly(
+    srn: Srn,
+    bondIndex: Max5000,
+    disposalIndex: Max50,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn, bondIndex, disposalIndex, mode)(implicitly)
+    }
 
-          howBondsDisposed <- request.userAnswers
-            .get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex))
-            .getOrRecoverJourney
+  def onPageLoadCommon(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode)(
+    implicit request: DataRequest[AnyContent]
+  ): Result =
+    (
+      for {
+        bondsName <- request.userAnswers
+          .get(NameOfBondsPage(srn, bondIndex))
+          .getOrRecoverJourney
+        acquisitionType <- request.userAnswers
+          .get(WhyDoesSchemeHoldBondsPage(srn, bondIndex))
+          .getOrRecoverJourney
+        costOfBonds <- request.userAnswers
+          .get(CostOfBondsPage(srn, bondIndex))
+          .getOrRecoverJourney
 
-          dateBondsSold = Option.when(howBondsDisposed == Sold)(
-            request.userAnswers.get(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex)).get
-          )
+        howBondsDisposed <- request.userAnswers
+          .get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex))
+          .getOrRecoverJourney
 
-          considerationBondsSold = Option.when(howBondsDisposed == Sold)(
-            request.userAnswers.get(TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex)).get
-          )
-          buyerName = Option.when(howBondsDisposed == Sold)(
-            request.userAnswers.get(BuyerNamePage(srn, bondIndex, disposalIndex)).get
-          )
-          isBuyerConnectedParty = Option.when(howBondsDisposed == Sold)(
-            request.userAnswers.get(IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex)).get
-          )
+        dateBondsSold = Option.when(howBondsDisposed == Sold)(
+          request.userAnswers.get(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex)).get
+        )
 
-          bondsStillHeld <- request.userAnswers
-            .get(BondsStillHeldPage(srn, bondIndex, disposalIndex))
-            .getOrRecoverJourney
+        considerationBondsSold = Option.when(howBondsDisposed == Sold)(
+          request.userAnswers.get(TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex)).get
+        )
+        buyerName = Option.when(howBondsDisposed == Sold)(
+          request.userAnswers.get(BuyerNamePage(srn, bondIndex, disposalIndex)).get
+        )
+        isBuyerConnectedParty = Option.when(howBondsDisposed == Sold)(
+          request.userAnswers.get(IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex)).get
+        )
 
-          schemeName = request.schemeDetails.schemeName
+        bondsStillHeld <- request.userAnswers
+          .get(BondsStillHeldPage(srn, bondIndex, disposalIndex))
+          .getOrRecoverJourney
 
-        } yield Ok(
-          view(
-            viewModel(
-              ViewModelParameters(
-                srn,
-                bondIndex,
-                disposalIndex,
-                bondsName,
-                acquisitionType,
-                costOfBonds,
-                howBondsDisposed,
-                dateBondsSold,
-                considerationBondsSold,
-                buyerName,
-                isBuyerConnectedParty,
-                bondsStillHeld,
-                schemeName,
-                mode
-              )
-            )
+        schemeName = request.schemeDetails.schemeName
+
+      } yield Ok(
+        view(
+          viewModel(
+            ViewModelParameters(
+              srn,
+              bondIndex,
+              disposalIndex,
+              bondsName,
+              acquisitionType,
+              costOfBonds,
+              howBondsDisposed,
+              dateBondsSold,
+              considerationBondsSold,
+              buyerName,
+              isBuyerConnectedParty,
+              bondsStillHeld,
+              schemeName,
+              mode
+            ),
+            srn,
+            mode,
+            viewOnlyUpdated = false, // flag is not displayed on this tier
+            optYear = request.year,
+            optCurrentVersion = request.currentVersion,
+            optPreviousVersion = request.previousVersion,
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
           )
         )
-      ).merge
-    }
+      )
+    ).merge
 
   def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -143,6 +170,12 @@ class BondsDisposalCYAController @Inject()(
           )
       )
     }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+    }
+
 }
 
 case class ViewModelParameters(
@@ -163,15 +196,27 @@ case class ViewModelParameters(
 )
 
 object BondsDisposalCYAController {
-  def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
+  def viewModel(
+    parameters: ViewModelParameters,
+    srn: Srn,
+    mode: Mode,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
+      mode = mode,
       title = parameters.mode.fold(
         normal = "bondsDisposalCYA.title",
-        check = "bondsDisposalCYA.change.title"
+        check = "bondsDisposalCYA.change.title",
+        viewOnly = "bondsDisposalCYA.viewOnly.title"
       ),
       heading = parameters.mode.fold(
         normal = "bondsDisposalCYA.heading",
-        check = Message("bondsDisposalCYA.change.heading")
+        check = Message("bondsDisposalCYA.change.heading"),
+        viewOnly = "bondsDisposalCYA.viewOnly.heading"
       ),
       description = None,
       page = CheckYourAnswersViewModel
@@ -180,12 +225,32 @@ object BondsDisposalCYAController {
         )
         .withMarginBottom(Margin.Fixed60Bottom),
       refresh = None,
-      buttonText = parameters.mode.fold(
-        normal = "site.saveAndContinue",
-        check = "site.continue"
-      ),
-      onSubmit = routes.BondsDisposalCYAController
-        .onSubmit(parameters.srn, parameters.bondIndex, parameters.disposalIndex, parameters.mode)
+      buttonText =
+        parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
+      onSubmit = controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+        .onSubmit(parameters.srn, parameters.bondIndex, parameters.disposalIndex, parameters.mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = None,
+            submittedText = Some(Message("")),
+            title = "bondsDisposalCYA.viewOnly.title",
+            heading = Message("bondsDisposalCYA.viewOnly.heading", parameters.bondsName),
+            buttonText = "site.continue",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                  .onSubmit(srn, parameters.bondIndex, parameters.disposalIndex, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
 
   private def rows(parameters: ViewModelParameters): List[CheckYourAnswersRowViewModel] =
