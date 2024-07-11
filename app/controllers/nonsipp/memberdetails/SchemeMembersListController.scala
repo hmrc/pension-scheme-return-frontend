@@ -24,25 +24,31 @@ import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.Max300
 import controllers.PSRController
-import config.Constants
-import cats.implicits.catsSyntaxApplicativeId
+import cats.implicits.{catsSyntaxApplicativeId, toShow}
 import config.Constants.maxSchemeMembers
 import forms.YesNoPageFormProvider
-import models._
-import controllers.nonsipp.memberdetails.SchemeMembersListController._
 import play.api.i18n.MessagesApi
-import play.api.data.Form
+import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
 import controllers.actions._
 import eu.timepit.refined.refineV
+import pages.nonsipp.CompilationOrSubmissionDatePage
 import play.api.Logger
 import navigation.Navigator
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import utils.DateTimeUtils.localDateTimeShow
+import models._
+import viewmodels.models.TaskListStatus.Updated
+import controllers.nonsipp.memberdetails.SchemeMembersListController._
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
+import models.requests.DataRequest
+import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
+import java.time.LocalDateTime
 import javax.inject.Named
 
 class SchemeMembersListController @Inject()(
@@ -61,34 +67,88 @@ class SchemeMembersListController @Inject()(
   private def form(manualOrUpload: ManualOrUpload, maxNumberReached: Boolean): Form[Boolean] =
     SchemeMembersListController.form(formProvider, manualOrUpload, maxNumberReached)
 
+  def onPageLoadViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn, page, ManualOrUpload.Manual, ViewOnlyMode)
+    }
+
   def onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val completedMembers = request.userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty)
-      val membersDetails = request.userAnswers.membersDetails(srn)
-      val completedMembersDetails = completedMembers.keySet
-        .intersect(membersDetails.keySet)
-        .map(k => k -> membersDetails(k))
-        .toMap
-      if (membersDetails.isEmpty) {
-        logger.error(s"no members found")
-        Redirect(routes.PensionSchemeMembersController.onPageLoad(srn))
-      } else {
+      onPageLoadCommon(srn, page, manualOrUpload, mode)
+    }
 
-        completedMembersDetails.view
-          .mapValues(_.fullName)
-          .toList
-          .zipWithRefinedIndex[Max300.Refined]
-          .map { filteredMembers =>
-            Ok(
-              view(
-                form(manualOrUpload, filteredMembers.size >= maxSchemeMembers),
-                viewModel(srn, page, manualOrUpload, mode, filteredMembers)
+  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
+        )
+      )
+    }
+
+  def onPageLoadCommon(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode)(
+    implicit request: DataRequest[_]
+  ): Result = {
+    val completedMembers = request.userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty)
+    val membersDetails = request.userAnswers.membersDetails(srn)
+    val completedMembersDetails = completedMembers.keySet
+      .intersect(membersDetails.keySet)
+      .map(k => k -> membersDetails(k))
+      .toMap
+    if (membersDetails.isEmpty) {
+      logger.error(s"no members found")
+      Redirect(routes.PensionSchemeMembersController.onPageLoad(srn))
+    } else {
+
+      completedMembersDetails.view
+        .mapValues(_.fullName)
+        .toList
+        .zipWithRefinedIndex[Max300.Refined]
+        .map { filteredMembers =>
+          Ok(
+            view(
+              form(manualOrUpload, filteredMembers.size >= maxSchemeMembers),
+              viewModel(
+                srn,
+                page,
+                manualOrUpload,
+                mode,
+                filteredMembers,
+                viewOnlyUpdated = (mode, request.previousUserAnswers) match {
+                  case (ViewOnlyMode, Some(previousUserAnswers)) =>
+                    val updated = getCompletedOrUpdatedTaskListStatus(
+                      request.userAnswers,
+                      previousUserAnswers,
+                      pages.nonsipp.memberdetails.Paths.personalDetails
+                    ) == Updated
+                    logger.info(s"""[ViewOnlyMode] Status for member details list is ${if (updated) "updated"
+                    else "not updated"}""")
+                    updated
+                  case (ViewOnlyMode, None) =>
+                    logger.info(
+                      s"[ViewOnlyMode] no previous submiossion version, Status for member details list is not udpated"
+                    )
+                    false
+                  case _ => false
+                },
+                optYear = request.year,
+                optCurrentVersion = request.currentVersion,
+                optPreviousVersion = request.previousVersion,
+                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
               )
             )
-          }
-          .merge
-      }
+          )
+        }
+        .merge
     }
+  }
 
   def onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -107,7 +167,17 @@ class SchemeMembersListController @Inject()(
                 BadRequest(
                   view(
                     formWithErrors,
-                    viewModel(srn, page, manualOrUpload, mode, filteredMembers)
+                    viewModel(
+                      srn,
+                      page,
+                      manualOrUpload,
+                      mode,
+                      filteredMembers,
+                      viewOnlyUpdated = false,
+                      None,
+                      None,
+                      None
+                    )
                   )
                 )
               }
@@ -134,6 +204,13 @@ class SchemeMembersListController @Inject()(
           }
         )
     }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+      )
+    }
 }
 
 object SchemeMembersListController {
@@ -153,36 +230,71 @@ object SchemeMembersListController {
     page: Int,
     manualOrUpload: ManualOrUpload,
     mode: Mode,
-    filteredMembers: List[(Max300, (String, String))]
+    filteredMembers: List[(Max300, (String, String))],
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[ListViewModel] = {
 
     val lengthOfFilteredMembers = filteredMembers.length
 
     val rows: List[ListRow] = filteredMembers
       .sortBy { case (_, (_, name)) => name }
-      .map {
+      .flatMap {
         case (_, (unrefinedIndex, memberFullName)) =>
           val index = refineV[Max300.Refined](unrefinedIndex.toInt + 1).toOption.get
-          ListRow(
-            memberFullName,
-            changeUrl = routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckMode).url,
-            changeHiddenText = Message("schemeMembersList.change.hidden", memberFullName),
-            removeUrl = routes.RemoveMemberDetailsController.onPageLoad(srn, index, mode).url,
-            removeHiddenText = Message("schemeMembersList.remove.hidden", memberFullName)
-          )
+          if (mode.isViewOnlyMode) {
+            (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+              case (ViewOnlyMode, Some(year), Some(current), Some(previous)) =>
+                List(
+                  ListRow.view(
+                    memberFullName,
+                    routes.SchemeMemberDetailsAnswersController
+                      .onPageLoadViewOnly(srn, index, year, current, previous)
+                      .url,
+                    Message("schemeMembersList.change.hidden", memberFullName)
+                  )
+                )
+              case _ => Nil
+            }
+          } else {
+            List(
+              ListRow(
+                memberFullName,
+                changeUrl = routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckMode).url,
+                changeHiddenText = Message("schemeMembersList.change.hidden", memberFullName),
+                removeUrl = routes.RemoveMemberDetailsController.onPageLoad(srn, index, mode).url,
+                removeHiddenText = Message("schemeMembersList.remove.hidden", memberFullName)
+              )
+            )
+          }
       }
 
-    val (title, heading) = if (lengthOfFilteredMembers > 1) {
-      ("schemeMembersList.title.plural", "schemeMembersList.heading.plural")
-    } else {
-      ("schemeMembersList.title", "schemeMembersList.heading")
+    val (title, heading) = ((mode, lengthOfFilteredMembers) match {
+      case (ViewOnlyMode, lengthOfFilteredMembers) if lengthOfFilteredMembers > 1 =>
+        ("schemeMembersList.view.title.plural", "schemeMembersList.view.heading.plural")
+      case (ViewOnlyMode, _) =>
+        ("schemeMembersList.view.title", "schemeMembersList.view.heading")
+      case (_, lengthOfFilteredMembers) if lengthOfFilteredMembers > 1 =>
+        ("schemeMembersList.title.plural", "schemeMembersList.heading.plural")
+      case _ =>
+        ("schemeMembersList.title", "schemeMembersList.heading")
+    }) match {
+      case (title, heading) => (Message(title, lengthOfFilteredMembers), Message(heading, lengthOfFilteredMembers))
     }
 
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.schemeMembersPageSize,
       rows.size,
-      routes.SchemeMembersListController.onPageLoad(srn, _, manualOrUpload)
+      call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+        case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+          routes.SchemeMembersListController.onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
+        case _ =>
+          routes.SchemeMembersListController.onPageLoad(srn, _, manualOrUpload)
+      }
     )
 
     val radioText = manualOrUpload.fold(
@@ -190,7 +302,7 @@ object SchemeMembersListController {
       manual =
         if (lengthOfFilteredMembers < Constants.maxSchemeMembers) "schemeMembersList.radio" else "membersUploaded.radio"
     )
-    val yesHintText = manualOrUpload.fold(
+    val yesHintText: Option[Message] = manualOrUpload.fold(
       upload = Some(Message("membersUploaded.radio.yes.hint")),
       manual = if (lengthOfFilteredMembers < Constants.maxSchemeMembers) {
         None
@@ -200,15 +312,15 @@ object SchemeMembersListController {
     )
 
     FormPageViewModel(
-      title = Message(title, lengthOfFilteredMembers),
-      heading = Message(heading, lengthOfFilteredMembers),
+      title = title,
+      heading = heading,
       description = Option
         .when(lengthOfFilteredMembers < Constants.maxSchemeMembers)(ParagraphMessage("schemeMembersList.paragraph")),
       page = ListViewModel(
         inset = "schemeMembersList.inset",
         rows,
         radioText,
-        showInsetWithRadios = lengthOfFilteredMembers == Constants.maxSchemeMembers,
+        showInsetWithRadios = !mode.isViewOnlyMode && lengthOfFilteredMembers == Constants.maxSchemeMembers,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
@@ -225,7 +337,45 @@ object SchemeMembersListController {
       refresh = None,
       Message("site.saveAndContinue"),
       None,
-      onSubmit = routes.SchemeMembersListController.onSubmit(srn, page, manualOrUpload)
+      onSubmit = routes.SchemeMembersListController.onSubmit(srn, page, manualOrUpload),
+      mode = mode,
+      optViewOnlyDetails = Option.when(mode == ViewOnlyMode) {
+        ViewOnlyDetailsViewModel(
+          updated = viewOnlyUpdated,
+          link = (optYear, optCurrentVersion, optPreviousVersion) match {
+            case (Some(year), Some(currentVersion), Some(previousVersion))
+                if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+              Some(
+                LinkMessage(
+                  "schemeMembersList.view.link",
+                  routes.SchemeMembersListController
+                    .onPreviousViewOnly(
+                      srn,
+                      page,
+                      year,
+                      currentVersion,
+                      previousVersion
+                    )
+                    .url
+                )
+              )
+            case _ => None
+          },
+          submittedText =
+            compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+          title = title,
+          heading = heading,
+          buttonText = "site.return.to.tasklist",
+          onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+            case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+              controllers.nonsipp.membercontributions.routes.MemberContributionListController
+                .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+            case _ =>
+              controllers.nonsipp.membercontributions.routes.MemberContributionListController
+                .onSubmit(srn, page, mode)
+          }
+        )
+      }
     )
   }
 }

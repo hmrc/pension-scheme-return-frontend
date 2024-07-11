@@ -15,79 +15,107 @@
  *@
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukErrorSummary: GovukErrorSummary,
-    govukButton: GovukButton,
-    govukRadios: GovukRadios,
-    hmrcListWithActions: HmrcListWithActions,
-    govukInsetText: GovukInsetText,
-    govukPagination: GovukPagination
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukButton: GovukButton,
+        govukRadios: GovukRadios,
+        hmrcListWithActions: HmrcListWithActions,
+        govukInsetText: GovukInsetText,
+        govukPagination: GovukPagination
 )
 @(form: Form[Boolean], viewmodel: FormPageViewModel[ListViewModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, viewmodel.title.toMessage)) {
+    @layout(pageTitle = title(form, viewmodel.title.toMessage)) {
 
-    @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
+        @formHelper(action = if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.onSubmit else viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
 
-        @if(form.hasErrors) {
-          @govukErrorSummary(ErrorSummaryViewModel(form))
-        }
+            @if(form.hasErrors) {
+                @govukErrorSummary(ErrorSummaryViewModel(form))
+            }
 
-        <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+            @if(viewmodel.optViewOnlyDetails.isEmpty) {
+                <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+            }
 
-        @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.rows)(paginatedViewModel =>
-            viewmodel.page.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
-        ){ rows =>
-            @hmrcListWithActions(ListWithActionsViewModel(
-                rows.map( value =>
-                    ListWithActionsItemViewModel(
-                        renderMessage(value.text),
-                        List(
-                            ListWithActionsActionViewModel(messages("site.change"), value.changeUrl)
-                                    .withVisuallyHiddenText(value.changeHiddenText.toMessage),
-                            ListWithActionsActionViewModel(messages("site.remove"), value.removeUrl)
-                                    .withVisuallyHiddenText(value.removeHiddenText.toMessage),
+            @if(viewmodel.optViewOnlyDetails.nonEmpty) {
+                @if(viewmodel.optViewOnlyDetails.get.updated) {
+                    <strong class ="govuk-tag govuk-tag--green govuk-!-margin-bottom-4">Updated</strong>
+                    <br/>
+
+                    @viewmodel.optViewOnlyDetails.get.link.map { link =>
+                        <p class="govuk-body">
+                            <a href=@link.url
+                            class="govuk-link" rel="noreferrer noopener" target="_blank" >@renderMessage(link.content)</a></p>
+                    }
+                }
+                @viewmodel.optViewOnlyDetails.get.submittedText.map { submittedText =>
+                    <span class="govuk-caption-l">@renderMessage(submittedText)</span>
+                }
+                <h1 class="govuk-heading-l">@renderMessage(viewmodel.optViewOnlyDetails.get.heading)</h1>
+            }
+
+            @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.rows)(paginatedViewModel =>
+                viewmodel.page.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
+            ) { rows =>
+                @hmrcListWithActions(ListWithActionsViewModel(
+                    rows.map(value =>
+                        ListWithActionsItemViewModel(
+                            renderMessage(value.text),
+                            value.change.map(change => ListWithActionsActionViewModel(messages("site.change"), change.url)
+                            .withVisuallyHiddenText(change.hiddenText.toMessage)).toList ++
+                                    value.remove.map(remove => ListWithActionsActionViewModel(messages("site.remove"), remove.url)
+                                    .withVisuallyHiddenText(remove.hiddenText.toMessage)).toList ++
+                                    value.view.map(view => ListWithActionsActionViewModel(messages("site.view"), view.url)
+                                    .withVisuallyHiddenText(view.hiddenText.toMessage)).toList
+
                         )
                     )
-                )
-            ))
-        }
-
-        @viewmodel.page.paginatedViewModel.map{ paginatedViewModel =>
-            @if(paginatedViewModel.pagination.totalPages > 1) {
-                <p id="pagination-label" class="govuk-body">@{renderMessage(paginatedViewModel.label)}</p>
+                ))
             }
-            @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
-        }
 
-        @viewmodel.description.map(renderMessage)
+            @viewmodel.page.paginatedViewModel.map { paginatedViewModel =>
+                @if(paginatedViewModel.pagination.totalPages > 1) {
+                    <p id="pagination-label" class="govuk-body">@{
+                        renderMessage(paginatedViewModel.label)
+                    }</p>
+                }
+                @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
+            }
 
-        @if(viewmodel.page.showRadios && viewmodel.page.showInsetWithRadios) {
-            @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.page.inset)))
-            @govukRadios(
-              RadiosViewModel.yesNo(
-                field = form("value"),
-                fieldset = FieldsetViewModel(LegendViewModel(renderMessage(viewmodel.page.radioText)).withSize(LegendSize.Medium)),
-                yesHint = viewmodel.page.yesHintText.map(renderMessage)
-              )
+            @if(!viewmodel.mode.isViewOnlyMode) {
+                @viewmodel.description.map(renderMessage)
+            }
+
+            @if(viewmodel.mode != ViewOnlyMode && viewmodel.page.showRadios && viewmodel.page.showInsetWithRadios) {
+                @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.page.inset)))
+                @govukRadios(
+                    RadiosViewModel.yesNo(
+                        field = form("value"),
+                        fieldset = FieldsetViewModel(LegendViewModel(renderMessage(viewmodel.page.radioText)).withSize(LegendSize.Medium)),
+                        yesHint = viewmodel.page.yesHintText.map(renderMessage)
+                    )
+                )
+            }
+
+            @if(!viewmodel.mode.isViewOnlyMode && viewmodel.page.showRadios && !viewmodel.page.showInsetWithRadios) {
+                @govukRadios(
+                    RadiosViewModel.yesNo(
+                        field = form("value"),
+                        fieldset = FieldsetViewModel(LegendViewModel(renderMessage(viewmodel.page.radioText)).withSize(LegendSize.Medium)),
+                        yesHint = viewmodel.page.yesHintText.map(renderMessage)
+                    )
+                )
+            }
+            @if(!viewmodel.mode.isViewOnlyMode && !viewmodel.page.showRadios && !viewmodel.page.showInsetWithRadios) {
+                @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.page.inset)))
+            }
+
+            @govukButton(
+                if(viewmodel.optViewOnlyDetails.nonEmpty)
+                    ButtonViewModel(renderMessage(viewmodel.optViewOnlyDetails.get.buttonText))
+                else
+                    ButtonViewModel(renderMessage(viewmodel.buttonText))
             )
         }
-        @if(viewmodel.page.showRadios && !viewmodel.page.showInsetWithRadios){
-            @govukRadios(
-              RadiosViewModel.yesNo(
-                field = form("value"),
-                fieldset = FieldsetViewModel(LegendViewModel(renderMessage(viewmodel.page.radioText)).withSize(LegendSize.Medium)),
-                yesHint = viewmodel.page.yesHintText.map(renderMessage)
-              )
-            )
-        }
-        @if(!viewmodel.page.showRadios && !viewmodel.page.showInsetWithRadios){
-          @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.page.inset)))
-        }
-
-        @govukButton(
-            ButtonViewModel(renderMessage(viewmodel.buttonText))
-        )
     }
-}

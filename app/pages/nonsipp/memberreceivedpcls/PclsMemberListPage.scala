@@ -25,5 +25,9 @@ case class PclsMemberListPage(srn: Srn) extends QuestionPage[Boolean] {
 
   override def path: JsPath = memberDetails \ toString
 
-  override def toString: String = "pclsListPage"
+  override def toString: String = PclsMemberListPage.key
+}
+
+object PclsMemberListPage {
+  val key = "pclsListPage"
 }

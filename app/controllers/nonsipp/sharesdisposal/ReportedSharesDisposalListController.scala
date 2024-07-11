@@ -187,7 +187,7 @@ object ReportedSharesDisposalListController {
           }
       }
       .toList
-      .sortBy(_.changeUrl)
+      .sortBy(_.change.fold("")(_.url))
 
   private def buildMessage(messageString: String, sharesDisposalData: SharesDisposalData): Message =
     sharesDisposalData match {

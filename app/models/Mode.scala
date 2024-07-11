@@ -34,6 +34,7 @@ sealed trait Mode {
 
   val isNormalMode: Boolean = this == NormalMode
   val isCheckMode: Boolean = this == CheckMode
+  val isViewOnlyMode: Boolean = this == ViewOnlyMode
 }
 
 case object CheckMode extends Mode

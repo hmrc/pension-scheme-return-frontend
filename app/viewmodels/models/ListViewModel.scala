@@ -21,11 +21,35 @@ import viewmodels.DisplayMessage.Message
 
 case class ListRow(
   text: DisplayMessage,
-  changeUrl: String,
-  changeHiddenText: Message,
-  removeUrl: String,
-  removeHiddenText: Message
+  change: Option[ListRowLink],
+  remove: Option[ListRowLink],
+  view: Option[ListRowLink]
 )
+
+case class ListRowLink(url: String, hiddenText: Message)
+
+object ListRow {
+  def apply(
+    text: DisplayMessage,
+    changeUrl: String,
+    changeHiddenText: Message,
+    removeUrl: String,
+    removeHiddenText: Message
+  ): ListRow = ListRow(
+    text,
+    change = Some(ListRowLink(changeUrl, changeHiddenText)),
+    remove = Some(ListRowLink(removeUrl, removeHiddenText)),
+    view = None
+  )
+
+  def view(text: DisplayMessage, url: String, hiddenText: Message): ListRow =
+    ListRow(
+      text,
+      change = None,
+      remove = None,
+      view = Some(ListRowLink(url, hiddenText))
+    )
+}
 
 case class ListViewModel(
   inset: DisplayMessage,
