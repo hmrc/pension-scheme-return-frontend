@@ -3228,7 +3228,7 @@ bondsDisposalCYA.change.title= Change details of bond disposal
 bondsDisposalCYA.change.heading = Change details of bond disposal
 
 bondsDisposalCYA.viewOnly.title = View details of bond disposals
-bondsDisposalCYA.viewOnly.heading = Disposal of [name of bond]
+bondsDisposalCYA.viewOnly.heading = Disposal of {0}
 
 bondsDisposal.reportBondsDisposalList.title = You have reported {0} bond disposal
 bondsDisposal.reportBondsDisposalList.title.plural = You have reported {0} bond disposals
