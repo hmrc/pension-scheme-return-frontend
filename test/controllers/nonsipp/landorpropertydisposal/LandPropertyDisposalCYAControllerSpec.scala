@@ -25,7 +25,6 @@ import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.nonsipp.landorpropertydisposal.LandPropertyDisposalCYAController._
 import pages.nonsipp.landorpropertydisposal._
 import eu.timepit.refined.refineMV
-import pages.nonsipp.FbVersionPage
 import models._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
@@ -50,22 +49,6 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec {
     routes.LandPropertyDisposalCYAController.onPageLoad(srn, assetIndex, disposalIndex, mode)
   private def onSubmit(mode: Mode) =
     routes.LandPropertyDisposalCYAController.onSubmit(srn, assetIndex, disposalIndex, mode)
-
-  private lazy val onSubmitViewOnly = routes.LandPropertyDisposalCYAController.onSubmitViewOnly(
-    srn,
-    yearString,
-    submissionNumberTwo,
-    submissionNumberOne
-  )
-
-  private lazy val onPageLoadViewOnly = routes.LandPropertyDisposalCYAController.onPageLoadViewOnly(
-    srn,
-    assetIndex,
-    disposalIndex,
-    yearString,
-    submissionNumberTwo,
-    submissionNumberOne
-  )
 
   private val assetIndex = refineMV[OneTo5000](1)
   private val disposalIndex = refineMV[OneTo50](1)
@@ -109,10 +92,7 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec {
                 None,
                 None,
                 mode
-              ),
-              srn,
-              mode,
-              viewOnlyUpdated = true
+              )
             )
           )
         }.withName(s"render correct $mode view for Sold journey")
@@ -142,59 +122,5 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec {
           .withName(s"redirect to journey recovery page on submit when in $mode mode")
       )
     }
-  }
-
-  "LandPropertyDisposalCYAController in view only mode" - {
-
-    val currentUserAnswers = userAnswers
-      .unsafeSet(FbVersionPage(srn), "002")
-
-    val previousUserAnswers = currentUserAnswers
-      .unsafeSet(FbVersionPage(srn), "001")
-
-    act.like(
-      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-        implicit app => implicit request =>
-          injected[CheckYourAnswersView].apply(
-            viewModel(
-              ViewModelParameters(
-                srn,
-                assetIndex,
-                disposalIndex,
-                schemeName,
-                howWasPropertyDisposed = HowDisposed.Sold,
-                dateSold,
-                address,
-                landOrPropertyDisposedType = Some(IdentityType.UKPartnership),
-                isBuyerConnectedParty,
-                considerationAssetSold,
-                independentValuation = Some(true),
-                landOrPropertyStillHeld = true,
-                Some(recipientName),
-                None,
-                None,
-                ViewOnlyMode
-              ),
-              srn,
-              ViewOnlyMode,
-              viewOnlyUpdated = false,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
-            )
-          )
-      }
-    )
-    act.like(
-      redirectToPage(
-        onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
-      ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only tasklist")
-    )
   }
 }

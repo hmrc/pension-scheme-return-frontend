@@ -26,15 +26,13 @@ import controllers.PSRController
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal._
 import controllers.actions._
+import navigation.Navigator
 import play.api.i18n._
 import models.requests.DataRequest
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import cats.implicits.toShow
 import controllers.nonsipp.landorpropertydisposal.LandPropertyDisposalCYAController._
-import controllers.nonsipp.routes
-import pages.nonsipp.CompilationOrSubmissionDatePage
-import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
 import viewmodels.DisplayMessage._
@@ -42,7 +40,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
 class LandPropertyDisposalCYAController @Inject()(
@@ -63,128 +61,101 @@ class LandPropertyDisposalCYAController @Inject()(
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn, index, disposalIndex, mode)(implicitly)
-    }
+      (
+        for {
+          howWasPropertyDisposed <- requiredPage(HowWasPropertyDisposedOfPage(srn, index, disposalIndex))
+          addressLookUpPage <- requiredPage(LandOrPropertyChosenAddressPage(srn, index))
+          landOrPropertyStillHeld <- requiredPage(LandOrPropertyStillHeldPage(srn, index, disposalIndex))
 
-  def onPageLoadViewOnly(
-    srn: Srn,
-    landOrPropertyIndex: Max5000,
-    disposalIndex: Max50,
-    mode: Mode,
-    year: String,
-    current: Int,
-    previous: Int
-  ): Action[AnyContent] =
-    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, landOrPropertyIndex, disposalIndex, mode)(implicitly)
-    }
-
-  def onPageLoadCommon(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode)(
-    implicit request: DataRequest[AnyContent]
-  ): Result =
-    (
-      for {
-        howWasPropertyDisposed <- requiredPage(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
-        addressLookUpPage <- requiredPage(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex))
-        landOrPropertyStillHeld <- requiredPage(LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex))
-
-        totalProceedsSale = Option.when(howWasPropertyDisposed == Sold)(
-          request.userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex)).get
-        )
-        independentValuation = Option.when(howWasPropertyDisposed == Sold)(
-          request.userAnswers.get(DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex)).get
-        )
-        landOrPropertyDisposedType = Option.when(howWasPropertyDisposed == Sold)(
-          request.userAnswers
-            .get(WhoPurchasedLandOrPropertyPage(srn: Srn, landOrPropertyIndex, disposalIndex))
-            .get
-        )
-
-        whenWasPropertySold = Option.when(howWasPropertyDisposed == Sold)(
-          request.userAnswers.get(WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex)).get
-        )
-
-        landOrPropertyDisposalBuyerConnectedParty = Option.when(howWasPropertyDisposed == Sold)(
-          request.userAnswers
-            .get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, landOrPropertyIndex, disposalIndex))
-            .get
-        )
-
-        recipientName = Option.when(howWasPropertyDisposed == Sold)(
-          List(
-            request.userAnswers.get(LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)),
-            request.userAnswers.get(CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)),
-            request.userAnswers.get(PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)),
+          totalProceedsSale = Option.when(howWasPropertyDisposed == Sold)(
+            request.userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, index, disposalIndex)).get
+          )
+          independentValuation = Option.when(howWasPropertyDisposed == Sold)(
+            request.userAnswers.get(DisposalIndependentValuationPage(srn, index, disposalIndex)).get
+          )
+          landOrPropertyDisposedType = Option.when(howWasPropertyDisposed == Sold)(
             request.userAnswers
-              .get(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex))
-              .map(_.name)
-          ).flatten.head
-        )
+              .get(WhoPurchasedLandOrPropertyPage(srn: Srn, index, disposalIndex))
+              .get
+          )
 
-        recipientDetails = Option.when(howWasPropertyDisposed == Sold)(
-          List(
-            request.userAnswers
-              .get(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex))
-              .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
-              .get(CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex))
-              .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
-              .get(PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex))
-              .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
-              .get(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex))
-              .map(_.description)
-          ).flatten.headOption
-        )
+          whenWasPropertySold = Option.when(howWasPropertyDisposed == Sold)(
+            request.userAnswers.get(WhenWasPropertySoldPage(srn, index, disposalIndex)).get
+          )
 
-        recipientReasonNoDetails = Option.when(howWasPropertyDisposed == Sold)(
-          List(
-            request.userAnswers
-              .get(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex))
-              .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
-              .get(CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex))
-              .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
-              .get(PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex))
-              .flatMap(_.value.swap.toOption.map(_.value))
-          ).flatten.headOption
-        )
-        schemeName = request.schemeDetails.schemeName
+          landOrPropertyDisposalBuyerConnectedParty = Option.when(howWasPropertyDisposed == Sold)(
+            request.userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex)).get
+          )
 
-      } yield Ok(
-        view(
-          viewModel(
-            ViewModelParameters(
-              srn,
-              landOrPropertyIndex,
-              disposalIndex,
-              schemeName,
-              howWasPropertyDisposed,
-              whenWasPropertySold,
-              addressLookUpPage,
-              landOrPropertyDisposedType,
-              landOrPropertyDisposalBuyerConnectedParty,
-              totalProceedsSale,
-              independentValuation,
-              landOrPropertyStillHeld,
-              recipientName,
-              recipientDetails.flatten,
-              recipientReasonNoDetails.flatten,
-              mode
-            ),
-            srn,
-            mode,
-            viewOnlyUpdated = false, // flag is not displayed on this tier
-            optYear = request.year,
-            optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          recipientName = Option.when(howWasPropertyDisposed == Sold)(
+            List(
+              request.userAnswers.get(LandOrPropertyIndividualBuyerNamePage(srn, index, disposalIndex)),
+              request.userAnswers.get(CompanyBuyerNamePage(srn, index, disposalIndex)),
+              request.userAnswers.get(PartnershipBuyerNamePage(srn, index, disposalIndex)),
+              request.userAnswers
+                .get(OtherBuyerDetailsPage(srn, index, disposalIndex))
+                .map(_.name)
+            ).flatten.head
+          )
+
+          recipientDetails = Option.when(howWasPropertyDisposed == Sold)(
+            List(
+              request.userAnswers
+                .get(IndividualBuyerNinoNumberPage(srn, index, disposalIndex))
+                .flatMap(_.value.toOption.map(_.value)),
+              request.userAnswers
+                .get(CompanyBuyerCrnPage(srn, index, disposalIndex))
+                .flatMap(_.value.toOption.map(_.value)),
+              request.userAnswers
+                .get(PartnershipBuyerUtrPage(srn, index, disposalIndex))
+                .flatMap(_.value.toOption.map(_.value)),
+              request.userAnswers
+                .get(OtherBuyerDetailsPage(srn, index, disposalIndex))
+                .map(_.description)
+            ).flatten.headOption
+          )
+
+          recipientReasonNoDetails = Option.when(howWasPropertyDisposed == Sold)(
+            List(
+              request.userAnswers
+                .get(IndividualBuyerNinoNumberPage(srn, index, disposalIndex))
+                .flatMap(_.value.swap.toOption.map(_.value)),
+              request.userAnswers
+                .get(CompanyBuyerCrnPage(srn, index, disposalIndex))
+                .flatMap(_.value.swap.toOption.map(_.value)),
+              request.userAnswers
+                .get(PartnershipBuyerUtrPage(srn, index, disposalIndex))
+                .flatMap(_.value.swap.toOption.map(_.value))
+            ).flatten.headOption
+          )
+          schemeName = request.schemeDetails.schemeName
+
+        } yield Ok(
+          view(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                index,
+                disposalIndex,
+                schemeName,
+                howWasPropertyDisposed,
+                whenWasPropertySold,
+                addressLookUpPage,
+                landOrPropertyDisposedType,
+                landOrPropertyDisposalBuyerConnectedParty,
+                totalProceedsSale,
+                independentValuation,
+                landOrPropertyStillHeld,
+                recipientName,
+                recipientDetails.flatten,
+                recipientReasonNoDetails.flatten,
+                mode
+              )
+            )
           )
         )
-      )
-    ).merge
+      ).merge
+    }
 
   def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -213,11 +184,6 @@ class LandPropertyDisposalCYAController @Inject()(
           }
       } yield redirectTo
     }
-
-  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
-    }
 }
 
 case class ViewModelParameters(
@@ -239,27 +205,15 @@ case class ViewModelParameters(
   mode: Mode
 )
 object LandPropertyDisposalCYAController {
-  def viewModel(
-    parameters: ViewModelParameters,
-    srn: Srn,
-    mode: Mode,
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
-  ): FormPageViewModel[CheckYourAnswersViewModel] =
+  def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      mode = mode,
       title = parameters.mode.fold(
         normal = "checkYourAnswers.title",
-        check = "landPropertyDisposalCYA.change.title",
-        viewOnly = "landPropertyDisposalCYA.viewOnly.title"
+        check = "landPropertyDisposalCYA.change.title"
       ),
       heading = parameters.mode.fold(
         normal = "checkYourAnswers.heading",
-        check = Message("landPropertyDisposalCYA.change.heading", parameters.addressLookUpPage.addressLine1),
-        viewOnly = "landPropertyDisposalCYA.viewOnly.heading"
+        check = Message("landPropertyDisposalCYA.change.heading", parameters.addressLookUpPage.addressLine1)
       ),
       description = Some(ParagraphMessage("landOrPropertyCYA.paragraph")),
       page = CheckYourAnswersViewModel.singleSection(
@@ -282,32 +236,9 @@ object LandPropertyDisposalCYAController {
         )
       ),
       refresh = None,
-      buttonText =
-        parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
-      onSubmit = controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-        .onSubmit(parameters.srn, parameters.index, parameters.disposalIndex, parameters.mode),
-      optViewOnlyDetails = if (mode == ViewOnlyMode) {
-        Some(
-          ViewOnlyDetailsViewModel(
-            updated = viewOnlyUpdated,
-            link = None,
-            submittedText = Some(Message("")),
-            title = "landPropertyDisposalCYA.viewOnly.title",
-            heading = Message("landPropertyDisposalCYA.viewOnly.heading", parameters.addressLookUpPage.addressLine1),
-            buttonText = "site.continue",
-            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-                controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
-              case _ =>
-                controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-                  .onSubmit(srn, parameters.index, parameters.disposalIndex, mode)
-            }
-          )
-        )
-      } else {
-        None
-      }
+      buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
+      onSubmit = routes.LandPropertyDisposalCYAController
+        .onSubmit(parameters.srn, parameters.index, parameters.disposalIndex, parameters.mode)
     )
 
   private def rows(
@@ -427,21 +358,13 @@ object LandPropertyDisposalCYAController {
 
     val recipientNameUrl = landOrPropertyDisposedType match {
       case Some(IdentityType.Individual) =>
-        controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyIndividualBuyerNameController
-          .onSubmit(srn, index, disposalIndex, CheckMode)
-          .url
+        routes.LandOrPropertyIndividualBuyerNameController.onSubmit(srn, index, disposalIndex, CheckMode).url
       case Some(IdentityType.UKCompany) =>
-        controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerNameController
-          .onSubmit(srn, index, disposalIndex, CheckMode)
-          .url
+        routes.CompanyBuyerNameController.onSubmit(srn, index, disposalIndex, CheckMode).url
       case Some(IdentityType.UKPartnership) =>
-        controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerNameController
-          .onSubmit(srn, index, disposalIndex, CheckMode)
-          .url
+        routes.PartnershipBuyerNameController.onSubmit(srn, index, disposalIndex, CheckMode).url
       case Some(IdentityType.Other) =>
-        controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
-          .onSubmit(srn, index, disposalIndex, CheckMode)
-          .url
+        routes.OtherBuyerDetailsController.onSubmit(srn, index, disposalIndex, CheckMode).url
     }
 
     val (
@@ -454,36 +377,28 @@ object LandPropertyDisposalCYAController {
         case Some(IdentityType.Individual) =>
           (
             Message("landPropertyDisposalCYA.section1.recipientDetails.nino", recipientName),
-            controllers.nonsipp.landorpropertydisposal.routes.IndividualBuyerNinoNumberController
-              .onSubmit(srn, index, disposalIndex, CheckMode)
-              .url,
+            routes.IndividualBuyerNinoNumberController.onSubmit(srn, index, disposalIndex, CheckMode).url,
             "landPropertyDisposalCYA.section1.recipientDetails.nino.hidden",
             "landPropertyDisposalCYA.section1.recipientDetails.noNinoReason.hidden"
           )
         case Some(IdentityType.UKCompany) =>
           (
             Message("landPropertyDisposalCYA.section1.recipientDetails.crn", recipientName),
-            controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerCrnController
-              .onSubmit(srn, index, disposalIndex, CheckMode)
-              .url,
+            routes.CompanyBuyerCrnController.onSubmit(srn, index, disposalIndex, CheckMode).url,
             "landPropertyDisposalCYA.section1.recipientDetails.crn.hidden",
             "landPropertyDisposalCYA.section1.recipientDetails.noCrnReason.hidden"
           )
         case Some(IdentityType.UKPartnership) =>
           (
             Message("landPropertyDisposalCYA.section1.recipientDetails.utr", recipientName),
-            controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerUtrController
-              .onSubmit(srn, index, disposalIndex, CheckMode)
-              .url,
+            routes.PartnershipBuyerUtrController.onSubmit(srn, index, disposalIndex, CheckMode).url,
             "landPropertyDisposalCYA.section1.recipientDetails.utr.hidden",
             "landPropertyDisposalCYA.section1.recipientDetails.noUtrReason.hidden"
           )
         case Some(IdentityType.Other) =>
           (
             Message("landPropertyDisposalCYA.section1.recipientDetails.other", recipientName),
-            controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
-              .onSubmit(srn, index, disposalIndex, CheckMode)
-              .url,
+            routes.OtherBuyerDetailsController.onSubmit(srn, index, disposalIndex, CheckMode).url,
             "landPropertyDisposalCYA.section1.recipientDetails.other.hidden",
             ""
           )
@@ -492,27 +407,19 @@ object LandPropertyDisposalCYAController {
     val (recipientNoDetailsReasonKey, recipientNoDetailsUrl): (Message, String) = landOrPropertyDisposedType match {
       case Some(IdentityType.Individual) =>
         Message("landPropertyDisposalCYA.section1.recipientDetails.noNinoReason", recipientName) ->
-          controllers.nonsipp.landorpropertydisposal.routes.IndividualBuyerNinoNumberController
-            .onSubmit(srn, index, disposalIndex, CheckMode)
-            .url
+          routes.IndividualBuyerNinoNumberController.onSubmit(srn, index, disposalIndex, CheckMode).url
 
       case Some(IdentityType.UKCompany) =>
         Message("landPropertyDisposalCYA.section1.recipientDetails.noCrnReason", recipientName) ->
-          controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerCrnController
-            .onSubmit(srn, index, disposalIndex, CheckMode)
-            .url
+          routes.CompanyBuyerCrnController.onSubmit(srn, index, disposalIndex, CheckMode).url
 
       case Some(IdentityType.UKPartnership) =>
         Message("landPropertyDisposalCYA.section1.recipientDetails.noUtrReason", recipientName) ->
-          controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerUtrController
-            .onSubmit(srn, index, disposalIndex, CheckMode)
-            .url
+          routes.PartnershipBuyerUtrController.onSubmit(srn, index, disposalIndex, CheckMode).url
 
       case Some(IdentityType.Other) =>
         Message("landPropertyDisposalCYA.section1.recipientDetails.other", recipientName) ->
-          controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
-            .onSubmit(srn, index, disposalIndex, CheckMode)
-            .url
+          routes.OtherBuyerDetailsController.onSubmit(srn, index, disposalIndex, CheckMode).url
 
     }
 
@@ -523,9 +430,7 @@ object LandPropertyDisposalCYAController {
       ).withAction(
         SummaryAction(
           "site.change",
-          controllers.nonsipp.landorpropertydisposal.routes.WhenWasPropertySoldController
-            .onSubmit(srn, index, disposalIndex, CheckMode)
-            .url
+          routes.WhenWasPropertySoldController.onSubmit(srn, index, disposalIndex, CheckMode).url
         ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.whenWasPropertySold.hidden")
       ),
       CheckYourAnswersRowViewModel(
@@ -534,9 +439,7 @@ object LandPropertyDisposalCYAController {
       ).withAction(
         SummaryAction(
           "site.change",
-          controllers.nonsipp.landorpropertydisposal.routes.TotalProceedsSaleLandPropertyController
-            .onSubmit(srn, index, disposalIndex, CheckMode)
-            .url
+          routes.TotalProceedsSaleLandPropertyController.onSubmit(srn, index, disposalIndex, CheckMode).url
         ).withVisuallyHiddenContent(
           "landPropertyDisposalCYA.section1.totalProceedsSaleInfo.hidden"
         )
@@ -547,9 +450,7 @@ object LandPropertyDisposalCYAController {
       ).withAction(
         SummaryAction(
           "site.change",
-          controllers.nonsipp.landorpropertydisposal.routes.WhoPurchasedLandOrPropertyController
-            .onSubmit(srn, index, disposalIndex, CheckMode)
-            .url
+          routes.WhoPurchasedLandOrPropertyController.onSubmit(srn, index, disposalIndex, CheckMode).url
         ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.whoPurchasedLandOrProperty.hidden")
       ),
       CheckYourAnswersRowViewModel("landPropertyDisposalCYA.section1.recipientName", recipientName)
