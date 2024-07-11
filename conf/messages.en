@@ -2383,6 +2383,8 @@ employerContributionsCYA.row.contributionOtherEmployer.hidden =  if employer con
 employerContributionsCYA.inset = You cannot add any more employer contributions for this member as you have entered the maximum of 50. If you need to remove one, you can do this on the next page.
 employerContributionsCYA.title.change = Change details of employer contributions
 employerContributionsCYA.heading.change = Change details of employer contributions for {0}
+employerContributionsCYA.title.viewOnly = Employer contributions for this member
+employerContributionsCYA.heading.viewOnly = Employer contributions for {0}
 
 transferringSchemeName.title = What is the transferring scheme’s name?
 transferringSchemeName.heading = What is the transferring scheme’s name?

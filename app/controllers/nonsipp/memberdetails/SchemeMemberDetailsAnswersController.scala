@@ -255,8 +255,7 @@ object SchemeMemberDetailsAnswersController {
         rows(index, srn, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)
       ),
       refresh = None,
-      buttonText =
-        mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
+      buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
       onSubmit = routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
         Some(
@@ -266,7 +265,7 @@ object SchemeMemberDetailsAnswersController {
             submittedText = Some(Message("")),
             title = "memberDetailsCYA.viewOnly.title",
             heading = Message("memberDetailsCYA.viewOnly.heading", memberDetails.fullName),
-            buttonText = "site.return.to.tasklist",
+            buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 routes.SchemeMemberDetailsAnswersController

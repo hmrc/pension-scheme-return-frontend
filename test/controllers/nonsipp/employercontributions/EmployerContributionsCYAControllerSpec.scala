@@ -20,6 +20,7 @@ import config.Refined._
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import eu.timepit.refined.refineMV
+import pages.nonsipp.FbVersionPage
 import models._
 import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
@@ -27,7 +28,7 @@ import pages.nonsipp.employercontributions._
 import services.PsrSubmissionService
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import org.mockito.Mockito.{reset, when}
+import org.mockito.Mockito.{reset, when, _}
 import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
 import views.html.CheckYourAnswersView
 
@@ -43,9 +44,25 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec {
     EmployerCYA(secondaryIndex, employerName, IdentityType.UKCompany, Right(crn.value), money)
   )
 
-  private lazy val onPageLoad =
-    routes.EmployerContributionsCYAController.onPageLoad(srn, index, page, NormalMode)
-  private lazy val onSubmit = routes.EmployerContributionsCYAController.onSubmit(srn, index, page, NormalMode)
+  private def onPageLoad(mode: Mode) =
+    routes.EmployerContributionsCYAController.onPageLoad(srn, index, page, mode)
+  private def onSubmit(mode: Mode) = routes.EmployerContributionsCYAController.onSubmit(srn, index, page, mode)
+
+  private lazy val onPageLoadViewOnly = routes.EmployerContributionsCYAController.onPageLoadViewOnly(
+    srn,
+    index,
+    page,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private lazy val onSubmitViewOnly = routes.EmployerContributionsCYAController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
@@ -69,16 +86,61 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec {
 
   "EmployerContributionsCYAController" - {
 
-    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      injected[CheckYourAnswersView].apply(
-        viewModel(srn, memberDetails.fullName, index, page, employerCYAs, NormalMode)
-      )
-    })
+    List(NormalMode, CheckMode).foreach { mode =>
+      act.like(renderView(onPageLoad(mode), userAnswers) { implicit app => implicit request =>
+        injected[CheckYourAnswersView].apply(
+          viewModel(srn, memberDetails.fullName, index, page, employerCYAs, mode, viewOnlyUpdated = true)
+        )
+      }.withName(s"render correct ${mode.toString} view"))
 
-    act.like(redirectNextPage(onSubmit))
+      act.like(redirectNextPage(onSubmit(mode)).updateName(s"${mode.toString} onSubmit" + _))
 
-    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
+      act.like(journeyRecoveryPage(onPageLoad(mode)).updateName(s"${mode.toString} onPageLoad" + _))
 
-    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+      act.like(journeyRecoveryPage(onSubmit(mode)).updateName(s"${mode.toString} onSubmit" + _))
+    }
+  }
+
+  "EmployerContributionsCYAController in view only mode" - {
+
+    val currentUserAnswers = userAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+
+    val previousUserAnswers = userAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+
+    act.like(
+      renderView(
+        onPageLoadViewOnly,
+        userAnswers = currentUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[CheckYourAnswersView].apply(
+          EmployerContributionsCYAController.viewModel(
+            srn,
+            memberDetails.fullName,
+            index,
+            page,
+            employerCYAs,
+            ViewOnlyMode,
+            viewOnlyUpdated = false,
+            optYear = Some(yearString),
+            optCurrentVersion = Some(submissionNumberTwo),
+            optPreviousVersion = Some(submissionNumberOne),
+            compilationOrSubmissionDate = Some(submissionDateTwo)
+          )
+        )
+      }.withName("Render view only mode correctly")
+    )
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
   }
 }

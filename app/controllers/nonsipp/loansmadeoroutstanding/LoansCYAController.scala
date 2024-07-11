@@ -241,8 +241,7 @@ object LoansCYAController {
         )
       ),
       refresh = None,
-      buttonText =
-        mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.return.to.tasklist"),
+      buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
       onSubmit = routes.LoansCYAController.onSubmit(srn, index, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
         Some(
@@ -252,7 +251,7 @@ object LoansCYAController {
             submittedText = Some(Message("")),
             title = "loanCheckYourAnswers.viewOnly.title",
             heading = Message("loanCheckYourAnswers.viewOnly.heading", loanAmount._1.displayAs, recipientName),
-            buttonText = "site.return.to.tasklist",
+            buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 routes.LoansCYAController.onSubmitViewOnly(srn, year, currentVersion, previousVersion)
