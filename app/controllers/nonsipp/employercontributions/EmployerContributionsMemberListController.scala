@@ -21,10 +21,10 @@ import play.api.mvc._
 import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.PSRController
-import cats.implicits.catsSyntaxApplicativeId
+import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import cats.implicits.{catsSyntaxApplicativeId, toShow}
 import _root_.config.Constants
-import navigation.Navigator
-import models._
+import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
 import pages.nonsipp.employercontributions._
 import services.{PsrSubmissionService, SaveService}
@@ -32,9 +32,13 @@ import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
 import controllers.actions._
 import eu.timepit.refined.refineMV
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import utils.DateTimeUtils.localDateTimeShow
+import models._
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models.SectionJourneyStatus.InProgress
 import viewmodels.models._
 import models.requests.DataRequest
@@ -44,6 +48,7 @@ import _root_.config.Refined.{Max300, Max50}
 
 import scala.concurrent.{ExecutionContext, Future}
 
+import java.time.LocalDateTime
 import javax.inject.Named
 
 class EmployerContributionsMemberListController @Inject()(
@@ -62,19 +67,57 @@ class EmployerContributionsMemberListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
-      if (optionList.flatten.nonEmpty) {
-        optionList
-          .zipWithRefinedIndex[Max300.Refined]
-          .map { indexes =>
-            val employerContributions = buildEmployerContributions(srn, indexes)
-            val filledForm = request.userAnswers.fillForm(EmployerContributionsMemberListPage(srn), form)
-            Ok(view(filledForm, viewModel(srn, page, mode, employerContributions)))
-          }
-          .merge
-      } else {
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
+      onPageLoadCommon(srn, page, mode)(implicitly)
+  }
+
+  def onPageLoadViewOnly(
+    srn: Srn,
+    page: Int,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    onPageLoadCommon(srn, page, mode)(implicitly)
+  }
+
+  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+    val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
+    if (optionList.flatten.nonEmpty) {
+      optionList
+        .zipWithRefinedIndex[Max300.Refined]
+        .map { indexes =>
+          val employerContributions = buildEmployerContributions(srn, indexes)
+          val filledForm = request.userAnswers.fillForm(EmployerContributionsMemberListPage(srn), form)
+          Ok(
+            view(
+              filledForm,
+              viewModel(
+                srn,
+                page,
+                mode,
+                employerContributions,
+                viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+                  getCompletedOrUpdatedTaskListStatus(
+                    request.userAnswers,
+                    request.previousUserAnswers.get,
+                    pages.nonsipp.employercontributions.Paths.memberEmpContribution
+                  ) == Updated
+                } else {
+                  false
+                },
+                optYear = request.year,
+                optCurrentVersion = request.currentVersion,
+                optPreviousVersion = request.previousVersion,
+                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+              )
+            )
+          )
+        }
+        .merge
+    } else {
+      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
@@ -100,7 +143,7 @@ class EmployerContributionsMemberListController @Inject()(
                     view(
                       errors,
                       EmployerContributionsMemberListController
-                        .viewModel(srn, page, mode, employerContributions)
+                        .viewModel(srn, page, mode, employerContributions, viewOnlyUpdated = false, None, None, None)
                     )
                   )
                 }
@@ -140,6 +183,23 @@ class EmployerContributionsMemberListController @Inject()(
       }
   }
 
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+      )
+    }
+
+  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
+        )
+      )
+    }
+
   private def buildEmployerContributions(srn: Srn, indexes: List[(Max300, Option[NameDOB])])(
     implicit request: DataRequest[_]
   ): List[EmployerContributions] = indexes.flatMap {
@@ -169,7 +229,10 @@ object EmployerContributionsMemberListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    employerContributions: List[EmployerContributions]
+    employerContributions: List[EmployerContributions],
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None
   ): List[List[TableElem]] =
     employerContributions.map { employerContribution =>
       val noContributions = employerContribution.contributions.isEmpty
@@ -183,16 +246,20 @@ object EmployerContributionsMemberListController {
           TableElem(
             Message("employerContributions.MemberList.status.no.contributions")
           ),
-          TableElem.add(
-            employerContribution.contributions.find(_.status.inProgress) match {
-              case Some(Contributions(_, InProgress(url))) => url
-              case None =>
-                controllers.nonsipp.employercontributions.routes.EmployerNameController
-                  .onSubmit(srn, employerContribution.memberIndex, refineMV(1), mode)
-                  .url
-            },
-            Message("employerContributions.MemberList.add.hidden.text", employerContribution.employerFullName)
-          ),
+          if (mode != ViewOnlyMode) {
+            TableElem.add(
+              employerContribution.contributions.find(_.status.inProgress) match {
+                case Some(Contributions(_, InProgress(url))) => url
+                case None =>
+                  controllers.nonsipp.employercontributions.routes.EmployerNameController
+                    .onSubmit(srn, employerContribution.memberIndex, refineMV(1), mode)
+                    .url
+              },
+              Message("employerContributions.MemberList.add.hidden.text", employerContribution.employerFullName)
+            )
+          } else {
+            TableElem.empty
+          },
           TableElem.empty
         )
       } else {
@@ -213,16 +280,36 @@ object EmployerContributionsMemberListController {
               )
             }
           ),
-          TableElem.change(
-            controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-              .onSubmit(srn, employerContribution.memberIndex, page = 1, CheckMode),
-            Message("employerContributions.MemberList.change.hidden.text", employerContribution.employerFullName)
-          ),
-          TableElem.remove(
-            controllers.nonsipp.employercontributions.routes.WhichEmployerContributionRemoveController
-              .onSubmit(srn, employerContribution.memberIndex),
-            Message("employerContributions.MemberList.remove.hidden.text", employerContribution.employerFullName)
-          )
+          (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+            case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+              TableElem.view(
+                controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                  .onPageLoadViewOnly(
+                    srn,
+                    employerContribution.memberIndex,
+                    page = 1,
+                    year = year,
+                    current = currentVersion,
+                    previous = previousVersion
+                  ),
+                Message("employerContributions.MemberList.remove.hidden.text", employerContribution.employerFullName)
+              )
+            case _ =>
+              TableElem.change(
+                controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                  .onSubmit(srn, employerContribution.memberIndex, page = 1, CheckMode),
+                Message("employerContributions.MemberList.change.hidden.text", employerContribution.employerFullName)
+              )
+          },
+          if (mode == ViewOnlyMode) {
+            TableElem.empty
+          } else {
+            TableElem.remove(
+              controllers.nonsipp.employercontributions.routes.WhichEmployerContributionRemoveController
+                .onSubmit(srn, employerContribution.memberIndex),
+              Message("employerContributions.MemberList.remove.hidden.text", employerContribution.employerFullName)
+            )
+          }
         )
       }
     }
@@ -231,7 +318,12 @@ object EmployerContributionsMemberListController {
     srn: Srn,
     page: Int,
     mode: Mode,
-    employerContributions: List[EmployerContributions]
+    employerContributions: List[EmployerContributions],
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[ActionTableViewModel] = {
 
     val (title, heading) = if (employerContributions.size == 1) {
@@ -239,16 +331,24 @@ object EmployerContributionsMemberListController {
     } else {
       ("employerContributions.MemberList.title.plural", "employerContributions.MemberList.heading.plural")
     }
-
+    // in view-only mode or with direct url edit page value can be higher than needed
+    val currentPage = if ((page - 1) * Constants.landOrPropertiesSize >= employerContributions.size) 1 else page
     val pagination = Pagination(
-      currentPage = page,
+      currentPage = currentPage,
       pageSize = Constants.employerContributionsMemberListSize,
       employerContributions.size,
-      controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-        .onPageLoad(srn, _, NormalMode)
+      call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+        case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+          controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
+        case _ =>
+          controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+            .onPageLoad(srn, _, NormalMode)
+      }
     )
 
     FormPageViewModel(
+      mode = mode,
       title = Message(title, employerContributions.size),
       heading = Message(heading, employerContributions.size),
       description = None,
@@ -267,7 +367,14 @@ object EmployerContributionsMemberListController {
             TableElem.empty
           )
         ),
-        rows = rows(srn, mode, employerContributions.sortBy(_.employerFullName)),
+        rows = rows(
+          srn,
+          mode,
+          employerContributions.sortBy(_.employerFullName),
+          optYear,
+          optCurrentVersion,
+          optPreviousVersion
+        ),
         radioText = Message("employerContributions.MemberList.radios"),
         showInsetWithRadios = true,
         paginatedViewModel = Some(
@@ -286,7 +393,48 @@ object EmployerContributionsMemberListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit = controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-        .onSubmit(srn, page, mode)
+        .onSubmit(srn, page, mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion))
+                  if optYear.nonEmpty && currentVersion > 1 && previousVersion > 0 =>
+                Some(
+                  LinkMessage(
+                    "employerContributions.MemberList.viewOnly.link",
+                    controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+                      .onPreviousViewOnly(
+                        srn,
+                        page,
+                        year,
+                        currentVersion,
+                        previousVersion
+                      )
+                      .url
+                  )
+                )
+              case _ => None
+            },
+            submittedText =
+              compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+            title = "employerContributions.MemberList.viewOnly.title",
+            heading = "employerContributions.MemberList.viewOnly.heading",
+            buttonText = "site.return.to.tasklist",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+                  .onSubmit(srn, page, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
   }
 

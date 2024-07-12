@@ -320,7 +320,9 @@ object ViewOnlyTaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "employercontributions.title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
+          controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .url
         ),
         employerContributionsTaskListStatus
       ),
