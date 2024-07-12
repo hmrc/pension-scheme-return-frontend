@@ -477,7 +477,7 @@ class MemberPaymentsTransformer @Inject()(
     nameDob: NameDOB,
     userAnswers: UserAnswers
   ): MemberPersonalDetails = {
-    val maybeNino = userAnswers.get(MemberDetailsNinoPage(srn, index)).map(_.value)
+    val maybeNino = userAnswers.get(MemberDetailsNinoPage(srn, index)).map(_.value.filterNot(_.isWhitespace))
     val maybeNoNinoReason = userAnswers.get(NoNINOPage(srn, index))
 
     MemberPersonalDetails(

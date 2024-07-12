@@ -38,6 +38,7 @@ import pages.nonsipp.memberpensionpayments._
 import eu.timepit.refined.refineMV
 import pages.nonsipp.{FbStatus, FbVersionPage}
 import org.scalatest.OptionValues
+import uk.gov.hmrc.domain.Nino
 import pages.nonsipp.memberpayments._
 import com.softwaremill.diffx.generic.AutoDerivation
 import viewmodels.models._
@@ -378,6 +379,15 @@ class MemberPaymentsTransformerSpec
     "should return member payments with recordVersion/memberPsrVersion when initial UA and current UA are same" in {
       val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswersAllSections, userAnswersAllSections)
       result shouldMatchTo Some(memberPaymentsAllSections)
+    }
+
+    "should return member payments with nino spaces trimmed" in {
+      val ninoWithSpaces = Nino("SC 13 51 60 C")
+      val userAnswersWithNinoSpaces = userAnswersAllSections
+        .unsafeSet(MemberDetailsNinoPage(srn, index), ninoWithSpaces)
+
+      val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswersWithNinoSpaces, userAnswersAllSections)
+      result.get.memberDetails(0).personalDetails.nino.value shouldMatchTo ninoWithSpaces.value.replace(" ", "")
     }
 
     "Member state" - {
