@@ -25,7 +25,6 @@ import controllers.PSRController
 import config.Constants
 import cats.implicits.{catsSyntaxApplicativeId, toTraverseOps}
 import controllers.actions._
-import navigation.Navigator
 import models._
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
@@ -35,12 +34,15 @@ import cats.data.EitherT
 import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
 import viewmodels.DisplayMessage.{Heading2, Message}
 import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
+import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
 class EmployerContributionsCYAController @Inject()(
@@ -56,18 +58,50 @@ class EmployerContributionsCYAController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300, page: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
-          membersName <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
-          indexes <- buildCompletedSecondaryIndexes(srn, index)
-          employerCYAs <- indexes.map(secondaryIndex => buildCYA(srn, index, secondaryIndex)).sequence
-          orderedCYAs = employerCYAs.sortBy(_.secondaryIndex.value)
-          _ <- recoverJourneyWhen(orderedCYAs.isEmpty)
-        } yield Ok(
-          view(viewModel(srn, membersName.fullName, index, page, orderedCYAs, mode))
-        )
-      ).merge
+      onPageLoadCommon(srn: Srn, index: Max300, page: Int, mode: Mode)(implicitly)
     }
+
+  def onPageLoadViewOnly(
+    srn: Srn,
+    index: Max300,
+    page: Int,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn: Srn, index: Max300, page: Int, mode: Mode)(implicitly)
+    }
+
+  def onPageLoadCommon(srn: Srn, index: Max300, page: Int, mode: Mode)(
+    implicit request: DataRequest[AnyContent]
+  ): Result =
+    (
+      for {
+        membersName <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
+        indexes <- buildCompletedSecondaryIndexes(srn, index)
+        employerCYAs <- indexes.map(secondaryIndex => buildCYA(srn, index, secondaryIndex)).sequence
+        orderedCYAs = employerCYAs.sortBy(_.secondaryIndex.value)
+        _ <- recoverJourneyWhen(orderedCYAs.isEmpty)
+      } yield Ok(
+        view(
+          viewModel(
+            srn,
+            membersName.fullName,
+            index,
+            page,
+            orderedCYAs,
+            mode,
+            viewOnlyUpdated = false,
+            optYear = request.year,
+            optCurrentVersion = request.currentVersion,
+            optPreviousVersion = request.previousVersion,
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          )
+        )
+      )
+    ).merge
 
   def onSubmit(srn: Srn, index: Max300, page: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -96,6 +130,13 @@ class EmployerContributionsCYAController @Inject()(
           _ => Redirect(navigator.nextPage(EmployerContributionsCYAPage(srn), mode, updatedAnswers))
         )
       ).merge
+    }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+      )
     }
 
   private def buildCompletedSecondaryIndexes(srn: Srn, index: Max300)(
@@ -157,23 +198,42 @@ object EmployerContributionsCYAController {
     memberIndex: Max300,
     page: Int,
     employerCYAs: List[EmployerCYA],
-    mode: Mode
+    mode: Mode,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] = {
 
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.employerContributionsCYASize,
       employerCYAs.size,
-      controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-        .onPageLoad(srn, memberIndex, _, NormalMode)
+      (optYear, optCurrentVersion, optPreviousVersion) match {
+        case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+          routes.EmployerContributionsCYAController
+            .onPageLoadViewOnly(srn, memberIndex, _, year, currentVersion, previousVersion)
+        case _ =>
+          routes.EmployerContributionsCYAController.onPageLoad(srn, memberIndex, _, mode)
+      }
     )
 
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = mode.fold("checkYourAnswers.title", "employerContributionsCYA.title.change"),
-      heading = mode.fold("checkYourAnswers.heading", Message("employerContributionsCYA.heading.change", membersName)),
+      mode = mode,
+      title = mode.fold(
+        "checkYourAnswers.title",
+        "employerContributionsCYA.title.change",
+        "employerContributionsCYA.title.viewOnly"
+      ),
+      heading = mode.fold(
+        "checkYourAnswers.heading",
+        Message("employerContributionsCYA.heading.change", membersName),
+        Message("employerContributionsCYA.heading.viewOnly", membersName)
+      ),
       description = None,
       page = CheckYourAnswersViewModel(
-        rows(srn, memberIndex, membersName, employerCYAs),
+        rows(srn, mode, memberIndex, membersName, employerCYAs),
         inset = if (employerCYAs.length == 50) Some("employerContributionsCYA.inset") else None,
         paginatedViewModel = Some(
           PaginatedViewModel(
@@ -188,13 +248,34 @@ object EmployerContributionsCYAController {
         )
       ),
       refresh = None,
-      buttonText = "site.saveAndContinue",
-      onSubmit = routes.EmployerContributionsCYAController.onSubmit(srn, memberIndex, 1, mode)
+      buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
+      onSubmit = routes.EmployerContributionsCYAController.onSubmit(srn, memberIndex, 1, mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = None,
+            submittedText = Some(Message("")),
+            title = "employerContributionsCYA.title.viewOnly",
+            heading = Message("employerContributionsCYA.heading.viewOnly", membersName),
+            buttonText = "site.continue",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                routes.EmployerContributionsCYAController.onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                routes.EmployerContributionsCYAController.onSubmit(srn, memberIndex, page, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
   }
 
   private def rows(
     srn: Srn,
+    mode: Mode,
     memberIndex: Max300,
     membersName: String,
     employerCYAs: List[EmployerCYA]
@@ -217,7 +298,10 @@ object EmployerContributionsCYAController {
                   Message("employerContributionsCYA.row.employerId.company.reason.hidden", employerName),
                   reason,
                   controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
-                    .onPageLoad(srn, memberIndex, secondaryIndex, CheckMode)
+                    .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                      case ViewOnlyMode => NormalMode
+                      case _ => mode
+                    })
                     .url
                 )
               case IdentityType.UKPartnership =>
@@ -226,7 +310,10 @@ object EmployerContributionsCYAController {
                   Message("employerContributionsCYA.row.employerId.partnership.reason.hidden", employerName),
                   reason,
                   controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
-                    .onPageLoad(srn, memberIndex, secondaryIndex, CheckMode)
+                    .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                      case ViewOnlyMode => NormalMode
+                      case _ => mode
+                    })
                     .url
                 )
             },
@@ -238,7 +325,10 @@ object EmployerContributionsCYAController {
                   Message("employerContributionsCYA.row.employerId.company.hidden", employerName),
                   id,
                   controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
-                    .onPageLoad(srn, memberIndex, secondaryIndex, CheckMode)
+                    .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                      case ViewOnlyMode => NormalMode
+                      case _ => mode
+                    })
                     .url
                 )
               case IdentityType.UKPartnership =>
@@ -247,7 +337,10 @@ object EmployerContributionsCYAController {
                   Message("employerContributionsCYA.row.employerId.partnership.hidden", employerName),
                   id,
                   controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
-                    .onPageLoad(srn, memberIndex, secondaryIndex, CheckMode)
+                    .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                      case ViewOnlyMode => NormalMode
+                      case _ => mode
+                    })
                     .url
                 )
               case IdentityType.Other =>
@@ -256,7 +349,10 @@ object EmployerContributionsCYAController {
                   Message("employerContributionsCYA.row.employerId.other.hidden", employerName),
                   id,
                   controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
-                    .onPageLoad(srn, memberIndex, secondaryIndex, CheckMode)
+                    .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                      case ViewOnlyMode => NormalMode
+                      case _ => mode
+                    })
                     .url
                 )
             }
@@ -275,7 +371,10 @@ object EmployerContributionsCYAController {
                 SummaryAction(
                   "site.change",
                   controllers.nonsipp.employercontributions.routes.EmployerNameController
-                    .onPageLoad(srn, memberIndex, secondaryIndex, CheckMode)
+                    .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                      case ViewOnlyMode => NormalMode
+                      case _ => mode
+                    })
                     .url
                 ).withVisuallyHiddenContent("employerContributionsCYA.row.employerName.hidden")
               ),
@@ -286,7 +385,10 @@ object EmployerContributionsCYAController {
               SummaryAction(
                 "site.change",
                 controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
-                  .onPageLoad(srn, memberIndex, secondaryIndex, CheckMode)
+                  .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                    case ViewOnlyMode => NormalMode
+                    case _ => mode
+                  })
                   .url
               ).withVisuallyHiddenContent(Message("employerContributionsCYA.row.businessType.hidden", employerName))
             ),
@@ -301,7 +403,10 @@ object EmployerContributionsCYAController {
               SummaryAction(
                 "site.change",
                 controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
-                  .onPageLoad(srn, memberIndex, secondaryIndex, CheckMode)
+                  .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                    case ViewOnlyMode => NormalMode
+                    case _ => mode
+                  })
                   .url
               ).withVisuallyHiddenContent(
                 Message("employerContributionsCYA.row.contribution.hidden", employerName, membersName)
@@ -316,7 +421,10 @@ object EmployerContributionsCYAController {
               SummaryAction(
                 "site.change",
                 controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
-                  .onPageLoad(srn, memberIndex, secondaryIndex, CheckMode)
+                  .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                    case ViewOnlyMode => NormalMode
+                    case _ => mode
+                  })
                   .url
               ).withVisuallyHiddenContent(
                 Message("employerContributionsCYA.row.contributionOtherEmployer", membersName)
