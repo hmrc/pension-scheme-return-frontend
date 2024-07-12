@@ -252,7 +252,7 @@ object AssetDisposalCYAController {
       heading = parameters.mode.fold(
         normal = "checkYourAnswers.heading",
         check = Message("assetDisposalCYA.change.heading"),
-        viewOnly = Message("assetDisposalCYA.viewOnly.heading", parameters.schemeName)
+        viewOnly = Message("assetDisposalCYA.viewOnly.heading", parameters.whatIsOtherAsset)
       ),
       description = Some(ParagraphMessage("assetDisposalCYA.paragraph")),
       page = CheckYourAnswersViewModel.singleSection(
@@ -286,7 +286,7 @@ object AssetDisposalCYAController {
             link = None,
             submittedText = Some(Message("")),
             title = "assetDisposalCYA.viewOnly.title",
-            heading = Message("assetDisposalCYA.viewOnly.heading", parameters.schemeName),
+            heading = Message("assetDisposalCYA.viewOnly.heading", parameters.whatIsOtherAsset),
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
