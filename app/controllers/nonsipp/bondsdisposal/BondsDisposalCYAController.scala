@@ -216,7 +216,7 @@ object BondsDisposalCYAController {
       heading = parameters.mode.fold(
         normal = "bondsDisposalCYA.heading",
         check = Message("bondsDisposalCYA.change.heading"),
-        viewOnly = "bondsDisposalCYA.viewOnly.heading"
+        viewOnly = Message("bondsDisposalCYA.viewOnly.heading", parameters.bondsName)
       ),
       description = None,
       page = CheckYourAnswersViewModel

@@ -23,13 +23,16 @@ import play.api.mvc._
 import utils.ListUtils.ListOps
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
-import cats.implicits.toShow
 import controllers.actions._
 import play.api.i18n._
+import models.requests.DataRequest
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import models.HowDisposed._
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import cats.implicits.toShow
+import controllers.nonsipp.routes
+import pages.nonsipp.CompilationOrSubmissionDatePage
 import controllers.nonsipp.otherassetsdisposal.AssetDisposalCYAController._
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
@@ -40,7 +43,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
 class AssetDisposalCYAController @Inject()(
@@ -61,101 +64,126 @@ class AssetDisposalCYAController @Inject()(
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
-          howWasAssetDisposed <- requiredPage(HowWasAssetDisposedOfPage(srn, index, disposalIndex))
-          whatIsOtherAsset <- requiredPage(WhatIsOtherAssetPage(srn, index))
-          anyPartAssetStillHeld <- requiredPage(AnyPartAssetStillHeldPage(srn, index, disposalIndex))
+      onPageLoadCommon(srn, index, disposalIndex, mode)(implicitly)
+    }
 
-          totalConsiderationSale = Option.when(howWasAssetDisposed == Sold)(
-            request.userAnswers.get(TotalConsiderationSaleAssetPage(srn, index, disposalIndex)).get
-          )
-          independentValuation = Option.when(howWasAssetDisposed == Sold)(
-            request.userAnswers.get(AssetSaleIndependentValuationPage(srn, index, disposalIndex)).get
-          )
-          assetDisposedType = Option.when(howWasAssetDisposed == Sold)(
+  def onPageLoadViewOnly(
+    srn: Srn,
+    index: Max5000,
+    disposalIndex: Max50,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn, index, disposalIndex, mode)(implicitly)
+    }
+
+  def onPageLoadCommon(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode)(
+    implicit request: DataRequest[AnyContent]
+  ): Result =
+    (
+      for {
+        howWasAssetDisposed <- requiredPage(HowWasAssetDisposedOfPage(srn, index, disposalIndex))
+        whatIsOtherAsset <- requiredPage(WhatIsOtherAssetPage(srn, index))
+        anyPartAssetStillHeld <- requiredPage(AnyPartAssetStillHeldPage(srn, index, disposalIndex))
+
+        totalConsiderationSale = Option.when(howWasAssetDisposed == Sold)(
+          request.userAnswers.get(TotalConsiderationSaleAssetPage(srn, index, disposalIndex)).get
+        )
+        independentValuation = Option.when(howWasAssetDisposed == Sold)(
+          request.userAnswers.get(AssetSaleIndependentValuationPage(srn, index, disposalIndex)).get
+        )
+        assetDisposedType = Option.when(howWasAssetDisposed == Sold)(
+          request.userAnswers
+            .get(TypeOfAssetBuyerPage(srn: Srn, index, disposalIndex))
+            .get
+        )
+
+        whenWasAssetSold = Option.when(howWasAssetDisposed == Sold)(
+          request.userAnswers.get(WhenWasAssetSoldPage(srn, index, disposalIndex)).get
+        )
+
+        assetDisposalBuyerConnectedParty = Option.when(howWasAssetDisposed == Sold)(
+          request.userAnswers.get(IsBuyerConnectedPartyPage(srn, index, disposalIndex)).get
+        )
+
+        recipientName = Option.when(howWasAssetDisposed == Sold)(
+          List(
+            request.userAnswers.get(IndividualNameOfAssetBuyerPage(srn, index, disposalIndex)),
+            request.userAnswers.get(CompanyNameOfAssetBuyerPage(srn, index, disposalIndex)),
+            request.userAnswers.get(PartnershipBuyerNamePage(srn, index, disposalIndex)),
             request.userAnswers
-              .get(TypeOfAssetBuyerPage(srn: Srn, index, disposalIndex))
-              .get
-          )
+              .get(OtherBuyerDetailsPage(srn, index, disposalIndex))
+              .map(_.name)
+          ).flatten.head
+        )
 
-          whenWasAssetSold = Option.when(howWasAssetDisposed == Sold)(
-            request.userAnswers.get(WhenWasAssetSoldPage(srn, index, disposalIndex)).get
-          )
+        recipientDetails = Option.when(howWasAssetDisposed == Sold)(
+          List(
+            request.userAnswers
+              .get(AssetIndividualBuyerNiNumberPage(srn, index, disposalIndex))
+              .flatMap(_.value.toOption.map(_.value)),
+            request.userAnswers
+              .get(AssetCompanyBuyerCrnPage(srn, index, disposalIndex))
+              .flatMap(_.value.toOption.map(_.value)),
+            request.userAnswers
+              .get(PartnershipBuyerUtrPage(srn, index, disposalIndex))
+              .flatMap(_.value.toOption.map(_.value)),
+            request.userAnswers
+              .get(OtherBuyerDetailsPage(srn, index, disposalIndex))
+              .map(_.description)
+          ).flatten.headOption
+        )
 
-          assetDisposalBuyerConnectedParty = Option.when(howWasAssetDisposed == Sold)(
-            request.userAnswers.get(IsBuyerConnectedPartyPage(srn, index, disposalIndex)).get
-          )
+        recipientReasonNoDetails = Option.when(howWasAssetDisposed == Sold)(
+          List(
+            request.userAnswers
+              .get(AssetIndividualBuyerNiNumberPage(srn, index, disposalIndex))
+              .flatMap(_.value.swap.toOption.map(_.value)),
+            request.userAnswers
+              .get(AssetCompanyBuyerCrnPage(srn, index, disposalIndex))
+              .flatMap(_.value.swap.toOption.map(_.value)),
+            request.userAnswers
+              .get(PartnershipBuyerUtrPage(srn, index, disposalIndex))
+              .flatMap(_.value.swap.toOption.map(_.value))
+          ).flatten.headOption
+        )
+        schemeName = request.schemeDetails.schemeName
 
-          recipientName = Option.when(howWasAssetDisposed == Sold)(
-            List(
-              request.userAnswers.get(IndividualNameOfAssetBuyerPage(srn, index, disposalIndex)),
-              request.userAnswers.get(CompanyNameOfAssetBuyerPage(srn, index, disposalIndex)),
-              request.userAnswers.get(PartnershipBuyerNamePage(srn, index, disposalIndex)),
-              request.userAnswers
-                .get(OtherBuyerDetailsPage(srn, index, disposalIndex))
-                .map(_.name)
-            ).flatten.head
-          )
-
-          recipientDetails = Option.when(howWasAssetDisposed == Sold)(
-            List(
-              request.userAnswers
-                .get(AssetIndividualBuyerNiNumberPage(srn, index, disposalIndex))
-                .flatMap(_.value.toOption.map(_.value)),
-              request.userAnswers
-                .get(AssetCompanyBuyerCrnPage(srn, index, disposalIndex))
-                .flatMap(_.value.toOption.map(_.value)),
-              request.userAnswers
-                .get(PartnershipBuyerUtrPage(srn, index, disposalIndex))
-                .flatMap(_.value.toOption.map(_.value)),
-              request.userAnswers
-                .get(OtherBuyerDetailsPage(srn, index, disposalIndex))
-                .map(_.description)
-            ).flatten.headOption
-          )
-
-          recipientReasonNoDetails = Option.when(howWasAssetDisposed == Sold)(
-            List(
-              request.userAnswers
-                .get(AssetIndividualBuyerNiNumberPage(srn, index, disposalIndex))
-                .flatMap(_.value.swap.toOption.map(_.value)),
-              request.userAnswers
-                .get(AssetCompanyBuyerCrnPage(srn, index, disposalIndex))
-                .flatMap(_.value.swap.toOption.map(_.value)),
-              request.userAnswers
-                .get(PartnershipBuyerUtrPage(srn, index, disposalIndex))
-                .flatMap(_.value.swap.toOption.map(_.value))
-            ).flatten.headOption
-          )
-          schemeName = request.schemeDetails.schemeName
-
-        } yield Ok(
-          view(
-            viewModel(
-              ViewModelParameters(
-                srn,
-                index,
-                disposalIndex,
-                schemeName,
-                howWasAssetDisposed,
-                whenWasAssetSold,
-                whatIsOtherAsset,
-                assetDisposedType,
-                assetDisposalBuyerConnectedParty,
-                totalConsiderationSale,
-                independentValuation,
-                anyPartAssetStillHeld,
-                recipientName,
-                recipientDetails.flatten,
-                recipientReasonNoDetails.flatten,
-                mode
-              )
-            )
+      } yield Ok(
+        view(
+          viewModel(
+            ViewModelParameters(
+              srn,
+              index,
+              disposalIndex,
+              schemeName,
+              howWasAssetDisposed,
+              whenWasAssetSold,
+              whatIsOtherAsset,
+              assetDisposedType,
+              assetDisposalBuyerConnectedParty,
+              totalConsiderationSale,
+              independentValuation,
+              anyPartAssetStillHeld,
+              recipientName,
+              recipientDetails.flatten,
+              recipientReasonNoDetails.flatten,
+              mode
+            ),
+            srn,
+            mode,
+            viewOnlyUpdated = false, // flag is not displayed on this tier
+            optYear = request.year,
+            optCurrentVersion = request.currentVersion,
+            optPreviousVersion = request.previousVersion,
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
           )
         )
-      ).merge
-    }
+      )
+    ).merge
 
   def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -177,6 +205,12 @@ class AssetDisposalCYAController @Inject()(
           )
       )
     }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+    }
+
 }
 
 case class ViewModelParameters(
@@ -198,15 +232,27 @@ case class ViewModelParameters(
   mode: Mode
 )
 object AssetDisposalCYAController {
-  def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
+  def viewModel(
+    parameters: ViewModelParameters,
+    srn: Srn,
+    mode: Mode,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
+      mode = mode,
       title = parameters.mode.fold(
         normal = "checkYourAnswers.title",
-        check = "assetDisposalCYA.change.title"
+        check = "assetDisposalCYA.change.title",
+        viewOnly = "assetDisposalCYA.viewOnly.title"
       ),
       heading = parameters.mode.fold(
         normal = "checkYourAnswers.heading",
-        check = Message("assetDisposalCYA.change.heading")
+        check = Message("assetDisposalCYA.change.heading"),
+        viewOnly = Message("assetDisposalCYA.viewOnly.heading", parameters.whatIsOtherAsset)
       ),
       description = Some(ParagraphMessage("assetDisposalCYA.paragraph")),
       page = CheckYourAnswersViewModel.singleSection(
@@ -229,9 +275,32 @@ object AssetDisposalCYAController {
         )
       ),
       refresh = None,
-      buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
-      onSubmit = routes.AssetDisposalCYAController
-        .onSubmit(parameters.srn, parameters.index, parameters.disposalIndex, parameters.mode)
+      buttonText =
+        parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
+      onSubmit = controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+        .onSubmit(parameters.srn, parameters.index, parameters.disposalIndex, parameters.mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = None,
+            submittedText = Some(Message("")),
+            title = "assetDisposalCYA.viewOnly.title",
+            heading = Message("assetDisposalCYA.viewOnly.heading", parameters.whatIsOtherAsset),
+            buttonText = "site.continue",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
+                  .onSubmit(srn, parameters.index, parameters.disposalIndex, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
 
   private def rows(
@@ -347,13 +416,21 @@ object AssetDisposalCYAController {
 
     val recipientNameUrl = assetDisposedType match {
       case Some(IdentityType.Individual) =>
-        routes.IndividualNameOfAssetBuyerController.onSubmit(srn, index, disposalIndex, CheckMode).url
+        controllers.nonsipp.otherassetsdisposal.routes.IndividualNameOfAssetBuyerController
+          .onSubmit(srn, index, disposalIndex, CheckMode)
+          .url
       case Some(IdentityType.UKCompany) =>
-        routes.CompanyNameOfAssetBuyerController.onSubmit(srn, index, disposalIndex, CheckMode).url
+        controllers.nonsipp.otherassetsdisposal.routes.CompanyNameOfAssetBuyerController
+          .onSubmit(srn, index, disposalIndex, CheckMode)
+          .url
       case Some(IdentityType.UKPartnership) =>
-        routes.PartnershipBuyerNameController.onSubmit(srn, index, disposalIndex, CheckMode).url
+        controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerNameController
+          .onSubmit(srn, index, disposalIndex, CheckMode)
+          .url
       case Some(IdentityType.Other) =>
-        routes.OtherBuyerDetailsController.onSubmit(srn, index, disposalIndex, CheckMode).url
+        controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
+          .onSubmit(srn, index, disposalIndex, CheckMode)
+          .url
     }
 
     val (
@@ -366,28 +443,36 @@ object AssetDisposalCYAController {
         case Some(IdentityType.Individual) =>
           (
             Message("assetDisposalCYA.section1.recipientDetails.nino", recipientName),
-            routes.AssetIndividualBuyerNiNumberController.onSubmit(srn, index, disposalIndex, CheckMode).url,
+            controllers.nonsipp.otherassetsdisposal.routes.AssetIndividualBuyerNiNumberController
+              .onSubmit(srn, index, disposalIndex, CheckMode)
+              .url,
             "assetDisposalCYA.section1.recipientDetails.nino.hidden",
             "assetDisposalCYA.section1.recipientDetails.noNinoReason.hidden"
           )
         case Some(IdentityType.UKCompany) =>
           (
             Message("assetDisposalCYA.section1.recipientDetails.crn", recipientName),
-            routes.AssetCompanyBuyerCrnController.onSubmit(srn, index, disposalIndex, CheckMode).url,
+            controllers.nonsipp.otherassetsdisposal.routes.AssetCompanyBuyerCrnController
+              .onSubmit(srn, index, disposalIndex, CheckMode)
+              .url,
             "assetDisposalCYA.section1.recipientDetails.crn.hidden",
             "assetDisposalCYA.section1.recipientDetails.noCrnReason.hidden"
           )
         case Some(IdentityType.UKPartnership) =>
           (
             Message("assetDisposalCYA.section1.recipientDetails.utr", recipientName),
-            routes.PartnershipBuyerUtrController.onSubmit(srn, index, disposalIndex, CheckMode).url,
+            controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerUtrController
+              .onSubmit(srn, index, disposalIndex, CheckMode)
+              .url,
             "assetDisposalCYA.section1.recipientDetails.utr.hidden",
             "assetDisposalCYA.section1.recipientDetails.noUtrReason.hidden"
           )
         case Some(IdentityType.Other) =>
           (
             Message("assetDisposalCYA.section1.recipientDetails.other", recipientName),
-            routes.OtherBuyerDetailsController.onSubmit(srn, index, disposalIndex, CheckMode).url,
+            controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
+              .onSubmit(srn, index, disposalIndex, CheckMode)
+              .url,
             "assetDisposalCYA.section1.recipientDetails.other.hidden",
             ""
           )
@@ -396,19 +481,27 @@ object AssetDisposalCYAController {
     val (recipientNoDetailsReasonKey, recipientNoDetailsUrl): (Message, String) = assetDisposedType match {
       case Some(IdentityType.Individual) =>
         Message("assetDisposalCYA.section1.recipientDetails.noNinoReason", recipientName) ->
-          routes.AssetIndividualBuyerNiNumberController.onSubmit(srn, index, disposalIndex, CheckMode).url
+          controllers.nonsipp.otherassetsdisposal.routes.AssetIndividualBuyerNiNumberController
+            .onSubmit(srn, index, disposalIndex, CheckMode)
+            .url
 
       case Some(IdentityType.UKCompany) =>
         Message("assetDisposalCYA.section1.recipientDetails.noCrnReason", recipientName) ->
-          routes.AssetCompanyBuyerCrnController.onSubmit(srn, index, disposalIndex, CheckMode).url
+          controllers.nonsipp.otherassetsdisposal.routes.AssetCompanyBuyerCrnController
+            .onSubmit(srn, index, disposalIndex, CheckMode)
+            .url
 
       case Some(IdentityType.UKPartnership) =>
         Message("assetDisposalCYA.section1.recipientDetails.noUtrReason", recipientName) ->
-          routes.PartnershipBuyerUtrController.onSubmit(srn, index, disposalIndex, CheckMode).url
+          controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerUtrController
+            .onSubmit(srn, index, disposalIndex, CheckMode)
+            .url
 
       case Some(IdentityType.Other) =>
         Message("assetDisposalCYA.section1.recipientDetails.other", recipientName) ->
-          routes.OtherBuyerDetailsController.onSubmit(srn, index, disposalIndex, CheckMode).url
+          controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
+            .onSubmit(srn, index, disposalIndex, CheckMode)
+            .url
 
     }
 
@@ -419,7 +512,9 @@ object AssetDisposalCYAController {
       ).withAction(
         SummaryAction(
           "site.change",
-          routes.WhenWasAssetSoldController.onSubmit(srn, index, disposalIndex, CheckMode).url
+          controllers.nonsipp.otherassetsdisposal.routes.WhenWasAssetSoldController
+            .onSubmit(srn, index, disposalIndex, CheckMode)
+            .url
         ).withVisuallyHiddenContent("assetDisposalCYA.section1.whenWasAssetSold.hidden")
       ),
       CheckYourAnswersRowViewModel(
@@ -428,7 +523,9 @@ object AssetDisposalCYAController {
       ).withAction(
         SummaryAction(
           "site.change",
-          routes.TotalConsiderationSaleAssetController.onSubmit(srn, index, disposalIndex, CheckMode).url
+          controllers.nonsipp.otherassetsdisposal.routes.TotalConsiderationSaleAssetController
+            .onSubmit(srn, index, disposalIndex, CheckMode)
+            .url
         ).withVisuallyHiddenContent(
           "assetDisposalCYA.section1.totalConsiderationSale.hidden"
         )
@@ -439,7 +536,9 @@ object AssetDisposalCYAController {
       ).withAction(
         SummaryAction(
           "site.change",
-          routes.TypeOfAssetBuyerController.onSubmit(srn, index, disposalIndex, CheckMode).url
+          controllers.nonsipp.otherassetsdisposal.routes.TypeOfAssetBuyerController
+            .onSubmit(srn, index, disposalIndex, CheckMode)
+            .url
         ).withVisuallyHiddenContent("assetDisposalCYA.section1.whoPurchasedTheAsset.hidden")
       ),
       CheckYourAnswersRowViewModel("assetDisposalCYA.section1.recipientName", recipientName)

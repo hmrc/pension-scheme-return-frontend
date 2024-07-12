@@ -124,7 +124,7 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
               compilationOrSubmissionDate = Some(submissionDateOne)
             )
           )
-      }
+      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
 
     act.like(
