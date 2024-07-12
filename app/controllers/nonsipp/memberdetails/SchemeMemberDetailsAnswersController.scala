@@ -110,10 +110,6 @@ class SchemeMemberDetailsAnswersController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      lazy val memberPaymentsChanged = request.pureUserAnswers.exists(
-        !_.sameAs(request.userAnswers, membersPayments, Omitted.membersPayments: _*)
-      )
-
       lazy val justAdded = mode.isNormalMode && request.userAnswers.get(MemberStatus(srn, index)).isEmpty
 
       for {
