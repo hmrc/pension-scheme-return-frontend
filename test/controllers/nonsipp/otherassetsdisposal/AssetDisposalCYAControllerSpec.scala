@@ -24,11 +24,12 @@ import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
-import controllers.nonsipp.otherassetsdisposal.AssetDisposalCYAController._
 import models._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import pages.nonsipp.FbVersionPage
+import controllers.nonsipp.otherassetsdisposal.AssetDisposalCYAController._
 
 import scala.concurrent.Future
 
@@ -49,6 +50,22 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
     routes.AssetDisposalCYAController.onPageLoad(srn, assetIndex, disposalIndex, mode)
   private def onSubmit(mode: Mode) =
     routes.AssetDisposalCYAController.onSubmit(srn, assetIndex, disposalIndex, mode)
+
+  private lazy val onSubmitViewOnly = routes.AssetDisposalCYAController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private lazy val onPageLoadViewOnly = routes.AssetDisposalCYAController.onPageLoadViewOnly(
+    srn,
+    assetIndex,
+    disposalIndex,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
 
   private val assetIndex = refineMV[OneTo5000](1)
   private val disposalIndex = refineMV[OneTo50](1)
@@ -93,7 +110,10 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
                 None,
                 None,
                 mode
-              )
+              ),
+              srn,
+              mode,
+              viewOnlyUpdated = true
             )
           )
         }.withName(s"render correct $mode view for Sold journey")
@@ -124,4 +144,69 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
       )
     }
   }
+
+  "BondsDisposalCYAController in view only mode" - {
+
+    val currentUserAnswers = defaultUserAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex), HowDisposed.Sold)
+      .unsafeSet(WhatIsOtherAssetPage(srn, assetIndex), otherAsset)
+      .unsafeSet(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex), true)
+      .unsafeSet(TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex), considerationAssetSold.get)
+      .unsafeSet(AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex), true)
+      .unsafeSet(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex), IdentityType.UKPartnership)
+      .unsafeSet(PartnershipBuyerNamePage(srn, assetIndex, disposalIndex), recipientName)
+      .unsafeSet(WhenWasAssetSoldPage(srn, assetIndex, disposalIndex), dateAssetSold.get)
+      .unsafeSet(IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex), isBuyerConnectedParty.get)
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex), HowDisposed.Sold)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                assetIndex,
+                disposalIndex,
+                schemeName,
+                howWasAssetDisposed = HowDisposed.Sold,
+                dateAssetSold,
+                otherAsset,
+                assetDisposedType = Some(IdentityType.UKPartnership),
+                isBuyerConnectedParty,
+                considerationAssetSold,
+                independentValuation = Some(true),
+                anyPartAssetStillHeld = true,
+                Some(recipientName),
+                None,
+                None,
+                ViewOnlyMode
+              ),
+              srn,
+              ViewOnlyMode,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
+    )
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
+  }
+
 }

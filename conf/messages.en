@@ -3437,6 +3437,9 @@ assetDisposalCYA.identityType.pageContent3 = Other
 assetDisposalCYA.change.title = Change details of asset disposal
 assetDisposalCYA.change.heading = Change details of asset disposal
 
+assetDisposalCYA.viewOnly.title = View details of asset disposal
+assetDisposalCYA.viewOnly.heading = Disposal of {0}
+
 assetDisposal.reportedOtherAssetsDisposalList.title = You have reported {0} asset disposal
 assetDisposal.reportedOtherAssetsDisposalList.title.plural = You have reported {0} asset disposals
 assetDisposal.reportedOtherAssetsDisposalList.heading = You have reported {0} asset disposal
