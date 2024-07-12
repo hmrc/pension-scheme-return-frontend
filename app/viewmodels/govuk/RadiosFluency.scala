@@ -173,8 +173,12 @@ trait RadiosFluency {
             legend
               .map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
               .getOrElse(
-                LegendViewModel(heading.toString)
-                  .asPageHeading(LegendSize.Large)
+                LegendViewModel(
+                  heading match {
+                    case message: Message => message.toMessage
+                    case _ => heading.toString
+                  }
+                ).asPageHeading(LegendSize.Large)
                   .withCssClass("govuk-visually-hidden")
               )
           )
