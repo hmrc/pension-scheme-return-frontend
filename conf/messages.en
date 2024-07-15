@@ -2337,6 +2337,9 @@ employerContributions.MemberList.status.single.contribution = {0} employer contr
 employerContributions.MemberList.add.hidden.text = employer contributions for {0}
 employerContributions.MemberList.change.hidden.text = employer contributions for {0}
 employerContributions.MemberList.remove.hidden.text = employer contributions for {0}
+employerContributions.MemberList.viewOnly.title = Employer contributions
+employerContributions.MemberList.viewOnly.heading = Employer contributions
+employerContributions.MemberList.viewOnly.link = View previous version of employer contributions (opens in new tab)
 
 ReportContribution.MemberList.title = Select a member to report member contributions
 ReportContribution.MemberList.title.plural = Select a member to report member contributions
