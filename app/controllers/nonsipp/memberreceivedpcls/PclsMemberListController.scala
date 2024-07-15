@@ -271,7 +271,7 @@ object PclsMemberListController {
                       TableElem.view(
                         controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
                           .onPageLoadViewOnly(srn, nextIndex, year, currentVersion, previousVersion),
-                        Message("ReportContribution.MemberList.remove.hidden.text", memberName.fullName)
+                        Message("pcls.memberList.remove.hidden.text", memberName.fullName)
                       )
                     case _ =>
                       TableElem.change(

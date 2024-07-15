@@ -150,7 +150,7 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )
-        .withName("Submit redirects to view only tasklist")
+        .withName("Submit redirects to MemberContributionListController page")
     )
   }
 }
