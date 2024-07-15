@@ -107,9 +107,12 @@ class MemberContributionsCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      lazy val memberContributionsChanged =
+        request.userAnswers.changed(_.buildMemberContributions(srn, index))
+
       for {
         updatedAnswers <- request.userAnswers
-          .setWhen(memberPaymentsChanged)(MemberStatus(srn, index), MemberState.Changed)
+          .setWhen(memberContributionsChanged)(MemberStatus(srn, index), MemberState.Changed)
           .mapK[Future]
         _ <- saveService.save(updatedAnswers)
         submissionResult <- psrSubmissionService

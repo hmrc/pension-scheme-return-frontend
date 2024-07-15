@@ -130,10 +130,13 @@ class TransfersOutCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      lazy val transfersOutChanged: Boolean =
+        request.userAnswers.changedList(_.buildTransfersOut(srn, index))
+
       for {
         updatedUserAnswers <- request.userAnswers
           .set(TransfersOutJourneyStatus(srn), SectionStatus.InProgress)
-          .setWhen(memberPaymentsChanged)(MemberStatus(srn, index), MemberState.Changed)
+          .setWhen(transfersOutChanged)(MemberStatus(srn, index), MemberState.Changed)
           .remove(TransferOutMemberListPage(srn))
           .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)

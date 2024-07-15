@@ -137,10 +137,13 @@ class TransfersInCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      lazy val transfersInChanged: Boolean =
+        request.userAnswers.changedList(_.buildTransfersIn(srn, index))
+
       for {
         updatedUserAnswers <- request.userAnswers
           .set(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
-          .setWhen(memberPaymentsChanged)(MemberStatus(srn, index), MemberState.Changed)
+          .setWhen(transfersInChanged)(MemberStatus(srn, index), MemberState.Changed)
           .remove(TransferReceivedMemberListPage(srn))
           .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)

@@ -159,6 +159,8 @@ class MemberPaymentsTransformer @Inject()(
       // Omit memberPSRVersion if member has changed
       // Check for empty member payment sections before comparing members
       // (this is because we send empty records in certain sections for members)
+      //
+      // Note: This will be changing soon when we re-design statuses
       val memberDetailsWithCorrectVersion: List[MemberDetails] = memberDetailsWithCorrectState.map {
         case (index, currentMemberDetail) =>
           val optInitialMemberDetail = initialMemberDetails.get(index)
@@ -166,7 +168,7 @@ class MemberPaymentsTransformer @Inject()(
             currentMemberDetail
               .copy(
                 memberLumpSumReceived =
-                  if (currentMemberDetail.memberLumpSumReceived.exists(_.empty)) None
+                  if (currentMemberDetail.memberLumpSumReceived.exists(_.zero)) None
                   else currentMemberDetail.memberLumpSumReceived,
                 pensionAmountReceived =
                   if (currentMemberDetail.pensionAmountReceived.contains(0.0)) None
@@ -184,7 +186,6 @@ class MemberPaymentsTransformer @Inject()(
           )
       }.toList
 
-      // Bug: Currently
       (memberDetailsWithCorrectVersion, softDeletedMembers) match {
         case (Nil, Nil) => None
         case _ =>

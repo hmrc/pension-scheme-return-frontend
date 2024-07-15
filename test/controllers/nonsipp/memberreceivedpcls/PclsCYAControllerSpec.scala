@@ -24,12 +24,12 @@ import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models.{NormalMode, ViewOnlyMode}
+import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito._
 import play.api.inject.bind
 import controllers.nonsipp.memberreceivedpcls.PclsCYAController._
-import org.mockito.ArgumentMatchers.any
 
 class PclsCYAControllerSpec extends ControllerBaseSpec {
 

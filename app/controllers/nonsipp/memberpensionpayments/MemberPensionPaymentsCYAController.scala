@@ -110,10 +110,13 @@ class MemberPensionPaymentsCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      lazy val memberPensionPaymentsChanged: Boolean =
+        request.userAnswers.changed(_.buildMemberPensionPayments(srn, index))
+
       for {
         updatedAnswers <- request.userAnswers
-          .setWhen(memberPaymentsChanged)(MemberStatus(srn, index), {
-            logger.info(s"Setting member $index MemberStatus to Changed")
+          .setWhen(memberPensionPaymentsChanged)(MemberStatus(srn, index), {
+            logger.info(s"Pension payments has changed for member $index. Setting MemberStatus to Changed")
             MemberState.Changed
           })
           .mapK[Future]

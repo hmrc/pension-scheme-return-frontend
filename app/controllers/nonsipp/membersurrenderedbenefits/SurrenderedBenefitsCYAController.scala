@@ -87,11 +87,14 @@ class SurrenderedBenefitsCYAController @Inject()(
 
   def onSubmit(srn: Srn, memberIndex: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      lazy val surrenderedBenefitsChanged =
+        request.userAnswers.changed(_.buildSurrenderedBenefits(srn, memberIndex))
+
       for {
         updatedUserAnswers <- request.userAnswers
           .set(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.InProgress)
           .set(SurrenderedBenefitsCompletedPage(srn, memberIndex), SectionCompleted)
-          .setWhen(memberPaymentsChanged)(MemberStatus(srn, memberIndex), MemberState.Changed)
+          .setWhen(surrenderedBenefitsChanged)(MemberStatus(srn, memberIndex), MemberState.Changed)
           .remove(SurrenderedBenefitsMemberListPage(srn))
           .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)

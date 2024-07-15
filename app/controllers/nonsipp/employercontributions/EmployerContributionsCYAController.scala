@@ -117,8 +117,11 @@ class EmployerContributionsCYAController @Inject()(
       (
         for {
           userAnswers <- EitherT(userAnswersWithJourneysCompleted.pure[Future])
+          employerContributionsChanged = userAnswers.toOption.exists(
+            _.changedList(_.buildEmployerContributions(srn, index))
+          )
           updatedAnswers <- userAnswers
-            .setWhen(memberPaymentsChanged)(MemberStatus(srn, index), MemberState.Changed)
+            .setWhen(employerContributionsChanged)(MemberStatus(srn, index), MemberState.Changed)
             .mapK[Future]
             .liftF
           _ <- saveService.save(updatedAnswers).liftF

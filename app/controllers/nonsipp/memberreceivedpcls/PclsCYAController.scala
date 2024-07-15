@@ -98,9 +98,12 @@ class PclsCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      lazy val pclsChanged: Boolean =
+        request.userAnswers.changed(_.buildPCLS(srn, index))
+
       for {
         updatedAnswers <- request.userAnswers
-          .setWhen(memberPaymentsChanged)(MemberStatus(srn, index), MemberState.Changed)
+          .setWhen(pclsChanged)(MemberStatus(srn, index), MemberState.Changed)
           .mapK[Future]
         _ <- saveService.save(updatedAnswers)
         submissionResult <- psrSubmissionService
