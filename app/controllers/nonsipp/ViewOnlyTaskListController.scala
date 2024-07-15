@@ -368,7 +368,9 @@ object ViewOnlyTaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "payments.title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
+          controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .url
         ),
         pensionPaymentsTaskListStatus
       ),

@@ -2590,6 +2590,9 @@ memberPensionPayments.memberList.noPensionPayments = No pension payments
 memberPensionPayments.memberList.add.hidden.text = pension payments for {0}
 memberPensionPayments.memberList.change.hidden.text = pension payments for {0}
 memberPensionPayments.memberList.remove.hidden.text = pension payments for {0}
+memberPensionPayments.memberList.viewOnly.title = Pension payments
+memberPensionPayments.memberList.viewOnly.heading = Pension payments
+memberPensionPayments.memberList.viewOnly.link = View previous version of pension payments (opens in new tab)
 
 totalAmountPensionPayments.title = What was the taxable amount of pension payments received by the member during the period of this return, in pounds and pence?
 totalAmountPensionPayments.heading = What was the taxable amount of pension payments received by {0} during the period of this return, in pounds and pence?
