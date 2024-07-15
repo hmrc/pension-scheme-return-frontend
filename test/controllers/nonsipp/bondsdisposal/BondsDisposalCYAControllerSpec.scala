@@ -109,8 +109,6 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
                 schemeName,
                 mode
               ),
-              srn,
-              mode,
               viewOnlyUpdated = true
             )
           )
@@ -179,8 +177,6 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
                 schemeName,
                 ViewOnlyMode
               ),
-              srn,
-              ViewOnlyMode,
               viewOnlyUpdated = false,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),

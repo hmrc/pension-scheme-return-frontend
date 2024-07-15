@@ -22,7 +22,6 @@ import play.api.mvc._
 import config.Refined._
 import controllers.PSRController
 import controllers.nonsipp.memberreceivedpcls.PclsCYAController._
-import controllers.nonsipp.routes
 import controllers.actions._
 import models._
 import play.api.i18n.MessagesApi
@@ -109,9 +108,14 @@ class PclsCYAController @Inject()(
         }
     }
 
-  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
-      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
+            .onPageLoadViewOnly(srn, page, year, current, previous)
+        )
+      )
     }
 
 }
@@ -169,7 +173,7 @@ object PclsCYAController {
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
-                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+                  .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
                   .onSubmit(srn, index, mode)

@@ -811,6 +811,10 @@ pcls.memberList.add.hidden.text = PCLS for {0}
 pcls.memberList.change.hidden.text = PCLS for {0}
 pcls.memberList.remove.hidden.text = PCLS for {0}
 
+pcls.MemberList.viewOnly.title = Pension commencement lump sum
+pcls.MemberList.viewOnly.heading = Pension commencement lump sum
+pcls.MemberList.viewOnly.link = View previous version of pension commencement lump sum (opens in new tab)
+
 pclsCYA.change.title.check = Change details of PCLS for this member
 pclsCYA.heading.check = Change details of PCLS for {0}
 pclsCYA.rows.membersName = Member’s name

@@ -138,8 +138,6 @@ class BondsDisposalCYAController @Inject()(
               schemeName,
               mode
             ),
-            srn,
-            mode,
             viewOnlyUpdated = false, // flag is not displayed on this tier
             optYear = request.year,
             optCurrentVersion = request.currentVersion,
@@ -198,8 +196,6 @@ case class ViewModelParameters(
 object BondsDisposalCYAController {
   def viewModel(
     parameters: ViewModelParameters,
-    srn: Srn,
-    mode: Mode,
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
@@ -207,7 +203,7 @@ object BondsDisposalCYAController {
     compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      mode = mode,
+      mode = parameters.mode,
       title = parameters.mode.fold(
         normal = "bondsDisposalCYA.title",
         check = "bondsDisposalCYA.change.title",
@@ -229,7 +225,7 @@ object BondsDisposalCYAController {
         parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
       onSubmit = controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
         .onSubmit(parameters.srn, parameters.bondIndex, parameters.disposalIndex, parameters.mode),
-      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+      optViewOnlyDetails = if (parameters.mode == ViewOnlyMode) {
         Some(
           ViewOnlyDetailsViewModel(
             updated = viewOnlyUpdated,
@@ -241,10 +237,10 @@ object BondsDisposalCYAController {
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
-                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+                  .onSubmitViewOnly(parameters.srn, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
-                  .onSubmit(srn, parameters.bondIndex, parameters.disposalIndex, mode)
+                  .onSubmit(parameters.srn, parameters.bondIndex, parameters.disposalIndex, parameters.mode)
             }
           )
         )
