@@ -111,8 +111,6 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
                 None,
                 mode
               ),
-              srn,
-              mode,
               viewOnlyUpdated = true
             )
           )
@@ -186,8 +184,6 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
                 None,
                 ViewOnlyMode
               ),
-              srn,
-              ViewOnlyMode,
               viewOnlyUpdated = false,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),

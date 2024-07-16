@@ -361,7 +361,9 @@ object ViewOnlyTaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "pcls.title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
+          controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .url
         ),
         pclsMemberTaskListStatus
       ),

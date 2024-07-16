@@ -173,8 +173,6 @@ class AssetDisposalCYAController @Inject()(
               recipientReasonNoDetails.flatten,
               mode
             ),
-            srn,
-            mode,
             viewOnlyUpdated = false, // flag is not displayed on this tier
             optYear = request.year,
             optCurrentVersion = request.currentVersion,
@@ -234,8 +232,6 @@ case class ViewModelParameters(
 object AssetDisposalCYAController {
   def viewModel(
     parameters: ViewModelParameters,
-    srn: Srn,
-    mode: Mode,
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
@@ -243,7 +239,7 @@ object AssetDisposalCYAController {
     compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      mode = mode,
+      mode = parameters.mode,
       title = parameters.mode.fold(
         normal = "checkYourAnswers.title",
         check = "assetDisposalCYA.change.title",
@@ -279,7 +275,7 @@ object AssetDisposalCYAController {
         parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
       onSubmit = controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
         .onSubmit(parameters.srn, parameters.index, parameters.disposalIndex, parameters.mode),
-      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+      optViewOnlyDetails = if (parameters.mode == ViewOnlyMode) {
         Some(
           ViewOnlyDetailsViewModel(
             updated = viewOnlyUpdated,
@@ -291,10 +287,10 @@ object AssetDisposalCYAController {
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
-                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+                  .onSubmitViewOnly(parameters.srn, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
-                  .onSubmit(srn, parameters.index, parameters.disposalIndex, mode)
+                  .onSubmit(parameters.srn, parameters.index, parameters.disposalIndex, parameters.mode)
             }
           )
         )
