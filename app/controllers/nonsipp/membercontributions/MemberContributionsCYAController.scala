@@ -16,7 +16,8 @@
 
 package controllers.nonsipp.membercontributions
 
-import services.PsrSubmissionService
+import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails.MemberStatus
 import play.api.mvc._
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.Max300
@@ -32,6 +33,7 @@ import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -46,6 +48,7 @@ class MemberContributionsCYAController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   psrSubmissionService: PsrSubmissionService,
+  saveService: SaveService,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -104,17 +107,24 @@ class MemberContributionsCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      psrSubmissionService
-        .submitPsrDetails(
-          srn,
-          fallbackCall =
-            controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController.onPageLoad(srn, index, mode)
-        )
-        .map {
-          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          case Some(_) =>
-            Redirect(navigator.nextPage(MemberContributionsCYAPage(srn), mode, request.userAnswers))
-        }
+      lazy val memberContributionsChanged =
+        request.userAnswers.changed(_.buildMemberContributions(srn, index))
+
+      for {
+        updatedAnswers <- request.userAnswers
+          .setWhen(memberContributionsChanged)(MemberStatus(srn, index), MemberState.Changed)
+          .mapK[Future]
+        _ <- saveService.save(updatedAnswers)
+        submissionResult <- psrSubmissionService
+          .submitPsrDetailsWithUA(
+            srn,
+            updatedAnswers,
+            fallbackCall = controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
+              .onPageLoad(srn, index, mode)
+          )
+      } yield submissionResult.getOrRecoverJourney(
+        _ => Redirect(navigator.nextPage(MemberContributionsCYAPage(srn), mode, request.userAnswers))
+      )
     }
 
   def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =

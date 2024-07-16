@@ -25,7 +25,6 @@ import config.Refined.Max300
 import controllers.PSRController
 import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
-import pages.nonsipp.memberpayments.Paths.membersPayments
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
 import viewmodels.implicits._
@@ -38,7 +37,6 @@ import play.api.Logger
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
-import pages.nonsipp.memberpayments.Omitted
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
@@ -110,9 +108,11 @@ class SchemeMemberDetailsAnswersController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      lazy val memberPaymentsChanged = request.pureUserAnswers.exists(
-        !_.sameAs(request.userAnswers, membersPayments, Omitted.membersPayments: _*)
-      )
+      lazy val memberDetailsChanged: Boolean = (for {
+        initial <- request.pureUserAnswers
+        initialMemberPayments <- initial.buildMemberDetails(srn, index)
+        currentMemberPayments <- request.userAnswers.buildMemberDetails(srn, index)
+      } yield initialMemberPayments != currentMemberPayments).getOrElse(false)
 
       lazy val justAdded = mode.isNormalMode && request.userAnswers.get(MemberStatus(srn, index)).isEmpty
 
@@ -121,7 +121,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
         // Only set member state to CHANGED if something has actually changed
         // CHANGED status is checked in the transformer later on to make sure this is the status we want to send to ETMP
           .setWhen(
-            mode.isCheckMode && memberPaymentsChanged
+            mode.isCheckMode && memberDetailsChanged
           )(
             MemberStatus(srn, index), {
               logger.info(s"Something has changed in member payments for member index $index, setting state to CHANGED")

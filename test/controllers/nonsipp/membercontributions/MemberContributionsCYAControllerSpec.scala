@@ -89,12 +89,9 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
 
       act.like(
         redirectNextPage(onSubmit(mode))
-          .before(MockPSRSubmissionService.submitPsrDetails())
+          .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
           .withName(s"redirect to next page when in $mode mode")
-          .after({
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-            reset(mockPsrSubmissionService)
-          })
+          .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(1)))
       )
 
       act.like(

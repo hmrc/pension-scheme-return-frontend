@@ -17,7 +17,7 @@
 package controllers.nonsipp.receivetransfer
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc._
 import config.Refined._
@@ -37,6 +37,7 @@ import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
@@ -136,12 +137,15 @@ class TransfersInCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      lazy val transfersInChanged: Boolean =
+        request.userAnswers.changedList(_.buildTransfersIn(srn, index))
+
       for {
-        updatedUserAnswers <- Future.fromTry(
-          request.userAnswers
-            .set(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
-            .remove(TransferReceivedMemberListPage(srn))
-        )
+        updatedUserAnswers <- request.userAnswers
+          .set(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
+          .setWhen(transfersInChanged)(MemberStatus(srn, index), MemberState.Changed)
+          .remove(TransferReceivedMemberListPage(srn))
+          .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
           srn,

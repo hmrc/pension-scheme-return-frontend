@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberreceivedpcls
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max300
 import controllers.PSRController
@@ -32,7 +32,7 @@ import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, R
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, MemberState, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -103,7 +103,9 @@ class RemovePclsController @Inject()(
             if (removeDetails) {
               for {
                 updatedAnswers <- Future.fromTry(
-                  request.userAnswers.remove(PensionCommencementLumpSumAmountPage(srn, memberIndex))
+                  request.userAnswers
+                    .remove(PensionCommencementLumpSumAmountPage(srn, memberIndex))
+                    .set(MemberStatus(srn, memberIndex), MemberState.Changed)
                 )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(

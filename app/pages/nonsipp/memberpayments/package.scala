@@ -30,7 +30,8 @@ package object memberpayments {
       PensionSchemeMembersPage.key,
       SafeToHardDelete.key,
       MemberStatus.key,
-      MemberPaymentsRecordVersionPage.key
+      MemberPaymentsRecordVersionPage.key,
+      MemberDetailsCompletedPage.key
     )
   }
 }

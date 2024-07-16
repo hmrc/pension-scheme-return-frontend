@@ -25,7 +25,6 @@ import views.html.CheckYourAnswersView
 import pages.nonsipp.FbVersionPage
 import models._
 import viewmodels.models.SectionCompleted
-import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
@@ -91,12 +90,9 @@ class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec {
 
       act.like(
         redirectNextPage(onSubmit(mode))
-          .before(MockPSRSubmissionService.submitPsrDetails())
+          .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
           .withName(s"redirect to next page when in $mode mode")
-          .after({
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-            reset(mockPsrSubmissionService)
-          })
+          .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(1)))
       )
 
       act.like(
@@ -146,12 +142,10 @@ class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec {
     )
     act.like(
       redirectToPage(
-        onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
+        call = onSubmitViewOnly,
+        expected = controllers.nonsipp.routes.ViewOnlyTaskListController
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
-      ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
+      ).after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(never))
         .withName("Submit redirects to view only tasklist")
     )
   }

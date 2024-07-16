@@ -53,7 +53,7 @@ class MoneyBorrowedControllerSpec extends ControllerBaseSpec {
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
-        .before(MockPSRSubmissionService.submitPsrDetails())
+        .before(MockPsrSubmissionService.submitPsrDetails())
         .after({
           verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
@@ -62,7 +62,7 @@ class MoneyBorrowedControllerSpec extends ControllerBaseSpec {
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
-        .before(MockPSRSubmissionService.submitPsrDetails())
+        .before(MockPsrSubmissionService.submitPsrDetails())
         .after({
           verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)

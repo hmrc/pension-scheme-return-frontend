@@ -16,24 +16,40 @@
 
 package controllers
 
-import queries.{Gettable, Removable, Settable}
+import pages.nonsipp.employercontributions._
+import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import play.api.mvc.Result
 import org.slf4j.LoggerFactory
-import config.Refined.Max3
-import cats.data.{EitherT, NonEmptyList}
-import cats.implicits.toTraverseOps
-import cats.syntax.applicative._
+import config.Refined._
 import play.api.libs.json.{Reads, Writes}
 import models.backend.responses.{IndividualDetails, PsrVersionsResponse}
-import models.{DateRange, UserAnswers}
+import models._
 import cats.Applicative
-import viewmodels.models.Flag
 import models.requests.DataRequest
 import eu.timepit.refined.api.{Refined, Validate}
+import pages.nonsipp.membercontributions.TotalMemberContributionPage
+import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
+import queries.{Gettable, Removable, Settable}
+import cats.data.{EitherT, NonEmptyList}
+import models.SchemeId.Srn
+import cats.implicits.toTraverseOps
+import pages.nonsipp.receivetransfer._
+import cats.syntax.applicative._
+import models.requests.psr._
+import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
 import cats.syntax.either._
 import eu.timepit.refined.refineV
+import pages.nonsipp.memberpayments.Paths.membersPayments
+import pages.nonsipp.membersurrenderedbenefits.{
+  SurrenderedBenefitsAmountPage,
+  WhenDidMemberSurrenderBenefitsPage,
+  WhyDidMemberSurrenderBenefitsPage
+}
+import pages.nonsipp.membertransferout._
 import play.api.i18n.I18nSupport
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import pages.nonsipp.memberpayments.Omitted
+import viewmodels.models.Flag
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -105,6 +121,10 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
         }
     }
 
+  def memberPaymentsChanged(implicit request: DataRequest[_]): Boolean = request.pureUserAnswers.exists(
+    !_.sameAs(request.userAnswers, membersPayments, Omitted.membersPayments: _*)
+  )
+
   implicit class OptionOps[A](maybe: Option[A]) {
     def getOrRecoverJourney[F[_]: Applicative](f: A => F[Result]): F[Result] = maybe match {
       case Some(value) => f(value)
@@ -156,6 +176,154 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
   implicit class UserAnswersOps(userAnswers: UserAnswers) {
     def exists[A: Reads](page: Gettable[A])(f: A => Boolean)(implicit request: DataRequest[_]): Boolean =
       request.userAnswers.get(page).fold(true)(f)
+
+    def buildMemberDetails(srn: Srn, index: Max300): Option[MemberPersonalDetails] =
+      userAnswers
+        .get(MemberDetailsPage(srn, index))
+        .map(
+          memberDetails =>
+            MemberPersonalDetails(
+              firstName = memberDetails.firstName,
+              lastName = memberDetails.lastName,
+              nino = userAnswers.get(MemberDetailsNinoPage(srn, index)).map(_.value),
+              reasonNoNINO = userAnswers.get(NoNINOPage(srn, index)),
+              dateOfBirth = memberDetails.dob
+            )
+        )
+
+    def buildEmployerContributions(
+      srn: Srn,
+      index: Max300
+    ): Option[List[EmployerContributions]] = {
+      val secondaryIndexes =
+        userAnswers
+          .map(EmployerContributionsCompleted.all(srn, index))
+          .keys
+          .toList
+          .flatMap(_.toIntOption.flatMap(i => refineV[Max50.Refined](i + 1).leftMap(new Exception(_)).toOption))
+
+      secondaryIndexes.traverse(
+        secondaryIndex =>
+          for {
+            employerName <- userAnswers.get(EmployerNamePage(srn, index, secondaryIndex))
+            identityType <- userAnswers.get(EmployerTypeOfBusinessPage(srn, index, secondaryIndex))
+            employerType <- identityType match {
+              case IdentityType.Individual => None
+              case IdentityType.UKCompany =>
+                userAnswers
+                  .get(EmployerCompanyCrnPage(srn, index, secondaryIndex))
+                  .map(v => EmployerType.UKCompany(v.value.map(_.value)))
+              case IdentityType.UKPartnership =>
+                userAnswers
+                  .get(PartnershipEmployerUtrPage(srn, index, secondaryIndex))
+                  .map(v => EmployerType.UKPartnership(v.value.map(_.value)))
+              case IdentityType.Other =>
+                userAnswers
+                  .get(OtherEmployeeDescriptionPage(srn, index, secondaryIndex))
+                  .map(EmployerType.Other)
+            }
+            total <- userAnswers.get(TotalEmployerContributionPage(srn, index, secondaryIndex))
+          } yield EmployerContributions(
+            employerName,
+            employerType,
+            totalTransferValue = total.value
+          )
+      )
+    }
+
+    def buildTransfersIn(
+      srn: Srn,
+      index: Max300
+    ): Option[List[TransfersIn]] = {
+      val secondaryIndexes =
+        userAnswers
+          .map(TransfersInSectionCompleted.all(srn, index))
+          .keys
+          .toList
+          .flatMap(_.toIntOption.flatMap(i => refineV[Max5.Refined](i + 1).leftMap(new Exception(_)).toOption))
+
+      secondaryIndexes.traverse(
+        secondaryIndex =>
+          for {
+            schemeName <- userAnswers.get(TransferringSchemeNamePage(srn, index, secondaryIndex))
+            dateOfTransfer <- userAnswers.get(WhenWasTransferReceivedPage(srn, index, secondaryIndex))
+            transferValue <- userAnswers.get(TotalValueTransferPage(srn, index, secondaryIndex))
+            transferIncludedAsset <- userAnswers.get(DidTransferIncludeAssetPage(srn, index, secondaryIndex))
+            transferSchemeType <- userAnswers.get(TransferringSchemeTypePage(srn, index, secondaryIndex))
+          } yield TransfersIn(
+            schemeName = schemeName,
+            dateOfTransfer = dateOfTransfer,
+            transferSchemeType = transferSchemeType,
+            transferValue = transferValue.value,
+            transferIncludedAsset = transferIncludedAsset
+          )
+      )
+    }
+
+    def buildTransfersOut(
+      srn: Srn,
+      index: Max300
+    ): Option[List[TransfersOut]] = {
+      val secondaryIndexes =
+        userAnswers
+          .map(TransfersOutSectionCompleted.all(srn, index))
+          .keys
+          .toList
+          .flatMap(_.toIntOption.flatMap(i => refineV[Max5.Refined](i + 1).leftMap(new Exception(_)).toOption))
+
+      secondaryIndexes.traverse(
+        secondaryIndex =>
+          for {
+            schemeName <- userAnswers.get(ReceivingSchemeNamePage(srn, index, secondaryIndex))
+            dateOfTransfer <- userAnswers.get(WhenWasTransferMadePage(srn, index, secondaryIndex))
+            transferSchemeType <- userAnswers.get(ReceivingSchemeTypePage(srn, index, secondaryIndex))
+          } yield TransfersOut(
+            schemeName = schemeName,
+            dateOfTransfer = dateOfTransfer,
+            transferSchemeType = transferSchemeType
+          )
+      )
+    }
+
+    def buildMemberContributions(srn: Srn, index: Max300): Option[Double] =
+      userAnswers.get(TotalMemberContributionPage(srn, index)).map(_.value)
+
+    def buildPCLS(srn: Srn, index: Max300): Option[PensionCommencementLumpSum] =
+      userAnswers.get(PensionCommencementLumpSumAmountPage(srn, index))
+
+    def buildMemberPensionPayments(srn: Srn, index: Max300): Option[Double] =
+      userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)).map(_.value)
+
+    def buildSurrenderedBenefits(srn: Srn, index: Max300): Option[SurrenderedBenefits] =
+      for {
+        totalSurrendered <- userAnswers.get(SurrenderedBenefitsAmountPage(srn, index))
+        dateOfSurrender <- userAnswers.get(WhenDidMemberSurrenderBenefitsPage(srn, index))
+        surrenderReason <- userAnswers.get(WhyDidMemberSurrenderBenefitsPage(srn, index))
+      } yield SurrenderedBenefits(
+        totalSurrendered = totalSurrendered.value,
+        dateOfSurrender = dateOfSurrender,
+        surrenderReason = surrenderReason
+      )
+
+    def changed[A](f: UserAnswers => Option[A])(implicit request: DataRequest[_]): Boolean =
+      request.pureUserAnswers match {
+        case Some(pure) =>
+          (for {
+            initial <- f(pure)
+            current <- f(userAnswers)
+          } yield initial != current).getOrElse(true)
+        case None => false
+      }
+
+    def changedList[A](f: UserAnswers => Option[List[A]])(implicit request: DataRequest[_]): Boolean =
+      request.pureUserAnswers match {
+        case Some(pure) =>
+          (for {
+            initial <- f(pure)
+            current <- f(userAnswers)
+          } yield !(initial.length == current.length && initial.forall(current.contains))).getOrElse(true)
+        case None => false
+      }
   }
 
   implicit class UserAnswersTryOps(userAnswers: Try[UserAnswers]) {

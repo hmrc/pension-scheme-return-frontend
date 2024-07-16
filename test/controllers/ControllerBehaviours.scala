@@ -176,8 +176,8 @@ trait ControllerBehaviours {
       }
     }
 
-  def redirectToPage(call: => Call, page: => Call, form: (String, String)*): BehaviourTest =
-    redirectToPage(call, page, defaultUserAnswers, form: _*)
+  def redirectToPage(call: => Call, expected: => Call, form: (String, String)*): BehaviourTest =
+    redirectToPage(call, expected, defaultUserAnswers, form: _*)
 
   def saveAndContinue(
     call: => Call,

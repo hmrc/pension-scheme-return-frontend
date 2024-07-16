@@ -50,6 +50,14 @@ object TransfersOutSectionCompleted {
       override def toString: String = "transfersOutCYA"
     }
 
+  def all(srn: Srn, index: Max300): IndexedQuestionPage[Map[String, SectionCompleted.type]] =
+    new IndexedQuestionPage[Map[String, SectionCompleted.type]] {
+
+      override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+
+      override def toString: String = "transfersOutCYA"
+    }
+
   def exists(srn: Srn, userAnswers: UserAnswers): Boolean = userAnswers.map(all(srn)).values.exists(_.values.nonEmpty)
 
   implicit class TransfersOutSectionCompletedUserAnswersOps(ua: UserAnswers) {

@@ -109,7 +109,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
       redirectNextPage(onSubmit, userAnswersWithTaxYear)
         .before {
           MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(dateRange)))
-          MockPSRSubmissionService.submitPsrDetails()
+          MockPsrSubmissionService.submitPsrDetails()
         }
         .after(
           verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
@@ -123,7 +123,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
         userAnswersWithManyMembers
       ).before {
         MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(dateRange)))
-        MockPSRSubmissionService.submitPsrDetails()
+        MockPsrSubmissionService.submitPsrDetails()
       }
     )
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))

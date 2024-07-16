@@ -17,7 +17,7 @@
 package controllers.nonsipp.membertransferout
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max300, Max5}
@@ -32,7 +32,7 @@ import models.SchemeId.Srn
 import pages.nonsipp.membertransferout._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
+import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -101,6 +101,7 @@ class RemoveTransferOutController @Inject()(
                     request.userAnswers
                       .removePages(transferOutPages(srn, memberIndex, index))
                       .set(TransfersOutJourneyStatus(srn), SectionStatus.InProgress)
+                      .set(MemberStatus(srn, memberIndex), MemberState.Changed)
                   )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(

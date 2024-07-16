@@ -86,7 +86,7 @@ class PsaDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfte
           when(mockSchemeDateService.now()).thenReturn(LocalDateTime.now())
           when(mockAuditService.sendEvent(emailAuditEventCaptor.capture())(any(), any()))
             .thenReturn(Future.successful(AuditResult.Success))
-          MockPSRSubmissionService.submitPsrDetails()
+          MockPsrSubmissionService.submitPsrDetails()
           MockEmailConnector.sendEmail(email, templateId)
         })
         .after({

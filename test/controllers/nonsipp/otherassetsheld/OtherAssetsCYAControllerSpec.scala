@@ -104,7 +104,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
         redirectNextPage(onSubmit(mode))
           .before({
             when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
-            MockPSRSubmissionService.submitPsrDetails()
+            MockPsrSubmissionService.submitPsrDetails()
           })
           .after({
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
