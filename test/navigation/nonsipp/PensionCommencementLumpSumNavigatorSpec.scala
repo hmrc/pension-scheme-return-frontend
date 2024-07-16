@@ -69,7 +69,7 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
     act.like(
       normalmode
         .navigateTo(
-          PclsMemberListPage,
+          PclsMemberListPage.apply,
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName("go from pcls member list page page to task list page")

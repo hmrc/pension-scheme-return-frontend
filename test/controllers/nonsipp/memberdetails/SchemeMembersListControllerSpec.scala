@@ -27,13 +27,12 @@ import views.html.ListView
 import eu.timepit.refined._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
-import models.{NameDOB, NormalMode, ViewOnlyMode}
+import models.{NormalMode, ViewOnlyMode}
 import controllers.nonsipp.memberdetails.SchemeMembersListController._
 import viewmodels.models.{MemberState, SectionCompleted}
-import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails._
-import org.mockito.Mockito._
+import org.mockito.Mockito.times
 
 class SchemeMembersListControllerSpec extends ControllerBaseSpec {
 
@@ -148,7 +147,11 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      act.like(redirectNextPage(onSubmitManual, "value" -> "false"))
+      act.like(
+        redirectNextPage(onSubmitManual, "value" -> "false")
+          .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+          .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(1)))
+      )
       act.like(invalidForm(onSubmitManual))
       act.like(journeyRecoveryPage(onSubmitManual).updateName("onSubmit" + _))
     }
@@ -224,8 +227,6 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
       act.like(
         renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
           implicit app => implicit request =>
-            val memberList: List[Option[NameDOB]] = currentUserAnswers.membersOptionList(srn)
-
             injected[ListView].apply(
               form(injected[YesNoPageFormProvider], Upload),
               viewModel(
@@ -241,16 +242,15 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
                 compilationOrSubmissionDate = Some(submissionDateTwo)
               )
             )
-        }.withName("OnPageLoadViewOnly renders ok with no changed flag")
+        }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
       )
 
       val updatedUserAnswers = currentUserAnswers
+        .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
 
       act.like(
         renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
           implicit app => implicit request =>
-            val memberList: List[Option[NameDOB]] = updatedUserAnswers.membersOptionList(srn)
-
             injected[ListView].apply(
               form(injected[YesNoPageFormProvider], Upload),
               viewModel(
@@ -259,14 +259,14 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
                 manualOrUpload = Upload,
                 mode = ViewOnlyMode,
                 filteredMembers = List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
-                viewOnlyUpdated = false,
+                viewOnlyUpdated = true,
                 optYear = Some(yearString),
                 optCurrentVersion = Some(submissionNumberTwo),
                 optPreviousVersion = Some(submissionNumberOne),
                 compilationOrSubmissionDate = Some(submissionDateTwo)
               )
             )
-        }.withName("OnPageLoadViewOnly renders ok with changed flag")
+        }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated true")
       )
 
       act.like(
@@ -274,16 +274,13 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
           onSubmitViewOnly,
           controllers.nonsipp.routes.ViewOnlyTaskListController
             .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
-        ).after(
-            verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-          )
-          .withName("Submit redirects to view only tasklist")
+        ).withName("Submit redirects to view only tasklist")
       )
 
       act.like(
         redirectToPage(
           onPreviousViewOnly,
-          controllers.nonsipp.membercontributions.routes.MemberContributionListController
+          routes.SchemeMembersListController
             .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
         ).withName(
           "Submit previous view only redirects to the controller with parameters for the previous submission"

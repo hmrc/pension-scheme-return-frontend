@@ -182,7 +182,8 @@ class MemberPaymentsTransformer @Inject()(
             logger.info(s"member $index has changed, removing memberPSRVersion")
           }
           currentMemberDetail.copy(
-            memberPSRVersion = if (same) currentMemberDetail.memberPSRVersion else None
+            memberPSRVersion =
+              if (optInitialMemberDetail.contains(currentMemberDetail)) currentMemberDetail.memberPSRVersion else None
           )
       }.toList
 

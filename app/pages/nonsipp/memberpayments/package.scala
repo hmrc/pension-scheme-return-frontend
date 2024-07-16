@@ -17,7 +17,7 @@
 package pages.nonsipp
 
 import pages.nonsipp.memberdetails._
-import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
+import pages.nonsipp.memberreceivedpcls._
 import play.api.libs.json.{__, JsPath}
 
 package object memberpayments {
@@ -26,15 +26,15 @@ package object memberpayments {
   }
 
   object Omitted {
-    // List of UserAnswer keys to omit during comparison with other UserAnswer member payments sections.
-    // These mainly include pages that are not associated with a member index or meta pages (e.g. SafeToHardDelete, MemberStatus)
+    // List of UserAnswer keys to omit during comparison with other UserAnswer member payments sections
     val membersPayments: List[String] = List(
       PensionSchemeMembersPage.key,
       SafeToHardDelete.key,
       MemberStatus.key,
       MemberPaymentsRecordVersionPage.key,
-      MemberDetailsCompletedPage.key
-      PclsMemberListPage.key
+      MemberDetailsCompletedPage.key,
+      PclsMemberListPage.key,
+      MemberPaymentsRecordVersionPage.key
     )
   }
 }

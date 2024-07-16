@@ -339,7 +339,7 @@ object SchemeMembersListController {
       None,
       onSubmit = routes.SchemeMembersListController.onSubmit(srn, page, manualOrUpload),
       mode = mode,
-      optViewOnlyDetails = Option.when(mode == ViewOnlyMode) {
+      optViewOnlyDetails = Option.when(mode.isViewOnlyMode) {
         ViewOnlyDetailsViewModel(
           updated = viewOnlyUpdated,
           link = (optYear, optCurrentVersion, optPreviousVersion) match {
