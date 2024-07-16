@@ -17,6 +17,7 @@
 package pages.nonsipp
 
 import pages.nonsipp.memberdetails._
+import pages.nonsipp.memberreceivedpcls._
 import play.api.libs.json.{__, JsPath}
 
 package object memberpayments {
@@ -31,7 +32,9 @@ package object memberpayments {
       SafeToHardDelete.key,
       MemberStatus.key,
       MemberPaymentsRecordVersionPage.key,
-      MemberDetailsCompletedPage.key
+      MemberDetailsCompletedPage.key,
+      PclsMemberListPage.key,
+      MemberPaymentsRecordVersionPage.key
     )
   }
 }

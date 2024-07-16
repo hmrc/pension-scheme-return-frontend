@@ -576,7 +576,9 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             expectedStatus = Completed,
             expectedTitleKey = "nonsipp.tasklist.members.title",
             expectedLinkContentKey = "nonsipp.tasklist.members.view.details.title",
-            expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+              .onPageLoadViewOnly(srn, page = 1, yearString, submissionNumberTwo, submissionNumberOne)
+              .url
           )
         }
 
@@ -589,7 +591,9 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             expectedStatus = Updated,
             expectedTitleKey = "nonsipp.tasklist.members.title",
             expectedLinkContentKey = "nonsipp.tasklist.members.view.details.title",
-            expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+              .onPageLoadViewOnly(srn, page = 1, yearString, submissionNumberTwo, submissionNumberOne)
+              .url
           )
         }
       }

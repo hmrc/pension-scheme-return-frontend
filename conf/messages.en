@@ -371,6 +371,12 @@ schemeMembersList.remove.hidden = Remove {0} from the list
 schemeMembersList.error.required = Select yes if you need to add more members
 schemeMembersList.pagination.label = Showing {0} - {1} of {2} members
 
+schemeMembersList.view.title = {0} member
+schemeMembersList.view.title.plural = {0} members
+schemeMembersList.view.heading = {0} member
+schemeMembersList.view.heading.plural = {0} members
+schemeMembersList.view.link = View previous version of member's (opens in new tab)
+
 changeMemberDetails.title = Change member’s details
 changeMemberDetails.heading = Change {0}’s details
 

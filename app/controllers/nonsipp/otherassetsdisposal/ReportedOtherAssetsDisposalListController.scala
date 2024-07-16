@@ -188,7 +188,7 @@ object ReportedOtherAssetsDisposalListController {
           }
       }
       .toList
-      .sortBy(_.changeUrl)
+      .sortBy(_.change.fold("")(_.url))
 
   private def buildMessage(messageString: String, otherAssetsDisposalData: OtherAssetsDisposalData): Message =
     otherAssetsDisposalData match {

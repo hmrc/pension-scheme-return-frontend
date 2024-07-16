@@ -58,9 +58,9 @@ class ListViewSpec extends ViewSpec {
           val changeLinks = links.map(_.get(0))
           val removeLinks = links.map(_.get(1))
           changeLinks.map(_.children().select(".govuk-visually-hidden").text()) mustEqual
-            viewModel.page.rows.map(row => messageKey(row.changeHiddenText))
+            viewModel.page.rows.map(row => messageKey(row.change.get.hiddenText))
           removeLinks.map(_.children().select(".govuk-visually-hidden").text()) mustEqual
-            viewModel.page.rows.map(row => messageKey(row.removeHiddenText))
+            viewModel.page.rows.map(row => messageKey(row.remove.get.hiddenText))
         }
       }
 

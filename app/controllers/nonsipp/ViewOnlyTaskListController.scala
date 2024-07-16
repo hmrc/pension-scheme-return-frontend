@@ -247,7 +247,9 @@ object ViewOnlyTaskListController {
       TaskListItemViewModel(
         LinkMessage(
           Message(messageKey(prefix, "details.title"), schemeName),
-          controllers.routes.UnauthorisedController.onPageLoad().url
+          controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+            .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion)
+            .url
         ),
         membersTaskListStatus
       )
