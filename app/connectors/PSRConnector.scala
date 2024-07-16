@@ -18,8 +18,10 @@ package connectors
 
 import config.FrontendAppConfig
 import handlers.GetPsrException
+import play.api.libs.ws.WSRequest
 import models.requests.psr.PsrSubmission
 import models.AnswersSavedDisplayVersion
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import play.api.mvc.Call
 import play.api.Logger
@@ -32,10 +34,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
 
-class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
+class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
 
   private val baseUrl = appConfig.pensionSchemeReturn.baseUrl
   protected val logger: Logger = Logger(classOf[PSRConnector])
+  private def getStandardUrl(pstr: String) = s"$baseUrl/pension-scheme-return/psr/standard/$pstr"
   private def submitStandardUrl = s"$baseUrl/pension-scheme-return/psr/standard"
   private def overviewUrl(pstr: String) = s"$baseUrl/pension-scheme-return/psr/overview/$pstr"
   private def versionsForYearsUrl(pstr: String, startDates: Seq[String]) =
@@ -47,14 +50,12 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
     psrSubmission: PsrSubmission,
     userName: String,
     schemeName: String
-  )(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] = {
-    val hc: HeaderCarrier = buildHeaders(userName, schemeName, headerCarrier)
-
+  )(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] =
     http
-      .POST[PsrSubmission, HttpResponse](
-        submitStandardUrl,
-        psrSubmission
-      )(implicitly, implicitly, hc, implicitly)
+      .post(url"$submitStandardUrl")
+      .withBody(Json.toJson(psrSubmission))
+      .transform(buildHeaders(_, userName, schemeName))
+      .execute[HttpResponse]
       .map { response =>
         response.status match {
           case NO_CONTENT => Right(())
@@ -62,7 +63,6 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
             Left(s"{${response.status}, ${response.json}}")
         }
       }
-  }
 
   def getStandardPsrDetails(
     pstr: String,
@@ -82,13 +82,10 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
       case (_, _, Some(fbNumber)) =>
         Seq("fbNumber" -> fbNumber)
     }
-
     http
-      .GET[HttpResponse](s"$baseUrl/pension-scheme-return/psr/standard/$pstr", queryParams)(
-        implicitly,
-        buildHeaders(userName, schemeName, headerCarrier),
-        implicitly
-      )
+      .get(url"${getStandardUrl(pstr)}?$queryParams")
+      .transform(buildHeaders(_, userName, schemeName))
+      .execute[HttpResponse]
       .map { response =>
         response.status match {
           case OK =>
@@ -113,9 +110,8 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsForYearsResponse]] =
     http
-      .GET[HttpResponse](
-        versionsForYearsUrl(pstr, startDates)
-      )
+      .get(url"${versionsForYearsUrl(pstr, startDates)}")
+      .execute[HttpResponse]
       .map { response =>
         response.status match {
           case OK =>
@@ -149,9 +145,8 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsResponse]] =
     http
-      .GET[HttpResponse](
-        versionsUrl(pstr, startDate)
-      )
+      .get(url"${versionsUrl(pstr, startDate)}")
+      .execute[HttpResponse]
       .map { response =>
         response.status match {
           case OK =>
@@ -190,7 +185,8 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
       )
 
     http
-      .GET[HttpResponse](overviewUrl(pstr), queryParams)
+      .get(url"${overviewUrl(pstr)}?$queryParams")
+      .execute[HttpResponse]
       .map { response =>
         response.status match {
           case OK =>
@@ -207,12 +203,10 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
       }
   }
 
-  private def buildHeaders(userName: String, schemeName: String, headerCarrier: HeaderCarrier): HeaderCarrier = {
-    val headers: Seq[(String, String)] = Seq(
+  private def buildHeaders(wsRequest: WSRequest, userName: String, schemeName: String): WSRequest =
+    wsRequest.addHttpHeaders(
       "Content-Type" -> "application/json",
       "userName" -> userName,
       "schemeName" -> schemeName
     )
-    headerCarrier.withExtraHeaders(headers: _*)
-  }
 }
