@@ -31,7 +31,6 @@ import models.PensionSchemeType.PensionSchemeType
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import cats.implicits.{toShow, toTraverseOps}
-import controllers.nonsipp.routes
 import pages.nonsipp.receivetransfer._
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
@@ -158,9 +157,14 @@ class TransfersInCYAController @Inject()(
       )
     }
 
-  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
-      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+            .onPageLoadViewOnly(srn, page, year, current, previous)
+        )
+      )
     }
 }
 
@@ -213,7 +217,7 @@ object TransfersInCYAController {
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
-                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+                  .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
                   .onSubmit(srn, index, mode)

@@ -349,7 +349,9 @@ object ViewOnlyTaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "transfersreceived.title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
+          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .url
         ),
         transferInTaskListStatus
       ),

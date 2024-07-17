@@ -23,23 +23,30 @@ import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.OneTo300
 import controllers.PSRController
-import config.Constants
-import pages.nonsipp.receivetransfer._
 import config.Constants.maxNotRelevant
-import navigation.Navigator
 import forms.YesNoPageFormProvider
-import models._
+import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
-import play.api.data.Form
+import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import config.Constants
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
+import cats.implicits.toShow
+import pages.nonsipp.receivetransfer._
 import controllers.actions._
 import eu.timepit.refined.{refineMV, refineV}
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
+import utils.DateTimeUtils.localDateTimeShow
+import models._
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
+import models.requests.DataRequest
+import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
+import java.time.LocalDateTime
 import javax.inject.Named
 
 class TransferReceivedMemberListController @Inject()(
@@ -58,17 +65,51 @@ class TransferReceivedMemberListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
+      onPageLoadCommon(srn, page, mode)(implicitly)
+  }
 
-      if (optionList.flatten.nonEmpty) {
-        val viewModel = TransferReceivedMemberListController
-          .viewModel(srn, page, mode, optionList, request.userAnswers)
-        val filledForm =
-          request.userAnswers.get(TransferReceivedMemberListPage(srn)).fold(form)(form.fill)
-        Ok(view(filledForm, viewModel))
-      } else {
-        Redirect(controllers.routes.UnauthorisedController.onPageLoad())
-      }
+  def onPageLoadViewOnly(
+    srn: Srn,
+    page: Int,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    onPageLoadCommon(srn, page, mode)(implicitly)
+  }
+
+  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+    val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
+
+    if (optionList.flatten.nonEmpty) {
+      val viewModel = TransferReceivedMemberListController
+        .viewModel(
+          srn,
+          page,
+          mode,
+          optionList,
+          request.userAnswers,
+          viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+            getCompletedOrUpdatedTaskListStatus(
+              request.userAnswers,
+              request.previousUserAnswers.get,
+              pages.nonsipp.receivetransfer.Paths.memberTransfersIn
+            ) == Updated
+          } else {
+            false
+          },
+          optYear = request.year,
+          optCurrentVersion = request.currentVersion,
+          optPreviousVersion = request.previousVersion,
+          compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+        )
+      val filledForm =
+        request.userAnswers.get(TransferReceivedMemberListPage(srn)).fold(form)(form.fill)
+      Ok(view(filledForm, viewModel))
+    } else {
+      Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+    }
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
@@ -83,7 +124,8 @@ class TransferReceivedMemberListController @Inject()(
         )
       } else {
         val viewModel =
-          TransferReceivedMemberListController.viewModel(srn, page, mode, optionList, request.userAnswers)
+          TransferReceivedMemberListController
+            .viewModel(srn, page, mode, optionList, request.userAnswers, false, None, None, None)
 
         form
           .bindFromRequest()
@@ -117,6 +159,24 @@ class TransferReceivedMemberListController @Inject()(
           )
       }
   }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+      )
+    }
+
+  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
+        )
+      )
+    }
+
 }
 
 object TransferReceivedMemberListController {
@@ -129,7 +189,10 @@ object TransferReceivedMemberListController {
     srn: Srn,
     mode: Mode,
     memberList: List[Option[NameDOB]],
-    userAnswers: UserAnswers
+    userAnswers: UserAnswers,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None
   ): List[List[TableElem]] =
     memberList.zipWithIndex
       .map {
@@ -146,14 +209,18 @@ object TransferReceivedMemberListController {
                   TableElem(
                     Message("transferIn.MemberList.status.no.contributions")
                   ),
-                  TableElem(
-                    LinkMessage(
-                      Message("site.add"),
-                      controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
-                        .onSubmit(srn, nextIndex, refineMV(1), mode)
-                        .url
+                  if (mode != ViewOnlyMode) {
+                    TableElem(
+                      LinkMessage(
+                        Message("site.add"),
+                        controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+                          .onSubmit(srn, nextIndex, refineMV(1), mode)
+                          .url
+                      )
                     )
-                  ),
+                  } else {
+                    TableElem.empty
+                  },
                   TableElem("")
                 )
               } else {
@@ -167,26 +234,40 @@ object TransferReceivedMemberListController {
                     else
                       Message("transferIn.MemberList.status.some.contributions", contributions.size)
                   ),
-                  TableElem(
-                    LinkMessage(
-                      Message("site.change"),
-                      controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
-                        .onSubmit(srn, nextIndex, CheckMode)
-                        .url
+                  (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                    case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                      TableElem.view(
+                        controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+                          .onPageLoadViewOnly(srn, nextIndex, year, currentVersion, previousVersion),
+                        Message("transferIn.memberList.remove.hidden.text", memberName.fullName)
+                      )
+                    case _ =>
+                      TableElem(
+                        LinkMessage(
+                          Message("site.change"),
+                          controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+                            .onSubmit(srn, nextIndex, CheckMode)
+                            .url
+                        )
+                      )
+                  },
+                  if (mode == ViewOnlyMode) {
+                    TableElem.empty
+                  } else {
+                    TableElem(
+                      LinkMessage(
+                        Message("site.remove"),
+                        controllers.nonsipp.receivetransfer.routes.WhichTransferInRemoveController
+                          .onSubmit(srn, nextIndex)
+                          .url
+                      )
                     )
-                  ),
-                  TableElem(
-                    LinkMessage(
-                      Message("site.remove"),
-                      controllers.nonsipp.receivetransfer.routes.WhichTransferInRemoveController
-                        .onSubmit(srn, nextIndex)
-                        .url
-                    )
-                  )
+                  }
                 )
               }
           }
         case _ => List.empty
+
       }
       .sortBy(_.headOption.map(_.text.toString))
 
@@ -195,7 +276,12 @@ object TransferReceivedMemberListController {
     page: Int,
     mode: Mode,
     memberList: List[Option[NameDOB]],
-    userAnswers: UserAnswers
+    userAnswers: UserAnswers,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[ActionTableViewModel] = {
     val title =
       if (memberList.flatten.size == 1) "transferIn.MemberList.title"
@@ -205,15 +291,24 @@ object TransferReceivedMemberListController {
       if (memberList.flatten.size == 1) "transferIn.MemberList.heading"
       else "transferIn.MemberList.heading.plural"
 
+    // in view-only mode or with direct url edit page value can be higher than needed
+    val currentPage = if ((page - 1) * Constants.landOrPropertiesSize >= memberList.flatten.size) 1 else page
     val pagination = Pagination(
-      currentPage = page,
+      currentPage = currentPage,
       pageSize = Constants.transferInListSize,
       memberList.flatten.size,
-      controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-        .onPageLoad(srn, _, NormalMode)
+      call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+        case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
+        case _ =>
+          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+            .onPageLoad(srn, _, NormalMode)
+      }
     )
 
     FormPageViewModel(
+      mode = mode,
       title = Message(title, memberList.flatten.size),
       heading = Message(heading, memberList.flatten.size),
       description = None,
@@ -232,7 +327,7 @@ object TransferReceivedMemberListController {
             TableElem.empty
           )
         ),
-        rows = rows(srn, mode, memberList, userAnswers),
+        rows = rows(srn, mode, memberList, userAnswers, optYear, optCurrentVersion, optPreviousVersion),
         radioText = Message("transferIn.MemberList.radios"),
         showRadios = memberList.length < maxNotRelevant,
         showInsetWithRadios = true,
@@ -252,7 +347,48 @@ object TransferReceivedMemberListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit = controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-        .onSubmit(srn, page, mode)
+        .onSubmit(srn, page, mode),
+      optViewOnlyDetails = if (mode.isViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion))
+                  if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+                Some(
+                  LinkMessage(
+                    "transferIn.MemberList.viewOnly.link",
+                    controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+                      .onPreviousViewOnly(
+                        srn,
+                        page,
+                        year,
+                        currentVersion,
+                        previousVersion
+                      )
+                      .url
+                  )
+                )
+              case _ => None
+            },
+            submittedText =
+              compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+            title = "transferIn.MemberList.viewOnly.title",
+            heading = "transferIn.MemberList.viewOnly.heading",
+            buttonText = "site.return.to.tasklist",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+                  .onSubmit(srn, page, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
   }
 }
