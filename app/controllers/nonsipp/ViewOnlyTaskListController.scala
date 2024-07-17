@@ -383,7 +383,9 @@ object ViewOnlyTaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "surrenderedbenefits.title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
+          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .url
         ),
         surrenderedBenefitsTaskListStatus
       )

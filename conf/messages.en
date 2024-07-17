@@ -901,6 +901,10 @@ surrenderedBenefits.memberList.radios.error.required = Select yes if you have fi
 surrenderedBenefits.memberList.pagination.label = Showing {0} - {1} of {2} members
 surrenderedBenefits.memberList.status.no.items = No surrendered benefits
 surrenderedBenefits.memberList.status.some.item = Surrendered benefits reported
+surrenderedBenefits.memberList.viewOnly.title = Surrendered benefits
+surrenderedBenefits.memberList.viewOnly.heading = Surrendered benefits
+surrenderedBenefits.memberList.viewOnly.link = View previous version of surrendered benefits (opens in new tab)
+surrenderedBenefits.memberList.add.hidden.text = surrendered benefits for {0}
 
 surrenderedBenefits.amount.title = What was the total amount surrendered by the member, in pounds and pence?
 surrenderedBenefits.amount.heading = What was the total amount surrendered by {0}, in pounds and pence?
