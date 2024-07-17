@@ -19,13 +19,15 @@ package controllers.nonsipp.membersurrenderedbenefits
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListController._
 import services.PsrSubmissionService
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
+import config.Refined.Max300
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
+import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
-import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListPage
-import models.{NameDOB, NormalMode, UserAnswers}
+import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, SurrenderedBenefitsMemberListPage}
+import models._
 import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
@@ -38,6 +40,28 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.SurrenderedBenefitsMemberListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.SurrenderedBenefitsMemberListController.onSubmit(srn, page = 1, NormalMode)
+  private lazy val onSubmitViewOnly = routes.SurrenderedBenefitsMemberListController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+  private lazy val onPageLoadViewOnly = routes.SurrenderedBenefitsMemberListController.onPageLoadViewOnly(
+    srn,
+    1,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+  private lazy val onPreviousViewOnly = routes.SurrenderedBenefitsMemberListController.onPreviousViewOnly(
+    srn,
+    1,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+  private val index = refineMV[Max300.Refined](1)
+  private val page = 1
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -68,7 +92,8 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
           page = 1,
           NormalMode,
           memberList: List[Option[NameDOB]],
-          userAnswers: UserAnswers
+          userAnswers: UserAnswers,
+          viewOnlyUpdated = false
         )
       )
     })
@@ -84,7 +109,8 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
               page = 1,
               NormalMode,
               memberList: List[Option[NameDOB]],
-              userAnswers: UserAnswers
+              userAnswers: UserAnswers,
+              viewOnlyUpdated = false
             )
           )
     })
@@ -108,5 +134,86 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
     act.like(invalidForm(onSubmit, userAnswers))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+  }
+
+  "SurrenderedBenefitsMemberListControllerSpec in view only mode" - {
+
+    val currentUserAnswers = userAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
+
+          injected[TwoColumnsTripleAction].apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              memberList,
+              currentUserAnswers,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
+    )
+
+    val updatedUserAnswers = currentUserAnswers
+      .unsafeSet(SurrenderedBenefitsAmountPage(srn, index), money)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
+
+          injected[TwoColumnsTripleAction].apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              memberList,
+              updatedUserAnswers,
+              viewOnlyUpdated = true,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
+
+    act.like(
+      redirectToPage(
+        onPreviousViewOnly,
+        controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+      ).withName(
+        "Submit previous view only redirects to the controller with parameters for the previous submission"
+      )
+    )
   }
 }
