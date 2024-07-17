@@ -42,6 +42,7 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit = routes.TransfersInCYAController.onSubmit(srn, index, NormalMode)
   private lazy val onSubmitViewOnly = routes.TransfersInCYAController.onSubmitViewOnly(
     srn,
+    1,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -149,12 +150,12 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+        controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )
-        .withName("Submit redirects to view only tasklist")
+        .withName("Submit redirects to TransferReceivedMemberListController page")
     )
   }
 }
