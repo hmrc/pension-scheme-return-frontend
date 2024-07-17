@@ -348,7 +348,7 @@ object TransferReceivedMemberListController {
       details = None,
       onSubmit = controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
         .onSubmit(srn, page, mode),
-      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+      optViewOnlyDetails = if (mode.isViewOnlyMode) {
         Some(
           ViewOnlyDetailsViewModel(
             updated = viewOnlyUpdated,
