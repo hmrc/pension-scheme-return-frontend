@@ -24,15 +24,16 @@ import models.PensionSchemeId.{PsaId, PspId}
 import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
 import play.api.Logger
 import models.MinimalDetails
+import uk.gov.hmrc.http.client.HttpClientV2
 import utils.FutureUtils.FutureOps
 import play.api.http.Status.{FORBIDDEN, NOT_FOUND}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
 
-class MinimalDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: HttpClient)
+class MinimalDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2)
     extends MinimalDetailsConnector {
 
   private val url = s"${appConfig.pensionsAdministrator}/pension-administrator/get-minimal-psa"
@@ -53,7 +54,9 @@ class MinimalDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: 
     idValue: String
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]] =
     http
-      .GET[MinimalDetails](url, headers = Seq(idType -> idValue))
+      .get(url"$url")
+      .setHeader(idType -> idValue)
+      .execute[MinimalDetails]
       .map(Right(_))
       .recover {
         case e @ WithStatusCode(NOT_FOUND) if e.message.contains(Constants.detailsNotFound) =>

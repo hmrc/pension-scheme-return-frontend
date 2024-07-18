@@ -24,15 +24,16 @@ import uk.gov.hmrc.http.UpstreamErrorResponse.WithStatusCode
 import models.PensionSchemeId.{PsaId, PspId}
 import play.api.Logger
 import models.{ListMinimalSchemeDetails, SchemeDetails, SchemeId}
+import uk.gov.hmrc.http.client.HttpClientV2
 import utils.FutureUtils.FutureOps
 import play.api.http.Status.NOT_FOUND
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
 
-class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: HttpClient)
+class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2)
     extends SchemeDetailsConnector {
 
   private def url(relativePath: String) = s"${appConfig.pensionsScheme}$relativePath"
@@ -41,42 +42,42 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
   override def details(
     psaId: PsaId,
     schemeId: SchemeId
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SchemeDetails]] = {
-
-    val headers = List(
-      "idNumber" -> schemeId.value,
-      "schemeIdType" -> schemeId.idType,
-      "psaId" -> psaId.value
-    )
-
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SchemeDetails]] =
     http
-      .GET[Option[SchemeDetails]](url("/pensions-scheme/scheme"), headers = headers)
+      .get(url"${url("/pensions-scheme/scheme")}")
+      .transform(
+        _.addHttpHeaders(
+          "idNumber" -> schemeId.value,
+          "schemeIdType" -> schemeId.idType,
+          "psaId" -> psaId.value
+        )
+      )
+      .execute[Option[SchemeDetails]]
       .tapError { t =>
         Future.successful(
           logger.error(s"Failed to fetch scheme details $schemeId for psa with message ${t.getMessage}")
         )
       }
-  }
 
   // API 1444 (Get scheme details)
   override def details(
     pspId: PspId,
     schemeId: Srn
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SchemeDetails]] = {
-
-    val headers = List(
-      "pspId" -> pspId.value,
-      "srn" -> schemeId.value
-    )
-
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SchemeDetails]] =
     http
-      .GET[Option[SchemeDetails]](url("/pensions-scheme/psp-scheme"), headers = headers)
+      .get(url"${url("/pensions-scheme/psp-scheme")}")
+      .transform(
+        _.addHttpHeaders(
+          "pspId" -> pspId.value,
+          "srn" -> schemeId.value
+        )
+      )
+      .execute[Option[SchemeDetails]]
       .tapError { t =>
         Future.successful(
           logger.error(s"Failed to fetch scheme details $schemeId for psp with message ${t.getMessage}")
         )
       }
-  }
 
   override def checkAssociation(
     psaId: PsaId,
@@ -93,22 +94,22 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
   private def checkAssociation(idValue: String, idType: String, srn: Srn)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext
-  ): Future[Boolean] = {
-
-    val headers = List(
-      idType -> idValue,
-      "schemeReferenceNumber" -> srn.value,
-      "Content-Type" -> "application/json"
-    )
-
+  ): Future[Boolean] =
     http
-      .GET[Boolean](url("/pensions-scheme/is-psa-associated"), headers = headers)
+      .get(url"${url("/pensions-scheme/is-psa-associated")}")
+      .transform(
+        _.addHttpHeaders(
+          idType -> idValue,
+          "schemeReferenceNumber" -> srn.value,
+          "Content-Type" -> "application/json"
+        )
+      )
+      .execute[Boolean]
       .tapError { t =>
         Future.successful(
           logger.error(s"Failed check association for scheme $srn for $idType with message ${t.getMessage}")
         )
       }
-  }
 
   def listSchemeDetails(
     psaId: PsaId
@@ -123,15 +124,16 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
   private def listSchemeDetails(
     idValue: String,
     idType: String
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ListMinimalSchemeDetails]] = {
-
-    val headers = List(
-      "idValue" -> idValue,
-      "idType" -> idType
-    )
-
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ListMinimalSchemeDetails]] =
     http
-      .GET[ListMinimalSchemeDetails](url("/pensions-scheme/list-of-schemes"), headers = headers)
+      .get(url"${url("/pensions-scheme/list-of-schemes")}")
+      .transform(
+        _.addHttpHeaders(
+          "idValue" -> idValue,
+          "idType" -> idType
+        )
+      )
+      .execute[ListMinimalSchemeDetails]
       .map(Some(_))
       .recover {
         case WithStatusCode(NOT_FOUND) => None
@@ -139,7 +141,6 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
       .tapError { t =>
         Future.successful(logger.error(s"Failed list scheme details for $idType with message ${t.getMessage}"))
       }
-  }
 }
 
 @ImplementedBy(classOf[SchemeDetailsConnectorImpl])

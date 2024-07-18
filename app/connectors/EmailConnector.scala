@@ -22,10 +22,11 @@ import com.google.inject.Inject
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
 import config.FrontendAppConfig
 import models.SendEmailRequest
+import uk.gov.hmrc.http.client.HttpClientV2
 import play.api.Logger
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import play.api.http.Status._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,7 +41,7 @@ case object EmailNotSent extends WithName("EmailNotSent") with EmailStatus
 
 class EmailConnector @Inject()(
   appConfig: FrontendAppConfig,
-  http: HttpClient,
+  http: HttpClientV2,
   crypto: ApplicationCrypto
 ) {
 
@@ -104,7 +105,9 @@ class EmailConnector @Inject()(
     val jsonData = Json.toJson(sendEmailReq)
 
     http
-      .POST[JsValue, HttpResponse](emailServiceUrl, jsonData)
+      .post(url"$emailServiceUrl")
+      .withBody(jsonData)
+      .execute[HttpResponse]
       .map { response =>
         response.status match {
           case ACCEPTED =>

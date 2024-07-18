@@ -19,15 +19,16 @@ package connectors
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import config.FrontendAppConfig
 import play.api.libs.json._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import models._
+import uk.gov.hmrc.http.client.HttpClientV2
 import utils.JsonUtils._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
 
-class AddressLookupConnector @Inject()(http: HttpClient, appConfig: FrontendAppConfig)(
+class AddressLookupConnector @Inject()(http: HttpClientV2, appConfig: FrontendAppConfig)(
   implicit ec: ExecutionContext
 ) {
 
@@ -35,11 +36,8 @@ class AddressLookupConnector @Inject()(http: HttpClient, appConfig: FrontendAppC
 
   def lookup(postcode: String, filter: Option[String])(implicit hc: HeaderCarrier): Future[List[ALFAddressResponse]] =
     http
-      .POST[JsObject, List[ALFAddressResponse]](
-        addressLookupUrl,
-        Json.obj("postcode" -> postcode) +? filter.map(f => Json.obj("filter" -> f)),
-        headers = List(
-          "Content-Type" -> "application/json"
-        )
-      )
+      .post(url"$addressLookupUrl")
+      .withBody(Json.obj("postcode" -> postcode) +? filter.map(f => Json.obj("filter" -> f)))
+      .setHeader("Content-Type" -> "application/json")
+      .execute[List[ALFAddressResponse]]
 }
