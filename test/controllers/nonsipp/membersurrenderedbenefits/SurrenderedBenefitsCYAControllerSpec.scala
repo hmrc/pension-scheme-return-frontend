@@ -22,8 +22,9 @@ import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
+import pages.nonsipp.FbVersionPage
 import pages.nonsipp.membersurrenderedbenefits._
-import models.{CheckMode, Mode, NormalMode}
+import models._
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCYAController._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
@@ -51,6 +52,20 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
     routes.SurrenderedBenefitsCYAController.onPageLoad(srn, memberIndex, mode)
   private def onSubmit(mode: Mode) =
     routes.SurrenderedBenefitsCYAController.onSubmit(srn, memberIndex, mode)
+  private lazy val onPageLoadViewOnly = routes.SurrenderedBenefitsCYAController.onPageLoadViewOnly(
+    srn,
+    memberIndex,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private lazy val onSubmitViewOnly = routes.SurrenderedBenefitsCYAController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, memberIndex), memberDetails)
@@ -71,7 +86,8 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
               surrenderedBenefitsAmount,
               whenSurrenderedBenefits,
               reasonSurrenderedBenefits,
-              mode
+              mode,
+              viewOnlyUpdated = false
             )
           )
         }.withName(s"render correct $mode view")
@@ -98,5 +114,49 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
           .withName(s"redirect to journey recovery page on submit when in $mode mode")
       )
     }
+  }
+
+  "SurrenderedBenefitsCYAController in view only mode" - {
+
+    val currentUserAnswers = filledUserAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+
+    val previousUserAnswers = filledUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+
+    act.like(
+      renderView(
+        onPageLoadViewOnly,
+        userAnswers = currentUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[CheckYourAnswersView].apply(
+          viewModel(
+            srn,
+            memberIndex,
+            memberDetails.fullName,
+            surrenderedBenefitsAmount,
+            whenSurrenderedBenefits,
+            reasonSurrenderedBenefits,
+            ViewOnlyMode,
+            viewOnlyUpdated = false,
+            optYear = Some(yearString),
+            optCurrentVersion = Some(submissionNumberTwo),
+            optPreviousVersion = Some(submissionNumberOne),
+            compilationOrSubmissionDate = Some(submissionDateTwo)
+          )
+        )
+      }
+    )
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
   }
 }

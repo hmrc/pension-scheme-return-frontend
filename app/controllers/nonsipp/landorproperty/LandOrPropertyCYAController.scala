@@ -213,8 +213,6 @@ class LandOrPropertyCYAController @Inject()(
     }
 }
 
-case class ViewModelParameters(
-  )
 object LandOrPropertyCYAController {
   def viewModel(
     srn: Srn,

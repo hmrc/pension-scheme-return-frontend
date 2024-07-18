@@ -19,18 +19,20 @@ package controllers.nonsipp.membersurrenderedbenefits
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import config.Refined.Max300
 import controllers.PSRController
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
-import navigation.Navigator
 import pages.nonsipp.membersurrenderedbenefits._
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCYAController._
+import models.requests.DataRequest
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
-import models.{CheckMode, Mode, Money}
+import models._
 import play.api.i18n.MessagesApi
 import viewmodels.Margin
 import utils.FunctionKUtils._
@@ -39,7 +41,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
 class SurrenderedBenefitsCYAController @Inject()(
@@ -53,37 +55,59 @@ class SurrenderedBenefitsCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
-          memberDetails <- request.userAnswers
-            .get(MemberDetailsPage(srn, memberIndex))
-            .getOrRecoverJourney
-          surrenderedBenefitsAmount <- request.userAnswers
-            .get(SurrenderedBenefitsAmountPage(srn, memberIndex))
-            .getOrRecoverJourney
-          whenSurrenderedBenefits <- request.userAnswers
-            .get(WhenDidMemberSurrenderBenefitsPage(srn, memberIndex))
-            .getOrRecoverJourney
-          whySurrenderedBenefits <- request.userAnswers
-            .get(WhyDidMemberSurrenderBenefitsPage(srn, memberIndex))
-            .getOrRecoverJourney
-        } yield Ok(
-          view(
-            viewModel(
-              srn,
-              memberIndex,
-              memberDetails.fullName,
-              surrenderedBenefitsAmount,
-              whenSurrenderedBenefits,
-              whySurrenderedBenefits,
-              mode
-            )
+      onPageLoadCommon(srn, index, mode)
+    }
+
+  def onPageLoadViewOnly(
+    srn: Srn,
+    index: Max300,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn, index, mode)
+    }
+
+  def onPageLoadCommon(srn: SchemeId.Srn, index: Max300, mode: Mode)(
+    implicit request: DataRequest[AnyContent]
+  ): Result =
+    (
+      for {
+        memberDetails <- request.userAnswers
+          .get(MemberDetailsPage(srn, index))
+          .getOrRecoverJourney
+        surrenderedBenefitsAmount <- request.userAnswers
+          .get(SurrenderedBenefitsAmountPage(srn, index))
+          .getOrRecoverJourney
+        whenSurrenderedBenefits <- request.userAnswers
+          .get(WhenDidMemberSurrenderBenefitsPage(srn, index))
+          .getOrRecoverJourney
+        whySurrenderedBenefits <- request.userAnswers
+          .get(WhyDidMemberSurrenderBenefitsPage(srn, index))
+          .getOrRecoverJourney
+      } yield Ok(
+        view(
+          viewModel(
+            srn,
+            index,
+            memberDetails.fullName,
+            surrenderedBenefitsAmount,
+            whenSurrenderedBenefits,
+            whySurrenderedBenefits,
+            mode,
+            viewOnlyUpdated = false,
+            optYear = request.year,
+            optCurrentVersion = request.currentVersion,
+            optPreviousVersion = request.previousVersion,
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
           )
         )
-      ).merge
-    }
+      )
+    ).merge
 
   def onSubmit(srn: Srn, memberIndex: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -111,6 +135,13 @@ class SurrenderedBenefitsCYAController @Inject()(
           )
       )
     }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+      )
+    }
 }
 
 object SurrenderedBenefitsCYAController {
@@ -121,16 +152,24 @@ object SurrenderedBenefitsCYAController {
     surrenderedBenefitsAmount: Money,
     whenSurrenderedBenefits: LocalDate,
     whySurrenderedBenefits: String,
-    mode: Mode
+    mode: Mode,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
+      mode = mode,
       title = mode.fold(
         normal = "surrenderedBenefits.cya.title",
-        check = "surrenderedBenefits.change.title"
+        check = "surrenderedBenefits.change.title",
+        viewOnly = "surrenderedBenefits.cya.viewOnly.title"
       ),
       heading = mode.fold(
         normal = "surrenderedBenefits.cya.heading",
-        check = Message("surrenderedBenefits.change.heading", memberName)
+        check = Message("surrenderedBenefits.change.heading", memberName),
+        viewOnly = Message("surrenderedBenefits.cya.viewOnly.heading", memberName)
       ),
       description = None,
       page = CheckYourAnswersViewModel(
@@ -140,15 +179,40 @@ object SurrenderedBenefitsCYAController {
           memberName,
           surrenderedBenefitsAmount,
           whenSurrenderedBenefits,
-          whySurrenderedBenefits
+          whySurrenderedBenefits,
+          mode match {
+            case ViewOnlyMode => NormalMode
+            case _ => mode
+          }
         )
       ).withMarginBottom(Margin.Fixed60Bottom),
       refresh = None,
       buttonText = mode.fold(
         normal = "site.saveAndContinue",
-        check = "site.continue"
+        check = "site.continue",
+        viewOnly = "site.continue"
       ),
-      onSubmit = routes.SurrenderedBenefitsCYAController.onSubmit(srn, memberIndex, mode)
+      onSubmit = routes.SurrenderedBenefitsCYAController.onSubmit(srn, memberIndex, mode),
+      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = None,
+            submittedText = Some(Message("")),
+            title = "surrenderedBenefits.cya.viewOnly.title",
+            heading = Message("surrenderedBenefits.cya.viewOnly.heading", memberName),
+            buttonText = "site.continue",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                routes.SurrenderedBenefitsCYAController.onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                routes.SurrenderedBenefitsCYAController.onSubmit(srn, memberIndex, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
 
   private def rows(
@@ -157,7 +221,8 @@ object SurrenderedBenefitsCYAController {
     memberName: String,
     surrenderedBenefitsAmount: Money,
     whenSurrenderedBenefits: LocalDate,
-    whySurrenderedBenefits: String
+    whySurrenderedBenefits: String,
+    mode: Mode
   ): List[CheckYourAnswersSection] =
     List(
       CheckYourAnswersSection(
@@ -174,7 +239,7 @@ object SurrenderedBenefitsCYAController {
             SummaryAction(
               "site.change",
               controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsAmountController
-                .onSubmit(srn, memberIndex, CheckMode)
+                .onSubmit(srn, memberIndex, mode)
                 .url
             ).withVisuallyHiddenContent(Message("surrenderedBenefits.cya.section.amount.hidden", memberName))
           ),
@@ -185,7 +250,7 @@ object SurrenderedBenefitsCYAController {
             SummaryAction(
               "site.change",
               controllers.nonsipp.membersurrenderedbenefits.routes.WhenDidMemberSurrenderBenefitsController
-                .onSubmit(srn, memberIndex, CheckMode)
+                .onSubmit(srn, memberIndex, mode)
                 .url
             ).withVisuallyHiddenContent(Message("surrenderedBenefits.cya.section.date.hidden", memberName))
           ),
@@ -196,7 +261,7 @@ object SurrenderedBenefitsCYAController {
             SummaryAction(
               "site.change",
               controllers.nonsipp.membersurrenderedbenefits.routes.WhyDidMemberSurrenderBenefitsController
-                .onSubmit(srn, memberIndex, CheckMode)
+                .onSubmit(srn, memberIndex, mode)
                 .url
             ).withVisuallyHiddenContent(Message("surrenderedBenefits.cya.section.reason.hidden", memberName))
           )
