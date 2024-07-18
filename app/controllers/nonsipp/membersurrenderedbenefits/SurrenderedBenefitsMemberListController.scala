@@ -247,16 +247,14 @@ object SurrenderedBenefitsMemberListController {
                   (mode, optYear, optCurrentVersion, optPreviousVersion) match {
                     case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
                       TableElem.view(
-                        /*controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
+                        controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
                           .onPageLoadViewOnly(
                             srn,
                             nextIndex,
-                            page = 1,
                             year = year,
                             current = currentVersion,
                             previous = previousVersion
-                          )*/
-                        controllers.routes.UnauthorisedController.onPageLoad(),
+                          ),
                         Message("surrenderedBenefits.memberList.add.hidden.text", memberName.fullName)
                       )
                     case _ =>
