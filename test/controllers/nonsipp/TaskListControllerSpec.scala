@@ -355,12 +355,12 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         }
       }
 
-      "completed" in {
+      "Recorded" in {
         testViewModel(
           userAnswersOneMember,
           1,
           0,
-          expectedStatus = TaskListStatus.Completed,
+          expectedStatus = TaskListStatus.Recorded(1, "members"),
           expectedTitleKey = "nonsipp.tasklist.members.title",
           expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
           expectedLinkUrl = controllers.nonsipp.memberdetails.routes.SchemeMembersListController
@@ -480,7 +480,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         }
       }
 
-      "completed" in {
+      "Recorded" in {
         val userAnswersWithLoans =
           defaultUserAnswers
             .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
@@ -495,7 +495,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           userAnswersWithLoans,
           3,
           0,
-          expectedStatus = TaskListStatus.Completed,
+          expectedStatus = TaskListStatus.Recorded(2, "loans"),
           expectedTitleKey = "nonsipp.tasklist.loans.title",
           expectedLinkContentKey = "nonsipp.tasklist.loans.change.loansmade.title",
           expectedLinkUrl =
@@ -573,7 +573,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "completed" in {
+      "Recorded" in {
         val userAnswersWithData =
           defaultUserAnswers
             .unsafeSet(DidSchemeHoldAnySharesPage(srn), false)
@@ -582,7 +582,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           userAnswersWithData,
           4,
           0,
-          expectedStatus = TaskListStatus.Completed,
+          expectedStatus = TaskListStatus.Recorded(0, ""),
           expectedTitleKey = "nonsipp.tasklist.shares.title",
           expectedLinkContentKey = "nonsipp.tasklist.shares.change.sponsoringemployer.title",
           expectedLinkUrl = controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController
@@ -608,7 +608,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "completed (with 'No' selection on first page) and only visible with a share existing" in {
+      "Recorded (with 'No' selection on first page) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
           .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), false)
@@ -618,7 +618,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           userAnswersWithData,
           4,
           1,
-          expectedStatus = TaskListStatus.Completed,
+          expectedStatus = TaskListStatus.Recorded(0, ""),
           expectedTitleKey = "nonsipp.tasklist.shares.title",
           expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
           expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
@@ -642,13 +642,13 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           expectedStatus = TaskListStatus.InProgress,
           expectedTitleKey = "nonsipp.tasklist.shares.title",
           expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
-          expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
-            .onPageLoad(srn, page = 1)
+          expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
+            .onPageLoad(srn, NormalMode)
             .url
         )
       }
 
-      "inProgress (with 1 complete and 1 incomplete disposal) and only visible with a share existing" in {
+      "Recorded (with 1 complete and 1 incomplete disposal) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
           .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), true)
@@ -665,7 +665,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           userAnswersWithData,
           4,
           1,
-          expectedStatus = TaskListStatus.InProgress,
+          expectedStatus = TaskListStatus.Recorded(1, "disposals"),
           expectedTitleKey = "nonsipp.tasklist.shares.title",
           expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
           expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
@@ -674,7 +674,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "completed (with only 1 complete disposal) and only visible with a share existing" in {
+      "Recorded (with only 1 complete disposal) and only visible with a share existing" in {
         val userAnswersWithData = defaultUserAnswers
           .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
           .unsafeSet(SharesDisposalPage(srn), true)
@@ -688,7 +688,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           userAnswersWithData,
           4,
           1,
-          expectedStatus = TaskListStatus.Completed,
+          expectedStatus = TaskListStatus.Recorded(1, "disposals"),
           expectedTitleKey = "nonsipp.tasklist.shares.title",
           expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
           expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
@@ -740,7 +740,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "completed and only visible with shares answered" in {
+      "Recorded and only visible with shares answered" in {
         val userAnswersWithData =
           defaultUserAnswers
             .unsafeSet(QuotedSharesManagedFundsHeldPage(srn), true)
@@ -751,7 +751,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           userAnswersWithData,
           7,
           0,
-          expectedStatus = TaskListStatus.Completed,
+          expectedStatus = TaskListStatus.Recorded,
           expectedTitleKey = "nonsipp.tasklist.otherassets.title",
           expectedLinkContentKey = "nonsipp.tasklist.otherassets.change.quotedshares.title",
           expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController

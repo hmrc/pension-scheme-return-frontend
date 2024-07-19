@@ -94,11 +94,11 @@ object TaskListUtils {
 
     val sectionListWithoutDeclaration = getSectionListWithoutDeclaration(srn, schemeName, userAnswers, pensionSchemeId)
 
-    val (numberOfCompletedWithoutDeclaration, numberOfTotalWithoutDeclaration) = evaluateCompletedTotalTuple(
+    val (numSectionsReadyForSubmission, numSectionsTotal) = evaluateReadyForSubmissionTotalTuple(
       sectionListWithoutDeclaration
     )
 
-    val isLinkActive = numberOfTotalWithoutDeclaration == numberOfCompletedWithoutDeclaration
+    val isLinkActive = numSectionsTotal == numSectionsReadyForSubmission
 
     val declarationSectionViewModel =
       getDeclarationSection(
@@ -212,7 +212,7 @@ object TaskListUtils {
           taskListStatus match {
             case NotStarted =>
               controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn).url
-            case Completed =>
+            case Completed | Recorded(_, _) =>
               controllers.nonsipp.memberdetails.routes.SchemeMembersListController
                 .onPageLoad(srn, 1, ManualOrUpload.Manual)
                 .url
@@ -366,7 +366,7 @@ object TaskListUtils {
               controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
                 .onPageLoad(srn, NormalMode)
                 .url
-            case Completed =>
+            case Completed | Recorded(_, _) =>
               controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
                 .onPageLoad(srn, 1, NormalMode)
                 .url
@@ -535,10 +535,15 @@ object TaskListUtils {
       case _ => s"$prefix.change.$suffix"
     }
 
-  def evaluateCompletedTotalTuple(sections: List[TaskListSectionViewModel]): (Int, Int) = {
+  def evaluateReadyForSubmissionTotalTuple(sections: List[TaskListSectionViewModel]): (Int, Int) = {
     val items = sections.flatMap(_.items.fold(_ => Nil, _.toList))
-    val numberOfCompleted = items.count(_.status == Completed)
-    val numberOfTotal = items.length
-    (numberOfCompleted, numberOfTotal)
+    val numSectionsTotal = items.length
+    val numSectionsUnableToStart = items.count(_.status == UnableToStart)
+    val numSectionsNotStarted = items.count(_.status == NotStarted)
+    val numSectionsInProgress = items.count(_.status == InProgress)
+    val numSectionsReadyForSubmission =
+      numSectionsTotal - (numSectionsUnableToStart + numSectionsNotStarted + numSectionsInProgress)
+
+    (numSectionsReadyForSubmission, numSectionsTotal)
   }
 }

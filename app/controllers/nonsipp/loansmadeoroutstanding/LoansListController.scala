@@ -105,7 +105,11 @@ class LoansListController @Inject()(
         Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
       } else {
         val status = getLoansTaskListStatus(request.userAnswers, srn)
-        if (status == TaskListStatus.Completed) {
+        if (status == TaskListStatus.NotStarted) {
+          Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
+        } else if (status == TaskListStatus.InProgress) {
+          Redirect(getIncompleteLoansLink(request.userAnswers, srn))
+        } else {
           loanRecipients(srn)
             .map(
               recipients =>
@@ -124,10 +128,6 @@ class LoansListController @Inject()(
                 )
             )
             .merge
-        } else if (status == TaskListStatus.InProgress) {
-          Redirect(getIncompleteLoansLink(request.userAnswers, srn))
-        } else {
-          Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
         }
       }
     }.merge

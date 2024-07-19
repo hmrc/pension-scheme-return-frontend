@@ -34,6 +34,7 @@ import views.html.TaskListView
 import models.SchemeId.Srn
 import pages.nonsipp.{CompilationOrSubmissionDatePage, WhichTaxYearPage}
 import play.api.Logger
+import utils.nonsipp.TaskListUtils.evaluateReadyForSubmissionTotalTuple
 import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models._
 import viewmodels.DisplayMessage._
@@ -127,7 +128,7 @@ object ViewOnlyTaskListController {
       sectionListWithoutDeclaration.tail :+ declarationSectionViewModel: _*
     )
 
-    val (numberOfCompleted, numberOfTotal) = evaluateCompletedTotalTuple(viewModel.sections.toList)
+    val (numSectionsSubmitted, numSectionsTotal) = evaluateReadyForSubmissionTotalTuple(viewModel.sections.toList)
 
     PageViewModel(
       Message("nonsipp.tasklist.title", dateRange.from.show, dateRange.to.show),
@@ -135,16 +136,8 @@ object ViewOnlyTaskListController {
       viewModel
     ).withDescription(
       Heading2.small("nonsipp.tasklist.subheading.completed") ++
-        ParagraphMessage(Message("nonsipp.tasklist.description", numberOfCompleted, numberOfTotal))
+        ParagraphMessage(Message("nonsipp.tasklist.description", numSectionsSubmitted, numSectionsTotal))
     )
-  }
-
-  private def evaluateCompletedTotalTuple(sections: List[TaskListSectionViewModel]): (Int, Int) = {
-    val items = sections.flatMap(_.items.fold(_ => Nil, _.toList))
-    val numberOfCompleted = items.count(_.status == Completed)
-    val numberOfUpdated = items.count(_.status == Updated)
-    val numberOfTotal = items.length
-    (numberOfCompleted + numberOfUpdated, numberOfTotal)
   }
 
   private def messageKey(prefix: String, suffix: String): String = s"$prefix.view.$suffix"
@@ -295,7 +288,7 @@ object ViewOnlyTaskListController {
         pages.nonsipp.receivetransfer.Paths.memberTransfersIn
       )
 
-    val transferOutTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
+    val transferOutTaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
       pages.nonsipp.membertransferout.Paths.memberTransfersOut
@@ -454,14 +447,14 @@ object ViewOnlyTaskListController {
   ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.shares"
 
-    val sharesTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
+    val sharesTaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
       pages.nonsipp.shares.Paths.shareTransactions,
       Some("disposedSharesTransaction")
     )
 
-    val shareDisposalTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
+    val sharesDisposalsTaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
       pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction
@@ -484,7 +477,7 @@ object ViewOnlyTaskListController {
           .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
           .url
       ),
-      shareDisposalTaskListStatus
+      sharesDisposalsTaskListStatus
     )
 
     val currentSharesCompleted = currentUA.get(SharesCompleted.all(srn)).filter(_.nonEmpty)
@@ -631,7 +624,7 @@ object ViewOnlyTaskListController {
   ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.otherassets"
 
-    val quotedSharesStatusAndLink: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
+    val quotedSharesTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
       pages.nonsipp.totalvaluequotedshares.Paths.quotedShares \ "totalValueQuotedShares"
@@ -657,7 +650,7 @@ object ViewOnlyTaskListController {
           .onPageLoadViewOnly(srn, year, currentVersion, previousVersion)
           .url
       ),
-      quotedSharesStatusAndLink
+      quotedSharesTaskListStatus
     )
 
     val otherAssetsItem = TaskListItemViewModel(

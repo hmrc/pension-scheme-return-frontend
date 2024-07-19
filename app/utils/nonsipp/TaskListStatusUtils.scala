@@ -31,7 +31,7 @@ import pages.nonsipp.landorpropertydisposal.{
 }
 import pages.nonsipp.sharesdisposal._
 import play.api.libs.json.{JsObject, JsPath}
-import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
+import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsCompleted, SurrenderedBenefitsPage}
 import models._
 import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.otherassetsdisposal.{
@@ -51,11 +51,11 @@ import eu.timepit.refined.{refineMV, refineV}
 import viewmodels.models.TaskListStatus._
 import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import pages.nonsipp.common.IdentityTypes
-import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutJourneyStatus}
+import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutSectionCompleted}
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
 import pages.nonsipp.bondsdisposal.{BondsDisposalCompleted, BondsDisposalPage, BondsDisposalProgress}
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
-import viewmodels.models.{SectionStatus, TaskListStatus}
+import viewmodels.models.{SectionCompleted, SectionStatus, TaskListStatus}
 
 object TaskListStatusUtils {
 
@@ -95,14 +95,11 @@ object TaskListStatusUtils {
           NotStarted
         } else {
           val countMemberDetails = memberDetails.size
-          val countCompletedMembers = userAnswers.get(MembersDetailsCompletedPages(srn)) match {
-            case Some(value) => value.size
-            case None => 0
-          }
+          val countCompletedMembers = userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty).size
           if (countMemberDetails > countCompletedMembers) {
             InProgress
           } else {
-            Completed
+            Recorded(countCompletedMembers, "members")
           }
         }
     }
@@ -118,7 +115,7 @@ object TaskListStatusUtils {
       case (None, _, _, _, _) => NotStarted
       case (Some(loansMade), whoReceived, arrears, sponsoring, connected) =>
         if (!loansMade) {
-          Completed
+          Recorded(0, "")
         } else {
           val countLoanTransactions = whoReceived.getOrElse(List.empty).size
           val countLastPage = arrears.getOrElse(List.empty).size
@@ -133,7 +130,7 @@ object TaskListStatusUtils {
             if (countSponsoringAndConnectedPages < countLastPage) {
               InProgress
             } else {
-              Completed
+              Recorded(countLastPage, "loans")
             }
           }
         }
@@ -185,6 +182,7 @@ object TaskListStatusUtils {
           .url
     )
   }
+
   def getNotStartedOrCannotStartYetStatus(userAnswers: UserAnswers, srn: Srn): TaskListStatus =
     getMembersTaskListStatus(userAnswers, srn) match {
       case TaskListStatus.InProgress =>
@@ -193,6 +191,7 @@ object TaskListStatusUtils {
           case None => TaskListStatus.UnableToStart
         }
       case TaskListStatus.Completed => TaskListStatus.NotStarted
+      case TaskListStatus.Recorded(_, _) => TaskListStatus.NotStarted
       case TaskListStatus.UnableToStart => TaskListStatus.UnableToStart
       case TaskListStatus.NotStarted => TaskListStatus.UnableToStart
     }
@@ -266,87 +265,47 @@ object TaskListStatusUtils {
   }
 
   def getTransferOutStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val status = userAnswers.get(TransfersOutJourneyStatus(srn))
     val wereTransfersIn = userAnswers.get(SchemeTransferOutPage(srn))
-    (wereTransfersIn, status) match {
-      case (None, _) =>
-        (
-          getNotStartedOrCannotStartYetStatus(userAnswers, srn),
-          controllers.nonsipp.membertransferout.routes.SchemeTransferOutController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
-      case (Some(false), _) =>
-        (
-          Completed,
-          controllers.nonsipp.membertransferout.routes.SchemeTransferOutController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
-      case (Some(true), None) =>
-        (
-          InProgress,
-          controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
-            .onPageLoad(srn, 1, NormalMode)
-            .url
-        )
-      case (Some(true), Some(SectionStatus.InProgress)) =>
-        (
-          InProgress,
-          controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
-            .onPageLoad(srn, 1, NormalMode)
-            .url
-        )
-      case (Some(true), Some(SectionStatus.Completed)) =>
-        (
-          Completed,
-          controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
-            .onPageLoad(srn, 1, NormalMode)
-            .url
-        )
+    val numReported =
+      userAnswers.map(TransfersOutSectionCompleted.all(srn)).flatten(_._2).count(_._2 == SectionCompleted)
+
+    val firstQuestionPageUrl =
+      controllers.nonsipp.membertransferout.routes.SchemeTransferOutController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    val memberListPageUrl =
+      controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
+
+    (wereTransfersIn, numReported) match {
+      case (None, _) => (getNotStartedOrCannotStartYetStatus(userAnswers, srn), firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0) => (InProgress, firstQuestionPageUrl)
+      case (Some(true), _) => (Recorded(numReported, "transfers"), memberListPageUrl)
     }
   }
 
   def getSurrenderedBenefitsStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val status = userAnswers.get(SurrenderedBenefitsJourneyStatus(srn))
     val wereSurrenderedBenefits = userAnswers.get(SurrenderedBenefitsPage(srn))
+    val numReported = userAnswers.get(SurrenderedBenefitsCompleted.all(srn)).getOrElse(Map.empty).size
 
-    (wereSurrenderedBenefits, status) match {
-      case (None, _) =>
-        (
-          getNotStartedOrCannotStartYetStatus(userAnswers, srn),
-          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
-      case (Some(false), _) =>
-        (
-          Completed,
-          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
-      case (Some(true), None) =>
-        (
-          InProgress,
-          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
-            .onPageLoad(srn, 1, NormalMode)
-            .url
-        )
-      case (Some(true), Some(SectionStatus.InProgress)) =>
-        (
-          InProgress,
-          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
-            .onPageLoad(srn, 1, NormalMode)
-            .url
-        )
-      case (Some(true), Some(SectionStatus.Completed)) =>
-        (
-          Completed,
-          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
-            .onPageLoad(srn, 1, NormalMode)
-            .url
-        )
+    val firstQuestionPageUrl =
+      controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    val memberListPageUrl =
+      controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
+
+    (wereSurrenderedBenefits, numReported) match {
+      case (None, _) => (getNotStartedOrCannotStartYetStatus(userAnswers, srn), firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0) => (InProgress, firstQuestionPageUrl)
+      case (Some(true), _) => (Recorded(numReported, "surrenders"), memberListPageUrl)
     }
   }
 
@@ -459,41 +418,24 @@ object TaskListStatusUtils {
   }
 
   def getUnallocatedContributionsStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
-      .onPageLoad(srn, NormalMode)
-      .url
-    val wereUnallocatedContributions = userAnswers.get(UnallocatedEmployerContributionsPage(srn))
+    val wereUnallocatedContributionsMade = userAnswers.get(UnallocatedEmployerContributionsPage(srn))
     val amount = userAnswers.get(UnallocatedEmployerAmountPage(srn))
 
-    (wereUnallocatedContributions, amount) match {
-      case (None, _) =>
-        (
-          getNotStartedOrCannotStartYetStatus(userAnswers, srn),
-          controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
-      case (Some(false), _) =>
-        (
-          Completed,
-          controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
-      case (Some(true), Some(_)) =>
-        (
-          Completed,
-          controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
-      case (Some(true), None) =>
-        (
-          InProgress,
-          controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
+    val firstQuestionPageUrl =
+      controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    val cyaPageUrl =
+      controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    (wereUnallocatedContributionsMade, amount) match {
+      case (None, _) => (getNotStartedOrCannotStartYetStatus(userAnswers, srn), firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), None) => (InProgress, firstQuestionPageUrl)
+      case (Some(true), Some(_)) => (Recorded, cyaPageUrl)
     }
   }
   def getLandOrPropertyTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
@@ -711,101 +653,84 @@ object TaskListStatusUtils {
     }
 
   def getSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val defaultLink =
+    val wereSharesReported = userAnswers.get(DidSchemeHoldAnySharesPage(srn))
+    val numReported = userAnswers.get(SharesCompleted.all(srn)).getOrElse(Map.empty).size
+
+    val firstQuestionPageUrl =
       controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController
         .onPageLoad(srn, NormalMode)
         .url
+
     val sharesListPageUrl =
       controllers.nonsipp.shares.routes.SharesListController
         .onPageLoad(srn, 1, NormalMode)
         .url
-    val hadSharesPage = userAnswers.get(DidSchemeHoldAnySharesPage(srn))
-    val shareStatusPage = userAnswers.get(SharesJourneyStatus(srn))
+
     val firstPages = userAnswers.get(TypeOfSharesHeldPages(srn))
     val lastPages = userAnswers.map(SharesCompleted.all(srn))
     val incompleteIndex: Int = getIncompleteIndex(firstPages, Some(lastPages))
 
     val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+      _ => firstQuestionPageUrl,
+      index => controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, index, NormalMode).url
+    )
+
+    val someReportedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
       _ => sharesListPageUrl,
       index => controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, index, NormalMode).url
     )
 
-    (hadSharesPage, shareStatusPage) match {
-      case (None, _) => (NotStarted, defaultLink)
-      case (Some(false), _) => (Completed, defaultLink)
-      case (Some(true), None) => (InProgress, inProgressCalculatedUrl)
-      case (Some(true), Some(SectionStatus.Completed)) => (Completed, sharesListPageUrl)
-      case (Some(true), Some(SectionStatus.InProgress)) => (InProgress, inProgressCalculatedUrl)
+    (wereSharesReported, numReported) match {
+      case (None, _) => (NotStarted, firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
+      case (Some(true), _) => (Recorded(numReported, "shares"), someReportedCalculatedUrl)
+      // Todo: check if smart navigation is required when 1+ have been reported - if not, use sharesListPageUrl instead.
     }
   }
 
   def getSharesDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val sharesDisposalsMade = userAnswers.get(SharesDisposalPage(srn))
+    val numReported = userAnswers.map(SharesDisposalProgress.all(srn)).flatten(_._2).count(_._2.completed)
 
-    val didSchemeDisposePage = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
+    val firstQuestionPageUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
       .onPageLoad(srn, NormalMode)
       .url
 
-    val sharesToDisposePage = controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
+    val disposalsListPageUrl = controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
       .onPageLoad(srn, page = 1)
       .url
 
-    val reportedDisposalsPage = controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
-      .onPageLoad(srn, page = 1)
-      .url
-
-    val anyJourneysCompleted = userAnswers
-      .map(SharesDisposalProgress.all(srn))
-      .values
-      .exists(_.values.exists(_.completed))
-
-    val allJourneysCompleted = userAnswers
-      .map(SharesDisposalProgress.all(srn))
-      .values
-      .forall(_.values.forall(_.completed))
-
-    val (status, link) =
-      (userAnswers.get(SharesDisposalPage(srn)), userAnswers.get(SharesDisposalCompleted(srn))) match {
-        // No user answers provided for this section
-        case (None, _) => (NotStarted, didSchemeDisposePage)
-        // User answered "No" for "Did scheme dispose of any shares...?"
-        case (Some(false), _) => (TaskListStatus.Completed, didSchemeDisposePage)
-        // No complete journeys & 1 incomplete journey
-        case (Some(true), None) if !anyJourneysCompleted => (TaskListStatus.InProgress, sharesToDisposePage)
-        // 1 or more complete journeys & 1 or more incomplete journeys
-        case (Some(true), None) if !allJourneysCompleted => (TaskListStatus.InProgress, reportedDisposalsPage)
-        // 1 or more complete journeys & 0 incomplete journeys
-        case (Some(true), None) if allJourneysCompleted => (TaskListStatus.Completed, reportedDisposalsPage)
-        // User answered "No" for "Do you need to report another shares disposal?"
-        case (Some(true), Some(_)) => (TaskListStatus.Completed, reportedDisposalsPage)
-
-        /*
-        // The case shown below is logically equivalent to the last 2 cases shown above, and could replace them,
-        // resulting in less code, but also less clarity, which I think is the most important thing right now. As such,
-        // I've shown both options, but commented this one out for now.
-        case (Some(true), _) => (TaskListStatus.Completed, reportedDisposalsPage)
-       */
-      }
-
-    (status, link)
+    (sharesDisposalsMade, numReported) match {
+      case (None, _) => (NotStarted, firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0) => (InProgress, firstQuestionPageUrl)
+      case (Some(true), _) => (Recorded(numReported, "disposals"), disposalsListPageUrl)
+    }
   }
 
   def getQuotedSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val quotedSharesManagedFundsHeld = userAnswers.get(QuotedSharesManagedFundsHeldPage(srn))
     val totalValueQuotedShares = userAnswers.get(TotalValueQuotedSharesPage(srn))
-    val defaultLink =
+
+    val firstQuestionPageUrl =
       controllers.nonsipp.totalvaluequotedshares.routes.QuotedSharesManagedFundsHeldController
         .onPageLoad(srn, NormalMode)
         .url
 
-    val cyaLink =
+    val cyaPageUrl =
       controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
         .onPageLoad(srn)
         .url
 
     (quotedSharesManagedFundsHeld, totalValueQuotedShares) match {
-      case (Some(false), _) => (Completed, defaultLink)
-      case (_, Some(amount)) => if (amount == Money(0.00)) (Completed, defaultLink) else (Completed, cyaLink)
-      case _ => (NotStarted, defaultLink)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), None) => (InProgress, firstQuestionPageUrl)
+      case (_, Some(amount)) =>
+        if (amount == Money(0)) (Recorded(0, ""), firstQuestionPageUrl) else (Recorded, cyaPageUrl)
+      // The condition above is necessary because there is no boolean field in ETMP where we can store the answer to
+      // the first question page, so a value of 0.00 stored in ETMP indicates that no Quoted Shares were reported.
+      case _ => (NotStarted, firstQuestionPageUrl)
     }
   }
 
