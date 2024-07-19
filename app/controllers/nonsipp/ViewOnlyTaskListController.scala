@@ -16,15 +16,16 @@
 
 package controllers.nonsipp
 
-import pages.nonsipp.bonds.BondsCompleted
 import viewmodels.implicits._
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils._
 import pages.nonsipp.landorproperty.LandOrPropertyCompleted
 import controllers.actions._
-import pages.nonsipp.memberdetails.Paths.personalDetails
+import pages.nonsipp.sharesdisposal.SharesDisposalProgress
 import viewmodels.models.TaskListStatus._
-import play.api.i18n.{I18nSupport, MessagesApi}
+import pages.nonsipp.bonds.BondsCompleted
+import pages.nonsipp.memberdetails.MembersDetailsCompletedPages
+import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, Paths, SharesCompleted}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.OtherAssetsCompleted
@@ -36,8 +37,14 @@ import cats.implicits.toShow
 import pages.nonsipp.memberpensionpayments.Paths.membersPayments
 import pages.nonsipp.WhichTaxYearPage
 import play.api.Logger
+import utils.nonsipp.TaskListUtils.evaluateReadyForSubmissionTotalTuple
+import pages.nonsipp.memberdetails.Paths.personalDetails
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCompleted
 import utils.DateTimeUtils.localDateShow
 import models._
+import pages.nonsipp.membertransferout.TransfersOutSectionCompleted
+import play.api.i18n.{I18nSupport, MessagesApi}
+import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
@@ -123,7 +130,7 @@ object ViewOnlyTaskListController {
       sectionListWithoutDeclaration.tail :+ declarationSectionViewModel: _*
     )
 
-    val (numberOfCompleted, numberOfTotal) = evaluateCompletedTotalTuple(viewModel.sections.toList)
+    val (numSectionsSubmitted, numSectionsTotal) = evaluateReadyForSubmissionTotalTuple(viewModel.sections.toList)
 
     PageViewModel(
       Message("nonsipp.tasklist.title", dateRange.from.show, dateRange.to.show),
@@ -131,16 +138,8 @@ object ViewOnlyTaskListController {
       viewModel
     ).withDescription(
       Heading2.small("nonsipp.tasklist.subheading.completed") ++
-        ParagraphMessage(Message("nonsipp.tasklist.description", numberOfCompleted, numberOfTotal))
+        ParagraphMessage(Message("nonsipp.tasklist.description", numSectionsSubmitted, numSectionsTotal))
     )
-  }
-
-  private def evaluateCompletedTotalTuple(sections: List[TaskListSectionViewModel]): (Int, Int) = {
-    val items = sections.flatMap(_.items.fold(_ => Nil, _.toList))
-    val numberOfCompleted = items.count(_.status == Completed)
-    val numberOfUpdated = items.count(_.status == Updated)
-    val numberOfTotal = items.length
-    (numberOfCompleted + numberOfUpdated, numberOfTotal)
   }
 
   private def messageKey(prefix: String, suffix: String): String = s"$prefix.view.$suffix"
@@ -236,11 +235,16 @@ object ViewOnlyTaskListController {
     previousVersion: Int
   ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.members"
-    val membersTaskListStatus = getCompletedOrUpdatedTaskListStatus(
+    val completedOrUpdated = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
       personalDetails
     )
+
+    val membersTaskListStatus = completedOrUpdated match {
+      case Completed => Reported(currentUA.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty).size)
+      case Updated => Updated
+    }
 
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -274,11 +278,18 @@ object ViewOnlyTaskListController {
       pages.nonsipp.employercontributions.Paths.memberEmpContribution
     )
 
-    val unallocatedEmployerContributionsTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
+    val unallocatedEmployerContributionsCompletedOrUpdated: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
       membersPayments \ "unallocatedContribAmount"
     )
+
+    val unallocatedEmployerContributionsTaskListStatus = unallocatedEmployerContributionsCompletedOrUpdated match {
+      case Completed =>
+        if (currentUA.get(UnallocatedEmployerContributionsPage(srn)).getOrElse(false)) Reported else Reported(0)
+      case Updated =>
+        Updated
+    }
 
     val memberContributionTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
@@ -293,11 +304,18 @@ object ViewOnlyTaskListController {
         pages.nonsipp.receivetransfer.Paths.memberTransfersIn
       )
 
-    val transferOutTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
+    val transferOutCompletedOrUpdated = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
       pages.nonsipp.membertransferout.Paths.memberTransfersOut
     )
+
+    val transferOutTaskListStatus = transferOutCompletedOrUpdated match {
+      case Completed =>
+        Reported(currentUA.map(TransfersOutSectionCompleted.all(srn)).flatten(_._2).count(_._2 == SectionCompleted))
+      case Updated =>
+        Updated
+    }
 
     val pclsMemberTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
@@ -311,11 +329,16 @@ object ViewOnlyTaskListController {
       pages.nonsipp.memberpensionpayments.Paths.memberDetails \ "pensionAmountReceived"
     )
 
-    val surrenderedBenefitsTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
+    val surrenderedBenefitsCompletedOrUpdated: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
       pages.nonsipp.membersurrenderedbenefits.Paths.memberPensionSurrender
     )
+
+    val surrenderedBenefitsTaskListStatus = surrenderedBenefitsCompletedOrUpdated match {
+      case Completed => Reported(currentUA.get(SurrenderedBenefitsCompleted.all(srn)).getOrElse(Map.empty).size)
+      case Updated => Updated
+    }
 
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -450,18 +473,28 @@ object ViewOnlyTaskListController {
   ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.shares"
 
-    val sharesTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
+    val sharesCompletedOrUpdated = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
       pages.nonsipp.shares.Paths.shareTransactions,
       Some("disposedSharesTransaction")
     )
 
-    val shareDisposalTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
+    val sharesTaskListStatus = sharesCompletedOrUpdated match {
+      case Completed => Reported(currentUA.get(SharesCompleted.all(srn)).getOrElse(Map.empty).size)
+      case Updated => Updated
+    }
+
+    val sharesDisposalsCompletedOrUpdated = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
       pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction
     )
+
+    val sharesDisposalsTaskListStatus = sharesDisposalsCompletedOrUpdated match {
+      case Completed => Reported(currentUA.map(SharesDisposalProgress.all(srn)).flatten(_._2).count(_._2.completed))
+      case Updated => Updated
+    }
 
     val sharesItem = TaskListItemViewModel(
       LinkMessage(
@@ -478,7 +511,7 @@ object ViewOnlyTaskListController {
         messageKey("nonsipp.tasklist.sharesdisposal", "title"),
         controllers.routes.UnauthorisedController.onPageLoad().url
       ),
-      shareDisposalTaskListStatus
+      sharesDisposalsTaskListStatus
     )
 
     val currentSharesCompleted = currentUA.get(SharesCompleted.all(srn)).filter(_.nonEmpty)
@@ -617,11 +650,23 @@ object ViewOnlyTaskListController {
   ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.otherassets"
 
-    val quotedSharesStatusAndLink: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
+    val quotedSharesCompletedOrUpdated: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
       Paths.shares \ "totalValueQuotedShares"
     )
+
+    val quotedSharesTaskListStatus = quotedSharesCompletedOrUpdated match {
+      case Completed =>
+        currentUA.get(TotalValueQuotedSharesPage(srn)) match {
+          case Some(amount) if !amount.isZero => Reported
+          // The condition above is necessary because there is no boolean field in ETMP where we can store the answer to
+          // the first question page, so a value of 0.00 stored in ETMP indicates that no Quoted Shares were reported.
+          case _ => Reported(0)
+        }
+      case Updated =>
+        Updated
+    }
 
     val otherAssetsTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
@@ -641,7 +686,7 @@ object ViewOnlyTaskListController {
         messageKey(prefix, "quotedshares.title"),
         controllers.routes.UnauthorisedController.onPageLoad().url
       ),
-      quotedSharesStatusAndLink
+      quotedSharesTaskListStatus
     )
 
     val otherAssetsItem = TaskListItemViewModel(
