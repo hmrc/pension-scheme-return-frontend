@@ -155,7 +155,7 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
               compilationOrSubmissionDate = Some(submissionDateTwo)
             )
           )
-      }
+      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
     act.like(
       redirectToPage(
