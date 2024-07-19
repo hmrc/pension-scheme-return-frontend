@@ -99,30 +99,10 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateToWithData(
             HowManyMembersPage(_, pensionSchemeIdGen.sample.value),
-            Gen.chooseNum(1, 99).map(SchemeMemberNumbers(_, 0, 0)),
+            Gen.chooseNum(1, 300).map(SchemeMemberNumbers(_, 0, 0)),
             routes.BasicDetailsCheckYourAnswersController.onPageLoad
           )
-          .withName("go from how many members page to check your answers page when less than 100 members")
-      )
-
-      act.like(
-        normalmode
-          .navigateToWithData(
-            HowManyMembersPage(_, psaIdGen.sample.value),
-            Gen.chooseNum(100, 1000).map(SchemeMemberNumbers(_, 0, 0)),
-            (srn, _) => declaration.routes.PsaDeclarationController.onPageLoad(srn)
-          )
-          .withName("go from how many members to psa declaration when more than 99 members and psa signed in")
-      )
-
-      act.like(
-        normalmode
-          .navigateToWithData(
-            HowManyMembersPage(_, pspIdGen.sample.value),
-            Gen.chooseNum(100, 1000).map(SchemeMemberNumbers(_, 0, 0)),
-            (srn, _) => declaration.routes.PspDeclarationController.onPageLoad(srn)
-          )
-          .withName("go from how many members to psp declaration when more than 99 members and psp signed in")
+          .withName("go from How Many Members to Basic Details CYA (for any number of members)")
       )
     }
 
@@ -132,6 +112,16 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         checkmode
           .navigateTo(_ => UnknownPage, (_, _) => controllers.routes.IndexController.onPageLoad())
           .withName("redirect any unknown pages to index page")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithData(
+            HowManyMembersPage(_, pensionSchemeIdGen.sample.value),
+            Gen.chooseNum(1, 300).map(SchemeMemberNumbers(_, 0, 0)),
+            routes.BasicDetailsCheckYourAnswersController.onPageLoad
+          )
+          .withName("go from How Many Members to Basic Details CYA (for any number of members)")
       )
     }
   }

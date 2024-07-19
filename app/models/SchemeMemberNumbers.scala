@@ -21,7 +21,7 @@ import play.api.libs.json.{Format, Json}
 
 case class SchemeMemberNumbers(noOfActiveMembers: Int, noOfDeferredMembers: Int, noOfPensionerMembers: Int) {
 
-  val total: Int = noOfActiveMembers + noOfDeferredMembers + noOfPensionerMembers
+  val totalActiveAndDeferred: Int = noOfActiveMembers + noOfDeferredMembers
 }
 
 object SchemeMemberNumbers {

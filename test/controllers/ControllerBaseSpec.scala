@@ -81,7 +81,8 @@ trait ControllerBaseSpec
           bind[DataRequiredAction].to[DataRequiredActionImpl],
           bind[IdentifierAction].to[FakeIdentifierAction],
           bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails, minimalDetails)),
-          bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
+          bind[DataRetrievalAction]
+            .toInstance(new FakeDataRetrievalAction(userAnswers, pureUserAnswers, previousUserAnswers)),
           bind[DataRetrievalETMPActionProvider]
             .toInstance(
               new FakeDataRetrievalETMPActionProvider(userAnswers, pureUserAnswers, previousUserAnswers)

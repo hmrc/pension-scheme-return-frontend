@@ -16,26 +16,28 @@
 
 package controllers.nonsipp
 
-import services.{AuditService, PsrSubmissionService, SchemeDateService}
+import services._
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
 import controllers.{nonsipp, PSRController}
 import utils.nonsipp.TaskListStatusUtils.getBasicDetailsTaskListStatus
-import cats.implicits.toShow
+import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import _root_.config.Constants.{PSA, PSP}
+import pages.nonsipp.memberdetails.Paths.memberDetails
 import viewmodels.models.TaskListStatus.Updated
 import models.requests.DataRequest
 import _root_.config.Refined.Max3
 import models.audit.PSRStartAuditEvent
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
-import cats.data.NonEmptyList
+import cats.data.{EitherT, NonEmptyList}
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import pages.nonsipp.{BasicDetailsCheckYourAnswersPage, CompilationOrSubmissionDatePage, WhichTaxYearPage}
+import pages.nonsipp._
 import navigation.Navigator
+import play.api.libs.json.JsObject
 import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models._
 import play.api.i18n._
@@ -56,6 +58,8 @@ class BasicDetailsCheckYourAnswersController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   psrSubmissionService: PsrSubmissionService,
   auditService: AuditService,
+  psrVersionsService: PsrVersionsService,
+  psrRetrievalService: PsrRetrievalService,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -113,29 +117,98 @@ class BasicDetailsCheckYourAnswersController @Inject()(
     psrSubmissionService
       .submitPsrDetails(srn, fallbackCall = controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
       .map {
-        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        case None =>
+          Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         case Some(_) =>
-          (
+          val eitherResultOrFutureResult: Either[Result, Future[Result]] =
             for {
               taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
               schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
               userName <- loggedInUserNameOrRedirect
               _ = auditService.sendEvent(buildAuditEvent(taxYear, schemeMemberNumbers, userName))
             } yield {
-              mode match {
-                case NormalMode =>
-                  Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
-                case CheckMode =>
-                  val members = request.userAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
-                  if (members.exists(_.total > 99)) { // as we cannot access pensionSchemeId in the navigator
-                    Redirect(nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn))
-                  } else {
+              calculateNextPage(srn)
+            }
+
+          // Transform Either[Result, Future[Result]] into a Future[Result]
+          EitherT(eitherResultOrFutureResult.sequence).merge
+      }
+      .flatten
+  }
+
+  /**
+   * This method determines whether the user proceeds directly to the Task List page or skips to the Declaration page.
+   *
+   * This is dependent on two factors: (1) the number of Active & Deferred members in the scheme, and (2) whether any
+   * 'full' returns have been submitted for this scheme before.
+   *
+   * If the number of Active + Deferred members > 99, and no 'full' returns have been submitted for this scheme, then
+   * the user will skip to the Declaration page. In all other cases, they will proceed to the Task List page.
+   *
+   * A 'full' return must include at least 1 member, while a 'skipped' return will contain no member details at all, so
+   * we use {{{.get(memberDetails).getOrElse(JsObject.empty).as[JsObject] == JsObject.empty}}} to determine whether or
+   * not a retrieved set of `UserAnswers` refers to a 'full' or 'skipped' return.
+   */
+  private def calculateNextPage(srn: Srn)(implicit request: DataRequest[AnyContent]): Future[Result] = {
+
+    // Determine next page in case of Declaration redirect
+    val declarationPage = if (request.pensionSchemeId.isPSP) {
+      nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
+    } else {
+      nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
+    }
+
+    // Determine if the member threshold is reached
+    val currentSchemeMembers = request.userAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
+    if (currentSchemeMembers.exists(_.totalActiveAndDeferred > 99)) {
+      // If so, then determine if a full return was submitted this tax year
+      val noFullReturnSubmittedThisTaxYear = request.previousUserAnswers match {
+        case Some(previousUserAnswers) =>
+          previousUserAnswers.get(memberDetails).getOrElse(JsObject.empty).as[JsObject] == JsObject.empty
+        case None =>
+          true
+      }
+
+      if (noFullReturnSubmittedThisTaxYear) {
+        // If so, then determine if a full return was submitted last tax year
+        request.userAnswers.get(WhichTaxYearPage(srn)) match {
+          case Some(currentReturnTaxYear) =>
+            val previousTaxYear = formatDateForApi(currentReturnTaxYear.from.minusYears(1))
+            val previousTaxYearVersions = psrVersionsService.getVersions(request.schemeDetails.pstr, previousTaxYear)
+
+            previousTaxYearVersions.map { psrVersionsResponses =>
+              if (psrVersionsResponses.nonEmpty) {
+                // If so, then determine if the latest submitted return from last year was a full return
+                val latestVersionNumber = "%03d".format(psrVersionsResponses.map(_.reportVersion).max)
+                val latestReturnFromPreviousTaxYear = psrRetrievalService.getAndTransformStandardPsrDetails(
+                  optPeriodStartDate = Some(previousTaxYear),
+                  optPsrVersion = Some(latestVersionNumber),
+                  fallBackCall = controllers.routes.OverviewController.onPageLoad(request.srn)
+                )
+
+                latestReturnFromPreviousTaxYear.map { previousUserAnswers =>
+                  val noFullReturnSubmittedLastTaxYear =
+                    previousUserAnswers.get(memberDetails).getOrElse(JsObject.empty).as[JsObject] == JsObject.empty
+
+                  if (noFullReturnSubmittedLastTaxYear) { // Redirect triggered: no 'full' returns submitted last year
+                    Redirect(declarationPage)
+                  } else { // No redirect triggered: 'full' return submitted last year
                     Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), NormalMode, request.userAnswers))
                   }
+                }
+              } else { // Redirect triggered: no returns of any kind submitted last year
+                Future(Redirect(declarationPage))
               }
-            }
-          ).merge
+            }.flatten
+          case None => // Couldn't get current return's tax year, so something's gone wrong
+            Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+      } else { // No redirect: full return was submitted earlier this tax year
+        Future(Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), NormalMode, request.userAnswers)))
       }
+    } else { // No redirect: too few Active & Deferred members
+      Future(Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), NormalMode, request.userAnswers)))
+    }
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
