@@ -16,7 +16,7 @@
 
 package handlers
 
-import play.api.mvc.{Request, RequestHeader, Result}
+import play.api.mvc.{RequestHeader, Result}
 import play.twirl.api.Html
 import views.html.ErrorTemplate
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
@@ -25,7 +25,7 @@ import play.api.{Logger, PlayException}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Results.Redirect
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Singleton}
 
@@ -33,15 +33,16 @@ import javax.inject.{Inject, Singleton}
 class ErrorHandler @Inject()(
   val messagesApi: MessagesApi,
   view: ErrorTemplate
-) extends FrontendErrorHandler
+)(implicit override protected val ec: ExecutionContext)
+    extends FrontendErrorHandler
     with I18nSupport {
 
   private val logger = Logger(getClass)
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(
-    implicit rh: Request[_]
-  ): Html =
-    view(pageTitle, heading, message)
+    implicit rh: RequestHeader
+  ): Future[Html] =
+    Future.successful(view(pageTitle, heading, message))
 
   private def logError(request: RequestHeader, ex: Throwable): Unit =
     logger.error(

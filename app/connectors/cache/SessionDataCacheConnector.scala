@@ -21,14 +21,15 @@ import com.google.inject.ImplementedBy
 import config.FrontendAppConfig
 import models.cache.SessionData
 import play.api.Logger
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
+import uk.gov.hmrc.http.client.HttpClientV2
 import utils.FutureUtils.FutureOps
 
 import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
 
-class SessionDataCacheConnectorImpl @Inject()(config: FrontendAppConfig, http: HttpClient)
+class SessionDataCacheConnectorImpl @Inject()(config: FrontendAppConfig, http: HttpClientV2)
     extends SessionDataCacheConnector {
 
   private def url(cacheId: String): String =
@@ -36,12 +37,14 @@ class SessionDataCacheConnectorImpl @Inject()(config: FrontendAppConfig, http: H
 
   override def fetch(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SessionData]] =
     http
-      .GET[Option[SessionData]](url(cacheId))
+      .get(url"${url(cacheId)}")
+      .execute[Option[SessionData]]
       .tapError(t => Future.successful(logger.error(s"Failed to fetch $cacheId with message ${t.getMessage}")))
 
   override def remove(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
-      .DELETE[Unit](url(cacheId))
+      .delete(url"${url(cacheId)}")
+      .execute[Unit]
       .tapError(t => Future.successful(logger.error(s"Failed to delete $cacheId with message ${t.getMessage}")))
 }
 
