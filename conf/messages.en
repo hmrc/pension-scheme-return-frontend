@@ -3202,6 +3202,9 @@ otherAssets.cya.crn = Company Registration Number (CRN)
 otherAssets.cya.utr = Unique Taxpayer Reference (UTR)
 otherAssets.cya.details = details
 
+otherAssets.viewOnly.title = View details of asset
+otherAssets.viewOnly.heading = Details of asset
+
 otherAssets.change.title = Change details for asset
 otherAssets.change.heading = Change details for asset
 

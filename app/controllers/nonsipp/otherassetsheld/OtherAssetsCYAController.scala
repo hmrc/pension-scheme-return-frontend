@@ -19,18 +19,21 @@ package controllers.nonsipp.otherassetsheld
 import controllers.nonsipp.otherassetsheld.OtherAssetsCYAController._
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import utils.ListUtils.ListOps
 import config.Refined.Max5000
 import controllers.PSRController
-import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
-import navigation.Navigator
 import pages.nonsipp.common._
+import models.requests.DataRequest
 import pages.nonsipp.otherassetsheld._
 import models.PointOfEntry.NoPointOfEntry
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import cats.implicits.toShow
+import controllers.nonsipp.routes
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
 import models.SchemeHoldAsset._
@@ -41,7 +44,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
 class OtherAssetsCYAController @Inject()(
@@ -55,7 +58,7 @@ class OtherAssetsCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = {
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       //Clear any PointOfEntry
       saveService.save(
@@ -63,125 +66,143 @@ class OtherAssetsCYAController @Inject()(
           .set(OtherAssetsCYAPointOfEntry(srn, index), NoPointOfEntry)
           .getOrElse(request.userAnswers)
       )
+      onPageLoadCommon(srn, index, mode)(implicitly)
+    }
 
-      (
-        for {
+  def onPageLoadViewOnly(
+    srn: Srn,
+    index: Max5000,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn, index, mode)(implicitly)
+    }
 
-          description <- request.userAnswers
-            .get(WhatIsOtherAssetPage(srn, index))
-            .getOrRecoverJourney
+  def onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+    (
+      for {
 
-          isTangibleMoveableProperty <- request.userAnswers
-            .get(IsAssetTangibleMoveablePropertyPage(srn, index))
-            .getOrRecoverJourney
+        description <- request.userAnswers
+          .get(WhatIsOtherAssetPage(srn, index))
+          .getOrRecoverJourney
 
-          whyHeld <- request.userAnswers
-            .get(WhyDoesSchemeHoldAssetsPage(srn, index))
-            .getOrRecoverJourney
+        isTangibleMoveableProperty <- request.userAnswers
+          .get(IsAssetTangibleMoveablePropertyPage(srn, index))
+          .getOrRecoverJourney
 
-          acquisitionOrContributionDate = Option.when(whyHeld != Transfer)(
+        whyHeld <- request.userAnswers
+          .get(WhyDoesSchemeHoldAssetsPage(srn, index))
+          .getOrRecoverJourney
+
+        acquisitionOrContributionDate = Option.when(whyHeld != Transfer)(
+          request.userAnswers
+            .get(WhenDidSchemeAcquireAssetsPage(srn, index))
+            .get
+        )
+
+        sellerIdentityType = Option.when(whyHeld == Acquisition)(
+          request.userAnswers
+            .get(IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller))
+            .get
+        )
+
+        sellerName = Option.when(whyHeld == Acquisition)(
+          List(
+            request.userAnswers.get(IndividualNameOfOtherAssetSellerPage(srn, index)),
+            request.userAnswers.get(CompanyNameOfOtherAssetSellerPage(srn, index)),
+            request.userAnswers.get(PartnershipOtherAssetSellerNamePage(srn, index)),
             request.userAnswers
-              .get(WhenDidSchemeAcquireAssetsPage(srn, index))
-              .get
-          )
+              .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.OtherAssetSeller))
+              .map(_.name)
+          ).flatten.head
+        )
 
-          sellerIdentityType = Option.when(whyHeld == Acquisition)(
+        sellerDetails = Option.when(whyHeld == Acquisition)(
+          List(
             request.userAnswers
-              .get(IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller))
-              .get
-          )
-
-          sellerName = Option.when(whyHeld == Acquisition)(
-            List(
-              request.userAnswers.get(IndividualNameOfOtherAssetSellerPage(srn, index)),
-              request.userAnswers.get(CompanyNameOfOtherAssetSellerPage(srn, index)),
-              request.userAnswers.get(PartnershipOtherAssetSellerNamePage(srn, index)),
-              request.userAnswers
-                .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.OtherAssetSeller))
-                .map(_.name)
-            ).flatten.head
-          )
-
-          sellerDetails = Option.when(whyHeld == Acquisition)(
-            List(
-              request.userAnswers
-                .get(OtherAssetIndividualSellerNINumberPage(srn, index))
-                .flatMap(_.value.toOption.map(_.value)),
-              request.userAnswers
-                .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.OtherAssetSeller))
-                .flatMap(_.value.toOption.map(_.value)),
-              request.userAnswers
-                .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.OtherAssetSeller))
-                .flatMap(_.value.toOption.map(_.value)),
-              request.userAnswers
-                .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.OtherAssetSeller))
-                .map(_.description)
-            ).flatten.headOption
-          )
-
-          sellerReasonNoDetails = Option.when(whyHeld == Acquisition)(
-            List(
-              request.userAnswers
-                .get(OtherAssetIndividualSellerNINumberPage(srn, index))
-                .flatMap(_.value.swap.toOption.map(_.value)),
-              request.userAnswers
-                .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.OtherAssetSeller))
-                .flatMap(_.value.swap.toOption.map(_.value)),
-              request.userAnswers
-                .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.OtherAssetSeller))
-                .flatMap(_.value.swap.toOption.map(_.value))
-            ).flatten.headOption
-          )
-
-          isSellerConnectedParty = Option.when(whyHeld == Acquisition)(
+              .get(OtherAssetIndividualSellerNINumberPage(srn, index))
+              .flatMap(_.value.toOption.map(_.value)),
             request.userAnswers
-              .get(OtherAssetSellerConnectedPartyPage(srn, index))
-              .get
-          )
-
-          totalCost <- request.userAnswers
-            .get(CostOfOtherAssetPage(srn, index))
-            .getOrRecoverJourney
-
-          isIndependentValuation = Option.when(whyHeld != Transfer)(
+              .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.OtherAssetSeller))
+              .flatMap(_.value.toOption.map(_.value)),
             request.userAnswers
-              .get(IndependentValuationPage(srn, index))
-              .get
-          )
+              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.OtherAssetSeller))
+              .flatMap(_.value.toOption.map(_.value)),
+            request.userAnswers
+              .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.OtherAssetSeller))
+              .map(_.description)
+          ).flatten.headOption
+        )
 
-          totalIncome <- request.userAnswers
-            .get(IncomeFromAssetPage(srn, index))
-            .getOrRecoverJourney
+        sellerReasonNoDetails = Option.when(whyHeld == Acquisition)(
+          List(
+            request.userAnswers
+              .get(OtherAssetIndividualSellerNINumberPage(srn, index))
+              .flatMap(_.value.swap.toOption.map(_.value)),
+            request.userAnswers
+              .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.OtherAssetSeller))
+              .flatMap(_.value.swap.toOption.map(_.value)),
+            request.userAnswers
+              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.OtherAssetSeller))
+              .flatMap(_.value.swap.toOption.map(_.value))
+          ).flatten.headOption
+        )
 
-          schemeName = request.schemeDetails.schemeName
+        isSellerConnectedParty = Option.when(whyHeld == Acquisition)(
+          request.userAnswers
+            .get(OtherAssetSellerConnectedPartyPage(srn, index))
+            .get
+        )
 
-        } yield Ok(
-          view(
-            viewModel(
-              ViewModelParameters(
-                srn,
-                index,
-                schemeName,
-                description,
-                isTangibleMoveableProperty,
-                whyHeld,
-                acquisitionOrContributionDate,
-                sellerIdentityType,
-                sellerName,
-                sellerDetails.flatten,
-                sellerReasonNoDetails.flatten,
-                isSellerConnectedParty,
-                totalCost,
-                isIndependentValuation,
-                totalIncome,
-                mode
-              )
-            )
+        totalCost <- request.userAnswers
+          .get(CostOfOtherAssetPage(srn, index))
+          .getOrRecoverJourney
+
+        isIndependentValuation = Option.when(whyHeld != Transfer)(
+          request.userAnswers
+            .get(IndependentValuationPage(srn, index))
+            .get
+        )
+
+        totalIncome <- request.userAnswers
+          .get(IncomeFromAssetPage(srn, index))
+          .getOrRecoverJourney
+
+        schemeName = request.schemeDetails.schemeName
+
+      } yield Ok(
+        view(
+          viewModel(
+            ViewModelParameters(
+              srn,
+              index,
+              schemeName,
+              description,
+              isTangibleMoveableProperty,
+              whyHeld,
+              acquisitionOrContributionDate,
+              sellerIdentityType,
+              sellerName,
+              sellerDetails.flatten,
+              sellerReasonNoDetails.flatten,
+              isSellerConnectedParty,
+              totalCost,
+              isIndependentValuation,
+              totalIncome,
+              mode
+            ),
+            viewOnlyUpdated = false, // flag is not displayed on this tier
+            optYear = request.year,
+            optCurrentVersion = request.currentVersion,
+            optPreviousVersion = request.previousVersion,
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
           )
         )
-      ).merge
-    }
-  }
+      )
+    ).merge
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -202,6 +223,12 @@ class OtherAssetsCYAController @Inject()(
           }
       } yield Redirect(redirectTo)
     }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+    }
+
 }
 
 case class ViewModelParameters(
@@ -224,15 +251,25 @@ case class ViewModelParameters(
 )
 
 object OtherAssetsCYAController {
-  def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
+  def viewModel(
+    parameters: ViewModelParameters,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
+      mode = parameters.mode,
       title = parameters.mode.fold(
         normal = "otherAssets.cya.title",
-        check = "otherAssets.change.title"
+        check = "otherAssets.change.title",
+        viewOnly = "otherAssets.viewOnly.title"
       ),
       heading = parameters.mode.fold(
         normal = "otherAssets.cya.heading",
-        check = "otherAssets.change.heading"
+        check = "otherAssets.change.heading",
+        viewOnly = "otherAssets.viewOnly.heading"
       ),
       description = None,
       page = CheckYourAnswersViewModel(
@@ -241,9 +278,33 @@ object OtherAssetsCYAController {
       refresh = None,
       buttonText = parameters.mode.fold(
         normal = "site.saveAndContinue",
-        check = "site.continue"
+        check = "site.continue",
+        viewOnly = "site.continue"
       ),
-      onSubmit = routes.OtherAssetsCYAController.onSubmit(parameters.srn, parameters.index, parameters.mode)
+      onSubmit = controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
+        .onSubmit(parameters.srn, parameters.index, parameters.mode),
+      optViewOnlyDetails = if (parameters.mode.isViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = None,
+            submittedText = Some(Message("")),
+            title = "otherAssets.viewOnly.title",
+            heading = Message("otherAssets.viewOnly.heading"),
+            buttonText = "site.continue",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
+                  .onSubmitViewOnly(parameters.srn, year, currentVersion, previousVersion)
+              case _ =>
+                controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
+                  .onSubmit(parameters.srn, parameters.index, parameters.mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
 
   private def sections(parameters: ViewModelParameters): List[CheckYourAnswersSection] = {
@@ -405,11 +466,17 @@ object OtherAssetsCYAController {
 
     val sellerNameUrl = sellerIdentityType match {
       case IdentityType.Individual =>
-        routes.IndividualNameOfOtherAssetSellerController.onPageLoad(srn, index, CheckMode).url
+        controllers.nonsipp.otherassetsheld.routes.IndividualNameOfOtherAssetSellerController
+          .onPageLoad(srn, index, CheckMode)
+          .url
       case IdentityType.UKCompany =>
-        routes.CompanyNameOfOtherAssetSellerController.onPageLoad(srn, index, CheckMode).url
+        controllers.nonsipp.otherassetsheld.routes.CompanyNameOfOtherAssetSellerController
+          .onPageLoad(srn, index, CheckMode)
+          .url
       case IdentityType.UKPartnership =>
-        routes.PartnershipNameOfOtherAssetsSellerController.onPageLoad(srn, index, CheckMode).url
+        controllers.nonsipp.otherassetsheld.routes.PartnershipNameOfOtherAssetsSellerController
+          .onPageLoad(srn, index, CheckMode)
+          .url
       case IdentityType.Other =>
         controllers.nonsipp.common.routes.OtherRecipientDetailsController
           .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller)
@@ -418,7 +485,7 @@ object OtherAssetsCYAController {
 
     val sellerDetailsUrl = sellerIdentityType match {
       case IdentityType.Individual =>
-        routes.OtherAssetIndividualSellerNINumberController
+        controllers.nonsipp.otherassetsheld.routes.OtherAssetIndividualSellerNINumberController
           .onPageLoad(srn, index, CheckMode)
           .url
       case IdentityType.UKCompany =>

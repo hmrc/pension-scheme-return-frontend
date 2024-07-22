@@ -183,7 +183,7 @@ object MoneyBorrowedCYAController {
       refresh = None,
       buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
       onSubmit = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onSubmit(srn, index, mode),
-      optViewOnlyDetails = if (mode == ViewOnlyMode) {
+      optViewOnlyDetails = if (mode.isViewOnlyMode) {
         Some(
           ViewOnlyDetailsViewModel(
             updated = viewOnlyUpdated,

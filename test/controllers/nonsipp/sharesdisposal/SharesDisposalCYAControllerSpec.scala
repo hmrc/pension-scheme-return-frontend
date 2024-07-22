@@ -177,8 +177,6 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
                 schemeName,
                 mode
               ),
-              srn,
-              mode,
               viewOnlyUpdated = true
             )
           )
@@ -215,8 +213,6 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
                 schemeName,
                 mode
               ),
-              srn,
-              mode,
               viewOnlyUpdated = true
             )
           )
@@ -253,8 +249,6 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
                 schemeName,
                 mode
               ),
-              srn,
-              mode,
               viewOnlyUpdated = true
             )
           )
@@ -291,8 +285,6 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
                 schemeName,
                 mode
               ),
-              srn,
-              mode,
               viewOnlyUpdated = true
             )
           )
@@ -380,8 +372,6 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
                 schemeName,
                 ViewOnlyMode
               ),
-              srn,
-              ViewOnlyMode,
               viewOnlyUpdated = false,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),

@@ -24,12 +24,13 @@ import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
-import uk.gov.hmrc.domain.Nino
 import models._
 import pages.nonsipp.common.IdentityTypePage
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import pages.nonsipp.FbVersionPage
+import uk.gov.hmrc.domain.Nino
 
 import scala.concurrent.Future
 
@@ -56,6 +57,21 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
 
   private def onPageLoad(mode: Mode) = routes.OtherAssetsCYAController.onPageLoad(srn, index, mode)
   private def onSubmit(mode: Mode) = routes.OtherAssetsCYAController.onSubmit(srn, index, mode)
+
+  private lazy val onSubmitViewOnly = routes.OtherAssetsCYAController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private lazy val onPageLoadViewOnly = routes.OtherAssetsCYAController.onPageLoadViewOnly(
+    srn,
+    index,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(WhatIsOtherAssetPage(srn, index), otherAssetDescription)
@@ -93,7 +109,8 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
                 isIndependentValuation = Some(true),
                 totalIncome = money,
                 mode = mode
-              )
+              ),
+              viewOnlyUpdated = true
             )
           )
         }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
@@ -128,4 +145,69 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
       )
     }
   }
+
+  "OtherAssetsCYAController in view only mode" - {
+
+    val currentUserAnswers = defaultUserAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(WhatIsOtherAssetPage(srn, index), otherAssetDescription)
+      .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, index), true)
+      .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index), SchemeHoldAsset.Acquisition)
+      .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, index), localDate)
+      .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.Individual)
+      .unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, index), individualName)
+      .unsafeSet(OtherAssetIndividualSellerNINumberPage(srn, index), ConditionalYesNo.yes[String, Nino](nino))
+      .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, index), true)
+      .unsafeSet(CostOfOtherAssetPage(srn, index), money)
+      .unsafeSet(IndependentValuationPage(srn, index), true)
+      .unsafeSet(IncomeFromAssetPage(srn, index), money)
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(IncomeFromAssetPage(srn, index), money)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                index,
+                schemeName,
+                description = otherAssetDescription,
+                isTangibleMoveableProperty = true,
+                whyHeld = SchemeHoldAsset.Acquisition,
+                acquisitionOrContributionDate = Some(localDate),
+                sellerIdentityType = Some(IdentityType.Individual),
+                sellerName = Some(individualName),
+                sellerDetails = Some(nino.toString),
+                sellerReasonNoDetails = None,
+                isSellerConnectedParty = Some(true),
+                totalCost = money,
+                isIndependentValuation = Some(true),
+                totalIncome = money,
+                mode = ViewOnlyMode
+              ),
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
+    )
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only taskList")
+    )
+  }
+
 }
