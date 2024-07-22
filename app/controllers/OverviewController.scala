@@ -52,7 +52,6 @@ class OverviewController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   psrOverviewService: PsrOverviewService,
   psrVersionsService: PsrVersionsService,
-  psrRetrievalService: PsrRetrievalService,
   saveService: SaveService,
   view: OverviewView,
   taxYearService: TaxYearService
@@ -205,15 +204,15 @@ class OverviewController @Inject()(
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).async { implicit request =>
-      val toDate = formatDateForApi(allDates.toList.head._2.from)
-      val fromDate = formatDateForApi(allDates.toList.reverse.head._2.from)
+      val toDate = formatDateForApi(allDates.head._2.from)
+      val fromDate = formatDateForApi(allDates.last._2.from)
       val labelView = messagesApi.preferred(request)("site.viewOrChange")
       val labelStart = messagesApi.preferred(request)("site.start")
       val labelContinue = messagesApi.preferred(request)("site.continue")
       for {
         overviewResponse <- psrOverviewService.getOverview(request.schemeDetails.pstr, fromDate, toDate)
         getVersionsResponse <- psrVersionsService
-          .getVersionsForYears(request.schemeDetails.pstr, allDates.toList.map(dates => dates._2.from.toString))
+          .getVersionsForYears(request.schemeDetails.pstr, allDates.drop(1).map(dates => dates._2.from.toString))
         outstanding = outstandingData(srn, overviewResponse, labelStart, labelContinue)
         previous = previousData(srn, getVersionsResponse, overviewResponse, labelView, labelContinue, outstanding)
       } yield Ok(view(outstanding, previous, request.schemeDetails.schemeName))
@@ -265,12 +264,12 @@ class OverviewController @Inject()(
 
 object OverviewController {
 
-  def options(startingTaxYear: TaxYear): Enumerable[DateRange] = {
+  def options(startingTaxYear: TaxYear): List[(String, DateRange)] = {
 
-    val taxYears = List.iterate(startingTaxYear, 7)(_.previous)
+    val taxYears = startingTaxYear.next +: List.iterate(startingTaxYear, 7)(_.previous)
 
     val taxYearRanges = taxYears.map(DateRange.from).map(r => (r.toString, r))
 
-    Enumerable(taxYearRanges: _*)
+    Enumerable(taxYearRanges: _*).toList
   }
 }
