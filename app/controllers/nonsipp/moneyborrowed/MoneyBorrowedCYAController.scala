@@ -20,14 +20,13 @@ import services.PsrSubmissionService
 import viewmodels.implicits._
 import play.api.mvc._
 import config.Refined.Max5000
+import cats.implicits.toShow
 import controllers.actions._
 import models.requests.DataRequest
 import controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController._
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import cats.implicits.toShow
-import controllers.nonsipp.routes
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
@@ -120,9 +119,14 @@ class MoneyBorrowedCYAController @Inject()(
         }
     }
 
-  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
-      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
+            .onPageLoadViewOnly(srn, page, year, current, previous)
+        )
+      )
     }
 
 }
@@ -196,7 +200,7 @@ object MoneyBorrowedCYAController {
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+                  .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
                   .onSubmit(srn, index, mode)
