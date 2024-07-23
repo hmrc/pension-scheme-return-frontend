@@ -18,7 +18,9 @@ package connectors
 
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import config.FrontendAppConfig
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.client.HttpClientV2
 import models._
 import play.mvc.Http.HeaderNames
 
@@ -26,15 +28,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
 
-class UpscanConnector @Inject()(httpClient: HttpClient, appConfig: FrontendAppConfig)(
+class UpscanConnector @Inject()(httpClientV2: HttpClientV2, appConfig: FrontendAppConfig)(
   implicit ec: ExecutionContext
 ) {
 
   private val maxFileSizeMB = appConfig.upscanMaxFileSize
 
-  private val headers = Map(
-    HeaderNames.CONTENT_TYPE -> "application/json"
-  )
+  private val header = HeaderNames.CONTENT_TYPE -> "application/json"
 
   def initiate(
     callBackUrl: String,
@@ -48,8 +48,11 @@ class UpscanConnector @Inject()(httpClient: HttpClient, appConfig: FrontendAppCo
       maximumFileSize = Some(maxFileSizeMB * (1024 * 1024))
     )
 
-    httpClient
-      .POST[UpscanInitiateRequest, PreparedUpload](appConfig.urls.upscan.initiate, request, headers.toSeq)
+    httpClientV2
+      .post(url"${appConfig.urls.upscan.initiate}")
+      .withBody(Json.toJson(request))
+      .setHeader(header)
+      .execute[PreparedUpload]
       .map { response =>
         val fileReference = UpscanFileReference(response.reference.reference)
         val postTarget = response.uploadRequest.href
@@ -59,5 +62,7 @@ class UpscanConnector @Inject()(httpClient: HttpClient, appConfig: FrontendAppCo
   }
 
   def download(downloadUrl: String)(implicit hc: HeaderCarrier): Future[HttpResponse] =
-    httpClient.GET[HttpResponse](downloadUrl)
+    httpClientV2
+      .get(url"$downloadUrl")
+      .execute[HttpResponse]
 }
