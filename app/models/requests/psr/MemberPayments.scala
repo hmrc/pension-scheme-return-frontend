@@ -75,7 +75,7 @@ case class MemberLumpSumReceived(
   lumpSumAmount: Double,
   designatedPensionAmount: Double
 ) {
-  val zero: Boolean = lumpSumAmount == 0d && designatedPensionAmount == 0d
+  val isZero: Boolean = lumpSumAmount == 0d && designatedPensionAmount == 0d
 }
 
 object MemberLumpSumReceived {

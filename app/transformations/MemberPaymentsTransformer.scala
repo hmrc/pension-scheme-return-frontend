@@ -159,7 +159,7 @@ class MemberPaymentsTransformer @Inject()(
 
       val normalise = (memberDetails: MemberDetails) => {
         memberDetails.copy(
-          memberLumpSumReceived = if (memberDetails.memberLumpSumReceived.exists(_.zero)) {
+          memberLumpSumReceived = if (memberDetails.memberLumpSumReceived.exists(_.isZero)) {
             None
           } else {
             memberDetails.memberLumpSumReceived
