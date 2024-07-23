@@ -75,7 +75,11 @@ case class MemberLumpSumReceived(
   lumpSumAmount: Double,
   designatedPensionAmount: Double
 ) {
-  val zero: Boolean = lumpSumAmount == 0.0 && designatedPensionAmount == 0.0
+  val zero: Boolean = lumpSumAmount == 0d && designatedPensionAmount == 0d
+}
+
+object MemberLumpSumReceived {
+  val zero: MemberLumpSumReceived = MemberLumpSumReceived(0d, 0d)
 }
 
 sealed trait EmployerType
