@@ -44,33 +44,35 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
 
   private lazy val onSubmit =
     controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onSubmit(srn, page, NormalMode)
-  private lazy val onSubmitViewOnly = controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onSubmitViewOnly(
-    srn,
-    yearString,
-    submissionNumberTwo,
-    submissionNumberOne
-  )
-  private lazy val onPageLoadViewOnly = controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoadViewOnly(
-    srn,
-    1,
-    yearString,
-    submissionNumberTwo,
-    submissionNumberOne
-  )
-  private lazy val onPreviousViewOnly = controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPreviousViewOnly(
-    srn,
-    1,
-    yearString,
-    submissionNumberTwo,
-    submissionNumberOne
-  )
+  private lazy val onSubmitViewOnly =
+    controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onSubmitViewOnly(
+      srn,
+      yearString,
+      submissionNumberTwo,
+      submissionNumberOne
+    )
+  private lazy val onPageLoadViewOnly =
+    controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoadViewOnly(
+      srn,
+      1,
+      yearString,
+      submissionNumberTwo,
+      submissionNumberOne
+    )
+  private lazy val onPreviousViewOnly =
+    controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPreviousViewOnly(
+      srn,
+      1,
+      yearString,
+      submissionNumberTwo,
+      submissionNumberOne
+    )
 
   private val userAnswers =
     defaultUserAnswers
       .unsafeSet(MoneyBorrowedPage(srn), false)
       .unsafeSet(LenderNamePages(srn), Map("0" -> lenderName))
       .unsafeSet(BorrowedAmountAndRatePage(srn, index), (money, percentage))
-
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
@@ -117,32 +119,29 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(LenderNamePages(srn), Map("0" -> lenderName))
       .unsafeSet(BorrowedAmountAndRatePage(srn, index), (money, percentage))
 
-
     val previousUserAnswers = currentUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
       .unsafeSet(BorrowedAmountAndRatePage(srn, index), (money, percentage))
 
-
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-        implicit app =>
-          implicit request =>
-            injected[ListView]
-              .apply(
-                form(injected[YesNoPageFormProvider]),
-                viewModel(
-                  srn,
-                 mode = ViewOnlyMode,
-                  page = 1,
-                  borrowingInstances = List((index, lenderName, money)),
-                  viewOnlyUpdated = false,
-                  optYear = Some(yearString),
-                  optCurrentVersion = Some(submissionNumberTwo),
-                  optPreviousVersion = Some(submissionNumberOne),
-                  compilationOrSubmissionDate = Some(submissionDateTwo)
-                )
+        implicit app => implicit request =>
+          injected[ListView]
+            .apply(
+              form(injected[YesNoPageFormProvider]),
+              viewModel(
+                srn,
+                mode = ViewOnlyMode,
+                page = 1,
+                borrowingInstances = List((index, lenderName, money)),
+                viewOnlyUpdated = false,
+                optYear = Some(yearString),
+                optCurrentVersion = Some(submissionNumberTwo),
+                optPreviousVersion = Some(submissionNumberOne),
+                compilationOrSubmissionDate = Some(submissionDateTwo)
               )
+            )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
 
@@ -151,23 +150,22 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-        implicit app =>
-          implicit request =>
-            injected[ListView]
-              .apply(
-                form(injected[YesNoPageFormProvider]),
-                viewModel(
-                  srn,
-                  mode = ViewOnlyMode,
-                  page = 1,
-                  borrowingInstances = List((index, lenderName, money)),
-                  viewOnlyUpdated = false,
-                  optYear = Some(yearString),
-                  optCurrentVersion = Some(submissionNumberTwo),
-                  optPreviousVersion = Some(submissionNumberOne),
-                  compilationOrSubmissionDate = Some(submissionDateTwo)
-                )
+        implicit app => implicit request =>
+          injected[ListView]
+            .apply(
+              form(injected[YesNoPageFormProvider]),
+              viewModel(
+                srn,
+                mode = ViewOnlyMode,
+                page = 1,
+                borrowingInstances = List((index, lenderName, money)),
+                viewOnlyUpdated = false,
+                optYear = Some(yearString),
+                optCurrentVersion = Some(submissionNumberTwo),
+                optPreviousVersion = Some(submissionNumberOne),
+                compilationOrSubmissionDate = Some(submissionDateTwo)
               )
+            )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
     )
 
@@ -177,8 +175,8 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.routes.ViewOnlyTaskListController
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-      )
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
         .withName("Submit redirects to view only tasklist")
     )
 

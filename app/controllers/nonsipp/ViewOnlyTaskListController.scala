@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils._
 import pages.nonsipp.landorproperty.LandOrPropertyCompleted
+import controllers.actions._
 import pages.nonsipp.memberdetails.Paths.personalDetails
 import viewmodels.models.TaskListStatus._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -33,8 +34,6 @@ import views.html.TaskListView
 import models.SchemeId.Srn
 import cats.implicits.toShow
 import pages.nonsipp.memberpensionpayments.Paths.membersPayments
-import controllers.actions._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.WhichTaxYearPage
 import play.api.Logger
 import utils.DateTimeUtils.localDateShow
@@ -428,8 +427,8 @@ object ViewOnlyTaskListController {
       TaskListItemViewModel(
         LinkMessage(
           Message(messageKey(prefix, "moneyborrowed.title"), schemeName),
-          controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-            .onPageLoadViewOnly(srn, refineMV(1), year, currentVersion, previousVersion)
+          controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
             .url
         ),
         borrowingTaskListStatus
