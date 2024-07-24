@@ -51,6 +51,7 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onSubmitViewOnly = routes.MoneyBorrowedCYAController.onSubmitViewOnly(
     srn,
+    1,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -160,12 +161,12 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+        controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )
-        .withName("Submit redirects to view only tasklist")
+        .withName("Submit redirects to view only BorrowInstancesListController page")
     )
   }
 

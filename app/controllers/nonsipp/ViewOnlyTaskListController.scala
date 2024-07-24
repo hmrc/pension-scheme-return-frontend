@@ -427,7 +427,9 @@ object ViewOnlyTaskListController {
       TaskListItemViewModel(
         LinkMessage(
           Message(messageKey(prefix, "moneyborrowed.title"), schemeName),
-          controllers.routes.UnauthorisedController.onPageLoad().url
+          controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .url
         ),
         borrowingTaskListStatus
       )
