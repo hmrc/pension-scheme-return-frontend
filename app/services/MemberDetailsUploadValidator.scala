@@ -42,8 +42,9 @@ import scala.math.Integral.Implicits.infixIntegralOps
 import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicInteger
 import java.time.format.{DateTimeFormatter, FormatStyle}
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class MemberDetailsUploadValidator @Inject()(
   nameDOBFormProvider: NameDOBFormProvider,
   textFormProvider: TextFormProvider,

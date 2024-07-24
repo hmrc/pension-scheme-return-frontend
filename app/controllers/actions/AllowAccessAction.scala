@@ -32,8 +32,9 @@ import models.requests.{AllowedAccessRequest, IdentifierRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class AllowAccessAction(
   srn: Srn,
   appConfig: FrontendAppConfig,

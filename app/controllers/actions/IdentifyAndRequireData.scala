@@ -27,6 +27,9 @@ import play.api.mvc.Results.Redirect
 
 import scala.concurrent.{ExecutionContext, Future}
 
+import javax.inject.Singleton
+
+@Singleton
 class IdentifyAndRequireData @Inject()(
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,

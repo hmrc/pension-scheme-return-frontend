@@ -26,8 +26,9 @@ import utils.JsonUtils._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class AddressLookupConnector @Inject()(http: HttpClientV2, appConfig: FrontendAppConfig)(
   implicit ec: ExecutionContext
 ) {

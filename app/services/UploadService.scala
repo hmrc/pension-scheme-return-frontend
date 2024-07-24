@@ -27,8 +27,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.{Clock, Instant}
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class UploadService @Inject()(
   upscanConnector: UpscanConnector,
   repository: UploadRepository,

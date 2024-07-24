@@ -27,8 +27,9 @@ import models.requests.DataRequest
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class PsrRetrievalService @Inject()(
   psrConnector: PSRConnector,
   minimalRequiredSubmissionTransformer: MinimalRequiredSubmissionTransformer,

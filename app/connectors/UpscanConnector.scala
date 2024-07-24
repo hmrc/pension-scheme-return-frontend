@@ -26,8 +26,9 @@ import play.mvc.Http.HeaderNames
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class UpscanConnector @Inject()(httpClientV2: HttpClientV2, appConfig: FrontendAppConfig)(
   implicit ec: ExecutionContext
 ) {

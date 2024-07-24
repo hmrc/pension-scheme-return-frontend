@@ -22,8 +22,9 @@ import models.{ALFAddressResponse, Address, LookupAddress}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class AddressService @Inject()(connector: AddressLookupConnector)(
   implicit ec: ExecutionContext
 ) {
