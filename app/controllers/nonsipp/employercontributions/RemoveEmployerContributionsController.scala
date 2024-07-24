@@ -58,9 +58,13 @@ class RemoveEmployerContributionsController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          total <- request.userAnswers.get(TotalEmployerContributionPage(srn, memberIndex, index)).getOrRecoverJourney
-          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney
-          employerName <- request.userAnswers.get(EmployerNamePage(srn, memberIndex, index)).getOrRecoverJourney
+          total <- request.userAnswers
+            .get(TotalEmployerContributionPage(srn, memberIndex, index))
+            .getOrRedirectToTaskList(srn)
+          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRedirectToTaskList(srn)
+          employerName <- request.userAnswers
+            .get(EmployerNamePage(srn, memberIndex, index))
+            .getOrRedirectToTaskList(srn)
         } yield Ok(
           view(form, viewModel(srn, memberIndex: Max300, index: Max50, total, nameDOB.fullName, employerName))
         )

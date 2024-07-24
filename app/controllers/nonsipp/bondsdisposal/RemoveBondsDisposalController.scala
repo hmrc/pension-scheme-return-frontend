@@ -56,16 +56,20 @@ class RemoveBondsDisposalController @Inject()(
 
   def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(NameOfBondsPage(srn, bondIndex)).getOrRecoverJourney { nameOfBonds =>
-        val preparedForm =
-          request.userAnswers.fillForm(RemoveBondsDisposalPage(srn, bondIndex, disposalIndex), form)
-        Ok(
-          view(
-            preparedForm,
-            viewModel(srn, bondIndex, disposalIndex, nameOfBonds)
+      (
+        for {
+          nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, bondIndex)).getOrRedirectToTaskList(srn)
+        } yield {
+          val preparedForm =
+            request.userAnswers.fillForm(RemoveBondsDisposalPage(srn, bondIndex, disposalIndex), form)
+          Ok(
+            view(
+              preparedForm,
+              viewModel(srn, bondIndex, disposalIndex, nameOfBonds)
+            )
           )
-        )
-      }
+        }
+      ).merge
     }
 
   def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50): Action[AnyContent] =

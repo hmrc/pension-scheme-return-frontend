@@ -54,17 +54,21 @@ class RemoveBondsController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(NameOfBondsPage(srn, index)).getOrRecoverJourney { nameOfBonds =>
-        val preparedForm =
-          request.userAnswers.fillForm(RemoveBondsPage(srn, index), form)
-        Ok(
-          view(
-            preparedForm,
-            RemoveBondsController
-              .viewModel(srn, index, nameOfBonds, mode)
+      (
+        for {
+          nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, index)).getOrRedirectToTaskList(srn)
+        } yield {
+          val preparedForm =
+            request.userAnswers.fillForm(RemoveBondsPage(srn, index), form)
+          Ok(
+            view(
+              preparedForm,
+              RemoveBondsController
+                .viewModel(srn, index, nameOfBonds, mode)
+            )
           )
-        )
-      }
+        }
+      ).merge
     }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =

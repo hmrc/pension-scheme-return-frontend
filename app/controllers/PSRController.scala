@@ -23,8 +23,14 @@ import org.slf4j.LoggerFactory
 import config.Refined._
 import play.api.libs.json.{Reads, Writes}
 import models.backend.responses.{IndividualDetails, PsrVersionsResponse}
+import pages.nonsipp.membersurrenderedbenefits.{
+  SurrenderedBenefitsAmountPage,
+  WhenDidMemberSurrenderBenefitsPage,
+  WhyDidMemberSurrenderBenefitsPage
+}
 import models._
 import cats.Applicative
+import viewmodels.models.Flag
 import models.requests.DataRequest
 import eu.timepit.refined.api.{Refined, Validate}
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
@@ -39,17 +45,9 @@ import models.requests.psr._
 import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
 import cats.syntax.either._
 import eu.timepit.refined.refineV
-import pages.nonsipp.memberpayments.Paths.membersPayments
-import pages.nonsipp.membersurrenderedbenefits.{
-  SurrenderedBenefitsAmountPage,
-  WhenDidMemberSurrenderBenefitsPage,
-  WhyDidMemberSurrenderBenefitsPage
-}
 import pages.nonsipp.membertransferout._
 import play.api.i18n.I18nSupport
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import pages.nonsipp.memberpayments.Omitted
-import viewmodels.models.Flag
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -121,10 +119,6 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
         }
     }
 
-  def memberPaymentsChanged(implicit request: DataRequest[_]): Boolean = request.pureUserAnswers.exists(
-    !_.sameAs(request.userAnswers, membersPayments, Omitted.membersPayments: _*)
-  )
-
   implicit class OptionOps[A](maybe: Option[A]) {
     def getOrRecoverJourney[F[_]: Applicative](f: A => F[Result]): F[Result] = maybe match {
       case Some(value) => f(value)
@@ -149,6 +143,11 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
     def getOrRecoverJourneyT(implicit ec: ExecutionContext): EitherT[Future, Result, A] = maybe match {
       case Some(value) => EitherT.right(Future.successful(value))
       case None => EitherT.left(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+    }
+
+    def getOrRedirectToTaskList(srn: Srn): Either[Result, A] = maybe match {
+      case Some(value) => Right(value)
+      case None => Left(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
     }
   }
   implicit class FutureOps[A](f: Future[A]) {

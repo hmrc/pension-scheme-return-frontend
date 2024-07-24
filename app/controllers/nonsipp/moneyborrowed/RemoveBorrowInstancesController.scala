@@ -56,18 +56,20 @@ class RemoveBorrowInstancesController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      (for {
-        borrows <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney
-        lenderName <- request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney
-      } yield {
-        val preparedForm = request.userAnswers.fillForm(RemoveBorrowInstancesPage(srn, index), form)
-        Ok(
-          view(
-            preparedForm,
-            RemoveBorrowInstancesController.viewModel(srn, index, mode, borrows._1.displayAs, lenderName)
+      (
+        for {
+          borrows <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRedirectToTaskList(srn)
+          lenderName <- request.userAnswers.get(LenderNamePage(srn, index)).getOrRedirectToTaskList(srn)
+        } yield {
+          val preparedForm = request.userAnswers.fillForm(RemoveBorrowInstancesPage(srn, index), form)
+          Ok(
+            view(
+              preparedForm,
+              RemoveBorrowInstancesController.viewModel(srn, index, mode, borrows._1.displayAs, lenderName)
+            )
           )
-        )
-      }).merge
+        }
+      ).merge
   }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {

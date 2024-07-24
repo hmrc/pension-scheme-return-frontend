@@ -43,7 +43,7 @@ class AllowAccessAction(
 )(implicit override val executionContext: ExecutionContext)
     extends ActionFunction[IdentifierRequest, AllowedAccessRequest] {
 
-  val validStatuses: List[SchemeStatus] = List(Open, WoundUp, Deregistered)
+  private val validStatuses: List[SchemeStatus] = List(Open, WoundUp, Deregistered)
 
   override def invokeBlock[A](
     request: IdentifierRequest[A],

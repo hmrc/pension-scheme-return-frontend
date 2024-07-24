@@ -37,7 +37,7 @@ class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
     .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), period)
     .unsafeSet(AccountingPeriodPage(srn, refineMV(2), NormalMode), otherPeriod)
 
-  "RemoveSchemeBankAccountController" - {
+  "RemoveAccountingPeriodController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[YesNoPageView]
@@ -48,7 +48,7 @@ class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
       )
     })
 
-    act.like(redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad()))
+    act.like(redirectToPage(onPageLoad, controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 

@@ -55,9 +55,13 @@ class RemoveAssetDisposalController @Inject()(
 
   def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(WhatIsOtherAssetPage(srn, assetIndex)).getOrRecoverJourney { otherAsset =>
-        Ok(view(form, viewModel(srn, assetIndex, disposalIndex, otherAsset)))
-      }
+      (
+        for {
+          otherAsset <- request.userAnswers.get(WhatIsOtherAssetPage(srn, assetIndex)).getOrRedirectToTaskList(srn)
+        } yield {
+          Ok(view(form, viewModel(srn, assetIndex, disposalIndex, otherAsset)))
+        }
+      ).merge
     }
 
   def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50): Action[AnyContent] =

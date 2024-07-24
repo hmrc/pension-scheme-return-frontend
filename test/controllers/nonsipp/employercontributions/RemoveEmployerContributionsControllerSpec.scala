@@ -68,6 +68,8 @@ class RemoveEmployerContributionsControllerSpec extends ControllerBaseSpec {
       )
     })
 
+    act.like(redirectToPage(onPageLoad, controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
+
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(continueNoSave(onSubmit, userAnswers, "value" -> "false"))

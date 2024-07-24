@@ -58,10 +58,10 @@ class RemoveTransferInController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney
+          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRedirectToTaskList(srn)
           transferringSchemeName <- request.userAnswers
             .get(TransferringSchemeNamePage(srn, memberIndex, index))
-            .getOrRecoverJourney
+            .getOrRedirectToTaskList(srn)
         } yield Ok(
           view(form, viewModel(srn, memberIndex: Max300, index: Max5, nameDOB.fullName, transferringSchemeName))
         )

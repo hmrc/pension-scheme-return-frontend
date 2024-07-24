@@ -61,11 +61,13 @@ class RemoveLoanController @Inject()(
 
   private def getResult(srn: Srn, index: Max5000, mode: Mode, form: Form[Boolean], error: Boolean = false)(
     implicit request: DataRequest[_]
-  ) = {
-    val whoReceivedLoanPage = request.userAnswers
-      .get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
-    whoReceivedLoanPage match {
-      case Some(who) => {
+  ) =
+    (
+      for {
+        who <- request.userAnswers
+          .get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
+          .getOrRedirectToTaskList(srn)
+      } yield {
         val recipientName =
           who match {
             case IdentityType.Individual =>
@@ -97,9 +99,7 @@ class RemoveLoanController @Inject()(
           }
         )
       }
-      case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-    }
-  }
+    ).merge
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>

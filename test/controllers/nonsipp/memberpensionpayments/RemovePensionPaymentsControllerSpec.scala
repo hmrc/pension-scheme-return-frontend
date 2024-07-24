@@ -68,6 +68,8 @@ class RemovePensionPaymentsControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
+    act.like(redirectToPage(onPageLoad, controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
+
     act.like(
       continueNoSave(onSubmit, userAnswers, "value" -> "false")
         .after(verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))

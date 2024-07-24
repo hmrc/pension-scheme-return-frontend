@@ -20,18 +20,18 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
 import config.Refined.Max3
+import controllers.PSRController
 import controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController._
 import cats.implicits.toShow
 import controllers.actions._
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, RemoveAccountingPeriodPage}
 import navigation.Navigator
 import forms.YesNoPageFormProvider
+import play.api.i18n.{I18nSupport, MessagesApi}
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import utils.DateTimeUtils.localDateShow
 import models.{DateRange, Mode}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import models.requests.DataRequest
@@ -50,7 +50,7 @@ class RemoveAccountingPeriodController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+    extends PSRController
     with I18nSupport {
 
   private val form = RemoveAccountingPeriodController.form(formProvider)
@@ -92,10 +92,13 @@ class RemoveAccountingPeriodController @Inject()(
   private def withAccountingPeriodAtIndex(srn: Srn, index: Max3, mode: Mode)(
     f: DateRange => Result
   )(implicit request: DataRequest[_]): Result =
-    request.userAnswers.get(AccountingPeriodPage(srn, index, mode)) match {
-      case Some(bankAccount) => f(bankAccount)
-      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-    }
+    (
+      for {
+        bankAccount <- request.userAnswers.get(AccountingPeriodPage(srn, index, mode)).getOrRedirectToTaskList(srn)
+      } yield {
+        f(bankAccount)
+      }
+    ).merge
 
 }
 
