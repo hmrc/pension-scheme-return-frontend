@@ -23,8 +23,9 @@ import models.requests.{DataRequest, OptionalDataRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class DataCreationActionImpl @Inject()(sessionRepository: SessionRepository)(
   implicit val executionContext: ExecutionContext
 ) extends DataCreationAction {

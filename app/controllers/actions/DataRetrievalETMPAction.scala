@@ -31,8 +31,9 @@ import models.requests.{AllowedAccessRequest, DataRequest, OptionalDataRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class DataRetrievalETMPAction(
   sessionRepository: SessionRepository,
   psrRetrievalService: PsrRetrievalService

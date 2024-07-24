@@ -23,8 +23,9 @@ import models.requests.{AllowedAccessRequest, OptionalDataRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class DataRetrievalActionImpl @Inject()(
   val sessionRepository: SessionRepository
 )(implicit val executionContext: ExecutionContext)

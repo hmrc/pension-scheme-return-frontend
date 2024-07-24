@@ -20,7 +20,7 @@ import connectors.cache.SessionDataCacheConnector
 import play.api.mvc._
 import com.google.inject.ImplementedBy
 import controllers.routes
-import config.{Constants, FrontendAppConfig}
+import _root_.config.{Constants, FrontendAppConfig}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.mvc.Results._
@@ -35,11 +35,12 @@ import models.cache.PensionSchemeUser.{Administrator, Practitioner}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 @ImplementedBy(classOf[IdentifierActionImpl])
 trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent]
 
+@Singleton
 class IdentifierActionImpl @Inject()(
   appConfig: FrontendAppConfig,
   override val authConnector: AuthConnector,
