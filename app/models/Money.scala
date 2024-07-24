@@ -27,6 +27,8 @@ case class Money(value: Double, displayAs: String) {
 
 object Money {
 
+  val zero: Money = apply(0.0)
+
   def apply(value: Double): Money =
     Money(value, new DecimalFormat("#,##0.00").format(value))
 

@@ -16,7 +16,6 @@
 
 package transformations
 
-import pages.nonsipp.memberdetails._
 import com.google.inject.Singleton
 import pages.nonsipp.memberdetails.MembersDetailsPage._
 import config.Refined.{Max300, Max50}
@@ -28,6 +27,8 @@ import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransferOutMember
 import models.softdelete.SoftDeletedMember
 import cats.syntax.traverse._
 import pages.nonsipp.employercontributions._
+import utils.Diff
+import pages.nonsipp.memberdetails._
 import pages.nonsipp.membercontributions.{
   MemberContributionsListPage,
   MemberContributionsPage,
@@ -156,6 +157,22 @@ class MemberPaymentsTransformer @Inject()(
         }
       }
 
+      val normalise = (memberDetails: MemberDetails) => {
+        memberDetails.copy(
+          memberLumpSumReceived = if (memberDetails.memberLumpSumReceived.exists(_.isZero)) {
+            None
+          } else {
+            memberDetails.memberLumpSumReceived
+          },
+          pensionAmountReceived =
+            if (memberDetails.pensionAmountReceived.contains(0.0)) None
+            else memberDetails.pensionAmountReceived,
+          totalContributions =
+            if (memberDetails.totalContributions.contains(0.0)) None
+            else memberDetails.totalContributions
+        )
+      }
+
       // Omit memberPSRVersion if member has changed
       // Check for empty member payment sections before comparing members
       // (this is because we send empty records in certain sections for members)
@@ -163,28 +180,23 @@ class MemberPaymentsTransformer @Inject()(
       // Note: This will be changing soon when we re-design statuses
       val memberDetailsWithCorrectVersion: List[MemberDetails] = memberDetailsWithCorrectState.map {
         case (index, currentMemberDetail) =>
-          val optInitialMemberDetail = initialMemberDetails.get(index)
-          val refinedCurrentMember =
-            currentMemberDetail
-              .copy(
-                memberLumpSumReceived =
-                  if (currentMemberDetail.memberLumpSumReceived.exists(_.zero)) None
-                  else currentMemberDetail.memberLumpSumReceived,
-                pensionAmountReceived =
-                  if (currentMemberDetail.pensionAmountReceived.contains(0.0)) None
-                  else currentMemberDetail.pensionAmountReceived,
-                totalContributions =
-                  if (currentMemberDetail.totalContributions.contains(0.0)) None
-                  else currentMemberDetail.totalContributions
+          initialMemberDetails.get(index) match {
+            case None =>
+              currentMemberDetail.copy(memberPSRVersion = None)
+            case Some(initialMemberDetail) =>
+              val normalisedInitialMember = normalise(initialMemberDetail)
+              val normalisedCurrentMember = normalise(currentMemberDetail)
+              val same = normalisedInitialMember == normalisedCurrentMember
+              if (!same) {
+                logger.info(s"member $index has changed, removing memberPSRVersion")
+                if(logger.isDebugEnabled) {
+                  logger.debug(Diff(normalisedInitialMember, normalisedCurrentMember).mkString(" - "))
+                }
+              }
+              currentMemberDetail.copy(
+                memberPSRVersion = if (same) currentMemberDetail.memberPSRVersion else None
               )
-          val same = optInitialMemberDetail.contains(refinedCurrentMember)
-          if (!same) {
-            logger.info(s"member $index has changed, removing memberPSRVersion")
           }
-          currentMemberDetail.copy(
-            memberPSRVersion =
-              if (optInitialMemberDetail.contains(currentMemberDetail)) currentMemberDetail.memberPSRVersion else None
-          )
       }.toList
 
       (memberDetailsWithCorrectVersion, softDeletedMembers) match {
