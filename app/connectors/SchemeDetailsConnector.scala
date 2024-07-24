@@ -31,8 +31,9 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2)
     extends SchemeDetailsConnector {
 

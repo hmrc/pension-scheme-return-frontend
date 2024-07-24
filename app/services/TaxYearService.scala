@@ -20,8 +20,9 @@ import com.google.inject.ImplementedBy
 import uk.gov.hmrc.time.{CurrentTaxYear, TaxYear}
 
 import java.time.LocalDate
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class TaxYearServiceImpl @Inject() extends TaxYearService with CurrentTaxYear {
   override def now: () => LocalDate = () => LocalDate.now()
 }

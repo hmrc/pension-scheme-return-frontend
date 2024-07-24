@@ -32,6 +32,9 @@ import scala.language.implicitConversions
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
+import javax.inject.Singleton
+
+@Singleton
 class AuditService @Inject()(
   config: FrontendAppConfig,
   connector: AuditConnector

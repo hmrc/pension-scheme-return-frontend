@@ -31,6 +31,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import scala.concurrent.{ExecutionContext, Future}
 
 import java.nio.charset.StandardCharsets
+import javax.inject.Singleton
 import java.net.URLEncoder
 
 sealed trait EmailStatus
@@ -39,6 +40,7 @@ case object EmailSent extends WithName("EmailSent") with EmailStatus
 
 case object EmailNotSent extends WithName("EmailNotSent") with EmailStatus
 
+@Singleton
 class EmailConnector @Inject()(
   appConfig: FrontendAppConfig,
   http: HttpClientV2,

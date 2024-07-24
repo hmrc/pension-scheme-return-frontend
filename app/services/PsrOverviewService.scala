@@ -22,8 +22,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class PsrOverviewService @Inject()(psrConnector: PSRConnector) {
   def getOverview(pstr: String, fromDate: String, toDate: String)(
     implicit hc: HeaderCarrier,

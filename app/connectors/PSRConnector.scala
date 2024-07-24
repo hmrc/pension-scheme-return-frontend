@@ -32,8 +32,9 @@ import uk.gov.hmrc.http._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
 
   private val baseUrl = appConfig.pensionSchemeReturn.baseUrl

@@ -24,8 +24,9 @@ import models.{MinimalSchemeDetails, PensionSchemeId}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class SchemeDetailsServiceImpl @Inject()(schemeDetailsConnector: SchemeDetailsConnector) extends SchemeDetailsService {
 
   def getMinimalSchemeDetails(

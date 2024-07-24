@@ -37,8 +37,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+@Singleton
 class PsrSubmissionService @Inject()(
   psrConnector: PSRConnector,
   schemeDateService: SchemeDateService,
