@@ -16,18 +16,22 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import services.PsrSubmissionService
+import org.mockito.Mockito._
 import models.ConditionalYesNo._
 import config.Refined.{Max5000, OneTo5000}
 import controllers.ControllerBaseSpec
 import views.html.ListView
-import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider
 import models._
 import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, PartnershipRecipientUtrPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import eu.timepit.refined.api.Refined
+import org.mockito.ArgumentMatchers.any
 import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
 import eu.timepit.refined.refineMV
+import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
+import uk.gov.hmrc.domain.Nino
 
 class LoansListControllerSpec extends ControllerBaseSpec {
   private val subject = IdentitySubject.LoanRecipient
@@ -79,11 +83,35 @@ class LoansListControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit = routes.LoansListController.onSubmit(srn, page = 1, NormalMode)
   private lazy val onLoansMadePageLoad = routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
 
+  private lazy val onSubmitViewOnly = routes.LoansListController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+  private lazy val onPageLoadViewOnly = routes.LoansListController.onPageLoadViewOnly(
+    srn,
+    1,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+  private lazy val onPreviousViewOnly = routes.LoansListController.onPreviousViewOnly(
+    srn,
+    1,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+  private val page = 1
+
   private val recipients: List[(Max5000, String, Money)] = List(
     (indexOne, "recipientName1", money),
     (indexTwo, "recipientName2", money),
     (indexThree, "recipientName3", money)
   )
+
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   "LandOrPropertyDisposalListController" - {
 
@@ -94,7 +122,8 @@ class LoansListControllerSpec extends ControllerBaseSpec {
           srn,
           1,
           NormalMode,
-          recipients
+          recipients,
+          viewOnlyUpdated = false
         )
       )
     }.withName("Completed Journey"))
@@ -121,5 +150,79 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+  }
+
+  "LoansListController in view only mode" - {
+    val currentUserAnswers = completedUserAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[ListView].apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              recipients,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
+    )
+
+    val updatedUserAnswers = currentUserAnswers
+      .unsafeSet(AreRepaymentsInstalmentsPage(srn, indexOne), true)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[ListView].apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              recipients,
+              viewOnlyUpdated = true,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
+
+    act.like(
+      redirectToPage(
+        onPreviousViewOnly,
+        controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+      ).withName(
+        "Submit previous view only redirects to the controller with parameters for the previous submission"
+      )
+    )
   }
 }

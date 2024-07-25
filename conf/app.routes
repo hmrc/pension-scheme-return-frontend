@@ -405,6 +405,12 @@ GET         /:srn/change-loans                                                  
 GET         /:srn/change-loans/:page                                                    controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
 POST        /:srn/change-loans/:page                                                    controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
 
+POST        /:srn/change-loans/:page                                                    controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmit(srn: Srn, page: Int, mode: Mode = ViewOnlyMode)
+GET         /:srn/loans/view/:year/:current/:previous                                   controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoadViewOnly(srn: Srn, page: Int = 1, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/loans/:page/view/:year/:current/:previous                             controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoadViewOnly(srn: Srn, page: Int, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/loans/:page/previous/:year/:current/:previous                         controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int)
+GET         /:srn/submit-loans/view/:year/:current/:previous                            controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
+
 GET         /:srn/security-given-for-loan                                               controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
 GET         /:srn/security-given-for-loan/:index                                        controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 POST        /:srn/security-given-for-loan                                               controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
