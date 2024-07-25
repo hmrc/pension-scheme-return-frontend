@@ -211,10 +211,13 @@ class SharesCYAController @Inject()(
       } yield Redirect(redirectTo)
     }
 
-  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
       Future.successful(
-        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+        Redirect(
+          controllers.nonsipp.shares.routes.SharesListController
+            .onPageLoadViewOnly(srn, 1, year, current, previous)
+        )
       )
     }
 }
@@ -303,7 +306,7 @@ object SharesCYAController {
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-                routes.SharesCYAController.onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+                routes.SharesCYAController.onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
               case _ =>
                 routes.SharesCYAController.onSubmit(srn, index, mode)
             }

@@ -464,7 +464,9 @@ object ViewOnlyTaskListController {
     val sharesItem = TaskListItemViewModel(
       LinkMessage(
         messageKey(prefix, "sponsoringemployer.title"),
-        controllers.routes.UnauthorisedController.onPageLoad().url
+        controllers.nonsipp.shares.routes.SharesListController
+          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+          .url
       ),
       sharesTaskListStatus
     )

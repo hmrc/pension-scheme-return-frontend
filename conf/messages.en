@@ -2732,6 +2732,12 @@ sharesList.row = {0} in {1} {2}
 sharesList.row.change.hiddenText = Change {0}
 sharesList.row.remove.hiddenText = Remove {0}
 
+sharesList.view.title = View share transactions
+sharesList.view.title.plural = View share transactions
+sharesList.view.heading = {0} share transaction
+sharesList.view.heading.plural = {0} share transactions
+sharesList.view.link = View previous version of share transactions (opens in new tab)
+
 sharesList.sharesType.sponsoringEmployer = Shares in a sponsoring employer
 sharesList.sharesType.unquoted = Unquoted shares
 sharesList.sharesType.connectedParty = Shares acquired from a connected party
@@ -2749,7 +2755,6 @@ companyNameOfSharesBuyer.heading = What is the buyer’s company name?
 companyNameOfSharesBuyer.error.required = Enter the buyer’s company name
 companyNameOfSharesBuyer.error.invalid = Buyer’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 companyNameOfSharesBuyer.error.tooLong = Buyer’s company name must be 160 characters or fewer
-
 
 companyBuyerCrn.title = Do you know the buyer’s Company Registration Number (CRN)?
 companyBuyerCrn.heading = Do you know {0}’s Company Registration Number (CRN)?
