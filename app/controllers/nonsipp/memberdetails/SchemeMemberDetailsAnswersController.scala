@@ -116,12 +116,15 @@ class SchemeMemberDetailsAnswersController @Inject()(
 
       lazy val justAdded = mode.isNormalMode && request.userAnswers.get(MemberStatus(srn, index)).isEmpty
 
+      lazy val addedThisVersion = request.userAnswers.get(MemberPsrVersionPage(srn, index)).isEmpty
+
       for {
         updatedUserAnswers <- request.userAnswers
         // Only set member state to CHANGED if something has actually changed
+        // if memberPsrVersion is not present for member, do not set to CHANGED
         // CHANGED status is checked in the transformer later on to make sure this is the status we want to send to ETMP
           .setWhen(
-            mode.isCheckMode && memberDetailsChanged
+            mode.isCheckMode && memberDetailsChanged && !addedThisVersion
           )(
             MemberStatus(srn, index), {
               logger.info(s"Something has changed in member payments for member index $index, setting state to CHANGED")
