@@ -23,13 +23,14 @@ import controllers.ControllerBaseSpec
 import views.html.ListView
 import controllers.nonsipp.shares.SharesListController._
 import eu.timepit.refined.refineMV
-import play.api.inject
 import forms.YesNoPageFormProvider
 import models._
 import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import org.mockito.Mockito.{reset, when}
+import org.mockito.Mockito._
+import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
+import play.api.inject
 
 import scala.concurrent.Future
 
@@ -44,6 +45,30 @@ class SharesListControllerSpec extends ControllerBaseSpec {
 
   private lazy val onSubmit =
     controllers.nonsipp.shares.routes.SharesListController.onSubmit(srn, page, NormalMode)
+
+  private lazy val onSubmitViewOnly =
+    controllers.nonsipp.shares.routes.SharesListController.onSubmitViewOnly(
+      srn,
+      yearString,
+      submissionNumberTwo,
+      submissionNumberOne
+    )
+  private lazy val onPageLoadViewOnly =
+    controllers.nonsipp.shares.routes.SharesListController.onPageLoadViewOnly(
+      srn,
+      1,
+      yearString,
+      submissionNumberTwo,
+      submissionNumberOne
+    )
+  private lazy val onPreviousViewOnly =
+    controllers.nonsipp.shares.routes.SharesListController.onPreviousViewOnly(
+      srn,
+      1,
+      yearString,
+      submissionNumberTwo,
+      submissionNumberOne
+    )
 
   private val userAnswers =
     defaultUserAnswers
@@ -77,7 +102,10 @@ class SharesListControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[ListView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, page, NormalMode, sharesData))
+        .apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(srn, page, NormalMode, sharesData, viewOnlyUpdated = false)
+        )
     })
 
     act.like(
@@ -85,7 +113,7 @@ class SharesListControllerSpec extends ControllerBaseSpec {
         injected[ListView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, page, NormalMode, sharesData)
+            viewModel(srn, page, NormalMode, sharesData, viewOnlyUpdated = false)
           )
       }
     )
@@ -101,4 +129,88 @@ class SharesListControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
+
+  "BorrowInstancesListController in view only mode" - {
+
+    val currentUserAnswers = defaultUserAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+      .unsafeSet(SharesCompleted(srn, index), SectionCompleted)
+      .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
+      .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
+      .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition)
+      .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index), localDate)
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+      .unsafeSet(SharesCompleted(srn, index), SectionCompleted)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[ListView]
+            .apply(
+              form(injected[YesNoPageFormProvider]),
+              viewModel(
+                srn,
+                page,
+                mode = ViewOnlyMode,
+                sharesData,
+                viewOnlyUpdated = false,
+                optYear = Some(yearString),
+                optCurrentVersion = Some(submissionNumberTwo),
+                optPreviousVersion = Some(submissionNumberOne),
+                compilationOrSubmissionDate = Some(submissionDateTwo)
+              )
+            )
+      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
+    )
+
+    val updatedUserAnswers = currentUserAnswers
+      .unsafeSet(SharesCompleted(srn, index), SectionCompleted)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[ListView]
+            .apply(
+              form(injected[YesNoPageFormProvider]),
+              viewModel(
+                srn,
+                page,
+                mode = ViewOnlyMode,
+                sharesData,
+                viewOnlyUpdated = false,
+                optYear = Some(yearString),
+                optCurrentVersion = Some(submissionNumberTwo),
+                optPreviousVersion = Some(submissionNumberOne),
+                compilationOrSubmissionDate = Some(submissionDateTwo)
+              )
+            )
+      }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only taskList")
+    )
+
+    act.like(
+      redirectToPage(
+        onPreviousViewOnly,
+        controllers.nonsipp.shares.routes.SharesListController
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+      ).withName(
+        "Submit previous view only redirects to the controller with parameters for the previous submission"
+      )
+    )
+  }
+
 }
