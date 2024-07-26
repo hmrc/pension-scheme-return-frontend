@@ -32,7 +32,6 @@ import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import cats.implicits.toShow
 import controllers.nonsipp.landorpropertydisposal.LandPropertyDisposalCYAController._
-import controllers.nonsipp.routes
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
@@ -216,7 +215,12 @@ class LandPropertyDisposalCYAController @Inject()(
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
-      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
+            .onPageLoadViewOnly(srn, page = 1, year, current, previous)
+        )
+      )
     }
 }
 

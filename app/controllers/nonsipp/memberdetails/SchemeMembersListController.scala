@@ -336,7 +336,7 @@ object SchemeMembersListController {
       ),
       refresh = None,
       Message("site.saveAndContinue"),
-      None,
+      details = None,
       onSubmit = routes.SchemeMembersListController.onSubmit(srn, page, manualOrUpload),
       mode = mode,
       optViewOnlyDetails = Option.when(mode.isViewOnlyMode) {

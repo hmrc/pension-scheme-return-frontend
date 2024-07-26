@@ -66,8 +66,11 @@
                             .withVisuallyHiddenText(change.hiddenText.toMessage)).toList ++
                                     value.remove.map(remove => ListWithActionsActionViewModel(messages("site.remove"), remove.url)
                                     .withVisuallyHiddenText(remove.hiddenText.toMessage)).toList ++
-                                    value.view.map(view => ListWithActionsActionViewModel(messages("site.view"), view.url)
-                                    .withVisuallyHiddenText(view.hiddenText.toMessage)).toList
+                                    value.view.map {
+                                        case ListRowLink(url, hiddenText) => ListWithActionsActionViewModel(messages("site.view"), url)
+                                        .withVisuallyHiddenText(hiddenText.toMessage)
+                                        case ListRowNoLink(text) => ListWithActionsActionViewModel.noLink(renderMessage(text))
+                                    }.toList
 
                         )
                     )

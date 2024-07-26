@@ -189,12 +189,12 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+        controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
+          .onPageLoadViewOnly(srn, page = 1, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )
-        .withName("Submit redirects to view only tasklist")
+        .withName("Submit redirects to land or property disposal list page")
     )
   }
 }

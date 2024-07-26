@@ -23,10 +23,13 @@ case class ListRow(
   text: DisplayMessage,
   change: Option[ListRowLink],
   remove: Option[ListRowLink],
-  view: Option[ListRowLink]
+  view: Option[ViewOnlyLink]
 )
 
-case class ListRowLink(url: String, hiddenText: Message)
+sealed trait ViewOnlyLink
+
+case class ListRowNoLink(text: DisplayMessage) extends ViewOnlyLink
+case class ListRowLink(url: String, hiddenText: Message) extends ViewOnlyLink
 
 object ListRow {
   def apply(
@@ -48,6 +51,14 @@ object ListRow {
       change = None,
       remove = None,
       view = Some(ListRowLink(url, hiddenText))
+    )
+
+  def viewNoLink(text: DisplayMessage, value: DisplayMessage): ListRow =
+    ListRow(
+      text,
+      change = None,
+      remove = None,
+      view = Some(ListRowNoLink(value))
     )
 }
 

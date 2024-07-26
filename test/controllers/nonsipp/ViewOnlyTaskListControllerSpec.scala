@@ -1161,7 +1161,15 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedStatus = Completed,
               expectedTitleKey = "nonsipp.tasklist.landorproperty.title",
               expectedLinkContentKey = "nonsipp.tasklist.landorpropertydisposal.view.title",
-              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+              expectedLinkUrl = controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
+                .onPageLoadViewOnly(
+                  srn,
+                  page = 1,
+                  yearString,
+                  current = submissionNumberTwo,
+                  previous = submissionNumberOne
+                )
+                .url
             )
           }
 
@@ -1174,7 +1182,15 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedStatus = Updated,
               expectedTitleKey = "nonsipp.tasklist.landorproperty.title",
               expectedLinkContentKey = "nonsipp.tasklist.landorpropertydisposal.view.title",
-              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+              expectedLinkUrl = controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
+                .onPageLoadViewOnly(
+                  srn,
+                  page = 1,
+                  yearString,
+                  current = submissionNumberTwo,
+                  previous = submissionNumberOne
+                )
+                .url
             )
           }
         }
