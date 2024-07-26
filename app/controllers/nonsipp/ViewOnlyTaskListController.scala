@@ -420,7 +420,9 @@ object ViewOnlyTaskListController {
       TaskListItemViewModel(
         LinkMessage(
           Message(messageKey(prefix, "loansmade.title"), schemeName),
-          controllers.routes.UnauthorisedController.onPageLoad().url
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .url
         ),
         loansTaskListStatus
       ),

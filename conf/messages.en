@@ -1522,6 +1522,12 @@ loansList.description = You must tell us about all loans the scheme made, or had
 loansList.radios = Do you need to add another loan?
 loansList.radios.error.required = Select yes if you need to add another loan
 loansList.pagination.label = Showing {0} - {1} of {2} loans
+loansList.viewOnly.title = {0} loan
+loansList.viewOnly.title.plural = {0} loans
+loansList.viewOnly.heading = {0} loan
+loansList.viewOnly.heading.plural = {0} loans
+loansList.viewOnly.link = View previous version of loans (opens in new tab)
+
 
 removeLoan.title = Are you sure you want to remove this loan?
 removeLoan.heading = Are you sure you want to remove the loan of £{0} to {1}?
