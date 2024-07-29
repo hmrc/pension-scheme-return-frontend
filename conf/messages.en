@@ -72,6 +72,8 @@ tasklist.notStarted = Not started
 tasklist.inProgress = In progress
 tasklist.completed = Completed
 tasklist.updated = Updated
+tasklist.reported = Reported
+tasklist.reportedWithAmount = {0} reported
 
 memberList.memberName = Member name
 memberList.status = Status

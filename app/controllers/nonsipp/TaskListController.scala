@@ -114,7 +114,8 @@ object TaskListController {
       sectionList.tail: _*
     )
 
-    val (numberOfCompleted, numberOfTotal) = evaluateCompletedTotalTuple(viewModel.sections.toList)
+    val (numSectionsReadyForSubmission, numSectionsTotal) =
+      evaluateReadyForSubmissionTotalTuple(viewModel.sections.toList)
 
     PageViewModel(
       Message("nonsipp.tasklist.title", startDate.show, endDate.show),
@@ -122,8 +123,7 @@ object TaskListController {
       viewModel
     ).withDescription(
       Heading2.small("nonsipp.tasklist.subheading.incomplete") ++
-        ParagraphMessage(Message("nonsipp.tasklist.description", numberOfCompleted, numberOfTotal))
+        ParagraphMessage(Message("nonsipp.tasklist.description", numSectionsReadyForSubmission, numSectionsTotal))
     )
   }
-
 }

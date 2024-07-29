@@ -79,4 +79,11 @@ object TaskListStatus {
   case object Completed extends TaskListStatus("tasklist.completed")
 
   case object Updated extends TaskListStatus("tasklist.updated")
+
+  case object Reported extends TaskListStatus("tasklist.reported")
+
+  case class Reported(numReported: Int)
+      extends TaskListStatus(
+        Message("tasklist.reportedWithAmount", if (numReported == 0) "None" else numReported.toString)
+      )
 }

@@ -55,7 +55,7 @@ import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import play.api.inject
 import uk.gov.hmrc.domain.Nino
 import models.HowSharesDisposed._
-import viewmodels.models.TaskListStatus.{Completed, TaskListStatus, Updated}
+import viewmodels.models.TaskListStatus._
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
 import models.IdentitySubject._
@@ -107,6 +107,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(DoesMemberHaveNinoPage(srn, index1of300), true)
     .unsafeSet(MemberDetailsNinoPage(srn, index1of300), nino)
     .unsafeSet(MemberStatus(srn, index1of300), MemberState.New)
+    .unsafeSet(MemberDetailsCompletedPage(srn, index1of300), SectionCompleted)
     // Section 3 - Member Payments
     // (S3) Employer Contributions
     .unsafeSet(EmployerContributionsPage(srn), true)
@@ -132,6 +133,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(ReceivingSchemeNamePage(srn, index1of300, index1of5), name)
     .unsafeSet(ReceivingSchemeTypePage(srn, index1of300, index1of5), PensionSchemeType.Other(otherDetails))
     .unsafeSet(WhenWasTransferMadePage(srn, index1of300, index1of5), localDate)
+    .unsafeSet(TransfersOutSectionCompleted(srn, index1of300, index1of5), SectionCompleted)
     // (S3) PCLS
     .unsafeSet(PensionCommencementLumpSumPage(srn), true)
     .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index1of300), pcls)
@@ -142,6 +144,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(SurrenderedBenefitsAmountPage(srn, index1of300), money)
     .unsafeSet(WhenDidMemberSurrenderBenefitsPage(srn, index1of300), localDate)
     .unsafeSet(WhyDidMemberSurrenderBenefitsPage(srn, index1of300), reason)
+    .unsafeSet(SurrenderedBenefitsCompletedPage(srn, index1of300), SectionCompleted)
     // Section 4 - Loans Made & Money Borrowed
     // (S4) Loans Made
     .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
@@ -193,6 +196,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(pages.nonsipp.sharesdisposal.IsBuyerConnectedPartyPage(srn, index1of5000, index1of50), true)
     .unsafeSet(pages.nonsipp.sharesdisposal.IndependentValuationPage(srn, index1of5000, index1of50), true)
     .unsafeSet(HowManyDisposalSharesPage(srn, index1of5000, index1of50), totalShares)
+    .unsafeSet(SharesDisposalProgress(srn, index1of5000, index1of50), SectionJourneyStatus.Completed)
     // (S5) Quoted Shares
     .unsafeSet(TotalValueQuotedSharesPage(srn), money)
     // Section 6 - Land or Property
@@ -297,6 +301,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(DoesMemberHaveNinoPage(srn, index1of300), false)
     .unsafeSet(NoNINOPage(srn, index1of300), reason)
     .unsafeSet(MemberStatus(srn, index1of300), MemberState.New)
+    .unsafeSet(MemberDetailsCompletedPage(srn, index1of300), SectionCompleted)
     // Section 3 - Member Payments
     // (S3) Employer Contributions
     .unsafeSet(EmployerContributionsPage(srn), true)
@@ -326,6 +331,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(ReceivingSchemeNamePage(srn, index1of300, index1of5), name)
     .unsafeSet(ReceivingSchemeTypePage(srn, index1of300, index1of5), RegisteredPS(pstr))
     .unsafeSet(WhenWasTransferMadePage(srn, index1of300, index1of5), localDate)
+    .unsafeSet(TransfersOutSectionCompleted(srn, index1of300, index1of5), SectionCompleted)
     // (S3) PCLS
     .unsafeSet(PensionCommencementLumpSumPage(srn), false)
     // (S3) Pension Payments
@@ -336,6 +342,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(SurrenderedBenefitsAmountPage(srn, index1of300), money)
     .unsafeSet(WhenDidMemberSurrenderBenefitsPage(srn, index1of300), localDate)
     .unsafeSet(WhyDidMemberSurrenderBenefitsPage(srn, index1of300), "")
+    .unsafeSet(SurrenderedBenefitsCompletedPage(srn, index1of300), SectionCompleted)
     // Section 4 - Loans Made & Money Borrowed
     // (S4) Loans Made
     .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
@@ -380,6 +387,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(HowManySharesRedeemedPage(srn, index1of5000, index1of50), totalShares)
     .unsafeSet(TotalConsiderationSharesRedeemedPage(srn, index1of5000, index1of50), money)
     .unsafeSet(HowManyDisposalSharesPage(srn, index1of5000, index1of50), totalShares)
+    .unsafeSet(SharesDisposalProgress(srn, index1of5000, index1of50), SectionJourneyStatus.Completed)
     // (S5) Quoted Shares
     .unsafeSet(TotalValueQuotedSharesPage(srn), Money(0))
     // Section 6 - Land or Property
@@ -567,13 +575,13 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
 
       "Section 2 - Members" - {
 
-        "Completed" in {
+        "Reported" in {
           testViewModel(
             currentUA,
             currentUA,
             1,
             0,
-            expectedStatus = Completed,
+            expectedStatus = Reported(1),
             expectedTitleKey = "nonsipp.tasklist.members.title",
             expectedLinkContentKey = "nonsipp.tasklist.members.view.details.title",
             expectedLinkUrl = controllers.nonsipp.memberdetails.routes.SchemeMembersListController
@@ -637,13 +645,13 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
 
         "(S3) Unallocated employer contributions" - {
 
-          "Completed" in {
+          "Reported" in {
             testViewModel(
               currentUA,
               currentUA,
               2,
               1,
-              expectedStatus = Completed,
+              expectedStatus = Reported,
               expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.unallocatedcontributions.title",
               expectedLinkUrl = controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
@@ -735,13 +743,13 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
 
         "(S3) Transfers out" - {
 
-          "Completed" in {
+          "Reported" in {
             testViewModel(
               currentUA,
               currentUA,
               2,
               4,
-              expectedStatus = Completed,
+              expectedStatus = Reported(1),
               expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.transfersout.title",
               expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
@@ -830,13 +838,13 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
 
         "(S3) Surrendered benefits" - {
 
-          "Completed" in {
+          "Reported" in {
             testViewModel(
               currentUA,
               currentUA,
               2,
               7,
-              expectedStatus = Completed,
+              expectedStatus = Reported(1),
               expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.surrenderedbenefits.title",
               expectedLinkUrl =
@@ -937,13 +945,13 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
 
         "(S5) Shares" - {
 
-          "Completed" in {
+          "Reported" in {
             testViewModel(
               currentUA,
               currentUA,
               4,
               0,
-              expectedStatus = Completed,
+              expectedStatus = Reported(1),
               expectedTitleKey = "nonsipp.tasklist.shares.title",
               expectedLinkContentKey = "nonsipp.tasklist.shares.view.sponsoringemployer.title",
               expectedLinkUrl = controllers.nonsipp.shares.routes.SharesListController
@@ -1016,13 +1024,13 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             )
           }
 
-          "Completed" in {
+          "Reported" in {
             testViewModel(
               currentUA,
               currentUA,
               4,
               1,
-              expectedStatus = Completed,
+              expectedStatus = Reported(1),
               expectedTitleKey = "nonsipp.tasklist.shares.title",
               expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.view.title",
               expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
@@ -1045,13 +1053,13 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
 
         "(S8) Quoted Shares" - {
 
-          "Completed" in {
+          "Reported" in {
             testViewModel(
               currentUA,
               currentUA,
               7,
               0,
-              expectedStatus = Completed,
+              expectedStatus = Reported,
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.quotedshares.title",
               expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url

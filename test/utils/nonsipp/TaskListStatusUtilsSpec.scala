@@ -19,16 +19,15 @@ package utils.nonsipp
 import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
-import config.Refined.Max5000
+import config.Refined._
 import controllers.TestValues
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInJourneyStatus}
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalatest.OptionValues
-import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
-import models._
+import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsCompletedPage, SurrenderedBenefitsPage}
+import models.{TypeOfShares, _}
 import pages.nonsipp.loansmadeoroutstanding._
-import viewmodels.models.{SectionCompleted, SectionStatus}
 import models.SponsoringOrConnectedParty.Sponsoring
 import pages.nonsipp.bonds._
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
@@ -42,10 +41,22 @@ import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, Pensi
 import eu.timepit.refined.refineMV
 import viewmodels.models.TaskListStatus._
 import pages.nonsipp.common.{IdentityTypePage, IdentityTypes}
-import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutJourneyStatus}
+import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutSectionCompleted}
 import pages.nonsipp.moneyborrowed._
+import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
+import viewmodels.models.{SectionCompleted, SectionStatus}
 
 class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
+
+  private val index1of5: Max5 = refineMV(1)
+  private val index1of300: Max300 = refineMV(1)
+  private val index1of5000: Max5000 = refineMV(1)
+
+  private val defaultUserAnswersWithMember: UserAnswers = defaultUserAnswers
+    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
+    .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
+    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
   "Loans status" - {
     "should be Not Started" - {
@@ -104,12 +115,12 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         result mustBe InProgress
       }
     }
-    "should be Complete" - {
+    "should be Reported" - {
       "when only LoansMadeOrOutstandingPage false is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LoansMadeOrOutstandingPage(srn), false)
         val result = TaskListStatusUtils.getLoansTaskListStatus(customUserAnswers, srn)
-        result mustBe Completed
+        result mustBe Reported(0)
       }
       "when LoansMadeOrOutstandingPage true and equal number of first pages and last pages and sponsoring/connected party pages is present" in {
         val customUserAnswers = defaultUserAnswers
@@ -120,11 +131,9 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
           .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(2)), ConditionalYesNo.yes[Unit, Money](money))
-
         val result = TaskListStatusUtils.getLoansTaskListStatus(customUserAnswers, srn)
-        result mustBe Completed
+        result mustBe Reported(2)
       }
-
     }
   }
 
@@ -386,19 +395,46 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         result mustBe (NotStarted, hadSharesPageUrl)
       }
     }
-    "should be Complete" - {
+    "should be Reported" - {
       "when only DidSchemeHoldAnyShares false is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), false)
         val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
-        result mustBe (Completed, hadSharesPageUrl)
+        result mustBe (Reported(0), hadSharesPageUrl)
       }
-      "when DidSchemeHoldAnyShares is true and status is completed" in {
+      "when DidSchemeHoldAnyShares is true and with 1 reported" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
-          .unsafeSet(SharesJourneyStatus(srn), SectionStatus.Completed)
+          .unsafeSet(TypeOfSharesHeldPage(srn, index1of5000), TypeOfShares.ConnectedParty)
+          .unsafeSet(SharesCompleted(srn, index1of5000), SectionCompleted)
         val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
-        result mustBe (Completed, sharesListPageUrl)
+        result mustBe (Reported(1), sharesListPageUrl)
+      }
+      "when DidSchemeHoldAnyShares is true and status is Reported - first incomplete" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+          .unsafeSet(SharesJourneyStatus(srn), SectionStatus.InProgress)
+          // first share:
+          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), TypeOfShares.Unquoted)
+          // second share:
+          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
+          .unsafeSet(SharesCompleted(srn, refineMV(2)), SectionCompleted)
+
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (Reported(1), typeOfSharesHeldPageOneUrl)
+      }
+      "when DidSchemeHoldAnyShares is true and status is Reported - second incomplete" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+          .unsafeSet(SharesJourneyStatus(srn), SectionStatus.InProgress)
+          // first share:
+          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), TypeOfShares.Unquoted)
+          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
+          // second share:
+          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
+
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (Reported(1), typeOfSharesHeldPageTwoUrl)
       }
     }
     "should be InProgress" - {
@@ -414,32 +450,6 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(SharesJourneyStatus(srn), SectionStatus.InProgress)
         val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
         result mustBe (InProgress, typeOfSharesHeldPageOneUrl)
-      }
-      "when DidSchemeHoldAnyShares is true and status is InProgress - first incomplete" in {
-        val customUserAnswers = defaultUserAnswers
-          .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
-          .unsafeSet(SharesJourneyStatus(srn), SectionStatus.InProgress)
-          // first share:
-          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), TypeOfShares.Unquoted)
-          // second share:
-          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
-          .unsafeSet(SharesCompleted(srn, refineMV(2)), SectionCompleted)
-
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
-        result mustBe (InProgress, typeOfSharesHeldPageOneUrl)
-      }
-      "when DidSchemeHoldAnyShares is true and status is InProgress - second incomplete" in {
-        val customUserAnswers = defaultUserAnswers
-          .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
-          .unsafeSet(SharesJourneyStatus(srn), SectionStatus.InProgress)
-          // first share:
-          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), TypeOfShares.Unquoted)
-          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
-          // second share:
-          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
-
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
-        result mustBe (InProgress, typeOfSharesHeldPageTwoUrl)
       }
       "when DidSchemeHoldAnyShares is true and only second exist" in {
         val customUserAnswers = defaultUserAnswers
@@ -471,12 +481,12 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         result mustBe (NotStarted, quotedSharesManagedFundsUrl)
       }
     }
-    "should be Complete" - {
+    "should be Reported" - {
       "when TotalValueQuotedSharesPage is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(TotalValueQuotedSharesPage(srn), money)
         val result = TaskListStatusUtils.getQuotedSharesTaskListStatusAndLink(customUserAnswers, srn)
-        result mustBe (Completed, totalValueQuotedSharesCyaUrl)
+        result mustBe (Reported, totalValueQuotedSharesCyaUrl)
       }
     }
   }
@@ -698,14 +708,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     }
     "should be Not Started" - {
       "when members are added" in {
-        val result = TaskListStatusUtils.getEmployerContributionStatusAndLink(
-          defaultUserAnswers
-            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-            .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
-            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted),
-          srn
-        )
+        val result = TaskListStatusUtils.getEmployerContributionStatusAndLink(defaultUserAnswersWithMember, srn)
         result mustBe (NotStarted, wereContributions)
       }
     }
@@ -737,6 +740,64 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     }
   }
 
+  "Unallocated Employer Contributions status" - {
+
+    val firstQuestionPageUrl =
+      controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    val cyaPageUrl =
+      controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    "should be Unable to start" - {
+      "when no Members are reported" in {
+        val result = TaskListStatusUtils.getUnallocatedContributionsStatusAndLink(defaultUserAnswers, srn)
+        result mustBe (UnableToStart, firstQuestionPageUrl)
+      }
+    }
+
+    "should be Not started" - {
+      "when Member is reported and UnallocatedEmployerContributionsPage is None" in {
+        val result = TaskListStatusUtils.getUnallocatedContributionsStatusAndLink(defaultUserAnswersWithMember, srn)
+        result mustBe (NotStarted, firstQuestionPageUrl)
+      }
+    }
+
+    "should be None reported" - {
+      "when UnallocatedEmployerContributionsPage is false" in {
+        val customUserAnswers = defaultUserAnswersWithMember
+          .unsafeSet(UnallocatedEmployerContributionsPage(srn), false)
+
+        val result = TaskListStatusUtils.getUnallocatedContributionsStatusAndLink(customUserAnswers, srn)
+        result mustBe (Reported(0), firstQuestionPageUrl)
+      }
+    }
+
+    "should be In progress" - {
+      "when UnallocatedEmployerContributionsPage is true and UnallocatedEmployerAmountPage is None" in {
+        val customUserAnswers = defaultUserAnswersWithMember
+          .unsafeSet(UnallocatedEmployerContributionsPage(srn), true)
+
+        val result = TaskListStatusUtils.getUnallocatedContributionsStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, firstQuestionPageUrl)
+      }
+    }
+
+    "should be Reported" - {
+      "when UnallocatedEmployerContributionsPage is true and UnallocatedEmployerAmountPage is present" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(UnallocatedEmployerContributionsPage(srn), true)
+          .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
+
+        val result = TaskListStatusUtils.getUnallocatedContributionsStatusAndLink(customUserAnswers, srn)
+        result mustBe (Reported, cyaPageUrl)
+      }
+    }
+  }
+
   "Transfer in status" - {
     val wereTransfersIn =
       controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController
@@ -755,14 +816,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     }
     "should be Not Started" - {
       "when members are added" in {
-        val result = TaskListStatusUtils.getTransferInStatusAndLink(
-          defaultUserAnswers
-            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-            .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
-            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted),
-          srn
-        )
+        val result = TaskListStatusUtils.getTransferInStatusAndLink(defaultUserAnswersWithMember, srn)
         result mustBe (NotStarted, wereTransfersIn)
       }
     }
@@ -795,6 +849,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
   }
 
   "Transfer out status" - {
+
     val wereTransfersOut =
       controllers.nonsipp.membertransferout.routes.SchemeTransferOutController
         .onPageLoad(srn, NormalMode)
@@ -810,52 +865,48 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         result mustBe (UnableToStart, wereTransfersOut)
       }
     }
+
     "should be Not Started" - {
       "when members are added" in {
-        val result = TaskListStatusUtils.getTransferOutStatusAndLink(
-          defaultUserAnswers
-            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-            .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
-            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted),
-          srn
-        )
+        val result = TaskListStatusUtils.getTransferOutStatusAndLink(defaultUserAnswersWithMember, srn)
         result mustBe (NotStarted, wereTransfersOut)
       }
     }
 
     "should be In Progress" - {
-      "when only were section status is progress and scheme made transfer out true is present" in {
+      "when SchemeTransferOutPage is true and no Transfer Out has been reported" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(SchemeTransferOutPage(srn), true)
-          .unsafeSet(TransfersOutJourneyStatus(srn), SectionStatus.InProgress)
         val result = TaskListStatusUtils.getTransferOutStatusAndLink(customUserAnswers, srn)
-        result mustBe (InProgress, selectMember)
+        result mustBe (InProgress, wereTransfersOut)
       }
     }
-    "should be Complete" - {
-      "when section status is complete and scheme made transfer out false is present" in {
+
+    "should be Reported" - {
+      "when SchemeTransferOutPage is false" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(SchemeTransferOutPage(srn), false)
-          .unsafeSet(TransfersOutJourneyStatus(srn), SectionStatus.Completed)
         val result = TaskListStatusUtils.getTransferOutStatusAndLink(customUserAnswers, srn)
-        result mustBe (Completed, wereTransfersOut)
+        result mustBe (Reported(0), wereTransfersOut)
       }
-      "when section status is complete and scheme made transfer out true is present" in {
+
+      "when SchemeTransferOutPage is true and Transfer Out has been reported" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(SchemeTransferOutPage(srn), true)
-          .unsafeSet(TransfersOutJourneyStatus(srn), SectionStatus.Completed)
+          .unsafeSet(TransfersOutSectionCompleted(srn, index1of300, index1of5), SectionCompleted)
         val result = TaskListStatusUtils.getTransferOutStatusAndLink(customUserAnswers, srn)
-        result mustBe (Completed, selectMember)
+        result mustBe (Reported(1), selectMember)
       }
     }
   }
 
   "Surrendered benefits status" - {
+
     val wereSurrenderedBenefits =
       controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsController
         .onPageLoad(srn, NormalMode)
         .url
+
     val selectMember =
       controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
         .onPageLoad(srn, 1, NormalMode)
@@ -867,43 +918,37 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         result mustBe (UnableToStart, wereSurrenderedBenefits)
       }
     }
+
     "should be Not Started" - {
       "when members are added" in {
-        val result = TaskListStatusUtils.getSurrenderedBenefitsStatusAndLink(
-          defaultUserAnswers
-            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-            .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
-            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted),
-          srn
-        )
+        val result = TaskListStatusUtils.getSurrenderedBenefitsStatusAndLink(defaultUserAnswersWithMember, srn)
         result mustBe (NotStarted, wereSurrenderedBenefits)
       }
     }
 
     "should be In Progress" - {
-      "when only were section status is progress and scheme reported surrendered benefits true is present" in {
+      "when SurrenderedBenefitsPage is true and no Surrendered Benefit has been reported" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(SurrenderedBenefitsPage(srn), true)
-          .unsafeSet(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.InProgress)
         val result = TaskListStatusUtils.getSurrenderedBenefitsStatusAndLink(customUserAnswers, srn)
-        result mustBe (InProgress, selectMember)
+        result mustBe (InProgress, wereSurrenderedBenefits)
       }
     }
-    "should be Complete" - {
-      "when section status is complete and scheme scheme reported surrendered benefits false is present" in {
+
+    "should be Reported" - {
+      "when SurrenderedBenefitsPage is false" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(SurrenderedBenefitsPage(srn), false)
-          .unsafeSet(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.Completed)
         val result = TaskListStatusUtils.getSurrenderedBenefitsStatusAndLink(customUserAnswers, srn)
-        result mustBe (Completed, wereSurrenderedBenefits)
+        result mustBe (Reported(0), wereSurrenderedBenefits)
       }
-      "when section status is complete and scheme reported surrendered benefits true is present" in {
+
+      "when SurrenderedBenefitsPage is true and Surrendered Benefit has been reported" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(SurrenderedBenefitsPage(srn), true)
-          .unsafeSet(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.Completed)
+          .unsafeSet(SurrenderedBenefitsCompletedPage(srn, index1of300), SectionCompleted)
         val result = TaskListStatusUtils.getSurrenderedBenefitsStatusAndLink(customUserAnswers, srn)
-        result mustBe (Completed, selectMember)
+        result mustBe (Reported(1), selectMember)
       }
     }
   }
@@ -917,11 +962,6 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       controllers.nonsipp.membercontributions.routes.MemberContributionListController
         .onPageLoad(srn, 1, NormalMode)
         .url
-    val userAnswersWithMembers = defaultUserAnswers
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-      .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
     "should be Unable to start" - {
       "when default data" in {
@@ -931,24 +971,21 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     }
     "should be Not Started" - {
       "when members are added" in {
-        val result = TaskListStatusUtils.getMemberContributionStatusAndLink(
-          userAnswersWithMembers,
-          srn
-        )
+        val result = TaskListStatusUtils.getMemberContributionStatusAndLink(defaultUserAnswersWithMember, srn)
         result mustBe (NotStarted, wereContributions)
       }
     }
 
     "should be In Progress" - {
       "when only member contributions true is present" in {
-        val customUserAnswers = userAnswersWithMembers
+        val customUserAnswers = defaultUserAnswersWithMember
           .unsafeSet(MemberContributionsPage(srn), true)
         val result = TaskListStatusUtils.getMemberContributionStatusAndLink(customUserAnswers, srn)
         result mustBe (InProgress, selectMember)
       }
 
       "when member contributions is true and member contributions list page is false" in {
-        val customUserAnswers = userAnswersWithMembers
+        val customUserAnswers = defaultUserAnswersWithMember
           .unsafeSet(MemberContributionsPage(srn), true)
           .unsafeSet(MemberContributionsListPage(srn), false)
         val result = TaskListStatusUtils.getMemberContributionStatusAndLink(customUserAnswers, srn)
@@ -957,7 +994,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     }
     "should be Complete" - {
       "when member contributions is true and member contributions list page is true" in {
-        val customUserAnswers = userAnswersWithMembers
+        val customUserAnswers = defaultUserAnswersWithMember
           .unsafeSet(MemberContributionsPage(srn), true)
           .unsafeSet(MemberContributionsListPage(srn), true)
         val result = TaskListStatusUtils.getMemberContributionStatusAndLink(customUserAnswers, srn)
@@ -965,6 +1002,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       }
     }
   }
+
   "Pcls status" - {
     val werePcls =
       controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
@@ -974,11 +1012,6 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
         .onPageLoad(srn, 1, NormalMode)
         .url
-    val userAnswersWithMembers = defaultUserAnswers
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-      .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
     "should be Unable to start" - {
       "when default data" in {
@@ -988,24 +1021,21 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     }
     "should be Not Started" - {
       "when members are added" in {
-        val result = TaskListStatusUtils.getPclsStatusAndLink(
-          userAnswersWithMembers,
-          srn
-        )
+        val result = TaskListStatusUtils.getPclsStatusAndLink(defaultUserAnswersWithMember, srn)
         result mustBe (NotStarted, werePcls)
       }
     }
 
     "should be In Progress" - {
       "when only PCLS received true is present" in {
-        val customUserAnswers = userAnswersWithMembers
+        val customUserAnswers = defaultUserAnswersWithMember
           .unsafeSet(PensionCommencementLumpSumPage(srn), true)
         val result = TaskListStatusUtils.getPclsStatusAndLink(customUserAnswers, srn)
         result mustBe (InProgress, selectMember)
       }
 
       "when PCLS received is true and member list page is false" in {
-        val customUserAnswers = userAnswersWithMembers
+        val customUserAnswers = defaultUserAnswersWithMember
           .unsafeSet(PensionCommencementLumpSumPage(srn), true)
           .unsafeSet(PclsMemberListPage(srn), false)
         val result = TaskListStatusUtils.getPclsStatusAndLink(customUserAnswers, srn)
@@ -1014,7 +1044,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     }
     "should be Complete" - {
       "when PCLS received is true and member list page is true" in {
-        val customUserAnswers = userAnswersWithMembers
+        val customUserAnswers = defaultUserAnswersWithMember
           .unsafeSet(PensionCommencementLumpSumPage(srn), true)
           .unsafeSet(PclsMemberListPage(srn), true)
         val result = TaskListStatusUtils.getPclsStatusAndLink(customUserAnswers, srn)
@@ -1022,6 +1052,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       }
     }
   }
+
   "Pension payments status" - {
     val werePensionPayments =
       controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
@@ -1031,11 +1062,6 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
         .onPageLoad(srn, 1, NormalMode)
         .url
-    val userAnswersWithMembers = defaultUserAnswers
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-      .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
     "should be Unable to start" - {
       "when default data" in {
@@ -1045,24 +1071,21 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     }
     "should be Not Started" - {
       "when members are added" in {
-        val result = TaskListStatusUtils.getPensionPaymentsStatusAndLink(
-          userAnswersWithMembers,
-          srn
-        )
+        val result = TaskListStatusUtils.getPensionPaymentsStatusAndLink(defaultUserAnswersWithMember, srn)
         result mustBe (NotStarted, werePensionPayments)
       }
     }
 
     "should be In Progress" - {
       "when only pension payments received true is present" in {
-        val customUserAnswers = userAnswersWithMembers
+        val customUserAnswers = defaultUserAnswersWithMember
           .unsafeSet(PensionPaymentsReceivedPage(srn), true)
         val result = TaskListStatusUtils.getPensionPaymentsStatusAndLink(customUserAnswers, srn)
         result mustBe (InProgress, selectMember)
       }
 
       "when were pension payments received  is true and member payments list page is false" in {
-        val customUserAnswers = userAnswersWithMembers
+        val customUserAnswers = defaultUserAnswersWithMember
           .unsafeSet(PensionPaymentsReceivedPage(srn), true)
           .unsafeSet(MemberPensionPaymentsListPage(srn), false)
         val result = TaskListStatusUtils.getPensionPaymentsStatusAndLink(customUserAnswers, srn)
@@ -1071,7 +1094,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     }
     "should be Complete" - {
       "when pension payments received  is true and member payments list page is true" in {
-        val customUserAnswers = userAnswersWithMembers
+        val customUserAnswers = defaultUserAnswersWithMember
           .unsafeSet(PensionPaymentsReceivedPage(srn), true)
           .unsafeSet(MemberPensionPaymentsListPage(srn), true)
         val result = TaskListStatusUtils.getPensionPaymentsStatusAndLink(customUserAnswers, srn)
