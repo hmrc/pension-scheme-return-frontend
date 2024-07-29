@@ -97,10 +97,13 @@ class RemoveMemberDetailsController @Inject()(
   private def withMemberDetails(srn: Srn, index: Max300)(
     f: NameDOB => Result
   )(implicit request: DataRequest[_]): Result =
-    request.userAnswers.get(MemberDetailsPage(srn, index)) match {
-      case Some(nameDOB) => f(nameDOB)
-      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-    }
+    (
+      for {
+        nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRedirectToTaskList(srn)
+      } yield {
+        f(nameDOB)
+      }
+    ).merge
 }
 object RemoveMemberDetailsController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(

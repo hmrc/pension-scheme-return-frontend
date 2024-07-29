@@ -64,6 +64,8 @@ class RemoveUnallocatedAmountControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
+    act.like(redirectToPage(onPageLoad, controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
+
     act.like(saveAndContinue(onSubmit, "value" -> "true"))
 
     act.like(invalidForm(onSubmit, filledUserAnswers))

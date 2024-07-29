@@ -53,18 +53,19 @@ class RemoveUnallocatedAmountController @Inject()(
   private val form = RemoveUnallocatedAmountController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val res = request.userAnswers.get(UnallocatedEmployerAmountPage(srn))
-    res match {
-      case Some(value) =>
+    (
+      for {
+        res <- request.userAnswers.get(UnallocatedEmployerAmountPage(srn)).getOrRedirectToTaskList(srn)
+      } yield {
         val preparedForm = request.userAnswers.fillForm(RemoveUnallocatedAmountPage(srn), form)
         Ok(
           view(
             preparedForm,
-            RemoveUnallocatedAmountController.viewModel(srn, mode, value.displayAs)
+            RemoveUnallocatedAmountController.viewModel(srn, mode, res.displayAs)
           )
         )
-      case None => Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn).url)
-    }
+      }
+    ).merge
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>

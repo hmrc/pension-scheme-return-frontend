@@ -55,8 +55,15 @@ class RemoveLandPropertyDisposalController @Inject()(
 
   def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
-        address =>
+      (
+        for {
+          _ <- request.userAnswers
+            .get(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndex, disposalIndex))
+            .getOrRedirectToTaskList(srn)
+          address <- request.userAnswers
+            .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex))
+            .getOrRedirectToTaskList(srn)
+        } yield {
           val preparedForm =
             request.userAnswers.fillForm(RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex, disposalIndex), form)
           Ok(
@@ -66,7 +73,8 @@ class RemoveLandPropertyDisposalController @Inject()(
                 .viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode)
             )
           )
-      }
+        }
+      ).merge
     }
 
   def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =

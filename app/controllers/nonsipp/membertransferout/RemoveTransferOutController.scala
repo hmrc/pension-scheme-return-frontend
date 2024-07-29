@@ -55,22 +55,22 @@ class RemoveTransferOutController @Inject()(
 
   def onPageLoad(srn: Srn, memberIndex: Max300, index: Max5): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val nameDOB = request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).get
-      val receivingSchemeName = request.userAnswers.get(ReceivingSchemeNamePage(srn, memberIndex, index))
-      receivingSchemeName match {
-        case Some(schemeName) =>
+      (
+        for {
+          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRedirectToTaskList(srn)
+          receivingSchemeName <- request.userAnswers
+            .get(ReceivingSchemeNamePage(srn, memberIndex, index))
+            .getOrRedirectToTaskList(srn)
+        } yield {
           Ok(
             view(
               form,
               RemoveTransferOutController
-                .viewModel(srn, memberIndex: Max300, index: Max5, nameDOB.fullName, schemeName)
+                .viewModel(srn, memberIndex: Max300, index: Max5, nameDOB.fullName, receivingSchemeName)
             )
           )
-        case None =>
-          Redirect(
-            controllers.nonsipp.membertransferout.routes.SchemeTransferOutController.onPageLoad(srn, NormalMode).url
-          )
-      }
+        }
+      ).merge
     }
 
   def onSubmit(srn: Srn, memberIndex: Max300, index: Max5): Action[AnyContent] =

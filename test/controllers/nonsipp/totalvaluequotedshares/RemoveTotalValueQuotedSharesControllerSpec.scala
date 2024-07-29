@@ -62,6 +62,8 @@ class RemoveTotalValueQuotedSharesControllerSpec extends ControllerBaseSpec {
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
     act.like(redirectNextPage(onSubmit, "value" -> "false"))
 
+    act.like(redirectToPage(onPageLoad, controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
+
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
     act.like(saveAndContinue(onSubmit, "value" -> "true"))

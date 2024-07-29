@@ -55,28 +55,26 @@ class RemovePclsController @Inject()(
 
   def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val nameDOB = request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).get
-      val total = request.userAnswers.get(PensionCommencementLumpSumAmountPage(srn, memberIndex))
-      total match {
-        case Some(value) =>
+      (
+        for {
+          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRedirectToTaskList(srn)
+          total <- request.userAnswers
+            .get(PensionCommencementLumpSumAmountPage(srn, memberIndex))
+            .getOrRedirectToTaskList(srn)
+        } yield {
           Ok(
             view(
               form,
               RemovePclsController.viewModel(
                 srn,
                 memberIndex: Max300,
-                value.lumpSumAmount,
+                total.lumpSumAmount,
                 nameDOB.fullName
               )
             )
           )
-        case None =>
-          Redirect(
-            controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
-              .onPageLoad(srn, NormalMode)
-              .url
-          )
-      }
+        }
+      ).merge
     }
 
   def onSubmit(srn: Srn, memberIndex: Max300): Action[AnyContent] =

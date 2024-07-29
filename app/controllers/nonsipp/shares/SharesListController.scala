@@ -111,7 +111,7 @@ class SharesListController @Inject()(
         )
       }.merge
     } else {
-      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
     }
   }
 

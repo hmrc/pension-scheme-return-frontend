@@ -55,12 +55,18 @@ class RemoveShareDisposalController @Inject()(
 
   def onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex)).getOrRecoverJourney { _ =>
-        request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).getOrRecoverJourney {
-          nameOfSharesCompany =>
-            Ok(view(form, viewModel(srn, shareIndex, disposalIndex, nameOfSharesCompany, mode)))
+      (
+        for {
+          _ <- request.userAnswers
+            .get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex))
+            .getOrRedirectToTaskList(srn)
+          nameOfSharesCompany <- request.userAnswers
+            .get(CompanyNameRelatedSharesPage(srn, shareIndex))
+            .getOrRedirectToTaskList(srn)
+        } yield {
+          Ok(view(form, viewModel(srn, shareIndex, disposalIndex, nameOfSharesCompany, mode)))
         }
-      }
+      ).merge
     }
 
   def onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =

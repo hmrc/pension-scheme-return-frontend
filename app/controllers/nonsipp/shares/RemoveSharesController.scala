@@ -58,7 +58,7 @@ class RemoveSharesController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          companyName <- requiredPage(CompanyNameRelatedSharesPage(srn, index))
+          companyName <- request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRedirectToTaskList(srn)
         } yield Ok(
           view(form, viewModel(srn, index, mode, companyName))
         )

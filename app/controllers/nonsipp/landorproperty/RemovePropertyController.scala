@@ -54,10 +54,14 @@ class RemovePropertyController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-        val preparedForm = request.userAnswers.fillForm(RemovePropertyPage(srn, index), form)
-        Ok(view(preparedForm, RemovePropertyController.viewModel(srn, index, mode, address.addressLine1)))
-      }
+      (
+        for {
+          address <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRedirectToTaskList(srn)
+        } yield {
+          val preparedForm = request.userAnswers.fillForm(RemovePropertyPage(srn, index), form)
+          Ok(view(preparedForm, RemovePropertyController.viewModel(srn, index, mode, address.addressLine1)))
+        }
+      ).merge
   }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {

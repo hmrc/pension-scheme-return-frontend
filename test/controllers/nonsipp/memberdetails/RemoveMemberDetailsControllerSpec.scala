@@ -68,6 +68,8 @@ class RemoveMemberDetailsControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
+    act.like(redirectToPage(onPageLoad, controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
+
     act.like(continueNoSave(onSubmit, userAnswers, "value" -> "false"))
     act.like(saveAndContinue(onSubmit, userAnswers, "value" -> "true"))
 

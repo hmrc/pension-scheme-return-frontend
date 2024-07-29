@@ -1,461 +1,461 @@
 # microservice specific routes
 
-->          /hmrc-frontend                                                              hmrcfrontend.Routes
-->          /                                                                           landorproperty.Routes
-->          /                                                                           landorpropertydisposal.Routes
-->          /                                                                           moneyborrowed.Routes
-->          /                                                                           employercontributions.Routes
-->          /                                                                           membercontributions.Routes
-->          /                                                                           receivetransfer.Routes
-->          /                                                                           memberpayments_transferout.Routes
-->          /                                                                           pcls.Routes
-->          /                                                                           memberpayments_pensionpayments.Routes
-->          /                                                                           membersurrenderedbenefits.Routes
-->          /                                                                           shares.Routes
-->          /                                                                           sharesdisposal.Routes
-->          /                                                                           bonds.Routes
-->          /                                                                           bondsdisposal.Routes
-->          /                                                                           otherassetsheld.Routes
-->          /                                                                           otherassetsdisposal.Routes
+->          /hmrc-frontend                                                                                     hmrcfrontend.Routes
+->          /                                                                                                  landorproperty.Routes
+->          /                                                                                                  landorpropertydisposal.Routes
+->          /                                                                                                  moneyborrowed.Routes
+->          /                                                                                                  employercontributions.Routes
+->          /                                                                                                  membercontributions.Routes
+->          /                                                                                                  receivetransfer.Routes
+->          /                                                                                                  memberpayments_transferout.Routes
+->          /                                                                                                  pcls.Routes
+->          /                                                                                                  memberpayments_pensionpayments.Routes
+->          /                                                                                                  membersurrenderedbenefits.Routes
+->          /                                                                                                  shares.Routes
+->          /                                                                                                  sharesdisposal.Routes
+->          /                                                                                                  bonds.Routes
+->          /                                                                                                  bondsdisposal.Routes
+->          /                                                                                                  otherassetsheld.Routes
+->          /                                                                                                  otherassetsdisposal.Routes
 
-GET         /                                                                           controllers.IndexController.onPageLoad()
+GET         /                                                                                                  controllers.IndexController.onPageLoad()
 
-POST        /fileupload/upscan-callback                                                 controllers.UploadCallbackController.callback
+POST        /fileupload/upscan-callback                                                                        controllers.UploadCallbackController.callback
 
-GET         /assets/*file                                                               controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                                                                                      controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /language/:lang                                                             controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET         /language/:lang                                                                                    controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /refresh-session                                                            controllers.KeepAliveController.keepAlive()
+GET         /refresh-session                                                                                   controllers.KeepAliveController.keepAlive()
 
-GET         /problem-with-service                                                       controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None, answersSavedDisplayVersion: Int ?= 0)
+GET         /problem-with-service                                                                              controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None, answersSavedDisplayVersion: Int ?= 0)
 
-GET         /account/sign-out-survey                                                    controllers.auth.AuthController.signOut()
-GET         /account/sign-out                                                           controllers.auth.AuthController.signOutNoSurvey()
-GET         /account/signed-out                                                         controllers.auth.SignedOutController.onPageLoad()
+GET         /account/sign-out-survey                                                                           controllers.auth.AuthController.signOut()
+GET         /account/sign-out                                                                                  controllers.auth.AuthController.signOutNoSurvey()
+GET         /account/signed-out                                                                                controllers.auth.SignedOutController.onPageLoad()
 
-GET         /unauthorised                                                               controllers.UnauthorisedController.onPageLoad()
+GET         /unauthorised                                                                                      controllers.UnauthorisedController.onPageLoad()
 
-GET         /:srn/what-you-will-need/:fbNumber                                          controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String, taxYear: String = "", version: String = "")
-GET         /:srn/what-you-will-need/:taxYear/:version                                  controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String, version: String)
-GET         /:srn/what-you-will-need                                                    controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String = "2022-04-06", version: String = "001")
-GET         /:srn/what-you-will-need-next-page                                          controllers.WhatYouWillNeedController.onSubmit(srn: Srn, taxYear: String, fbNumber: String,  version: String)
+GET         /:srn/what-you-will-need/:fbNumber                                                                 controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String, taxYear: String = "", version: String = "")
+GET         /:srn/what-you-will-need/:taxYear/:version                                                         controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String, version: String)
+GET         /:srn/what-you-will-need                                                                           controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String = "2022-04-06", version: String = "001")
+GET         /:srn/what-you-will-need-next-page                                                                 controllers.WhatYouWillNeedController.onSubmit(srn: Srn, taxYear: String, fbNumber: String,  version: String)
 
-GET         /:srn/which-tax-year                                                        controllers.nonsipp.WhichTaxYearController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/which-tax-year                                                        controllers.nonsipp.WhichTaxYearController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/which-tax-year                                                                               controllers.nonsipp.WhichTaxYearController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/which-tax-year                                                                               controllers.nonsipp.WhichTaxYearController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET         /:srn/change-which-tax-year                                                 controllers.nonsipp.WhichTaxYearController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-which-tax-year                                                 controllers.nonsipp.WhichTaxYearController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-which-tax-year                                                                        controllers.nonsipp.WhichTaxYearController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-which-tax-year                                                                        controllers.nonsipp.WhichTaxYearController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/check-dates                                                           controllers.nonsipp.CheckReturnDatesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/check-dates                                                           controllers.nonsipp.CheckReturnDatesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/check-dates                                                                                  controllers.nonsipp.CheckReturnDatesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/check-dates                                                                                  controllers.nonsipp.CheckReturnDatesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET         /:srn/change-check-dates                                                    controllers.nonsipp.CheckReturnDatesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-check-dates                                                    controllers.nonsipp.CheckReturnDatesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-check-dates                                                                           controllers.nonsipp.CheckReturnDatesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-check-dates                                                                           controllers.nonsipp.CheckReturnDatesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/accounting-period                                                     controllers.nonsipp.accountingperiod.AccountingPeriodController.onPageLoad(srn: Srn, index: Max3 = 1, mode: Mode = NormalMode)
-GET         /:srn/accounting-period/:index                                              controllers.nonsipp.accountingperiod.AccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = NormalMode)
-POST        /:srn/accounting-period/:index                                              controllers.nonsipp.accountingperiod.AccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = NormalMode)
+GET         /:srn/accounting-period                                                                            controllers.nonsipp.accountingperiod.AccountingPeriodController.onPageLoad(srn: Srn, index: Max3 = 1, mode: Mode = NormalMode)
+GET         /:srn/accounting-period/:index                                                                     controllers.nonsipp.accountingperiod.AccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = NormalMode)
+POST        /:srn/accounting-period/:index                                                                     controllers.nonsipp.accountingperiod.AccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = NormalMode)
 
-GET         /:srn/change-accounting-period/:index                                       controllers.nonsipp.accountingperiod.AccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = CheckMode)
-POST        /:srn/change-accounting-period/:index                                       controllers.nonsipp.accountingperiod.AccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = CheckMode)
+GET         /:srn/change-accounting-period/:index                                                              controllers.nonsipp.accountingperiod.AccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = CheckMode)
+POST        /:srn/change-accounting-period/:index                                                              controllers.nonsipp.accountingperiod.AccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = CheckMode)
 
-GET         /:srn/check-accounting-period/:index                                        controllers.nonsipp.accountingperiod.AccountingPeriodCheckYourAnswersController.onPageLoad(srn: Srn, index: Max3, mode: Mode = NormalMode)
-POST        /:srn/check-accounting-period                                               controllers.nonsipp.accountingperiod.AccountingPeriodCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/check-accounting-period/:index                                                               controllers.nonsipp.accountingperiod.AccountingPeriodCheckYourAnswersController.onPageLoad(srn: Srn, index: Max3, mode: Mode = NormalMode)
+POST        /:srn/check-accounting-period                                                                      controllers.nonsipp.accountingperiod.AccountingPeriodCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET         /:srn/change-check-accounting-period/:index                                 controllers.nonsipp.accountingperiod.AccountingPeriodCheckYourAnswersController.onPageLoad(srn: Srn, index: Max3, mode: Mode = CheckMode)
-POST        /:srn/change-check-accounting-period                                        controllers.nonsipp.accountingperiod.AccountingPeriodCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-check-accounting-period/:index                                                        controllers.nonsipp.accountingperiod.AccountingPeriodCheckYourAnswersController.onPageLoad(srn: Srn, index: Max3, mode: Mode = CheckMode)
+POST        /:srn/change-check-accounting-period                                                               controllers.nonsipp.accountingperiod.AccountingPeriodCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/accounting-periods                                                    controllers.nonsipp.accountingperiod.AccountingPeriodListController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/accounting-periods                                                    controllers.nonsipp.accountingperiod.AccountingPeriodListController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/accounting-periods                                                                           controllers.nonsipp.accountingperiod.AccountingPeriodListController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/accounting-periods                                                                           controllers.nonsipp.accountingperiod.AccountingPeriodListController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET         /:srn/change-accounting-periods                                             controllers.nonsipp.accountingperiod.AccountingPeriodListController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-accounting-periods                                             controllers.nonsipp.accountingperiod.AccountingPeriodListController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-accounting-periods                                                                    controllers.nonsipp.accountingperiod.AccountingPeriodListController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-accounting-periods                                                                    controllers.nonsipp.accountingperiod.AccountingPeriodListController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/remove-accounting-period/:index                                       controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = NormalMode)
-POST        /:srn/remove-accounting-period/:index                                       controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = NormalMode)
+GET         /:srn/remove-accounting-period/:index                                                              controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = NormalMode)
+POST        /:srn/remove-accounting-period/:index                                                              controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = NormalMode)
 
-GET         /:srn/change-remove-accounting-period/:index                                controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = CheckMode)
-POST        /:srn/change-remove-accounting-period/:index                                controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = CheckMode)
+GET         /:srn/change-remove-accounting-period/:index                                                       controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = CheckMode)
+POST        /:srn/change-remove-accounting-period/:index                                                       controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = CheckMode)
 
-GET         /:srn/how-much-cash                                                         controllers.nonsipp.schemedesignatory.HowMuchCashController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/how-much-cash                                                         controllers.nonsipp.schemedesignatory.HowMuchCashController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/how-much-cash                                                                                controllers.nonsipp.schemedesignatory.HowMuchCashController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/how-much-cash                                                                                controllers.nonsipp.schemedesignatory.HowMuchCashController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET         /:srn/change-how-much-cash                                                  controllers.nonsipp.schemedesignatory.HowMuchCashController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-how-much-cash                                                  controllers.nonsipp.schemedesignatory.HowMuchCashController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-how-much-cash                                                                         controllers.nonsipp.schemedesignatory.HowMuchCashController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-how-much-cash                                                                         controllers.nonsipp.schemedesignatory.HowMuchCashController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/pension-scheme-members                                                controllers.nonsipp.memberdetails.PensionSchemeMembersController.onPageLoad(srn: Srn)
-POST        /:srn/pension-scheme-members                                                controllers.nonsipp.memberdetails.PensionSchemeMembersController.onSubmit(srn: Srn)
+GET         /:srn/pension-scheme-members                                                                       controllers.nonsipp.memberdetails.PensionSchemeMembersController.onPageLoad(srn: Srn)
+POST        /:srn/pension-scheme-members                                                                       controllers.nonsipp.memberdetails.PensionSchemeMembersController.onSubmit(srn: Srn)
 
-GET         /:srn/member-details                                                        controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
-GET         /:srn/member-details/:index                                                 controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
-POST        /:srn/member-details/:index                                                 controllers.nonsipp.memberdetails.MemberDetailsController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
+GET         /:srn/member-details                                                                               controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
+GET         /:srn/member-details/:index                                                                        controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/member-details/:index                                                                        controllers.nonsipp.memberdetails.MemberDetailsController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
 
-GET         /:srn/member-details/change                                                 controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = CheckMode)
-GET         /:srn/member-details/:index/change                                          controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
-POST        /:srn/member-details/:index/change                                          controllers.nonsipp.memberdetails.MemberDetailsController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
+GET         /:srn/member-details/change                                                                        controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = CheckMode)
+GET         /:srn/member-details/:index/change                                                                 controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST        /:srn/member-details/:index/change                                                                 controllers.nonsipp.memberdetails.MemberDetailsController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
-GET         /:srn/psa-declaration                                                       controllers.nonsipp.declaration.PsaDeclarationController.onPageLoad(srn: Srn)
-GET         /:srn/submit-psa-declaration                                                controllers.nonsipp.declaration.PsaDeclarationController.onSubmit(srn: Srn)
+GET         /:srn/psa-declaration                                                                              controllers.nonsipp.declaration.PsaDeclarationController.onPageLoad(srn: Srn)
+GET         /:srn/submit-psa-declaration                                                                       controllers.nonsipp.declaration.PsaDeclarationController.onSubmit(srn: Srn)
 
-GET         /:srn/psp-declaration                                                       controllers.nonsipp.declaration.PspDeclarationController.onPageLoad(srn: Srn)
-POST        /:srn/psp-declaration                                                       controllers.nonsipp.declaration.PspDeclarationController.onSubmit(srn: Srn)
+GET         /:srn/psp-declaration                                                                              controllers.nonsipp.declaration.PspDeclarationController.onPageLoad(srn: Srn)
+POST        /:srn/psp-declaration                                                                              controllers.nonsipp.declaration.PspDeclarationController.onSubmit(srn: Srn)
 
-GET         /:srn/member-ni-number                                                      controllers.nonsipp.memberdetails.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
-GET         /:srn/member-ni-number/:index                                               controllers.nonsipp.memberdetails.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
-POST        /:srn/member-ni-number/:index                                               controllers.nonsipp.memberdetails.MemberDetailsNinoController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
+GET         /:srn/member-ni-number                                                                             controllers.nonsipp.memberdetails.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
+GET         /:srn/member-ni-number/:index                                                                      controllers.nonsipp.memberdetails.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/member-ni-number/:index                                                                      controllers.nonsipp.memberdetails.MemberDetailsNinoController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
 
-GET         /:srn/change-member-ni-number/:index                                        controllers.nonsipp.memberdetails.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
-POST        /:srn/change-member-ni-number/:index                                        controllers.nonsipp.memberdetails.MemberDetailsNinoController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
+GET         /:srn/change-member-ni-number/:index                                                               controllers.nonsipp.memberdetails.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST        /:srn/change-member-ni-number/:index                                                               controllers.nonsipp.memberdetails.MemberDetailsNinoController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
-GET         /:srn/national-insurance-number                                             controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
-GET         /:srn/national-insurance-number/:index                                      controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
-POST        /:srn/national-insurance-number/:index                                      controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
+GET         /:srn/national-insurance-number                                                                    controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
+GET         /:srn/national-insurance-number/:index                                                             controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/national-insurance-number/:index                                                             controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
 
-GET         /:srn/change-national-insurance-number/:index                               controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
-POST        /:srn/change-national-insurance-number/:index                               controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
+GET         /:srn/change-national-insurance-number/:index                                                      controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST        /:srn/change-national-insurance-number/:index                                                      controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
-GET         /:srn/check-member-details                                                      controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
-GET         /:srn/check-member-details/:index                                               controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
-POST        /:srn/check-member-details/:index                                               controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
-POST        /:srn/change-submit-check-member-details/:index                         controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, mode: Mode = ViewOnlyMode)
-GET         /:srn/check-member-details/:index/view/:year/:current/:previous         controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoadViewOnly(srn: Srn, index: Max300, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
-GET         /:srn/submit-check-member-details/view/:year/:current/:previous         controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
+GET         /:srn/check-member-details                                                                         controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
+GET         /:srn/check-member-details/:index                                                                  controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/check-member-details/:index                                                                  controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/change-submit-check-member-details/:index                                                    controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, mode: Mode = ViewOnlyMode)
+GET         /:srn/check-member-details/:index/view/:year/:current/:previous                                    controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoadViewOnly(srn: Srn, index: Max300, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/submit-check-member-details/view/:year/:current/:previous                                    controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
 
-GET         /:srn/change-member-details                                                 controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-member-details/:index                                          controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
-POST        /:srn/change-member-details/:index                                          controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
+GET         /:srn/change-member-details                                                                        controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-member-details/:index                                                                 controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST        /:srn/change-member-details/:index                                                                 controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
-GET         /:srn/how-many-members                                                      controllers.nonsipp.schemedesignatory.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/how-many-members                                                      controllers.nonsipp.schemedesignatory.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-how-many-members                                               controllers.nonsipp.schemedesignatory.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-how-many-members                                               controllers.nonsipp.schemedesignatory.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/how-many-members                                                                             controllers.nonsipp.schemedesignatory.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/how-many-members                                                                             controllers.nonsipp.schemedesignatory.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-how-many-members                                                                      controllers.nonsipp.schemedesignatory.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-how-many-members                                                                      controllers.nonsipp.schemedesignatory.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/no-ni-number                                                          controllers.nonsipp.memberdetails.NoNINOController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
-GET         /:srn/no-ni-number/:index                                                   controllers.nonsipp.memberdetails.NoNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
-POST        /:srn/no-ni-number/:index                                                   controllers.nonsipp.memberdetails.NoNINOController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
-
-GET         /:srn/change-no-ni-number/:index                                            controllers.nonsipp.memberdetails.NoNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
-POST        /:srn/change-no-ni-number/:index                                            controllers.nonsipp.memberdetails.NoNINOController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
-
-GET         /:srn/value-of-assets-and-cash                                              controllers.nonsipp.schemedesignatory.ValueOfAssetsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/value-of-assets-and-cash                                              controllers.nonsipp.schemedesignatory.ValueOfAssetsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-
-GET         /:srn/change-value-of-assets-and-cash                                       controllers.nonsipp.schemedesignatory.ValueOfAssetsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-value-of-assets-and-cash                                       controllers.nonsipp.schemedesignatory.ValueOfAssetsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/members                                                               controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int = 1, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
-GET         /:srn/members/:page                                                         controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
-POST        /:srn/members/:page                                                         controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
-
-GET         /:srn/members-uploaded                                                      controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int = 1, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
-GET         /:srn/members-uploaded/:page                                                controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
-POST        /:srn/members-uploaded/:page                                                controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
-
-GET         /:srn/members/:page/view/:year/:current/:previous                           controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoadViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int)
-GET         /:srn/members/:page/previous/:year/:current/:previous                       controllers.nonsipp.memberdetails.SchemeMembersListController.onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int)
-GET         /:srn/submit-members/view/:year/:current/:previous                          controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
-
-GET         /:srn/remove-member-details/:index                                          controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
-POST        /:srn/remove-member-details/:index                                          controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
-
-GET         /:srn/change-remove-member-details/:index                                   controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
-POST        /:srn/change-remove-member-details/:index                                   controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
-
-GET         /:srn/upload-member-details-file                                            controllers.nonsipp.memberdetails.UploadMemberDetailsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/submit-upload-member-details-file                                     controllers.nonsipp.memberdetails.UploadMemberDetailsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-
-GET         /:srn/did-scheme-have-bank-account                                          controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/did-scheme-have-bank-account                                          controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-
-GET         /:srn/change-did-scheme-have-bank-account                                   controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-did-scheme-have-bank-account                                   controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/reason-for-no-bank-account                                            controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/reason-for-no-bank-account                                            controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-reason-for-no-bank-account                                     controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-reason-for-no-bank-account                                     controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/loans-made-or-outstanding                                             controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/loans-made-or-outstanding                                             controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-
-GET         /:srn/change-loans-made-or-outstanding                                      controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-loans-made-or-outstanding                                      controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-fees-commissions-wages-salaries                                controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-fees-commissions-wages-salaries                                controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/return-submitted                                                      controllers.nonsipp.ReturnSubmittedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/view-only-return-submitted/:year/:version                             controllers.nonsipp.ViewOnlyReturnSubmittedController.onPageLoad(srn: Srn, year: String, version: Int)
-
-GET         /:srn/unallocated-employer-contributions                                    controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/unallocated-employer-contributions                                    controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-unallocated-employer-contributions                             controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-unallocated-employer-contributions                             controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/download-template-file                                                 controllers.nonsipp.memberdetails.HowToUploadController.onPageLoad(srn: Srn)
-GET         /:srn/submit-download-template-file                                          controllers.nonsipp.memberdetails.HowToUploadController.onSubmit(srn: Srn)
-GET         /download-file                                                               controllers.nonsipp.memberdetails.DownloadPensionSchemeTemplateController.downloadFile
-
-GET         /:srn/check-member-details-file                                             controllers.nonsipp.memberdetails.CheckMemberDetailsFileController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/check-member-details-file                                             controllers.nonsipp.memberdetails.CheckMemberDetailsFileController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-check-member-details-file                                      controllers.nonsipp.memberdetails.CheckMemberDetailsFileController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-check-member-details-file                                      controllers.nonsipp.memberdetails.CheckMemberDetailsFileController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/checking-member-details-file                                          controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/submit-checking-member-details-file                                   controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-checking-member-details-file                                   controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-checking-member-details-file                                   controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/file-upload-error                                                     controllers.nonsipp.memberdetails.upload.FileUploadErrorController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/submit-file-upload-error                                              controllers.nonsipp.memberdetails.upload.FileUploadErrorController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-file-upload-error                                              controllers.nonsipp.memberdetails.upload.FileUploadErrorController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-file-upload-error                                              controllers.nonsipp.memberdetails.upload.FileUploadErrorController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/file-upload-success                                                   controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/submit-file-upload-success                                            controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-file-upload-success                                            controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-GET         /:srn/submit-change-file-upload-success                                     controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/pension-scheme-return-task-list                                       controllers.nonsipp.TaskListController.onPageLoad(srn: Srn)
-GET         /:srn/pension-scheme-return-view-only-task-list/:year/:current/:previous    controllers.nonsipp.ViewOnlyTaskListController.onPageLoad(srn: Srn, year: String, current: Int, previous: Int)
-
-GET         /:srn/file-upload-error-missing-information                                 controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/submit-file-upload-error-missing-information                          controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-file-upload-error-missing-information                          controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-GET         /:srn/change-submit-file-upload-error-missing-information                   controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/type-of-:subject                                                      controllers.nonsipp.common.IdentityTypeController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
-GET         /:srn/type-of-:subject/:index                                               controllers.nonsipp.common.IdentityTypeController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
-POST        /:srn/type-of-:subject                                                      controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
-POST        /:srn/type-of-:subject/:index                                               controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
-GET         /:srn/change-type-of-:subject                                               controllers.nonsipp.common.IdentityTypeController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
-GET         /:srn/change-type-of-:subject/:index                                        controllers.nonsipp.common.IdentityTypeController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
-POST        /:srn/change-type-of-:subject                                               controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
-POST        /:srn/change-type-of-:subject/:index                                        controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
-
-GET         /:srn/file-upload-error-some                                                controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/submit-file-upload-error-some                                         controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-file-upload-error-some                                         controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-GET         /:srn/change-submit-file-upload-error-some                                  controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/other-details-of-:subject                                             controllers.nonsipp.common.OtherRecipientDetailsController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
-GET         /:srn/other-details-of-:subject/:index                                      controllers.nonsipp.common.OtherRecipientDetailsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
-POST        /:srn/other-details-of-:subject                                             controllers.nonsipp.common.OtherRecipientDetailsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
-POST        /:srn/other-details-of-:subject/:index                                      controllers.nonsipp.common.OtherRecipientDetailsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
-GET         /:srn/change-other-details-of-:subject                                      controllers.nonsipp.common.OtherRecipientDetailsController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
-GET         /:srn/change-other-details-of-:subject/:index                               controllers.nonsipp.common.OtherRecipientDetailsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
-POST        /:srn/change-other-details-of-:subject                                      controllers.nonsipp.common.OtherRecipientDetailsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
-POST        /:srn/change-other-details-of-:subject/:index                               controllers.nonsipp.common.OtherRecipientDetailsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
-
-GET         /:srn/file-upload-error-many                                                controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/submit-file-upload-error-many                                         controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-file-upload-error-many                                         controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-GET         /:srn/change-submit-file-upload-error-many                                  controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/what-you-will-need-loans                                              controllers.nonsipp.loansmadeoroutstanding.WhatYouWillNeedLoansController.onPageLoad(srn: Srn)
-GET         /:srn/submit-what-you-will-need-loans                                       controllers.nonsipp.loansmadeoroutstanding.WhatYouWillNeedLoansController.onSubmit(srn: Srn)
-
-GET         /:srn/individual-recipient-name                                             controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-GET         /:srn/individual-recipient-name/:index                                      controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/individual-recipient-name                                             controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-POST        /:srn/individual-recipient-name/:index                                      controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-individual-recipient-name                                      controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-individual-recipient-name/:index                               controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-individual-recipient-name                                      controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-POST        /:srn/change-individual-recipient-name/:index                               controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-
-GET         /:srn/is-individual-recipient-connected-party                               controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-GET         /:srn/is-individual-recipient-connected-party/:index                        controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/is-individual-recipient-connected-party                               controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-POST        /:srn/is-individual-recipient-connected-party/:index                        controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-is-individual-recipient-connected-party                        controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-is-individual-recipient-connected-party/:index                 controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-is-individual-recipient-connected-party                        controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-POST        /:srn/change-is-individual-recipient-connected-party/:index                 controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-
-GET         /:srn/check-your-answers-basic-details                                      controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/submit-check-your-answers-basic-details                               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-check-your-answers-basic-details                               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-GET         /:srn/change-submit-check-your-answers-basic-details                        controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-submit-check-your-answers-basic-details                        controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = ViewOnlyMode)
-GET         /:srn/check-your-answers-basic-details/view/:year/:current/:previous        controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoadViewOnly(srn: Srn, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
-GET         /:srn/check-your-answers-basic-details/previous/:year/:current/:previous    controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int)
-GET         /:srn/submit-check-your-answers-basic-details/view/:year/:current/:previous controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
-
-GET         /:srn/company-recipient-name                                                controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-GET         /:srn/company-recipient-name/:index                                         controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/company-recipient-name                                                controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-POST        /:srn/company-recipient-name/:index                                         controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-company-recipient-name                                         controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-company-recipient-name/:index                                  controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-company-recipient-name                                         controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-POST        /:srn/change-company-recipient-name/:index                                  controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-
-GET         /:srn/individual-recipient-ni-number                                        controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-GET         /:srn/individual-recipient-ni-number/:index                                 controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/individual-recipient-ni-number                                        controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-POST        /:srn/individual-recipient-ni-number/:index                                 controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onSubmit(srn: Srn, index: Max5000 , mode: Mode = NormalMode)
-GET         /:srn/change-individual-recipient-ni-number                                 controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-individual-recipient-ni-number/:index                          controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-individual-recipient-ni-number                                 controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-POST        /:srn/change-individual-recipient-ni-number/:index                          controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-
-GET         /:srn/crn-of-:subject                                                       controllers.nonsipp.common.CompanyRecipientCrnController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
-GET         /:srn/crn-of-:subject/:index                                                controllers.nonsipp.common.CompanyRecipientCrnController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
-POST        /:srn/crn-of-:subject                                                       controllers.nonsipp.common.CompanyRecipientCrnController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
-POST        /:srn/crn-of-:subject/:index                                                controllers.nonsipp.common.CompanyRecipientCrnController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
-GET         /:srn/change-crn-of-:subject                                                controllers.nonsipp.common.CompanyRecipientCrnController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
-GET         /:srn/change-crn-of-:subject/:index                                         controllers.nonsipp.common.CompanyRecipientCrnController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
-POST        /:srn/change-crn-of-:subject                                                controllers.nonsipp.common.CompanyRecipientCrnController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
-POST        /:srn/change-crn-of-:subject/:index                                         controllers.nonsipp.common.CompanyRecipientCrnController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
-
-GET         /:srn/partnership-recipient-name                                            controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-GET         /:srn/partnership-recipient-name/:index                                     controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/partnership-recipient-name                                            controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-POST        /:srn/partnership-recipient-name/:index                                     controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-partnership-recipient-name                                     controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-partnership-recipient-name/:index                              controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-partnership-recipient-name                                     controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-POST        /:srn/change-partnership-recipient-name/:index                              controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-
-GET         /:srn/file-upload-too-many-rows                                             controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/submit-file-upload-too-many-rows                                      controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-file-upload-too-many-rows                                      controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-GET         /:srn/change-submit-file-upload-too-many-rows                               controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/utr-of-:subject                                                       controllers.nonsipp.common.PartnershipRecipientUtrController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
-GET         /:srn/utr-of-:subject/:index                                                controllers.nonsipp.common.PartnershipRecipientUtrController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
-POST        /:srn/utr-of-:subject                                                       controllers.nonsipp.common.PartnershipRecipientUtrController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
-POST        /:srn/utr-of-:subject/:index                                                controllers.nonsipp.common.PartnershipRecipientUtrController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
-GET         /:srn/change-utr-of-:subject                                                controllers.nonsipp.common.PartnershipRecipientUtrController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
-GET         /:srn/change-utr-of-:subject/:index                                         controllers.nonsipp.common.PartnershipRecipientUtrController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
-POST        /:srn/change-utr-of-:subject                                                controllers.nonsipp.common.PartnershipRecipientUtrController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
-POST        /:srn/change-utr-of-:subject/:index                                         controllers.nonsipp.common.PartnershipRecipientUtrController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
-
-GET         /:srn/is-recipient-sponsoring-employer-connected-party                      controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-GET         /:srn/is-recipient-sponsoring-employer-connected-party/:index               controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/is-recipient-sponsoring-employer-connected-party                      controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-POST        /:srn/is-recipient-sponsoring-employer-connected-party/:index               controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-is-recipient-sponsoring-employer-connected-party               controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-is-recipient-sponsoring-employer-connected-party/:index        controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-is-recipient-sponsoring-employer-connected-party               controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-POST        /:srn/change-is-recipient-sponsoring-employer-connected-party/:index        controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-
-GET         /:srn/date-period-of-loan                                                   controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-GET         /:srn/date-period-of-loan/:index                                            controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/date-period-of-loan                                                   controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-POST        /:srn/date-period-of-loan/:index                                            controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-date-period-of-loan                                            controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-date-period-of-loan/:index                                     controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-date-period-of-loan                                            controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-POST        /:srn/change-date-period-of-loan/:index                                     controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-
-GET         /:srn/are-repayments-instalments                                            controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-GET         /:srn/are-repayments-instalments/:index                                     controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/are-repayments-instalments                                            controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-POST        /:srn/are-repayments-instalments/:index                                     controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-are-repayments-instalments                                     controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-are-repayments-instalments/:index                              controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-are-repayments-instalments                                     controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-POST        /:srn/change-are-repayments-instalments/:index                              controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-
-GET         /:srn/interest-on-loan                                                      controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-GET         /:srn/interest-on-loan/:index                                               controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/interest-on-loan                                                      controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-POST        /:srn/interest-on-loan/:index                                               controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-interest-on-loan                                               controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-interest-on-loan/:index                                        controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-interest-on-loan                                               controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-POST        /:srn/change-interest-on-loan/:index                                        controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-
-GET         /:srn/amount-of-loan-payments                                               controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-GET         /:srn/amount-of-loan-payments/:index                                        controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/amount-of-loan-payments                                               controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-POST        /:srn/amount-of-loan-payments/:index                                        controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-amount-of-loan-payments                                        controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-amount-of-loan-payments/:index                                 controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-amount-of-loan-payments                                        controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-POST        /:srn/change-amount-of-loan-payments/:index                                 controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-
-GET         /:srn/check-answers-loan/:index                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/submit-check-answers-loan/:index                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-check-answers-loan/:index                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-submit-check-answers-loan/:index                               controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-submit-check-answers-loan/:index                               controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, index: Max5000, mode: Mode = ViewOnlyMode)
-GET         /:srn/check-answers-loan/:index/view/:year/:current/:previous               controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoadViewOnly(srn: Srn, index: Max5000, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
-GET         /:srn/submit-check-answers-loan/view/:year/:current/:previous               controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
-
-GET         /:srn/outstanding-arrears-on-loan                                           controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-GET         /:srn/outstanding-arrears-on-loan/:index                                    controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/outstanding-arrears-on-loan                                           controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-POST        /:srn/outstanding-arrears-on-loan/:index                                    controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-outstanding-arrears-on-loan                                    controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-outstanding-arrears-on-loan/:index                             controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-outstanding-arrears-on-loan                                    controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-POST        /:srn/change-outstanding-arrears-on-loan/:index                             controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-
-GET         /:srn/loans                                                                 controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = NormalMode)
-GET         /:srn/loans/:page                                                           controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
-POST        /:srn/loans/:page                                                           controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
-
-GET         /:srn/change-loans                                                          controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = CheckMode)
-GET         /:srn/change-loans/:page                                                    controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
-POST        /:srn/change-loans/:page                                                    controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
-
-POST        /:srn/change-loans/:page                                                    controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmit(srn: Srn, page: Int, mode: Mode = ViewOnlyMode)
-GET         /:srn/loans/view/:year/:current/:previous                                   controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoadViewOnly(srn: Srn, page: Int = 1, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
-GET         /:srn/loans/:page/view/:year/:current/:previous                             controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoadViewOnly(srn: Srn, page: Int, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
-GET         /:srn/loans/:page/previous/:year/:current/:previous                         controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int)
-GET         /:srn/submit-loans/view/:year/:current/:previous                            controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
-
-GET         /:srn/security-given-for-loan                                               controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-GET         /:srn/security-given-for-loan/:index                                        controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/security-given-for-loan                                               controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-POST        /:srn/security-given-for-loan/:index                                        controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-security-given-for-loan                                        controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-security-given-for-loan/:index                                 controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-security-given-for-loan                                        controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-POST        /:srn/change-security-given-for-loan/:index                                 controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-
-GET         /:srn/remove-loan/:index                                                    controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/remove-loan/:index                                                    controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-remove-loan/:index                                             controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-remove-loan/:index                                             controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-
-GET         /:srn/check-answers-financial-details                                       controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/submit-check-answers-financial-details                                controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-check-answers-financial-details                                controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-submit-check-answers-financial-details                         controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-submit-check-answers-financial-details                         controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = ViewOnlyMode)
-GET         /:srn/check-answers-financial-details/view/:year/:current/:previous         controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoadViewOnly(srn: Srn, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
-GET         /:srn/check-answers-financial-details/previous/:year/:current/:previous     controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int)
-GET         /:srn/submit-check-answers-financial-details/view/:year/:current/:previous  controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
-
-GET         /:srn/how-much-unallocated-employer-contributions                           controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/how-much-unallocated-employer-contributions                           controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-how-much-unallocated-employer-contributions                    controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-how-much-unallocated-employer-contributions                    controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/check-answers-unallocated-employer-contributions                                                  controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/submit-check-answers-unallocated-employer-contributions                                           controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-check-answers-unallocated-employer-contributions                                           controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-submit-answers-unallocated-employer-contributions                                          controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-submit-check-answers-unallocated-employer-contributions                                    controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, mode: Mode = ViewOnlyMode)
-GET         /:srn/check-answers-unallocated-employer-contributions/view/:year/:current/:previous                    controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoadViewOnly(srn: Srn, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
-GET         /:srn/check-answers-unallocated-employer-contributions/previous/:year/:current/:previous                controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int)
-GET         /:srn/submit-check-answers-unallocated-employer-contributions/view/:year/:current/:previous             controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
-
-GET         /:srn/remove-unallocated-employer-contributions                             controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/remove-unallocated-employer-contributions                             controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-remove-unallocated-employer-contributions                      controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-remove-unallocated-employer-contributions                      controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/overview                                                              controllers.OverviewController.onPageLoad(srn: Srn)
-GET         /:srn/select-view-and-change                                                controllers.OverviewController.onSelectViewAndChange(srn: Srn, fbNumber: String, reportType: String)
-GET         /:srn/select-start                                                          controllers.OverviewController.onSelectStart(srn: Srn, taxYear: String, version: String, reportType: String)
-GET         /:srn/select-continue                                                       controllers.OverviewController.onSelectContinue(srn: Srn, taxYear: String, version: String, reportType: String)
-GET         /:srn/view-change/submitted-returns/:page                                   controllers.ReturnsSubmittedController.onPageLoad(srn: Srn, page: Int)
-GET         /:srn/view-change/select-submitted-returns                                  controllers.ReturnsSubmittedController.onSelect(srn: Srn, fbNumber: String)
+GET         /:srn/no-ni-number                                                                                 controllers.nonsipp.memberdetails.NoNINOController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
+GET         /:srn/no-ni-number/:index                                                                          controllers.nonsipp.memberdetails.NoNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/no-ni-number/:index                                                                          controllers.nonsipp.memberdetails.NoNINOController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
+
+GET         /:srn/change-no-ni-number/:index                                                                   controllers.nonsipp.memberdetails.NoNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST        /:srn/change-no-ni-number/:index                                                                   controllers.nonsipp.memberdetails.NoNINOController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
+
+GET         /:srn/value-of-assets-and-cash                                                                     controllers.nonsipp.schemedesignatory.ValueOfAssetsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/value-of-assets-and-cash                                                                     controllers.nonsipp.schemedesignatory.ValueOfAssetsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-value-of-assets-and-cash                                                              controllers.nonsipp.schemedesignatory.ValueOfAssetsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-value-of-assets-and-cash                                                              controllers.nonsipp.schemedesignatory.ValueOfAssetsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/members                                                                                      controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int = 1, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
+GET         /:srn/members/:page                                                                                controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
+POST        /:srn/members/:page                                                                                controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
+
+GET         /:srn/members-uploaded                                                                             controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int = 1, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
+GET         /:srn/members-uploaded/:page                                                                       controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
+POST        /:srn/members-uploaded/:page                                                                       controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
+
+GET         /:srn/members/:page/view/:year/:current/:previous                                                  controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoadViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int)
+GET         /:srn/members/:page/previous/:year/:current/:previous                                              controllers.nonsipp.memberdetails.SchemeMembersListController.onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int)
+GET         /:srn/submit-members/view/:year/:current/:previous                                                 controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
+
+GET         /:srn/remove-member-details/:index                                                                 controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/remove-member-details/:index                                                                 controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
+
+GET         /:srn/change-remove-member-details/:index                                                          controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST        /:srn/change-remove-member-details/:index                                                          controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
+
+GET         /:srn/upload-member-details-file                                                                   controllers.nonsipp.memberdetails.UploadMemberDetailsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/submit-upload-member-details-file                                                            controllers.nonsipp.memberdetails.UploadMemberDetailsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/did-scheme-have-bank-account                                                                 controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/did-scheme-have-bank-account                                                                 controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-did-scheme-have-bank-account                                                          controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-did-scheme-have-bank-account                                                          controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/reason-for-no-bank-account                                                                   controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/reason-for-no-bank-account                                                                   controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-reason-for-no-bank-account                                                            controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-reason-for-no-bank-account                                                            controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/loans-made-or-outstanding                                                                    controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/loans-made-or-outstanding                                                                    controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-loans-made-or-outstanding                                                             controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-loans-made-or-outstanding                                                             controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/fees-commissions-wages-salaries                                                              controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/fees-commissions-wages-salaries                                                              controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-fees-commissions-wages-salaries                                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-fees-commissions-wages-salaries                                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/return-submitted                                                                             controllers.nonsipp.ReturnSubmittedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/view-only-return-submitted/:year/:version                                                    controllers.nonsipp.ViewOnlyReturnSubmittedController.onPageLoad(srn: Srn, year: String, version: Int)
+
+GET         /:srn/unallocated-employer-contributions                                                           controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/unallocated-employer-contributions                                                           controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-unallocated-employer-contributions                                                    controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-unallocated-employer-contributions                                                    controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/download-template-file                                                                       controllers.nonsipp.memberdetails.HowToUploadController.onPageLoad(srn: Srn)
+GET         /:srn/submit-download-template-file                                                                controllers.nonsipp.memberdetails.HowToUploadController.onSubmit(srn: Srn)
+GET         /download-file                                                                                     controllers.nonsipp.memberdetails.DownloadPensionSchemeTemplateController.downloadFile
+
+GET         /:srn/check-member-details-file                                                                    controllers.nonsipp.memberdetails.CheckMemberDetailsFileController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/check-member-details-file                                                                    controllers.nonsipp.memberdetails.CheckMemberDetailsFileController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-check-member-details-file                                                             controllers.nonsipp.memberdetails.CheckMemberDetailsFileController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-check-member-details-file                                                             controllers.nonsipp.memberdetails.CheckMemberDetailsFileController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/checking-member-details-file                                                                 controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/submit-checking-member-details-file                                                          controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-checking-member-details-file                                                          controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-checking-member-details-file                                                          controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/file-upload-error                                                                            controllers.nonsipp.memberdetails.upload.FileUploadErrorController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/submit-file-upload-error                                                                     controllers.nonsipp.memberdetails.upload.FileUploadErrorController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-file-upload-error                                                                     controllers.nonsipp.memberdetails.upload.FileUploadErrorController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-file-upload-error                                                                     controllers.nonsipp.memberdetails.upload.FileUploadErrorController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/file-upload-success                                                                          controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/submit-file-upload-success                                                                   controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-file-upload-success                                                                   controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/submit-change-file-upload-success                                                            controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/pension-scheme-return-task-list                                                              controllers.nonsipp.TaskListController.onPageLoad(srn: Srn)
+GET         /:srn/pension-scheme-return-view-only-task-list/:year/:current/:previous                           controllers.nonsipp.ViewOnlyTaskListController.onPageLoad(srn: Srn, year: String, current: Int, previous: Int)
+
+GET         /:srn/file-upload-error-missing-information                                                        controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/submit-file-upload-error-missing-information                                                 controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-file-upload-error-missing-information                                                 controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-submit-file-upload-error-missing-information                                          controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/type-of-:subject                                                                             controllers.nonsipp.common.IdentityTypeController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
+GET         /:srn/type-of-:subject/:index                                                                      controllers.nonsipp.common.IdentityTypeController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
+POST        /:srn/type-of-:subject                                                                             controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
+POST        /:srn/type-of-:subject/:index                                                                      controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
+GET         /:srn/change-type-of-:subject                                                                      controllers.nonsipp.common.IdentityTypeController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
+GET         /:srn/change-type-of-:subject/:index                                                               controllers.nonsipp.common.IdentityTypeController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
+POST        /:srn/change-type-of-:subject                                                                      controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
+POST        /:srn/change-type-of-:subject/:index                                                               controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
+
+GET         /:srn/file-upload-error-some                                                                       controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/submit-file-upload-error-some                                                                controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-file-upload-error-some                                                                controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-submit-file-upload-error-some                                                         controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/other-details-of-:subject                                                                    controllers.nonsipp.common.OtherRecipientDetailsController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
+GET         /:srn/other-details-of-:subject/:index                                                             controllers.nonsipp.common.OtherRecipientDetailsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
+POST        /:srn/other-details-of-:subject                                                                    controllers.nonsipp.common.OtherRecipientDetailsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
+POST        /:srn/other-details-of-:subject/:index                                                             controllers.nonsipp.common.OtherRecipientDetailsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
+GET         /:srn/change-other-details-of-:subject                                                             controllers.nonsipp.common.OtherRecipientDetailsController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
+GET         /:srn/change-other-details-of-:subject/:index                                                      controllers.nonsipp.common.OtherRecipientDetailsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
+POST        /:srn/change-other-details-of-:subject                                                             controllers.nonsipp.common.OtherRecipientDetailsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
+POST        /:srn/change-other-details-of-:subject/:index                                                      controllers.nonsipp.common.OtherRecipientDetailsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
+
+GET         /:srn/file-upload-error-many                                                                       controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/submit-file-upload-error-many                                                                controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-file-upload-error-many                                                                controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-submit-file-upload-error-many                                                         controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/what-you-will-need-loans                                                                     controllers.nonsipp.loansmadeoroutstanding.WhatYouWillNeedLoansController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-loans                                                              controllers.nonsipp.loansmadeoroutstanding.WhatYouWillNeedLoansController.onSubmit(srn: Srn)
+
+GET         /:srn/individual-recipient-name                                                                    controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/individual-recipient-name/:index                                                             controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/individual-recipient-name                                                                    controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/individual-recipient-name/:index                                                             controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-individual-recipient-name                                                             controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-individual-recipient-name/:index                                                      controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-individual-recipient-name                                                             controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-individual-recipient-name/:index                                                      controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/is-individual-recipient-connected-party                                                      controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/is-individual-recipient-connected-party/:index                                               controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/is-individual-recipient-connected-party                                                      controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/is-individual-recipient-connected-party/:index                                               controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-is-individual-recipient-connected-party                                               controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-is-individual-recipient-connected-party/:index                                        controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-is-individual-recipient-connected-party                                               controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-is-individual-recipient-connected-party/:index                                        controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/check-your-answers-basic-details                                                             controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/submit-check-your-answers-basic-details                                                      controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-check-your-answers-basic-details                                                      controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-submit-check-your-answers-basic-details                                               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-submit-check-your-answers-basic-details                                               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = ViewOnlyMode)
+GET         /:srn/check-your-answers-basic-details/view/:year/:current/:previous                               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoadViewOnly(srn: Srn, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/check-your-answers-basic-details/previous/:year/:current/:previous                           controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int)
+GET         /:srn/submit-check-your-answers-basic-details/view/:year/:current/:previous                        controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
+
+GET         /:srn/company-recipient-name                                                                       controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/company-recipient-name/:index                                                                controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/company-recipient-name                                                                       controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/company-recipient-name/:index                                                                controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-company-recipient-name                                                                controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-company-recipient-name/:index                                                         controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-company-recipient-name                                                                controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-company-recipient-name/:index                                                         controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/individual-recipient-ni-number                                                               controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/individual-recipient-ni-number/:index                                                        controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/individual-recipient-ni-number                                                               controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/individual-recipient-ni-number/:index                                                        controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onSubmit(srn: Srn, index: Max5000 , mode: Mode = NormalMode)
+GET         /:srn/change-individual-recipient-ni-number                                                        controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-individual-recipient-ni-number/:index                                                 controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-individual-recipient-ni-number                                                        controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-individual-recipient-ni-number/:index                                                 controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/crn-of-:subject                                                                              controllers.nonsipp.common.CompanyRecipientCrnController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
+GET         /:srn/crn-of-:subject/:index                                                                       controllers.nonsipp.common.CompanyRecipientCrnController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
+POST        /:srn/crn-of-:subject                                                                              controllers.nonsipp.common.CompanyRecipientCrnController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
+POST        /:srn/crn-of-:subject/:index                                                                       controllers.nonsipp.common.CompanyRecipientCrnController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
+GET         /:srn/change-crn-of-:subject                                                                       controllers.nonsipp.common.CompanyRecipientCrnController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
+GET         /:srn/change-crn-of-:subject/:index                                                                controllers.nonsipp.common.CompanyRecipientCrnController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
+POST        /:srn/change-crn-of-:subject                                                                       controllers.nonsipp.common.CompanyRecipientCrnController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
+POST        /:srn/change-crn-of-:subject/:index                                                                controllers.nonsipp.common.CompanyRecipientCrnController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
+
+GET         /:srn/partnership-recipient-name                                                                   controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/partnership-recipient-name/:index                                                            controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/partnership-recipient-name                                                                   controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/partnership-recipient-name/:index                                                            controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-partnership-recipient-name                                                            controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-partnership-recipient-name/:index                                                     controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-partnership-recipient-name                                                            controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-partnership-recipient-name/:index                                                     controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/file-upload-too-many-rows                                                                    controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/submit-file-upload-too-many-rows                                                             controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-file-upload-too-many-rows                                                             controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-submit-file-upload-too-many-rows                                                      controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/utr-of-:subject                                                                              controllers.nonsipp.common.PartnershipRecipientUtrController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
+GET         /:srn/utr-of-:subject/:index                                                                       controllers.nonsipp.common.PartnershipRecipientUtrController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
+POST        /:srn/utr-of-:subject                                                                              controllers.nonsipp.common.PartnershipRecipientUtrController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
+POST        /:srn/utr-of-:subject/:index                                                                       controllers.nonsipp.common.PartnershipRecipientUtrController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
+GET         /:srn/change-utr-of-:subject                                                                       controllers.nonsipp.common.PartnershipRecipientUtrController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
+GET         /:srn/change-utr-of-:subject/:index                                                                controllers.nonsipp.common.PartnershipRecipientUtrController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
+POST        /:srn/change-utr-of-:subject                                                                       controllers.nonsipp.common.PartnershipRecipientUtrController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
+POST        /:srn/change-utr-of-:subject/:index                                                                controllers.nonsipp.common.PartnershipRecipientUtrController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
+
+GET         /:srn/is-recipient-sponsoring-employer-connected-party                                             controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/is-recipient-sponsoring-employer-connected-party/:index                                      controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/is-recipient-sponsoring-employer-connected-party                                             controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/is-recipient-sponsoring-employer-connected-party/:index                                      controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-is-recipient-sponsoring-employer-connected-party                                      controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-is-recipient-sponsoring-employer-connected-party/:index                               controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-is-recipient-sponsoring-employer-connected-party                                      controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-is-recipient-sponsoring-employer-connected-party/:index                               controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/date-period-of-loan                                                                          controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/date-period-of-loan/:index                                                                   controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/date-period-of-loan                                                                          controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/date-period-of-loan/:index                                                                   controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-date-period-of-loan                                                                   controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-date-period-of-loan/:index                                                            controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-date-period-of-loan                                                                   controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-date-period-of-loan/:index                                                            controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/are-repayments-instalments                                                                   controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/are-repayments-instalments/:index                                                            controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/are-repayments-instalments                                                                   controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/are-repayments-instalments/:index                                                            controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-are-repayments-instalments                                                            controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-are-repayments-instalments/:index                                                     controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-are-repayments-instalments                                                            controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-are-repayments-instalments/:index                                                     controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/interest-on-loan                                                                             controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/interest-on-loan/:index                                                                      controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/interest-on-loan                                                                             controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/interest-on-loan/:index                                                                      controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-interest-on-loan                                                                      controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-interest-on-loan/:index                                                               controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-interest-on-loan                                                                      controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-interest-on-loan/:index                                                               controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/amount-of-loan-payments                                                                      controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/amount-of-loan-payments/:index                                                               controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/amount-of-loan-payments                                                                      controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/amount-of-loan-payments/:index                                                               controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-amount-of-loan-payments                                                               controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-amount-of-loan-payments/:index                                                        controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-amount-of-loan-payments                                                               controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-amount-of-loan-payments/:index                                                        controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/check-answers-loan/:index                                                                    controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/submit-check-answers-loan/:index                                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-check-answers-loan/:index                                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-submit-check-answers-loan/:index                                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-submit-check-answers-loan/:index                                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, index: Max5000, mode: Mode = ViewOnlyMode)
+GET         /:srn/check-answers-loan/:index/view/:year/:current/:previous                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoadViewOnly(srn: Srn, index: Max5000, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/submit-check-answers-loan/view/:year/:current/:previous                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
+
+GET         /:srn/outstanding-arrears-on-loan                                                                  controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/outstanding-arrears-on-loan/:index                                                           controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/outstanding-arrears-on-loan                                                                  controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/outstanding-arrears-on-loan/:index                                                           controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-outstanding-arrears-on-loan                                                           controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-outstanding-arrears-on-loan/:index                                                    controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-outstanding-arrears-on-loan                                                           controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-outstanding-arrears-on-loan/:index                                                    controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/loans                                                                                        controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = NormalMode)
+GET         /:srn/loans/:page                                                                                  controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
+POST        /:srn/loans/:page                                                                                  controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
+
+GET         /:srn/change-loans                                                                                 controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = CheckMode)
+GET         /:srn/change-loans/:page                                                                           controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
+POST        /:srn/change-loans/:page                                                                           controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
+
+POST        /:srn/change-loans/:page                                                                           controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmit(srn: Srn, page: Int, mode: Mode = ViewOnlyMode)
+GET         /:srn/loans/view/:year/:current/:previous                                                          controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoadViewOnly(srn: Srn, page: Int = 1, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/loans/:page/view/:year/:current/:previous                                                    controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoadViewOnly(srn: Srn, page: Int, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/loans/:page/previous/:year/:current/:previous                                                controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int)
+GET         /:srn/submit-loans/view/:year/:current/:previous                                                   controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
+
+GET         /:srn/security-given-for-loan                                                                      controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/security-given-for-loan/:index                                                               controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/security-given-for-loan                                                                      controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/security-given-for-loan/:index                                                               controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-security-given-for-loan                                                               controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-security-given-for-loan/:index                                                        controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-security-given-for-loan                                                               controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-security-given-for-loan/:index                                                        controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/remove-loan/:index                                                                           controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/remove-loan/:index                                                                           controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-remove-loan/:index                                                                    controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-remove-loan/:index                                                                    controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/check-answers-financial-details                                                              controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/submit-check-answers-financial-details                                                       controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-check-answers-financial-details                                                       controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-submit-check-answers-financial-details                                                controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-submit-check-answers-financial-details                                                controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = ViewOnlyMode)
+GET         /:srn/check-answers-financial-details/view/:year/:current/:previous                                controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoadViewOnly(srn: Srn, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/check-answers-financial-details/previous/:year/:current/:previous                            controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int)
+GET         /:srn/submit-check-answers-financial-details/view/:year/:current/:previous                         controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
+
+GET         /:srn/how-much-unallocated-employer-contributions                                                  controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/how-much-unallocated-employer-contributions                                                  controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-how-much-unallocated-employer-contributions                                           controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-how-much-unallocated-employer-contributions                                           controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/check-answers-unallocated-employer-contributions                                             controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/submit-check-answers-unallocated-employer-contributions                                      controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-check-answers-unallocated-employer-contributions                                      controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-submit-answers-unallocated-employer-contributions                                     controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-submit-check-answers-unallocated-employer-contributions                               controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, mode: Mode = ViewOnlyMode)
+GET         /:srn/check-answers-unallocated-employer-contributions/view/:year/:current/:previous               controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoadViewOnly(srn: Srn, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/check-answers-unallocated-employer-contributions/previous/:year/:current/:previous           controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int)
+GET         /:srn/submit-check-answers-unallocated-employer-contributions/view/:year/:current/:previous        controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
+
+GET         /:srn/remove-unallocated-employer-contributions                                                    controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/remove-unallocated-employer-contributions                                                    controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-remove-unallocated-employer-contributions                                             controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-remove-unallocated-employer-contributions                                             controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/overview                                                                                     controllers.OverviewController.onPageLoad(srn: Srn)
+GET         /:srn/select-view-and-change                                                                       controllers.OverviewController.onSelectViewAndChange(srn: Srn, fbNumber: String, reportType: String)
+GET         /:srn/select-start                                                                                 controllers.OverviewController.onSelectStart(srn: Srn, taxYear: String, version: String, reportType: String)
+GET         /:srn/select-continue                                                                              controllers.OverviewController.onSelectContinue(srn: Srn, taxYear: String, version: String, reportType: String)
+GET         /:srn/view-change/submitted-returns/:page                                                          controllers.ReturnsSubmittedController.onPageLoad(srn: Srn, page: Int)
+GET         /:srn/view-change/select-submitted-returns                                                         controllers.ReturnsSubmittedController.onSelect(srn: Srn, fbNumber: String)

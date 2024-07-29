@@ -70,7 +70,7 @@ class OtherAssetsListController @Inject()(
           Ok(view(filledForm, viewModel(srn, page, mode, data)))
         }.merge
       } else {
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
       }
   }
 

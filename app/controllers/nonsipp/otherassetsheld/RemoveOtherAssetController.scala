@@ -54,17 +54,21 @@ class RemoveOtherAssetController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(WhatIsOtherAssetPage(srn, index)).getOrRecoverJourney { whatIsOtherAsset =>
-        val preparedForm =
-          request.userAnswers.fillForm(RemoveOtherAssetPage(srn, index), form)
-        Ok(
-          view(
-            preparedForm,
-            RemoveOtherAssetController
-              .viewModel(srn, index, whatIsOtherAsset, mode)
+      (
+        for {
+          whatIsOtherAsset <- request.userAnswers.get(WhatIsOtherAssetPage(srn, index)).getOrRedirectToTaskList(srn)
+        } yield {
+          val preparedForm =
+            request.userAnswers.fillForm(RemoveOtherAssetPage(srn, index), form)
+          Ok(
+            view(
+              preparedForm,
+              RemoveOtherAssetController
+                .viewModel(srn, index, whatIsOtherAsset, mode)
+            )
           )
-        )
-      }
+        }
+      ).merge
     }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =

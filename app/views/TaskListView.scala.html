@@ -31,7 +31,7 @@
   </li>
 }
 
-@layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
+@layout(pageTitle = titleNoForm(viewmodel.title.toMessage), showBackLink = false) {
 
   <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)</h1>
 

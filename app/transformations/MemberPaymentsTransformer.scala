@@ -353,26 +353,26 @@ class MemberPaymentsTransformer @Inject()(
           && !memberPayments.employerContributionsDetails.completed
       )
 
-      ua3_2 <- employerContributionsNotStarted match {
-        case true => ua3_1
-        case false =>
-          ua3_1
-            .set(
-              EmployerContributionsPage(srn),
-              // If 1 or more Employer Contributions have been made, then this answer must be set to true / Yes, even if
-              // the value in ETMP is false - this is used as a workaround to indicate the section is In Progress.
-              if (memberPayments.memberDetails.exists(_.employerContributions.nonEmpty)) true
-              else memberPayments.employerContributionsDetails.made
-            )
-            .set(
-              EmployerContributionsSectionStatus(srn),
-              if (memberPayments.employerContributionsDetails.completed) SectionStatus.Completed
-              else SectionStatus.InProgress
-            )
-            .set(
-              EmployerContributionsMemberListPage(srn),
-              memberPayments.employerContributionsDetails.completed
-            )
+      ua3_2 <- if (employerContributionsNotStarted) {
+        ua3_1
+      } else {
+        ua3_1
+          .set(
+            EmployerContributionsPage(srn),
+            // If 1 or more Employer Contributions have been made, then this answer must be set to true / Yes, even if
+            // the value in ETMP is false - this is used as a workaround to indicate the section is In Progress.
+            if (memberPayments.memberDetails.exists(_.employerContributions.nonEmpty)) true
+            else memberPayments.employerContributionsDetails.made
+          )
+          .set(
+            EmployerContributionsSectionStatus(srn),
+            if (memberPayments.employerContributionsDetails.completed) SectionStatus.Completed
+            else SectionStatus.InProgress
+          )
+          .set(
+            EmployerContributionsMemberListPage(srn),
+            memberPayments.employerContributionsDetails.completed
+          )
       }
 
       // Transfers In section-wide user answers
@@ -473,7 +473,7 @@ class MemberPaymentsTransformer @Inject()(
       val psrStatus = ua.get(FbStatus(srn))
       val psrVersion = ua.get(FbVersionPage(srn))
       logger.info(
-        s"""[identifyNewMembers] identifying members that are safe to hard delete with PSR version $psrVersion, psrStatus ${psrStatus} and previous version useranswers are ${previousVersionUA
+        s"""[identifyNewMembers] identifying members that are safe to hard delete with PSR version $psrVersion, psrStatus $psrStatus and previous version useranswers are ${previousVersionUA
           .fold("empty")(_ => "non-empty")}"""
       )
       previousVersionUA match {

@@ -55,29 +55,26 @@ class RemovePensionPaymentsController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val nameDOB = request.userAnswers.get(MemberDetailsPage(srn, index)).get
-      val totalAmountPensionPayment = request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index))
-      totalAmountPensionPayment match {
-        case Some(value) =>
+      (
+        for {
+          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRedirectToTaskList(srn)
+          totalAmountPensionPayment <- request.userAnswers
+            .get(TotalAmountPensionPaymentsPage(srn, index))
+            .getOrRedirectToTaskList(srn)
+        } yield {
           Ok(
             view(
               form,
               RemovePensionPaymentsController.viewModel(
                 srn,
                 index: Max300,
-                value,
+                totalAmountPensionPayment,
                 nameDOB.fullName
               )
             )
           )
-        case None =>
-          Redirect(
-            controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
-              .onPageLoad(srn, NormalMode)
-              .url
-          )
-      }
-
+        }
+      ).merge
     }
 
   def onSubmit(srn: Srn, index: Max300): Action[AnyContent] =

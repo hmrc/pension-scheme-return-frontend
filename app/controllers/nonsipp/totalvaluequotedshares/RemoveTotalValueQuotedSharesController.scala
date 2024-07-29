@@ -57,18 +57,19 @@ class RemoveTotalValueQuotedSharesController @Inject()(
   private val form = RemoveTotalValueQuotedSharesController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val res = request.userAnswers.get(TotalValueQuotedSharesPage(srn))
-    res match {
-      case Some(value) =>
+    (
+      for {
+        res <- request.userAnswers.get(TotalValueQuotedSharesPage(srn)).getOrRedirectToTaskList(srn)
+      } yield {
         val preparedForm = request.userAnswers.fillForm(RemoveTotalValueQuotedSharesPage(srn), form)
         Ok(
           view(
             preparedForm,
-            RemoveTotalValueQuotedSharesController.viewModel(srn, mode, value.displayAs)
+            RemoveTotalValueQuotedSharesController.viewModel(srn, mode, res.displayAs)
           )
         )
-      case None => Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn).url)
-    }
+      }
+    ).merge
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>

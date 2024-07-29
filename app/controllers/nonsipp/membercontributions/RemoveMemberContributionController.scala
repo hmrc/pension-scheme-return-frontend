@@ -56,29 +56,24 @@ class RemoveMemberContributionController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val nameDOB = request.userAnswers.get(MemberDetailsPage(srn, index)).get
-      val totalContrib = request.userAnswers.get(TotalMemberContributionPage(srn, index))
-      totalContrib match {
-        case Some(value) =>
+      (
+        for {
+          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRedirectToTaskList(srn)
+          totalContrib <- request.userAnswers.get(TotalMemberContributionPage(srn, index)).getOrRedirectToTaskList(srn)
+        } yield {
           Ok(
             view(
               form,
               RemoveMemberContributionController.viewModel(
                 srn,
                 index: Max300,
-                value,
+                totalContrib,
                 nameDOB.fullName
               )
             )
           )
-        case None =>
-          Redirect(
-            controllers.nonsipp.membercontributions.routes.MemberContributionsController
-              .onPageLoad(srn, NormalMode)
-              .url
-          )
-      }
-
+        }
+      ).merge
     }
 
   def onSubmit(srn: Srn, index: Max300): Action[AnyContent] =

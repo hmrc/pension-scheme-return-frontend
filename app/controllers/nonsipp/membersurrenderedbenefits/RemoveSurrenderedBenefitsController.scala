@@ -55,29 +55,26 @@ class RemoveSurrenderedBenefitsController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val nameDOB = request.userAnswers.get(MemberDetailsPage(srn, index)).get
-      val surrenderedBenefitsAmount = request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, index))
-      surrenderedBenefitsAmount match {
-        case Some(value) =>
+      (
+        for {
+          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRedirectToTaskList(srn)
+          surrenderedBenefitsAmount <- request.userAnswers
+            .get(SurrenderedBenefitsAmountPage(srn, index))
+            .getOrRedirectToTaskList(srn)
+        } yield {
           Ok(
             view(
               form,
               RemoveSurrenderedBenefitsController.viewModel(
                 srn,
                 index: Max300,
-                value,
+                surrenderedBenefitsAmount,
                 nameDOB.fullName
               )
             )
           )
-        case None =>
-          Redirect(
-            controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsController
-              .onPageLoad(srn, NormalMode)
-              .url
-          )
-      }
-
+        }
+      ).merge
     }
 
   def onSubmit(srn: Srn, index: Max300): Action[AnyContent] =
