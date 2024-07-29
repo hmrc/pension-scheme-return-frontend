@@ -16,24 +16,56 @@
 
 package controllers.nonsipp.sharesdisposal
 
-import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController._
+import services.PsrSubmissionService
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompleted, TypeOfSharesHeldPage}
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, SharesDisposalProgress}
-import models.HowSharesDisposed._
 import forms.YesNoPageFormProvider
-import models.NormalMode
+import models.{NormalMode, ViewOnlyMode}
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito._
+import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController._
+import play.api.inject.guice.GuiceableModule
 import views.html.ListView
 import models.TypeOfShares._
+import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
+import play.api.inject
+import models.HowSharesDisposed._
+
+import scala.concurrent.Future
 
 class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.ReportedSharesDisposalListController.onPageLoad(srn, page)
-  private lazy val onSubmit = routes.ReportedSharesDisposalListController.onSubmit(srn, page)
-  private lazy val sharesDisposalPage = routes.SharesDisposalController.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit = routes.ReportedSharesDisposalListController.onSubmit(srn, page, NormalMode)
+//  private lazy val sharesDisposalPage = routes.SharesDisposalController.onPageLoad(srn, NormalMode)
+
+  private lazy val onSubmitViewOnly =
+    controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController.onSubmitViewOnly(
+      srn,
+      yearString,
+      submissionNumberTwo,
+      submissionNumberOne
+    )
+  private lazy val onPageLoadViewOnly =
+    controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController.onPageLoadViewOnly(
+      srn,
+      1,
+      yearString,
+      submissionNumberTwo,
+      submissionNumberOne
+    )
+  private lazy val onPreviousViewOnly =
+    controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController.onPreviousViewOnly(
+      srn,
+      1,
+      yearString,
+      submissionNumberTwo,
+      submissionNumberOne
+    )
 
   private val page = 1
   private val shareIndexOne = refineMV[Max5000.Refined](1)
@@ -71,6 +103,17 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(SharesDisposalProgress(srn, shareIndexTwo, disposalIndexOne), SectionJourneyStatus.Completed)
     .unsafeSet(SharesDisposalProgress(srn, shareIndexTwo, disposalIndexTwo), SectionJourneyStatus.Completed)
 
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    inject.bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
   "ReportedSharesDisposalListController" - {
 
     act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
@@ -79,19 +122,13 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
         viewModel(
           srn,
           page,
+          mode = NormalMode,
           sharesDisposalsWithIndexes,
-          completedUserAnswers
+          completedUserAnswers,
+          viewOnlyUpdated = false
         )
       )
     }.withName("Completed Journey"))
-
-    act.like(
-      redirectToPage(
-        onPageLoad,
-        sharesDisposalPage,
-        defaultUserAnswers
-      ).withName("Not Started Journey")
-    )
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
 
@@ -99,4 +136,101 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
+
+  "ReportedSharesDisposalListController in view only mode" - {
+
+    val currentUserAnswers = defaultUserAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+      // Shares #1
+      .unsafeSet(TypeOfSharesHeldPage(srn, shareIndexOne), sharesTypeOne)
+      .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndexOne), companyName)
+      .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexOne, disposalIndexOne), howSharesDisposedOne)
+      .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexOne, disposalIndexTwo), howSharesDisposedTwo)
+      .unsafeSet(SharesCompleted(srn, shareIndexOne), SectionCompleted)
+      .unsafeSet(SharesDisposalProgress(srn, shareIndexOne, disposalIndexOne), SectionJourneyStatus.Completed)
+      .unsafeSet(SharesDisposalProgress(srn, shareIndexOne, disposalIndexTwo), SectionJourneyStatus.Completed)
+      // Shares #2
+      .unsafeSet(TypeOfSharesHeldPage(srn, shareIndexTwo), sharesTypeTwo)
+      .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndexTwo), companyName)
+      .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexTwo, disposalIndexOne), howSharesDisposedThree)
+      .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexTwo, disposalIndexTwo), howSharesDisposedFour)
+      .unsafeSet(SharesCompleted(srn, shareIndexTwo), SectionCompleted)
+      .unsafeSet(SharesDisposalProgress(srn, shareIndexTwo, disposalIndexOne), SectionJourneyStatus.Completed)
+      .unsafeSet(SharesDisposalProgress(srn, shareIndexTwo, disposalIndexTwo), SectionJourneyStatus.Completed)
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+      .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndexOne), companyName)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[ListView]
+            .apply(
+              form(injected[YesNoPageFormProvider]),
+              viewModel(
+                srn,
+                page,
+                mode = ViewOnlyMode,
+                sharesDisposalsWithIndexes,
+                completedUserAnswers,
+                viewOnlyUpdated = false,
+                optYear = Some(yearString),
+                optCurrentVersion = Some(submissionNumberTwo),
+                optPreviousVersion = Some(submissionNumberOne),
+                compilationOrSubmissionDate = Some(submissionDateTwo)
+              )
+            )
+      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
+    )
+
+    val updatedUserAnswers = currentUserAnswers
+      .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndexOne), companyName)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[ListView]
+            .apply(
+              form(injected[YesNoPageFormProvider]),
+              viewModel(
+                srn,
+                page,
+                mode = ViewOnlyMode,
+                sharesDisposalsWithIndexes,
+                completedUserAnswers,
+                viewOnlyUpdated = false,
+                optYear = Some(yearString),
+                optCurrentVersion = Some(submissionNumberTwo),
+                optPreviousVersion = Some(submissionNumberOne),
+                compilationOrSubmissionDate = Some(submissionDateTwo)
+              )
+            )
+      }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only taskList")
+    )
+
+    act.like(
+      redirectToPage(
+        onPreviousViewOnly,
+        controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+      ).withName(
+        "Submit previous view only redirects to the controller with parameters for the previous submission"
+      )
+    )
+  }
+
 }

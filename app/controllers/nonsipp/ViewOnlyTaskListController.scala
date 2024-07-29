@@ -476,7 +476,9 @@ object ViewOnlyTaskListController {
     val sharesDisposalItem = TaskListItemViewModel(
       LinkMessage(
         messageKey("nonsipp.tasklist.sharesdisposal", "title"),
-        controllers.routes.UnauthorisedController.onPageLoad().url
+        controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+          .url
       ),
       shareDisposalTaskListStatus
     )
