@@ -204,6 +204,19 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
         act.like(
           saveAndContinue(
             call = onSubmit(CheckMode),
+            userAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New),
+            pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New).some,
+            expectations = (ua: UserAnswers) =>
+              List(
+                ua.get(MemberStatus(srn, refineMV(1))).exists(_._new),
+                ua.get(SafeToHardDelete(srn, refineMV(1))).isEmpty
+              )
+          ).withName(s"DO NOT Set Member status to Changed when member PSR version is not present for member")
+        )
+
+        act.like(
+          saveAndContinue(
+            call = onSubmit(CheckMode),
             userAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.Changed),
             pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New).some,
             expectations = (ua: UserAnswers) =>
