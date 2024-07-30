@@ -99,7 +99,7 @@ class ReportedSharesDisposalListController @Inject()(
                 getCompletedOrUpdatedTaskListStatus(
                   request.userAnswers,
                   request.previousUserAnswers.get,
-                  pages.nonsipp.shares.Paths.shareTransactions
+                  pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction
                 ) == Updated
               } else {
                 false
@@ -112,7 +112,7 @@ class ReportedSharesDisposalListController @Inject()(
           )
         )
       } else {
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        Redirect(routes.SharesDisposalController.onPageLoad(srn, NormalMode))
       }
     }.merge
 

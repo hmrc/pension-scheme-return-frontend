@@ -41,7 +41,7 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.ReportedSharesDisposalListController.onPageLoad(srn, page)
   private lazy val onSubmit = routes.ReportedSharesDisposalListController.onSubmit(srn, page, NormalMode)
-//  private lazy val sharesDisposalPage = routes.SharesDisposalController.onPageLoad(srn, NormalMode)
+  private lazy val sharesDisposalPage = routes.SharesDisposalController.onPageLoad(srn, NormalMode)
 
   private lazy val onSubmitViewOnly =
     controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController.onSubmitViewOnly(
@@ -129,6 +129,14 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
         )
       )
     }.withName("Completed Journey"))
+
+    act.like(
+      redirectToPage(
+        onPageLoad,
+        sharesDisposalPage,
+        defaultUserAnswers
+      ).withName("Not Started Journey")
+    )
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
 
