@@ -244,7 +244,7 @@ object ReportedSharesDisposalListController {
                       .onPageLoadViewOnly(srn, shareIndex, disposalIndex, year, current, previous)
                       .url,
                     buildMessage(
-                      "sharesDisposal.reportedSharesDisposalList.row.change.hidden",
+                      "sharesDisposal.reportedSharesDisposalList.row.view.hidden",
                       sharesDisposalData
                     )
                   )
@@ -317,8 +317,8 @@ object ReportedSharesDisposalListController {
 
     val (titleView, headView) = if (numberOfDisposals == 1) {
       (
-        "sharesDisposal.reportedSharesDisposalList.title.view.title",
-        Message("sharesDisposal.reportedSharesDisposalList.heading.view.heading", numberOfDisposals)
+        "sharesDisposal.reportedSharesDisposalList.view.title",
+        Message("sharesDisposal.reportedSharesDisposalList.view.heading", numberOfDisposals)
       )
     } else {
       (
