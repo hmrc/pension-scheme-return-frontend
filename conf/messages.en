@@ -2347,6 +2347,7 @@ transferIn.MemberList.status.some.contributions = {0} transfers in
 transferIn.MemberList.viewOnly.title = Transfers in
 transferIn.MemberList.viewOnly.heading = Transfers in
 transferIn.MemberList.viewOnly.link = View previous version of transfers in (opens in new tab)
+transferIn.MemberList.viewOnly.noLabel = Did {0} receive a transfer for any member during the period of this return?
 
 contributionsFromAnotherEmployer.title = Were employer contributions made for the member by any other employer?
 contributionsFromAnotherEmployer.heading = Were employer contributions made for {0} by any other employer?

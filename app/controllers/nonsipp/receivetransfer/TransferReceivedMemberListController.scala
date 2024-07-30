@@ -29,7 +29,7 @@ import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
-import views.html.TwoColumnsTripleAction
+import views.html.{TwoColumnsTripleAction, ViewOnlyNoView}
 import models.SchemeId.Srn
 import cats.implicits.toShow
 import pages.nonsipp.receivetransfer._
@@ -55,6 +55,7 @@ class TransferReceivedMemberListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
+  viewOnlyNoView: ViewOnlyNoView,
   saveService: SaveService,
   formProvider: YesNoPageFormProvider,
   psrSubmissionService: PsrSubmissionService
@@ -76,7 +77,72 @@ class TransferReceivedMemberListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    val wereTransfersIn = request.userAnswers.get(DidSchemeReceiveTransferPage(srn))
+    wereTransfersIn match {
+      case Some(false) =>
+        onPageLoadViewOnlyNo(srn, page, mode)(implicitly)
+      case Some(true) =>
+        onPageLoadCommon(srn, page, mode)(implicitly)
+      case None =>
+        Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+    }
+  }
+
+  def onPageLoadViewOnlyNo(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+    // TODO move some of this code to PSR controller and only pass in values specific to transfers in
+    // TODO Apart from noLabel, the rest is a copy of existing code, would make sense to centralise
+    val viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+      getCompletedOrUpdatedTaskListStatus(
+        request.userAnswers,
+        request.previousUserAnswers.get,
+        pages.nonsipp.receivetransfer.Paths.memberTransfersIn
+      ) == Updated
+    } else {
+      false
+    }
+    val optYear = request.year
+    val optCurrentVersion = request.currentVersion
+    val optPreviousVersion = request.previousVersion
+    val compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+
+    val viewOnlyNoViewModel = ViewOnlyDetailsViewModel(
+      updated = viewOnlyUpdated,
+      link = (optYear, optCurrentVersion, optPreviousVersion) match {
+        case (Some(year), Some(currentVersion), Some(previousVersion))
+            if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+          Some(
+            LinkMessage(
+              "transferIn.MemberList.viewOnly.link",
+              controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+                .onPreviousViewOnly(
+                  srn,
+                  page,
+                  year,
+                  currentVersion,
+                  previousVersion
+                )
+                .url
+            )
+          )
+        case _ => None
+      },
+      submittedText =
+        compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+      title = "transferIn.MemberList.viewOnly.title",
+      heading = "transferIn.MemberList.viewOnly.heading",
+      buttonText = "site.return.to.tasklist",
+      onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+        case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+            .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+        case _ =>
+          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+            .onSubmit(srn, page, mode)
+      },
+      noLabel = Some(Message("transferIn.MemberList.viewOnly.noLabel", "TODO"))
+    )
+
+    Ok(viewOnlyNoView(viewOnlyNoViewModel))
   }
 
   def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
