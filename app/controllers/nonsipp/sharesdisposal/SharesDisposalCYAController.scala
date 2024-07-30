@@ -24,6 +24,7 @@ import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import models.SchemeHoldShare.Transfer
+import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal._
 import models.requests.DataRequest
@@ -31,8 +32,6 @@ import pages.nonsipp.shares._
 import play.api.mvc._
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import cats.implicits.toShow
-import controllers.nonsipp.routes
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import models.HowSharesDisposed._
@@ -247,9 +246,14 @@ class SharesDisposalCYAController @Inject()(
       )
     }
 
-  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
-      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+            .onPageLoadViewOnly(srn, 1, year, current, previous)
+        )
+      )
     }
 
 }
@@ -324,7 +328,7 @@ object SharesDisposalCYAController {
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
-                  .onSubmitViewOnly(parameters.srn, year, currentVersion, previousVersion)
+                  .onSubmitViewOnly(parameters.srn, 1, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onSubmit(parameters.srn, parameters.shareIndex, parameters.disposalIndex, parameters.mode)
