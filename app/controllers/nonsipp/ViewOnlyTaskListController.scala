@@ -525,7 +525,9 @@ object ViewOnlyTaskListController {
     val landOrPropertyItem = TaskListItemViewModel(
       LinkMessage(
         messageKey(prefix, "title"),
-        controllers.routes.UnauthorisedController.onPageLoad().url
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
+          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+          .url
       ),
       landOrPropertyTaskListStatus
     )
