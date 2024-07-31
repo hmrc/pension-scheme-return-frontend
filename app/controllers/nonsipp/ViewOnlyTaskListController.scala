@@ -590,7 +590,9 @@ object ViewOnlyTaskListController {
     val bondsDisposalItem = TaskListItemViewModel(
       LinkMessage(
         messageKey(prefix, "bondsdisposal.title"),
-        controllers.routes.UnauthorisedController.onPageLoad().url
+        controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
+          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+          .url
       ),
       bondsDisposalTaskListStatus
     )

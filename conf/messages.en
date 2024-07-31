@@ -3315,6 +3315,13 @@ bondsDisposal.reportBondsDisposalList.methodOfDisposal.sold = sale
 bondsDisposal.reportBondsDisposalList.methodOfDisposal.transferred = transfer out
 bondsDisposal.reportBondsDisposalList.methodOfDisposal.other = another method
 
+bondsDisposal.reportBondsDisposalList.view.title = View bond disposals
+bondsDisposal.reportBondsDisposalList.view.title.plural = View bond disposals
+bondsDisposal.reportBondsDisposalList.view.heading = {0} bond disposal
+bondsDisposal.reportBondsDisposalList.view.heading.plural = {0} bond disposals
+bondsDisposal.reportBondsDisposalList.row.view.hidden = View details of the disposal of {0} by {1}
+bondsDisposal.reportBondsDisposalList.view.link = View previous version of bond disposals (opens in new tab)
+
 bondsDisposal.removeBondsDisposal.title = Are you sure you want to remove details of the disposal of these bonds?
 bondsDisposal.removeBondsDisposal.heading = Are you sure you want to remove details of the disposal of {0}?
 bondsDisposal.removeBondsDisposal.error.required = Select yes if you are sure you want to remove this bond disposal
