@@ -21,3 +21,16 @@
 .autocomplete__wrapper {
   width: 66.66% !important;
 }
+
+a[href="none"] {
+  pointer-events: none;  // Disable click
+  cursor: default;       // Default cursor, not a pointer
+  text-decoration: none; // Remove underline
+  color: inherit;        // Inherit color from parent, typically black
+
+  // Override styles from govuk-link class
+  &.govuk-link {
+    color: inherit;       // Ensure text color is inherited
+    text-decoration: none; // Remove underline
+  }
+}

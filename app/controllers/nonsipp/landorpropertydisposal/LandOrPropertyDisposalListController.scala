@@ -23,11 +23,13 @@ import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import cats.implicits._
 import controllers.actions._
-import navigation.Navigator
 import forms.YesNoPageFormProvider
-import models._
+import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
-import utils.nonsipp.TaskListStatusUtils.getLandOrPropertyDisposalsTaskListStatusWithLink
+import utils.nonsipp.TaskListStatusUtils.{
+  getCompletedOrUpdatedTaskListStatus,
+  getLandOrPropertyDisposalsTaskListStatusWithLink
+}
 import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
@@ -35,10 +37,17 @@ import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListCont
 import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPropertyChosenAddressPage}
 import config.Constants.maxLandOrPropertyDisposals
 import pages.nonsipp.landorpropertydisposal._
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import play.api.Logger
+import navigation.Navigator
+import utils.DateTimeUtils.localDateTimeShow
+import models.{ViewOnlyViewModel, _}
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
+
+import scala.concurrent.Future
 
 import javax.inject.Named
 
@@ -51,29 +60,94 @@ class LandOrPropertyDisposalListController @Inject()(
   formProvider: YesNoPageFormProvider
 ) extends PSRController {
 
+  private val logger = Logger(getClass)
+
   val form: Form[Boolean] = LandOrPropertyDisposalListController.form(formProvider)
 
-  def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
-      val (status, incompleteDisposalUrl) = getLandOrPropertyDisposalsTaskListStatusWithLink(request.userAnswers, srn)
-
-      if (status == TaskListStatus.Completed) {
-        getDisposals(srn).map { disposals =>
-          val numberOfDisposal = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-          val numberOfAddresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
-          val maxPossibleNumberOfDisposals = maxLandOrPropertyDisposals * numberOfAddresses
-          getAddressesWithIndexes(srn, disposals)
-            .map(
-              indexes =>
-                Ok(view(form, viewModel(srn, mode, page, indexes, numberOfDisposal, maxPossibleNumberOfDisposals)))
+  def onPageLoadViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, current, previous) { implicit request =>
+      val viewOnlyViewModel = ViewOnlyViewModel(
+        viewOnlyUpdated = request.previousUserAnswers match {
+          case Some(previousUserAnswers) =>
+            val updated = getCompletedOrUpdatedTaskListStatus(
+              request.userAnswers,
+              previousUserAnswers,
+              pages.nonsipp.landorpropertydisposal.Paths.disposalPropertyTransaction
+            ) == Updated
+            logger.info(s"""[ViewOnlyMode] Status for member details list is ${if (updated) "updated"
+            else "not updated"}""")
+            updated
+          case None =>
+            logger.info(
+              s"[ViewOnlyMode] no previous submission version, Status for member details list is not updated"
             )
-            .merge
+            false
+          case _ => false
+        },
+        year = year,
+        currentVersion = current,
+        previousVersion = previous,
+        compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+      )
+      onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel))
+    }
+
+  def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] =
+    identifyAndRequireData(srn) { implicit request =>
+      onPageLoadCommon(srn, page, mode)
+    }
+
+  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(
+          routes.LandOrPropertyDisposalListController
+            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
+        )
+      )
+    }
+
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+    implicit request: DataRequest[_]
+  ): Result = {
+    val (status, incompleteDisposalUrl) = getLandOrPropertyDisposalsTaskListStatusWithLink(request.userAnswers, srn)
+
+    logger.info(s"Land or property disposal status is $status")
+
+    if (viewOnlyViewModel.nonEmpty || status == TaskListStatus.Completed) {
+      getDisposals(srn).map { disposals =>
+        val numberOfDisposal = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+        val numberOfAddresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
+        val maxPossibleNumberOfDisposals = maxLandOrPropertyDisposals * numberOfAddresses
+        getAddressesWithIndexes(srn, disposals).map { indexes =>
+          Ok(
+            view(
+              form,
+              viewModel(
+                srn,
+                mode,
+                page,
+                indexes,
+                numberOfDisposal,
+                maxPossibleNumberOfDisposals,
+                request.schemeDetails.schemeName,
+                viewOnlyViewModel
+              )
+            )
+          )
         }.merge
-      } else if (status == TaskListStatus.InProgress) {
-        Redirect(incompleteDisposalUrl)
-      } else {
-        Redirect(routes.LandOrPropertyDisposalController.onPageLoad(srn, NormalMode))
-      }
+      }.merge
+    } else if (status == TaskListStatus.InProgress) {
+      Redirect(incompleteDisposalUrl)
+    } else {
+      Redirect(routes.LandOrPropertyDisposalController.onPageLoad(srn, NormalMode))
+    }
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
@@ -94,7 +168,18 @@ class LandOrPropertyDisposalListController @Inject()(
                 .map(
                   indexes =>
                     BadRequest(
-                      view(errors, viewModel(srn, mode, page, indexes, numberOfDisposals, maxPossibleNumberOfDisposals))
+                      view(
+                        errors,
+                        viewModel(
+                          srn,
+                          mode,
+                          page,
+                          indexes,
+                          numberOfDisposals,
+                          maxPossibleNumberOfDisposals,
+                          request.schemeDetails.schemeName
+                        )
+                      )
                     )
                 )
                 .merge,
@@ -104,6 +189,13 @@ class LandOrPropertyDisposalListController @Inject()(
       }
     }.merge
   }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+      )
+    }
 
   private def getDisposals(
     srn: Srn
@@ -154,19 +246,59 @@ object LandOrPropertyDisposalListController {
       "landOrPropertyDisposalList.radios.error.required"
     )
 
-  private def rows(srn: Srn, mode: Mode, addressesWithIndexes: List[((Max5000, List[Max50]), Address)]): List[ListRow] =
-    addressesWithIndexes.flatMap {
-      case ((index, disposalIndexes), address) =>
-        disposalIndexes.map { x =>
-          ListRow(
-            Message("landOrPropertyDisposalList.row", address.addressLine1),
-            changeUrl = routes.LandPropertyDisposalCYAController
-              .onPageLoad(srn, index, x, mode)
-              .url,
-            changeHiddenText = Message("landOrPropertyDisposalList.row.change.hidden", address.addressLine1),
-            removeUrl = routes.RemoveLandPropertyDisposalController.onPageLoad(srn, index, x, NormalMode).url,
-            removeHiddenText = Message("landOrPropertyDisposalList.row.remove.hidden", address.addressLine1)
+  private def rows(
+    srn: Srn,
+    mode: Mode,
+    addressesWithIndexes: List[((Max5000, List[Max50]), Address)],
+    viewOnlyViewModel: Option[ViewOnlyViewModel],
+    schemeName: String
+  ): List[ListRow] =
+    addressesWithIndexes match {
+      case Nil =>
+        List(
+          ListRow.viewNoLink(
+            Message("landOrPropertyDisposalList.view.none", schemeName),
+            "landOrPropertyDisposalList.view.none.value"
           )
+        )
+      case list =>
+        list.flatMap { a =>
+          (a, viewOnlyViewModel) match {
+            case (((index, disposalIndexes), address), Some(viewOnly)) =>
+              List(
+                ListRow.view(
+                  Message(
+                    if (disposalIndexes.size > 1) "landOrPropertyDisposalList.view.row.plural"
+                    else "landOrPropertyDisposalList.view.row",
+                    disposalIndexes.size,
+                    address.addressLine1
+                  ),
+                  routes.LandPropertyDisposalCYAController
+                    .onPageLoadViewOnly(
+                      srn,
+                      index,
+                      disposalIndexes.head,
+                      viewOnly.year,
+                      viewOnly.currentVersion,
+                      viewOnly.previousVersion
+                    )
+                    .url,
+                  Message("landOrPropertyDisposalList.row.change.hidden", address.addressLine1)
+                )
+              )
+            case (((index, disposalIndexes), address), None) =>
+              disposalIndexes.map { x =>
+                ListRow(
+                  Message("landOrPropertyDisposalList.row", address.addressLine1),
+                  changeUrl = routes.LandPropertyDisposalCYAController
+                    .onPageLoad(srn, index, x, mode)
+                    .url,
+                  changeHiddenText = Message("landOrPropertyDisposalList.row.change.hidden", address.addressLine1),
+                  removeUrl = routes.RemoveLandPropertyDisposalController.onPageLoad(srn, index, x, NormalMode).url,
+                  removeHiddenText = Message("landOrPropertyDisposalList.row.remove.hidden", address.addressLine1)
+                )
+              }
+          }
         }
     }
 
@@ -176,33 +308,49 @@ object LandOrPropertyDisposalListController {
     page: Int,
     addressesWithIndexes: List[((Max5000, List[Max50]), Address)],
     numberOfDisposals: Int,
-    maxPossibleNumberOfDisposals: Int
+    maxPossibleNumberOfDisposals: Int,
+    schemeName: String,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
   ): FormPageViewModel[ListViewModel] = {
 
-    val (title, heading) = if (numberOfDisposals == 1) {
-      ("landOrPropertyDisposalList.title", "landOrPropertyDisposalList.heading")
-    } else {
-      ("landOrPropertyDisposalList.title.plural", "landOrPropertyDisposalList.heading.plural")
+    val (title, heading) = ((mode, numberOfDisposals) match {
+      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals == 0 =>
+        ("landOrPropertyDisposalList.view.title", "landOrPropertyDisposalList.view.heading.none")
+      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals > 1 =>
+        ("landOrPropertyDisposalList.view.title", "landOrPropertyDisposalList.view.heading.plural")
+      case (ViewOnlyMode, _) =>
+        ("landOrPropertyDisposalList.view.title", "landOrPropertyDisposalList.view.heading")
+      case (_, numberOfDisposals) if numberOfDisposals > 1 =>
+        ("landOrPropertyDisposalList.title.plural", "landOrPropertyDisposalList.heading.plural")
+      case _ =>
+        ("landOrPropertyDisposalList.title", "landOrPropertyDisposalList.heading")
+    }) match {
+      case (title, heading) => (Message(title, numberOfDisposals), Message(heading, numberOfDisposals))
     }
 
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.landOrPropertyDisposalsSize,
-      numberOfDisposals,
-      routes.LandOrPropertyDisposalListController.onPageLoad(srn, _)
+      totalSize = numberOfDisposals,
+      call = viewOnlyViewModel match {
+        case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
+          routes.LandOrPropertyDisposalListController.onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
+        case None =>
+          routes.LandOrPropertyDisposalListController.onPageLoad(srn, _)
+      }
     )
 
     FormPageViewModel(
-      title = Message(title, numberOfDisposals),
-      heading = Message(heading, numberOfDisposals),
+      title = title,
+      heading = heading,
       description = Option.when(numberOfDisposals < maxPossibleNumberOfDisposals)(
         ParagraphMessage("landOrPropertyDisposalList.description")
       ),
       page = ListViewModel(
         inset = "landOrPropertyDisposalList.inset",
-        rows(srn, mode, addressesWithIndexes),
+        rows(srn, mode, addressesWithIndexes, viewOnlyViewModel, schemeName),
         Message("landOrPropertyDisposalList.radios"),
-        showRadios = numberOfDisposals < maxPossibleNumberOfDisposals,
+        showRadios = !mode.isViewOnlyMode && numberOfDisposals < maxPossibleNumberOfDisposals,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
@@ -218,7 +366,38 @@ object LandOrPropertyDisposalListController {
       refresh = None,
       buttonText = "site.saveAndContinue",
       details = None,
-      onSubmit = routes.LandOrPropertyDisposalListController.onSubmit(srn, page)
+      onSubmit = routes.LandOrPropertyDisposalListController.onSubmit(srn, page),
+      mode = mode,
+      optViewOnlyDetails = viewOnlyViewModel.map { viewOnly =>
+        ViewOnlyDetailsViewModel(
+          updated = viewOnly.viewOnlyUpdated,
+          link = if (viewOnly.currentVersion > 1 && viewOnly.previousVersion > 0) {
+            Some(
+              LinkMessage(
+                "landOrPropertyDisposalList.view.link",
+                routes.LandOrPropertyDisposalListController
+                  .onPreviousViewOnly(
+                    srn,
+                    page,
+                    viewOnly.year,
+                    viewOnly.currentVersion,
+                    viewOnly.previousVersion
+                  )
+                  .url
+              )
+            )
+          } else {
+            None
+          },
+          submittedText = viewOnly.compilationOrSubmissionDate
+            .fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+          title = title,
+          heading = heading,
+          buttonText = "site.return.to.tasklist",
+          onSubmit = controllers.nonsipp.membercontributions.routes.MemberContributionListController
+            .onSubmitViewOnly(srn, viewOnly.year, viewOnly.currentVersion, viewOnly.previousVersion)
+        )
+      }
     )
   }
 }

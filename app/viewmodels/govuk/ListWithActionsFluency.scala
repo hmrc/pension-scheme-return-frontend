@@ -41,8 +41,18 @@ trait ListWithActionsFluency {
     def apply(content: Content, href: String): ListWithActionsAction =
       ListWithActionsAction(content = content, href = href)
 
+    def apply(content: Content): ListWithActionsAction =
+      ListWithActionsAction(content = content)
+
     def apply(html: Html, href: String): ListWithActionsAction =
       apply(HtmlContent(html), href)
+
+    def noLink(html: Html): ListWithActionsAction =
+      ListWithActionsAction(
+        content = HtmlContent(html),
+        classes = "govuk-summary-list__key govuk-!-font-weight-regular",
+        href = "none"
+      )
   }
 
   implicit class FluentListWithActionsAction(actionList: ListWithActionsAction) {

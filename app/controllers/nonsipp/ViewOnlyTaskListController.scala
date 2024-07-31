@@ -533,7 +533,9 @@ object ViewOnlyTaskListController {
     val landOrPropertyDisposalItem = TaskListItemViewModel(
       LinkMessage(
         messageKey("nonsipp.tasklist.landorpropertydisposal", "title"),
-        controllers.routes.UnauthorisedController.onPageLoad().url
+        controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
+          .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion)
+          .url
       ),
       landOrPropertyDisposalTaskListStatus
     )
