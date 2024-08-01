@@ -3037,6 +3037,11 @@ bondsList.radios = Do you need to add another bond transaction?
 bondsList.inset = You cannot add another bond transaction as you have entered the maximum of 5,000.
 bondsList.error.required = Select yes if you need to add another bond transaction
 bondsList.pagination.label = Showing {0} - {1} of {2} bonds
+bondsList.view.title = View bond transactions
+bondsList.view.title.plural = View bond transactions
+bondsList.view.heading = {0} bond transaction
+bondsList.view.heading.plural = {0} bond transactions
+bondsList.view.link = View previous version of bond transactions (opens in new tab)
 
 bondsDisposalList.title = Start reporting a bond disposal
 bondsDisposalList.heading = Start reporting a bond disposal

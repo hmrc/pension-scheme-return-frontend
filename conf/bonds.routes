@@ -56,6 +56,11 @@ GET         /:srn/bonds-list/:page                                              
 POST        /:srn/bonds-list/:page                                              controllers.nonsipp.bonds.BondsListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
 GET         /:srn/change-bonds-list/:page                                       controllers.nonsipp.bonds.BondsListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
 POST        /:srn/change-bonds-list/:page                                       controllers.nonsipp.bonds.BondsListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
+POST        /:srn/change-bonds-list/:page                                       controllers.nonsipp.bonds.BondsListController.onSubmit(srn: Srn, page: Int, mode: Mode = ViewOnlyMode)
+GET         /:srn/bonds-list/view/:year/:current/:previous                      controllers.nonsipp.bonds.BondsListController.onPageLoadViewOnly(srn: Srn, page: Int = 1, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/bonds-list/:page/view/:year/:current/:previous                controllers.nonsipp.bonds.BondsListController.onPageLoadViewOnly(srn: Srn, page: Int, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/bonds-list/:page/previous/:year/:current/:previous            controllers.nonsipp.bonds.BondsListController.onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int)
+GET         /:srn/submit-bonds-list/view/:year/:current/:previous               controllers.nonsipp.bonds.BondsListController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
 
 GET         /:srn/remove-bonds/:index                                           controllers.nonsipp.bonds.RemoveBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 POST        /:srn/remove-bonds/:index                                           controllers.nonsipp.bonds.RemoveBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)

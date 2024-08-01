@@ -22,14 +22,15 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.bonds.BondsListController._
 import views.html.ListView
 import eu.timepit.refined.refineMV
-import play.api.inject
 import forms.YesNoPageFormProvider
 import models._
 import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, when}
+import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds._
+import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
+import play.api.inject
 
 import scala.concurrent.Future
 
@@ -40,10 +41,31 @@ class BondsListControllerSpec extends ControllerBaseSpec {
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   private lazy val onPageLoad =
-    controllers.nonsipp.bonds.routes.BondsListController.onPageLoad(srn, page, NormalMode)
+    routes.BondsListController.onPageLoad(srn, page, NormalMode)
 
   private lazy val onSubmit =
-    controllers.nonsipp.bonds.routes.BondsListController.onSubmit(srn, page, NormalMode)
+    routes.BondsListController.onSubmit(srn, page, NormalMode)
+
+  private lazy val onSubmitViewOnly = routes.BondsListController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+  private lazy val onPageLoadViewOnly = routes.BondsListController.onPageLoadViewOnly(
+    srn,
+    1,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+  private lazy val onPreviousViewOnly = routes.BondsListController.onPreviousViewOnly(
+    srn,
+    1,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
 
   private val userAnswers =
     defaultUserAnswers
@@ -75,7 +97,10 @@ class BondsListControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[ListView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, page, NormalMode, bondsData))
+        .apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(srn, page, NormalMode, bondsData, viewOnlyUpdated = false)
+        )
     })
 
     act.like(
@@ -83,7 +108,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
         injected[ListView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, page, NormalMode, bondsData)
+            viewModel(srn, page, NormalMode, bondsData, viewOnlyUpdated = false)
           )
       }
     )
@@ -98,5 +123,84 @@ class BondsListControllerSpec extends ControllerBaseSpec {
     act.like(invalidForm(onSubmit, userAnswers))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+  }
+
+  "BondsListController in view only mode" - {
+    val currentUserAnswers = userAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+      .unsafeSet(BondsCompleted(srn, index), SectionCompleted)
+      .unsafeSet(NameOfBondsPage(srn, index), "Name")
+      .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, index), SchemeHoldBond.Acquisition)
+      .unsafeSet(CostOfBondsPage(srn, index), money)
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+      .unsafeSet(BondsCompleted(srn, index), SectionCompleted)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[ListView].apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              bondsData,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
+    )
+
+    val updatedUserAnswers = currentUserAnswers
+      .unsafeSet(BondsCompleted(srn, index), SectionCompleted)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(defaultUserAnswers)) {
+        implicit app => implicit request =>
+          injected[ListView].apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              bondsData,
+              viewOnlyUpdated = true,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
+
+    act.like(
+      redirectToPage(
+        onPreviousViewOnly,
+        controllers.nonsipp.bonds.routes.BondsListController
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+      ).withName(
+        "Submit previous view only redirects to the controller with parameters for the previous submission"
+      )
+    )
   }
 }
