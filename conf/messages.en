@@ -3187,6 +3187,12 @@ otherAssets.list.inset = You cannot add another asset as you have entered the ma
 otherAssets.list.error.required = Select yes if you need to add another asset
 otherAssets.list.pagination.label = Showing {0} - {1} of {2} assets
 
+otherAssets.list.view.title = View other assets
+otherAssets.list.view.title.plural = View other assets
+otherAssets.list.view.heading = {0} other asset
+otherAssets.list.view.heading.plural = {0} other assets
+otherAssets.list.view.link = View previous version of other assets (opens in new tab)
+
 otherAssets.removeOtherAsset.title = Are you sure you want to remove this asset?
 otherAssets.removeOtherAsset.heading = Are you sure you want to remove {0}?
 otherAssets.removeOtherAsset.required = Select yes if you are sure you want to remove this asset
