@@ -3001,6 +3001,9 @@ bonds.checkYourAnswers.section.incomeFromBonds.hidden = total income from these 
 bonds.checkYourAnswers.change.title = Change details of bond transaction
 bonds.checkYourAnswers.change.heading = Change details of bond transaction
 
+bonds.checkYourAnswers.viewOnly.title = View details of bond transaction
+bonds.checkYourAnswers.viewOnly.heading = {0} transaction
+
 bondsDisposal.title = Did the scheme dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
 bondsDisposal.heading = Did {0} dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
 bondsDisposal.error.required = Select yes if the scheme disposed of any unregulated bonds, or bonds acquired from a connected party, during the period of this return

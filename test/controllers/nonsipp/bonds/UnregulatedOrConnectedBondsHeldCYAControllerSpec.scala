@@ -21,10 +21,11 @@ import config.Refined.OneTo5000
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
-import models.{CheckMode, Mode, NormalMode}
+import pages.nonsipp.FbVersionPage
+import models._
 import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController._
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, times, verify}
+import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds._
 import controllers.ControllerBaseSpec
@@ -48,6 +49,21 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
 
   private def onSubmit(mode: Mode) = routes.UnregulatedOrConnectedBondsHeldCYAController.onSubmit(srn, index, mode)
 
+  private lazy val onPageLoadViewOnly = routes.UnregulatedOrConnectedBondsHeldCYAController.onPageLoadViewOnly(
+    srn,
+    index,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
+  private lazy val onSubmitViewOnly = routes.UnregulatedOrConnectedBondsHeldCYAController.onSubmitViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
+
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(NameOfBondsPage(srn, index), otherName)
     .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, index), Acquisition)
@@ -63,19 +79,18 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
         renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
             viewModel(
-              ViewModelParameters(
-                srn,
-                index,
-                schemeName,
-                otherName,
-                Acquisition,
-                Some(localDate),
-                money,
-                Some(true),
-                areBondsUnregulated = true,
-                money,
-                mode
-              )
+              srn,
+              index,
+              schemeName,
+              otherName,
+              Acquisition,
+              Some(localDate),
+              money,
+              Some(true),
+              areBondsUnregulated = true,
+              money,
+              mode,
+              viewOnlyUpdated = true
             )
           )
         }.withName(s"render correct $mode view")
@@ -103,5 +118,50 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
           .withName(s"redirect to journey recovery page on submit when in $mode mode")
       )
     }
+  }
+
+  "UnregulatedOrConnectedBondsHeldCYAController in view only mode" - {
+
+    val currentUserAnswers = filledUserAnswers
+      .unsafeSet(FbVersionPage(srn), "002")
+
+    val previousUserAnswers = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              srn,
+              index,
+              schemeName,
+              otherName,
+              Acquisition,
+              Some(localDate),
+              money,
+              Some(true),
+              areBondsUnregulated = true,
+              money,
+              ViewOnlyMode,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo)
+            )
+          )
+      }
+    )
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
   }
 }
