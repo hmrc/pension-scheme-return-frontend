@@ -657,7 +657,9 @@ object ViewOnlyTaskListController {
     val otherAssetsItem = TaskListItemViewModel(
       LinkMessage(
         messageKey(prefix, "title"),
-        controllers.routes.UnauthorisedController.onPageLoad().url
+        controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
+          .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion)
+          .url
       ),
       otherAssetsTaskListStatus
     )
