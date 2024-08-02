@@ -63,36 +63,29 @@ class UnallocatedContributionCYAController @Inject()(
     }
 
   def onPageLoadCommon(srn: Srn, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
-    (
-      for {
-
-        unallocatedAmount <- request.userAnswers.get(UnallocatedEmployerAmountPage(srn)).getOrRecoverJourney
-
-        schemeName = request.schemeDetails.schemeName
-      } yield Ok(
-        view(
-          UnallocatedContributionCYAController.viewModel(
-            srn,
-            schemeName,
-            unallocatedAmount,
-            mode,
-            viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-              getCompletedOrUpdatedTaskListStatus(
-                request.userAnswers,
-                request.previousUserAnswers.get,
-                membersPayments \ "unallocatedContribAmount"
-              ) == Updated
-            } else {
-              false
-            },
-            optYear = request.year,
-            optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
-          )
+    Ok(
+      view(
+        UnallocatedContributionCYAController.viewModel(
+          srn,
+          request.schemeDetails.schemeName,
+          request.userAnswers.get(UnallocatedEmployerAmountPage(srn)),
+          mode,
+          viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+            getCompletedOrUpdatedTaskListStatus(
+              request.userAnswers,
+              request.previousUserAnswers.get,
+              membersPayments \ "unallocatedContribAmount"
+            ) == Updated
+          } else {
+            false
+          },
+          optYear = request.year,
+          optCurrentVersion = request.currentVersion,
+          optPreviousVersion = request.previousVersion,
+          compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
         )
       )
-    ).merge
+    )
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -130,7 +123,7 @@ object UnallocatedContributionCYAController {
   def viewModel(
     srn: Srn,
     schemeName: String,
-    unallocatedAmount: Money,
+    unallocatedAmount: Option[Money],
     mode: Mode,
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
@@ -160,10 +153,7 @@ object UnallocatedContributionCYAController {
           srn,
           schemeName,
           unallocatedAmount,
-          mode match {
-            case ViewOnlyMode => NormalMode
-            case _ => mode
-          }
+          mode
         )
       ),
       refresh = None,
@@ -212,43 +202,42 @@ object UnallocatedContributionCYAController {
   private def sections(
     srn: Srn,
     schemeName: String,
-    unallocatedAmount: Money,
+    unallocatedAmount: Option[Money],
     mode: Mode
-  ): List[CheckYourAnswersSection] =
-    checkYourAnswerSection(
-      srn,
-      schemeName,
-      unallocatedAmount,
-      mode
-    )
-
-  private def checkYourAnswerSection(
-    srn: Srn,
-    schemeName: String,
-    unallocatedAmount: Money,
-    mode: Mode
-  ): List[CheckYourAnswersSection] =
-    List(
-      CheckYourAnswersSection(
-        None,
+  ): List[CheckYourAnswersSection] = {
+    val rows = (unallocatedAmount, mode) match {
+      case (None, ViewOnlyMode) =>
+        List(
+          CheckYourAnswersRowViewModel(
+            Message("unallocatedEmployerCYA.section.view.none", schemeName),
+            Message("site.no")
+          )
+        )
+      case (Some(amount), mode) =>
+        val newMode = mode match {
+          case ViewOnlyMode => NormalMode
+          case _ => mode
+        }
         List(
           CheckYourAnswersRowViewModel(
             Message("unallocatedEmployerCYA.section.schemeName", schemeName),
-            Message("unallocatedEmployerCYA.section.amount", unallocatedAmount.displayAs)
+            Message("unallocatedEmployerCYA.section.amount", amount.displayAs)
           ).with2Actions(
             SummaryAction(
               "site.change",
               controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController
-                .onSubmit(srn, mode)
+                .onSubmit(srn, newMode)
                 .url
             ).withVisuallyHiddenContent(Message("unallocatedEmployerCYA.section.hide", schemeName)),
             SummaryAction(
               "site.remove",
-              controllers.nonsipp.memberpayments.routes.RemoveUnallocatedAmountController.onSubmit(srn, mode).url
+              controllers.nonsipp.memberpayments.routes.RemoveUnallocatedAmountController.onSubmit(srn, newMode).url
             ).withVisuallyHiddenContent(Message("unallocatedEmployerCYA.section.hide", schemeName))
           )
         )
-      )
-    )
+      case _ => Nil
+    }
 
+    List(CheckYourAnswersSection(heading = None, rows))
+  }
 }

@@ -85,7 +85,7 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
             UnallocatedContributionCYAController.viewModel(
               srn,
               schemeName,
-              money,
+              Some(money),
               mode,
               viewOnlyUpdated = false
             )
@@ -136,7 +136,7 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
             viewModel(
               srn,
               schemeName,
-              money,
+              Some(money),
               ViewOnlyMode,
               viewOnlyUpdated = false,
               optYear = Some(yearString),
@@ -149,6 +149,29 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
         .withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
 
+    act.like(
+      renderView(
+        onPageLoadViewOnly,
+        userAnswers = currentUserAnswers.remove(UnallocatedEmployerAmountPage(srn)).get,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[CYAWithRemove].apply(
+          viewModel(
+            srn,
+            schemeName,
+            unallocatedAmount = None,
+            ViewOnlyMode,
+            viewOnlyUpdated = true,
+            optYear = Some(yearString),
+            optCurrentVersion = Some(submissionNumberTwo),
+            optPreviousVersion = Some(submissionNumberOne),
+            compilationOrSubmissionDate = Some(submissionDateTwo)
+          )
+        )
+      }.before(mockTaxYear(dateRange))
+        .withName("OnPageLoadViewOnly renders ok with no unallocated amount")
+    )
+
     val updatedUserAnswers = currentUserAnswers
       .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
 
@@ -159,7 +182,7 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
             viewModel(
               srn,
               schemeName,
-              money,
+              Some(money),
               ViewOnlyMode,
               viewOnlyUpdated = false,
               optYear = Some(yearString),

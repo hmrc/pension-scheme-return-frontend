@@ -2267,6 +2267,7 @@ unallocatedEmployerCYA.viewOnly.link =  View previous version of unallocated emp
 unallocatedEmployerCYA.section.schemeName = Amount of unallocated employer contributions received by {0}
 unallocatedEmployerCYA.section.amount = £ {0}
 unallocatedEmployerCYA.section.hide = amount of unallocated employer contributions received by {0}
+unallocatedEmployerCYA.section.view.none = Were any unallocated employer contributions received by {0} during the period of this return?
 
 removeUnallocatedAmount.title = Are you sure you want to remove the unallocated employer contributions?
 removeUnallocatedAmount.heading = Are you sure you want to remove the unallocated employer contributions of £{0}?
