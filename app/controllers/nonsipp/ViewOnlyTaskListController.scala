@@ -584,7 +584,9 @@ object ViewOnlyTaskListController {
     val bondsItem = TaskListItemViewModel(
       LinkMessage(
         messageKey(prefix, "unregulatedorconnected.title"),
-        controllers.routes.UnauthorisedController.onPageLoad().url
+        controllers.nonsipp.bonds.routes.BondsListController
+          .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion)
+          .url
       ),
       bondsTaskListStatus
     )
