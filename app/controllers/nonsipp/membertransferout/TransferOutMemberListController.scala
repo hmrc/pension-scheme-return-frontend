@@ -358,7 +358,7 @@ object TransferOutMemberListController {
                   if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
                 Some(
                   LinkMessage(
-                    "transferIn.MemberList.viewOnly.link",
+                    "transferOut.MemberList.viewOnly.link",
                     controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
                       .onPreviousViewOnly(
                         srn,
@@ -374,8 +374,8 @@ object TransferOutMemberListController {
             },
             submittedText =
               compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
-            title = "transferIn.MemberList.viewOnly.title",
-            heading = "transferIn.MemberList.viewOnly.heading",
+            title = "transferOut.MemberList.viewOnly.title",
+            heading = "transferOut.MemberList.viewOnly.heading",
             buttonText = "site.return.to.tasklist",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
