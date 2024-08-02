@@ -23,21 +23,23 @@ import play.api.mvc._
 import config.Refined.Max5000
 import cats.implicits.toShow
 import controllers.actions._
-import navigation.Navigator
 import play.api.i18n._
+import models.requests.DataRequest
 import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController._
 import controllers.PSRController
 import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
 class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
@@ -56,47 +58,65 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
-          nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, index)).getOrRecoverJourney
-          whyDoesSchemeHoldBonds <- request.userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, index)).getOrRecoverJourney
+      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicitly)
+    }
 
-          whenDidSchemeAcquireBonds = Option.when(whyDoesSchemeHoldBonds != Transfer)(
-            request.userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, index)).get
-          )
+  def onPageLoadViewOnly(
+    srn: Srn,
+    index: Max5000,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicitly)
+    }
 
-          costOfBonds <- request.userAnswers.get(CostOfBondsPage(srn, index)).getOrRecoverJourney
+  def onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+    (
+      for {
+        nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, index)).getOrRecoverJourney
+        whyDoesSchemeHoldBonds <- request.userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, index)).getOrRecoverJourney
 
-          bondsFromConnectedParty = Option.when(whyDoesSchemeHoldBonds == Acquisition)(
-            request.userAnswers.get(BondsFromConnectedPartyPage(srn, index)).get
-          )
+        whenDidSchemeAcquireBonds = Option.when(whyDoesSchemeHoldBonds != Transfer)(
+          request.userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, index)).get
+        )
 
-          areBondsUnregulated <- request.userAnswers.get(AreBondsUnregulatedPage(srn, index)).getOrRecoverJourney
+        costOfBonds <- request.userAnswers.get(CostOfBondsPage(srn, index)).getOrRecoverJourney
 
-          incomeFromBonds <- request.userAnswers.get(IncomeFromBondsPage(srn, index)).getOrRecoverJourney
+        bondsFromConnectedParty = Option.when(whyDoesSchemeHoldBonds == Acquisition)(
+          request.userAnswers.get(BondsFromConnectedPartyPage(srn, index)).get
+        )
 
-          schemeName = request.schemeDetails.schemeName
-        } yield Ok(
-          view(
-            viewModel(
-              ViewModelParameters(
-                srn,
-                index,
-                schemeName,
-                nameOfBonds,
-                whyDoesSchemeHoldBonds,
-                whenDidSchemeAcquireBonds,
-                costOfBonds,
-                bondsFromConnectedParty,
-                areBondsUnregulated,
-                incomeFromBonds,
-                mode
-              )
-            )
+        areBondsUnregulated <- request.userAnswers.get(AreBondsUnregulatedPage(srn, index)).getOrRecoverJourney
+
+        incomeFromBonds <- request.userAnswers.get(IncomeFromBondsPage(srn, index)).getOrRecoverJourney
+
+        schemeName = request.schemeDetails.schemeName
+      } yield Ok(
+        view(
+          viewModel(
+            srn,
+            index,
+            schemeName,
+            nameOfBonds,
+            whyDoesSchemeHoldBonds,
+            whenDidSchemeAcquireBonds,
+            costOfBonds,
+            bondsFromConnectedParty,
+            areBondsUnregulated,
+            incomeFromBonds,
+            mode,
+            viewOnlyUpdated = false,
+            optYear = request.year,
+            optCurrentVersion = request.currentVersion,
+            optPreviousVersion = request.previousVersion,
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
           )
         )
-      ).merge
-    }
+      )
+    ).merge
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -112,52 +132,93 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
             Redirect(navigator.nextPage(UnregulatedOrConnectedBondsHeldCYAPage(srn), NormalMode, request.userAnswers))
         }
     }
+
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+      )
+    }
 }
 
-case class ViewModelParameters(
-  srn: Srn,
-  index: Max5000,
-  schemeName: String,
-  nameOfBonds: String,
-  whyDoesSchemeHoldBonds: SchemeHoldBond,
-  whenDidSchemeAcquireBonds: Option[LocalDate],
-  costOfBonds: Money,
-  bondsFromConnectedParty: Option[Boolean],
-  areBondsUnregulated: Boolean,
-  incomeFromBonds: Money,
-  mode: Mode
-)
 object UnregulatedOrConnectedBondsHeldCYAController {
-  def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
+  def viewModel(
+    srn: Srn,
+    index: Max5000,
+    schemeName: String,
+    nameOfBonds: String,
+    whyDoesSchemeHoldBonds: SchemeHoldBond,
+    whenDidSchemeAcquireBonds: Option[LocalDate],
+    costOfBonds: Money,
+    bondsFromConnectedParty: Option[Boolean],
+    areBondsUnregulated: Boolean,
+    incomeFromBonds: Money,
+    mode: Mode,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = parameters.mode
-        .fold(normal = "bonds.checkYourAnswers.title", check = "bonds.checkYourAnswers.change.title"),
-      heading = parameters.mode.fold(
+      mode = mode,
+      title = mode.fold(
+        normal = "bonds.checkYourAnswers.title",
+        check = "bonds.checkYourAnswers.change.title",
+        viewOnly = "bonds.checkYourAnswers.viewOnly.title"
+      ),
+      heading = mode.fold(
         normal = "bonds.checkYourAnswers.heading",
-        check = Message(
-          "bonds.checkYourAnswers.change.heading"
-        )
+        check = "bonds.checkYourAnswers.change.heading",
+        viewOnly = Message("bonds.checkYourAnswers.viewOnly.heading", nameOfBonds)
       ),
       description = None,
       page = CheckYourAnswersViewModel(
         sections(
-          parameters.srn,
-          parameters.index,
-          parameters.schemeName,
-          parameters.nameOfBonds,
-          parameters.whyDoesSchemeHoldBonds,
-          parameters.whenDidSchemeAcquireBonds,
-          parameters.costOfBonds,
-          parameters.bondsFromConnectedParty,
-          parameters.areBondsUnregulated,
-          parameters.incomeFromBonds,
-          CheckMode
+          srn,
+          index,
+          schemeName,
+          nameOfBonds,
+          whyDoesSchemeHoldBonds,
+          whenDidSchemeAcquireBonds,
+          costOfBonds,
+          bondsFromConnectedParty,
+          areBondsUnregulated,
+          incomeFromBonds,
+          mode match {
+            case ViewOnlyMode => NormalMode
+            case _ => mode
+          }
         )
       ),
       refresh = None,
-      buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
-      onSubmit = routes.UnregulatedOrConnectedBondsHeldCYAController
-        .onSubmit(parameters.srn, parameters.index, parameters.mode)
+      buttonText = mode.fold(
+        normal = "site.saveAndContinue",
+        check = "site.continue",
+        viewOnly = "site.continue"
+      ),
+      onSubmit = routes.UnregulatedOrConnectedBondsHeldCYAController.onSubmit(srn, index, mode),
+      optViewOnlyDetails = if (mode.isViewOnlyMode) {
+        Some(
+          ViewOnlyDetailsViewModel(
+            updated = viewOnlyUpdated,
+            link = None,
+            submittedText = Some(Message("")),
+            title = "bonds.checkYourAnswers.viewOnly.title",
+            heading = Message("bonds.checkYourAnswers.viewOnly.heading", nameOfBonds),
+            buttonText = "site.continue",
+            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                routes.UnregulatedOrConnectedBondsHeldCYAController
+                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+              case _ =>
+                routes.UnregulatedOrConnectedBondsHeldCYAController.onSubmit(srn, index, mode)
+            }
+          )
+        )
+      } else {
+        None
+      }
     )
 
   private def sections(
