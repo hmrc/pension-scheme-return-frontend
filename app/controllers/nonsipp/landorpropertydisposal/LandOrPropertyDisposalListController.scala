@@ -38,7 +38,7 @@ import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPro
 import config.Constants.maxLandOrPropertyDisposals
 import pages.nonsipp.landorpropertydisposal._
 import pages.nonsipp.CompilationOrSubmissionDatePage
-import play.api.Logger
+import play.api.Logging
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
 import models.{ViewOnlyViewModel, _}
@@ -58,9 +58,8 @@ class LandOrPropertyDisposalListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
   formProvider: YesNoPageFormProvider
-) extends PSRController {
-
-  private val logger = Logger(getClass)
+) extends PSRController
+    with Logging {
 
   val form: Form[Boolean] = LandOrPropertyDisposalListController.form(formProvider)
 
@@ -80,12 +79,12 @@ class LandOrPropertyDisposalListController @Inject()(
               previousUserAnswers,
               pages.nonsipp.landorpropertydisposal.Paths.disposalPropertyTransaction
             ) == Updated
-            logger.info(s"""[ViewOnlyMode] Status for member details list is ${if (updated) "updated"
+            logger.info(s"""[ViewOnlyMode] Status for land or property disposal list is ${if (updated) "updated"
             else "not updated"}""")
             updated
           case None =>
             logger.info(
-              s"[ViewOnlyMode] no previous submission version, Status for member details list is not updated"
+              s"[ViewOnlyMode] no previous submission version, Status for land or property disposal list is not updated"
             )
             false
           case _ => false

@@ -29,10 +29,10 @@ trait Transformer {
     map.keys.toList.flatMap(refineIndex[A])
 
   protected def refineIndex[A: Validate[Int, *]](index: String): Option[Refined[Int, A]] =
-    index.toIntOption.flatMap(i => refineV[A](i + 1).leftMap(new Exception(_)).toOption)
+    index.toIntOption.flatMap(i => refineV[A](i + 1).toOption)
 
   protected def refineIndex[A: Validate[Int, *]](index: Int): Option[Refined[Int, A]] =
-    refineV[A](index + 1).leftMap(new Exception(_)).toOption
+    refineV[A](index + 1).toOption
 
   protected def buildIndexesForMax5000(num: Int): Try[List[Max5000]] =
     (1 to num).map(i => refineV[OneTo5000](i).leftMap(new Exception(_)).toTry).toList.sequence

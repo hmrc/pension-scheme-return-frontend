@@ -65,7 +65,7 @@ class TransferReceivedMemberListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)(implicitly)
+      onPageLoadCommon(srn, page, mode)
   }
 
   def onPageLoadViewOnly(
@@ -76,10 +76,12 @@ class TransferReceivedMemberListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    onPageLoadCommon(srn, page, mode)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(
+    implicit request: DataRequest[AnyContent]
+  ): Result = {
     val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
 
     if (optionList.flatten.nonEmpty) {
@@ -125,7 +127,7 @@ class TransferReceivedMemberListController @Inject()(
       } else {
         val viewModel =
           TransferReceivedMemberListController
-            .viewModel(srn, page, mode, optionList, request.userAnswers, false, None, None, None)
+            .viewModel(srn, page, mode, optionList, request.userAnswers, viewOnlyUpdated = false, None, None, None)
 
         form
           .bindFromRequest()
@@ -354,7 +356,7 @@ object TransferReceivedMemberListController {
             updated = viewOnlyUpdated,
             link = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion))
-                  if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+                  if optYear.nonEmpty && currentVersion > 1 && previousVersion > 0 =>
                 Some(
                   LinkMessage(
                     "transferIn.MemberList.viewOnly.link",

@@ -89,7 +89,7 @@ object SchemeDetails {
       .and((__ \ "pspDetails" \ "authorisingPSAID").readNullable[String])
       .and(
         (__ \ "establishers")
-          .read[JsArray]
+          .readWithDefault[JsArray](JsArray.empty)
           .map[List[Establisher]](
             l =>
               if (l.value.isEmpty) {
