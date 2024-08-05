@@ -22,29 +22,34 @@ import viewmodels.implicits._
 import play.api.mvc._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
-import config.Constants
 import cats.implicits._
 import config.Constants.{maxDisposalPerOtherAsset, maxOtherAssetsTransactions}
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController._
-import navigation.Navigator
 import forms.YesNoPageFormProvider
-import models._
+import viewmodels.models.TaskListStatus.Updated
 import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, WhatIsOtherAssetPage}
 import models.HowDisposed._
 import com.google.inject.Inject
+import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
+import pages.nonsipp.CompilationOrSubmissionDatePage
+import navigation.Navigator
+import utils.DateTimeUtils.localDateTimeShow
+import models._
 import play.api.i18n.MessagesApi
 import viewmodels.DisplayMessage
 import utils.FunctionKUtils._
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
+import java.time.LocalDateTime
 import javax.inject.Named
 
 class ReportedOtherAssetsDisposalListController @Inject()(
@@ -63,14 +68,52 @@ class ReportedOtherAssetsDisposalListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      getCompletedDisposals(srn).map { completedDisposals =>
-        if (completedDisposals.values.exists(_.nonEmpty)) {
-          Ok(view(form, viewModel(srn, page, completedDisposals, request.userAnswers)))
-        } else {
-          Redirect(routes.OtherAssetsDisposalController.onPageLoad(srn, NormalMode))
-        }
-      }.merge
+      onPageLoadCommon(srn, page, mode)(implicitly)
   }
+
+  def onPageLoadViewOnly(
+    srn: Srn,
+    page: Int,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    onPageLoadCommon(srn, page, mode)(implicitly)
+  }
+
+  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+    getCompletedDisposals(srn).map { completedDisposals =>
+      if (completedDisposals.values.exists(_.nonEmpty)) {
+        Ok(
+          view(
+            form,
+            viewModel(
+              srn,
+              mode,
+              page,
+              completedDisposals,
+              request.userAnswers,
+              viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+                getCompletedOrUpdatedTaskListStatus(
+                  request.userAnswers,
+                  request.previousUserAnswers.get,
+                  pages.nonsipp.bondsdisposal.Paths.bondsDisposed
+                ) == Updated
+              } else {
+                false
+              },
+              optYear = request.year,
+              optCurrentVersion = request.currentVersion,
+              optPreviousVersion = request.previousVersion,
+              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+            )
+          )
+        )
+      } else {
+        Redirect(routes.OtherAssetsDisposalController.onPageLoad(srn, NormalMode))
+      }
+    }.merge
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
@@ -89,7 +132,10 @@ class ReportedOtherAssetsDisposalListController @Inject()(
             form
               .bindFromRequest()
               .fold(
-                errors => BadRequest(view(errors, viewModel(srn, page, disposals, request.userAnswers))).pure[Future],
+                errors =>
+                  BadRequest(
+                    view(errors, viewModel(srn, mode, page, disposals, request.userAnswers, false, None, None, None))
+                  ).pure[Future],
                 reportAnotherDisposal =>
                   for {
                     updatedUserAnswers <- request.userAnswers
@@ -124,6 +170,23 @@ class ReportedOtherAssetsDisposalListController @Inject()(
         .merge
   }
 
+  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+      )
+    }
+
+  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn).async {
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
+        )
+      )
+    }
+
   private def getCompletedDisposals(
     srn: Srn
   )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
@@ -154,8 +217,12 @@ object ReportedOtherAssetsDisposalListController {
 
   private def rows(
     srn: Srn,
+    mode: Mode,
     disposals: Map[Max5000, List[Max50]],
-    userAnswers: UserAnswers
+    userAnswers: UserAnswers,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None
   ): List[ListRow] =
     disposals
       .flatMap {
@@ -168,23 +235,39 @@ object ReportedOtherAssetsDisposalListController {
               userAnswers.get(HowWasAssetDisposedOfPage(srn, otherAssetsIndex, disposalIndex)).get
             )
 
-            ListRow(
-              buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
-              changeUrl = routes.AssetDisposalCYAController
-                .onPageLoad(srn, otherAssetsIndex, disposalIndex, CheckMode)
-                .url,
-              changeHiddenText = buildMessage(
-                "assetDisposal.reportedOtherAssetsDisposalList.row.change.hidden",
-                otherAssetsDisposalData
-              ),
-              removeUrl = routes.RemoveAssetDisposalController
-                .onPageLoad(srn, otherAssetsIndex, disposalIndex)
-                .url,
-              removeHiddenText = buildMessage(
-                "assetDisposal.reportedOtherAssetsDisposalList.row.remove.hidden",
-                otherAssetsDisposalData
+            if (mode.isViewOnlyMode) {
+              (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                case (ViewOnlyMode, Some(year), Some(current), Some(previous)) =>
+                  ListRow.view(
+                    buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
+                    routes.AssetDisposalCYAController
+                      .onPageLoadViewOnly(srn, otherAssetsIndex, disposalIndex, year, current, previous)
+                      .url,
+                    buildMessage(
+                      "assetDisposal.reportedOtherAssetsDisposalList.row.view.hidden",
+                      otherAssetsDisposalData
+                    )
+                  )
+              }
+            } else {
+              ListRow(
+                buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
+                changeUrl = routes.AssetDisposalCYAController
+                  .onPageLoad(srn, otherAssetsIndex, disposalIndex, CheckMode)
+                  .url,
+                changeHiddenText = buildMessage(
+                  "assetDisposal.reportedOtherAssetsDisposalList.row.change.hidden",
+                  otherAssetsDisposalData
+                ),
+                removeUrl = routes.RemoveAssetDisposalController
+                  .onPageLoad(srn, otherAssetsIndex, disposalIndex)
+                  .url,
+                removeHiddenText = buildMessage(
+                  "assetDisposal.reportedOtherAssetsDisposalList.row.remove.hidden",
+                  otherAssetsDisposalData
+                )
               )
-            )
+            }
           }
       }
       .toList
@@ -203,29 +286,59 @@ object ReportedOtherAssetsDisposalListController {
 
   def viewModel(
     srn: Srn,
+    mode: Mode,
     page: Int,
     disposals: Map[Max5000, List[Max50]],
-    userAnswers: UserAnswers
+    userAnswers: UserAnswers,
+    viewOnlyUpdated: Boolean,
+    optYear: Option[String] = None,
+    optCurrentVersion: Option[Int] = None,
+    optPreviousVersion: Option[Int] = None,
+    compilationOrSubmissionDate: Option[LocalDateTime] = None
   ): FormPageViewModel[ListViewModel] = {
 
     val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
     val numberOfOtherAssetsItems = userAnswers.map(OtherAssetsCompleted.all(srn)).size
     val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
 
-    val (title, heading) = if (numberOfDisposals == 1) {
-      ("assetDisposal.reportedOtherAssetsDisposalList.title", "assetDisposal.reportedOtherAssetsDisposalList.heading")
-    } else {
-      (
-        "assetDisposal.reportedOtherAssetsDisposalList.title.plural",
-        "assetDisposal.reportedOtherAssetsDisposalList.heading.plural"
-      )
+    val (title, heading) = ((mode, numberOfDisposals) match {
+
+      case (ViewOnlyMode, 1) =>
+        (
+          "assetDisposal.reportedOtherAssetsDisposalList.view.title",
+          "assetDisposal.reportedOtherAssetsDisposalList.view.heading"
+        )
+      case (ViewOnlyMode, _) =>
+        (
+          "assetDisposal.reportedOtherAssetsDisposalList.view.title.plural",
+          "assetDisposal.reportedOtherAssetsDisposalList.view.heading.plural"
+        )
+      case (_, 1) =>
+        (
+          "assetDisposal.reportedOtherAssetsDisposalList.title",
+          "assetDisposal.reportedOtherAssetsDisposalList.heading"
+        )
+      case (_, _) =>
+        (
+          "assetDisposal.reportedOtherAssetsDisposalList.title.plural",
+          "assetDisposal.reportedOtherAssetsDisposalList.heading.plural"
+        )
+    }) match {
+      case (title, heading) =>
+        (Message(title, numberOfDisposals), Message(heading, numberOfDisposals))
     }
 
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.reportedOtherAssetsDisposalListSize,
       numberOfDisposals,
-      routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, _)
+      call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+        case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+          routes.ReportedOtherAssetsDisposalListController
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
+        case _ =>
+          routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, _)
+      }
     )
 
     val conditionalInsetText: DisplayMessage = {
@@ -240,8 +353,9 @@ object ReportedOtherAssetsDisposalListController {
     }
 
     FormPageViewModel(
-      title = Message(title, numberOfDisposals),
-      heading = Message(heading, numberOfDisposals),
+      mode = mode,
+      title = title,
+      heading = heading,
       description = Option.when(
         !((numberOfDisposals >= maxOtherAssetsTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals))
       )(
@@ -249,7 +363,7 @@ object ReportedOtherAssetsDisposalListController {
       ),
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows(srn, disposals, userAnswers),
+        rows(srn, mode, disposals, userAnswers, optYear, optCurrentVersion, optPreviousVersion),
         Message("assetDisposal.reportedOtherAssetsDisposalList.radios"),
         showRadios =
           !((numberOfDisposals >= maxOtherAssetsTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
@@ -268,7 +382,44 @@ object ReportedOtherAssetsDisposalListController {
       refresh = None,
       buttonText = "site.saveAndContinue",
       details = None,
-      onSubmit = routes.ReportedOtherAssetsDisposalListController.onSubmit(srn, page)
+      onSubmit = routes.ReportedOtherAssetsDisposalListController.onSubmit(srn, page, mode),
+      optViewOnlyDetails = Option.when(mode.isViewOnlyMode) {
+        ViewOnlyDetailsViewModel(
+          updated = viewOnlyUpdated,
+          link = (optYear, optCurrentVersion, optPreviousVersion) match {
+            case (Some(year), Some(currentVersion), Some(previousVersion))
+                if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+              Some(
+                LinkMessage(
+                  "assetDisposal.reportedOtherAssetsDisposalList.view.link",
+                  controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+                    .onPreviousViewOnly(
+                      srn,
+                      page,
+                      year,
+                      currentVersion,
+                      previousVersion
+                    )
+                    .url
+                )
+              )
+            case _ => None
+          },
+          submittedText =
+            compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+          title = title,
+          heading = heading,
+          buttonText = "site.return.to.tasklist",
+          onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
+            case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+              controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+                .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+            case _ =>
+              controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+                .onSubmit(srn, page, mode)
+          }
+        )
+      }
     )
   }
 

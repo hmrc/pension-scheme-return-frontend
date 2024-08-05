@@ -23,6 +23,7 @@ import play.api.mvc._
 import utils.ListUtils.ListOps
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
+import cats.implicits.toShow
 import controllers.actions._
 import play.api.i18n._
 import models.requests.DataRequest
@@ -30,8 +31,6 @@ import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import models.HowDisposed._
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import cats.implicits.toShow
-import controllers.nonsipp.routes
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import controllers.nonsipp.otherassetsdisposal.AssetDisposalCYAController._
 import navigation.Navigator
@@ -206,7 +205,12 @@ class AssetDisposalCYAController @Inject()(
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
-      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+            .onPageLoadViewOnly(srn, 1, year, current, previous)
+        )
+      )
     }
 
 }
