@@ -21,6 +21,7 @@ import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc._
 import config.Refined._
+import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
 import models.requests.DataRequest
 import utils.ListUtils.ListOps
@@ -29,8 +30,6 @@ import controllers.PSRController
 import controllers.nonsipp.membertransferout.TransfersOutCYAController._
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import cats.implicits.{toShow, toTraverseOps}
-import controllers.nonsipp.routes
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
@@ -156,7 +155,12 @@ class TransfersOutCYAController @Inject()(
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
-      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
+            .onPageLoadViewOnly(srn, 1, year, current, previous)
+        )
+      )
     }
 
 }

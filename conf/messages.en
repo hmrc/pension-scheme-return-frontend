@@ -2562,6 +2562,10 @@ transferOut.memberList.status.no.contributions =  No transfers out
 transferOut.memberList.singleStatus.some.contribution = {0} transfer out
 transferOut.memberList.status.some.contributions = {0} transfers out
 
+transferOut.MemberList.viewOnly.title = Transfers out
+transferOut.MemberList.viewOnly.heading = Transfers out
+transferOut.MemberList.viewOnly.link =  View previous version of transfers out (opens in new tab)
+
 TransferOut.receivingSchemeName.title = What is the receiving scheme’s name?
 TransferOut.receivingSchemeName.heading = What is the receiving scheme’s name?
 TransferOut.receivingSchemeName.error.required = Enter the receiving scheme’s name

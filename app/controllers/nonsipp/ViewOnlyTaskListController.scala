@@ -358,7 +358,9 @@ object ViewOnlyTaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "transfersout.title"),
-          controllers.routes.UnauthorisedController.onPageLoad().url
+          controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .url
         ),
         transferOutTaskListStatus
       ),

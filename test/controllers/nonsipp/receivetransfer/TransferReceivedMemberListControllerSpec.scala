@@ -18,7 +18,6 @@ package controllers.nonsipp.receivetransfer
 
 import services.PsrSubmissionService
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.Max300
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.TwoColumnsTripleAction
@@ -38,8 +37,8 @@ import scala.concurrent.Future
 
 class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.TransferReceivedMemberListController.onPageLoad(srn, page = 1, NormalMode)
-  private lazy val onSubmit = routes.TransferReceivedMemberListController.onSubmit(srn, page = 1, NormalMode)
+  private lazy val onPageLoad = routes.TransferReceivedMemberListController.onPageLoad(srn, page, NormalMode)
+  private lazy val onSubmit = routes.TransferReceivedMemberListController.onSubmit(srn, page, NormalMode)
   private lazy val onSubmitViewOnly = routes.TransferReceivedMemberListController.onSubmitViewOnly(
     srn,
     yearString,
@@ -60,7 +59,7 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
     submissionNumberTwo,
     submissionNumberOne
   )
-  private val index = refineMV[Max300.Refined](1)
+
   private val page = 1
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
@@ -88,7 +87,7 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
         form(injected[YesNoPageFormProvider]),
         viewModel(
           srn,
-          page = 1,
+          page,
           NormalMode,
           memberList: List[Option[NameDOB]],
           userAnswers: UserAnswers,
@@ -106,7 +105,7 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
             form(injected[YesNoPageFormProvider]).fill(true),
             viewModel(
               srn,
-              page = 1,
+              page,
               NormalMode,
               memberList: List[Option[NameDOB]],
               userAnswers: UserAnswers,
@@ -146,7 +145,7 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
             TransferReceivedMemberListController.form(injected[YesNoPageFormProvider]),
             TransferReceivedMemberListController.viewModel(
               srn,
-              page = 1,
+              page,
               mode = ViewOnlyMode,
               memberList: List[Option[NameDOB]],
               userAnswers: UserAnswers,
@@ -172,7 +171,7 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
             TransferReceivedMemberListController.form(injected[YesNoPageFormProvider]),
             TransferReceivedMemberListController.viewModel(
               srn,
-              page = 1,
+              page,
               mode = ViewOnlyMode,
               memberList: List[Option[NameDOB]],
               userAnswers: UserAnswers,
