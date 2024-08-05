@@ -1141,8 +1141,11 @@ removeTotalValueQuotedShares.title = Are you sure you want to remove the quoted 
 removeTotalValueQuotedShares.heading = Are you sure you want to remove the quoted shares and third party managed funds of £{0}?
 removeTotalValueQuotedShares.error.required = Select yes if you are sure you want to remove the quoted shares and third party managed funds
 
+totalValueQuotedSharesCYA.title.view = View details of quoted shares and managed funds
+totalValueQuotedSharesCYA.heading.view = Quoted shares and third party managed funds
 totalValueQuotedSharesCYA.section.totalCost = Total value of all quoted shares and third party managed funds held by {0} on {1}
 totalValueQuotedSharesCYA.section.totalCost.hidden = total value of all quoted shares and third party managed funds held by {0} on {1}
+totalValueQuotedSharesCYA.view.link = View previous version of quoted shares and third party managed funds (opens in new tab)
 
 fileUploadErrorMissingInformation.title = Your member details file is missing information or incorrectly formatted
 fileUploadErrorMissingInformation.heading = Your member details file is missing information or incorrectly formatted

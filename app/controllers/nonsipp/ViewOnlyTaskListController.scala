@@ -25,7 +25,7 @@ import controllers.actions._
 import pages.nonsipp.memberdetails.Paths.personalDetails
 import viewmodels.models.TaskListStatus._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, Paths, SharesCompleted}
+import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.OtherAssetsCompleted
 import com.google.inject.Inject
@@ -628,7 +628,7 @@ object ViewOnlyTaskListController {
     val quotedSharesStatusAndLink: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
-      Paths.shares \ "totalValueQuotedShares"
+      pages.nonsipp.totalvaluequotedshares.Paths.quotedShares
     )
 
     val otherAssetsTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
@@ -647,7 +647,9 @@ object ViewOnlyTaskListController {
     val quotedSharesItem = TaskListItemViewModel(
       LinkMessage(
         messageKey(prefix, "quotedshares.title"),
-        controllers.routes.UnauthorisedController.onPageLoad().url
+        controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
+          .onPageLoadViewOnly(srn, year, currentVersion, previousVersion)
+          .url
       ),
       quotedSharesStatusAndLink
     )
