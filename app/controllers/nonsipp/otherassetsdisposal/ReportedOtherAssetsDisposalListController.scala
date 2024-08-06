@@ -98,7 +98,7 @@ class ReportedOtherAssetsDisposalListController @Inject()(
                 getCompletedOrUpdatedTaskListStatus(
                   request.userAnswers,
                   request.previousUserAnswers.get,
-                  pages.nonsipp.bondsdisposal.Paths.bondsDisposed
+                  pages.nonsipp.otherassetsdisposal.Paths.assetsDisposed
                 ) == Updated
               } else {
                 false
