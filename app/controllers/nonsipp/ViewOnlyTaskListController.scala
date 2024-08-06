@@ -669,7 +669,9 @@ object ViewOnlyTaskListController {
     val otherAssetsDisposalItem = TaskListItemViewModel(
       LinkMessage(
         messageKey("nonsipp.tasklist.otherassetsdisposal", "title"),
-        controllers.routes.UnauthorisedController.onPageLoad().url
+        controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+          .url
       ),
       otherAssetsDisposalTaskListStatus
     )

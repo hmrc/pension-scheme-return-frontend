@@ -196,12 +196,12 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+        controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )
-        .withName("Submit redirects to view only tasklist")
+        .withName("Submit redirects to view only ReportedOtherAssetsDisposalListController page")
     )
   }
 
