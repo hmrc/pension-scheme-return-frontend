@@ -28,7 +28,11 @@ object Components {
   private def anchor(content: Html, url: String, attrs: Map[String, String]): Html = {
     val attributes = attrs.toList.map { case (key, value) => s"""$key="$value"""" }.mkString(" ")
 
-    HtmlFormat.raw(s"""<a href="$url" class="govuk-link" $attributes>$content</a>""")
+    if (attributes.endsWith("class=\"govuk-task-list__link\"")) {
+      HtmlFormat.raw(s"""<a href="$url" class="govuk-link govuk-task-list__link" $attributes>$content</a>""")
+    } else {
+      HtmlFormat.raw(s"""<a href="$url" class="govuk-link" $attributes>$content</a>""")
+    }
   }
 
   private def anchorWithHiddenText(content: Html, url: String, attrs: Map[String, String], hiddenText: Html): Html = {

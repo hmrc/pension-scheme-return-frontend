@@ -15,7 +15,7 @@
  *@
 
 @import cats.data.NonEmptyList
-@import viewmodels.models.TaskListStatus.{UnableToStart, Updated}
+@import viewmodels.models.TaskListStatus._
 
 @this()
 
@@ -23,27 +23,59 @@
 
 @viewModel.toList.zipWithIndex.map { case (item, itemIndex) =>
     @defining(s"task-list-item-$index-$itemIndex") { id =>
-        <li class="app-task-list__item">
-            <span class="app-task-list__task-name">
-                @{
-                    item.status match {
-                        case UnableToStart => renderMessage(item.link.content)
-                        case _ => renderMessage(item.link.withAttr("aria-describedby", id))
-                    }
-                }
-            </span>
-            @if(item.status == Updated) {
-                <span class="hmrc-status-tag" id="@id">
-                    <strong class ="govuk-tag govuk-tag--green">
+        @if(item.status == UnableToStart) {
+            <li class="govuk-task-list__item">
+                <span class="govuk-task-list__name-and-hint">
+                    <span>
+                        @renderMessage(item.link.content)
+                    </span>
+                </span>
+                <span class="govuk-task-list__status govuk-task-list__status--cannot-start-yet" id="@id">
+                    @renderMessage(item.status.description)
+                </span>
+            </li>
+        } else if(item.status == NotStarted) {
+            <li class="govuk-task-list__item govuk-task-list__item--with-link">
+                <span class="govuk-task-list__name-and-hint">
+                    @renderMessage(item.link.withAttr("aria-describedby", id).withAttr("class", "govuk-task-list__link"))
+                </span>
+                <span class="govuk-task-list__status" id="@id">
+                    <strong class="govuk-tag govuk-tag--blue">
                         @renderMessage(item.status.description)
                     </strong>
                 </span>
-            } else {
-                <span class="hmrc-status-tag" id="@id">
+            </li>
+        } else if(item.status == InProgress) {
+            <li class="govuk-task-list__item govuk-task-list__item--with-link">
+                <span class="govuk-task-list__name-and-hint">
+                    @renderMessage(item.link.withAttr("aria-describedby", id).withAttr("class", "govuk-task-list__link"))
+                </span>
+                <span class="govuk-task-list__status" id="@id">
+                    <strong class="govuk-tag govuk-tag--light-blue">
+                        @renderMessage(item.status.description)
+                    </strong>
+                </span>
+            </li>
+        } else if(item.status == Updated) {
+            <li class="govuk-task-list__item govuk-task-list__item--with-link">
+                <span class="govuk-task-list__name-and-hint">
+                    @renderMessage(item.link.withAttr("aria-describedby", id).withAttr("class", "govuk-task-list__link"))
+                </span>
+                <span class="govuk-task-list__status" id="@id">
+                    <strong class="govuk-tag govuk-tag--green">
+                        @renderMessage(item.status.description)
+                    </strong>
+                </span>
+            </li>
+        } else {
+            <li class="govuk-task-list__item govuk-task-list__item--with-link">
+                <span class="govuk-task-list__name-and-hint">
+                    @renderMessage(item.link.withAttr("aria-describedby", id).withAttr("class", "govuk-task-list__link"))
+                </span>
+                <span class="govuk-task-list__status" id="@id">
                     @renderMessage(item.status.description)
                 </span>
-            }
-        </li>
+            </li>
+        }
     }
 }
-

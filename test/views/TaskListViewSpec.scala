@@ -44,7 +44,7 @@ class TaskListViewSpec extends ViewSpec {
           val expected =
             viewmodel.page.sections.zipWithIndex.map {
               case (section, index) =>
-                s"${index + 1}. ${renderMessage(section.title)}"
+                s"${renderMessage(section.title)}"
             }.toList
 
           h2(view(viewmodel)) must contain allElementsOf expected
