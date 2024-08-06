@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.totalvaluequotedshares
+package pages.nonsipp
 
-import pages.QuestionPage
-import models.SchemeId.Srn
-import play.api.libs.json.JsPath
-import models.Money
+import play.api.libs.json.{__, JsPath}
 
-case class TotalValueQuotedSharesPage(srn: Srn) extends QuestionPage[Money] {
+package object totalvaluequotedshares {
 
-  override def path: JsPath = Paths.quotedShares \ toString
-
-  override def toString: String = "totalValueQuotedShares"
+  object Paths {
+    val quotedShares: JsPath = __ \ "quotedShares"
+  }
 }

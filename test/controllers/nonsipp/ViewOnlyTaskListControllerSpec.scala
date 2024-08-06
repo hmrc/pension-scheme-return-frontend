@@ -1062,7 +1062,9 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedStatus = Completed,
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.quotedshares.title",
-              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+              expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
+                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne)
+                .url
             )
           }
 
@@ -1075,7 +1077,9 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedStatus = Updated,
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.quotedshares.title",
-              expectedLinkUrl = controllers.routes.UnauthorisedController.onPageLoad().url
+              expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
+                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne)
+                .url
             )
           }
         }
