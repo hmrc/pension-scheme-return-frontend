@@ -1019,7 +1019,6 @@ membersUploaded.error.required = Select yes if you want to upload a member detai
 
 nonsipp.tasklist.title = Pension scheme return for {0} to {1}
 nonsipp.tasklist.heading = Pension scheme return for {0} to {1}
-nonsipp.tasklist.subheading.incomplete = Return incomplete
 nonsipp.tasklist.subheading.notSubmitted = Return not submitted
 nonsipp.tasklist.subheading.completed = Return completed
 nonsipp.tasklist.history = View all versions of this return

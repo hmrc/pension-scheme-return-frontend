@@ -34,9 +34,9 @@ import views.html.TaskListView
 import models.SchemeId.Srn
 import cats.implicits.toShow
 import pages.nonsipp.memberpensionpayments.Paths.membersPayments
-import pages.nonsipp.WhichTaxYearPage
+import pages.nonsipp.{CompilationOrSubmissionDatePage, WhichTaxYearPage}
 import play.api.Logger
-import utils.DateTimeUtils.localDateShow
+import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
@@ -103,6 +103,10 @@ object ViewOnlyTaskListController {
         controllers.routes.ReturnsSubmittedController.onPageLoad(srn, 1).url
       )
 
+    val submissionDateMessage = currentUA
+      .get(CompilationOrSubmissionDatePage(srn))
+      .fold(Message(""))(date => Message("site.submittedOn", date.show))
+
     val sectionListWithoutDeclaration = List(
       schemeDetailsSection(schemeName, currentUA, previousUA, srn, year, currentVersion, previousVersion),
       membersSection(schemeName, currentUA, previousUA, srn, year, currentVersion, previousVersion),
@@ -117,8 +121,10 @@ object ViewOnlyTaskListController {
     val declarationSectionViewModel = declarationSection(srn, schemeName, dateRange, currentVersion)
 
     val viewModel = TaskListViewModel(
+      false,
       true,
       Some(historyLink),
+      submissionDateMessage,
       sectionListWithoutDeclaration.head,
       sectionListWithoutDeclaration.tail :+ declarationSectionViewModel: _*
     )

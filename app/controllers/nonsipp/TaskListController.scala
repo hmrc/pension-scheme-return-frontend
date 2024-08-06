@@ -28,9 +28,9 @@ import viewmodels.models.TaskListStatus._
 import play.api.i18n.MessagesApi
 import views.html.TaskListView
 import models.SchemeId.Srn
-import pages.nonsipp.WhichTaxYearPage
+import pages.nonsipp.{CompilationOrSubmissionDatePage, WhichTaxYearPage}
 import utils.nonsipp.TaskListUtils._
-import utils.DateTimeUtils.localDateShow
+import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
@@ -96,6 +96,10 @@ object TaskListController {
 
     val sectionList = getSectionList(srn, schemeName, userAnswers, pensionSchemeId)
 
+    val (numberOfCompleted, numberOfTotal) = evaluateCompletedTotalTuple(sectionList)
+
+    val canDeclareAndSubmit = numberOfCompleted == numberOfTotal
+
     val historyLink = if (hasHistory) {
       Some(
         LinkMessage(
@@ -107,23 +111,23 @@ object TaskListController {
       None
     }
 
+    val submissionDateMessage = userAnswers
+      .get(CompilationOrSubmissionDatePage(srn))
+      .fold(Message(""))(date => Message("site.submittedOn", date.show))
+
     val viewModel = TaskListViewModel(
+      canDeclareAndSubmit,
       hasHistory,
       historyLink,
+      submissionDateMessage,
       sectionList.head,
       sectionList.tail: _*
     )
-
-    val (numberOfCompleted, numberOfTotal) = evaluateCompletedTotalTuple(viewModel.sections.toList)
 
     PageViewModel(
       Message("nonsipp.tasklist.title", startDate.show, endDate.show),
       Message("nonsipp.tasklist.heading", startDate.show, endDate.show),
       viewModel
-    ).withDescription(
-      Heading2.small("nonsipp.tasklist.subheading.incomplete") ++
-        ParagraphMessage(Message("nonsipp.tasklist.description", numberOfCompleted, numberOfTotal))
-    )
+    ).withDescription(ParagraphMessage(Message("nonsipp.tasklist.description", numberOfCompleted, numberOfTotal)))
   }
-
 }
