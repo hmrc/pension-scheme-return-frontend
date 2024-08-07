@@ -25,11 +25,7 @@ import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import models.{NormalMode, ViewOnlyMode}
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.employercontributions.{
-  EmployerContributionsMemberListPage,
-  EmployerContributionsProgress,
-  TotalEmployerContributionPage
-}
+import pages.nonsipp.employercontributions._
 import services.PsrSubmissionService
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
@@ -73,6 +69,7 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
       EmployerContributionsProgress(srn, refineMV(1), refineMV(1)),
       SectionJourneyStatus.Completed
     )
+    .unsafeSet(EmployerContributionsPage(srn), true)
 
   val employerContributions: List[EmployerContributions] = List(
     EmployerContributions(
@@ -104,7 +101,7 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[TwoColumnsTripleAction].apply(
         form(injected[YesNoPageFormProvider]),
-        viewModel(srn, page = 1, NormalMode, employerContributions, viewOnlyUpdated = false)
+        viewModel(srn, page = 1, NormalMode, employerContributions, viewOnlyUpdated = false, noPageEnabled = false)
       )
     })
 
@@ -113,7 +110,14 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
         injected[TwoColumnsTripleAction]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, page = 1, NormalMode, employerContributions, viewOnlyUpdated = false)
+            viewModel(
+              srn,
+              page = 1,
+              NormalMode,
+              employerContributions,
+              viewOnlyUpdated = false,
+              noPageEnabled = false
+            )
           )
     })
 
@@ -149,7 +153,8 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              noPageEnabled = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -172,10 +177,35 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              noPageEnabled = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    val noUserAnswers = currentUserAnswers
+      .unsafeSet(EmployerContributionsPage(srn), false)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[TwoColumnsTripleAction].apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              List.empty,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              noPageEnabled = true
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok NO records")
     )
 
     act.like(

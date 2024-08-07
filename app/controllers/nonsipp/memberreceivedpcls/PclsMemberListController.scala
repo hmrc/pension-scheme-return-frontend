@@ -64,7 +64,7 @@ class PclsMemberListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)(implicitly)
+      onPageLoadCommon(srn, page, mode)
   }
 
   def onPageLoadViewOnly(
@@ -75,14 +75,15 @@ class PclsMemberListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    onPageLoadCommon(srn, page, mode)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
     val ua = request.userAnswers
     val optionList: List[Option[NameDOB]] = ua.membersOptionList(srn)
 
     if (optionList.flatten.nonEmpty) {
+      val noPageEnabled = !ua.get(PensionCommencementLumpSumPage(srn)).getOrElse(false)
       val viewModel = PclsMemberListController
         .viewModel(
           srn,
@@ -102,7 +103,8 @@ class PclsMemberListController @Inject()(
           optYear = request.year,
           optCurrentVersion = request.currentVersion,
           optPreviousVersion = request.previousVersion,
-          compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+          noPageEnabled = noPageEnabled
         )
       val filledForm =
         request.userAnswers.get(PclsMemberListPage(srn)).fold(form)(form.fill)
@@ -128,15 +130,30 @@ class PclsMemberListController @Inject()(
         form
           .bindFromRequest()
           .fold(
-            errors =>
+            errors => {
+              val noPageEnabled = !ua.get(PensionCommencementLumpSumPage(srn)).getOrElse(false)
               Future.successful(
                 BadRequest(
                   view(
                     errors,
-                    PclsMemberListController.viewModel(srn, page, mode, optionList, ua, false, None, None, None)
+                    PclsMemberListController
+                      .viewModel(
+                        srn,
+                        page,
+                        mode,
+                        optionList,
+                        ua,
+                        viewOnlyUpdated = false,
+                        None,
+                        None,
+                        None,
+                        None,
+                        noPageEnabled
+                      )
                   )
                 )
-              ),
+              )
+            },
             value =>
               for {
                 updatedUserAnswers <- buildUserAnswerBySelection(srn, value, optionList.flatten.size)
@@ -304,13 +321,14 @@ object PclsMemberListController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    compilationOrSubmissionDate: Option[LocalDateTime] = None,
+    noPageEnabled: Boolean
   ): FormPageViewModel[ActionTableViewModel] = {
     val title = "pcls.memberlist.title"
     val heading = "pcls.memberlist.heading"
 
     // in view-only mode or with direct url edit page value can be higher than needed
-    val currentPage = if ((page - 1) * Constants.landOrPropertiesSize >= memberList.flatten.size) 1 else page
+    val currentPage = if ((page - 1) * Constants.pclsInListSize >= memberList.flatten.size) 1 else page
     val pagination = Pagination(
       currentPage = currentPage,
       pageSize = Constants.pclsInListSize,
@@ -371,7 +389,7 @@ object PclsMemberListController {
             updated = viewOnlyUpdated,
             link = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion))
-                  if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+                  if optYear.nonEmpty && currentVersion > 1 && previousVersion > 0 =>
                 Some(
                   LinkMessage(
                     "pcls.MemberList.viewOnly.link",
@@ -400,7 +418,10 @@ object PclsMemberListController {
               case _ =>
                 controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
                   .onSubmit(srn, page, mode)
-            }
+            },
+            noLabel = Option.when(noPageEnabled)(
+              Message("pcls.MemberList.view.none")
+            )
           )
         )
       } else {

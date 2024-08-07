@@ -26,11 +26,7 @@ import controllers.PSRController
 import cats.implicits.toShow
 import config.Constants.maxNotRelevant
 import forms.YesNoPageFormProvider
-import pages.nonsipp.membersurrenderedbenefits.{
-  SurrenderedBenefitsAmountPage,
-  SurrenderedBenefitsJourneyStatus,
-  SurrenderedBenefitsMemberListPage
-}
+import pages.nonsipp.membersurrenderedbenefits._
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
@@ -69,7 +65,7 @@ class SurrenderedBenefitsMemberListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)(implicitly)
+      onPageLoadCommon(srn, page, mode)
   }
 
   def onPageLoadViewOnly(
@@ -80,14 +76,14 @@ class SurrenderedBenefitsMemberListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    onPageLoadCommon(srn, page, mode)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
     val userAnswers = request.userAnswers
     val optionList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
     if (optionList.flatten.nonEmpty) {
+      val noPageEnabled = !userAnswers.get(SurrenderedBenefitsPage(srn)).getOrElse(false)
       val viewModel = SurrenderedBenefitsMemberListController
         .viewModel(
           srn,
@@ -107,7 +103,9 @@ class SurrenderedBenefitsMemberListController @Inject()(
           optYear = request.year,
           optCurrentVersion = request.currentVersion,
           optPreviousVersion = request.previousVersion,
-          compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+          schemeName = request.schemeDetails.schemeName,
+          noPageEnabled = noPageEnabled
         )
       val filledForm =
         userAnswers.get(SurrenderedBenefitsMemberListPage(srn)).fold(form)(form.fill)
@@ -128,9 +126,23 @@ class SurrenderedBenefitsMemberListController @Inject()(
           )
         )
       } else {
+        val noPageEnabled = !request.userAnswers.get(SurrenderedBenefitsPage(srn)).getOrElse(false)
         val viewModel =
           SurrenderedBenefitsMemberListController
-            .viewModel(srn, page, mode, optionList, request.userAnswers, viewOnlyUpdated = false, None, None, None)
+            .viewModel(
+              srn,
+              page,
+              mode,
+              optionList,
+              request.userAnswers,
+              viewOnlyUpdated = false,
+              None,
+              None,
+              None,
+              None,
+              request.schemeDetails.schemeName,
+              noPageEnabled
+            )
 
         form
           .bindFromRequest()
@@ -296,14 +308,16 @@ object SurrenderedBenefitsMemberListController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    compilationOrSubmissionDate: Option[LocalDateTime] = None,
+    schemeName: String,
+    noPageEnabled: Boolean
   ): FormPageViewModel[ActionTableViewModel] = {
     val title = "surrenderedBenefits.memberList.title"
     val heading = "surrenderedBenefits.memberList.heading"
 
     val memberListSize = memberList.flatten.size
     // in view-only mode or with direct url edit page value can be higher than needed
-    val currentPage = if ((page - 1) * Constants.landOrPropertiesSize >= memberListSize) 1 else page
+    val currentPage = if ((page - 1) * Constants.surrenderedBenefitsListSize >= memberListSize) 1 else page
     val pagination = Pagination(
       currentPage = currentPage,
       pageSize = Constants.surrenderedBenefitsListSize,
@@ -390,7 +404,10 @@ object SurrenderedBenefitsMemberListController {
               case _ =>
                 controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
                   .onSubmit(srn, page, mode)
-            }
+            },
+            noLabel = Option.when(noPageEnabled)(
+              Message("surrenderedBenefits.memberList.view.none", schemeName)
+            )
           )
         )
       } else {

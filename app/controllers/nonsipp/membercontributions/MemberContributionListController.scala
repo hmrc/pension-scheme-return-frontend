@@ -30,7 +30,11 @@ import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
 import _root_.config.Refined.OneTo300
 import viewmodels.implicits._
-import pages.nonsipp.membercontributions.{MemberContributionsListPage, TotalMemberContributionPage}
+import pages.nonsipp.membercontributions.{
+  MemberContributionsListPage,
+  MemberContributionsPage,
+  TotalMemberContributionPage
+}
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
 import controllers.actions.IdentifyAndRequireData
@@ -65,7 +69,7 @@ class MemberContributionListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)(implicitly)
+      onPageLoadCommon(srn, page, mode)
   }
 
   def onPageLoadViewOnly(
@@ -76,14 +80,16 @@ class MemberContributionListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    onPageLoadCommon(srn, page, mode)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
-    val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+    val userAnswers = request.userAnswers
+    val optionList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
     if (optionList.flatten.nonEmpty) {
-      val filledForm = request.userAnswers.get(MemberContributionsListPage(srn)).fold(form)(form.fill)
+      val filledForm = userAnswers.get(MemberContributionsListPage(srn)).fold(form)(form.fill)
+      val noPageEnabled = !userAnswers.get(MemberContributionsPage(srn)).getOrElse(false)
       Ok(
         view(
           filledForm,
@@ -92,10 +98,10 @@ class MemberContributionListController @Inject()(
             page,
             mode,
             optionList,
-            request.userAnswers,
+            userAnswers,
             viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
               getCompletedOrUpdatedTaskListStatus(
-                request.userAnswers,
+                userAnswers,
                 request.previousUserAnswers.get,
                 pages.nonsipp.membercontributions.Paths.memberDetails \ "totalMemberContribution"
               ) == Updated
@@ -105,7 +111,8 @@ class MemberContributionListController @Inject()(
             optYear = request.year,
             optCurrentVersion = request.currentVersion,
             optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+            compilationOrSubmissionDate = userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+            noPageEnabled = noPageEnabled
           )
         )
       )
@@ -130,16 +137,29 @@ class MemberContributionListController @Inject()(
         form
           .bindFromRequest()
           .fold(
-            errors =>
+            errors => {
+              val noPageEnabled = !userAnswers.get(MemberContributionsPage(srn)).getOrElse(false)
               Future.successful(
                 BadRequest(
                   view(
                     errors,
                     MemberContributionListController
-                      .viewModel(srn, page, mode, optionList, userAnswers, false, None, None, None)
+                      .viewModel(
+                        srn,
+                        page,
+                        mode,
+                        optionList,
+                        userAnswers,
+                        viewOnlyUpdated = false,
+                        None,
+                        None,
+                        None,
+                        noPageEnabled = noPageEnabled
+                      )
                   )
                 )
-              ),
+              )
+            },
             value =>
               for {
                 updatedUserAnswers <- buildUserAnswerBySelection(srn, value, optionList.flatten.size)
@@ -294,7 +314,8 @@ object MemberContributionListController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    compilationOrSubmissionDate: Option[LocalDateTime] = None,
+    noPageEnabled: Boolean
   ): FormPageViewModel[ActionTableViewModel] = {
 
     val (title, heading) =
@@ -305,10 +326,11 @@ object MemberContributionListController {
       }
 
     // in view-only mode or with direct url edit page value can be higher than needed
-    val currentPage = if ((page - 1) * Constants.landOrPropertiesSize >= memberList.flatten.size) 1 else page
+    val currentPage =
+      if ((page - 1) * Constants.memberContributionsMemberListSize >= memberList.flatten.size) 1 else page
     val pagination = Pagination(
       currentPage = currentPage,
-      pageSize = Constants.landOrPropertiesSize,
+      pageSize = Constants.memberContributionsMemberListSize,
       memberList.flatten.size,
       call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
         case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
@@ -366,7 +388,7 @@ object MemberContributionListController {
             updated = viewOnlyUpdated,
             link = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion))
-                  if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+                  if optYear.nonEmpty && currentVersion > 1 && previousVersion > 0 =>
                 Some(
                   LinkMessage(
                     "ReportContribution.MemberList.viewOnly.link",
@@ -395,7 +417,10 @@ object MemberContributionListController {
               case _ =>
                 controllers.nonsipp.membercontributions.routes.MemberContributionListController
                   .onSubmit(srn, page, mode)
-            }
+            },
+            noLabel = Option.when(noPageEnabled)(
+              Message("ReportContribution.MemberList.view.none")
+            )
           )
         )
       } else {

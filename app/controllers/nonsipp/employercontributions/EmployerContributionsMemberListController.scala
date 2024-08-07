@@ -67,7 +67,7 @@ class EmployerContributionsMemberListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)(implicitly)
+      onPageLoadCommon(srn, page, mode)
   }
 
   def onPageLoadViewOnly(
@@ -78,10 +78,10 @@ class EmployerContributionsMemberListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    onPageLoadCommon(srn, page, mode)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
     val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
     if (optionList.flatten.nonEmpty) {
       optionList
@@ -89,6 +89,7 @@ class EmployerContributionsMemberListController @Inject()(
         .map { indexes =>
           val employerContributions = buildEmployerContributions(srn, indexes)
           val filledForm = request.userAnswers.fillForm(EmployerContributionsMemberListPage(srn), form)
+          val noPageEnabled = !request.userAnswers.get(EmployerContributionsPage(srn)).getOrElse(false)
           Ok(
             view(
               filledForm,
@@ -109,7 +110,8 @@ class EmployerContributionsMemberListController @Inject()(
                 optYear = request.year,
                 optCurrentVersion = request.currentVersion,
                 optPreviousVersion = request.previousVersion,
-                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+                noPageEnabled
               )
             )
           )
@@ -135,6 +137,7 @@ class EmployerContributionsMemberListController @Inject()(
           .bindFromRequest()
           .fold(
             errors => {
+              val noPageEnabled = !request.userAnswers.get(EmployerContributionsPage(srn)).getOrElse(false)
               optionList
                 .zipWithRefinedIndex[Max300.Refined]
                 .map { indexes =>
@@ -143,7 +146,18 @@ class EmployerContributionsMemberListController @Inject()(
                     view(
                       errors,
                       EmployerContributionsMemberListController
-                        .viewModel(srn, page, mode, employerContributions, viewOnlyUpdated = false, None, None, None)
+                        .viewModel(
+                          srn,
+                          page,
+                          mode,
+                          employerContributions,
+                          viewOnlyUpdated = false,
+                          None,
+                          None,
+                          None,
+                          None,
+                          noPageEnabled
+                        )
                     )
                   )
                 }
@@ -323,7 +337,8 @@ object EmployerContributionsMemberListController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    compilationOrSubmissionDate: Option[LocalDateTime] = None,
+    noPageEnabled: Boolean
   ): FormPageViewModel[ActionTableViewModel] = {
 
     val (title, heading) = if (employerContributions.size == 1) {
@@ -332,7 +347,8 @@ object EmployerContributionsMemberListController {
       ("employerContributions.MemberList.title.plural", "employerContributions.MemberList.heading.plural")
     }
     // in view-only mode or with direct url edit page value can be higher than needed
-    val currentPage = if ((page - 1) * Constants.landOrPropertiesSize >= employerContributions.size) 1 else page
+    val currentPage =
+      if ((page - 1) * Constants.employerContributionsMemberListSize >= employerContributions.size) 1 else page
     val pagination = Pagination(
       currentPage = currentPage,
       pageSize = Constants.employerContributionsMemberListSize,
@@ -429,7 +445,10 @@ object EmployerContributionsMemberListController {
               case _ =>
                 controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
                   .onSubmit(srn, page, mode)
-            }
+            },
+            noLabel = Option.when(noPageEnabled)(
+              Message("employerContributions.MemberList.view.none")
+            )
           )
         )
       } else {

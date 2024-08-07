@@ -827,6 +827,7 @@ pcls.memberList.remove.hidden.text = PCLS for {0}
 pcls.MemberList.viewOnly.title = Pension commencement lump sum
 pcls.MemberList.viewOnly.heading = Pension commencement lump sum
 pcls.MemberList.viewOnly.link = View previous version of pension commencement lump sum (opens in new tab)
+pcls.MemberList.view.none = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 
 pclsCYA.change.title.check = Change details of PCLS for this member
 pclsCYA.heading.check = Change details of PCLS for {0}
@@ -912,6 +913,7 @@ surrenderedBenefits.memberList.viewOnly.title = Surrendered benefits
 surrenderedBenefits.memberList.viewOnly.heading = Surrendered benefits
 surrenderedBenefits.memberList.viewOnly.link = View previous version of surrendered benefits (opens in new tab)
 surrenderedBenefits.memberList.add.hidden.text = surrendered benefits for {0}
+surrenderedBenefits.memberList.view.none = Did any member surrender benefits within {0} during the period of this return?
 
 surrenderedBenefits.amount.title = What was the total amount surrendered by the member, in pounds and pence?
 surrenderedBenefits.amount.heading = What was the total amount surrendered by {0}, in pounds and pence?
@@ -2370,6 +2372,7 @@ transferIn.MemberList.status.some.contributions = {0} transfers in
 transferIn.MemberList.viewOnly.title = Transfers in
 transferIn.MemberList.viewOnly.heading = Transfers in
 transferIn.MemberList.viewOnly.link = View previous version of transfers in (opens in new tab)
+transferIn.MemberList.view.none = Did {0} receive a transfer for any member during the period of this return?
 
 contributionsFromAnotherEmployer.title = Were employer contributions made for the member by any other employer?
 contributionsFromAnotherEmployer.heading = Were employer contributions made for {0} by any other employer?
@@ -2394,6 +2397,7 @@ employerContributions.MemberList.remove.hidden.text = employer contributions for
 employerContributions.MemberList.viewOnly.title = Employer contributions
 employerContributions.MemberList.viewOnly.heading = Employer contributions
 employerContributions.MemberList.viewOnly.link = View previous version of employer contributions (opens in new tab)
+employerContributions.MemberList.view.none = Were employer contributions made for any member during the period of this return?
 
 ReportContribution.MemberList.title = Select a member to report member contributions
 ReportContribution.MemberList.title.plural = Select a member to report member contributions
@@ -2410,6 +2414,7 @@ ReportContribution.MemberList.remove.hidden.text = member contributions for {0}
 ReportContribution.MemberList.viewOnly.title = Member contributions
 ReportContribution.MemberList.viewOnly.heading = Member contributions
 ReportContribution.MemberList.viewOnly.link = View previous version of member contributions (opens in new tab)
+ReportContribution.MemberList.view.none = Were member contributions made by or for any member during the period of this return?
 
 MemberContributionCYA.title = Check your answers
 MemberContributionCYA.change.title = Change details of member contributions
@@ -2564,10 +2569,11 @@ transferOut.memberList.pagination.label = Showing {0} - {1} of {2} members
 transferOut.memberList.status.no.contributions =  No transfers out
 transferOut.memberList.singleStatus.some.contribution = {0} transfer out
 transferOut.memberList.status.some.contributions = {0} transfers out
-
-transferOut.MemberList.viewOnly.title = Transfers out
-transferOut.MemberList.viewOnly.heading = Transfers out
-transferOut.MemberList.viewOnly.link =  View previous version of transfers out (opens in new tab)
+transferOut.memberList.viewOnly.title = Transfers out
+transferOut.memberList.viewOnly.heading = Transfers out
+transferOut.memberList.viewOnly.link = View previous version of transfers out (opens in new tab)
+transferOut.memberList.add.hidden.text = transfers out for {0}
+transferOut.memberList.view.none = Did {0} make a transfer out for any member during the period of this return?
 
 TransferOut.receivingSchemeName.title = What is the receiving scheme’s name?
 TransferOut.receivingSchemeName.heading = What is the receiving scheme’s name?
@@ -2651,6 +2657,7 @@ memberPensionPayments.memberList.remove.hidden.text = pension payments for {0}
 memberPensionPayments.memberList.viewOnly.title = Pension payments
 memberPensionPayments.memberList.viewOnly.heading = Pension payments
 memberPensionPayments.memberList.viewOnly.link = View previous version of pension payments (opens in new tab)
+memberPensionPayments.memberList.view.none = Did any member receive pension payments from {0} during the period of this return?
 
 totalAmountPensionPayments.title = What was the taxable amount of pension payments received by the member during the period of this return, in pounds and pence?
 totalAmountPensionPayments.heading = What was the taxable amount of pension payments received by {0} during the period of this return, in pounds and pence?

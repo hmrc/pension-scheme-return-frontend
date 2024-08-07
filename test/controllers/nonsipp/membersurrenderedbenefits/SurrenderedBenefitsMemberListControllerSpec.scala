@@ -26,7 +26,11 @@ import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
-import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, SurrenderedBenefitsMemberListPage}
+import pages.nonsipp.membersurrenderedbenefits.{
+  SurrenderedBenefitsAmountPage,
+  SurrenderedBenefitsMemberListPage,
+  SurrenderedBenefitsPage
+}
 import models._
 import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
@@ -79,6 +83,7 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
     defaultUserAnswers
       .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
       .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+      .unsafeSet(SurrenderedBenefitsPage(srn), true)
 
   "SurrenderedBenefitsMemberListController" - {
 
@@ -91,9 +96,11 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
           srn,
           page = 1,
           NormalMode,
-          memberList: List[Option[NameDOB]],
-          userAnswers: UserAnswers,
-          viewOnlyUpdated = false
+          memberList,
+          userAnswers,
+          viewOnlyUpdated = false,
+          schemeName = schemeName,
+          noPageEnabled = false
         )
       )
     })
@@ -108,9 +115,11 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
               srn,
               page = 1,
               NormalMode,
-              memberList: List[Option[NameDOB]],
-              userAnswers: UserAnswers,
-              viewOnlyUpdated = false
+              memberList,
+              userAnswers,
+              viewOnlyUpdated = false,
+              schemeName = schemeName,
+              noPageEnabled = false
             )
           )
     })
@@ -142,7 +151,7 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(FbVersionPage(srn), "002")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
 
-    val previousUserAnswers = currentUserAnswers
+    val previousUserAnswers = userAnswers
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
 
@@ -163,7 +172,9 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              schemeName = schemeName,
+              noPageEnabled = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -189,10 +200,37 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              schemeName = schemeName,
+              noPageEnabled = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    val noUserAnswers = currentUserAnswers.unsafeSet(SurrenderedBenefitsPage(srn), false)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[TwoColumnsTripleAction].apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              List.empty,
+              noUserAnswers,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              schemeName = schemeName,
+              noPageEnabled = true
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok NO records")
     )
 
     act.like(

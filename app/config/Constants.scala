@@ -39,7 +39,6 @@ object Constants {
   val delimitedPSA = "DELIMITED_PSAID"
   val detailsNotFound = "no match found"
 
-  val maxSchemeBankAccounts = 10
   val maxAccountingPeriods = 3
   val maxLandOrProperties = 5000
   val maxLandOrPropertyDisposals = 50
@@ -62,6 +61,7 @@ object Constants {
   val transferOutListSize = 25
   val pclsInListSize = 25
   val surrenderedBenefitsListSize = 25
+  val memberContributionsMemberListSize = 25
   val employerContributionsMemberListSize = 25
   val employerContributionsCYASize = 5
   val memberPensionPayments = 25

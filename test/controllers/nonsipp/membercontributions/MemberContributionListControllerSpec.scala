@@ -17,7 +17,11 @@
 package controllers.nonsipp.membercontributions
 
 import services.PsrSubmissionService
-import pages.nonsipp.membercontributions.{MemberContributionsListPage, TotalMemberContributionPage}
+import pages.nonsipp.membercontributions.{
+  MemberContributionsListPage,
+  MemberContributionsPage,
+  TotalMemberContributionPage
+}
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.Max300
 import controllers.ControllerBaseSpec
@@ -70,6 +74,7 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
   val userAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberContributionsPage(srn), true)
 
   "MemberContributionListController" - {
 
@@ -82,9 +87,10 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
           srn,
           page = 1,
           NormalMode,
-          memberList: List[Option[NameDOB]],
+          memberList,
           userAnswers,
-          false
+          viewOnlyUpdated = false,
+          noPageEnabled = false
         )
       )
     })
@@ -100,9 +106,10 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
               srn,
               page = 1,
               NormalMode,
-              memberList: List[Option[NameDOB]],
+              memberList,
               userAnswers,
-              false
+              viewOnlyUpdated = false,
+              noPageEnabled = false
             )
           )
     })
@@ -139,17 +146,13 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
 
   "MemberContributionListController in view only mode" - {
 
-    val currentUserAnswers = defaultUserAnswers
+    val currentUserAnswers = userAnswers
       .unsafeSet(FbVersionPage(srn), "002")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
-    val previousUserAnswers = currentUserAnswers
+    val previousUserAnswers = userAnswers
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -162,13 +165,14 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
               srn,
               page,
               mode = ViewOnlyMode,
-              memberList: List[Option[NameDOB]],
+              memberList,
               currentUserAnswers,
               viewOnlyUpdated = false,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              noPageEnabled = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -188,16 +192,41 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
               srn,
               page,
               mode = ViewOnlyMode,
-              memberList: List[Option[NameDOB]],
+              memberList,
               updatedUserAnswers,
               viewOnlyUpdated = true,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              noPageEnabled = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    val noUserAnswers = currentUserAnswers.unsafeSet(MemberContributionsPage(srn), false)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[TwoColumnsTripleAction].apply(
+            MemberContributionListController.form(injected[YesNoPageFormProvider]),
+            MemberContributionListController.viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              List.empty,
+              noUserAnswers,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              noPageEnabled = true
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok NO records")
     )
 
     act.like(

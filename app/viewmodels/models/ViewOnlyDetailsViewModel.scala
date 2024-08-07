@@ -26,5 +26,6 @@ case class ViewOnlyDetailsViewModel(
   title: Message,
   heading: InlineMessage,
   buttonText: Message,
-  onSubmit: Call
+  onSubmit: Call,
+  noLabel: Option[Message] = None
 )
