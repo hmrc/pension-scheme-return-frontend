@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import controllers.PSRController
+import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
 import cats.implicits.toShow
 import controllers.actions._
 import models.backend.responses.ReportStatus
@@ -62,6 +63,14 @@ class TaskListController @Inject()(
             )
             .toList
             .nonEmpty
+          noChangesSincePreviousVersion = if (!hasHistory) {
+            true
+          } else {
+            userAnswersUnchangedAllSections(
+              request.userAnswers,
+              request.previousUserAnswers.get
+            )
+          }
           viewModel = TaskListController.viewModel(
             srn,
             request.schemeDetails.schemeName,
@@ -69,7 +78,8 @@ class TaskListController @Inject()(
             dates.to,
             request.userAnswers,
             request.pensionSchemeId,
-            hasHistory
+            hasHistory,
+            noChangesSincePreviousVersion
           )
         } yield Ok(view(viewModel))
     }
@@ -91,14 +101,24 @@ object TaskListController {
     endDate: LocalDate,
     userAnswers: UserAnswers,
     pensionSchemeId: PensionSchemeId,
-    hasHistory: Boolean = false
+    hasHistory: Boolean = false,
+    noChangesSincePreviousVersion: Boolean
   ): PageViewModel[TaskListViewModel] = {
 
     val sectionList = getSectionList(srn, schemeName, userAnswers, pensionSchemeId)
 
     val (numberOfCompleted, numberOfTotal) = evaluateCompletedTotalTuple(sectionList)
 
-    val canDeclareAndSubmit = numberOfCompleted == numberOfTotal
+    val allSectionsCompleted = numberOfCompleted == numberOfTotal
+
+    val displayNotSubmittedMessage = (hasHistory, noChangesSincePreviousVersion) match {
+      // In Compile mode, if all sections completed, display message
+      case (false, _) => allSectionsCompleted
+      // In View & Change mode, if userAnswers unchanged, don't display message
+      case (true, true) => false
+      // In View & Change mode, if userAnswers changed & all sections completed, display message
+      case (true, false) => allSectionsCompleted
+    }
 
     val historyLink = if (hasHistory) {
       Some(
@@ -116,7 +136,7 @@ object TaskListController {
       .fold(Message(""))(date => Message("site.submittedOn", date.show))
 
     val viewModel = TaskListViewModel(
-      canDeclareAndSubmit,
+      displayNotSubmittedMessage,
       hasHistory,
       historyLink,
       submissionDateMessage,

@@ -35,17 +35,17 @@
 
     <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)</h1>
 
-    @if(viewmodel.page.canDeclareAndSubmit) {
+    @if(viewmodel.page.displayNotSubmittedMessage) {
         <h2 class="govuk-heading-s govuk-!-margin-bottom-4">
             @renderMessage("nonsipp.tasklist.subheading.notSubmitted")
+        </h2>
+    } else if (viewmodel.page.hasHistory) {
+        <h2 class="govuk-heading-s">
+            @renderMessage(viewmodel.page.submissionDateMessage)
         </h2>
     }
 
     @if(viewmodel.page.hasHistory && viewmodel.page.historyLink.nonEmpty) {
-        <h2 class="govuk-heading-s">
-            @renderMessage(viewmodel.page.submissionDateMessage)
-        </h2>
-
         <p class="govuk-body">
             <a href=@viewmodel.page.historyLink.get.url class="govuk-link">
                 @renderMessage(viewmodel.page.historyLink.get.content)

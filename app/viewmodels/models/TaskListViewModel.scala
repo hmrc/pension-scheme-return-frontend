@@ -50,7 +50,7 @@ object TaskListSectionViewModel {
 }
 
 case class TaskListViewModel(
-  canDeclareAndSubmit: Boolean,
+  displayNotSubmittedMessage: Boolean,
   hasHistory: Boolean,
   historyLink: Option[LinkMessage],
   submissionDateMessage: Message,
@@ -60,14 +60,14 @@ case class TaskListViewModel(
 object TaskListViewModel {
 
   def apply(
-    canDeclareAndSubmit: Boolean,
+    displayNotSubmittedMessage: Boolean,
     hasHistory: Boolean,
     historyLink: Option[LinkMessage],
     submissionDateMessage: Message,
     headItem: TaskListSectionViewModel,
     tailItems: TaskListSectionViewModel*
   ): TaskListViewModel = TaskListViewModel(
-    canDeclareAndSubmit,
+    displayNotSubmittedMessage,
     hasHistory,
     historyLink,
     submissionDateMessage,
