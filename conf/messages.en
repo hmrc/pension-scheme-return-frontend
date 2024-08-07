@@ -67,9 +67,9 @@ identityType.company = A UK company
 identityType.partnership = A UK partnership
 identityType.other = Other
 
-tasklist.unableToStart = Cannot start yet
-tasklist.notStarted = Not started
-tasklist.inProgress = In progress
+tasklist.unableToStart = Cannot start yet
+tasklist.notStarted = Not started
+tasklist.inProgress = In progress
 tasklist.completed = Completed
 tasklist.updated = Updated
 
