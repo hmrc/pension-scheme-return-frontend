@@ -21,8 +21,8 @@ import viewmodels.implicits._
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils._
 import pages.nonsipp.landorproperty.LandOrPropertyCompleted
+import cats.implicits.toShow
 import controllers.actions._
-import pages.nonsipp.memberdetails.Paths.personalDetails
 import viewmodels.models.TaskListStatus._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
@@ -32,8 +32,6 @@ import com.google.inject.Inject
 import cats.data.NonEmptyList
 import views.html.TaskListView
 import models.SchemeId.Srn
-import cats.implicits.toShow
-import pages.nonsipp.memberpensionpayments.Paths.membersPayments
 import pages.nonsipp.{CompilationOrSubmissionDatePage, WhichTaxYearPage}
 import play.api.Logger
 import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
@@ -245,7 +243,7 @@ object ViewOnlyTaskListController {
     val membersTaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
-      personalDetails
+      pages.nonsipp.memberdetails.Paths.personalDetails
     )
 
     TaskListSectionViewModel(
@@ -283,7 +281,7 @@ object ViewOnlyTaskListController {
     val unallocatedEmployerContributionsTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
-      membersPayments \ "unallocatedContribAmount"
+      pages.nonsipp.memberpensionpayments.Paths.memberDetails \ "unallocatedContribAmount"
     )
 
     val memberContributionTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
