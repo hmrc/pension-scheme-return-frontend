@@ -281,7 +281,7 @@ object ViewOnlyTaskListController {
     val unallocatedEmployerContributionsTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
-      pages.nonsipp.memberpensionpayments.Paths.memberDetails \ "unallocatedContribAmount"
+      pages.nonsipp.memberpayments.Paths.membersPayments \ "unallocatedContribAmount"
     )
 
     val memberContributionTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
@@ -636,7 +636,7 @@ object ViewOnlyTaskListController {
     val quotedSharesStatusAndLink: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
-      pages.nonsipp.totalvaluequotedshares.Paths.quotedShares
+      pages.nonsipp.totalvaluequotedshares.Paths.quotedShares \ "totalValueQuotedShares"
     )
 
     val otherAssetsTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
