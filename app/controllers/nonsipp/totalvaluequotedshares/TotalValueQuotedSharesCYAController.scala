@@ -110,7 +110,7 @@ class TotalValueQuotedSharesCYAController @Inject()(
           view(
             viewModel(
               srn,
-              totalCost.get,
+              totalCost,
               periods,
               request.schemeDetails,
               mode,
@@ -146,7 +146,7 @@ class TotalValueQuotedSharesCYAController @Inject()(
 object TotalValueQuotedSharesCYAController {
   def viewModel(
     srn: Srn,
-    totalCost: Money,
+    totalCost: Option[Money],
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
     schemeDetails: SchemeDetails,
     mode: Mode,
@@ -215,28 +215,44 @@ object TotalValueQuotedSharesCYAController {
 
   private def sections(
     srn: Srn,
-    totalCost: Money,
+    totalCost: Option[Money],
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
     schemeDetails: SchemeDetails,
     mode: Mode
   ): List[CheckYourAnswersSection] = {
-    val row = CheckYourAnswersRowViewModel(
-      Message(
-        "totalValueQuotedSharesCYA.section.totalCost",
-        schemeDetails.schemeName,
-        taxEndDate(taxYearOrAccountingPeriods).show
-      ),
-      "£" + totalCost.displayAs
-    )
+    val row: List[CheckYourAnswersRowViewModel] = (mode, totalCost) match {
+      case (ViewOnlyMode, None) =>
+        List(
+          CheckYourAnswersRowViewModel(
+            Message(
+              "quotedSharesManagedFundsHeld.heading",
+              schemeDetails.schemeName
+            ),
+            "site.no"
+          )
+        )
+      case (_, Some(totalCost)) =>
+        List(
+          CheckYourAnswersRowViewModel(
+            Message(
+              "totalValueQuotedSharesCYA.section.totalCost",
+              schemeDetails.schemeName,
+              taxEndDate(taxYearOrAccountingPeriods).show
+            ),
+            "£" + totalCost.displayAs
+          )
+        )
+      case _ => Nil
+    }
 
     List(
       CheckYourAnswersSection(
         None,
-        List(
-          if (mode.isViewOnlyMode) {
-            row
-          } else {
-            row.with2Actions(
+        if (mode.isViewOnlyMode) {
+          row
+        } else {
+          row.map(
+            _.with2Actions(
               SummaryAction(
                 "site.change",
                 controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController
@@ -262,8 +278,8 @@ object TotalValueQuotedSharesCYAController {
                 )
               )
             )
-          }
-        )
+          )
+        }
       )
     )
   }

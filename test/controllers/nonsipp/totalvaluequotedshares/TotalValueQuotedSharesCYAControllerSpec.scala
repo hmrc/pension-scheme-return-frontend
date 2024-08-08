@@ -78,7 +78,7 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
       injected[CYAWithRemove].apply(
         viewModel(
           srn,
-          totalCost = money,
+          totalCost = Some(money),
           Left(dateRange),
           defaultSchemeDetails,
           NormalMode,
@@ -129,7 +129,7 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
             injected[CYAWithRemove].apply(
               viewModel(
                 srn,
-                money,
+                Some(money),
                 Left(dateRange),
                 defaultSchemeDetails,
                 ViewOnlyMode,
@@ -138,6 +138,26 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
             )
         }.before(mockTaxYear(dateRange))
           .withName("OnPageLoadViewOnly renders ok with no changed flag")
+      )
+
+      act.like(
+        renderView(
+          onPageLoadViewOnly,
+          userAnswers = currentUserAnswers.remove(TotalValueQuotedSharesPage(srn)).get,
+          optPreviousAnswers = Some(previousUserAnswers)
+        ) { implicit app => implicit request =>
+          injected[CYAWithRemove].apply(
+            viewModel(
+              srn,
+              totalCost = None,
+              Left(dateRange),
+              defaultSchemeDetails,
+              ViewOnlyMode,
+              Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+            )
+          )
+        }.before(mockTaxYear(dateRange))
+          .withName("OnPageLoadViewOnly renders ok with no quoted shares")
       )
 
       val updatedUserAnswers = currentUserAnswers
@@ -149,7 +169,7 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
             injected[CYAWithRemove].apply(
               viewModel(
                 srn,
-                otherMoney,
+                Some(otherMoney),
                 Left(dateRange),
                 defaultSchemeDetails,
                 ViewOnlyMode,
