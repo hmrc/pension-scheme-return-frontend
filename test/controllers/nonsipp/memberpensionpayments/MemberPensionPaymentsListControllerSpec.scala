@@ -30,7 +30,11 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
-import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, TotalAmountPensionPaymentsPage}
+import pages.nonsipp.memberpensionpayments.{
+  MemberPensionPaymentsListPage,
+  PensionPaymentsReceivedPage,
+  TotalAmountPensionPaymentsPage
+}
 import eu.timepit.refined.refineMV
 
 class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
@@ -68,6 +72,7 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
   val userAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(PensionPaymentsReceivedPage(srn), true)
 
   "MemberPensionPaymentsListController" - {
 
@@ -82,7 +87,9 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
           NormalMode,
           memberList,
           userAnswers,
-          viewOnlyUpdated = false
+          viewOnlyUpdated = false,
+          schemeName = schemeName,
+          noPageEnabled = false
         )
       )
     })
@@ -100,7 +107,9 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
               NormalMode,
               memberList,
               userAnswers,
-              viewOnlyUpdated = false
+              viewOnlyUpdated = false,
+              schemeName = schemeName,
+              noPageEnabled = false
             )
           )
     })
@@ -135,7 +144,7 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(FbVersionPage(srn), "002")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
 
-    val previousUserAnswers = currentUserAnswers
+    val previousUserAnswers = userAnswers
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
 
@@ -156,7 +165,9 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              schemeName = schemeName,
+              noPageEnabled = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -182,10 +193,38 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              schemeName = schemeName,
+              noPageEnabled = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    val noUserAnswers = currentUserAnswers
+      .unsafeSet(PensionPaymentsReceivedPage(srn), false)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[TwoColumnsTripleAction].apply(
+            MemberPensionPaymentsListController.form(injected[YesNoPageFormProvider]),
+            MemberPensionPaymentsListController.viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              List.empty,
+              noUserAnswers,
+              viewOnlyUpdated = true,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              schemeName = schemeName,
+              noPageEnabled = true
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok NO records")
     )
 
     act.like(

@@ -32,7 +32,11 @@ import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
-import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, TotalAmountPensionPaymentsPage}
+import pages.nonsipp.memberpensionpayments.{
+  MemberPensionPaymentsListPage,
+  PensionPaymentsReceivedPage,
+  TotalAmountPensionPaymentsPage
+}
 import controllers.actions._
 import eu.timepit.refined.refineV
 import pages.nonsipp.CompilationOrSubmissionDatePage
@@ -65,7 +69,7 @@ class MemberPensionPaymentsListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)(implicitly)
+      onPageLoadCommon(srn, page, mode)
   }
 
   def onPageLoadViewOnly(
@@ -76,14 +80,14 @@ class MemberPensionPaymentsListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    onPageLoadCommon(srn, page, mode)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
     val userAnswers = request.userAnswers
     val optionList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
     if (optionList.flatten.nonEmpty) {
+      val noPageEnabled = !userAnswers.get(PensionPaymentsReceivedPage(srn)).getOrElse(false)
       val viewModel = MemberPensionPaymentsListController
         .viewModel(
           srn,
@@ -103,7 +107,9 @@ class MemberPensionPaymentsListController @Inject()(
           optYear = request.year,
           optCurrentVersion = request.currentVersion,
           optPreviousVersion = request.previousVersion,
-          compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+          schemeName = request.schemeDetails.schemeName,
+          noPageEnabled = noPageEnabled
         )
       val filledForm =
         request.userAnswers.get(MemberPensionPaymentsListPage(srn)).fold(form)(form.fill)
@@ -131,16 +137,31 @@ class MemberPensionPaymentsListController @Inject()(
         form
           .bindFromRequest()
           .fold(
-            errors =>
+            errors => {
+              val noPageEnabled = !userAnswers.get(PensionPaymentsReceivedPage(srn)).getOrElse(false)
               Future.successful(
                 BadRequest(
                   view(
                     errors,
                     MemberPensionPaymentsListController
-                      .viewModel(srn, page, mode, optionList, userAnswers, viewOnlyUpdated = false, None, None, None)
+                      .viewModel(
+                        srn,
+                        page,
+                        mode,
+                        optionList,
+                        userAnswers,
+                        viewOnlyUpdated = false,
+                        None,
+                        None,
+                        None,
+                        None,
+                        request.schemeDetails.schemeName,
+                        noPageEnabled
+                      )
                   )
                 )
-              ),
+              )
+            },
             value =>
               for {
                 updatedUserAnswers <- buildUserAnswerBySelection(srn, value, optionList.flatten.size)
@@ -314,7 +335,9 @@ object MemberPensionPaymentsListController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    compilationOrSubmissionDate: Option[LocalDateTime] = None,
+    schemeName: String,
+    noPageEnabled: Boolean
   ): FormPageViewModel[ActionTableViewModel] = {
 
     val memberListSize = memberList.flatten.size
@@ -326,7 +349,7 @@ object MemberPensionPaymentsListController {
       }
 
     // in view-only mode or with direct url edit page value can be higher than needed
-    val currentPage = if ((page - 1) * Constants.landOrPropertiesSize >= memberListSize) 1 else page
+    val currentPage = if ((page - 1) * Constants.memberPensionPayments >= memberListSize) 1 else page
     val pagination = Pagination(
       currentPage = currentPage,
       pageSize = Constants.memberPensionPayments,
@@ -417,7 +440,10 @@ object MemberPensionPaymentsListController {
               case _ =>
                 controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
                   .onSubmit(srn, page, mode)
-            }
+            },
+            noLabel = Option.when(noPageEnabled)(
+              Message("memberPensionPayments.memberList.view.none", schemeName)
+            )
           )
         )
       } else {

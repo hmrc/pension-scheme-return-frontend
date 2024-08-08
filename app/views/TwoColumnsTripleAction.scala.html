@@ -23,7 +23,8 @@
     hmrcListWithActions: HmrcListWithActions,
     govukInsetText: GovukInsetText,
     govukPagination: GovukPagination,
-    govukTable: GovukTable
+    govukTable: GovukTable,
+    govukSummaryList: GovukSummaryList
 )
 @(form: Form[Boolean], viewmodel: FormPageViewModel[ActionTableViewModel])(implicit request: Request[_], messages: Messages)
 
@@ -52,36 +53,49 @@
                 <span class="govuk-caption-l">@renderMessage(submittedText)</span>
             }
             <h1 class="govuk-heading-l">@renderMessage(viewmodel.optViewOnlyDetails.get.heading)</h1>
+
+            @viewmodel.optViewOnlyDetails.get.noLabel.map { noLabel =>
+                @govukSummaryList(
+                    SummaryListViewModel(
+                        Seq(
+                            SummaryListRowViewModel(
+                                key = KeyViewModel(noLabel.toMessage).withOneHalfWidth(),
+                                value = ValueViewModel(renderMessage("No"))
+                            )
+                        )
+                    )
+                )
+            }
         }
 
-        @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.rows)(paginatedViewModel =>
-            viewmodel.page.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
-        ){ rows =>
-            @govukTable(TableViewModel(
-                head = viewmodel.page.head.fold(List.empty[HeadCell])(heads =>
-                    heads.map( head =>
-                        if (head.text == DisplayMessage.Empty) {
-                            HeadCell(HtmlContent("<span class='govuk-visually-hidden'>Actions</span>"))
-                        } else {
-                            HeadCell(HtmlContent(renderMessage(head.text)))
-                        }
+        @if(viewmodel.mode != ViewOnlyMode || (viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty && viewmodel.optViewOnlyDetails.get.noLabel.isEmpty)) {
+            @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.rows)(paginatedViewModel =>
+                viewmodel.page.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
+            ){ rows: List[List[TableElem]] =>
+
+                @govukTable(
+                    TableViewModel(
+                        head = viewmodel.page.head.fold(List.empty[HeadCell])(heads =>
+                            heads.map( head =>
+                                if (head.text == DisplayMessage.Empty) {
+                                    HeadCell(HtmlContent("<span class='govuk-visually-hidden'>Actions</span>"))
+                                } else {
+                                    HeadCell(HtmlContent(renderMessage(head.text)))
+                                }
+                            )
+                        ),
+                        rows = rows.map(otherRows =>
+                                otherRows.map( aRow =>
+                                    (aRow.messageKey, aRow.hiddenText, aRow.url) match {
+                                        case (Some(key), Some(hidden), Some(link)) => TableRow(HtmlContent(s"<a href='${link}'>${renderMessage(key)}<span class='govuk-visually-hidden'>${hidden.toMessage}</span></a>"))
+                                        case (_, _, _) => TableRow(HtmlContent(renderMessage(aRow.text)))
+                                    }
+                                )
+                        )
                     )
-                ),
-                rows = rows.map(
-                    otherRows =>
-                    otherRows.map( aRow =>
-                        (aRow.messageKey, aRow.hiddenText, aRow.url) match {
-                            case (Some(key),Some(hidden), Some(link)) =>
-                                TableRow(HtmlContent(s"<a href='${link}'>${renderMessage(key)}<span class='govuk-visually-hidden'>${hidden.toMessage}</span></a>"))
-                            case (_,_,_) => TableRow(HtmlContent(renderMessage(aRow.text)))
-                        }
-                    )
-                ),
-                 )
-            )
+                )
+            }
         }
-
-
 
         @viewmodel.page.paginatedViewModel.map{ paginatedViewModel =>
             @if(paginatedViewModel.pagination.totalPages > 1) {

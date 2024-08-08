@@ -17,7 +17,11 @@
 package controllers.nonsipp.memberreceivedpcls
 
 import services.PsrSubmissionService
-import pages.nonsipp.memberreceivedpcls.{PclsMemberListPage, PensionCommencementLumpSumAmountPage}
+import pages.nonsipp.memberreceivedpcls.{
+  PclsMemberListPage,
+  PensionCommencementLumpSumAmountPage,
+  PensionCommencementLumpSumPage
+}
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.Max300
 import controllers.ControllerBaseSpec
@@ -80,6 +84,7 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
     defaultUserAnswers
       .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
       .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+      .unsafeSet(PensionCommencementLumpSumPage(srn), true)
 
   "PclsMemberListController" - {
 
@@ -92,9 +97,10 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
           srn,
           page,
           NormalMode,
-          memberList: List[Option[NameDOB]],
-          userAnswers: UserAnswers,
-          false
+          memberList,
+          userAnswers,
+          viewOnlyUpdated = false,
+          noPageEnabled = false
         )
       )
     })
@@ -110,9 +116,10 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
               srn,
               page,
               NormalMode,
-              memberList: List[Option[NameDOB]],
-              userAnswers: UserAnswers,
-              false
+              memberList,
+              userAnswers,
+              viewOnlyUpdated = false,
+              noPageEnabled = false
             )
           )
     })
@@ -139,17 +146,13 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
 
   "PclsMemberListController in view only mode" - {
 
-    val currentUserAnswers = defaultUserAnswers
+    val currentUserAnswers = userAnswers
       .unsafeSet(FbVersionPage(srn), "002")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
-    val previousUserAnswers = currentUserAnswers
+    val previousUserAnswers = userAnswers
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -162,13 +165,14 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
               srn,
               page,
               mode = ViewOnlyMode,
-              memberList: List[Option[NameDOB]],
-              userAnswers: UserAnswers,
-              false,
+              memberList,
+              currentUserAnswers,
+              viewOnlyUpdated = false,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              noPageEnabled = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -188,16 +192,42 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
               srn,
               page,
               mode = ViewOnlyMode,
-              memberList: List[Option[NameDOB]],
+              memberList,
               updatedUserAnswers,
-              true,
+              viewOnlyUpdated = true,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              noPageEnabled = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    val noUserAnswers = currentUserAnswers
+      .unsafeSet(PensionCommencementLumpSumPage(srn), false)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[TwoColumnsTripleAction].apply(
+            PclsMemberListController.form(injected[YesNoPageFormProvider]),
+            PclsMemberListController.viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              List.empty,
+              noUserAnswers,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              noPageEnabled = true
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok NO records")
     )
 
     act.like(

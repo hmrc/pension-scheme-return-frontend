@@ -21,7 +21,7 @@ import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.TwoColumnsTripleAction
-import pages.nonsipp.receivetransfer.TransferReceivedMemberListPage
+import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransferReceivedMemberListPage}
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models._
@@ -67,6 +67,7 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
   val userAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(DidSchemeReceiveTransferPage(srn), true)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -89,9 +90,11 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
           srn,
           page,
           NormalMode,
-          memberList: List[Option[NameDOB]],
-          userAnswers: UserAnswers,
-          false
+          memberList,
+          userAnswers,
+          viewOnlyUpdated = false,
+          schemeName = schemeName,
+          noPageEnabled = false
         )
       )
     })
@@ -107,9 +110,11 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
               srn,
               page,
               NormalMode,
-              memberList: List[Option[NameDOB]],
-              userAnswers: UserAnswers,
-              false
+              memberList,
+              userAnswers,
+              viewOnlyUpdated = false,
+              schemeName = schemeName,
+              noPageEnabled = false
             )
           )
     })
@@ -125,16 +130,13 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
 
   "TransferReceivedMemberListController in view only mode" - {
 
-    val currentUserAnswers = defaultUserAnswers
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    val currentUserAnswers = userAnswers
       .unsafeSet(FbVersionPage(srn), "002")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
-    val previousUserAnswers = currentUserAnswers
+    val previousUserAnswers = userAnswers
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -147,13 +149,15 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
               srn,
               page,
               mode = ViewOnlyMode,
-              memberList: List[Option[NameDOB]],
-              userAnswers: UserAnswers,
-              false,
+              memberList,
+              currentUserAnswers,
+              viewOnlyUpdated = false,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              schemeName = schemeName,
+              noPageEnabled = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -173,16 +177,43 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
               srn,
               page,
               mode = ViewOnlyMode,
-              memberList: List[Option[NameDOB]],
-              userAnswers: UserAnswers,
-              false,
+              memberList,
+              updatedUserAnswers,
+              viewOnlyUpdated = false,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              schemeName = schemeName,
+              noPageEnabled = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    val noUserAnswers = currentUserAnswers.unsafeSet(DidSchemeReceiveTransferPage(srn), false)
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[TwoColumnsTripleAction].apply(
+            TransferReceivedMemberListController.form(injected[YesNoPageFormProvider]),
+            TransferReceivedMemberListController.viewModel(
+              srn,
+              page = 1,
+              mode = ViewOnlyMode,
+              List.empty,
+              noUserAnswers,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              schemeName = schemeName,
+              noPageEnabled = true
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok NO records")
     )
 
     act.like(

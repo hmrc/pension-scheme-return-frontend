@@ -18,6 +18,7 @@ package controllers.nonsipp.membertransferout
 
 import services.PsrSubmissionService
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
+import config.Refined.{Max300, Max5}
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.TwoColumnsTripleAction
@@ -25,7 +26,7 @@ import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models._
-import pages.nonsipp.membertransferout.TransferOutMemberListPage
+import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransferOutMemberListPage, WhenWasTransferMadePage}
 import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
@@ -59,13 +60,15 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
     submissionNumberTwo,
     submissionNumberOne
   )
+  private val index = refineMV[Max300.Refined](1)
+  private val page = 1
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
-  private val page = 1
 
   val userAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(SchemeTransferOutPage(srn), true)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -88,9 +91,11 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
           srn,
           page,
           NormalMode,
-          memberList: List[Option[NameDOB]],
-          userAnswers: UserAnswers,
-          viewOnlyUpdated = false
+          memberList,
+          userAnswers,
+          viewOnlyUpdated = false,
+          schemeName = schemeName,
+          noPageEnabled = false
         )
       )
     })
@@ -106,9 +111,11 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
               srn,
               page,
               NormalMode,
-              memberList: List[Option[NameDOB]],
-              userAnswers: UserAnswers,
-              viewOnlyUpdated = false
+              memberList,
+              userAnswers,
+              viewOnlyUpdated = false,
+              schemeName = schemeName,
+              noPageEnabled = false
             )
           )
     })
@@ -120,90 +127,114 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
 
     act.like(invalidForm(onSubmit, userAnswers))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
-  }
 
-  "TransferOutMemberListController in view only mode" - {
+    "TransferOutMemberListControllerSpec in view only mode" - {
+      val currentUserAnswers = userAnswers
+        .unsafeSet(FbVersionPage(srn), "002")
+        .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
 
-    val currentUserAnswers = defaultUserAnswers
-      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .unsafeSet(FbVersionPage(srn), "002")
-      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+      val previousUserAnswers = userAnswers
+        .unsafeSet(FbVersionPage(srn), "001")
+        .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
 
-    val previousUserAnswers = currentUserAnswers
-      .unsafeSet(FbVersionPage(srn), "001")
-      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+      act.like(
+        renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+          implicit app => implicit request =>
+            val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
-    act.like(
-      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-        implicit app => implicit request =>
-          val memberList: List[Option[NameDOB]] = currentUserAnswers.membersOptionList(srn)
-
-          injected[TwoColumnsTripleAction].apply(
-            TransferOutMemberListController.form(injected[YesNoPageFormProvider]),
-            TransferOutMemberListController.viewModel(
-              srn,
-              page,
-              mode = ViewOnlyMode,
-              memberList: List[Option[NameDOB]],
-              userAnswers: UserAnswers,
-              viewOnlyUpdated = false,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+            injected[TwoColumnsTripleAction].apply(
+              form(injected[YesNoPageFormProvider]),
+              viewModel(
+                srn,
+                page,
+                mode = ViewOnlyMode,
+                memberList,
+                currentUserAnswers,
+                viewOnlyUpdated = false,
+                optYear = Some(yearString),
+                optCurrentVersion = Some(submissionNumberTwo),
+                optPreviousVersion = Some(submissionNumberOne),
+                compilationOrSubmissionDate = Some(submissionDateTwo),
+                schemeName = schemeName,
+                noPageEnabled = false
+              )
             )
-          )
-      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
-    )
-
-    val updatedUserAnswers = currentUserAnswers
-      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
-
-    act.like(
-      renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-        implicit app => implicit request =>
-          val memberList: List[Option[NameDOB]] = updatedUserAnswers.membersOptionList(srn)
-
-          injected[TwoColumnsTripleAction].apply(
-            TransferOutMemberListController.form(injected[YesNoPageFormProvider]),
-            TransferOutMemberListController.viewModel(
-              srn,
-              page,
-              mode = ViewOnlyMode,
-              memberList: List[Option[NameDOB]],
-              userAnswers: UserAnswers,
-              viewOnlyUpdated = false,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
-            )
-          )
-      }.withName("OnPageLoadViewOnly renders ok with changed flag")
-    )
-
-    act.like(
-      redirectToPage(
-        onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
-      ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only taskList")
-    )
-
-    act.like(
-      redirectToPage(
-        onPreviousViewOnly,
-        controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
+        }.withName("OnPageLoadViewOnly renders ok with no changed flag")
       )
-    )
-  }
 
+      val updatedUserAnswers = currentUserAnswers
+        .unsafeSet(WhenWasTransferMadePage(srn, index, refineMV[Max5.Refined](1)), localDate)
+
+      act.like(
+        renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+          implicit app => implicit request =>
+            val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
+
+            injected[TwoColumnsTripleAction].apply(
+              form(injected[YesNoPageFormProvider]),
+              viewModel(
+                srn,
+                page,
+                mode = ViewOnlyMode,
+                memberList,
+                updatedUserAnswers,
+                viewOnlyUpdated = true,
+                optYear = Some(yearString),
+                optCurrentVersion = Some(submissionNumberTwo),
+                optPreviousVersion = Some(submissionNumberOne),
+                compilationOrSubmissionDate = Some(submissionDateTwo),
+                schemeName = schemeName,
+                noPageEnabled = false
+              )
+            )
+        }.withName("OnPageLoadViewOnly renders ok with changed flag")
+      )
+
+      val noUserAnswers = currentUserAnswers.unsafeSet(SchemeTransferOutPage(srn), false)
+
+      act.like(
+        renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+          implicit app => implicit request =>
+            injected[TwoColumnsTripleAction].apply(
+              form(injected[YesNoPageFormProvider]),
+              viewModel(
+                srn,
+                page,
+                mode = ViewOnlyMode,
+                List.empty,
+                noUserAnswers,
+                viewOnlyUpdated = false,
+                optYear = Some(yearString),
+                optCurrentVersion = Some(submissionNumberTwo),
+                optPreviousVersion = Some(submissionNumberOne),
+                compilationOrSubmissionDate = Some(submissionDateTwo),
+                schemeName = schemeName,
+                noPageEnabled = true
+              )
+            )
+        }.withName("OnPageLoadViewOnly renders ok NO records")
+      )
+
+      act.like(
+        redirectToPage(
+          onSubmitViewOnly,
+          controllers.nonsipp.routes.ViewOnlyTaskListController
+            .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+        ).after(
+            verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          )
+          .withName("Submit redirects to view only tasklist")
+      )
+
+      act.like(
+        redirectToPage(
+          onPreviousViewOnly,
+          controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
+            .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+        ).withName(
+          "Submit previous view only redirects to the controller with parameters for the previous submission"
+        )
+      )
+    }
+  }
 }
