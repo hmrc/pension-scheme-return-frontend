@@ -173,7 +173,7 @@ class BondsDisposalCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-            .onPageLoadViewOnly(srn, 1, year, current, previous)
+            .onPageLoadViewOnly(srn, page, year, current, previous)
         )
       )
     }
@@ -240,6 +240,7 @@ object BondsDisposalCYAController {
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                // view-only continue button always navigates back to the first list page if paginating
                 controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
                   .onSubmitViewOnly(parameters.srn, 1, year, currentVersion, previousVersion)
               case _ =>

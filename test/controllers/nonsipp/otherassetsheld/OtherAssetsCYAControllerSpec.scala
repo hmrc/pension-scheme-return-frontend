@@ -53,6 +53,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
   private val taxYear = Some(Left(dateRange))
+  private val page = 1
   private val subject = IdentitySubject.OtherAssetSeller
 
   private def onPageLoad(mode: Mode) = routes.OtherAssetsCYAController.onPageLoad(srn, index, mode)
@@ -60,6 +61,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onSubmitViewOnly = routes.OtherAssetsCYAController.onSubmitViewOnly(
     srn,
+    page,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -201,12 +203,12 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+        controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
+          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )
-        .withName("Submit redirects to view only taskList")
+        .withName("Submit redirects to other assets list page")
     )
   }
 

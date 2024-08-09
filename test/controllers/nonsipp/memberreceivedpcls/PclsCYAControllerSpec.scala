@@ -34,11 +34,12 @@ import controllers.nonsipp.memberreceivedpcls.PclsCYAController._
 class PclsCYAControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
+  private val page = 1
   private lazy val onPageLoad = routes.PclsCYAController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.PclsCYAController.onSubmit(srn, index, NormalMode)
   private lazy val onSubmitViewOnly = routes.PclsCYAController.onSubmitViewOnly(
     srn,
-    1,
+    page,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -129,11 +130,11 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onSubmitViewOnly,
         controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
+          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
         )
-        .withName("Submit redirects to Pcls MemberL ist Controller page")
+        .withName("Submit redirects to Pcls Member List page")
     )
   }
 

@@ -53,7 +53,7 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onSubmitViewOnly = routes.BondsDisposalCYAController.onSubmitViewOnly(
     srn,
-    1,
+    page,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -70,6 +70,7 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
 
   private val bondIndex = refineMV[OneTo5000](1)
   private val disposalIndex = refineMV[OneTo50](1)
+  private val page = 1
 
   private val dateBondsSold = Some(localDate)
   private val considerationBondsSold = Some(money)
@@ -191,7 +192,7 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onSubmitViewOnly,
         controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
+          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )

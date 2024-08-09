@@ -38,6 +38,7 @@ import scala.concurrent.Future
 class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
+  private val page = 1
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -57,6 +58,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
   private lazy val onSubmitViewOnly = routes.SchemeMemberDetailsAnswersController.onSubmitViewOnly(
     srn,
+    page,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -346,8 +348,8 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+        controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )
