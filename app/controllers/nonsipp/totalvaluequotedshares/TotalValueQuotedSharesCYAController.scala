@@ -221,7 +221,7 @@ object TotalValueQuotedSharesCYAController {
     mode: Mode
   ): List[CheckYourAnswersSection] = {
     val row: List[CheckYourAnswersRowViewModel] = (mode, totalCost) match {
-      case (ViewOnlyMode, None) =>
+      case (ViewOnlyMode, None | Some(Money.zero)) =>
         List(
           CheckYourAnswersRowViewModel(
             Message(
