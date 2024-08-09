@@ -134,7 +134,20 @@ class ReportedOtherAssetsDisposalListController @Inject()(
               .fold(
                 errors =>
                   BadRequest(
-                    view(errors, viewModel(srn, mode, page, disposals, request.userAnswers, false, None, None, None))
+                    view(
+                      errors,
+                      viewModel(
+                        srn,
+                        mode,
+                        page,
+                        disposals,
+                        request.userAnswers,
+                        viewOnlyUpdated = false,
+                        None,
+                        None,
+                        None
+                      )
+                    )
                   ).pure[Future],
                 reportAnotherDisposal =>
                   for {
@@ -388,7 +401,7 @@ object ReportedOtherAssetsDisposalListController {
           updated = viewOnlyUpdated,
           link = (optYear, optCurrentVersion, optPreviousVersion) match {
             case (Some(year), Some(currentVersion), Some(previousVersion))
-                if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+                if currentVersion > 1 && previousVersion > 0 =>
               Some(
                 LinkMessage(
                   "assetDisposal.reportedOtherAssetsDisposalList.view.link",

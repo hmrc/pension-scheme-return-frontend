@@ -134,7 +134,20 @@ class ReportedSharesDisposalListController @Inject()(
               .fold(
                 errors =>
                   BadRequest(
-                    view(errors, viewModel(srn, page, mode, disposals, request.userAnswers, false, None, None, None))
+                    view(
+                      errors,
+                      viewModel(
+                        srn,
+                        page,
+                        mode,
+                        disposals,
+                        request.userAnswers,
+                        viewOnlyUpdated = false,
+                        None,
+                        None,
+                        None
+                      )
+                    )
                   ).pure[Future],
                 reportAnotherDisposal =>
                   for {
@@ -387,7 +400,7 @@ object ReportedSharesDisposalListController {
           updated = viewOnlyUpdated,
           link = (optYear, optCurrentVersion, optPreviousVersion) match {
             case (Some(year), Some(currentVersion), Some(previousVersion))
-                if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+                if currentVersion > 1 && previousVersion > 0 =>
               Some(
                 LinkMessage(
                   "sharesDisposal.reportedSharesDisposalList.view.link",
