@@ -73,7 +73,7 @@ class UnallocatedContributionCYAController @Inject()(
             getCompletedOrUpdatedTaskListStatus(
               request.userAnswers,
               request.previousUserAnswers.get,
-              pages.nonsipp.memberpayments.Paths.membersPayments \ "unallocatedContribAmount" \ "unallocatedContribAmount"
+              pages.nonsipp.memberpayments.Paths.membersPayments \ "unallocatedContribAmount"
             ) == Updated
           } else {
             false
