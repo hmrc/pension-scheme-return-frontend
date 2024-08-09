@@ -30,10 +30,11 @@ import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import controllers.nonsipp.bonds.BondsListController._
-import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import utils.nonsipp.TaskListStatusUtils.{getBondsTaskListStatusAndLink, getCompletedOrUpdatedTaskListStatus}
 import views.html.ListView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage
+import play.api.Logging
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
 import models._
@@ -46,7 +47,6 @@ import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDateTime
 import javax.inject.Named
 
 class BondsListController @Inject()(
@@ -59,7 +59,8 @@ class BondsListController @Inject()(
   psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
-    extends PSRController {
+    extends PSRController
+    with Logging {
 
   val form: Form[Boolean] = BondsListController.form(formProvider)
 
@@ -76,13 +77,41 @@ class BondsListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = request.previousUserAnswers match {
+        case Some(previousUserAnswers) =>
+          val updated = getCompletedOrUpdatedTaskListStatus(
+            request.userAnswers,
+            previousUserAnswers,
+            pages.nonsipp.bonds.Paths.bondTransactions
+          ) == Updated
+          logger.info(s"""[ViewOnlyMode] Status for bond list is ${if (updated) "updated"
+          else "not updated"}""")
+          updated
+        case None =>
+          logger.info(
+            s"[ViewOnlyMode] no previous submission version, Status for bond list is not updated"
+          )
+          false
+        case _ => false
+      },
+      year = year,
+      currentVersion = current,
+      previousVersion = previous,
+      compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+    )
+    onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel))(implicitly)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+    implicit request: DataRequest[AnyContent]
+  ): Result = {
+    val (status, incompleteDisposalUrl) = getBondsTaskListStatusAndLink(request.userAnswers, srn)
     val indexes: List[Max5000] = request.userAnswers.map(BondsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
 
-    if (indexes.nonEmpty) {
+    logger.info(s"bond list status is $status,$incompleteDisposalUrl")
+
+    if (viewOnlyViewModel.nonEmpty || status == TaskListStatus.Completed) {
       bondsData(srn, indexes).map { data =>
         val filledForm =
           request.userAnswers.get(BondsListPage(srn)).fold(form)(form.fill)
@@ -94,23 +123,14 @@ class BondsListController @Inject()(
               page,
               mode,
               data,
-              viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-                getCompletedOrUpdatedTaskListStatus(
-                  request.userAnswers,
-                  request.previousUserAnswers.get,
-                  pages.nonsipp.bonds.Paths.bondTransactions
-                ) == Updated
-              } else {
-                false
-              },
-              optYear = request.year,
-              optCurrentVersion = request.currentVersion,
-              optPreviousVersion = request.previousVersion,
-              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+              request.schemeDetails.schemeName,
+              viewOnlyViewModel
             )
           )
         )
       }.merge
+    } else if (status == TaskListStatus.InProgress) {
+      Redirect(incompleteDisposalUrl)
     } else {
       Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
     }
@@ -133,7 +153,18 @@ class BondsListController @Inject()(
             errors => {
               bondsData(srn, indexes)
                 .map { data =>
-                  BadRequest(view(errors, viewModel(srn, page, mode, data, viewOnlyUpdated = false, None, None, None)))
+                  BadRequest(
+                    view(
+                      errors,
+                      viewModel(
+                        srn,
+                        page,
+                        mode,
+                        data,
+                        request.schemeDetails.schemeName
+                      )
+                    )
+                  )
                 }
                 .merge
                 .pure[Future]
@@ -189,7 +220,7 @@ class BondsListController @Inject()(
 
   private def bondsData(srn: Srn, indexes: List[Max5000])(
     implicit req: DataRequest[_]
-  ): Either[Result, List[BondsData]] =
+  ): Either[Result, List[BondsListController.BondsData]] =
     indexes
       .sortBy(x => x.value)
       .map { index =>
@@ -197,7 +228,7 @@ class BondsListController @Inject()(
           nameOfBonds <- requiredPage(NameOfBondsPage(srn, index))
           acquisitionType <- requiredPage(WhyDoesSchemeHoldBondsPage(srn, index))
           costOfBonds <- requiredPage(CostOfBondsPage(srn, index))
-        } yield BondsData(index, nameOfBonds, acquisitionType, costOfBonds)
+        } yield BondsListController.BondsData(index, nameOfBonds, acquisitionType, costOfBonds)
       }
       .sequence
 }
@@ -212,45 +243,73 @@ object BondsListController {
     srn: Srn,
     mode: Mode,
     memberList: List[BondsData],
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel],
+    schemeName: String
   ): List[ListRow] =
-    memberList.map {
-      case BondsData(index, nameOfBonds, acquisition, costOfBonds) =>
-        val acquisitionType = acquisition match {
-          case SchemeHoldBond.Acquisition => "bondsList.acquisition.acquired"
-          case SchemeHoldBond.Contribution => "bondsList.acquisition.contributed"
-          case SchemeHoldBond.Transfer => "bondsList.acquisition.transferred"
-        }
-        val bondsMessage =
-          Message("bondsList.row.withCost", nameOfBonds.show, acquisitionType, costOfBonds.displayAs)
+    memberList match {
 
-        if (mode.isViewOnlyMode) {
-          (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-            case (ViewOnlyMode, Some(year), Some(current), Some(previous)) =>
-              ListRow.view(
-                bondsMessage,
-                //                controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
-                //                  .onPageLoadViewOnly(srn, index, year, current, previous)
-                controllers.routes.UnauthorisedController.onPageLoad().url,
-                Message("bondsList.row.change.hiddenText", bondsMessage)
+      case Nil =>
+        List(
+          ListRow.viewNoLink(
+            Message("bondsList.view.none", schemeName),
+            "bondsList.view.none.value"
+          )
+        )
+
+      case list =>
+        list.flatMap { a =>
+          (a, viewOnlyViewModel) match {
+            case (BondsListController.BondsData(index, nameOfBonds, acquisition, costOfBonds), Some(viewOnly)) =>
+              val acquisitionType = acquisition match {
+                case SchemeHoldBond.Acquisition => "bondsList.acquisition.acquired"
+                case SchemeHoldBond.Contribution => "bondsList.acquisition.contributed"
+                case SchemeHoldBond.Transfer => "bondsList.acquisition.transferred"
+              }
+              val bondsMessage =
+                Message("bondsList.row.withCost", nameOfBonds.show, acquisitionType, costOfBonds.displayAs)
+              List(
+                ListRow.view(
+                  bondsMessage,
+                  routes.UnregulatedOrConnectedBondsHeldCYAController
+                    .onPageLoadViewOnly(
+                      srn,
+                      index,
+                      viewOnly.year,
+                      viewOnly.currentVersion,
+                      viewOnly.previousVersion
+                    )
+                    .url,
+//                  controllers.routes.UnauthorisedController.onPageLoad().url,
+                  Message("bondsList.row.change.hiddenText", bondsMessage)
+                )
+              )
+
+            case (BondsListController.BondsData(index, nameOfBonds, acquisition, costOfBonds), None) =>
+              val acquisitionType = acquisition match {
+                case SchemeHoldBond.Acquisition => "bondsList.acquisition.acquired"
+                case SchemeHoldBond.Contribution => "bondsList.acquisition.contributed"
+                case SchemeHoldBond.Transfer => "bondsList.acquisition.transferred"
+              }
+
+              val bondsMessage =
+                Message("bondsList.row.withCost", nameOfBonds.show, acquisitionType, costOfBonds.displayAs)
+
+              List(
+                ListRow(
+                  bondsMessage,
+                  changeUrl = controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                    .onPageLoad(srn, index, CheckMode)
+                    .url,
+                  changeHiddenText = Message("bondsList.row.change.hiddenText", bondsMessage),
+                  removeUrl = controllers.nonsipp.bonds.routes.RemoveBondsController
+                    .onPageLoad(srn, index, NormalMode)
+                    .url,
+                  removeHiddenText = Message("bondsList.row.remove.hiddenText", bondsMessage)
+                )
               )
           }
-        } else {
-
-          ListRow(
-            bondsMessage,
-            changeUrl = controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
-              .onPageLoad(srn, index, CheckMode)
-              .url,
-            changeHiddenText = Message("bondsList.row.change.hiddenText", bondsMessage),
-            removeUrl = controllers.nonsipp.bonds.routes.RemoveBondsController
-              .onPageLoad(srn, index, NormalMode)
-              .url,
-            removeHiddenText = Message("bondsList.row.remove.hiddenText", bondsMessage)
-          )
         }
+
     }
 
   def viewModel(
@@ -258,15 +317,16 @@ object BondsListController {
     page: Int,
     mode: Mode,
     data: List[BondsData],
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    schemeName: String,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
   ): FormPageViewModel[ListViewModel] = {
     val lengthOfData = data.length
 
     val (title, heading) = ((mode, lengthOfData) match {
+
+      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals == 0 =>
+        ("bondsList.view.title", "bondsList.view.heading.none")
+
       case (ViewOnlyMode, lengthOfData) if lengthOfData > 1 =>
         ("bondsList.view.title.plural", "bondsList.view.heading.plural")
       case (ViewOnlyMode, _) =>
@@ -284,8 +344,8 @@ object BondsListController {
       currentPage = page,
       pageSize = Constants.pageSize,
       totalSize = data.size,
-      call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-        case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+      call = viewOnlyViewModel match {
+        case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           controllers.nonsipp.bonds.routes.BondsListController
             .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
         case _ =>
@@ -308,9 +368,11 @@ object BondsListController {
       description = Some(ParagraphMessage("bondsList.description")),
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows = rows(srn, mode, data, optYear, optCurrentVersion, optPreviousVersion),
+        rows = rows(srn, mode, data, viewOnlyViewModel, schemeName),
         radioText = Message("bondsList.radios"),
-        showRadios = data.size < Constants.maxBondsTransactions,
+        showRadios =
+//          !mode.isViewOnlyMode &&
+          data.size < Constants.maxBondsTransactions,
         showInsetWithRadios = !(data.length < Constants.maxBondsTransactions),
         paginatedViewModel = Some(
           PaginatedViewModel(
@@ -328,41 +390,34 @@ object BondsListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit = controllers.nonsipp.bonds.routes.BondsListController.onSubmit(srn, page, mode),
-      optViewOnlyDetails = Option.when(mode.isViewOnlyMode) {
+      optViewOnlyDetails = viewOnlyViewModel.map { viewOnly =>
         ViewOnlyDetailsViewModel(
-          updated = viewOnlyUpdated,
-          link = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion))
-                if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
-              Some(
-                LinkMessage(
-                  "bondsList.view.link",
-                  controllers.nonsipp.bonds.routes.BondsListController
-                    .onPreviousViewOnly(
-                      srn,
-                      page,
-                      year,
-                      currentVersion,
-                      previousVersion
-                    )
-                    .url
-                )
+          updated = viewOnly.viewOnlyUpdated,
+          link = if (viewOnly.currentVersion > 1 && viewOnly.previousVersion > 0) {
+            Some(
+              LinkMessage(
+                "bondsList.view.link",
+                controllers.nonsipp.bonds.routes.BondsListController
+                  .onPreviousViewOnly(
+                    srn,
+                    page,
+                    viewOnly.year,
+                    viewOnly.currentVersion,
+                    viewOnly.previousVersion
+                  )
+                  .url
               )
-            case _ => None
+            )
+          } else {
+            None
           },
-          submittedText =
-            compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+          submittedText = viewOnly.compilationOrSubmissionDate
+            .fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
           title = title,
           heading = heading,
           buttonText = "site.return.to.tasklist",
-          onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-              controllers.nonsipp.bonds.routes.BondsListController
-                .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
-            case _ =>
-              controllers.nonsipp.bonds.routes.BondsListController
-                .onSubmit(srn, page, mode)
-          }
+          onSubmit = controllers.nonsipp.bonds.routes.BondsListController
+            .onSubmitViewOnly(srn, viewOnly.year, viewOnly.currentVersion, viewOnly.previousVersion)
         )
       }
     )

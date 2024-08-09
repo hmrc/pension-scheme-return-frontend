@@ -823,6 +823,7 @@ object TaskListStatusUtils {
     val firstPages = userAnswers.get(NameOfBondsPages(srn))
     val lastPages = userAnswers.map(BondsCompleted.all(srn))
     val incompleteIndex: Int = getIncompleteIndex(firstPages, Some(lastPages))
+    println(s"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx $incompleteIndex")
     val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
       _ => bondsListPageUrl,
       index => controllers.nonsipp.bonds.routes.NameOfBondsController.onPageLoad(srn, index, NormalMode).url
