@@ -1003,4 +1003,114 @@ object TaskListStatusUtils {
       Updated
     }
   }
+
+  def userAnswersUnchangedAllSections(currentUA: UserAnswers, previousUA: UserAnswers): Boolean = {
+    (getBasicDetailsTaskListStatus(currentUA, previousUA) == Completed) &&
+    (getFinancialDetailsTaskListStatus(currentUA, previousUA) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.memberdetails.Paths.personalDetails,
+      Some("safeToHardDelete")
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.employercontributions.Paths.memberEmpContribution
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.memberpayments.Paths.membersPayments \ "unallocatedContribAmount"
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.membercontributions.Paths.memberDetails \ "totalMemberContribution"
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.receivetransfer.Paths.memberTransfersIn
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.membertransferout.Paths.memberTransfersOut
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.memberreceivedpcls.Paths.memberDetails \ "memberLumpSumReceived"
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.memberpensionpayments.Paths.memberDetails \ "pensionAmountReceived"
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.membersurrenderedbenefits.Paths.memberPensionSurrender
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.loansmadeoroutstanding.Paths.loans
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.moneyborrowed.Paths.borrowing
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.shares.Paths.shareTransactions,
+      Some("disposedSharesTransaction")
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.landorproperty.Paths.landOrPropertyTransactions,
+      Some("disposedPropertyTransaction")
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.landorpropertydisposal.Paths.disposalPropertyTransaction
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.bonds.Paths.bondTransactions,
+      Some("bondsDisposed")
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.bondsdisposal.Paths.bondsDisposed
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.totalvaluequotedshares.Paths.quotedShares \ "totalValueQuotedShares"
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.otherassetsheld.Paths.otherAssetsTransactions,
+      Some("assetsDisposed")
+    ) == Completed) &&
+    (getCompletedOrUpdatedTaskListStatus(
+      currentUA,
+      previousUA,
+      pages.nonsipp.otherassetsdisposal.Paths.assetsDisposed
+    ) == Completed)
+  }
 }

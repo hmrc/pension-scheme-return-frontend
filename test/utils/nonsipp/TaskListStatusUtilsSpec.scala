@@ -16,36 +16,236 @@
 
 package utils.nonsipp
 
-import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
+import pages.nonsipp.employercontributions._
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
-import config.Refined.Max5000
+import config.Refined._
 import controllers.TestValues
+import models.TypeOfShares.SponsoringEmployer
 import pages.nonsipp.landorproperty._
-import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInJourneyStatus}
+import pages.nonsipp.receivetransfer._
+import pages.nonsipp.landorpropertydisposal.{
+  HowWasPropertyDisposedOfPage,
+  LandOrPropertyDisposalPage,
+  LandOrPropertyStillHeldPage
+}
+import pages.nonsipp.sharesdisposal._
 import utils.UserAnswersUtils.UserAnswersOps
-import org.scalatest.OptionValues
-import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
+import pages.nonsipp.membersurrenderedbenefits._
 import models._
-import pages.nonsipp.loansmadeoroutstanding._
-import viewmodels.models.{SectionCompleted, SectionStatus}
 import models.SponsoringOrConnectedParty.Sponsoring
+import pages.nonsipp.otherassetsdisposal.{AnyPartAssetStillHeldPage, HowWasAssetDisposedOfPage, OtherAssetsDisposalPage}
+import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.bonds._
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.memberdetails._
 import org.scalatest.freespec.AnyFreeSpec
 import pages.nonsipp.membercontributions.{MemberContributionsListPage, MemberContributionsPage}
-import pages.nonsipp.memberreceivedpcls.{PclsMemberListPage, PensionCommencementLumpSumPage}
+import pages.nonsipp.memberreceivedpcls.{
+  PclsMemberListPage,
+  PensionCommencementLumpSumAmountPage,
+  PensionCommencementLumpSumPage
+}
 import org.scalatest.matchers.must.Matchers
 import models.ConditionalYesNo._
+import models.ManualOrUpload.Manual
+import models.PensionSchemeType.RegisteredPS
+import models.IdentityType.{Individual, UKCompany, UKPartnership}
+import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
+import models.SchemeHoldShare.Acquisition
 import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, PensionPaymentsReceivedPage}
 import eu.timepit.refined.refineMV
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
+import org.scalatest.OptionValues
+import uk.gov.hmrc.domain.Nino
+import models.HowSharesDisposed.Sold
 import viewmodels.models.TaskListStatus._
-import pages.nonsipp.common.{IdentityTypePage, IdentityTypes}
-import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutJourneyStatus}
+import pages.nonsipp.common._
+import pages.nonsipp.loansmadeoroutstanding._
+import models.IdentitySubject._
+import pages.nonsipp.membertransferout._
 import pages.nonsipp.moneyborrowed._
+import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsStillHeldPage, HowWereBondsDisposedOfPage}
+import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
+import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
 
 class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
+
+  private val index1of300: Max300 = refineMV(1)
+  private val index1of50: Max50 = refineMV(1)
+  private val index1of5: Max5 = refineMV(1)
+  private val index1of5000: Max5000 = refineMV(1)
+  private val name: String = "name"
+  private val reason: String = "reason"
+
+  private val currentUA: UserAnswers = defaultUserAnswers
+    .unsafeSet(WhichTaxYearPage(srn), dateRange) // automatically set
+    // Section 1 - Scheme Details
+    // (S1) Basic Details
+    .unsafeSet(CheckReturnDatesPage(srn), true)
+    .unsafeSet(ActiveBankAccountPage(srn), true)
+    .unsafeSet(HowManyMembersPage(srn, psaId), schemeMemberNumbers)
+    // (S1) Financial Details
+    .unsafeSet(HowMuchCashPage(srn, NormalMode), moneyInPeriod)
+    .unsafeSet(ValueOfAssetsPage(srn, NormalMode), moneyInPeriod)
+    .unsafeSet(FeesCommissionsWagesSalariesPage(srn, NormalMode), money)
+    // Section 2 - Member Details
+    .unsafeSet(PensionSchemeMembersPage(srn), Manual)
+    .unsafeSet(MemberDetailsPage(srn, index1of300), memberDetails)
+    .unsafeSet(DoesMemberHaveNinoPage(srn, index1of300), true)
+    .unsafeSet(MemberDetailsNinoPage(srn, index1of300), nino)
+    .unsafeSet(MemberStatus(srn, index1of300), MemberState.New)
+    // Section 3 - Member Payments
+    // (S3) Employer Contributions
+    .unsafeSet(EmployerContributionsPage(srn), true)
+    .unsafeSet(EmployerNamePage(srn, index1of300, index1of50), name)
+    .unsafeSet(EmployerTypeOfBusinessPage(srn, index1of300, index1of50), IdentityType.Other)
+    .unsafeSet(OtherEmployeeDescriptionPage(srn, index1of300, index1of50), otherDetails)
+    .unsafeSet(TotalEmployerContributionPage(srn, index1of300, index1of50), money)
+    .unsafeSet(ContributionsFromAnotherEmployerPage(srn, index1of300, index1of50), false)
+    // (S3) Unallocated Employer Contributions
+    .unsafeSet(UnallocatedEmployerContributionsPage(srn), true)
+    .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
+    // (S3) Member Contributions
+    .unsafeSet(MemberContributionsPage(srn), false)
+    // (S3) Transfers In
+    .unsafeSet(DidSchemeReceiveTransferPage(srn), true)
+    .unsafeSet(TransferringSchemeNamePage(srn, index1of300, index1of5), name)
+    .unsafeSet(TransferringSchemeTypePage(srn, index1of300, index1of5), RegisteredPS(pstr))
+    .unsafeSet(TotalValueTransferPage(srn, index1of300, index1of5), money)
+    .unsafeSet(WhenWasTransferReceivedPage(srn, index1of300, index1of5), localDate)
+    .unsafeSet(DidTransferIncludeAssetPage(srn, index1of300, index1of5), true)
+    // (S3) Transfers Out
+    .unsafeSet(SchemeTransferOutPage(srn), true)
+    .unsafeSet(ReceivingSchemeNamePage(srn, index1of300, index1of5), name)
+    .unsafeSet(ReceivingSchemeTypePage(srn, index1of300, index1of5), PensionSchemeType.Other(otherDetails))
+    .unsafeSet(WhenWasTransferMadePage(srn, index1of300, index1of5), localDate)
+    // (S3) PCLS
+    .unsafeSet(PensionCommencementLumpSumPage(srn), true)
+    .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index1of300), pcls)
+    // (S3) Pension Payments
+    .unsafeSet(PensionPaymentsReceivedPage(srn), false)
+    // (S3) Surrendered Benefits
+    .unsafeSet(SurrenderedBenefitsPage(srn), true)
+    .unsafeSet(SurrenderedBenefitsAmountPage(srn, index1of300), money)
+    .unsafeSet(WhenDidMemberSurrenderBenefitsPage(srn, index1of300), localDate)
+    .unsafeSet(WhyDidMemberSurrenderBenefitsPage(srn, index1of300), reason)
+    // Section 4 - Loans Made & Money Borrowed
+    // (S4) Loans Made
+    .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+    .unsafeSet(IdentityTypePage(srn, index1of5000, LoanRecipient), Individual)
+    .unsafeSet(IndividualRecipientNamePage(srn, index1of5000), name)
+    .unsafeSet(IndividualRecipientNinoPage(srn, index1of5000), ConditionalYesNo.yes[String, Nino](nino))
+    .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, index1of5000), true)
+    .unsafeSet(DatePeriodLoanPage(srn, index1of5000), (localDate, money, loanPeriod))
+    .unsafeSet(AmountOfTheLoanPage(srn, index1of5000), (money, money, money))
+    .unsafeSet(AreRepaymentsInstalmentsPage(srn, index1of5000), true)
+    .unsafeSet(InterestOnLoanPage(srn, index1of5000), (money, percentage, money))
+    .unsafeSet(SecurityGivenForLoanPage(srn, index1of5000), ConditionalYesNo.yes[Unit, Security](security))
+    .unsafeSet(OutstandingArrearsOnLoanPage(srn, index1of5000), ConditionalYesNo.yes[Unit, Money](money))
+    // (S4) Money Borrowed
+    .unsafeSet(MoneyBorrowedPage(srn), true)
+    .unsafeSet(LenderNamePage(srn, index1of5000), lenderName)
+    .unsafeSet(IsLenderConnectedPartyPage(srn, index1of5000), true)
+    .unsafeSet(BorrowedAmountAndRatePage(srn, index1of5000), (money, percentage))
+    .unsafeSet(WhenBorrowedPage(srn, index1of5000), localDate)
+    .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index1of5000), money)
+    .unsafeSet(WhySchemeBorrowedMoneyPage(srn, index1of5000), reason)
+    // Section 5 - Shares
+    // (S5) Shares
+    .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+    .unsafeSet(TypeOfSharesHeldPage(srn, index1of5000), SponsoringEmployer)
+    .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index1of5000), Acquisition)
+    .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index1of5000), localDate)
+    .unsafeSet(CompanyNameRelatedSharesPage(srn, index1of5000), name)
+    .unsafeSet(SharesCompanyCrnPage(srn, index1of5000), ConditionalYesNo.yes[String, Crn](crn))
+    .unsafeSet(ClassOfSharesPage(srn, index1of5000), classOfShares)
+    .unsafeSet(HowManySharesPage(srn, index1of5000), totalShares)
+    .unsafeSet(IdentityTypePage(srn, index1of5000, SharesSeller), UKPartnership)
+    .unsafeSet(PartnershipShareSellerNamePage(srn, index1of5000), companyName)
+    .unsafeSet(PartnershipRecipientUtrPage(srn, index1of5000, SharesSeller), ConditionalYesNo.yes[String, Utr](utr))
+    .unsafeSet(CostOfSharesPage(srn, index1of5000), money)
+    .unsafeSet(SharesIndependentValuationPage(srn, index1of5000), true)
+    .unsafeSet(TotalAssetValuePage(srn, index1of5000), money)
+    .unsafeSet(SharesTotalIncomePage(srn, index1of5000), money)
+    .unsafeSet(SharesListPage(srn), false)
+    .unsafeSet(SharesCompleted(srn, index1of5000), SectionCompleted)
+    // (S5) Shares Disposals
+    .unsafeSet(SharesDisposalPage(srn), true)
+    .unsafeSet(HowWereSharesDisposedPage(srn, index1of5000, index1of50), Sold)
+    .unsafeSet(WhenWereSharesSoldPage(srn, index1of5000, index1of50), localDate)
+    .unsafeSet(HowManySharesSoldPage(srn, index1of5000, index1of50), totalShares)
+    .unsafeSet(TotalConsiderationSharesSoldPage(srn, index1of5000, index1of50), money)
+    .unsafeSet(WhoWereTheSharesSoldToPage(srn, index1of5000, index1of50), IdentityType.Other)
+    .unsafeSet(pages.nonsipp.sharesdisposal.OtherBuyerDetailsPage(srn, index1of5000, index1of50), otherRecipientDetails)
+    .unsafeSet(pages.nonsipp.sharesdisposal.IsBuyerConnectedPartyPage(srn, index1of5000, index1of50), true)
+    .unsafeSet(pages.nonsipp.sharesdisposal.IndependentValuationPage(srn, index1of5000, index1of50), true)
+    .unsafeSet(HowManyDisposalSharesPage(srn, index1of5000, index1of50), totalShares)
+    // (S5) Quoted Shares
+    .unsafeSet(TotalValueQuotedSharesPage(srn), money)
+    // Section 6 - Land or Property
+    // (S6) Land or Property
+    .unsafeSet(LandOrPropertyHeldPage(srn), true)
+    .unsafeSet(LandPropertyInUKPage(srn, index1of5000), true)
+    .unsafeSet(LandOrPropertyPostcodeLookupPage(srn, index1of5000), postcodeLookup)
+    .unsafeSet(AddressLookupResultsPage(srn, index1of5000), List(address, address, address))
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, index1of5000), address)
+    .unsafeSet(LandRegistryTitleNumberPage(srn, index1of5000), ConditionalYesNo.no[String, String](reason))
+    .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index1of5000), SchemeHoldLandProperty.Acquisition)
+    .unsafeSet(LandOrPropertyWhenDidSchemeAcquirePage(srn, index1of5000), localDate)
+    .unsafeSet(IdentityTypePage(srn, index1of5000, LandOrPropertySeller), UKCompany)
+    .unsafeSet(CompanySellerNamePage(srn, index1of5000), name)
+    .unsafeSet(CompanyRecipientCrnPage(srn, index1of5000, LandOrPropertySeller), ConditionalYesNo.yes[String, Crn](crn))
+    .unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, index1of5000), false)
+    .unsafeSet(LandOrPropertyTotalCostPage(srn, index1of5000), money)
+    .unsafeSet(LandPropertyIndependentValuationPage(srn, index1of5000), false)
+    .unsafeSet(IsLandOrPropertyResidentialPage(srn, index1of5000), false)
+    .unsafeSet(IsLandPropertyLeasedPage(srn, index1of5000), true)
+    .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, index1of5000), (leaseName, money, localDate))
+    .unsafeSet(IsLesseeConnectedPartyPage(srn, index1of5000), false)
+    .unsafeSet(LandOrPropertyTotalIncomePage(srn, index1of5000), money)
+    .unsafeSet(LandOrPropertyCompleted(srn, index1of5000), SectionCompleted)
+    // (S6) Land or Property Disposals
+    .unsafeSet(LandOrPropertyDisposalPage(srn), true)
+    .unsafeSet(HowWasPropertyDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Transferred)
+    .unsafeSet(LandOrPropertyStillHeldPage(srn, index1of5000, index1of50), false)
+    // Section 7 - Bonds
+    // (S7) Bonds
+    .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
+    .unsafeSet(NameOfBondsPage(srn, index1of5000), name)
+    .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, index1of5000), SchemeHoldBond.Acquisition)
+    .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, index1of5000), localDate)
+    .unsafeSet(CostOfBondsPage(srn, index1of5000), money)
+    .unsafeSet(BondsFromConnectedPartyPage(srn, index1of5000), true)
+    .unsafeSet(AreBondsUnregulatedPage(srn, index1of5000), true)
+    .unsafeSet(IncomeFromBondsPage(srn, index1of5000), money)
+    .unsafeSet(BondsCompleted(srn, index1of5000), SectionCompleted)
+    // (S7) Bonds Disposals
+    .unsafeSet(BondsDisposalPage(srn), true)
+    .unsafeSet(HowWereBondsDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Other(otherDetails))
+    .unsafeSet(BondsStillHeldPage(srn, index1of5000, index1of50), bondsStillHeld)
+    // Section 8 - Other Assets
+    // (S8) Other Assets
+    .unsafeSet(OtherAssetsHeldPage(srn), true)
+    .unsafeSet(WhatIsOtherAssetPage(srn, index1of5000), otherAssetDescription)
+    .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, index1of5000), true)
+    .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index1of5000), SchemeHoldAsset.Acquisition)
+    .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, index1of5000), localDate)
+    .unsafeSet(IdentityTypePage(srn, index1of5000, OtherAssetSeller), Individual)
+    .unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, index1of5000), name)
+    .unsafeSet(OtherAssetIndividualSellerNINumberPage(srn, index1of5000), ConditionalYesNo.no[String, Nino](reason))
+    .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, index1of5000), true)
+    .unsafeSet(CostOfOtherAssetPage(srn, index1of5000), money)
+    .unsafeSet(pages.nonsipp.otherassetsheld.IndependentValuationPage(srn, index1of5000), true)
+    .unsafeSet(IncomeFromAssetPage(srn, index1of5000), money)
+    .unsafeSet(OtherAssetsCompleted(srn, index1of5000), SectionCompleted)
+    // (S8) Other Assets Disposals
+    .unsafeSet(OtherAssetsDisposalPage(srn), true)
+    .unsafeSet(HowWasAssetDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Transferred)
+    .unsafeSet(AnyPartAssetStillHeldPage(srn, index1of5000, index1of50), true)
+
+  private val previousUA: UserAnswers = currentUA
+    .unsafeSet(TotalValueQuotedSharesPage(srn), Money(1))
 
   "Loans status" - {
     "should be Not Started" - {
@@ -1077,6 +1277,16 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val result = TaskListStatusUtils.getPensionPaymentsStatusAndLink(customUserAnswers, srn)
         result mustBe (Completed, selectMember)
       }
+    }
+  }
+
+  "\"userAnswersUnchangedAllSections\" method" - {
+    "should return true when UAs are identical" in {
+      userAnswersUnchangedAllSections(currentUA, currentUA)
+    }
+
+    "should return false when UAs aren't identical" in {
+      userAnswersUnchangedAllSections(currentUA, previousUA)
     }
   }
 }
