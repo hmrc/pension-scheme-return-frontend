@@ -34,6 +34,7 @@ import eu.timepit.refined.refineMV
 class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
+  private val page = 1
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -60,6 +61,7 @@ class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onSubmitViewOnly = routes.MemberPensionPaymentsCYAController.onSubmitViewOnly(
     srn,
+    page,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -143,10 +145,10 @@ class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         call = onSubmitViewOnly,
-        page = controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+        page = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(never))
-        .withName("Submit redirects to view only tasklist")
+        .withName("Submit redirects to to Pension payments Member List page")
     )
   }
 }

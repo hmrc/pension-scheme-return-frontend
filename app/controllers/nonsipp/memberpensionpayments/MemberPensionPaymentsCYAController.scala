@@ -24,7 +24,6 @@ import controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAControl
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.Max300
 import controllers.PSRController
-import controllers.nonsipp.routes
 import models._
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
@@ -133,9 +132,14 @@ class MemberPensionPaymentsCYAController @Inject()(
       )
     }
 
-  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
-      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+            .onPageLoadViewOnly(srn, page, year, current, previous)
+        )
+      )
     }
 }
 
@@ -192,11 +196,12 @@ object MemberPensionPaymentsCYAController {
             submittedText = Some(Message("")),
             title = "MemberPensionPaymentsCYA.viewOnly.title",
             heading = Message("MemberPensionPaymentsCYA.viewOnly.heading", memberName),
-            buttonText = "site.return.to.tasklist",
+            buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                // view-only continue button always navigates back to the first list page if paginating
                 controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+                  .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
                   .onSubmit(srn, index, mode)

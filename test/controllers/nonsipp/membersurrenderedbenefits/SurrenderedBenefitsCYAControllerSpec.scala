@@ -46,6 +46,7 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
       .thenReturn(Future.successful(Some(())))
   }
   private val memberIndex = refineMV[OneTo300](1)
+  private val page = 1
   private val whenSurrenderedBenefits = localDate
 
   private def onPageLoad(mode: Mode) =
@@ -62,6 +63,7 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onSubmitViewOnly = routes.SurrenderedBenefitsCYAController.onSubmitViewOnly(
     srn,
+    page,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -151,8 +153,8 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+        controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )

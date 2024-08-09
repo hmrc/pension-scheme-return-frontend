@@ -139,10 +139,13 @@ class EmployerContributionsCYAController @Inject()(
       ).merge
     }
 
-  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
       Future.successful(
-        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+        Redirect(
+          controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+            .onPageLoadViewOnly(srn, page, year, current, previous)
+        )
       )
     }
 
@@ -268,7 +271,9 @@ object EmployerContributionsCYAController {
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-                routes.EmployerContributionsCYAController.onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+                // view-only continue button always navigates back to the first list page if paginating
+                routes.EmployerContributionsCYAController
+                  .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
               case _ =>
                 routes.EmployerContributionsCYAController.onSubmit(srn, memberIndex, page, mode)
             }

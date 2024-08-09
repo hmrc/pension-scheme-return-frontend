@@ -23,6 +23,7 @@ import play.api.mvc._
 import utils.ListUtils.ListOps
 import config.Refined.Max5000
 import controllers.PSRController
+import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.common._
 import models.requests.DataRequest
@@ -30,8 +31,6 @@ import pages.nonsipp.otherassetsheld._
 import models.PointOfEntry.NoPointOfEntry
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import cats.implicits.toShow
-import controllers.nonsipp.routes
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
@@ -224,9 +223,14 @@ class OtherAssetsCYAController @Inject()(
       } yield Redirect(redirectTo)
     }
 
-  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
-      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+      Future.successful(
+        Redirect(
+          controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
+            .onPageLoadViewOnly(srn, page, year, current, previous)
+        )
+      )
     }
 
 }
@@ -294,8 +298,9 @@ object OtherAssetsCYAController {
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                // view-only continue button always navigates back to the first list page if paginating
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onSubmitViewOnly(parameters.srn, year, currentVersion, previousVersion)
+                  .onSubmitViewOnly(parameters.srn, 1, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                   .onSubmit(parameters.srn, parameters.index, parameters.mode)

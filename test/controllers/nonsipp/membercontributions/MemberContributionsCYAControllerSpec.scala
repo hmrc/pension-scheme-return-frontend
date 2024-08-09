@@ -39,7 +39,7 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onSubmitViewOnly = routes.MemberContributionsCYAController.onSubmitViewOnly(
     srn,
-    1,
+    page,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -54,6 +54,7 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
   )
 
   private val index = refineMV[Max300.Refined](1)
+  private val page = 1
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -143,7 +144,7 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onSubmitViewOnly,
         controllers.nonsipp.membercontributions.routes.MemberContributionListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
+          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )

@@ -53,6 +53,7 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onSubmitViewOnly = routes.AssetDisposalCYAController.onSubmitViewOnly(
     srn,
+    page,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -69,6 +70,7 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
 
   private val assetIndex = refineMV[OneTo5000](1)
   private val disposalIndex = refineMV[OneTo50](1)
+  private val page = 1
 
   private val dateAssetSold = Some(localDate)
   private val considerationAssetSold = Some(money)
@@ -197,7 +199,7 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onSubmitViewOnly,
         controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
+          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )

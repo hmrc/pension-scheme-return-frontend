@@ -203,12 +203,12 @@ class AssetDisposalCYAController @Inject()(
       )
     }
 
-  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
       Future.successful(
         Redirect(
           controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-            .onPageLoadViewOnly(srn, 1, year, current, previous)
+            .onPageLoadViewOnly(srn, page, year, current, previous)
         )
       )
     }
@@ -290,8 +290,9 @@ object AssetDisposalCYAController {
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                // view-only continue button always navigates back to the first list page if paginating
                 controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
-                  .onSubmitViewOnly(parameters.srn, year, currentVersion, previousVersion)
+                  .onSubmitViewOnly(parameters.srn, 1, year, currentVersion, previousVersion)
               case _ =>
                 controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
                   .onSubmit(parameters.srn, parameters.index, parameters.disposalIndex, parameters.mode)

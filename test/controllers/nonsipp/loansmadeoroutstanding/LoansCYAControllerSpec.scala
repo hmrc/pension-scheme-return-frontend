@@ -48,6 +48,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
   }
 
   private val index = refineMV[OneTo5000](1)
+  private val page = 1
   private val taxYear = Some(Left(dateRange))
   private val subject = IdentitySubject.LoanRecipient
 
@@ -65,6 +66,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onSubmitViewOnly = routes.LoansCYAController.onSubmitViewOnly(
     srn,
+    page,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -196,12 +198,12 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+        controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
+          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )
-        .withName("Submit redirects to view only tasklist")
+        .withName("Submit redirects to loans list page")
     )
   }
 }

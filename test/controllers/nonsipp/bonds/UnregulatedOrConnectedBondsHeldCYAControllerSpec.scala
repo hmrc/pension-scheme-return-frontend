@@ -43,6 +43,7 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
     reset(mockPsrSubmissionService)
 
   private val index = refineMV[OneTo5000](1)
+  private val page = 1
 
   private def onPageLoad(mode: Mode) =
     routes.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn, index, mode)
@@ -59,6 +60,7 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
 
   private lazy val onSubmitViewOnly = routes.UnregulatedOrConnectedBondsHeldCYAController.onSubmitViewOnly(
     srn,
+    page,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -156,12 +158,12 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
     act.like(
       redirectToPage(
         onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+        controllers.nonsipp.bonds.routes.BondsListController
+          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )
-        .withName("Submit redirects to view only tasklist")
+        .withName("Submit redirects to bond list page")
     )
   }
 }

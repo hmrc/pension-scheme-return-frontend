@@ -231,9 +231,9 @@ object BondsListController {
             case (ViewOnlyMode, Some(year), Some(current), Some(previous)) =>
               ListRow.view(
                 bondsMessage,
-                //                controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
-                //                  .onPageLoadViewOnly(srn, index, year, current, previous)
-                controllers.routes.UnauthorisedController.onPageLoad().url,
+                controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                  .onPageLoadViewOnly(srn, index, year, current, previous)
+                  .url,
                 Message("bondsList.row.change.hiddenText", bondsMessage)
               )
           }

@@ -145,8 +145,6 @@ object ViewOnlyTaskListController {
 
   private def messageKey(prefix: String, suffix: String): String = s"$prefix.view.$suffix"
 
-// TODO: implement lower-level journey navigation in future ticket - until then, Unauthorised page used for all links
-
 //--Scheme details----------------------------------------------------------------------------------------------------//
 
   private def schemeDetailsSection(

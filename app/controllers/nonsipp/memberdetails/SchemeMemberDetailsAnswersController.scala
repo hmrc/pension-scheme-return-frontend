@@ -148,10 +148,13 @@ class SchemeMemberDetailsAnswersController @Inject()(
       )(_ => Redirect(navigator.nextPage(SchemeMemberDetailsAnswersPage(srn), NormalMode, request.userAnswers)))
     }
 
-  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
       Future.successful(
-        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+        Redirect(
+          controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+            .onPageLoadViewOnly(srn, page, year, current, previous)
+        )
       )
     }
 }
@@ -271,8 +274,9 @@ object SchemeMemberDetailsAnswersController {
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                // view-only continue button always navigates back to the first list page if paginating
                 routes.SchemeMemberDetailsAnswersController
-                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+                  .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
               case _ =>
                 routes.SchemeMemberDetailsAnswersController
                   .onSubmit(srn, index, mode)
