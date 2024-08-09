@@ -1010,7 +1010,8 @@ object TaskListStatusUtils {
     (getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
-      pages.nonsipp.memberdetails.Paths.personalDetails
+      pages.nonsipp.memberdetails.Paths.personalDetails,
+      Some("safeToHardDelete")
     ) == Completed) &&
     (getCompletedOrUpdatedTaskListStatus(
       currentUA,
@@ -1020,7 +1021,7 @@ object TaskListStatusUtils {
     (getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
-      pages.nonsipp.memberpensionpayments.Paths.memberDetails \ "unallocatedContribAmount"
+      pages.nonsipp.memberpayments.Paths.membersPayments \ "unallocatedContribAmount"
     ) == Completed) &&
     (getCompletedOrUpdatedTaskListStatus(
       currentUA,
@@ -1098,7 +1099,7 @@ object TaskListStatusUtils {
     (getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
-      pages.nonsipp.shares.Paths.shares \ "totalValueQuotedShares"
+      pages.nonsipp.totalvaluequotedshares.Paths.quotedShares \ "totalValueQuotedShares"
     ) == Completed) &&
     (getCompletedOrUpdatedTaskListStatus(
       currentUA,

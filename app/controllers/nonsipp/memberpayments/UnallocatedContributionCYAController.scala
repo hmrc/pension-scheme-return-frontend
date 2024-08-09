@@ -28,7 +28,6 @@ import models.requests.DataRequest
 import views.html.CYAWithRemove
 import models.SchemeId.Srn
 import cats.implicits.toShow
-import pages.nonsipp.memberpensionpayments.Paths.membersPayments
 import controllers.nonsipp.routes
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
@@ -74,7 +73,7 @@ class UnallocatedContributionCYAController @Inject()(
             getCompletedOrUpdatedTaskListStatus(
               request.userAnswers,
               request.previousUserAnswers.get,
-              membersPayments \ "unallocatedContribAmount"
+              pages.nonsipp.memberpayments.Paths.membersPayments \ "unallocatedContribAmount" \ "unallocatedContribAmount"
             ) == Updated
           } else {
             false
