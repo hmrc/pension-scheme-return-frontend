@@ -21,9 +21,10 @@ import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
 import views.html.ListView
 import eu.timepit.refined.refineMV
-import models.{HowDisposed, NormalMode, ViewOnlyMode}
-import pages.nonsipp.bondsdisposal.{BondsDisposalProgress, HowWereBondsDisposedOfPage}
+import models._
+import pages.nonsipp.bondsdisposal._
 import viewmodels.models.SectionCompleted
+import eu.timepit.refined.api.Refined
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
@@ -77,10 +78,15 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
   private val bondsDisposalsWithIndexes =
     List(((bondIndexOne, disposalIndexes), SectionCompleted))
 
+  val bondIndex: Refined[Int, Max5000.Refined] = refineMV[Max5000.Refined](1)
+  val disposalIndex: Refined[Int, Max50.Refined] = refineMV[Max50.Refined](1)
+
   private val completedUserAnswers = defaultUserAnswers
   // Bonds data 1
     .unsafeSet(NameOfBondsPage(srn, bondIndexOne), "name")
     .unsafeSet(BondsCompleted(srn, bondIndexOne), SectionCompleted)
+    .unsafeSet(BondsDisposalPage(srn), true)
+    .unsafeSet(BondsDisposalCompleted(srn), SectionCompleted)
     //Bond 1 - disposal data 1
     .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne), HowDisposed.Sold)
     .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne), SectionCompleted)
@@ -102,118 +108,209 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
 
   "ReportBondsDisposalListController" - {
 
-    act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
-      injected[ListView].apply(
-        form(new YesNoPageFormProvider()),
-        viewModel(
-          srn,
-          NormalMode,
-          page,
-          bondsDisposalsWithIndexes,
-          numberOfDisposals,
-          maxPossibleNumberOfDisposals,
-          completedUserAnswers,
-          viewOnlyUpdated = false
-        )
-      )
-    }.withName("Completed Journey"))
+    //    act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
+    //      injected[ListView].apply(
+    //        form(injected[YesNoPageFormProvider]),
+    //        viewModel(
+    //          srn,
+    //          NormalMode,
+    //          page,
+    //          bondsDisposalsWithIndexes,
+    //          numberOfDisposals,
+    //          maxPossibleNumberOfDisposals,
+    //          completedUserAnswers,
+    //          schemeName,
+    //          viewOnlyViewModel = None
+    //        )
+    //      )
+    //    }.withName("Completed Journey"))
+    //
+    //    act.like(redirectNextPage(onSubmit, "value" -> "1"))
+    //
+    //    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
+    //
+    //    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+    //  }
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
+    act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
+      injected[ListView]
+        .apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(
+            srn,
+            NormalMode,
+            page = 1,
+            bondsDisposalsWithIndexes,
+            numberOfDisposals,
+            maxPossibleNumberOfDisposals = 50,
+            completedUserAnswers,
+            schemeName,
+            viewOnlyViewModel = None
+          )
+        )
+    })
+
+    act.like(redirectNextPage(onSubmit, "value" -> "1"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
+    act.like(invalidForm(onSubmit, completedUserAnswers))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
-  }
 
-  "ReportBondsDisposalListController in view only mode" - {
+    "ReportBondsDisposalListController in view only mode" - {
 
-    val currentUserAnswers = defaultUserAnswers
-      .unsafeSet(FbVersionPage(srn), "002")
-      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
-      // Bonds data 1
-      .unsafeSet(NameOfBondsPage(srn, bondIndexOne), "name")
-      .unsafeSet(BondsCompleted(srn, bondIndexOne), SectionCompleted)
-      //Bond 1 - disposal data 1
-      .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne), HowDisposed.Sold)
-      .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne), SectionCompleted)
-      //Bond 1 - disposal data 2
-      .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexTwo), HowDisposed.Sold)
-      .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexTwo), SectionCompleted)
+      val currentUserAnswers = completedUserAnswers
+        .unsafeSet(FbVersionPage(srn), "002")
+        .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
 
-    val previousUserAnswers = currentUserAnswers
-      .unsafeSet(FbVersionPage(srn), "001")
-      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
-      .unsafeSet(NameOfBondsPage(srn, bondIndexOne), "name")
+      val previousUserAnswers = completedUserAnswers
+        .unsafeSet(FbVersionPage(srn), "001")
+        .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
 
-    act.like(
-      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-        implicit app => implicit request =>
-          injected[ListView].apply(
-            form(new YesNoPageFormProvider()),
-            viewModel(
-              srn,
-              mode = ViewOnlyMode,
-              page,
-              bondsDisposalsWithIndexes,
-              numberOfDisposals,
-              maxPossibleNumberOfDisposals,
-              completedUserAnswers,
-              viewOnlyUpdated = false,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
-            )
-          )
-      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
-    )
-
-    val updatedUserAnswers = currentUserAnswers
-      .unsafeSet(NameOfBondsPage(srn, bondIndexOne), "name")
-
-    act.like(
-      renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-        implicit app => implicit request =>
-          injected[ListView].apply(
-            form(new YesNoPageFormProvider()),
-            viewModel(
-              srn,
-              mode = ViewOnlyMode,
-              page,
-              bondsDisposalsWithIndexes,
-              numberOfDisposals,
-              maxPossibleNumberOfDisposals,
-              completedUserAnswers,
-              viewOnlyUpdated = false,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
-            )
-          )
-      }.withName("OnPageLoadViewOnly renders ok with changed flag")
-    )
-
-    act.like(
-      redirectToPage(
-        onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
-      ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only taskList")
-    )
-
-    act.like(
-      redirectToPage(
-        onPreviousViewOnly,
-        controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
+      val viewOnlyViewModel = ViewOnlyViewModel(
+        viewOnlyUpdated = false,
+        year = yearString,
+        currentVersion = submissionNumberOne,
+        previousVersion = submissionNumberZero,
+        compilationOrSubmissionDate = Some(submissionDateTwo)
       )
-    )
-  }
 
+      act.like(
+        renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+          implicit app => implicit request =>
+            injected[ListView].apply(
+              form(injected[YesNoPageFormProvider]),
+              viewModel(
+                srn,
+                ViewOnlyMode,
+                page = 1,
+                bondsDisposalsWithIndexes,
+                numberOfDisposals = 1,
+                maxPossibleNumberOfDisposals,
+                completedUserAnswers,
+                schemeName,
+                viewOnlyViewModel = Some(viewOnlyViewModel)
+              )
+            )
+        }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
+      )
+
+      val updatedUserAnswers = currentUserAnswers
+
+      act.like(
+        renderView(
+          onPageLoadViewOnly,
+          userAnswers = updatedUserAnswers,
+          optPreviousAnswers = Some(
+            previousUserAnswers.unsafeSet(HowWereBondsDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Sold)
+          )
+        ) { implicit app => implicit request =>
+          injected[ListView].apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              ViewOnlyMode,
+              page = 2,
+              bondsDisposalsWithIndexes,
+              numberOfDisposals = 1,
+              maxPossibleNumberOfDisposals,
+              completedUserAnswers,
+              schemeName,
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+            )
+          )
+        }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated true")
+      )
+
+      act.like(
+        redirectToPage(
+          onSubmitViewOnly,
+          controllers.nonsipp.routes.ViewOnlyTaskListController
+            .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+        ).after(
+            verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          )
+          .withName("Submit redirects to view only taskList")
+      )
+
+      act.like(
+        redirectToPage(
+          onPreviousViewOnly,
+          controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
+            .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+        ).withName(
+          "Submit previous view only redirects to the controller with parameters for the previous submission"
+        )
+      )
+    }
+
+    //      act.like(
+    //        renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+    //          implicit app => implicit request =>
+    //            injected[ListView].apply(
+    //              form(injected[YesNoPageFormProvider]),
+    //              viewModel(
+    //                srn,
+    //                mode = ViewOnlyMode,
+    //                page = 1,
+    //                bondsDisposalsWithIndexes,
+    //                numberOfDisposals = 1,
+    //                maxPossibleNumberOfDisposals,
+    //                completedUserAnswers,
+    //                schemeName,
+    //                viewOnlyViewModel = Some(viewOnlyViewModel)
+    //              )
+    //            )
+    //        }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
+    //      )
+    //
+    //      val updatedUserAnswers = currentUserAnswers
+    //
+    //      act.like(
+    //        renderView(
+    //          onPageLoadViewOnly,
+    //          userAnswers = updatedUserAnswers,
+    //          optPreviousAnswers = Some(
+    //            previousUserAnswers
+    //              .unsafeSet(HowWereBondsDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
+    //          )
+    //        ) { implicit app => implicit request =>
+    //          injected[ListView].apply(
+    //            form(injected[YesNoPageFormProvider]),
+    //            viewModel(
+    //              srn,
+    //              mode = ViewOnlyMode,
+    //              page = 1,
+    //              bondsDisposalsWithIndexes,
+    //              numberOfDisposals = 1,
+    //              maxPossibleNumberOfDisposals,
+    //              completedUserAnswers,
+    //              schemeName,
+    //              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+    //            )
+    //          )
+    //        }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated true")
+    //      )
+    //
+    //      act.like(
+    //        redirectToPage(
+    //          onSubmitViewOnly,
+    //          controllers.nonsipp.routes.ViewOnlyTaskListController
+    //            .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+    //        ).withName("Submit redirects to view only tasklist")
+    //      )
+    //
+    //      act.like(
+    //        redirectToPage(
+    //          onPreviousViewOnly,
+    //          controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
+    //            .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+    //        ).withName(
+    //          "Submit previous view only redirects to the controller with parameters for the previous submission"
+    //        )
+    //      )
+    //    }
+    //  }
+
+  }
 }

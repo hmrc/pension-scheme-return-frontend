@@ -3048,7 +3048,10 @@ bondsList.view.title = View bond transactions
 bondsList.view.title.plural = View bond transactions
 bondsList.view.heading = {0} bond transaction
 bondsList.view.heading.plural = {0} bond transactions
+bondsList.view.heading.none = Bond transactions
 bondsList.view.link = View previous version of bond transactions (opens in new tab)
+bondsList.view.none = Did {0} hold any unregulated bonds, or bonds acquired from a connected party?
+bondsList.view.none.value = No
 
 bondsDisposalList.title = Start reporting a bond disposal
 bondsDisposalList.heading = Start reporting a bond disposal
@@ -3203,7 +3206,10 @@ otherAssets.list.view.title = View other assets
 otherAssets.list.view.title.plural = View other assets
 otherAssets.list.view.heading = {0} other asset
 otherAssets.list.view.heading.plural = {0} other assets
+otherAssets.list.view.heading.none = Other assets
 otherAssets.list.view.link = View previous version of other assets (opens in new tab)
+otherAssets.list.view.none = Did {0} hold any other assets during the period of this return?
+otherAssets.list.view.none.value = No
 
 otherAssets.removeOtherAsset.title = Are you sure you want to remove this asset?
 otherAssets.removeOtherAsset.heading = Are you sure you want to remove {0}?
@@ -3341,8 +3347,11 @@ bondsDisposal.reportBondsDisposalList.view.title = View bond disposals
 bondsDisposal.reportBondsDisposalList.view.title.plural = View bond disposals
 bondsDisposal.reportBondsDisposalList.view.heading = {0} bond disposal
 bondsDisposal.reportBondsDisposalList.view.heading.plural = {0} bond disposals
+bondsDisposal.reportBondsDisposalList.view.heading.none = Bond disposals
 bondsDisposal.reportBondsDisposalList.row.view.hidden = View details of the disposal of {0} by {1}
 bondsDisposal.reportBondsDisposalList.view.link = View previous version of bond disposals (opens in new tab)
+bondsDisposal.reportBondsDisposalList.view.none = Did {0} dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
+bondsDisposal.reportBondsDisposalList.view.none.value = No
 
 bondsDisposal.removeBondsDisposal.title = Are you sure you want to remove details of the disposal of these bonds?
 bondsDisposal.removeBondsDisposal.heading = Are you sure you want to remove details of the disposal of {0}?
