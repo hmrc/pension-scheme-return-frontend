@@ -143,6 +143,26 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
       act.like(
         renderView(
           onPageLoadViewOnly,
+          userAnswers = currentUserAnswers.unsafeSet(TotalValueQuotedSharesPage(srn), Money.zero),
+          optPreviousAnswers = Some(previousUserAnswers)
+        ) { implicit app => implicit request =>
+          injected[CYAWithRemove].apply(
+            viewModel(
+              srn,
+              Some(Money.zero),
+              Left(dateRange),
+              defaultSchemeDetails,
+              ViewOnlyMode,
+              Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+            )
+          )
+        }.before(mockTaxYear(dateRange))
+          .withName("OnPageLoadViewOnly renders ok when money is zero")
+      )
+
+      act.like(
+        renderView(
+          onPageLoadViewOnly,
           userAnswers = currentUserAnswers.remove(TotalValueQuotedSharesPage(srn)).get,
           optPreviousAnswers = Some(previousUserAnswers)
         ) { implicit app => implicit request =>
