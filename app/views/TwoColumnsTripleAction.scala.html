@@ -95,12 +95,11 @@
                     )
                 )
             }
-        }
-
-        @viewmodel.page.paginatedViewModel.map{ paginatedViewModel =>
-            @if(paginatedViewModel.pagination.totalPages > 1) {
-                <p id="pagination-label" class="govuk-body">@{renderMessage(paginatedViewModel.label)}</p>
-                @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
+            @viewmodel.page.paginatedViewModel.map{ paginatedViewModel =>
+                @if(paginatedViewModel.pagination.totalPages > 1) {
+                    <p id="pagination-label" class="govuk-body">@{renderMessage(paginatedViewModel.label)}</p>
+                    @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
+                }
             }
         }
 
@@ -120,6 +119,7 @@
                 )
             )
         }
+
         @if(viewmodel.mode != ViewOnlyMode && viewmodel.page.showRadios && !viewmodel.page.showInsetWithRadios){
             @govukRadios(
                 RadiosViewModel.yesNo(
@@ -129,10 +129,10 @@
                 )
             )
         }
+
         @if(!viewmodel.page.showRadios && !viewmodel.page.showInsetWithRadios){
             @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.page.inset)))
         }
-
 
         @govukButton(
             if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty)
