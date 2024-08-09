@@ -385,7 +385,7 @@ object TransferOutMemberListController {
             updated = viewOnlyUpdated,
             link = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion))
-                  if optYear.nonEmpty && currentVersion > 1 && previousVersion > 0 =>
+                  if currentVersion > 1 && previousVersion > 0 =>
                 Some(
                   LinkMessage(
                     "transferOut.memberList.viewOnly.link",

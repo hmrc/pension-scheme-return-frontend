@@ -132,7 +132,7 @@ class SharesListController @Inject()(
             errors => {
               sharesData(srn, indexes)
                 .map { data =>
-                  BadRequest(view(errors, viewModel(srn, page, mode, data, false, None, None, None)))
+                  BadRequest(view(errors, viewModel(srn, page, mode, data, viewOnlyUpdated = false, None, None, None)))
                 }
                 .merge
                 .pure[Future]
@@ -335,7 +335,7 @@ object SharesListController {
           updated = viewOnlyUpdated,
           link = (optYear, optCurrentVersion, optPreviousVersion) match {
             case (Some(year), Some(currentVersion), Some(previousVersion))
-                if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+                if currentVersion > 1 && previousVersion > 0 =>
               Some(
                 LinkMessage(
                   "sharesList.view.link",

@@ -122,7 +122,7 @@ class BorrowInstancesListController @Inject()(
         Redirect(navigator.nextPage(BorrowInstancesListPage(srn, addBorrow = false), mode, request.userAnswers))
       } else {
         val viewModel =
-          BorrowInstancesListController.viewModel(srn, mode, page, instances, false, None, None, None)
+          BorrowInstancesListController.viewModel(srn, mode, page, instances, viewOnlyUpdated = false, None, None, None)
 
         form
           .bindFromRequest()
@@ -300,7 +300,7 @@ object BorrowInstancesListController {
           updated = viewOnlyUpdated,
           link = (optYear, optCurrentVersion, optPreviousVersion) match {
             case (Some(year), Some(currentVersion), Some(previousVersion))
-                if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+                if currentVersion > 1 && previousVersion > 0 =>
               Some(
                 LinkMessage(
                   "borrowList.view.link",
