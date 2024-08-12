@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import controllers.PSRController
+import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
 import cats.implicits.toShow
 import controllers.actions._
 import models.backend.responses.ReportStatus
@@ -28,9 +29,9 @@ import viewmodels.models.TaskListStatus._
 import play.api.i18n.MessagesApi
 import views.html.TaskListView
 import models.SchemeId.Srn
-import pages.nonsipp.WhichTaxYearPage
+import pages.nonsipp.{CompilationOrSubmissionDatePage, WhichTaxYearPage}
 import utils.nonsipp.TaskListUtils._
-import utils.DateTimeUtils.localDateShow
+import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
@@ -62,6 +63,14 @@ class TaskListController @Inject()(
             )
             .toList
             .nonEmpty
+          noChangesSincePreviousVersion = if (!hasHistory) {
+            true
+          } else {
+            userAnswersUnchangedAllSections(
+              request.userAnswers,
+              request.previousUserAnswers.get
+            )
+          }
           viewModel = TaskListController.viewModel(
             srn,
             request.schemeDetails.schemeName,
@@ -69,7 +78,8 @@ class TaskListController @Inject()(
             dates.to,
             request.userAnswers,
             request.pensionSchemeId,
-            hasHistory
+            hasHistory,
+            noChangesSincePreviousVersion
           )
         } yield Ok(view(viewModel))
     }
@@ -91,10 +101,24 @@ object TaskListController {
     endDate: LocalDate,
     userAnswers: UserAnswers,
     pensionSchemeId: PensionSchemeId,
-    hasHistory: Boolean = false
+    hasHistory: Boolean = false,
+    noChangesSincePreviousVersion: Boolean
   ): PageViewModel[TaskListViewModel] = {
 
     val sectionList = getSectionList(srn, schemeName, userAnswers, pensionSchemeId)
+
+    val (numberOfCompleted, numberOfTotal) = evaluateCompletedTotalTuple(sectionList)
+
+    val allSectionsCompleted = numberOfCompleted == numberOfTotal
+
+    val displayNotSubmittedMessage = (hasHistory, noChangesSincePreviousVersion) match {
+      // In Compile mode, if all sections completed, display message
+      case (false, _) => allSectionsCompleted
+      // In View & Change mode, if userAnswers unchanged, don't display message
+      case (true, true) => false
+      // In View & Change mode, if userAnswers changed & all sections completed, display message
+      case (true, false) => allSectionsCompleted
+    }
 
     val historyLink = if (hasHistory) {
       Some(
@@ -107,23 +131,23 @@ object TaskListController {
       None
     }
 
+    val submissionDateMessage = userAnswers
+      .get(CompilationOrSubmissionDatePage(srn))
+      .fold(Message(""))(date => Message("site.submittedOn", date.show))
+
     val viewModel = TaskListViewModel(
+      displayNotSubmittedMessage,
       hasHistory,
       historyLink,
+      submissionDateMessage,
       sectionList.head,
       sectionList.tail: _*
     )
-
-    val (numberOfCompleted, numberOfTotal) = evaluateCompletedTotalTuple(viewModel.sections.toList)
 
     PageViewModel(
       Message("nonsipp.tasklist.title", startDate.show, endDate.show),
       Message("nonsipp.tasklist.heading", startDate.show, endDate.show),
       viewModel
-    ).withDescription(
-      Heading2.small("nonsipp.tasklist.subheading.incomplete") ++
-        ParagraphMessage(Message("nonsipp.tasklist.description", numberOfCompleted, numberOfTotal))
-    )
+    ).withDescription(ParagraphMessage(Message("nonsipp.tasklist.description", numberOfCompleted, numberOfTotal)))
   }
-
 }

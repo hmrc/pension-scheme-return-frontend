@@ -17,28 +17,38 @@
 @import views.html.components.TaskListItems
 
 @this(
- layout: templates.Layout,
- taskListItems: TaskListItems
+    layout: templates.Layout,
+    taskListItems: TaskListItems
 )
 
 @(viewmodel: PageViewModel[TaskListViewModel])(implicit request: Request[_], messages: Messages)
 
 @item(content: Html) = {
-  <li class="govuk-task-list__item govuk-task-list__item--with-link">
-    <span class="govuk-task-list__name-and-hint">
-      @content
-    </span>
-  </li>
+    <li class="govuk-task-list__item govuk-task-list__item--with-link">
+        <span class="govuk-task-list__name-and-hint">
+            @content
+        </span>
+    </li>
 }
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage), showBackLink = false) {
 
     <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)</h1>
 
+    @if(viewmodel.page.displayNotSubmittedMessage) {
+        <h2 class="govuk-heading-s govuk-!-margin-bottom-4">
+            @renderMessage("nonsipp.tasklist.subheading.notSubmitted")
+        </h2>
+    } else if (viewmodel.page.hasHistory) {
+        <h2 class="govuk-heading-s">
+            @renderMessage(viewmodel.page.submissionDateMessage)
+        </h2>
+    }
+
     @if(viewmodel.page.hasHistory && viewmodel.page.historyLink.nonEmpty) {
         <p class="govuk-body">
-            <a href=@viewmodel.page.historyLink.get.url
-               class="govuk-link">@renderMessage(viewmodel.page.historyLink.get.content)
+            <a href=@viewmodel.page.historyLink.get.url class="govuk-link">
+                @renderMessage(viewmodel.page.historyLink.get.content)
             </a>
         </p>
     }
