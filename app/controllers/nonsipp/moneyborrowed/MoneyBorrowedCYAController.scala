@@ -199,6 +199,7 @@ object MoneyBorrowedCYAController {
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                // view-only continue button always navigates back to the first list page if paginating
                 controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
                   .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
               case _ =>

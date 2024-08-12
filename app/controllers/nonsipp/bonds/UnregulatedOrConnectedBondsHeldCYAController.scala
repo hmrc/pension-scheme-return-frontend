@@ -133,10 +133,12 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
         }
     }
 
-  def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
       Future.successful(
-        Redirect(controllers.nonsipp.routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+        Redirect(
+          controllers.nonsipp.bonds.routes.BondsListController.onPageLoadViewOnly(srn, page, year, current, previous)
+        )
       )
     }
 }
@@ -209,8 +211,9 @@ object UnregulatedOrConnectedBondsHeldCYAController {
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                // view-only continue button always navigates back to the first list page if paginating
                 routes.UnregulatedOrConnectedBondsHeldCYAController
-                  .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
+                  .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
               case _ =>
                 routes.UnregulatedOrConnectedBondsHeldCYAController.onSubmit(srn, index, mode)
             }

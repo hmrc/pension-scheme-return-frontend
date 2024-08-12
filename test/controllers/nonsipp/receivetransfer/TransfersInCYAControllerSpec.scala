@@ -38,11 +38,12 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
   private val secondaryIndex = refineMV[Max5.Refined](1)
+  private val page = 1
   private lazy val onPageLoad = routes.TransfersInCYAController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.TransfersInCYAController.onSubmit(srn, index, NormalMode)
   private lazy val onSubmitViewOnly = routes.TransfersInCYAController.onSubmitViewOnly(
     srn,
-    1,
+    page,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -151,7 +152,7 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onSubmitViewOnly,
         controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
+          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )

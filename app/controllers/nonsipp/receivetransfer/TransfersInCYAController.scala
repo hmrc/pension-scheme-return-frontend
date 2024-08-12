@@ -216,6 +216,7 @@ object TransfersInCYAController {
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                // view-only continue button always navigates back to the first list page if paginating
                 controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
                   .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
               case _ =>

@@ -43,6 +43,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
     reset(mockPsrSubmissionService)
 
   private val index = refineMV[OneTo5000](1)
+  private val page = 1
 
   private def onPageLoad(mode: Mode) =
     routes.LandOrPropertyCYAController.onPageLoad(srn, index, mode)
@@ -59,6 +60,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onSubmitViewOnly = routes.LandOrPropertyCYAController.onSubmitViewOnly(
     srn,
+    page,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -178,12 +180,12 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
+          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )
-        .withName("Submit redirects to view only tasklist")
+        .withName("Submit redirects to land or property list")
     )
   }
 }

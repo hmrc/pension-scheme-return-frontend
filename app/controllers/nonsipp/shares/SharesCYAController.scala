@@ -216,7 +216,7 @@ class SharesCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.shares.routes.SharesListController
-            .onPageLoadViewOnly(srn, 1, year, current, previous)
+            .onPageLoadViewOnly(srn, page, year, current, previous)
         )
       )
     }
@@ -306,6 +306,7 @@ object SharesCYAController {
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+                // view-only continue button always navigates back to the first list page if paginating
                 routes.SharesCYAController.onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
               case _ =>
                 routes.SharesCYAController.onSubmit(srn, index, mode)
