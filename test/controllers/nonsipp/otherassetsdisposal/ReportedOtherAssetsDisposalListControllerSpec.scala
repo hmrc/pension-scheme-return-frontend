@@ -17,14 +17,14 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import services.PsrSubmissionService
-import pages.nonsipp.otherassetsdisposal.{HowWasAssetDisposedOfPage, OtherAssetsDisposalProgress}
+import pages.nonsipp.otherassetsdisposal._
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
 import views.html.ListView
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController._
 import forms.YesNoPageFormProvider
-import models.{NormalMode, ViewOnlyMode}
+import models.{NormalMode, ViewOnlyMode, ViewOnlyViewModel}
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
@@ -96,6 +96,18 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(OtherAssetsDisposalProgress(srn, otherAssetIndexTwo, disposalIndexOne), SectionJourneyStatus.Completed)
     .unsafeSet(OtherAssetsDisposalProgress(srn, otherAssetIndexTwo, disposalIndexTwo), SectionJourneyStatus.Completed)
 
+  private val noDisposalsUserAnswers = defaultUserAnswers
+    .unsafeSet(OtherAssetsDisposalPage(srn), false)
+    // Other Assets #1
+    .unsafeSet(WhatIsOtherAssetPage(srn, otherAssetIndexOne), nameOfAsset)
+    .unsafeSet(OtherAssetsCompleted(srn, otherAssetIndexOne), SectionCompleted)
+    // Other Assets #2
+    .unsafeSet(WhatIsOtherAssetPage(srn, otherAssetIndexTwo), nameOfAsset)
+    .unsafeSet(OtherAssetsCompleted(srn, otherAssetIndexTwo), SectionCompleted)
+    // fb / submission date
+    .unsafeSet(FbVersionPage(srn), "002")
+    .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
@@ -118,7 +130,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
           page,
           otherAssetsDisposalsWithIndexes,
           completedUserAnswers,
-          viewOnlyUpdated = false
+          schemeName,
+          viewOnlyViewModel = None
         )
       )
     }.withName("Completed Journey"))
@@ -149,29 +162,34 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
       .unsafeSet(WhatIsOtherAssetPage(srn, otherAssetIndexOne), nameOfAsset)
 
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = false,
+      year = yearString,
+      currentVersion = submissionNumberTwo,
+      previousVersion = submissionNumberOne,
+      compilationOrSubmissionDate = Some(submissionDateTwo)
+    )
+
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[ListView].apply(
-            form(new YesNoPageFormProvider()),
+            form(injected[YesNoPageFormProvider]),
             viewModel(
               srn,
               mode = ViewOnlyMode,
               page,
               otherAssetsDisposalsWithIndexes,
               completedUserAnswers,
-              viewOnlyUpdated = false,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              schemeName,
+              viewOnlyViewModel = Some(viewOnlyViewModel)
             )
           )
-      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
+      }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
     )
 
     val updatedUserAnswers = currentUserAnswers
-      .unsafeSet(WhatIsOtherAssetPage(srn, otherAssetIndexOne), nameOfAsset)
+      .unsafeSet(AssetSaleIndependentValuationPage(srn, otherAssetIndexOne, disposalIndexOne), true)
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -183,15 +201,33 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               page,
               otherAssetsDisposalsWithIndexes,
-              completedUserAnswers,
-              viewOnlyUpdated = false,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              updatedUserAnswers,
+              schemeName,
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    act.like(
+      renderView(
+        onPageLoadViewOnly,
+        userAnswers = noDisposalsUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[ListView].apply(
+          form(new YesNoPageFormProvider()),
+          viewModel(
+            srn,
+            mode = ViewOnlyMode,
+            page,
+            Map(),
+            noDisposalsUserAnswers,
+            schemeName,
+            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+          )
+        )
+      }.withName("OnPageLoadViewOnly renders ok with no disposals")
     )
 
     act.like(

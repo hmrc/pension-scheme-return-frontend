@@ -46,7 +46,6 @@ import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDateTime
 import javax.inject.Named
 
 class OtherAssetsListController @Inject()(
@@ -76,38 +75,44 @@ class OtherAssetsListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = request.previousUserAnswers match {
+        case Some(previousUserAnswers) =>
+          getCompletedOrUpdatedTaskListStatus(
+            request.userAnswers,
+            previousUserAnswers,
+            pages.nonsipp.otherassetsheld.Paths.otherAssetsTransactions
+          ) == Updated
+        case _ => false
+      },
+      year = year,
+      currentVersion = current,
+      previousVersion = previous,
+      compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+    )
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))(implicitly)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+    implicit request: DataRequest[AnyContent]
+  ): Result = {
     val indexes: List[Max5000] =
       request.userAnswers.map(OtherAssetsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
 
-    if (indexes.nonEmpty) {
+    if (indexes.nonEmpty || mode.isViewOnlyMode) {
       otherAssetsData(srn, indexes).map { data =>
         val filledForm =
           request.userAnswers.get(OtherAssetsListPage(srn)).fold(form)(form.fill)
         Ok(
           view(
             filledForm,
-            viewModel(
+            OtherAssetsListController.viewModel(
               srn,
               page,
               mode,
               data,
-              viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-                getCompletedOrUpdatedTaskListStatus(
-                  request.userAnswers,
-                  request.previousUserAnswers.get,
-                  pages.nonsipp.otherassetsheld.Paths.otherAssetsTransactions
-                ) == Updated
-              } else {
-                false
-              },
-              optYear = request.year,
-              optCurrentVersion = request.currentVersion,
-              optPreviousVersion = request.previousVersion,
-              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+              request.schemeDetails.schemeName,
+              viewOnlyViewModel
             )
           )
         )
@@ -135,7 +140,7 @@ class OtherAssetsListController @Inject()(
             errors => {
               otherAssetsData(srn, indexes)
                 .map { data =>
-                  BadRequest(view(errors, viewModel(srn, page, mode, data, viewOnlyUpdated = false, None, None, None)))
+                  BadRequest(view(errors, viewModel(srn, page, mode, data, request.schemeDetails.schemeName)))
                 }
                 .merge
                 .pure[Future]
@@ -192,13 +197,13 @@ class OtherAssetsListController @Inject()(
 
   private def otherAssetsData(srn: Srn, indexes: List[Max5000])(
     implicit req: DataRequest[_]
-  ): Either[Result, List[OtherAssetsData]] =
+  ): Either[Result, List[OtherAssetsListController.OtherAssetsData]] =
     indexes
       .sortBy(x => x.value)
       .map { index =>
         for {
           nameOfOtherAssets <- requiredPage(WhatIsOtherAssetPage(srn, index))
-        } yield OtherAssetsData(index, nameOfOtherAssets)
+        } yield OtherAssetsListController.OtherAssetsData(index, nameOfOtherAssets)
       }
       .sequence
 }
@@ -213,38 +218,47 @@ object OtherAssetsListController {
     srn: Srn,
     mode: Mode,
     memberList: List[OtherAssetsData],
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel],
+    schemeName: String
   ): List[ListRow] =
-    memberList.map {
-      case OtherAssetsData(index, nameOfOtherAssets) =>
-        val otherAssetsMessage =
-          Message("otherAssets.list.row", nameOfOtherAssets.show)
-
-        if (mode.isViewOnlyMode) {
-          (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-            case (ViewOnlyMode, Some(year), Some(current), Some(previous)) =>
-              ListRow.view(
-                otherAssetsMessage,
-                controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoadViewOnly(srn, index, year, current, previous)
-                  .url,
-                Message("otherAssets.list.row.change.hiddenText", otherAssetsMessage)
-              )
-          }
-        } else {
-          ListRow(
-            otherAssetsMessage,
-            changeUrl = controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-              .onPageLoad(srn, index, CheckMode)
-              .url,
-            changeHiddenText = Message("otherAssets.list.row.change.hiddenText", otherAssetsMessage),
-            removeUrl = controllers.nonsipp.otherassetsheld.routes.RemoveOtherAssetController
-              .onPageLoad(srn, index, NormalMode)
-              .url,
-            removeHiddenText = Message("otherAssets.list.row.remove.hiddenText", otherAssetsMessage)
+    (memberList, mode) match {
+      case (Nil, mode) if mode.isViewOnlyMode =>
+        List(
+          ListRow.viewNoLink(
+            Message("otherAssets.list.view.none", schemeName),
+            "otherAssets.list.view.none.value"
           )
+        )
+      case (Nil, mode) if !mode.isViewOnlyMode =>
+        List()
+      case (list, _) =>
+        list.map {
+          case OtherAssetsData(index, nameOfOtherAssets) =>
+            val otherAssetsMessage =
+              Message("otherAssets.list.row", nameOfOtherAssets.show)
+
+            (mode, viewOnlyViewModel) match {
+              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
+                ListRow.view(
+                  otherAssetsMessage,
+                  controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
+                    .onPageLoadViewOnly(srn, index, year, current, previous)
+                    .url,
+                  Message("otherAssets.list.row.change.hiddenText", otherAssetsMessage)
+                )
+              case _ =>
+                ListRow(
+                  otherAssetsMessage,
+                  changeUrl = controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
+                    .onPageLoad(srn, index, CheckMode)
+                    .url,
+                  changeHiddenText = Message("otherAssets.list.row.change.hiddenText", otherAssetsMessage),
+                  removeUrl = controllers.nonsipp.otherassetsheld.routes.RemoveOtherAssetController
+                    .onPageLoad(srn, index, NormalMode)
+                    .url,
+                  removeHiddenText = Message("otherAssets.list.row.remove.hiddenText", otherAssetsMessage)
+                )
+            }
         }
     }
 
@@ -253,15 +267,14 @@ object OtherAssetsListController {
     page: Int,
     mode: Mode,
     data: List[OtherAssetsData],
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    schemeName: String,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
   ): FormPageViewModel[ListViewModel] = {
     val lengthOfData = data.length
 
     val (title, heading) = ((mode, lengthOfData) match {
+      case (ViewOnlyMode, numberOfLoans) if numberOfLoans == 0 =>
+        ("otherAssets.list.view.title", "otherAssets.list.view.heading.none")
       case (ViewOnlyMode, lengthOfData) if lengthOfData > 1 =>
         ("otherAssets.list.view.title.plural", "otherAssets.list.view.heading.plural")
       case (ViewOnlyMode, _) =>
@@ -279,11 +292,11 @@ object OtherAssetsListController {
       currentPage = page,
       pageSize = Constants.pageSize,
       totalSize = data.size,
-      call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-        case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+      call = viewOnlyViewModel match {
+        case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
             .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
-        case _ =>
+        case None =>
           controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onPageLoad(srn, _, mode)
       }
     )
@@ -302,7 +315,7 @@ object OtherAssetsListController {
       description = Some(ParagraphMessage("otherAssets.list.description")),
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows = rows(srn, mode, data, optYear, optCurrentVersion, optPreviousVersion),
+        rows = rows(srn, mode, data, viewOnlyViewModel, schemeName),
         radioText = Message("otherAssets.list.radios"),
         showRadios = data.size < Constants.maxOtherAssetsTransactions,
         showInsetWithRadios = !(data.length < Constants.maxOtherAssetsTransactions),
@@ -322,41 +335,34 @@ object OtherAssetsListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit = controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onSubmit(srn, page, mode),
-      optViewOnlyDetails = Option.when(mode.isViewOnlyMode) {
+      optViewOnlyDetails = viewOnlyViewModel.map { viewOnly =>
         ViewOnlyDetailsViewModel(
-          updated = viewOnlyUpdated,
-          link = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion))
-                if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
-              Some(
-                LinkMessage(
-                  "otherAssets.list.view.link",
-                  controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
-                    .onPreviousViewOnly(
-                      srn,
-                      page,
-                      year,
-                      currentVersion,
-                      previousVersion
-                    )
-                    .url
-                )
+          updated = viewOnly.viewOnlyUpdated,
+          link = if (viewOnly.currentVersion > 1 && viewOnly.previousVersion > 0) {
+            Some(
+              LinkMessage(
+                "otherAssets.list.view.link",
+                controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
+                  .onPreviousViewOnly(
+                    srn,
+                    page,
+                    viewOnly.year,
+                    viewOnly.currentVersion,
+                    viewOnly.previousVersion
+                  )
+                  .url
               )
-            case _ => None
+            )
+          } else {
+            None
           },
-          submittedText =
-            compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+          submittedText = viewOnly.compilationOrSubmissionDate
+            .fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
           title = title,
           heading = heading,
           buttonText = "site.return.to.tasklist",
-          onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-              controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
-                .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
-            case _ =>
-              controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
-                .onSubmit(srn, page, mode)
-          }
+          onSubmit = controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
+            .onSubmitViewOnly(srn, viewOnly.year, viewOnly.currentVersion, viewOnly.previousVersion)
         )
       }
     )

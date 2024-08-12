@@ -74,14 +74,13 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, index), SchemeHoldBond.Acquisition)
       .unsafeSet(CostOfBondsPage(srn, index), money)
 
-  private val bondsData = List(
-    BondsData(
-      index,
-      nameOfBonds = "Name",
-      acquisitionType = SchemeHoldBond.Acquisition,
-      costOfBonds = money
-    )
+  private val bondData = BondsData(
+    index,
+    nameOfBonds = "Name",
+    acquisitionType = SchemeHoldBond.Acquisition,
+    costOfBonds = money
   )
+  private val bondsData = List(bondData)
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
@@ -99,7 +98,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       injected[ListView]
         .apply(
           form(injected[YesNoPageFormProvider]),
-          viewModel(srn, page, NormalMode, bondsData, viewOnlyUpdated = false)
+          viewModel(srn, page, NormalMode, bondsData, schemeName)
         )
     })
 
@@ -108,7 +107,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
         injected[ListView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, page, NormalMode, bondsData, viewOnlyUpdated = false)
+            viewModel(srn, page, NormalMode, bondsData, schemeName)
           )
       }
     )
@@ -129,15 +128,18 @@ class BondsListControllerSpec extends ControllerBaseSpec {
     val currentUserAnswers = userAnswers
       .unsafeSet(FbVersionPage(srn), "002")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
-      .unsafeSet(BondsCompleted(srn, index), SectionCompleted)
-      .unsafeSet(NameOfBondsPage(srn, index), "Name")
-      .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, index), SchemeHoldBond.Acquisition)
-      .unsafeSet(CostOfBondsPage(srn, index), money)
 
     val previousUserAnswers = currentUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
-      .unsafeSet(BondsCompleted(srn, index), SectionCompleted)
+
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = false,
+      year = yearString,
+      currentVersion = submissionNumberTwo,
+      previousVersion = submissionNumberOne,
+      compilationOrSubmissionDate = Some(submissionDateTwo)
+    )
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -149,18 +151,15 @@ class BondsListControllerSpec extends ControllerBaseSpec {
               page,
               mode = ViewOnlyMode,
               bondsData,
-              viewOnlyUpdated = false,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              schemeName,
+              Some(viewOnlyViewModel)
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
 
     val updatedUserAnswers = currentUserAnswers
-      .unsafeSet(BondsCompleted(srn, index), SectionCompleted)
+      .unsafeSet(NameOfBondsPage(srn, index), "Name")
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(defaultUserAnswers)) {
@@ -171,12 +170,9 @@ class BondsListControllerSpec extends ControllerBaseSpec {
               srn,
               page,
               mode = ViewOnlyMode,
-              bondsData,
-              viewOnlyUpdated = true,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              List(bondData.copy(nameOfBonds = "Name")),
+              schemeName,
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
