@@ -63,7 +63,7 @@ class TaskListController @Inject()(
             )
             .toList
             .nonEmpty
-          noChangesSincePreviousVersion = if (!hasHistory) {
+          noChangesSincePreviousVersion = if (!hasHistory || request.previousUserAnswers.isEmpty) {
             true
           } else {
             userAnswersUnchangedAllSections(
