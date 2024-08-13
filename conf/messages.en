@@ -2200,9 +2200,15 @@ borrowList.inset = You cannot add another instance of borrowing as you have ente
 
 borrowList.view.title = {0} instance of borrowing
 borrowList.view.title.plural = {0} instances of borrowing
+borrowList.view.title.none = Borrowing
 borrowList.view.heading = {0} instance of borrowing
 borrowList.view.heading.plural = {0} instances of borrowing
+borrowList.view.heading.none = Borrowing
 borrowList.view.link = View previous version of borrowing (opens in new tab)
+borrowList.view.none = Did {0} make any loans, or have any loans outstanding, during the period of this return?
+borrowList.view.none.value = No
+borrowList.view.none = Did {0} borrow any money during the period of this return?
+borrowList.view.none.value = No
 
 otherEmployeeDescription.title = Provide a brief description of the employer
 otherEmployeeDescription.heading = Provide a brief description of {0}
@@ -2777,9 +2783,13 @@ sharesList.row.remove.hiddenText = Remove {0}
 
 sharesList.view.title = View share transactions
 sharesList.view.title.plural = View share transactions
+sharesList.view.title.none = Share transactions
 sharesList.view.heading = {0} share transaction
 sharesList.view.heading.plural = {0} share transactions
+sharesList.view.heading.none = Share transactions
 sharesList.view.link = View previous version of share transactions (opens in new tab)
+sharesList.view.none = Did {0} hold any shares in a sponsoring employer, acquired from a connected party, or unquoted shares during the period of this return?
+sharesList.view.none.value = No
 
 sharesList.sharesType.sponsoringEmployer = Shares in a sponsoring employer
 sharesList.sharesType.unquoted = Unquoted shares

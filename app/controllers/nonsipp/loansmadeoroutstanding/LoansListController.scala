@@ -215,15 +215,17 @@ object LoansListController {
     viewOnlyViewModel: Option[ViewOnlyViewModel],
     schemeName: String
   ): List[ListRow] =
-    recipients match {
-      case Nil =>
+    (recipients, mode) match {
+      case (Nil, mode) if mode.isViewOnlyMode =>
         List(
           ListRow.viewNoLink(
             Message("loansList.viewOnly.none", schemeName),
             "loansList.viewOnly.none.value"
           )
         )
-      case list =>
+      case (Nil, mode) if !mode.isViewOnlyMode =>
+        List()
+      case (list, _) =>
         list.flatMap {
           case (index, recipientName, totalLoan) =>
             if (mode.isViewOnlyMode) {

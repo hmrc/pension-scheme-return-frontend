@@ -213,19 +213,18 @@ class LoansListControllerSpec extends ControllerBaseSpec {
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = noLoansUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-        implicit app =>
-          implicit request =>
-            injected[ListView].apply(
-              form(new YesNoPageFormProvider()),
-              viewModel(
-                srn,
-                page,
-                mode = ViewOnlyMode,
-                List(),
-                schemeName,
-                viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
-              )
+        implicit app => implicit request =>
+          injected[ListView].apply(
+            form(new YesNoPageFormProvider()),
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              List(),
+              schemeName,
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
             )
+          )
       }.withName("OnPageLoadViewOnly renders ok with no disposals")
     )
 

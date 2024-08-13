@@ -22,13 +22,13 @@ import com.google.inject.Inject
 import utils.ListUtils._
 import config.Refined.Max5000
 import controllers.PSRController
+import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import _root_.config.Constants
 import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import pages.nonsipp.shares._
 import play.api.mvc._
-import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
-import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
 import cats.implicits.{catsSyntaxApplicativeId, toShow, toTraverseOps}
@@ -46,7 +46,7 @@ import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDate
 import javax.inject.Named
 
 class SharesListController @Inject()(
@@ -75,37 +75,43 @@ class SharesListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = request.previousUserAnswers match {
+        case Some(previousUserAnswers) =>
+          getCompletedOrUpdatedTaskListStatus(
+            request.userAnswers,
+            previousUserAnswers,
+            pages.nonsipp.shares.Paths.shareTransactions
+          ) == Updated
+        case _ => false
+      },
+      year = year,
+      currentVersion = current,
+      previousVersion = previous,
+      compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+    )
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))(implicitly)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+    implicit request: DataRequest[AnyContent]
+  ): Result = {
     val indexes: List[Max5000] = request.userAnswers.map(SharesCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
 
-    if (indexes.nonEmpty) {
+    if (indexes.nonEmpty || mode.isViewOnlyMode) {
       sharesData(srn, indexes).map { data =>
         val filledForm =
           request.userAnswers.get(SharesListPage(srn)).fold(form)(form.fill)
         Ok(
           view(
             filledForm,
-            viewModel(
+            SharesListController.viewModel(
               srn,
               page,
               mode,
               data,
-              viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-                getCompletedOrUpdatedTaskListStatus(
-                  request.userAnswers,
-                  request.previousUserAnswers.get,
-                  pages.nonsipp.shares.Paths.shareTransactions
-                ) == Updated
-              } else {
-                false
-              },
-              optYear = request.year,
-              optCurrentVersion = request.currentVersion,
-              optPreviousVersion = request.previousVersion,
-              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+              request.schemeDetails.schemeName,
+              viewOnlyViewModel
             )
           )
         )
@@ -132,7 +138,7 @@ class SharesListController @Inject()(
             errors => {
               sharesData(srn, indexes)
                 .map { data =>
-                  BadRequest(view(errors, viewModel(srn, page, mode, data, false, None, None, None)))
+                  BadRequest(view(errors, viewModel(srn, page, mode, data, "")))
                 }
                 .merge
                 .pure[Future]
@@ -212,46 +218,56 @@ object SharesListController {
     srn: Srn,
     mode: Mode,
     memberList: List[SharesData],
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel],
+    schemeName: String
   ): List[ListRow] =
-    memberList.map {
-      case SharesData(index, typeOfShares, companyName, acquisition, acquisitionDate) =>
-        val sharesType = typeOfShares match {
-          case TypeOfShares.SponsoringEmployer => "sharesList.sharesType.sponsoringEmployer"
-          case TypeOfShares.Unquoted => "sharesList.sharesType.unquoted"
-          case TypeOfShares.ConnectedParty => "sharesList.sharesType.connectedParty"
-        }
-        val acquisitionType = acquisition match {
-          case SchemeHoldShare.Acquisition => "sharesList.acquisition.acquired"
-          case SchemeHoldShare.Contribution => "sharesList.acquisition.contributed"
-          case SchemeHoldShare.Transfer => "sharesList.acquisition.transferred"
-        }
-        val sharesMessage = acquisitionDate match {
-          case Some(date) => Message("sharesList.row.withDate", sharesType, companyName, acquisitionType, date.show)
-          case None => Message("sharesList.row", sharesType, companyName, acquisitionType)
-        }
-
-        if (mode.isViewOnlyMode) {
-          (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-            case (ViewOnlyMode, Some(year), Some(current), Some(previous)) =>
-              ListRow.view(
-                sharesMessage,
-                controllers.nonsipp.shares.routes.SharesCYAController
-                  .onPageLoadViewOnly(srn, index, year, current, previous)
-                  .url,
-                Message("sharesList.row.change.hiddenText", sharesMessage)
-              )
-          }
-        } else {
-          ListRow(
-            sharesMessage,
-            changeUrl = controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode).url,
-            changeHiddenText = Message("sharesList.row.change.hiddenText", sharesMessage),
-            removeUrl = routes.RemoveSharesController.onPageLoad(srn, index, mode).url,
-            removeHiddenText = Message("sharesList.row.remove.hiddenText", sharesMessage)
+    (memberList, mode) match {
+      case (Nil, mode) if mode.isViewOnlyMode =>
+        List(
+          ListRow.viewNoLink(
+            Message("sharesList.view.none", schemeName),
+            "sharesList.view.none.value"
           )
+        )
+      case (Nil, mode) if !mode.isViewOnlyMode =>
+        List()
+      case (list, _) =>
+        list.map {
+          case SharesData(index, typeOfShares, companyName, acquisition, acquisitionDate) =>
+            val sharesType = typeOfShares match {
+              case TypeOfShares.SponsoringEmployer => "sharesList.sharesType.sponsoringEmployer"
+              case TypeOfShares.Unquoted => "sharesList.sharesType.unquoted"
+              case TypeOfShares.ConnectedParty => "sharesList.sharesType.connectedParty"
+            }
+            val acquisitionType = acquisition match {
+              case SchemeHoldShare.Acquisition => "sharesList.acquisition.acquired"
+              case SchemeHoldShare.Contribution => "sharesList.acquisition.contributed"
+              case SchemeHoldShare.Transfer => "sharesList.acquisition.transferred"
+            }
+            val sharesMessage = acquisitionDate match {
+              case Some(date) => Message("sharesList.row.withDate", sharesType, companyName, acquisitionType, date.show)
+              case None => Message("sharesList.row", sharesType, companyName, acquisitionType)
+            }
+
+            (mode, viewOnlyViewModel) match {
+              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
+                ListRow.view(
+                  sharesMessage,
+                  controllers.nonsipp.shares.routes.SharesCYAController
+                    .onPageLoadViewOnly(srn, index, year, current, previous)
+                    .url,
+                  Message("sharesList.row.change.hiddenText", sharesMessage)
+                )
+              case _ =>
+                ListRow(
+                  sharesMessage,
+                  changeUrl =
+                    controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode).url,
+                  changeHiddenText = Message("sharesList.row.change.hiddenText", sharesMessage),
+                  removeUrl = routes.RemoveSharesController.onPageLoad(srn, index, mode).url,
+                  removeHiddenText = Message("sharesList.row.remove.hiddenText", sharesMessage)
+                )
+            }
         }
     }
 
@@ -260,16 +276,15 @@ object SharesListController {
     page: Int,
     mode: Mode,
     data: List[SharesData],
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    schemeName: String,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
   ): FormPageViewModel[ListViewModel] = {
 
     val lengthOfData = data.length
 
     val (title, heading) = ((mode, lengthOfData) match {
+      case (ViewOnlyMode, lengthOfData) if lengthOfData == 0 =>
+        ("sharesList.view.title.none", "sharesList.view.heading.none")
       case (ViewOnlyMode, lengthOfData) if lengthOfData > 1 =>
         ("sharesList.view.title.plural", "sharesList.view.heading.plural")
       case (ViewOnlyMode, _) =>
@@ -287,8 +302,8 @@ object SharesListController {
       currentPage = page,
       pageSize = Constants.pageSize,
       totalSize = data.size,
-      call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-        case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+      call = viewOnlyViewModel match {
+        case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.SharesListController.onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
         case _ =>
           routes.SharesListController.onPageLoad(srn, _, NormalMode)
@@ -310,7 +325,7 @@ object SharesListController {
       description = Some(ParagraphMessage("sharesList.description")),
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows = rows(srn, mode, data, optYear, optCurrentVersion, optPreviousVersion),
+        rows = rows(srn, mode, data, viewOnlyViewModel, schemeName),
         radioText = Message("sharesList.radios"),
         showRadios = data.size < Constants.maxSharesTransactions,
         showInsetWithRadios = !(data.length < Constants.maxSharesTransactions),
@@ -330,41 +345,34 @@ object SharesListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit = controllers.nonsipp.shares.routes.SharesListController.onSubmit(srn, page, mode),
-      optViewOnlyDetails = Option.when(mode.isViewOnlyMode) {
+      optViewOnlyDetails = viewOnlyViewModel.map { viewOnly =>
         ViewOnlyDetailsViewModel(
-          updated = viewOnlyUpdated,
-          link = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion))
-                if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
-              Some(
-                LinkMessage(
-                  "sharesList.view.link",
-                  controllers.nonsipp.shares.routes.SharesListController
-                    .onPreviousViewOnly(
-                      srn,
-                      page,
-                      year,
-                      currentVersion,
-                      previousVersion
-                    )
-                    .url
-                )
+          updated = viewOnly.viewOnlyUpdated,
+          link = if (viewOnly.currentVersion > 1 && viewOnly.previousVersion > 0) {
+            Some(
+              LinkMessage(
+                "sharesList.view.link",
+                controllers.nonsipp.shares.routes.SharesListController
+                  .onPreviousViewOnly(
+                    srn,
+                    page,
+                    viewOnly.year,
+                    viewOnly.currentVersion,
+                    viewOnly.previousVersion
+                  )
+                  .url
               )
-            case _ => None
+            )
+          } else {
+            None
           },
-          submittedText =
-            compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+          submittedText = viewOnly.compilationOrSubmissionDate
+            .fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
           title = title,
           heading = heading,
           buttonText = "site.return.to.tasklist",
-          onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-              controllers.nonsipp.shares.routes.SharesListController
-                .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
-            case _ =>
-              controllers.nonsipp.shares.routes.SharesListController
-                .onSubmit(srn, page, mode)
-          }
+          onSubmit = controllers.nonsipp.shares.routes.SharesListController
+            .onSubmitViewOnly(srn, viewOnly.year, viewOnly.currentVersion, viewOnly.previousVersion)
         )
       }
     )
