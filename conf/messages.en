@@ -1799,9 +1799,13 @@ landOrPropertyList.pagination.label = Showing {0} - {1} of {2} land or propertie
 landOrPropertyList.row.change.hiddenText = {0}
 landOrPropertyList.row.remove.hiddenText = {0}
 landOrPropertyList.viewOnly.title = View land or property
+landOrPropertyList.viewOnly.title.none = View land or property
 landOrPropertyList.viewOnly.heading = {0} land or property
+landOrPropertyList.viewOnly.heading.none = Land or property
 landOrPropertyList.viewOnly.heading.plural = {0} land or properties
 landOrPropertyList.viewOnly.link = View previous version of land or property (opens in new tab)
+landOrPropertyList.viewOnly.none = Did {0} hold any land or property during the period of this return?
+landOrPropertyList.viewOnly.none.value = No
 
 landOrPropertyStillHeld.title = Is any part of the land or property still held by the scheme?
 landOrPropertyStillHeld.heading = Is any part of {0} still held by {1}?
@@ -2783,7 +2787,7 @@ sharesList.row.remove.hiddenText = Remove {0}
 
 sharesList.view.title = View share transactions
 sharesList.view.title.plural = View share transactions
-sharesList.view.title.none = Share transactions
+sharesList.view.title.none = View share transactions
 sharesList.view.heading = {0} share transaction
 sharesList.view.heading.plural = {0} share transactions
 sharesList.view.heading.none = Share transactions

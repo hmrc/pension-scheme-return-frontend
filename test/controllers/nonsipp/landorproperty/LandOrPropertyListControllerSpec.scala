@@ -68,6 +68,11 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(RemovePropertyPage(srn, indexTwo), true)
     .unsafeSet(LandOrPropertyHeldPage(srn), true)
 
+  private val noUserAnswers = defaultUserAnswers
+    .unsafeSet(LandOrPropertyHeldPage(srn), false)
+    .unsafeSet(FbVersionPage(srn), "002")
+    .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
   private lazy val onPageLoad = routes.LandOrPropertyListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.LandOrPropertyListController.onSubmit(srn, page = 1, NormalMode)
   private lazy val onLandOrPropertyHeldPageLoad = routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode)
@@ -105,7 +110,7 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
           1,
           NormalMode,
           addresses,
-          viewOnlyUpdated = false
+          schemeName
         )
       )
     }.withName("Completed Journey"))
@@ -142,6 +147,14 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
 
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = false,
+      year = yearString,
+      currentVersion = submissionNumberTwo,
+      previousVersion = submissionNumberOne,
+      compilationOrSubmissionDate = Some(submissionDateTwo)
+    )
+
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
@@ -152,18 +165,15 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
               page,
               mode = ViewOnlyMode,
               addresses,
-              viewOnlyUpdated = false,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              schemeName,
+              Some(viewOnlyViewModel)
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
 
     val updatedUserAnswers = currentUserAnswers
-      .unsafeSet(LandPropertyInUKPage(srn, indexOne), true)
+      .unsafeSet(IsLesseeConnectedPartyPage(srn, indexOne), false)
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(defaultUserAnswers)) {
@@ -175,14 +185,31 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
               page,
               mode = ViewOnlyMode,
               addresses,
-              viewOnlyUpdated = true,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              schemeName,
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    act.like(
+      renderView(
+        onPageLoadViewOnly,
+        userAnswers = noUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[ListView].apply(
+          form(new YesNoPageFormProvider()),
+          viewModel(
+            srn,
+            page,
+            mode = ViewOnlyMode,
+            Map(),
+            schemeName,
+            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+          )
+        )
+      }.withName("OnPageLoadViewOnly renders ok with no land or property")
     )
 
     act.like(

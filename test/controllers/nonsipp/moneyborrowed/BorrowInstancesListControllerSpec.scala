@@ -193,29 +193,29 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
             viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
           )
         )
-      }.withName("OnPageLoadViewOnly renders ok with no disposals")
+      }.withName("OnPageLoadViewOnly renders ok with no borrowings")
     )
 
-    //    act.like(
-//      redirectToPage(
-//        onSubmitViewOnly,
-//        controllers.nonsipp.routes.ViewOnlyTaskListController
-//          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
-//      ).after(
-//          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-//        )
-//        .withName("Submit redirects to view only tasklist")
-//    )
-//
-//    act.like(
-//      redirectToPage(
-//        onPreviousViewOnly,
-//        controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
-//          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-//      ).withName(
-//        "Submit previous view only redirects to the controller with parameters for the previous submission"
-//      )
-//    )
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName("Submit redirects to view only tasklist")
+    )
+
+    act.like(
+      redirectToPage(
+        onPreviousViewOnly,
+        controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+      ).withName(
+        "Submit previous view only redirects to the controller with parameters for the previous submission"
+      )
+    )
   }
 
 }

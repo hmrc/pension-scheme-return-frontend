@@ -44,7 +44,6 @@ import play.api.data.Form
 
 import scala.concurrent.Future
 
-import java.time.LocalDateTime
 import javax.inject.Named
 
 class LandOrPropertyListController @Inject()(
@@ -71,10 +70,28 @@ class LandOrPropertyListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = request.previousUserAnswers match {
+        case Some(previousUserAnswers) =>
+          getCompletedOrUpdatedTaskListStatus(
+            request.userAnswers,
+            previousUserAnswers,
+            pages.nonsipp.landorproperty.Paths.landOrProperty,
+            Some("disposedPropertyTransaction")
+          ) == Updated
+        case _ => false
+      },
+      year = year,
+      currentVersion = current,
+      previousVersion = previous,
+      compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+    )
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))(implicitly)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+    implicit request: DataRequest[AnyContent]
+  ): Result = {
     val userAnswers = request.userAnswers
     val (status, incompleteLandOrPropertyUrl) = getLandOrPropertyTaskListStatusAndLink(userAnswers, srn)
     if (status == TaskListStatus.Completed) {
@@ -85,19 +102,8 @@ class LandOrPropertyListController @Inject()(
           page,
           mode,
           addresses,
-          viewOnlyUpdated = if (mode.isViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-            getCompletedOrUpdatedTaskListStatus(
-              request.userAnswers,
-              request.previousUserAnswers.get,
-              pages.nonsipp.landorproperty.Paths.landOrProperty
-            ) == Updated
-          } else {
-            false
-          },
-          optYear = request.year,
-          optCurrentVersion = request.currentVersion,
-          optPreviousVersion = request.previousVersion,
-          compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          request.schemeDetails.schemeName,
+          viewOnlyViewModel
         )
       Ok(view(form, viewModel))
     } else if (status == TaskListStatus.InProgress) {
@@ -114,7 +120,7 @@ class LandOrPropertyListController @Inject()(
       Redirect(navigator.nextPage(LandOrPropertyListPage(srn, addLandOrProperty = false), mode, request.userAnswers))
     } else {
       val viewModel =
-        LandOrPropertyListController.viewModel(srn, page, mode, addresses, viewOnlyUpdated = false, None, None, None)
+        LandOrPropertyListController.viewModel(srn, page, mode, addresses, "")
 
       form
         .bindFromRequest()
@@ -156,59 +162,79 @@ object LandOrPropertyListController {
     srn: Srn,
     mode: Mode,
     addresses: Map[String, Address],
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel],
+    schemeName: String
   ): List[ListRow] =
-    addresses
-      .flatMap {
-        case (index, address) =>
-          refineV[Max5000.Refined](index.toInt + 1).fold(
-            _ => Nil,
-            index =>
-              if (mode.isViewOnlyMode) {
-                (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-                  case (ViewOnlyMode, Some(year), Some(current), Some(previous)) =>
+    if (addresses.isEmpty && mode.isViewOnlyMode) {
+      List(
+        ListRow.viewNoLink(
+          Message("landOrPropertyList.viewOnly.none", schemeName),
+          "landOrPropertyList.viewOnly.none.value"
+        )
+      )
+    } else if (addresses.isEmpty && !mode.isViewOnlyMode) {
+      List()
+    } else {
+      addresses
+        .flatMap {
+          case (index, address) =>
+            refineV[Max5000.Refined](index.toInt + 1).fold(
+              _ => Nil,
+              index =>
+                (mode, viewOnlyViewModel) match {
+                  case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
                     List(
                       index -> ListRow.view(
                         address.addressLine1,
-                        routes.LandOrPropertyCYAController.onPageLoadViewOnly(srn, index, year, current, previous).url,
+                        routes.LandOrPropertyCYAController
+                          .onPageLoadViewOnly(srn, index, year, current, previous)
+                          .url,
                         Message("landOrPropertyList.row.change.hiddenText", address.addressLine1)
                       )
                     )
-                  case _ => Nil
+                  case _ =>
+                    List(
+                      index -> ListRow(
+                        address.addressLine1,
+                        changeUrl = routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckMode).url,
+                        changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1),
+                        removeUrl = routes.RemovePropertyController.onPageLoad(srn, index, mode).url,
+                        removeHiddenText = Message("landOrPropertyList.row.remove.hiddenText", address.addressLine1)
+                      )
+                    )
                 }
-              } else {
-                List(
-                  index -> ListRow(
-                    address.addressLine1,
-                    changeUrl = routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckMode).url,
-                    changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1),
-                    removeUrl = routes.RemovePropertyController.onPageLoad(srn, index, mode).url,
-                    removeHiddenText = Message("landOrPropertyList.row.remove.hiddenText", address.addressLine1)
-                  )
-                )
-              }
-          )
-      }
-      .toList
-      .sortBy { case (index, _) => index.value }
-      .map { case (_, listRow) => listRow }
+            )
+        }
+        .toList
+        .sortBy { case (index, _) => index.value }
+        .map { case (_, listRow) => listRow }
+    }
 
   def viewModel(
     srn: Srn,
     page: Int,
     mode: Mode,
     addresses: Map[String, Address],
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    schemeName: String,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
   ): FormPageViewModel[ListViewModel] = {
 
-    val title = if (addresses.size == 1) "landOrPropertyList.title" else "landOrPropertyList.title.plural"
-    val heading = if (addresses.size == 1) "landOrPropertyList.heading" else "landOrPropertyList.heading.plural"
+    val (title, heading) = ((mode, addresses.size) match {
+      case (ViewOnlyMode, addressesSize) if addressesSize == 0 =>
+        ("landOrPropertyList.viewOnly.title.none", "landOrPropertyList.viewOnly.heading.none")
+      case (ViewOnlyMode, addressesSize) if addressesSize > 1 =>
+        ("landOrPropertyList.viewOnly.title.plural", "landOrPropertyList.viewOnly.heading.plural")
+      case (ViewOnlyMode, _) =>
+        ("landOrPropertyList.viewOnly.title", "landOrPropertyList.viewOnly.heading")
+      case (_, addressesSize) if addressesSize > 1 =>
+        ("landOrPropertyList.title.plural", "landOrPropertyList.heading.plural")
+      case _ =>
+        ("landOrPropertyList.title", "landOrPropertyList.heading")
+    }) match {
+      case (title, heading) =>
+        (Message(title, addresses.size), Message(heading, addresses.size))
+    }
+
     val paragraph =
       if (addresses.size < maxLandOrProperties) Some(ParagraphMessage("landOrPropertyList.paragraph")) else None
 
@@ -218,8 +244,8 @@ object LandOrPropertyListController {
       currentPage = currentPage,
       pageSize = Constants.landOrPropertiesSize,
       addresses.size,
-      call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-        case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+      call = viewOnlyViewModel match {
+        case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.LandOrPropertyListController.onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
         case _ =>
           routes.LandOrPropertyListController.onPageLoad(srn, _, NormalMode)
@@ -228,12 +254,12 @@ object LandOrPropertyListController {
 
     FormPageViewModel(
       mode = mode,
-      title = Message(title, addresses.size),
-      heading = Message(heading, addresses.size),
+      title = title,
+      heading = heading,
       description = paragraph,
       page = ListViewModel(
         inset = "landOrPropertyList.inset",
-        rows(srn, mode, addresses, optYear, optCurrentVersion, optPreviousVersion),
+        rows(srn, mode, addresses, viewOnlyViewModel, schemeName),
         Message("landOrPropertyList.radios"),
         showRadios = addresses.size < Constants.maxLandOrProperties,
         paginatedViewModel = Some(
@@ -252,48 +278,35 @@ object LandOrPropertyListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit = routes.LandOrPropertyListController.onSubmit(srn, page, mode),
-      optViewOnlyDetails = if (mode.isViewOnlyMode) {
-        Some(
-          ViewOnlyDetailsViewModel(
-            updated = viewOnlyUpdated,
-            link = (optYear, optCurrentVersion, optPreviousVersion) match {
-              case (Some(year), Some(currentVersion), Some(previousVersion))
-                  if optYear.nonEmpty && currentVersion > 1 && previousVersion > 0 =>
-                Some(
-                  LinkMessage(
-                    "landOrPropertyList.viewOnly.link",
-                    routes.LandOrPropertyListController
-                      .onPreviousViewOnly(
-                        srn,
-                        page,
-                        year,
-                        currentVersion,
-                        previousVersion
-                      )
-                      .url
+      optViewOnlyDetails = viewOnlyViewModel.map { viewOnly =>
+        ViewOnlyDetailsViewModel(
+          updated = viewOnly.viewOnlyUpdated,
+          link = if (viewOnly.currentVersion > 1 && viewOnly.previousVersion > 0) {
+            Some(
+              LinkMessage(
+                "landOrPropertyList.viewOnly.link",
+                routes.LandOrPropertyListController
+                  .onPreviousViewOnly(
+                    srn,
+                    page,
+                    viewOnly.year,
+                    viewOnly.currentVersion,
+                    viewOnly.previousVersion
                   )
-                )
-              case _ => None
-            },
-            submittedText =
-              compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
-            title = "landOrPropertyList.viewOnly.title",
-            heading = Message(
-              if (addresses.size == 1) "landOrPropertyList.viewOnly.heading"
-              else "landOrPropertyList.viewOnly.heading.plural",
-              addresses.size
-            ),
-            buttonText = "site.return.to.tasklist",
-            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-                routes.LandOrPropertyListController.onSubmitViewOnly(srn, year, currentVersion, previousVersion)
-              case _ =>
-                routes.LandOrPropertyListController.onSubmit(srn, page, mode)
-            }
-          )
+                  .url
+              )
+            )
+          } else {
+            None
+          },
+          submittedText = viewOnly.compilationOrSubmissionDate
+            .fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+          title = title,
+          heading = heading,
+          buttonText = "site.return.to.tasklist",
+          onSubmit = routes.LandOrPropertyListController
+            .onSubmitViewOnly(srn, viewOnly.year, viewOnly.currentVersion, viewOnly.previousVersion)
         )
-      } else {
-        None
       }
     )
   }

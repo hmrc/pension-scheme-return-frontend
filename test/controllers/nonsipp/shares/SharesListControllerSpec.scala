@@ -81,6 +81,12 @@ class SharesListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition)
       .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index), localDate)
 
+  private val noUserAnswers =
+    defaultUserAnswers
+      .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
   private val shareData = SharesData(
     index,
     typeOfShares = TypeOfShares.Unquoted,
@@ -187,6 +193,24 @@ class SharesListControllerSpec extends ControllerBaseSpec {
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[ListView]
+            .apply(
+              form(injected[YesNoPageFormProvider]),
+              viewModel(
+                srn,
+                page,
+                mode = ViewOnlyMode,
+                List(),
+                schemeName,
+                viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              )
+            )
+      }.withName("OnPageLoadViewOnly renders ok with no shares")
     )
 
     act.like(
