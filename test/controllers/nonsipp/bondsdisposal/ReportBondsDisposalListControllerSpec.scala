@@ -21,8 +21,8 @@ import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
 import views.html.ListView
 import eu.timepit.refined.refineMV
-import models.{HowDisposed, NormalMode, ViewOnlyMode}
-import pages.nonsipp.bondsdisposal.{BondsDisposalProgress, HowWereBondsDisposedOfPage}
+import models._
+import pages.nonsipp.bondsdisposal._
 import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
@@ -81,6 +81,7 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
   // Bonds data 1
     .unsafeSet(NameOfBondsPage(srn, bondIndexOne), "name")
     .unsafeSet(BondsCompleted(srn, bondIndexOne), SectionCompleted)
+    .unsafeSet(BondsDisposalPage(srn), true)
     //Bond 1 - disposal data 1
     .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne), HowDisposed.Sold)
     .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne), SectionCompleted)
@@ -113,10 +114,19 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
           numberOfDisposals,
           maxPossibleNumberOfDisposals,
           completedUserAnswers,
-          viewOnlyUpdated = false
+          schemeName,
+          viewOnlyViewModel = None
         )
       )
     }.withName("Completed Journey"))
+
+    act.like(
+      redirectToPage(
+        onPageLoad,
+        bondsDisposalPage,
+        defaultUserAnswers
+      ).withName("Not Started Journey")
+    )
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
 
@@ -127,29 +137,28 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
 
   "ReportBondsDisposalListController in view only mode" - {
 
-    val currentUserAnswers = defaultUserAnswers
+    val currentUserAnswers = completedUserAnswers
       .unsafeSet(FbVersionPage(srn), "002")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
-      // Bonds data 1
-      .unsafeSet(NameOfBondsPage(srn, bondIndexOne), "name")
-      .unsafeSet(BondsCompleted(srn, bondIndexOne), SectionCompleted)
-      //Bond 1 - disposal data 1
-      .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne), HowDisposed.Sold)
-      .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne), SectionCompleted)
-      //Bond 1 - disposal data 2
-      .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexTwo), HowDisposed.Sold)
-      .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexTwo), SectionCompleted)
 
-    val previousUserAnswers = currentUserAnswers
+    val previousUserAnswers = completedUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
       .unsafeSet(NameOfBondsPage(srn, bondIndexOne), "name")
+
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = false,
+      year = yearString,
+      currentVersion = submissionNumberTwo,
+      previousVersion = submissionNumberOne,
+      compilationOrSubmissionDate = Some(submissionDateTwo)
+    )
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[ListView].apply(
-            form(new YesNoPageFormProvider()),
+            form(injected[YesNoPageFormProvider]),
             viewModel(
               srn,
               mode = ViewOnlyMode,
@@ -158,18 +167,15 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
               numberOfDisposals,
               maxPossibleNumberOfDisposals,
               completedUserAnswers,
-              viewOnlyUpdated = false,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              schemeName,
+              viewOnlyViewModel = Some(viewOnlyViewModel)
             )
           )
-      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
+      }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
     )
 
     val updatedUserAnswers = currentUserAnswers
-      .unsafeSet(NameOfBondsPage(srn, bondIndexOne), "name")
+      .unsafeSet(IsBuyerConnectedPartyPage(srn, bondIndexOne, disposalIndexOne), true)
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -183,12 +189,9 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
               bondsDisposalsWithIndexes,
               numberOfDisposals,
               maxPossibleNumberOfDisposals,
-              completedUserAnswers,
-              viewOnlyUpdated = false,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              updatedUserAnswers,
+              schemeName,
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")

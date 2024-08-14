@@ -36,8 +36,9 @@ import views.html.ListView
 import models.TypeOfShares._
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage
-import navigation.Navigator
 import models.HowSharesDisposed._
+import play.api.Logging
+import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
 import models._
 import play.api.i18n.MessagesApi
@@ -50,7 +51,6 @@ import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDateTime
 import javax.inject.Named
 
 class ReportedSharesDisposalListController @Inject()(
@@ -63,7 +63,8 @@ class ReportedSharesDisposalListController @Inject()(
   psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
-    extends PSRController {
+    extends PSRController
+    with Logging {
 
   val form: Form[Boolean] = ReportedSharesDisposalListController.form(formProvider)
 
@@ -80,12 +81,29 @@ class ReportedSharesDisposalListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+        getCompletedOrUpdatedTaskListStatus(
+          request.userAnswers,
+          request.previousUserAnswers.get,
+          pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction
+        ) == Updated
+      } else {
+        false
+      },
+      year = year,
+      currentVersion = current,
+      previousVersion = previous,
+      compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+    )
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))(implicitly)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+    implicit request: DataRequest[AnyContent]
+  ): Result =
     getCompletedDisposals(srn).map { completedDisposals =>
-      if (completedDisposals.values.exists(_.nonEmpty)) {
+      if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
         Ok(
           view(
             form,
@@ -95,19 +113,8 @@ class ReportedSharesDisposalListController @Inject()(
               mode,
               completedDisposals,
               request.userAnswers,
-              viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-                getCompletedOrUpdatedTaskListStatus(
-                  request.userAnswers,
-                  request.previousUserAnswers.get,
-                  pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction
-                ) == Updated
-              } else {
-                false
-              },
-              optYear = request.year,
-              optCurrentVersion = request.currentVersion,
-              optPreviousVersion = request.previousVersion,
-              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+              request.schemeDetails.schemeName,
+              viewOnlyViewModel
             )
           )
         )
@@ -134,7 +141,10 @@ class ReportedSharesDisposalListController @Inject()(
               .fold(
                 errors =>
                   BadRequest(
-                    view(errors, viewModel(srn, page, mode, disposals, request.userAnswers, false, None, None, None))
+                    view(
+                      errors,
+                      viewModel(srn, page, mode, disposals, request.userAnswers, request.schemeDetails.schemeName)
+                    )
                   ).pure[Future],
                 reportAnotherDisposal =>
                   for {
@@ -219,58 +229,64 @@ object ReportedSharesDisposalListController {
     mode: Mode,
     disposals: Map[Max5000, List[Max50]],
     userAnswers: UserAnswers,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel],
+    schemeName: String
   ): List[ListRow] =
-    disposals
-      .flatMap {
-        case (shareIndex, disposalIndexes) =>
-          disposalIndexes.map { disposalIndex =>
-            val sharesDisposalData = SharesDisposalData(
-              shareIndex,
-              disposalIndex,
-              userAnswers.get(TypeOfSharesHeldPage(srn, shareIndex)).get,
-              userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).get,
-              userAnswers.get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex)).get
-            )
+    if (disposals.isEmpty || mode.isViewOnlyMode) {
+      List(
+        ListRow.viewNoLink(
+          Message("sharesDisposal.reportedSharesDisposalList.view.none", schemeName),
+          "sharesDisposal.reportedSharesDisposalList.view.none.value"
+        )
+      )
+    } else {
+      disposals
+        .flatMap {
+          case (shareIndex, disposalIndexes) =>
+            disposalIndexes.map { disposalIndex =>
+              val sharesDisposalData = SharesDisposalData(
+                shareIndex,
+                disposalIndex,
+                userAnswers.get(TypeOfSharesHeldPage(srn, shareIndex)).get,
+                userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).get,
+                userAnswers.get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex)).get
+              )
 
-            if (mode.isViewOnlyMode) {
-              (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-                case (ViewOnlyMode, Some(year), Some(current), Some(previous)) =>
+              (mode, viewOnlyViewModel) match {
+                case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
                   ListRow.view(
                     buildMessage("sharesDisposal.reportedSharesDisposalList.row", sharesDisposalData),
                     routes.SharesDisposalCYAController
-                      .onPageLoadViewOnly(srn, shareIndex, disposalIndex, year, current, previous)
+                      .onPageLoadViewOnly(srn, shareIndex, disposalIndex, year, currentVersion, previousVersion)
                       .url,
                     buildMessage(
                       "sharesDisposal.reportedSharesDisposalList.row.view.hidden",
                       sharesDisposalData
                     )
                   )
+                case (_, _) =>
+                  ListRow(
+                    buildMessage("sharesDisposal.reportedSharesDisposalList.row", sharesDisposalData),
+                    changeUrl = routes.SharesDisposalCYAController
+                      .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+                      .url,
+                    changeHiddenText = buildMessage(
+                      "sharesDisposal.reportedSharesDisposalList.row.change.hidden",
+                      sharesDisposalData
+                    ),
+                    removeUrl =
+                      routes.RemoveShareDisposalController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode).url,
+                    removeHiddenText = buildMessage(
+                      "sharesDisposal.reportedSharesDisposalList.row.remove.hidden",
+                      sharesDisposalData
+                    )
+                  )
               }
-            } else {
-              ListRow(
-                buildMessage("sharesDisposal.reportedSharesDisposalList.row", sharesDisposalData),
-                changeUrl = routes.SharesDisposalCYAController
-                  .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
-                  .url,
-                changeHiddenText = buildMessage(
-                  "sharesDisposal.reportedSharesDisposalList.row.change.hidden",
-                  sharesDisposalData
-                ),
-                removeUrl =
-                  routes.RemoveShareDisposalController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode).url,
-                removeHiddenText = buildMessage(
-                  "sharesDisposal.reportedSharesDisposalList.row.remove.hidden",
-                  sharesDisposalData
-                )
-              )
             }
-          }
-      }
-      .toList
-      .sortBy(_.change.fold("")(_.url))
+        }
+        .toList
+        .sortBy(_.change.fold("")(_.url))
+    }
 
   private def buildMessage(messageString: String, sharesDisposalData: SharesDisposalData): Message =
     sharesDisposalData match {
@@ -295,47 +311,54 @@ object ReportedSharesDisposalListController {
     mode: Mode,
     disposals: Map[Max5000, List[Max50]],
     userAnswers: UserAnswers,
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    schemeName: String,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
   ): FormPageViewModel[ListViewModel] = {
 
     val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
     val numberOfSharesItems = userAnswers.map(SharesCompleted.all(srn)).size
     val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
 
-    val (title, heading) = if (numberOfDisposals == 1) {
-      ("sharesDisposal.reportedSharesDisposalList.title", "sharesDisposal.reportedSharesDisposalList.heading")
-    } else {
-      (
-        "sharesDisposal.reportedSharesDisposalList.title.plural",
-        "sharesDisposal.reportedSharesDisposalList.heading.plural"
-      )
+    val (title, heading) = ((mode, numberOfDisposals) match {
+      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals == 0 =>
+        (
+          "sharesDisposal.reportedSharesDisposalList.view.title",
+          "sharesDisposal.reportedSharesDisposalList.view.heading.none"
+        )
+
+      case (ViewOnlyMode, _) if numberOfDisposals > 1 =>
+        (
+          "sharesDisposal.reportedSharesDisposalList.view.title.plural",
+          "sharesDisposal.reportedSharesDisposalList.view.heading.plural"
+        )
+      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals > 1 =>
+        (
+          "sharesDisposal.reportedSharesDisposalList.view.title",
+          "sharesDisposal.reportedSharesDisposalList.view.heading"
+        )
+      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals > 1 =>
+        (
+          "sharesDisposal.reportedSharesDisposalList.title.plural",
+          "sharesDisposal.reportedSharesDisposalList.heading.plural"
+        )
+      case _ =>
+        (
+          "sharesDisposal.reportedSharesDisposalList.title",
+          "sharesDisposal.reportedSharesDisposalList.heading"
+        )
+    }) match {
+      case (title, heading) =>
+        (Message(title, numberOfDisposals), Message(heading, numberOfDisposals))
     }
 
-    val (titleView, headView) = if (numberOfDisposals == 1) {
-      (
-        "sharesDisposal.reportedSharesDisposalList.view.title",
-        Message("sharesDisposal.reportedSharesDisposalList.view.heading", numberOfDisposals)
-      )
-    } else {
-      (
-        "sharesDisposal.reportedSharesDisposalList.view.title.plural",
-        Message("sharesDisposal.reportedSharesDisposalList.view.heading.plural", numberOfDisposals)
-      )
-    }
-
-    val currentPage = if ((page - 1) * Constants.reportedSharesDisposalListSize >= numberOfDisposals) 1 else page
     val pagination = Pagination(
-      currentPage = currentPage,
+      currentPage = page,
       pageSize = Constants.reportedSharesDisposalListSize,
       numberOfDisposals,
-      call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-        case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+      call = viewOnlyViewModel match {
+        case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.ReportedSharesDisposalListController.onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
-        case _ =>
+        case None =>
           routes.ReportedSharesDisposalListController.onPageLoad(srn, _)
       }
     )
@@ -353,8 +376,8 @@ object ReportedSharesDisposalListController {
 
     FormPageViewModel(
       mode = mode,
-      title = Message(title, numberOfDisposals),
-      heading = Message(heading, numberOfDisposals),
+      title = title,
+      heading = heading,
       description = Option.when(
         !((numberOfDisposals >= maxSharesTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals))
       )(
@@ -362,7 +385,7 @@ object ReportedSharesDisposalListController {
       ),
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows(srn, mode, disposals, userAnswers, optYear, optCurrentVersion, optPreviousVersion),
+        rows(srn, mode, disposals, userAnswers, viewOnlyViewModel, schemeName),
         Message("sharesDisposal.reportedSharesDisposalList.radios"),
         showRadios =
           !((numberOfDisposals >= maxSharesTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
@@ -382,35 +405,34 @@ object ReportedSharesDisposalListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit = routes.ReportedSharesDisposalListController.onSubmit(srn, page, mode),
-      optViewOnlyDetails = Option.when(mode.isViewOnlyMode) {
+      optViewOnlyDetails = viewOnlyViewModel.map { viewOnly =>
         ViewOnlyDetailsViewModel(
-          updated = viewOnlyUpdated,
-          link = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion))
-                if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
-              Some(
-                LinkMessage(
-                  "sharesDisposal.reportedSharesDisposalList.view.link",
-                  routes.ReportedSharesDisposalListController
-                    .onPreviousViewOnly(
-                      srn,
-                      page,
-                      year,
-                      currentVersion,
-                      previousVersion
-                    )
-                    .url
-                )
+          updated = viewOnly.viewOnlyUpdated,
+          link = if (viewOnly.currentVersion > 1 && viewOnly.previousVersion > 0) {
+            Some(
+              LinkMessage(
+                "sharesDisposal.reportedSharesDisposalList.view.link",
+                routes.ReportedSharesDisposalListController
+                  .onPreviousViewOnly(
+                    srn,
+                    page,
+                    viewOnly.year,
+                    viewOnly.currentVersion,
+                    viewOnly.previousVersion
+                  )
+                  .url
               )
-            case _ => None
+            )
+          } else {
+            None
           },
-          submittedText =
-            compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
-          title = titleView,
-          heading = headView,
+          submittedText = viewOnly.compilationOrSubmissionDate
+            .fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+          title = title,
+          heading = heading,
           buttonText = "site.return.to.tasklist",
-          onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+          onSubmit = viewOnlyViewModel match {
+            case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
               routes.ReportedSharesDisposalListController
                 .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
             case _ =>

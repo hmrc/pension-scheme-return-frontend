@@ -17,13 +17,13 @@
 package controllers.nonsipp.sharesdisposal
 
 import services.PsrSubmissionService
-import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompleted, TypeOfSharesHeldPage}
+import pages.nonsipp.shares._
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
-import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, SharesDisposalProgress}
+import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, IndependentValuationPage, SharesDisposalProgress}
 import forms.YesNoPageFormProvider
-import models.{NormalMode, ViewOnlyMode}
+import models.{NormalMode, ViewOnlyMode, ViewOnlyViewModel}
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
@@ -103,6 +103,18 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(SharesDisposalProgress(srn, shareIndexTwo, disposalIndexOne), SectionJourneyStatus.Completed)
     .unsafeSet(SharesDisposalProgress(srn, shareIndexTwo, disposalIndexTwo), SectionJourneyStatus.Completed)
 
+  private val noDisposalsUserAnswers = defaultUserAnswers
+    .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+    // Shares Disposal #1
+    .unsafeSet(TypeOfSharesHeldPage(srn, shareIndexOne), sharesTypeOne)
+    .unsafeSet(SharesCompleted(srn, shareIndexOne), SectionCompleted)
+    // Shares Disposal #2
+    .unsafeSet(TypeOfSharesHeldPage(srn, shareIndexOne), sharesTypeOne)
+    .unsafeSet(SharesCompleted(srn, shareIndexOne), SectionCompleted)
+    // fb / submission date
+    .unsafeSet(FbVersionPage(srn), "002")
+    .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
@@ -125,7 +137,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
           mode = NormalMode,
           sharesDisposalsWithIndexes,
           completedUserAnswers,
-          viewOnlyUpdated = false
+          schemeName,
+          viewOnlyViewModel = None
         )
       )
     }.withName("Completed Journey"))
@@ -147,30 +160,21 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
 
   "ReportedSharesDisposalListController in view only mode" - {
 
-    val currentUserAnswers = defaultUserAnswers
+    val currentUserAnswers = completedUserAnswers
       .unsafeSet(FbVersionPage(srn), "002")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
-      // Shares #1
-      .unsafeSet(TypeOfSharesHeldPage(srn, shareIndexOne), sharesTypeOne)
-      .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndexOne), companyName)
-      .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexOne, disposalIndexOne), howSharesDisposedOne)
-      .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexOne, disposalIndexTwo), howSharesDisposedTwo)
-      .unsafeSet(SharesCompleted(srn, shareIndexOne), SectionCompleted)
-      .unsafeSet(SharesDisposalProgress(srn, shareIndexOne, disposalIndexOne), SectionJourneyStatus.Completed)
-      .unsafeSet(SharesDisposalProgress(srn, shareIndexOne, disposalIndexTwo), SectionJourneyStatus.Completed)
-      // Shares #2
-      .unsafeSet(TypeOfSharesHeldPage(srn, shareIndexTwo), sharesTypeTwo)
-      .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndexTwo), companyName)
-      .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexTwo, disposalIndexOne), howSharesDisposedThree)
-      .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexTwo, disposalIndexTwo), howSharesDisposedFour)
-      .unsafeSet(SharesCompleted(srn, shareIndexTwo), SectionCompleted)
-      .unsafeSet(SharesDisposalProgress(srn, shareIndexTwo, disposalIndexOne), SectionJourneyStatus.Completed)
-      .unsafeSet(SharesDisposalProgress(srn, shareIndexTwo, disposalIndexTwo), SectionJourneyStatus.Completed)
 
-    val previousUserAnswers = currentUserAnswers
+    val previousUserAnswers = completedUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
-      .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndexOne), companyName)
+
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = false,
+      year = yearString,
+      currentVersion = submissionNumberTwo,
+      previousVersion = submissionNumberOne,
+      compilationOrSubmissionDate = Some(submissionDateTwo)
+    )
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -184,18 +188,15 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
                 mode = ViewOnlyMode,
                 sharesDisposalsWithIndexes,
                 completedUserAnswers,
-                viewOnlyUpdated = false,
-                optYear = Some(yearString),
-                optCurrentVersion = Some(submissionNumberTwo),
-                optPreviousVersion = Some(submissionNumberOne),
-                compilationOrSubmissionDate = Some(submissionDateTwo)
+                schemeName,
+                viewOnlyViewModel = Some(viewOnlyViewModel)
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
 
     val updatedUserAnswers = currentUserAnswers
-      .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndexOne), companyName)
+      .unsafeSet(IndependentValuationPage(srn, shareIndexOne, disposalIndexOne), true)
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -208,15 +209,33 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
                 page,
                 mode = ViewOnlyMode,
                 sharesDisposalsWithIndexes,
-                completedUserAnswers,
-                viewOnlyUpdated = false,
-                optYear = Some(yearString),
-                optCurrentVersion = Some(submissionNumberTwo),
-                optPreviousVersion = Some(submissionNumberOne),
-                compilationOrSubmissionDate = Some(submissionDateTwo)
+                updatedUserAnswers,
+                schemeName,
+                viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    act.like(
+      renderView(
+        onPageLoadViewOnly,
+        userAnswers = noDisposalsUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[ListView].apply(
+          form(new YesNoPageFormProvider()),
+          viewModel(
+            srn,
+            page,
+            mode = ViewOnlyMode,
+            Map(),
+            noDisposalsUserAnswers,
+            schemeName,
+            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+          )
+        )
+      }.withName("OnPageLoadViewOnly renders ok with no disposals")
     )
 
     act.like(

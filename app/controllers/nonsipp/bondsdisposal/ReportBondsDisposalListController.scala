@@ -33,6 +33,7 @@ import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage
+import play.api.Logging
 import navigation.Navigator
 import controllers.nonsipp.bondsdisposal.ReportBondsDisposalListController._
 import forms.YesNoPageFormProvider
@@ -49,7 +50,6 @@ import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDateTime
 import javax.inject.Named
 
 class ReportBondsDisposalListController @Inject()(
@@ -62,7 +62,8 @@ class ReportBondsDisposalListController @Inject()(
   psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
-    extends PSRController {
+    extends PSRController
+    with Logging {
 
   val form: Form[Boolean] = ReportBondsDisposalListController.form(formProvider)
 
@@ -79,10 +80,27 @@ class ReportBondsDisposalListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+        getCompletedOrUpdatedTaskListStatus(
+          request.userAnswers,
+          request.previousUserAnswers.get,
+          pages.nonsipp.bondsdisposal.Paths.bondsDisposed
+        ) == Updated
+      } else {
+        false
+      },
+      year = year,
+      currentVersion = current,
+      previousVersion = previous,
+      compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+    )
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))(implicitly)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+    implicit request: DataRequest[AnyContent]
+  ): Result =
     getDisposals(srn).map { disposals =>
       val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
       val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
@@ -90,33 +108,26 @@ class ReportBondsDisposalListController @Inject()(
       getBondsDisposalsWithIndexes(srn, disposals)
         .map(
           bondsDisposalsWithIndexes =>
-            Ok(
-              view(
-                form,
-                viewModel(
-                  srn,
-                  mode,
-                  page,
-                  bondsDisposalsWithIndexes,
-                  numberOfDisposals,
-                  maxPossibleNumberOfDisposals,
-                  request.userAnswers,
-                  viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-                    getCompletedOrUpdatedTaskListStatus(
-                      request.userAnswers,
-                      request.previousUserAnswers.get,
-                      pages.nonsipp.bondsdisposal.Paths.bondsDisposed
-                    ) == Updated
-                  } else {
-                    false
-                  },
-                  optYear = request.year,
-                  optCurrentVersion = request.currentVersion,
-                  optPreviousVersion = request.previousVersion,
-                  compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+            if (viewOnlyViewModel.nonEmpty || disposals.values.exists(_.nonEmpty)) {
+              Ok(
+                view(
+                  form,
+                  viewModel(
+                    srn,
+                    mode,
+                    page,
+                    bondsDisposalsWithIndexes,
+                    numberOfDisposals,
+                    maxPossibleNumberOfDisposals,
+                    request.userAnswers,
+                    request.schemeDetails.schemeName,
+                    viewOnlyViewModel
+                  )
                 )
               )
-            )
+            } else {
+              Redirect(routes.BondsDisposalController.onPageLoad(srn, NormalMode))
+            }
         )
         .merge
     }.merge
@@ -151,10 +162,7 @@ class ReportBondsDisposalListController @Inject()(
                               numberOfDisposals,
                               maxPossibleNumberOfDisposals,
                               request.userAnswers,
-                              false,
-                              None,
-                              None,
-                              None
+                              request.schemeDetails.schemeName
                             )
                           )
                         )
@@ -261,51 +269,57 @@ object ReportBondsDisposalListController {
     mode: Mode,
     bondsDisposalsWithIndexes: List[((Max5000, List[Max50]), SectionCompleted)],
     userAnswers: UserAnswers,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel],
+    schemeName: String
   ): List[ListRow] =
-    bondsDisposalsWithIndexes.flatMap {
-      case ((bondIndex, disposalIndexes), bondsDisposal) =>
-        disposalIndexes.map { disposalIndex =>
-          val bondsDisposalData = BondsDisposalData(
-            bondIndex,
-            disposalIndex,
-            userAnswers.get(NameOfBondsPage(srn, bondIndex)).get,
-            userAnswers.get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex)).get
-          )
+    if (bondsDisposalsWithIndexes.isEmpty) {
+      List(
+        ListRow.viewNoLink(
+          Message("bondsDisposal.reportBondsDisposalList.view.none", schemeName),
+          "bondsDisposal.reportBondsDisposalList.view.none.value"
+        )
+      )
+    } else {
+      bondsDisposalsWithIndexes.flatMap {
+        case ((bondIndex, disposalIndexes), bondsDisposal) =>
+          disposalIndexes.map { disposalIndex =>
+            val bondsDisposalData = BondsDisposalData(
+              bondIndex,
+              disposalIndex,
+              userAnswers.get(NameOfBondsPage(srn, bondIndex)).get,
+              userAnswers.get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex)).get
+            )
 
-          if (mode.isViewOnlyMode) {
-            (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-              case (ViewOnlyMode, Some(year), Some(current), Some(previous)) =>
+            (mode, viewOnlyViewModel) match {
+              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
                 ListRow.view(
                   buildMessage("bondsDisposal.reportBondsDisposalList.row", bondsDisposalData),
                   routes.BondsDisposalCYAController
-                    .onPageLoadViewOnly(srn, bondIndex, disposalIndex, year, current, previous)
+                    .onPageLoadViewOnly(srn, bondIndex, disposalIndex, year, currentVersion, previousVersion)
                     .url,
                   buildMessage("bondsDisposal.reportBondsDisposalList.row.view.hidden", bondsDisposalData)
                 )
+              case (_, _) =>
+                ListRow(
+                  buildMessage("bondsDisposal.reportBondsDisposalList.row", bondsDisposalData),
+                  changeUrl = routes.BondsDisposalCYAController
+                    .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+                    .url,
+                  changeHiddenText = buildMessage(
+                    "bondsDisposal.reportBondsDisposalList.row.change.hidden",
+                    bondsDisposalData
+                  ),
+                  removeUrl = routes.RemoveBondsDisposalController
+                    .onPageLoad(srn, bondIndex, disposalIndex)
+                    .url,
+                  removeHiddenText = buildMessage(
+                    "bondsDisposal.reportBondsDisposalList.row.remove.hidden",
+                    bondsDisposalData
+                  )
+                )
             }
-          } else {
-            ListRow(
-              buildMessage("bondsDisposal.reportBondsDisposalList.row", bondsDisposalData),
-              changeUrl = routes.BondsDisposalCYAController
-                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
-                .url,
-              changeHiddenText = buildMessage(
-                "bondsDisposal.reportBondsDisposalList.row.change.hidden",
-                bondsDisposalData
-              ),
-              removeUrl = routes.RemoveBondsDisposalController
-                .onPageLoad(srn, bondIndex, disposalIndex)
-                .url,
-              removeHiddenText = buildMessage(
-                "bondsDisposal.reportBondsDisposalList.row.remove.hidden",
-                bondsDisposalData
-              )
-            )
           }
-        }
+      }
     }
 
   private def buildMessage(messageString: String, bondsDisposalData: BondsDisposalData): Message =
@@ -327,14 +341,14 @@ object ReportBondsDisposalListController {
     numberOfDisposals: Int,
     maxPossibleNumberOfDisposals: Int,
     userAnswers: UserAnswers,
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    schemeName: String,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
   ): FormPageViewModel[ListViewModel] = {
 
     val (title, heading) = ((mode, numberOfDisposals) match {
+      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals == 0 =>
+        ("bondsDisposal.reportBondsDisposalList.view.title", "bondsDisposal.reportBondsDisposalList.view.heading.none")
+
       case (ViewOnlyMode, _) if numberOfDisposals > 1 =>
         (
           "bondsDisposal.reportBondsDisposalList.view.title.plural",
@@ -364,10 +378,10 @@ object ReportBondsDisposalListController {
       currentPage = page,
       pageSize = Constants.reportedSharesDisposalListSize,
       numberOfDisposals,
-      call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-        case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+      call = viewOnlyViewModel match {
+        case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.ReportBondsDisposalListController.onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
-        case _ =>
+        case None =>
           routes.ReportBondsDisposalListController.onPageLoad(srn, _)
       }
     )
@@ -394,7 +408,7 @@ object ReportBondsDisposalListController {
       ),
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows(srn, mode, bondsDisposalsWithIndexes, userAnswers, optYear, optCurrentVersion, optPreviousVersion),
+        rows(srn, mode, bondsDisposalsWithIndexes, userAnswers, viewOnlyViewModel, schemeName),
         Message("bondsDisposal.reportBondsDisposalList.radios"),
         showRadios =
           !((numberOfDisposals >= maxBondsTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
@@ -414,35 +428,34 @@ object ReportBondsDisposalListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit = routes.ReportBondsDisposalListController.onSubmit(srn, page, mode),
-      optViewOnlyDetails = Option.when(mode.isViewOnlyMode) {
+      optViewOnlyDetails = viewOnlyViewModel.map { viewOnly =>
         ViewOnlyDetailsViewModel(
-          updated = viewOnlyUpdated,
-          link = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion))
-                if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
-              Some(
-                LinkMessage(
-                  "bondsDisposal.reportBondsDisposalList.view.link",
-                  controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-                    .onPreviousViewOnly(
-                      srn,
-                      page,
-                      year,
-                      currentVersion,
-                      previousVersion
-                    )
-                    .url
-                )
+          updated = viewOnly.viewOnlyUpdated,
+          link = if (viewOnly.currentVersion > 1 && viewOnly.previousVersion > 0) {
+            Some(
+              LinkMessage(
+                "bondsDisposal.reportBondsDisposalList.view.link",
+                controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
+                  .onPreviousViewOnly(
+                    srn,
+                    page,
+                    viewOnly.year,
+                    viewOnly.currentVersion,
+                    viewOnly.previousVersion
+                  )
+                  .url
               )
-            case _ => None
+            )
+          } else {
+            None
           },
-          submittedText =
-            compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+          submittedText = viewOnly.compilationOrSubmissionDate
+            .fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
           title = title,
           heading = heading,
           buttonText = "site.return.to.tasklist",
-          onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+          onSubmit = viewOnlyViewModel match {
+            case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
               controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
                 .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
             case _ =>

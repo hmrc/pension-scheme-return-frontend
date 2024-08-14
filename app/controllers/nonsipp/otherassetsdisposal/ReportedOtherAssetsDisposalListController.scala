@@ -20,22 +20,23 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.otherassetsdisposal._
 import viewmodels.implicits._
 import play.api.mvc._
-import config.Refined.{Max50, Max5000}
 import controllers.PSRController
+import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import cats.implicits._
-import config.Constants.{maxDisposalPerOtherAsset, maxOtherAssetsTransactions}
+import _root_.config.Constants
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController._
+import _root_.config.Constants.{maxDisposalPerOtherAsset, maxOtherAssetsTransactions}
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
+import _root_.config.Refined.{Max50, Max5000}
 import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, WhatIsOtherAssetPage}
 import models.HowDisposed._
 import com.google.inject.Inject
-import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
-import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage
+import play.api.Logging
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
 import models._
@@ -49,7 +50,6 @@ import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.LocalDateTime
 import javax.inject.Named
 
 class ReportedOtherAssetsDisposalListController @Inject()(
@@ -62,7 +62,8 @@ class ReportedOtherAssetsDisposalListController @Inject()(
   psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
-    extends PSRController {
+    extends PSRController
+    with Logging {
 
   val form: Form[Boolean] = ReportedOtherAssetsDisposalListController.form(formProvider)
 
@@ -79,12 +80,29 @@ class ReportedOtherAssetsDisposalListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+        getCompletedOrUpdatedTaskListStatus(
+          request.userAnswers,
+          request.previousUserAnswers.get,
+          pages.nonsipp.otherassetsdisposal.Paths.assetsDisposed
+        ) == Updated
+      } else {
+        false
+      },
+      year = year,
+      currentVersion = current,
+      previousVersion = previous,
+      compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+    )
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))(implicitly)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+    implicit request: DataRequest[AnyContent]
+  ): Result =
     getCompletedDisposals(srn).map { completedDisposals =>
-      if (completedDisposals.values.exists(_.nonEmpty)) {
+      if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
         Ok(
           view(
             form,
@@ -94,19 +112,8 @@ class ReportedOtherAssetsDisposalListController @Inject()(
               page,
               completedDisposals,
               request.userAnswers,
-              viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-                getCompletedOrUpdatedTaskListStatus(
-                  request.userAnswers,
-                  request.previousUserAnswers.get,
-                  pages.nonsipp.otherassetsdisposal.Paths.assetsDisposed
-                ) == Updated
-              } else {
-                false
-              },
-              optYear = request.year,
-              optCurrentVersion = request.currentVersion,
-              optPreviousVersion = request.previousVersion,
-              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+              request.schemeDetails.schemeName,
+              viewOnlyViewModel
             )
           )
         )
@@ -134,7 +141,7 @@ class ReportedOtherAssetsDisposalListController @Inject()(
               .fold(
                 errors =>
                   BadRequest(
-                    view(errors, viewModel(srn, mode, page, disposals, request.userAnswers, false, None, None, None))
+                    view(errors, viewModel(srn, mode, page, disposals, request.userAnswers, ""))
                   ).pure[Future],
                 reportAnotherDisposal =>
                   for {
@@ -220,58 +227,64 @@ object ReportedOtherAssetsDisposalListController {
     mode: Mode,
     disposals: Map[Max5000, List[Max50]],
     userAnswers: UserAnswers,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel],
+    schemeName: String
   ): List[ListRow] =
-    disposals
-      .flatMap {
-        case (otherAssetsIndex, disposalIndexes) =>
-          disposalIndexes.map { disposalIndex =>
-            val otherAssetsDisposalData = OtherAssetsDisposalData(
-              otherAssetsIndex,
-              disposalIndex,
-              userAnswers.get(WhatIsOtherAssetPage(srn, otherAssetsIndex)).get,
-              userAnswers.get(HowWasAssetDisposedOfPage(srn, otherAssetsIndex, disposalIndex)).get
-            )
+    if (disposals.isEmpty) {
+      List(
+        ListRow.viewNoLink(
+          Message("assetDisposal.reportedOtherAssetsDisposalList.view.none", schemeName),
+          "assetDisposal.reportedOtherAssetsDisposalList.view.none.value"
+        )
+      )
+    } else {
+      disposals
+        .flatMap {
+          case (otherAssetsIndex, disposalIndexes) =>
+            disposalIndexes.map { disposalIndex =>
+              val otherAssetsDisposalData = OtherAssetsDisposalData(
+                otherAssetsIndex,
+                disposalIndex,
+                userAnswers.get(WhatIsOtherAssetPage(srn, otherAssetsIndex)).get,
+                userAnswers.get(HowWasAssetDisposedOfPage(srn, otherAssetsIndex, disposalIndex)).get
+              )
 
-            if (mode.isViewOnlyMode) {
-              (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-                case (ViewOnlyMode, Some(year), Some(current), Some(previous)) =>
+              (mode, viewOnlyViewModel) match {
+                case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
                   ListRow.view(
                     buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
                     routes.AssetDisposalCYAController
-                      .onPageLoadViewOnly(srn, otherAssetsIndex, disposalIndex, year, current, previous)
+                      .onPageLoadViewOnly(srn, otherAssetsIndex, disposalIndex, year, currentVersion, previousVersion)
                       .url,
                     buildMessage(
                       "assetDisposal.reportedOtherAssetsDisposalList.row.view.hidden",
                       otherAssetsDisposalData
                     )
                   )
+                case (_, _) =>
+                  ListRow(
+                    buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
+                    changeUrl = routes.AssetDisposalCYAController
+                      .onPageLoad(srn, otherAssetsIndex, disposalIndex, CheckMode)
+                      .url,
+                    changeHiddenText = buildMessage(
+                      "assetDisposal.reportedOtherAssetsDisposalList.row.change.hidden",
+                      otherAssetsDisposalData
+                    ),
+                    removeUrl = routes.RemoveAssetDisposalController
+                      .onPageLoad(srn, otherAssetsIndex, disposalIndex)
+                      .url,
+                    removeHiddenText = buildMessage(
+                      "assetDisposal.reportedOtherAssetsDisposalList.row.remove.hidden",
+                      otherAssetsDisposalData
+                    )
+                  )
               }
-            } else {
-              ListRow(
-                buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
-                changeUrl = routes.AssetDisposalCYAController
-                  .onPageLoad(srn, otherAssetsIndex, disposalIndex, CheckMode)
-                  .url,
-                changeHiddenText = buildMessage(
-                  "assetDisposal.reportedOtherAssetsDisposalList.row.change.hidden",
-                  otherAssetsDisposalData
-                ),
-                removeUrl = routes.RemoveAssetDisposalController
-                  .onPageLoad(srn, otherAssetsIndex, disposalIndex)
-                  .url,
-                removeHiddenText = buildMessage(
-                  "assetDisposal.reportedOtherAssetsDisposalList.row.remove.hidden",
-                  otherAssetsDisposalData
-                )
-              )
             }
-          }
-      }
-      .toList
-      .sortBy(_.change.fold("")(_.url))
+        }
+        .toList
+        .sortBy(_.change.fold("")(_.url))
+    }
 
   private def buildMessage(messageString: String, otherAssetsDisposalData: OtherAssetsDisposalData): Message =
     otherAssetsDisposalData match {
@@ -290,11 +303,8 @@ object ReportedOtherAssetsDisposalListController {
     page: Int,
     disposals: Map[Max5000, List[Max50]],
     userAnswers: UserAnswers,
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    schemeName: String,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
   ): FormPageViewModel[ListViewModel] = {
 
     val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
@@ -302,6 +312,12 @@ object ReportedOtherAssetsDisposalListController {
     val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
 
     val (title, heading) = ((mode, numberOfDisposals) match {
+
+      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals == 0 =>
+        (
+          "assetDisposal.reportedOtherAssetsDisposalList.view.title",
+          "assetDisposal.reportedOtherAssetsDisposalList.view.heading.none"
+        )
 
       case (ViewOnlyMode, 1) =>
         (
@@ -332,11 +348,11 @@ object ReportedOtherAssetsDisposalListController {
       currentPage = page,
       pageSize = Constants.reportedOtherAssetsDisposalListSize,
       numberOfDisposals,
-      call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-        case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+      call = viewOnlyViewModel match {
+        case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.ReportedOtherAssetsDisposalListController
             .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
-        case _ =>
+        case None =>
           routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, _)
       }
     )
@@ -363,7 +379,7 @@ object ReportedOtherAssetsDisposalListController {
       ),
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows(srn, mode, disposals, userAnswers, optYear, optCurrentVersion, optPreviousVersion),
+        rows(srn, mode, disposals, userAnswers, viewOnlyViewModel, schemeName),
         Message("assetDisposal.reportedOtherAssetsDisposalList.radios"),
         showRadios =
           !((numberOfDisposals >= maxOtherAssetsTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
@@ -383,35 +399,34 @@ object ReportedOtherAssetsDisposalListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit = routes.ReportedOtherAssetsDisposalListController.onSubmit(srn, page, mode),
-      optViewOnlyDetails = Option.when(mode.isViewOnlyMode) {
+      optViewOnlyDetails = viewOnlyViewModel.map { viewOnly =>
         ViewOnlyDetailsViewModel(
-          updated = viewOnlyUpdated,
-          link = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion))
-                if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
-              Some(
-                LinkMessage(
-                  "assetDisposal.reportedOtherAssetsDisposalList.view.link",
-                  controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-                    .onPreviousViewOnly(
-                      srn,
-                      page,
-                      year,
-                      currentVersion,
-                      previousVersion
-                    )
-                    .url
-                )
+          updated = viewOnly.viewOnlyUpdated,
+          link = if (viewOnly.currentVersion > 1 && viewOnly.previousVersion > 0) {
+            Some(
+              LinkMessage(
+                "assetDisposal.reportedOtherAssetsDisposalList.view.link",
+                controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+                  .onPreviousViewOnly(
+                    srn,
+                    page,
+                    viewOnly.year,
+                    viewOnly.currentVersion,
+                    viewOnly.previousVersion
+                  )
+                  .url
               )
-            case _ => None
+            )
+          } else {
+            None
           },
-          submittedText =
-            compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+          submittedText = viewOnly.compilationOrSubmissionDate
+            .fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
           title = title,
           heading = heading,
           buttonText = "site.return.to.tasklist",
-          onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion)) =>
+          onSubmit = viewOnlyViewModel match {
+            case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
               controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
                 .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
             case _ =>

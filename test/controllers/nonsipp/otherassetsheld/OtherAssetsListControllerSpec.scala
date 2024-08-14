@@ -23,7 +23,7 @@ import controllers.ControllerBaseSpec
 import views.html.ListView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import controllers.nonsipp.otherassetsheld.OtherAssetsListController._
+import controllers.nonsipp.otherassetsheld.OtherAssetsListController.{OtherAssetsData, _}
 import models._
 import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
@@ -95,7 +95,7 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
       injected[ListView]
         .apply(
           form(injected[YesNoPageFormProvider]),
-          viewModel(srn, page, NormalMode, otherAssetsData, viewOnlyUpdated = false)
+          viewModel(srn, page, NormalMode, otherAssetsData, schemeName)
         )
     })
 
@@ -104,7 +104,7 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
         injected[ListView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, page, NormalMode, otherAssetsData, viewOnlyUpdated = false)
+            viewModel(srn, page, NormalMode, otherAssetsData, schemeName)
           )
       }
     )
@@ -130,6 +130,14 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
 
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = false,
+      year = yearString,
+      currentVersion = submissionNumberTwo,
+      previousVersion = submissionNumberOne,
+      compilationOrSubmissionDate = Some(submissionDateTwo)
+    )
+
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
@@ -140,18 +148,15 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
               page,
               mode = ViewOnlyMode,
               otherAssetsData,
-              viewOnlyUpdated = false,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              schemeName,
+              Some(viewOnlyViewModel)
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
 
     val updatedUserAnswers = currentUserAnswers
-      .unsafeSet(OtherAssetsCompleted(srn, index), SectionCompleted)
+      .unsafeSet(WhatIsOtherAssetPage(srn, index), nameOfAsset)
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(defaultUserAnswers)) {
@@ -163,11 +168,8 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
               page,
               mode = ViewOnlyMode,
               otherAssetsData,
-              viewOnlyUpdated = true,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              schemeName,
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
