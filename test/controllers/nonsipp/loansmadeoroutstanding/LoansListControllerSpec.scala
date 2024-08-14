@@ -118,7 +118,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(FbVersionPage(srn), "002")
     .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
 
-  "LandOrPropertyDisposalListController" - {
+  "LoansListController" - {
 
     act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
       injected[ListView].apply(
@@ -225,7 +225,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
             )
           )
-      }.withName("OnPageLoadViewOnly renders ok with no disposals")
+      }.withName("OnPageLoadViewOnly renders ok with no loans")
     )
 
     act.like(
