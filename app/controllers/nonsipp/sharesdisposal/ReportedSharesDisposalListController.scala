@@ -319,7 +319,6 @@ object ReportedSharesDisposalListController {
     val numberOfSharesItems = userAnswers.map(SharesCompleted.all(srn)).size
     val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
 
-
     val (title, heading) = ((mode, numberOfDisposals) match {
       case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals == 0 =>
         (
@@ -351,7 +350,6 @@ object ReportedSharesDisposalListController {
       case (title, heading) =>
         (Message(title, numberOfDisposals), Message(heading, numberOfDisposals))
     }
-
 
     val pagination = Pagination(
       currentPage = page,

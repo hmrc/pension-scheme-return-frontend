@@ -3380,7 +3380,7 @@ bondsDisposal.reportBondsDisposalList.view.heading.plural = {0} bond disposals
 bondsDisposal.reportBondsDisposalList.view.heading.none = Bond disposals
 bondsDisposal.reportBondsDisposalList.row.view.hidden = View details of the disposal of {0} by {1}
 bondsDisposal.reportBondsDisposalList.view.link = View previous version of bond disposals (opens in new tab)
-bondsDisposal.reportBondsDisposalList.view.none = Did [name of scheme] dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
+bondsDisposal.reportBondsDisposalList.view.none = Did {0} dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
 bondsDisposal.reportBondsDisposalList.view.none.value = No
 
 bondsDisposal.removeBondsDisposal.title = Are you sure you want to remove details of the disposal of these bonds?
