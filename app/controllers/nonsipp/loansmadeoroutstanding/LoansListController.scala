@@ -19,21 +19,21 @@ package controllers.nonsipp.loansmadeoroutstanding
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
-import config.Refined.{Max5000, OneTo5000}
 import controllers.PSRController
-import cats.implicits._
-import config.Constants.maxLoans
-import pages.nonsipp.accountingperiod.AccountingPeriodListPage
-import forms.YesNoPageFormProvider
-import pages.nonsipp.loansmadeoroutstanding._
-import play.api.i18n.MessagesApi
-import eu.timepit.refined.api.Refined
 import utils.nonsipp.TaskListStatusUtils.{
   getCompletedOrUpdatedTaskListStatus,
   getIncompleteLoansLink,
   getLoansTaskListStatus
 }
-import config.Constants
+import cats.implicits._
+import _root_.config.Constants
+import pages.nonsipp.accountingperiod.AccountingPeriodListPage
+import _root_.config.Constants.maxLoans
+import forms.YesNoPageFormProvider
+import pages.nonsipp.loansmadeoroutstanding._
+import play.api.i18n.MessagesApi
+import eu.timepit.refined.api.Refined
+import _root_.config.Refined.{Max5000, OneTo5000}
 import views.html.ListView
 import models.SchemeId.Srn
 import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
@@ -52,7 +52,6 @@ import play.api.data.Form
 
 import scala.concurrent.Future
 
-import java.time.LocalDateTime
 import javax.inject.Named
 
 class LoansListController @Inject()(
@@ -79,10 +78,28 @@ class LoansListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = request.previousUserAnswers match {
+        case Some(previousUserAnswers) =>
+          getCompletedOrUpdatedTaskListStatus(
+            request.userAnswers,
+            previousUserAnswers,
+            pages.nonsipp.loansmadeoroutstanding.Paths.loans
+          ) == Updated
+        case _ => false
+      },
+      year = year,
+      currentVersion = current,
+      previousVersion = previous,
+      compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+    )
+
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))(implicitly)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+    implicit request: DataRequest[AnyContent]
+  ): Result = {
     val status = getLoansTaskListStatus(request.userAnswers, srn)
     if (status == TaskListStatus.Completed) {
       loanRecipients(srn)
@@ -96,19 +113,8 @@ class LoansListController @Inject()(
                   page,
                   mode,
                   recipients,
-                  viewOnlyUpdated = if (mode.isViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-                    getCompletedOrUpdatedTaskListStatus(
-                      request.userAnswers,
-                      request.previousUserAnswers.get,
-                      pages.nonsipp.loansmadeoroutstanding.Paths.loans
-                    ) == Updated
-                  } else {
-                    false
-                  },
-                  optYear = request.year,
-                  optCurrentVersion = request.currentVersion,
-                  optPreviousVersion = request.previousVersion,
-                  compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+                  request.schemeDetails.schemeName,
+                  viewOnlyViewModel
                 )
               )
             )
@@ -128,7 +134,7 @@ class LoansListController @Inject()(
       } else {
 
         val viewModel =
-          LoansListController.viewModel(srn, page, mode, recipients, viewOnlyUpdated = false, None, None, None)
+          LoansListController.viewModel(srn, page, mode, recipients, "")
 
         form
           .bindFromRequest()
@@ -206,34 +212,45 @@ object LoansListController {
     srn: Srn,
     mode: Mode,
     recipients: List[(Max5000, String, Money)],
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel],
+    schemeName: String
   ): List[ListRow] =
-    recipients.flatMap {
-      case (index, recipientName, totalLoan) =>
-        if (mode.isViewOnlyMode) {
-          (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-            case (ViewOnlyMode, Some(year), Some(current), Some(previous)) =>
+    (recipients, mode) match {
+      case (Nil, mode) if mode.isViewOnlyMode =>
+        List(
+          ListRow.viewNoLink(
+            Message("loansList.viewOnly.none", schemeName),
+            "loansList.viewOnly.none.value"
+          )
+        )
+      case (Nil, mode) if !mode.isViewOnlyMode =>
+        List()
+      case (list, _) =>
+        list.flatMap {
+          case (index, recipientName, totalLoan) =>
+            if (mode.isViewOnlyMode) {
+              (mode, viewOnlyViewModel) match {
+                case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
+                  List(
+                    ListRow.view(
+                      Message("loansList.row", totalLoan.displayAs, recipientName),
+                      routes.LoansCYAController.onPageLoadViewOnly(srn, index, year, current, previous).url,
+                      Message("loansList.row.change.hidden", totalLoan.displayAs, recipientName)
+                    )
+                  )
+                case _ => Nil
+              }
+            } else {
               List(
-                ListRow.view(
+                ListRow(
                   Message("loansList.row", totalLoan.displayAs, recipientName),
-                  routes.LoansCYAController.onPageLoadViewOnly(srn, index, year, current, previous).url,
-                  Message("loansList.row.change.hidden", totalLoan.displayAs, recipientName)
+                  changeUrl = routes.LoansCYAController.onPageLoad(srn, index, CheckMode).url,
+                  changeHiddenText = Message("loansList.row.change.hidden", totalLoan.displayAs, recipientName),
+                  removeUrl = routes.RemoveLoanController.onPageLoad(srn, index, mode).url,
+                  removeHiddenText = Message("loansList.row.remove.hidden", totalLoan.displayAs, recipientName)
                 )
               )
-            case _ => Nil
-          }
-        } else {
-          List(
-            ListRow(
-              Message("loansList.row", totalLoan.displayAs, recipientName),
-              changeUrl = routes.LoansCYAController.onPageLoad(srn, index, CheckMode).url,
-              changeHiddenText = Message("loansList.row.change.hidden", totalLoan.displayAs, recipientName),
-              removeUrl = routes.RemoveLoanController.onPageLoad(srn, index, mode).url,
-              removeHiddenText = Message("loansList.row.remove.hidden", totalLoan.displayAs, recipientName)
-            )
-          )
+            }
         }
     }
 
@@ -242,15 +259,25 @@ object LoansListController {
     page: Int,
     mode: Mode,
     recipients: List[(Max5000, String, Money)],
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    schemeName: String,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
   ): FormPageViewModel[ListViewModel] = {
 
-    val title = if (recipients.length == 1) "loansList.title" else "loansList.title.plural"
-    val heading = if (recipients.length == 1) "loansList.heading" else "loansList.heading.plural"
+    val (title, heading) = ((mode, recipients.length) match {
+      case (ViewOnlyMode, numberOfLoans) if numberOfLoans == 0 =>
+        ("loansList.viewOnly.title.none", "loansList.viewOnly.heading.none")
+      case (ViewOnlyMode, numberOfLoans) if numberOfLoans > 1 =>
+        ("loansList.viewOnly.title.plural", "loansList.viewOnly.heading.plural")
+      case (ViewOnlyMode, _) =>
+        ("loansList.viewOnly.title", "loansList.viewOnly.heading")
+      case (_, numberOfLoans) if numberOfLoans > 1 =>
+        ("loansList.title.plural", "loansList.heading.plural")
+      case _ =>
+        ("loansList.title", "loansList.heading")
+    }) match {
+      case (title, heading) => (Message(title, recipients.size), Message(heading, recipients.length))
+    }
+
     val description = if (recipients.length < maxLoans) Some(ParagraphMessage("loansList.description")) else None
 
     val currentPage = if ((page - 1) * Constants.loanPageSize >= recipients.size) 1 else page
@@ -259,8 +286,8 @@ object LoansListController {
       currentPage = currentPage,
       pageSize = Constants.loanPageSize,
       recipients.size,
-      call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-        case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+      call = viewOnlyViewModel match {
+        case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.LoansListController.onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
         case _ =>
           routes.LoansListController.onPageLoad(srn, _, NormalMode)
@@ -269,12 +296,12 @@ object LoansListController {
 
     FormPageViewModel(
       mode = mode,
-      title = Message(title, recipients.length),
-      heading = Message(heading, recipients.length),
+      title = title,
+      heading = heading,
       description = description,
       page = ListViewModel(
         inset = "loansList.inset",
-        rows(srn, mode, recipients, optYear, optCurrentVersion, optPreviousVersion),
+        rows(srn, mode, recipients, viewOnlyViewModel, schemeName),
         Message("loansList.radios"),
         showRadios = recipients.length < Constants.maxLoans,
         paginatedViewModel = Some(
@@ -294,50 +321,35 @@ object LoansListController {
       details = None,
       onSubmit = routes.LoansListController
         .onSubmit(srn, page, mode),
-      optViewOnlyDetails = if (mode.isViewOnlyMode) {
-        Some(
-          ViewOnlyDetailsViewModel(
-            updated = viewOnlyUpdated,
-            link = (optYear, optCurrentVersion, optPreviousVersion) match {
-              case (Some(year), Some(currentVersion), Some(previousVersion))
-                  if optYear.nonEmpty && currentVersion > 1 && previousVersion > 0 =>
-                Some(
-                  LinkMessage(
-                    "loansList.viewOnly.link",
-                    routes.LoansListController
-                      .onPreviousViewOnly(
-                        srn,
-                        page,
-                        year,
-                        currentVersion,
-                        previousVersion
-                      )
-                      .url
+      optViewOnlyDetails = viewOnlyViewModel.map { viewOnly =>
+        ViewOnlyDetailsViewModel(
+          updated = viewOnly.viewOnlyUpdated,
+          link = if (viewOnly.currentVersion > 1 && viewOnly.previousVersion > 0) {
+            Some(
+              LinkMessage(
+                "loansList.viewOnly.link",
+                routes.LoansListController
+                  .onPreviousViewOnly(
+                    srn,
+                    page,
+                    viewOnly.year,
+                    viewOnly.currentVersion,
+                    viewOnly.previousVersion
                   )
-                )
-              case _ => None
-            },
-            submittedText =
-              compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
-            title = Message(
-              if (recipients.length == 1) "loansList.viewOnly.title" else "loansList.viewOnly.title.plural",
-              recipients.length
-            ),
-            heading = Message(
-              if (recipients.length == 1) "loansList.viewOnly.heading" else "loansList.viewOnly.title.plural",
-              recipients.length
-            ),
-            buttonText = "site.return.to.tasklist",
-            onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-              case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-                routes.LoansListController.onSubmitViewOnly(srn, year, currentVersion, previousVersion)
-              case _ =>
-                routes.LoansListController.onSubmit(srn, page, mode)
-            }
-          )
+                  .url
+              )
+            )
+          } else {
+            None
+          },
+          submittedText = viewOnly.compilationOrSubmissionDate
+            .fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+          title = title,
+          heading = heading,
+          buttonText = "site.return.to.tasklist",
+          onSubmit = routes.LoansListController
+            .onSubmitViewOnly(srn, viewOnly.year, viewOnly.currentVersion, viewOnly.previousVersion)
         )
-      } else {
-        None
       }
     )
   }

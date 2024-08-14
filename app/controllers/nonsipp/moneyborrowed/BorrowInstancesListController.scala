@@ -45,7 +45,6 @@ import play.api.data.Form
 
 import scala.concurrent.Future
 
-import java.time.LocalDateTime
 import javax.inject.Named
 
 class BorrowInstancesListController @Inject()(
@@ -73,10 +72,27 @@ class BorrowInstancesListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)(implicitly)
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = request.previousUserAnswers match {
+        case Some(previousUserAnswers) =>
+          getCompletedOrUpdatedTaskListStatus(
+            request.userAnswers,
+            previousUserAnswers,
+            pages.nonsipp.moneyborrowed.Paths.borrowing
+          ) == Updated
+        case _ => false
+      },
+      year = year,
+      currentVersion = current,
+      previousVersion = previous,
+      compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+    )
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))(implicitly)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+    implicit request: DataRequest[AnyContent]
+  ): Result = {
     val (borrowingStatus, incompleteBorrowingUrl) = getBorrowingTaskListStatusAndLink(request.userAnswers, srn)
 
     if (borrowingStatus == TaskListStatus.Completed) {
@@ -91,19 +107,8 @@ class BorrowInstancesListController @Inject()(
                   mode,
                   page,
                   instances,
-                  viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-                    getCompletedOrUpdatedTaskListStatus(
-                      request.userAnswers,
-                      request.previousUserAnswers.get,
-                      pages.nonsipp.moneyborrowed.Paths.borrowing
-                    ) == Updated
-                  } else {
-                    false
-                  },
-                  optYear = request.year,
-                  optCurrentVersion = request.currentVersion,
-                  optPreviousVersion = request.previousVersion,
-                  compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+                  request.schemeDetails.schemeName,
+                  viewOnlyViewModel
                 )
               )
             )
@@ -122,7 +127,7 @@ class BorrowInstancesListController @Inject()(
         Redirect(navigator.nextPage(BorrowInstancesListPage(srn, addBorrow = false), mode, request.userAnswers))
       } else {
         val viewModel =
-          BorrowInstancesListController.viewModel(srn, mode, page, instances, false, None, None, None)
+          BorrowInstancesListController.viewModel(srn, mode, page, instances, "")
 
         form
           .bindFromRequest()
@@ -192,40 +197,48 @@ object BorrowInstancesListController {
     srn: Srn,
     mode: Mode,
     borrowingInstances: List[(Max5000, String, Money)],
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel],
+    schemeName: String
   ): List[ListRow] =
-    borrowingInstances.flatMap {
-      case (index, lenderName, amount) =>
-        if (mode.isViewOnlyMode) {
-          (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-            case (ViewOnlyMode, Some(year), Some(current), Some(previous)) =>
-              List(
-                ListRow.view(
-                  lenderName,
-                  controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-                    .onPageLoadViewOnly(srn, index, year, current, previous)
-                    .url,
-                  Message("borrowList.row.change.hidden", amount.displayAs, lenderName)
-                )
-              )
-            case _ => Nil
-          }
-        } else {
-          List(
-            ListRow(
-              Message("borrowList.row.change.hidden", amount.displayAs, lenderName),
-              changeUrl = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-                .onPageLoad(srn, index, CheckMode)
-                .url,
-              changeHiddenText = Message("borrowList.row.change.hidden", amount.displayAs, lenderName),
-              controllers.nonsipp.moneyborrowed.routes.RemoveBorrowInstancesController
-                .onPageLoad(srn, index, mode)
-                .url,
-              Message("borrowList.row.remove.hidden", amount.displayAs, lenderName)
-            )
+    (borrowingInstances, mode) match {
+      case (Nil, mode) if mode.isViewOnlyMode =>
+        List(
+          ListRow.viewNoLink(
+            Message("borrowList.view.none", schemeName),
+            "borrowList.view.none.value"
           )
+        )
+      case (Nil, mode) if !mode.isViewOnlyMode =>
+        List()
+      case (list, _) =>
+        list.flatMap {
+          case (index, lenderName, amount) =>
+            (mode, viewOnlyViewModel) match {
+              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
+                List(
+                  ListRow.view(
+                    lenderName,
+                    controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
+                      .onPageLoadViewOnly(srn, index, year, current, previous)
+                      .url,
+                    Message("borrowList.row.change.hidden", amount.displayAs, lenderName)
+                  )
+                )
+              case _ =>
+                List(
+                  ListRow(
+                    Message("borrowList.row.change.hidden", amount.displayAs, lenderName),
+                    changeUrl = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
+                      .onPageLoad(srn, index, CheckMode)
+                      .url,
+                    changeHiddenText = Message("borrowList.row.change.hidden", amount.displayAs, lenderName),
+                    controllers.nonsipp.moneyborrowed.routes.RemoveBorrowInstancesController
+                      .onPageLoad(srn, index, mode)
+                      .url,
+                    Message("borrowList.row.remove.hidden", amount.displayAs, lenderName)
+                  )
+                )
+            }
         }
     }
 
@@ -234,16 +247,15 @@ object BorrowInstancesListController {
     mode: Mode,
     page: Int,
     borrowingInstances: List[(Max5000, String, Money)],
-    viewOnlyUpdated: Boolean,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    schemeName: String,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
   ): FormPageViewModel[ListViewModel] = {
 
     val lengthOfBorrowingInstances = borrowingInstances.length
 
     val (title, heading) = ((mode, lengthOfBorrowingInstances) match {
+      case (ViewOnlyMode, lengthOfBorrowingInstances) if lengthOfBorrowingInstances == 0 =>
+        ("borrowList.view.title.none", "borrowList.view.heading.none")
       case (ViewOnlyMode, lengthOfBorrowingInstances) if lengthOfBorrowingInstances > 1 =>
         ("borrowList.view.title.plural", "borrowList.view.heading.plural")
       case (ViewOnlyMode, _) =>
@@ -261,8 +273,8 @@ object BorrowInstancesListController {
       currentPage = page,
       pageSize = Constants.borrowPageSize,
       borrowingInstances.size,
-      call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-        case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+      call = viewOnlyViewModel match {
+        case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.BorrowInstancesListController.onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
         case _ =>
           routes.BorrowInstancesListController.onPageLoad(srn, _, NormalMode)
@@ -276,7 +288,7 @@ object BorrowInstancesListController {
       description = Some(ParagraphMessage("borrowList.description")),
       page = ListViewModel(
         inset = "borrowList.inset",
-        rows(srn, mode, borrowingInstances, optYear, optCurrentVersion, optPreviousVersion),
+        rows(srn, mode, borrowingInstances, viewOnlyViewModel, schemeName),
         Message("borrowList.radios"),
         showRadios = borrowingInstances.size < Constants.maxBorrows,
         paginatedViewModel = Some(
@@ -295,41 +307,34 @@ object BorrowInstancesListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit = routes.BorrowInstancesListController.onSubmit(srn, page, mode),
-      optViewOnlyDetails = Option.when(mode.isViewOnlyMode) {
+      optViewOnlyDetails = viewOnlyViewModel.map { viewOnly =>
         ViewOnlyDetailsViewModel(
-          updated = viewOnlyUpdated,
-          link = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion))
-                if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
-              Some(
-                LinkMessage(
-                  "borrowList.view.link",
-                  controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
-                    .onPreviousViewOnly(
-                      srn,
-                      page,
-                      year,
-                      currentVersion,
-                      previousVersion
-                    )
-                    .url
-                )
+          updated = viewOnly.viewOnlyUpdated,
+          link = if (viewOnly.currentVersion > 1 && viewOnly.previousVersion > 0) {
+            Some(
+              LinkMessage(
+                "borrowList.view.link",
+                controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
+                  .onPreviousViewOnly(
+                    srn,
+                    page,
+                    viewOnly.year,
+                    viewOnly.currentVersion,
+                    viewOnly.previousVersion
+                  )
+                  .url
               )
-            case _ => None
+            )
+          } else {
+            None
           },
-          submittedText =
-            compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
+          submittedText = viewOnly.compilationOrSubmissionDate
+            .fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
           title = title,
           heading = heading,
           buttonText = "site.return.to.tasklist",
-          onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
-            case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-              controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
-                .onSubmitViewOnly(srn, year, currentVersion, previousVersion)
-            case _ =>
-              controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
-                .onSubmit(srn, page, mode)
-          }
+          onSubmit = controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
+            .onSubmitViewOnly(srn, viewOnly.year, viewOnly.currentVersion, viewOnly.previousVersion)
         )
       }
     )

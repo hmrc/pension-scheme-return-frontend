@@ -113,6 +113,11 @@ class LoansListControllerSpec extends ControllerBaseSpec {
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
+  private val noLoansUserAnswers = defaultUserAnswers
+    .unsafeSet(LoansMadeOrOutstandingPage(srn), false)
+    .unsafeSet(FbVersionPage(srn), "002")
+    .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
   "LandOrPropertyDisposalListController" - {
 
     act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
@@ -123,7 +128,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
           1,
           NormalMode,
           recipients,
-          viewOnlyUpdated = false
+          schemeName
         )
       )
     }.withName("Completed Journey"))
@@ -161,6 +166,14 @@ class LoansListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
 
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = false,
+      year = yearString,
+      currentVersion = submissionNumberTwo,
+      previousVersion = submissionNumberOne,
+      compilationOrSubmissionDate = Some(submissionDateTwo)
+    )
+
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
@@ -171,11 +184,8 @@ class LoansListControllerSpec extends ControllerBaseSpec {
               page,
               mode = ViewOnlyMode,
               recipients,
-              viewOnlyUpdated = false,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              schemeName,
+              Some(viewOnlyViewModel)
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -194,14 +204,28 @@ class LoansListControllerSpec extends ControllerBaseSpec {
               page,
               mode = ViewOnlyMode,
               recipients,
-              viewOnlyUpdated = true,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              schemeName,
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
+
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = noLoansUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[ListView].apply(
+            form(new YesNoPageFormProvider()),
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              List(),
+              schemeName,
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok with no disposals")
     )
 
     act.like(

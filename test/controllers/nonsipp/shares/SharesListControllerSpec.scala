@@ -31,6 +31,7 @@ import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
+import viewmodels.models.SectionStatus.Completed
 
 import scala.concurrent.Future
 
@@ -72,21 +73,22 @@ class SharesListControllerSpec extends ControllerBaseSpec {
 
   private val userAnswers =
     defaultUserAnswers
+      .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+      .unsafeSet(SharesJourneyStatus(srn), Completed)
       .unsafeSet(SharesCompleted(srn, index), SectionCompleted)
       .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
       .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
       .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition)
       .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index), localDate)
 
-  private val sharesData = List(
-    SharesData(
-      index,
-      typeOfShares = TypeOfShares.Unquoted,
-      companyName = companyName,
-      acquisitionType = SchemeHoldShare.Acquisition,
-      acquisitionDate = Some(localDate)
-    )
+  private val shareData = SharesData(
+    index,
+    typeOfShares = TypeOfShares.Unquoted,
+    companyName = companyName,
+    acquisitionType = SchemeHoldShare.Acquisition,
+    acquisitionDate = Some(localDate)
   )
+  private val sharesData = List(shareData)
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
@@ -98,13 +100,13 @@ class SharesListControllerSpec extends ControllerBaseSpec {
     inject.bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
-  "SharesIndividualSellerNINumberController" - {
+  "SharesListController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[ListView]
         .apply(
           form(injected[YesNoPageFormProvider]),
-          viewModel(srn, page, NormalMode, sharesData, viewOnlyUpdated = false)
+          viewModel(srn, page, NormalMode, sharesData, schemeName)
         )
     })
 
@@ -113,7 +115,7 @@ class SharesListControllerSpec extends ControllerBaseSpec {
         injected[ListView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, page, NormalMode, sharesData, viewOnlyUpdated = false)
+            viewModel(srn, page, NormalMode, sharesData, schemeName)
           )
       }
     )
@@ -130,21 +132,23 @@ class SharesListControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 
-  "BorrowInstancesListController in view only mode" - {
+  "SharesListController in view only mode" - {
 
-    val currentUserAnswers = defaultUserAnswers
+    val currentUserAnswers = userAnswers
       .unsafeSet(FbVersionPage(srn), "002")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
-      .unsafeSet(SharesCompleted(srn, index), SectionCompleted)
-      .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
-      .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
-      .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition)
-      .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index), localDate)
 
     val previousUserAnswers = currentUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
-      .unsafeSet(SharesCompleted(srn, index), SectionCompleted)
+
+    val viewOnlyViewModel = ViewOnlyViewModel(
+      viewOnlyUpdated = false,
+      year = yearString,
+      currentVersion = submissionNumberTwo,
+      previousVersion = submissionNumberOne,
+      compilationOrSubmissionDate = Some(submissionDateTwo)
+    )
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -157,18 +161,15 @@ class SharesListControllerSpec extends ControllerBaseSpec {
                 page,
                 mode = ViewOnlyMode,
                 sharesData,
-                viewOnlyUpdated = false,
-                optYear = Some(yearString),
-                optCurrentVersion = Some(submissionNumberTwo),
-                optPreviousVersion = Some(submissionNumberOne),
-                compilationOrSubmissionDate = Some(submissionDateTwo)
+                schemeName,
+                Some(viewOnlyViewModel)
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
 
     val updatedUserAnswers = currentUserAnswers
-      .unsafeSet(SharesCompleted(srn, index), SectionCompleted)
+      .unsafeSet(CompanyNameRelatedSharesPage(srn, index), "changed")
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -180,12 +181,9 @@ class SharesListControllerSpec extends ControllerBaseSpec {
                 srn,
                 page,
                 mode = ViewOnlyMode,
-                sharesData,
-                viewOnlyUpdated = false,
-                optYear = Some(yearString),
-                optCurrentVersion = Some(submissionNumberTwo),
-                optPreviousVersion = Some(submissionNumberOne),
-                compilationOrSubmissionDate = Some(submissionDateTwo)
+                List(shareData.copy(companyName = "changed")),
+                schemeName,
+                viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
