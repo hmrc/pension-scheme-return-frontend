@@ -18,22 +18,23 @@ package controllers
 
 import services._
 import utils.DateTimeUtils
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import viewmodels.implicits.stringToText
+import play.api.mvc._
 import config.{Constants, FrontendAppConfig}
+import cats.implicits.toShow
 import controllers.actions._
 import pages.nonsipp.WhichTaxYearPage
-import models.backend.responses._
 import uk.gov.hmrc.time.TaxYear
 import viewmodels.DisplayMessage.Message
 import views.html.OverviewView
 import models.SchemeId.Srn
-import cats.implicits.toShow
-import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import config.Constants.UNCHANGED_SESSION_PREFIX
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions}
+import utils.nonsipp.SchemeDetailNavigationUtils
+import models.backend.responses._
 import utils.DateTimeUtils.localDateShow
-import models.{DateRange, Enumerable}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import models._
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import viewmodels.OverviewSummary
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -51,22 +52,22 @@ class OverviewController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   psrOverviewService: PsrOverviewService,
-  psrVersionsService: PsrVersionsService,
+  val psrVersionsService: PsrVersionsService,
+  val psrRetrievalService: PsrRetrievalService,
   saveService: SaveService,
   view: OverviewView,
   taxYearService: TaxYearService
 )(implicit ec: ExecutionContext)
     extends PSRController
-    with I18nSupport {
+    with I18nSupport
+    with SchemeDetailNavigationUtils {
 
   private val allDates = OverviewController.options(taxYearService.current)
 
   private def outstandingData(
     srn: Srn,
-    overview: Option[Seq[OverviewResponse]],
-    labelStart: String,
-    labelContinue: String
-  ): Seq[OverviewSummary] =
+    overview: Option[Seq[OverviewResponse]]
+  )(implicit messages: Messages): Seq[OverviewSummary] =
     overview.fold(Seq[OverviewSummary]())(
       values =>
         values
@@ -94,7 +95,7 @@ class OverviewController @Inject()(
                 controllers.routes.OverviewController
                   .onSelectContinue(srn, formatDateForApi(yearFrom), "001", overviewResponse.psrReportType.get.name)
                   .url,
-                labelContinue
+                messages("site.continue")
               )
             } else {
               (
@@ -102,7 +103,7 @@ class OverviewController @Inject()(
                 controllers.routes.OverviewController
                   .onSelectStart(srn, formatDateForApi(yearFrom), "001", overviewResponse.psrReportType.get.name)
                   .url,
-                labelStart
+                messages("site.start")
               )
             }
             OverviewSummary(
@@ -113,7 +114,7 @@ class OverviewController @Inject()(
                 Actions(
                   items = Seq(
                     ActionItem(
-                      content = Text(label),
+                      content = label,
                       href = url
                     )
                   )
@@ -126,16 +127,14 @@ class OverviewController @Inject()(
 
   private def previousData(
     srn: Srn,
-    response: Seq[PsrVersionsForYearsResponse],
+    versionsForYears: Seq[PsrVersionsForYearsResponse],
     overview: Option[Seq[OverviewResponse]],
-    labelView: String,
-    labelContinue: String,
     overviewSummary: Seq[OverviewSummary]
-  ): Seq[OverviewSummary] =
-    response.flatMap { versionsForYearsResponse =>
-      val yearFrom = LocalDate.parse(versionsForYearsResponse.startDate)
-      val reportVersions = versionsForYearsResponse.data.map(_.reportVersion)
-      val lastReturnForTaxYear = versionsForYearsResponse.data
+  )(implicit messages: Messages): Seq[OverviewSummary] =
+    versionsForYears.flatMap { versionsForTheYear =>
+      val yearFrom = LocalDate.parse(versionsForTheYear.startDate)
+      val reportVersions = versionsForTheYear.data.map(_.reportVersion)
+      val lastReturnForTaxYear = versionsForTheYear.data
         .find(
           _.reportVersion == reportVersions.max // last one only
             && !overviewSummary
@@ -161,7 +160,7 @@ class OverviewController @Inject()(
                   Actions(
                     items = Seq(
                       ActionItem(
-                        content = Text(labelContinue),
+                        content = messages("site.continue"),
                         href = controllers.routes.OverviewController
                           .onSelectContinue(
                             srn,
@@ -188,7 +187,7 @@ class OverviewController @Inject()(
                   Actions(
                     items = Seq(
                       ActionItem(
-                        content = Text(labelView),
+                        content = messages("site.viewOrChange"),
                         href = controllers.routes.OverviewController
                           .onSelectViewAndChange(srn, last.reportFormBundleNumber, reportType)
                           .url
@@ -206,15 +205,12 @@ class OverviewController @Inject()(
     identify.andThen(allowAccess(srn)).andThen(getData).async { implicit request =>
       val toDate = formatDateForApi(allDates.head._2.from)
       val fromDate = formatDateForApi(allDates.last._2.from)
-      val labelView = messagesApi.preferred(request)("site.viewOrChange")
-      val labelStart = messagesApi.preferred(request)("site.start")
-      val labelContinue = messagesApi.preferred(request)("site.continue")
       for {
         overviewResponse <- psrOverviewService.getOverview(request.schemeDetails.pstr, fromDate, toDate)
-        getVersionsResponse <- psrVersionsService
+        versionsForYearsResponse <- psrVersionsService
           .getVersionsForYears(request.schemeDetails.pstr, allDates.drop(1).map(dates => dates._2.from.toString))
-        outstanding = outstandingData(srn, overviewResponse, labelStart, labelContinue)
-        previous = previousData(srn, getVersionsResponse, overviewResponse, labelView, labelContinue, outstanding)
+        outstanding = outstandingData(srn, overviewResponse)
+        previous = previousData(srn, versionsForYearsResponse, overviewResponse, outstanding)
       } yield Ok(view(outstanding, previous, request.schemeDetails.schemeName))
         .addingToSession((Constants.SRN, srn.value))
     }
@@ -257,7 +253,10 @@ class OverviewController @Inject()(
           val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippViewAndChange}"
           Future.successful(Redirect(sippUrl).addingToSession("fbNumber" -> fbNumber))
         case _ =>
-          Future.successful(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
+          val byPassedJourney =
+            controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode)
+          val regularJourney = controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+          calculateNavigation(srn, byPassedJourney, regularJourney).map(Redirect)
       }
     }
 }

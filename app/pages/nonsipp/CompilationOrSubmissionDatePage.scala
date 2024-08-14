@@ -23,7 +23,6 @@ import play.api.libs.json.JsPath
 import java.time.LocalDateTime
 
 case class CompilationOrSubmissionDatePage(srn: Srn) extends QuestionPage[LocalDateTime] {
-  self =>
   override def path: JsPath = JsPath \ toString
   override def toString: String = "compilationOrSubmissionDate"
 }

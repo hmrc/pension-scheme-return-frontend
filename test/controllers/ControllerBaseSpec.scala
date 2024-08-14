@@ -326,6 +326,9 @@ trait TestValues {
     )
   )
 
+  val memberNumbersUnderThreshold: SchemeMemberNumbers = SchemeMemberNumbers(44, 55, 66)
+  val memberNumbersOverThreshold: SchemeMemberNumbers = SchemeMemberNumbers(50, 50, 50)
+
   def userAnswersWithAddress(srn: Srn, index: Max5000): UserAnswers =
     defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
 

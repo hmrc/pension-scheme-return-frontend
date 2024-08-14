@@ -52,6 +52,7 @@ import java.time.{LocalDate, LocalDateTime}
 class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
   private lazy val onPageLoad = routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
+  private lazy val onPageLoadWithCheckMode = routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode)
   private lazy val onSubmit = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, NormalMode)
   private lazy val onPageLoadViewOnly = routes.BasicDetailsCheckYourAnswersController.onPageLoadViewOnly(
     srn,
@@ -77,9 +78,6 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
     from = LocalDate.of(2022, 4, 6),
     to = LocalDate.of(2023, 4, 5)
   )
-
-  private val memberNumbersUnderThreshold = SchemeMemberNumbers(44, 55, 66)
-  private val memberNumbersOverThreshold = SchemeMemberNumbers(50, 50, 50)
 
   private val index1of3: Max3 = refineMV(1)
   private val recordVersion = "001"
@@ -134,8 +132,10 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
     // Not triggered in any other tests
   }
 
-  override def beforeEach(): Unit =
+  override def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
+    reset(mockSchemeDateService)
+  }
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
@@ -165,10 +165,55 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
           defaultSchemeDetails,
           psaId.value,
           psaId.isPSP,
-          viewOnlyUpdated = false
+          viewOnlyUpdated = false,
+          journeyByPassed = false
         )
       )
-    }.before(mockTaxYear(currentReturnTaxYear)))
+    }.before { mockTaxYear(currentReturnTaxYear) }
+      .after {
+        verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+      }
+      .withName("when Initial UserAnswers empty"))
+
+    val alreadySubmittedUserAnswer = currentTaxYearUserAnswersWithFewMembers
+      .unsafeSet(FbStatus(srn), Submitted)
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+
+    act.like(
+      renderView(
+        onPageLoadWithCheckMode,
+        alreadySubmittedUserAnswer,
+        alreadySubmittedUserAnswer
+      ) { implicit app => implicit request =>
+        injected[CheckYourAnswersView].apply(
+          viewModel(
+            srn,
+            CheckMode,
+            memberNumbersUnderThreshold,
+            activeBankAccount = true,
+            whyNoBankAccount = None,
+            whichTaxYearPage = Some(currentReturnTaxYear),
+            Left(currentReturnTaxYear),
+            individualDetails.fullName,
+            defaultSchemeDetails,
+            psaId.value,
+            psaId.isPSP,
+            viewOnlyUpdated = false,
+            journeyByPassed = true
+          )
+        )
+      }.before {
+          mockTaxYear(currentReturnTaxYear)
+          mockSubmissionDate
+          mockReturnPeriods
+        }
+        .after {
+          verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+          verify(mockSchemeDateService, times(1)).submissionDateAsString(any())
+          verify(mockSchemeDateService, times(1)).returnPeriodsAsJsonString(any())(any())
+        }
+        .withName("when Initial UserAnswers and current UserAnswers are not same")
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
@@ -185,12 +230,13 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             currentTaxYearUserAnswersWithFewMembers,
             emptyUserAnswers
           ).before {
-              MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(currentReturnTaxYear)))
+              mockTaxYear(currentReturnTaxYear)
               MockPsrSubmissionService.submitPsrDetails()
             }
-            .after(
+            .after {
+              verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
               verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-            )
+            }
         )
       }
 
@@ -203,12 +249,13 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             currentTaxYearUserAnswersWithManyMembers,
             fullUserAnswers
           ).before {
-              MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(currentReturnTaxYear)))
+              mockTaxYear(currentReturnTaxYear)
               MockPsrSubmissionService.submitPsrDetails()
             }
-            .after(
+            .after {
+              verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
               verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-            )
+            }
         )
       }
 
@@ -221,12 +268,13 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             currentTaxYearUserAnswersWithManyMembers,
             emptyUserAnswers
           ).before {
-              MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(currentReturnTaxYear)))
+              mockTaxYear(currentReturnTaxYear)
               MockPsrSubmissionService.submitPsrDetails()
             }
-            .after(
+            .after {
+              verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
               verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-            )
+            }
         )
       }
 
@@ -239,12 +287,13 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             currentTaxYearUserAnswersWithManyMembers,
             emptyUserAnswers
           ).before {
-              MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(currentReturnTaxYear)))
+              mockTaxYear(currentReturnTaxYear)
               MockPsrSubmissionService.submitPsrDetails()
             }
-            .after(
+            .after {
+              verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
               verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-            )
+            }
         )
       }
 
@@ -257,12 +306,13 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             currentTaxYearUserAnswersWithManyMembers,
             skippedUserAnswers
           ).before {
-              MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(currentReturnTaxYear)))
+              mockTaxYear(currentReturnTaxYear)
               MockPsrSubmissionService.submitPsrDetails()
             }
-            .after(
+            .after {
+              verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
               verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-            )
+            }
         )
       }
 
@@ -275,17 +325,18 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             noTaxYearUserAnswers,
             emptyUserAnswers
           ).before {
-              MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(currentReturnTaxYear)))
+              mockTaxYear(currentReturnTaxYear)
               MockPsrSubmissionService.submitPsrDetails()
             }
-            .after(
+            .after {
+              verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
               verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
-            )
+            }
         )
       }
     }
 
-    "viewmodel" - {
+    "viewModel" - {
 
       implicit val stubMessages: Messages = stubMessagesApi().preferred(FakeRequest())
 
@@ -432,7 +483,8 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              journeyByPassed = false
             )
           )
       }.before(mockTaxYear(dateRange))
@@ -461,7 +513,8 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              journeyByPassed = false
             )
           )
       }.before(mockTaxYear(dateRange))
@@ -500,7 +553,8 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]] = Left(dateRange),
     schemeAdminName: String = individualDetails.fullName,
     schemeDetails: SchemeDetails = defaultSchemeDetails,
-    pensionSchemeId: PensionSchemeId = pensionSchemeIdGen.sample.value
+    pensionSchemeId: PensionSchemeId = pensionSchemeIdGen.sample.value,
+    journeyByPassed: Boolean = false
   )(implicit messages: Messages): FormPageViewModel[CheckYourAnswersViewModel] = viewModel(
     srn,
     mode,
@@ -513,11 +567,18 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
     schemeDetails,
     pensionSchemeId.value,
     pensionSchemeId.isPSP,
-    viewOnlyUpdated = false
+    viewOnlyUpdated = false,
+    journeyByPassed = journeyByPassed
   )
 
   private def mockTaxYear(
     taxYear: DateRange
   ): OngoingStubbing[Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]] =
     when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(any())).thenReturn(Some(Left(taxYear)))
+
+  private def mockSubmissionDate: OngoingStubbing[String] =
+    when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")
+
+  private def mockReturnPeriods: OngoingStubbing[String] =
+    when(mockSchemeDateService.returnPeriodsAsJsonString(any())(any())).thenReturn("")
 }

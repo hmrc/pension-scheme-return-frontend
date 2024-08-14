@@ -19,7 +19,6 @@ package controllers.nonsipp.shares
 import services.PsrSubmissionService
 import pages.nonsipp.shares._
 import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import views.html.ListView
 import controllers.nonsipp.shares.SharesListController._
 import eu.timepit.refined.refineMV
@@ -29,9 +28,10 @@ import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import viewmodels.models.SectionStatus.Completed
+import controllers.ControllerBaseSpec
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
-import viewmodels.models.SectionStatus.Completed
 
 import scala.concurrent.Future
 
