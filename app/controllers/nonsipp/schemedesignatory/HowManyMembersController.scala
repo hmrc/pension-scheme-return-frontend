@@ -21,21 +21,23 @@ import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import viewmodels.implicits._
 import play.api.mvc._
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
+import controllers.PSRController
 import cats.implicits.toShow
 import config.Constants.maxMembers
 import controllers.actions._
 import forms.IntFormProvider
+import play.api.i18n.MessagesApi
 import forms.mappings.errors.IntFormErrors
 import views.html.MultipleQuestionView
 import models.SchemeId.Srn
 import controllers.nonsipp.schemedesignatory.HowManyMembersController._
+import pages.nonsipp.BasicDetailsCompletedPage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models.Mode
-import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.{ListMessage, ListType, Message}
-import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, QuestionField}
+import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
 
@@ -54,8 +56,7 @@ class HowManyMembersController @Inject()(
   view: MultipleQuestionView,
   dateService: SchemeDateService
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends PSRController {
 
   private val form = HowManyMembersController.form(formProvider)
 
@@ -83,7 +84,10 @@ class HowManyMembersController @Inject()(
           },
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.transformAndSet(page, value))
+            updatedAnswers <- request.userAnswers
+              .transformAndSet(page, value)
+              .set(BasicDetailsCompletedPage(srn), SectionCompleted)
+              .mapK[Future]
             _ <- saveService.save(updatedAnswers)
           } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
       )

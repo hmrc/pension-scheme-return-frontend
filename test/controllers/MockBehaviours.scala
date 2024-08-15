@@ -16,20 +16,28 @@
 
 package controllers
 
-import services.{PsrSubmissionService, SchemeDateService}
+import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import org.mockito.verification.VerificationMode
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import connectors.{EmailConnector, EmailSent, EmailStatus}
 import config.Refined.Max3
 import cats.data.NonEmptyList
 import org.mockito.stubbing.OngoingStubbing
-import models.DateRange
-import org.mockito.{ArgumentMatchers, Mockito}
+import models.{DateRange, UserAnswers}
+import org.mockito.{ArgumentCaptor, ArgumentMatchers, Mockito}
 import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 
 trait MockBehaviours {
+
+  object MockSaveService {
+    def capture(captor: ArgumentCaptor[UserAnswers])(implicit mock: SaveService): Future[Unit] =
+      verify(mock).save(captor.capture())(any(), any())
+
+    def save()(implicit mock: SaveService): OngoingStubbing[Future[Unit]] =
+      when(mock.save(any())(any(), any())).thenReturn(Future.successful(()))
+  }
 
   object MockSchemeDateService {
     def taxYearOrAccountingPeriods(

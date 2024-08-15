@@ -136,15 +136,19 @@ trait Mappings extends Formatters with Constraints {
     startDateErrors: DateFormErrors,
     endDateErrors: DateFormErrors,
     invalidRangeError: String,
-    allowedRange: Option[DateRange],
-    startDateAllowedDateRangeError: Option[String],
-    endDateAllowedDateRangeError: Option[String],
-    duplicateRangeError: Option[String],
+    allowedRange: DateRange,
+    startDateAllowedDateRangeError: String,
+    endDateAllowedDateRangeError: String,
+    overlappedStartDateError: String,
+    overlappedEndDateError: String,
     duplicateRanges: List[DateRange],
     previousDateRangeError: Option[String],
     index: Max3,
     taxYear: TaxYear,
-    errorTaxYear: Option[String]
+    errorStartBefore: String,
+    errorStartAfter: String,
+    errorEndBefore: String,
+    errorEndAfter: String
   ): FieldMapping[DateRange] =
     of(
       new DateRangeFormatter(
@@ -154,12 +158,16 @@ trait Mappings extends Formatters with Constraints {
         allowedRange,
         startDateAllowedDateRangeError,
         endDateAllowedDateRangeError,
-        duplicateRangeError,
+        overlappedStartDateError,
+        overlappedEndDateError,
         duplicateRanges,
         previousDateRangeError,
         index,
         taxYear,
-        errorTaxYear
+        errorStartBefore,
+        errorStartAfter,
+        errorEndBefore,
+        errorEndAfter
       )
     )
 
