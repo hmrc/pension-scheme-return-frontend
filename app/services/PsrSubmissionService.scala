@@ -77,7 +77,7 @@ class PsrSubmissionService @Inject()(
       .flatMap(
         _.flatMap(
           initialUA => {
-            val isAnyUpdated = initialUA != currentUA
+            val isAnyUpdated = initialUA.data != currentUA.data
             if (isAnyUpdated) {
               (
                 minimalRequiredSubmissionTransformer.transformToEtmp(srn, initialUA),

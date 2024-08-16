@@ -56,13 +56,11 @@ class TaskListController @Inject()(
         for {
           response <- psrVersionsService.getVersions(request.schemeDetails.pstr, formatDateForApi(dates.from))
           hasHistory = response
-            .filter(
-              psrVersionsService =>
-                psrVersionsService.reportStatus == ReportStatus.SubmittedAndInProgress
-                  || psrVersionsService.reportStatus == ReportStatus.SubmittedAndSuccessfullyProcessed
+            .exists(
+              psrVersionsResponse =>
+                psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndInProgress
+                  || psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndSuccessfullyProcessed
             )
-            .toList
-            .nonEmpty
           noChangesSincePreviousVersion = if (!hasHistory || request.previousUserAnswers.isEmpty) {
             true
           } else {

@@ -25,8 +25,8 @@ import utils.nonsipp.TaskListStatusUtils.getBasicDetailsTaskListStatus
 import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
-import _root_.config.Constants.{PSA, PSP}
-import pages.nonsipp.memberdetails.Paths.memberDetails
+import _root_.config.Constants._
+import utils.nonsipp.SchemeDetailNavigationUtils
 import viewmodels.models.TaskListStatus.Updated
 import models.requests.DataRequest
 import _root_.config.Refined.Max3
@@ -37,7 +37,6 @@ import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import pages.nonsipp._
 import navigation.Navigator
-import play.api.libs.json.JsObject
 import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models._
 import play.api.i18n._
@@ -51,64 +50,79 @@ import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
 class BasicDetailsCheckYourAnswersController @Inject()(
-  override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   schemeDateService: SchemeDateService,
   val controllerComponents: MessagesControllerComponents,
   psrSubmissionService: PsrSubmissionService,
   auditService: AuditService,
-  psrVersionsService: PsrVersionsService,
-  psrRetrievalService: PsrRetrievalService,
+  val psrVersionsService: PsrVersionsService,
+  val psrRetrievalService: PsrRetrievalService,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
-    extends PSRController {
+    extends PSRController
+    with SchemeDetailNavigationUtils {
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    onPageLoadCommon(srn, mode)(implicitly)
+    onPageLoadCommon(srn, mode)
   }
 
   def onPageLoadViewOnly(srn: Srn, mode: Mode, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, mode)(implicitly)
+      onPageLoadCommon(srn, mode)
     }
 
   def onPageLoadCommon(srn: Srn, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
     schemeDateService.taxYearOrAccountingPeriods(srn) match {
       case Some(periods) =>
+        val currentUserAnswers = request.userAnswers
         (
           for {
             schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
             activeBankAccount <- requiredPage(ActiveBankAccountPage(srn))
-            whyNoBankAccount = request.userAnswers.get(WhyNoBankAccountPage(srn))
-            whichTaxYearPage = request.userAnswers.get(WhichTaxYearPage(srn))
+            whyNoBankAccount = currentUserAnswers.get(WhyNoBankAccountPage(srn))
+            whichTaxYearPage = currentUserAnswers.get(WhichTaxYearPage(srn))
             userName <- loggedInUserNameOrRedirect
-          } yield Ok(
-            view(
-              viewModel(
-                srn,
-                mode,
-                schemeMemberNumbers,
-                activeBankAccount,
-                whyNoBankAccount,
-                whichTaxYearPage,
-                periods,
-                userName,
-                request.schemeDetails,
-                request.pensionSchemeId.value,
-                request.pensionSchemeId.isPSP,
-                viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-                  getBasicDetailsTaskListStatus(request.userAnswers, request.previousUserAnswers.get) == Updated
-                } else {
-                  false
-                },
-                optYear = request.year,
-                optCurrentVersion = request.currentVersion,
-                optPreviousVersion = request.previousVersion,
-                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          } yield {
+            val compilationOrSubmissionDate = currentUserAnswers.get(CompilationOrSubmissionDatePage(srn))
+            val journeyByPassed = isJourneyByPassed(srn)
+            val result = Ok(
+              view(
+                viewModel(
+                  srn,
+                  mode,
+                  schemeMemberNumbers,
+                  activeBankAccount,
+                  whyNoBankAccount,
+                  whichTaxYearPage,
+                  periods,
+                  userName,
+                  request.schemeDetails,
+                  request.pensionSchemeId.value,
+                  request.pensionSchemeId.isPSP,
+                  viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+                    getBasicDetailsTaskListStatus(currentUserAnswers, request.previousUserAnswers.get) == Updated
+                  } else {
+                    false
+                  },
+                  optYear = request.year,
+                  optCurrentVersion = request.currentVersion,
+                  optPreviousVersion = request.previousVersion,
+                  compilationOrSubmissionDate = compilationOrSubmissionDate,
+                  journeyByPassed = journeyByPassed
+                )
               )
             )
-          )
+            if (journeyByPassed) {
+              result
+                .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
+                .addingToSession(
+                  (SUBMISSION_DATE, schemeDateService.submissionDateAsString(compilationOrSubmissionDate.get))
+                )
+            } else {
+              result
+            }
+          }
         ).merge
       case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
@@ -127,88 +141,21 @@ class BasicDetailsCheckYourAnswersController @Inject()(
               userName <- loggedInUserNameOrRedirect
               _ = auditService.sendEvent(buildAuditEvent(taxYear, schemeMemberNumbers, userName))
             } yield {
-              calculateNextPage(srn)
+              // Determine next page in case of Declaration redirect
+              val byPassedJourney = if (request.pensionSchemeId.isPSP) {
+                nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
+              } else {
+                nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
+              }
+              val regularJourney = navigator
+                .nextPage(BasicDetailsCheckYourAnswersPage(srn), NormalMode, request.userAnswers)
+              calculateNavigation(srn, byPassedJourney, regularJourney).map(Redirect)
             }
 
           // Transform Either[Result, Future[Result]] into a Future[Result]
           EitherT(eitherResultOrFutureResult.sequence).merge
       }
       .flatten
-  }
-
-  /**
-   * This method determines whether the user proceeds directly to the Task List page or skips to the Declaration page.
-   *
-   * This is dependent on two factors: (1) the number of Active & Deferred members in the scheme, and (2) whether any
-   * 'full' returns have been submitted for this scheme before.
-   *
-   * If the number of Active + Deferred members > 99, and no 'full' returns have been submitted for this scheme, then
-   * the user will skip to the Declaration page. In all other cases, they will proceed to the Task List page.
-   *
-   * A 'full' return must include at least 1 member, while a 'skipped' return will contain no member details at all, so
-   * we use {{{.get(memberDetails).getOrElse(JsObject.empty).as[JsObject] == JsObject.empty}}} to determine whether or
-   * not a retrieved set of `UserAnswers` refers to a 'full' or 'skipped' return.
-   */
-  private def calculateNextPage(srn: Srn)(implicit request: DataRequest[AnyContent]): Future[Result] = {
-
-    // Determine next page in case of Declaration redirect
-    val declarationPage = if (request.pensionSchemeId.isPSP) {
-      nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
-    } else {
-      nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
-    }
-
-    // Determine if the member threshold is reached
-    val currentSchemeMembers = request.userAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
-    if (currentSchemeMembers.exists(_.totalActiveAndDeferred > 99)) {
-      // If so, then determine if a full return was submitted this tax year
-      val noFullReturnSubmittedThisTaxYear = request.previousUserAnswers match {
-        case Some(previousUserAnswers) =>
-          previousUserAnswers.get(memberDetails).getOrElse(JsObject.empty).as[JsObject] == JsObject.empty
-        case None =>
-          true
-      }
-
-      if (noFullReturnSubmittedThisTaxYear) {
-        // If so, then determine if a full return was submitted last tax year
-        request.userAnswers.get(WhichTaxYearPage(srn)) match {
-          case Some(currentReturnTaxYear) =>
-            val previousTaxYear = formatDateForApi(currentReturnTaxYear.from.minusYears(1))
-            val previousTaxYearVersions = psrVersionsService.getVersions(request.schemeDetails.pstr, previousTaxYear)
-
-            previousTaxYearVersions.map { psrVersionsResponses =>
-              if (psrVersionsResponses.nonEmpty) {
-                // If so, then determine if the latest submitted return from last year was a full return
-                val latestVersionNumber = "%03d".format(psrVersionsResponses.map(_.reportVersion).max)
-                val latestReturnFromPreviousTaxYear = psrRetrievalService.getAndTransformStandardPsrDetails(
-                  optPeriodStartDate = Some(previousTaxYear),
-                  optPsrVersion = Some(latestVersionNumber),
-                  fallBackCall = controllers.routes.OverviewController.onPageLoad(request.srn)
-                )
-
-                latestReturnFromPreviousTaxYear.map { previousUserAnswers =>
-                  val noFullReturnSubmittedLastTaxYear =
-                    previousUserAnswers.get(memberDetails).getOrElse(JsObject.empty).as[JsObject] == JsObject.empty
-
-                  if (noFullReturnSubmittedLastTaxYear) { // Redirect triggered: no 'full' returns submitted last year
-                    Redirect(declarationPage)
-                  } else { // No redirect triggered: 'full' return submitted last year
-                    Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), NormalMode, request.userAnswers))
-                  }
-                }
-              } else { // Redirect triggered: no returns of any kind submitted last year
-                Future(Redirect(declarationPage))
-              }
-            }.flatten
-          case None => // Couldn't get current return's tax year, so something's gone wrong
-            Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-        }
-      } else { // No redirect: full return was submitted earlier this tax year
-        Future(Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), NormalMode, request.userAnswers)))
-      }
-    } else { // No redirect: too few Active & Deferred members
-      Future(Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), NormalMode, request.userAnswers)))
-    }
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -259,7 +206,8 @@ object BasicDetailsCheckYourAnswersController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    compilationOrSubmissionDate: Option[LocalDateTime] = None,
+    journeyByPassed: Boolean
   )(implicit messages: Messages): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,
@@ -285,15 +233,23 @@ object BasicDetailsCheckYourAnswersController {
         )
       ).withMarginBottom(Margin.Fixed60Bottom),
       refresh = None,
-      buttonText = "site.saveAndContinue",
-      onSubmit = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, mode),
+      buttonText = if (journeyByPassed) {
+        "basicDetailsCheckYourAnswersController.button.view.submission.confirmation"
+      } else {
+        "site.saveAndContinue"
+      },
+      onSubmit = if (journeyByPassed) {
+        controllers.nonsipp.routes.ReturnSubmittedController.onPageLoad(srn)
+      } else {
+        routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, mode)
+      },
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
         Some(
           ViewOnlyDetailsViewModel(
             updated = viewOnlyUpdated,
             link = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion))
-                  if (optYear.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+                  if currentVersion > 1 && previousVersion > 0 =>
                 Some(
                   LinkMessage(
                     "basicDetailsCheckYourAnswersController.viewOnly.link",
@@ -480,6 +436,12 @@ object BasicDetailsCheckYourAnswersController {
       )
     )
   )
+
+  private def isJourneyByPassed(srn: Srn)(implicit request: DataRequest[AnyContent]): Boolean = {
+    val isAlreadySubmitted: Boolean = request.userAnswers.get(FbStatus(srn)).exists(_.isSubmitted)
+    val isPureAnswerStayUnchanged: Boolean = request.pureUserAnswers.fold(false)(_.data == request.userAnswers.data)
+    isAlreadySubmitted && isPureAnswerStayUnchanged
+  }
 
   private def taxEndDate(taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]]): LocalDate =
     taxYearOrAccountingPeriods match {

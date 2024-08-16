@@ -20,12 +20,6 @@ import play.api.mvc.JavascriptLiteral
 
 sealed trait Mode {
 
-  // TODO deprecated, remove when it is not used
-  def fold[A](normal: => A, check: => A): A = this match {
-    case CheckMode => check
-    case NormalMode => normal
-  }
-
   def fold[A](normal: => A, check: => A, viewOnly: => A): A = this match {
     case CheckMode => check
     case NormalMode => normal

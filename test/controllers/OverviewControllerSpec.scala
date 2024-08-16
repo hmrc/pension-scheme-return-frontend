@@ -18,11 +18,16 @@ package controllers
 
 import play.api.test.FakeRequest
 import services.{PsrOverviewService, PsrRetrievalService, PsrVersionsService}
+import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import play.api.inject.bind
 import views.html.OverviewView
+import eu.timepit.refined.refineMV
+import pages.nonsipp.WhichTaxYearPage
 import models.backend.responses.PsrReportType
+import models.CheckMode
 import viewmodels.OverviewSummary
 import org.mockito.ArgumentMatchers.any
+import pages.nonsipp.memberdetails.DoesMemberHaveNinoPage
 import org.mockito.Mockito.{reset, when}
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
@@ -141,13 +146,6 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
     }
 
     "onSelectContinue redirects to what you will need page" in runningApplication { implicit app =>
-      when(
-        mockPsrRetrievalService
-          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
-      ).thenReturn(
-        Future.successful(defaultUserAnswers)
-      )
-
       val request = FakeRequest(GET, onSelectContinue)
 
       val result = route(app, request).value
@@ -156,14 +154,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
       redirectLocation(result).value mustEqual controllers.nonsipp.routes.TaskListController.onPageLoad(srn).url
     }
 
-    "onSelectViewAndChange redirects to the task list page" in runningApplication { implicit app =>
-      when(
-        mockPsrRetrievalService
-          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
-      ).thenReturn(
-        Future.successful(defaultUserAnswers)
-      )
-
+    "onSelectViewAndChange redirects to the task list page when members empty" in runningApplication { implicit app =>
       val request = FakeRequest(GET, onSelectViewAndChange)
 
       val result = route(app, request).value
@@ -172,5 +163,114 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
       redirectLocation(result).value mustEqual controllers.nonsipp.routes.TaskListController.onPageLoad(srn).url
     }
 
+    "onSelectViewAndChange redirects to the task list page when members under threshold" in {
+      val ua = emptyUserAnswers.unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersUnderThreshold)
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, onSelectViewAndChange)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.nonsipp.routes.TaskListController.onPageLoad(srn).url
+      }
+    }
+
+    "onSelectViewAndChange redirects to the task list page when members over threshold and previous userAnswers has some memberDetails" in {
+      val currentUA = emptyUserAnswers.unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
+      val preUA = currentUA.unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
+
+      running(_ => applicationBuilder(userAnswers = Some(currentUA), previousUserAnswers = Some(preUA))) { app =>
+        val request = FakeRequest(GET, onSelectViewAndChange)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.nonsipp.routes.TaskListController.onPageLoad(srn).url
+      }
+    }
+
+    "onSelectViewAndChange redirects to the journeyRecovery page when members over threshold and previous userAnswers empty and no TaxYear data" in {
+      val currentUA = emptyUserAnswers.unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
+
+      running(_ => applicationBuilder(userAnswers = Some(currentUA))) { app =>
+        val request = FakeRequest(GET, onSelectViewAndChange)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "onSelectViewAndChange redirects to the BasicDetailsCYA page when members over threshold and no previous userAnswers and no previous psr return at all" in {
+      when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(
+        Future.successful(Seq())
+      )
+      val currentUA = emptyUserAnswers
+        .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
+        .unsafeSet(WhichTaxYearPage(srn), dateRange)
+
+      running(_ => applicationBuilder(userAnswers = Some(currentUA))) { app =>
+        val request = FakeRequest(GET, onSelectViewAndChange)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
+          .onPageLoad(srn, CheckMode)
+          .url
+      }
+    }
+
+    "onSelectViewAndChange redirects to the BasicDetailsCYA page " +
+      "when members over threshold and no previous userAnswers and no previous psr return with memberDetails" in {
+      when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(
+        Future.successful(versionsResponse)
+      )
+      when(
+        mockPsrRetrievalService
+          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+      ).thenReturn(Future.successful(emptyUserAnswers))
+      val currentUA = emptyUserAnswers
+        .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
+        .unsafeSet(WhichTaxYearPage(srn), dateRange)
+
+      running(_ => applicationBuilder(userAnswers = Some(currentUA))) { app =>
+        val request = FakeRequest(GET, onSelectViewAndChange)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
+          .onPageLoad(srn, CheckMode)
+          .url
+      }
+    }
+
+    "onSelectViewAndChange redirects to the task list page " +
+      "when members over threshold and no previous userAnswers and previous psr return with memberDetails" in {
+      val currentUA = emptyUserAnswers
+        .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
+        .unsafeSet(WhichTaxYearPage(srn), dateRange)
+      when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(
+        Future.successful(versionsResponse)
+      )
+      when(
+        mockPsrRetrievalService
+          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+      ).thenReturn(Future.successful(currentUA))
+      running(_ => applicationBuilder(userAnswers = Some(currentUA))) { app =>
+        val request = FakeRequest(GET, onSelectViewAndChange)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
+          .onPageLoad(srn, CheckMode)
+          .url
+      }
+    }
   }
 }
