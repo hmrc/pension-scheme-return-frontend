@@ -2676,17 +2676,17 @@ memberPensionPayments.memberList.viewOnly.heading = Pension payments
 memberPensionPayments.memberList.viewOnly.link = View previous version of pension payments (opens in new tab)
 memberPensionPayments.memberList.view.none = Did any member receive pension payments from {0} during the period of this return?
 
-totalAmountPensionPayments.title = What was the taxable amount of pension payments received by the member during the period of this return, in pounds and pence?
-totalAmountPensionPayments.heading = What was the taxable amount of pension payments received by {0} during the period of this return, in pounds and pence?
-totalAmountPensionPayments.error.required = Enter the taxable amount of pension payments, in pounds and pence
-totalAmountPensionPayments.error.invalid = Taxable amount of pension payments must be an amount of money, like 123 or 123.45
-totalAmountPensionPayments.error.tooSmall = Taxable amount of pension payments must be 0.01 or more
-totalAmountPensionPayments.error.tooLarge = Taxable amount of pension payments must be 999999999.99 or less
+totalAmountPensionPayments.title = What was the gross amount of pension payments received by the member during the period of this return, in pounds and pence?
+totalAmountPensionPayments.heading = What was the gross amount of pension payments received by {0} during the period of this return, in pounds and pence?
+totalAmountPensionPayments.error.required = Enter the gross amount of pension payments, in pounds and pence
+totalAmountPensionPayments.error.invalid = Gross amount of pension payments must be an amount of money, like 123 or 123.45
+totalAmountPensionPayments.error.tooSmall = Gross amount of pension payments must be 0.01 or more
+totalAmountPensionPayments.error.tooLarge = Gross amount of pension payments must be 999999999.99 or less
 
 MemberPensionPaymentsCYA.title = Check your answers
-MemberPensionPaymentsCYA.change.title = Change details of taxable pension payments for this member
+MemberPensionPaymentsCYA.change.title = Change details of pension payments for this member
 MemberPensionPaymentsCYA.heading = Check your answers
-MemberPensionPaymentsCYA.change.heading = Change details of taxable pension payments for {0}
+MemberPensionPaymentsCYA.change.heading = Change details of pension payments for {0}
 MemberPensionPaymentsCYA.section.memberName.header = Member’s name
 MemberPensionPaymentsCYA.section.memberName = Gross amount of pension payments received by {0}
 MemberPensionPaymentsCYA.section.amount = £ {0}
