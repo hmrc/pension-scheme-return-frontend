@@ -20,5 +20,6 @@ import viewmodels.DisplayMessage.{InlineMessage, Message}
 
 case class DatePageViewModel(
   legend: Option[Message],
-  header: InlineMessage
+  header: InlineMessage,
+  hint: Option[Message] = None
 )

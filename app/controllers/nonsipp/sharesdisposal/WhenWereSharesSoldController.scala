@@ -139,7 +139,11 @@ object WhenWereSharesSoldController {
     FormPageViewModel(
       title = Message("sharesDisposal.whenWereSharesSold.title"),
       heading = Message("sharesDisposal.whenWereSharesSold.heading", companyName),
-      page = DatePageViewModel(None, Message("sharesDisposal.whenWereSharesSold.heading", companyName)),
+      page = DatePageViewModel(
+        None,
+        Message("sharesDisposal.whenWereSharesSold.heading", companyName),
+        Some("sharesDisposal.whenWereSharesSold.hint")
+      ),
       onSubmit = routes.WhenWereSharesSoldController.onSubmit(srn, shareIndex, disposalIndex, mode)
     )
 }
