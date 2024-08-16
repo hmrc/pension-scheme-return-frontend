@@ -139,7 +139,11 @@ object WhenDidSchemeAcquireAssetsController {
         "otherAssets.whenDidSchemeAcquireAssets.heading",
         schemeName
       ),
-      DatePageViewModel(None, Message("otherAssets.whenDidSchemeAcquireAssets.heading", schemeName)),
+      DatePageViewModel(
+        None,
+        Message("otherAssets.whenDidSchemeAcquireAssets.heading", schemeName),
+        Some("otherAssets.whenDidSchemeAcquireAssets.hint")
+      ),
       routes.WhenDidSchemeAcquireAssetsController.onSubmit(srn, index, mode)
     )
 }

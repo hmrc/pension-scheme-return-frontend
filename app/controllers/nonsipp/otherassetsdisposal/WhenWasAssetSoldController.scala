@@ -142,7 +142,11 @@ object WhenWasAssetSoldController {
     FormPageViewModel(
       title = Message("whenWasAssetSold.title"),
       heading = Message("whenWasAssetSold.heading"),
-      page = DatePageViewModel(None, Message("whenWasAssetSold.heading")),
+      page = DatePageViewModel(
+        None,
+        Message("whenWasAssetSold.heading"),
+        Some(Message("whenWasAssetSold.hint"))
+      ),
       onSubmit = routes.WhenWasAssetSoldController.onSubmit(srn, assetIndex, disposalIndex, mode)
     )
 }

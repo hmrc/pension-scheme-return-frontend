@@ -134,7 +134,7 @@ object OtherAssetIndividualSellerNINumberController {
             Message("otherAssets.otherAssetIndividualSellerNINumber.no.conditional", individualName),
             FieldType.Textarea
           )
-      ),
+      ).withHint("otherAssets.otherAssetIndividualSellerNINumber.hint"),
       routes.OtherAssetIndividualSellerNINumberController.onSubmit(srn, index, mode)
     )
 }
