@@ -65,7 +65,7 @@ class SharesListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)(implicitly)
+      onPageLoadCommon(srn, page, mode)
   }
   def onPageLoadViewOnly(
     srn: Srn,
@@ -90,7 +90,7 @@ class SharesListController @Inject()(
       previousVersion = previous,
       compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
     )
-    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))(implicitly)
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))
   }
 
   def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(

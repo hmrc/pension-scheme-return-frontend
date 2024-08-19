@@ -62,7 +62,7 @@ class LandPropertyDisposalCYAController @Inject()(
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn, index, disposalIndex, mode)(implicitly)
+      onPageLoadCommon(srn, index, disposalIndex, mode)
     }
 
   def onPageLoadViewOnly(
@@ -75,7 +75,7 @@ class LandPropertyDisposalCYAController @Inject()(
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, landOrPropertyIndex, disposalIndex, mode)(implicitly)
+      onPageLoadCommon(srn, landOrPropertyIndex, disposalIndex, mode)
     }
 
   def onPageLoadCommon(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode)(
