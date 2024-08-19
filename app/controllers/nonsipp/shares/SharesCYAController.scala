@@ -62,7 +62,7 @@ class SharesCYAController @Inject()(
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicitly)
+      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)
     }
 
   def onPageLoadViewOnly(
@@ -74,7 +74,7 @@ class SharesCYAController @Inject()(
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicitly)
+      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)
     }
 
   def onPageLoadCommon(srn: SchemeId.Srn, index: Max5000, mode: Mode)(
