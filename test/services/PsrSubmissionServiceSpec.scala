@@ -16,13 +16,13 @@
 
 package services
 
+import models.audit.{PSRCompileAuditEvent, PSRSubmissionAuditEvent}
 import play.api.mvc.AnyContentAsEmpty
 import connectors.PSRConnector
 import controllers.TestValues
 import cats.data.NonEmptyList
 import transformations._
 import utils.UserAnswersUtils.UserAnswersOps
-import pages.nonsipp.CheckReturnDatesPage
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import models.DateRange
 import models.requests.{AllowedAccessRequest, DataRequest}
@@ -35,6 +35,8 @@ import play.api.test.Helpers.stubMessagesApi
 import org.mockito.Mockito._
 import models.requests.psr._
 import config.Constants.{PSP, UNCHANGED_SESSION_PREFIX}
+import pages.nonsipp.CheckReturnDatesPage
+import play.api.libs.json.{JsArray, JsValue}
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -175,16 +177,17 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
             verify(mockSharesTransformer, times(1)).transformToEtmp(any(), any())(any())
             verify(mockDeclarationTransformer, never).transformToEtmp(any())
-            verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any(), any())(any(), any())
-            verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
+            verify(mockConnector, times(1)).submitPsrDetails(psrSubmissionCaptor.capture(), any(), any())(any(), any())
+            verify(mockAuditService, times(1)).sendExtendedEvent(psrCompileAuditEventCaptor.capture())(any(), any())
             verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
 
-            captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-            captor.getValue.checkReturnDates mustBe checkReturnDatesAnswer
-            captor.getValue.loans mustBe None
-            captor.getValue.assets mustBe None
-            captor.getValue.shares mustBe None
-            captor.getValue.psrDeclaration mustBe None
+            psrSubmissionCaptor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+            psrSubmissionCaptor.getValue.checkReturnDates mustBe checkReturnDatesAnswer
+            psrSubmissionCaptor.getValue.loans mustBe None
+            psrSubmissionCaptor.getValue.assets mustBe None
+            psrSubmissionCaptor.getValue.shares mustBe None
+            psrSubmissionCaptor.getValue.psrDeclaration mustBe None
+            psrCompileAuditEventCaptor.getValue.taskList must not be JsArray(Array.empty[JsValue])
             result mustBe Some(())
           }
         }
@@ -215,16 +218,17 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
         verify(mockSharesTransformer, times(1)).transformToEtmp(any(), any())(any())
         verify(mockDeclarationTransformer, never).transformToEtmp(any())
-        verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any(), any())(any(), any())
-        verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
+        verify(mockConnector, times(1)).submitPsrDetails(psrSubmissionCaptor.capture(), any(), any())(any(), any())
+        verify(mockAuditService, times(1)).sendExtendedEvent(psrCompileAuditEventCaptor.capture())(any(), any())
         verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
 
-        captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-        captor.getValue.checkReturnDates mustBe false
-        captor.getValue.loans mustBe optLoans
-        captor.getValue.assets mustBe optAssets
-        captor.getValue.shares mustBe optShares
-        captor.getValue.psrDeclaration mustBe None
+        psrSubmissionCaptor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+        psrSubmissionCaptor.getValue.checkReturnDates mustBe false
+        psrSubmissionCaptor.getValue.loans mustBe optLoans
+        psrSubmissionCaptor.getValue.assets mustBe optAssets
+        psrSubmissionCaptor.getValue.shares mustBe optShares
+        psrSubmissionCaptor.getValue.psrDeclaration mustBe None
+        psrCompileAuditEventCaptor.getValue.taskList must not be JsArray(Array.empty[JsValue])
         result mustBe Some(())
       }
     }
@@ -254,16 +258,17 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
           verify(mockSharesTransformer, times(1)).transformToEtmp(any(), any())(any())
           verify(mockDeclarationTransformer, times(1)).transformToEtmp(any())
-          verify(mockConnector, times(1)).submitPsrDetails(captor.capture(), any(), any())(any(), any())
-          verify(mockAuditService, times(1)).sendExtendedEvent(any())(any(), any())
+          verify(mockConnector, times(1)).submitPsrDetails(psrSubmissionCaptor.capture(), any(), any())(any(), any())
+          verify(mockAuditService, times(1)).sendExtendedEvent(psrSubmissionAuditEventCaptor.capture())(any(), any())
           verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
 
-          captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-          captor.getValue.checkReturnDates mustBe false
-          captor.getValue.loans mustBe optLoans
-          captor.getValue.assets mustBe optAssets
-          captor.getValue.shares mustBe optShares
-          captor.getValue.psrDeclaration mustBe Some(declaration)
+          psrSubmissionCaptor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+          psrSubmissionCaptor.getValue.checkReturnDates mustBe false
+          psrSubmissionCaptor.getValue.loans mustBe optLoans
+          psrSubmissionCaptor.getValue.assets mustBe optAssets
+          psrSubmissionCaptor.getValue.shares mustBe optShares
+          psrSubmissionCaptor.getValue.psrDeclaration mustBe Some(declaration)
+          psrSubmissionAuditEventCaptor.getValue.psrSubmission mustBe psrSubmissionCaptor.getValue
           result mustBe Some(())
       }
     }
@@ -271,7 +276,12 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 }
 
 object PsrSubmissionServiceSpec {
-  val captor: ArgumentCaptor[PsrSubmission] = ArgumentCaptor.forClass(classOf[PsrSubmission])
+
+  val psrSubmissionCaptor: ArgumentCaptor[PsrSubmission] = ArgumentCaptor.forClass(classOf[PsrSubmission])
+  val psrSubmissionAuditEventCaptor: ArgumentCaptor[PSRSubmissionAuditEvent] =
+    ArgumentCaptor.forClass(classOf[PSRSubmissionAuditEvent])
+  val psrCompileAuditEventCaptor: ArgumentCaptor[PSRCompileAuditEvent] =
+    ArgumentCaptor.forClass(classOf[PSRCompileAuditEvent])
 
   val sampleDate: LocalDate = LocalDate.now
   val minimalRequiredSubmission: MinimalRequiredSubmission = MinimalRequiredSubmission(
