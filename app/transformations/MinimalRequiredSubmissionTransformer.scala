@@ -22,12 +22,14 @@ import pages.nonsipp.accountingperiod.Paths.accountingPeriodDetails
 import com.google.inject.Singleton
 import models.SchemeId.Srn
 import cats.implicits.catsSyntaxTuple2Semigroupal
-import models.requests.psr._
 import pages.nonsipp.accountingperiod.{AccountingPeriodRecordVersionPage, AccountingPeriods}
 import pages.nonsipp._
 import models._
 import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
+import viewmodels.models.{Compiled, PSRStatus, Submitted}
 import models.requests.DataRequest
+import models.requests.psr._
+import config.Constants.defaultFbVersion
 
 import scala.util.Try
 
@@ -35,8 +37,16 @@ import javax.inject.Inject
 
 @Singleton()
 class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDateService) {
+  def getVersionAndStatus(srn: Srn, currentUA: UserAnswers, isSubmitted: Boolean): (Option[String], PSRStatus) = {
+    val fbVersion = currentUA.get(FbVersionPage(srn)).getOrElse(defaultFbVersion)
+    val fbStatus = currentUA.get(FbStatus(srn)).getOrElse(Compiled)
+    (
+      if (fbVersion.toInt == 1 && fbStatus.isSubmitted) None else Some(fbVersion),
+      if (isSubmitted) Submitted else Compiled
+    )
+  }
 
-  def transformToEtmp(srn: Srn, initialUA: UserAnswers)(
+  def transformToEtmp(srn: Srn, initialUA: UserAnswers, isSubmitted: Boolean = false)(
     implicit request: DataRequest[_]
   ): Option[MinimalRequiredSubmission] = {
 
@@ -50,14 +60,16 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
     val accountingPeriodsSame = currentUA.get(accountingPeriodDetails) == initialUA.get(accountingPeriodDetails)
     val schemeDesignatorySame = currentUA.get(schemeDesignatory) == initialUA.get(schemeDesignatory)
 
+    val (version, status) = getVersionAndStatus(srn, currentUA, isSubmitted)
+
     (
       schemeDateService.returnPeriods(srn),
       currentUA.get(HowManyMembersPage(srn, request.pensionSchemeId))
     ).mapN { (returnPeriods, schemeMemberNumbers) =>
       MinimalRequiredSubmission(
         reportDetails = ReportDetails(
-          fbVersion = None,
-          fbstatus = None,
+          fbVersion = version,
+          fbstatus = Some(status),
           pstr = request.schemeDetails.pstr,
           periodStart = taxYear.get.from,
           periodEnd = taxYear.get.to,
