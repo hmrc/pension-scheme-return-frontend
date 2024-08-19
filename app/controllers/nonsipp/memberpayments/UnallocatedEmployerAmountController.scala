@@ -90,7 +90,8 @@ object UnallocatedEmployerAmountController {
     MoneyFormErrors(
       requiredKey = "unallocatedEmployerAmount.error.required",
       nonNumericKey = "unallocatedEmployerAmount.error.invalid",
-      max = (Constants.maxMoneyValue, "unallocatedEmployerAmount.error.tooLarge")
+      max = (Constants.maxMoneyValue, "unallocatedEmployerAmount.error.tooLarge"),
+      min = (Constants.minPosMoneyValue, "unallocatedEmployerAmount.error.tooSmall")
     )
   )
 

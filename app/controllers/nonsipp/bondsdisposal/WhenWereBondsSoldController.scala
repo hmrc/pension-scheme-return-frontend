@@ -143,7 +143,11 @@ object WhenWereBondsSoldController {
     FormPageViewModel(
       title = Message("bondsDisposal.whenWereBondsSold.title"),
       heading = Message("bondsDisposal.whenWereBondsSold.heading"),
-      page = DatePageViewModel(None, Message("bondsDisposal.whenWereBondsSold.heading")),
+      page = DatePageViewModel(
+        None,
+        Message("bondsDisposal.whenWereBondsSold.heading"),
+        Some(Message("bondsDisposal.whenWereBondsSold.hint"))
+      ),
       onSubmit = routes.WhenWereBondsSoldController.onSubmit(srn, bondIndex, disposalIndex, mode)
     )
 }

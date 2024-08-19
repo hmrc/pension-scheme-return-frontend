@@ -168,7 +168,11 @@ object WhenWasTransferMadeController {
     FormPageViewModel(
       "transferOut.transferMade.title",
       Message("transferOut.transferMade.heading", schemeName, memberName),
-      DatePageViewModel(None, Message("transferOut.transferMade.heading", schemeName, memberName)),
+      DatePageViewModel(
+        None,
+        Message("transferOut.transferMade.heading", schemeName, memberName),
+        Some("transferOut.transferMade.hint")
+      ),
       controllers.nonsipp.membertransferout.routes.WhenWasTransferMadeController
         .onSubmit(srn, index, secondaryIndex, mode)
     )

@@ -656,6 +656,7 @@ sharesDisposal.howWereSharesDisposed.conditional.error.length = Details of the d
 
 sharesDisposal.whenWereSharesSold.title = When were the shares in this company sold?
 sharesDisposal.whenWereSharesSold.heading = When were the shares in {0} sold?
+sharesDisposal.whenWereSharesSold.hint = For example, 27 6 2024
 sharesDisposal.whenWereSharesSold.error.required.all = Enter the date these shares were sold
 sharesDisposal.whenWereSharesSold.error.required.day = Date these shares were sold must include a day
 sharesDisposal.whenWereSharesSold.error.required.month = Date these shares were sold must include a month
@@ -927,6 +928,7 @@ surrenderedBenefits.amount.error.tooLarge = Total amount surrendered must be 999
 
 surrenderedBenefits.when.title = When did the member surrender their pension benefits?
 surrenderedBenefits.when.heading = When did {0} surrender their pension benefits of £{1}?
+surrenderedBenefits.when.hint = For example, 27 6 2024
 surrenderedBenefits.when.error.required.day = Date the member surrendered their pension benefits must include a day
 surrenderedBenefits.when.error.required.month = Date the member surrendered their pension benefits must include a month
 surrenderedBenefits.when.error.required.year = Date the member surrendered their pension benefits must include a year
@@ -1597,6 +1599,7 @@ landPropertyInUK.error.required = Select yes if the land or property is in the U
 
 whenDidSchemeAcquireLandOrProperty.title = When did the scheme acquire this land or property?
 whenDidSchemeAcquireLandOrProperty.heading = When did {0} acquire {1}?
+whenDidSchemeAcquireLandOrProperty.hint = For example, 27 6 2024
 whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.all = Enter the date the scheme acquired this land or property
 whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.day = Date the scheme acquired this land or property must include a day
 whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.month = Date the scheme acquired this land or property must include a month
@@ -1972,6 +1975,7 @@ partnershipBuyerName.error.invalid = Buyer’s partnership name must only includ
 
 individualBuyerNinoNumber.title = Do you know the buyer’s National Insurance number?
 individualBuyerNinoNumber.heading = Do you know {0}’s National Insurance number?
+individualBuyerNinoNumber.hint = This number will only be used to check if they are a connected party.
 individualBuyerNinoNumber.yes.conditional = What is {0}’s National Insurance number?
 individualBuyerNinoNumber.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
 individualBuyerNinoNumber.error.required = Select yes if you know the buyer’s National Insurance number
@@ -2274,6 +2278,7 @@ unallocatedEmployerAmount.heading = How much did {0} receive in unallocated empl
 unallocatedEmployerAmount.error.required = Enter the amount of unallocated employer contributions received by the scheme during the period of this return, in pounds and pence
 unallocatedEmployerAmount.error.invalid = Amount of unallocated employer contributions must be an amount of money, like 123.45 or 156
 unallocatedEmployerAmount.error.tooLarge = Amount of unallocated employer contributions must be 999999999.99 or less
+unallocatedEmployerAmount.error.tooSmall = Amount of unallocated employer contributions must be 0.01 or more
 
 unallocatedEmployerCYA.title = Check your answers
 unallocatedEmployerCYA.change.title = Check your answers
@@ -2494,6 +2499,7 @@ totalValueTransfer.error.tooLarge = Total value of the transfer must be 99999999
 
 transferReceived.title = When was this transfer for this member received?
 transferReceived.heading = When was the transfer from {0} for {1} received?
+transferReceived.hint = For example, 27 6 2024
 transferReceived.error.required.day = Date the transfer was received must include day
 transferReceived.error.required.month = Date the transfer was received must include month
 transferReceived.error.required.year = Date the transfer was received must include year
@@ -2602,6 +2608,7 @@ transferOut.pensionType.title = What type of scheme is the receiving scheme?
 
 transferOut.transferMade.title = When was this transfer for this member made?
 transferOut.transferMade.heading = When was the transfer to {0} for {1} made?
+transferOut.transferMade.hint = For example, 27 6 2024
 transferOut.transferMade.error.required.day = Date the transfer was made must include day
 transferOut.transferMade.error.required.month = Date the transfer was made must include month
 transferOut.transferMade.error.required.year = Date the transfer was made must include year
@@ -2724,6 +2731,7 @@ individualNameOfSharesSeller.error.invalid = Seller’s name must only include l
 
 sharesIndividualSellerNINumber.title = Do you know the seller’s National Insurance number?
 sharesIndividualSellerNINumber.heading = Do you know {0}’s National Insurance number?
+sharesIndividualSellerNINumber.hint = This number will only be used to check if they are a connected party.
 sharesIndividualSellerNINumber.yes.conditional = What is {0}’s National Insurance number?
 sharesIndividualSellerNINumber.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
 sharesIndividualSellerNINumber.error.required = Select yes if you know the seller’s National Insurance number
@@ -2972,6 +2980,7 @@ whyDoesSchemeHoldBonds.radioList3 = Transfer from another scheme
 
 whenDidSchemeAcquireBonds.title = When did the scheme acquire these bonds?
 whenDidSchemeAcquireBonds.heading = When did {0} acquire these bonds?
+whenDidSchemeAcquireBonds.hint = For example, 27 6 2025
 whenDidSchemeAcquireBonds.dateOfAcquired.error.required.all = Enter the date the scheme acquired these bonds
 whenDidSchemeAcquireBonds.dateOfAcquired.error.required.day = Date the scheme acquired these bonds must include a day
 whenDidSchemeAcquireBonds.dateOfAcquired.error.required.month = Date the scheme acquired these bonds must include a month
@@ -3302,6 +3311,7 @@ otherAssets.change.heading = Change details for asset
 
 bondsDisposal.whenWereBondsSold.title = When were these bonds sold?
 bondsDisposal.whenWereBondsSold.heading = When were these bonds sold?
+bondsDisposal.whenWereBondsSold.hint = For example, 27 6 2024
 bondsDisposal.whenWereBondsSold.error.required.all = Enter the date these bonds were sold
 bondsDisposal.whenWereBondsSold.error.required.day = Date these bonds were sold must include a day
 bondsDisposal.whenWereBondsSold.error.required.month = Date these bonds were sold must include a month
