@@ -20,10 +20,11 @@ import services.UploadService
 import controllers.ControllerBaseSpec
 import views.html.ContentPageView
 import play.api.inject
+import pages.nonsipp.memberdetails.upload.UploadStatusPage
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{reset, when}
-import models.{NormalMode, Upload}
+import models._
 import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController._
 
 import scala.concurrent.Future
@@ -44,9 +45,14 @@ class CheckingMemberDetailsFileControllerSpec extends ControllerBaseSpec {
 
   "CheckingMemberDetailsFileController" - {
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[ContentPageView].apply(viewModel(srn, NormalMode))
-    })
+    act.like(
+      renderView(
+        onPageLoad,
+        defaultUserAnswers.unsafeSet(UploadStatusPage(srn), UploadSubmitted)
+      ) { implicit app => implicit request =>
+        injected[ContentPageView].apply(viewModel(srn, NormalMode))
+      }.before(mockGetUploadResult(Some(uploadResultSuccess)))
+    )
 
     act.like(
       redirectToPage(onSubmit, routes.FileUploadSuccessController.onPageLoad(srn, NormalMode))

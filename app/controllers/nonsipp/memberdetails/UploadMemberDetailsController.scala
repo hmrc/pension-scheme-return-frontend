@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.memberdetails
 
-import services.{AuditService, SchemeDateService, UploadService}
+import services._
 import models.audit.PSRUpscanFileUploadAuditEvent
 import pages.nonsipp.memberdetails.UploadMemberDetailsPage
 import viewmodels.implicits._
@@ -27,17 +27,19 @@ import controllers.nonsipp.memberdetails.UploadMemberDetailsController._
 import config.Constants.{PSA, PSP}
 import controllers.actions._
 import navigation.Navigator
+import pages.nonsipp.memberdetails.upload.UploadStatusPage
 import models._
 import views.html.UploadView
 import models.SchemeId.Srn
 import models.UploadStatus.UploadStatus
 import play.api.i18n.{I18nSupport, MessagesApi}
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.{ListMessage, ListType, ParagraphMessage}
 import viewmodels.models.{FormPageViewModel, UploadViewModel}
 import models.requests.DataRequest
 import play.api.data.FormError
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
@@ -50,6 +52,7 @@ class UploadMemberDetailsController @Inject()(
   schemeDateService: SchemeDateService,
   auditService: AuditService,
   config: FrontendAppConfig,
+  saveService: SaveService,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
     extends PSRController
@@ -69,6 +72,8 @@ class UploadMemberDetailsController @Inject()(
     for {
       initiateResponse <- uploadService.initiateUpscan(callBackUrl, successRedirectUrl, failureRedirectUrl)
       _ <- uploadService.registerUploadRequest(uploadKey, Reference(initiateResponse.fileReference.reference))
+      updatedUserAnswers <- request.userAnswers.set(UploadStatusPage(srn), UploadInitiated).mapK[Future]
+      _ <- saveService.save(updatedUserAnswers)
     } yield Ok(
       view(
         viewModel(
@@ -81,8 +86,11 @@ class UploadMemberDetailsController @Inject()(
     )
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    Redirect(navigator.nextPage(UploadMemberDetailsPage(srn), mode, request.userAnswers))
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    for {
+      updatedUserAnswers <- request.userAnswers.set(UploadStatusPage(srn), UploadSubmitted).mapK[Future]
+      _ <- saveService.save(updatedUserAnswers)
+    } yield Redirect(navigator.nextPage(UploadMemberDetailsPage(srn), mode, request.userAnswers))
   }
 
   private def collectErrors(srn: Srn, startTime: Long)(implicit request: DataRequest[_]): Option[FormError] =

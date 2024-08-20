@@ -24,15 +24,17 @@ import org.apache.pekko.stream.Materializer
 import controllers.PSRController
 import config.Constants.{PSA, PSP}
 import controllers.actions._
-import navigation.Navigator
-import forms.YesNoPageFormProvider
 import models._
 import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
 import views.html.YesNoPageView
 import models.SchemeId.Srn
+import play.api.Logger
+import navigation.Navigator
+import forms.YesNoPageFormProvider
+import pages.nonsipp.memberdetails.upload.UploadStatusPage
 import models.UploadStatus.UploadStatus
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.MessagesApi
 import viewmodels.DisplayMessage.ParagraphMessage
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import models.requests.DataRequest
@@ -55,25 +57,35 @@ class CheckMemberDetailsFileController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
 )(implicit ec: ExecutionContext, mat: Materializer)
-    extends PSRController
-    with I18nSupport {
+    extends PSRController {
 
+  private val logger = Logger(getClass)
   private val form = CheckMemberDetailsFileController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    val startTime = System.currentTimeMillis
-    val preparedForm = request.userAnswers.fillForm(CheckMemberDetailsFilePage(srn), form)
-    val uploadKey = UploadKey.fromRequest(srn)
+    val uploadStatus = request.userAnswers.get(UploadStatusPage(srn))
 
-    uploadService.getUploadStatus(uploadKey).map {
-      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case Some(upload: UploadStatus.Success) =>
-        auditUpload(srn, upload, startTime)
-        Ok(view(preparedForm, viewModel(srn, Some(upload.name), mode)))
-      case Some(failure: UploadStatus.Failed) =>
-        auditUpload(srn, failure, startTime)
-        Ok(view(preparedForm, viewModel(srn, Some(""), mode)))
-      case Some(_) => Ok(view(preparedForm, viewModel(srn, None, mode)))
+    uploadStatus match {
+      case Some(UploadSubmitted) =>
+        val startTime = System.currentTimeMillis
+        val uploadKey = UploadKey.fromRequest(srn)
+        val preparedForm = request.userAnswers.fillForm(CheckMemberDetailsFilePage(srn), form)
+        uploadService.getUploadStatus(uploadKey).map {
+          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          case Some(upload: UploadStatus.Success) =>
+            auditUpload(srn, upload, startTime)
+            Ok(view(preparedForm, viewModel(srn, Some(upload.name), mode)))
+          case Some(failure: UploadStatus.Failed) =>
+            auditUpload(srn, failure, startTime)
+            logger.warn("Upload failed")
+            Ok(view(preparedForm, viewModel(srn, Some(""), mode)))
+          case Some(_: UploadStatus.InProgress.type) =>
+            logger.warn("Upload In progress, refreshing page")
+            Ok(view(preparedForm, viewModel(srn, None, mode)))
+        }
+      case _ =>
+        logger.warn("Upload is either initiated or never started, redirecting to upload member details")
+        Future.successful(Redirect(routes.UploadMemberDetailsController.onPageLoad(srn)))
     }
   }
 

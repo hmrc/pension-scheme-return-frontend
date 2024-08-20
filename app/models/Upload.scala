@@ -58,6 +58,18 @@ object ValidationError {
     ValidationError(cell + (row + 1), errorType: ValidationErrorType, errorMessage)
 }
 
+// Used to track the state of the upload user journey. This is separate from the actual Upload payload state
+sealed trait UploadJourneyStatus
+
+case object UploadInitiated extends UploadJourneyStatus
+case object UploadSubmitted extends UploadJourneyStatus
+
+object UploadJourneyStatus {
+  implicit val formatUploadInitiated: Format[UploadInitiated.type] = Json.format[UploadInitiated.type]
+  implicit val formatUploadSubmitted: Format[UploadSubmitted.type] = Json.format[UploadSubmitted.type]
+  implicit val formatUploadJourneyStatus: Format[UploadJourneyStatus] = Json.format[UploadJourneyStatus]
+}
+
 case class UploadState(row: Int, previousNinos: List[Nino]) {
   def next(nino: Option[Nino] = None): UploadState =
     UploadState(row + 1, previousNinos :?+ nino)
