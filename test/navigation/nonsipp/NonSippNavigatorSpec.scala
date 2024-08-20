@@ -21,8 +21,10 @@ import utils.BaseSpec
 import controllers.nonsipp
 import controllers.nonsipp._
 import eu.timepit.refined.refineMV
-import org.scalacheck.Gen
+import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import models.{NormalMode, SchemeMemberNumbers}
+import utils.UserAnswersUtils.UserAnswersOps
+import org.scalacheck.Gen
 import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import navigation.{Navigator, NavigatorBehaviours, UnknownPage}
 
@@ -122,6 +124,43 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             routes.BasicDetailsCheckYourAnswersController.onPageLoad
           )
           .withName("go from How Many Members to Basic Details CYA (for any number of members)")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithData(
+            CheckReturnDatesPage,
+            Gen.const(true),
+            nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad
+          )
+          .withName("go from CheckReturnDates page to basic details CYA when Yes selected")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithData(
+            CheckReturnDatesPage,
+            Gen.const(false),
+            nonsipp.accountingperiod.routes.AccountingPeriodListController.onPageLoad,
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), dateRangeGen.sample.value)
+          )
+          .withName(
+            "go from CheckReturnDates page to AccountingPeriodsList when No selected and accounting periods not empty"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithData(
+            CheckReturnDatesPage,
+            Gen.const(false),
+            (srn, mode) => nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), mode)
+          )
+          .withName(
+            "go from CheckReturnDates page to AccountingPeriods when No selected and AccountingPeriods is empty"
+          )
       )
     }
   }

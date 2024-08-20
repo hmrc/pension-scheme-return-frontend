@@ -334,14 +334,20 @@ object BasicDetailsCheckYourAnswersController {
               CheckYourAnswersRowViewModel(
                 "basicDetailsCheckYourAnswersController.schemeDetails.taxYear",
                 taxYear.show
-              ).withOneHalfWidth()
+              ).withChangeAction(
+                  controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, CheckMode).url
+                )
+                .withOneHalfWidth()
             )
           case Right(accountingPeriods) =>
             List(
               CheckYourAnswersRowViewModel(
                 "basicDetailsCheckYourAnswersController.schemeDetails.taxYear",
                 whichTaxYearPage.get.show
-              ).withOneHalfWidth()
+              ).withChangeAction(
+                  controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, CheckMode).url
+                )
+                .withOneHalfWidth()
             ) ++
               List(
                 CheckYourAnswersRowViewModel(
