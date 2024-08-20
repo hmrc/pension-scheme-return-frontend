@@ -19,6 +19,7 @@ package forms.mappings
 import play.api.data.format.Formatter
 import cats.data.Validated._
 import config.Refined.Max3
+import play.api.Logger
 import cats.syntax.all._
 import uk.gov.hmrc.time.TaxYear
 import play.api.data.FormError
@@ -32,17 +33,23 @@ private[mappings] class DateRangeFormatter(
   startDateErrors: DateFormErrors,
   endDateErrors: DateFormErrors,
   invalidRangeError: String,
-  allowedRange: Option[DateRange],
-  startDateAllowedDateRangeError: Option[String],
-  endDateAllowedDateRangeError: Option[String],
-  duplicateRangeError: Option[String],
+  allowedRange: DateRange,
+  startDateAllowedDateRangeError: String,
+  endDateAllowedDateRangeError: String,
+  overlappedStartDateError: String,
+  overlappedEndDateError: String,
   duplicateRanges: List[DateRange],
   previousDateRangeError: Option[String],
   index: Max3,
   taxYear: TaxYear,
-  errorTaxYear: Option[String]
+  errorStartBefore: String,
+  errorStartAfter: String,
+  errorEndBefore: String,
+  errorEndAfter: String
 ) extends Formatter[DateRange]
     with Formatters {
+
+  private val logger = Logger(getClass)
 
   val startDateFormatter = new LocalDateFormatter(startDateErrors)
   val endDateFormatter = new LocalDateFormatter(endDateErrors)
@@ -51,39 +58,58 @@ private[mappings] class DateRangeFormatter(
     if (range.from.isBefore(range.to)) Right(range)
     else Left(List(FormError(s"$key.endDate", invalidRangeError, List(range.from.show, range.to.show))))
 
+  // Checks that the provided date is within the allowedRange DateRange
   private def verifyRangeBounds(
     key: String,
     date: LocalDate,
-    error: Option[String]
+    error: String
   ): Either[Seq[FormError], LocalDate] =
-    allowedRange
-      .zip(error)
-      .map {
-        case (range, error) =>
-          if (range.contains(date)) Right(date)
-          else Left(List(FormError(key, error, List(range.from.show, range.to.show))))
-      }
-      .getOrElse(Right(date))
-
-  private def verifyUniqueRange(key: String, range: DateRange): Either[Seq[FormError], DateRange] =
-    duplicateRangeError
-      .flatMap { error =>
-        duplicateRanges
-          .find(d => d.intersects(range))
-          .map { i =>
-            Seq(FormError(s"$key.startDate", error, List(i.from.show, i.to.show)))
-          }
-      }
-      .toLeft(range)
-
-  private def verifyTaxYear(key: String, range: DateRange): Either[Seq[FormError], DateRange] =
-    errorTaxYear match {
-      case Some(error) =>
-        if (!range.from.isBefore(taxYear.finishes))
-          Left(List(FormError(s"$key.endDate", error, List(range.to.show))))
-        else Right(range)
-      case _ => Right(range)
+    if (allowedRange.contains(date)) Right(date)
+    else {
+      logger.error(s"[verifyRangeBounds] provided date ${date.show} is not within range ${allowedRange.toString}")
+      Left(List(FormError(key, error, List(allowedRange.from.show, allowedRange.to.show))))
     }
+
+  private def verifyUniqueRange(key: String, range: DateRange): Either[Seq[FormError], DateRange] = {
+
+    val validateStartDate: Either[Seq[FormError], DateRange] =
+      duplicateRanges
+        .find(_.contains(range.from))
+        .map(
+          startError =>
+            Seq(FormError(s"$key.startDate", overlappedStartDateError, List(startError.from.show, startError.to.show)))
+        )
+        .toLeft(range)
+
+    val validateEndDate: Either[Seq[FormError], DateRange] =
+      duplicateRanges
+        .find(_.contains(range.to))
+        .map(
+          endError =>
+            Seq(FormError(s"$key.endDate", overlappedEndDateError, List(endError.from.show, endError.to.show)))
+        )
+        .toLeft(range)
+
+    validateStartDate *> validateEndDate
+  }
+
+  // Verify provided date is after the start of the tax year or before the end of the tax year
+  private def verifyTaxYear(key: String, range: DateRange): Either[Seq[FormError], DateRange] =
+    if (range.from.isBefore(taxYear.starts)) {
+      logger.error(
+        s"[verifyTaxYear] provided start date ${range.from.show} is before the start of the tax year ${taxYear.starts.show}"
+      )
+      Left(List(FormError(s"$key.startDate", errorStartAfter, List(taxYear.starts.show))))
+    } else if (range.from.isAfter(taxYear.finishes)) {
+      logger.error(s"[verifyTaxYear] provided start date ${range.from.show} is after the end of the tax year")
+      Left(List(FormError(s"$key.startDate", errorStartBefore, List(taxYear.finishes.plusDays(1).show))))
+    } else if (range.to.isBefore(taxYear.starts)) {
+      logger.error(s"[verifyTaxYear] provided end date ${range.to.show} is before the start of the tax year")
+      Left(List(FormError(s"$key.endDate", errorEndAfter, List(taxYear.starts.minusDays(1).show))))
+    } else if (range.to.isAfter(taxYear.finishes)) {
+      logger.error(s"[verifyTaxYear] provided end date ${range.to.show} is after the end of the tax year")
+      Left(List(FormError(s"$key.endDate", errorEndBefore, List(taxYear.finishes.plusDays(1).show))))
+    } else Right(range)
 
   private def verifyPreviousDateRange(key: String, range: DateRange, index: Max3): Either[Seq[FormError], DateRange] =
     if (duplicateRanges.isEmpty || index.value == 1)
@@ -92,10 +118,12 @@ private[mappings] class DateRangeFormatter(
       previousDateRangeError match {
         case Some(error) =>
           val indexDate = duplicateRanges(index.value - 2)
-          if (!indexDate.to.plusDays(1).isEqual(range.from))
-            Left(Seq(FormError(s"$key.startDate", error, List(duplicateRanges.last.to.show))))
-          else
+          if (!indexDate.to.plusDays(1).isEqual(range.from)) {
+            logger.error(s"[verifyPreviousDateRange] provided date ${range.from.show} is a duplicate date}")
+            Left(Seq(FormError(s"$key.startDate", error, List(duplicateRanges.last.to.plusDays(1).show))))
+          } else {
             Right(range)
+          }
         case None =>
           Right(range)
       }
@@ -106,14 +134,12 @@ private[mappings] class DateRangeFormatter(
         startDateFormatter.bind(s"$key.startDate", data).toValidated,
         endDateFormatter.bind(s"$key.endDate", data).toValidated
       ).mapN(DateRange(_, _)).toEither
-      _ <- verifyValidRange(key, dateRange)
-      _ <- (
-        verifyRangeBounds(s"$key.startDate", dateRange.from, startDateAllowedDateRangeError).toValidated,
-        verifyRangeBounds(s"$key.endDate", dateRange.to, endDateAllowedDateRangeError).toValidated
-      ).mapN(DateRange(_, _)).toEither
       _ <- verifyTaxYear(key, dateRange)
+      _ <- verifyValidRange(key, dateRange)
       _ <- verifyUniqueRange(key, dateRange)
       _ <- verifyPreviousDateRange(key, dateRange, index)
+      _ <- verifyRangeBounds(s"$key.startDate", dateRange.from, startDateAllowedDateRangeError)
+      _ <- verifyRangeBounds(s"$key.endDate", dateRange.to, endDateAllowedDateRangeError)
     } yield {
       dateRange
     }

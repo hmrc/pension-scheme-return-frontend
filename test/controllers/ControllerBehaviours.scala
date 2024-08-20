@@ -174,10 +174,23 @@ trait ControllerBehaviours {
     userAnswers: UserAnswers,
     previousUserAnswers: UserAnswers,
     form: (String, String)*
+  ): BehaviourTest = redirectToPage(call, page, userAnswers, previousUserAnswers, None, form: _*)
+
+  def redirectToPage(
+    call: => Call,
+    page: => Call,
+    userAnswers: UserAnswers,
+    previousUserAnswers: UserAnswers,
+    mockSaveService: Option[SaveService],
+    form: (String, String)*
   ): BehaviourTest =
     s"redirect to page with form $form".hasBehaviour {
       val appBuilder =
-        applicationBuilder(userAnswers = Some(userAnswers), previousUserAnswers = Some(previousUserAnswers))
+        applicationBuilder(
+          userAnswers = Some(userAnswers),
+          previousUserAnswers = Some(previousUserAnswers),
+          saveService = mockSaveService
+        )
 
       running(_ => appBuilder) { app =>
         val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)

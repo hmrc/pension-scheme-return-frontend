@@ -17,6 +17,7 @@
 package controllers
 
 import play.api.test._
+import services.SaveService
 import queries.{Removable, Settable}
 import config.Refined.Max5000
 import play.api.inject.bind
@@ -73,7 +74,8 @@ trait ControllerBaseSpec
     schemeDetails: SchemeDetails = defaultSchemeDetails,
     minimalDetails: MinimalDetails = defaultMinimalDetails,
     pureUserAnswers: Option[UserAnswers] = Some(emptyUserAnswers),
-    previousUserAnswers: Option[UserAnswers] = Some(emptyUserAnswers)
+    previousUserAnswers: Option[UserAnswers] = Some(emptyUserAnswers),
+    saveService: Option[SaveService] = None
   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
@@ -88,7 +90,8 @@ trait ControllerBaseSpec
               new FakeDataRetrievalETMPActionProvider(userAnswers, pureUserAnswers, previousUserAnswers)
             ),
           bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers)))
-        ) ++ additionalBindings: _*
+        ) ++ saveService.fold[List[GuiceableModule]](Nil)(service => List(bind[SaveService].toInstance(service)))
+          ++ additionalBindings: _*
       )
       .configure("play.filters.csp.nonce.enabled" -> false)
 

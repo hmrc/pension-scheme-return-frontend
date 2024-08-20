@@ -41,11 +41,6 @@ class DateRangeMappingsSpec
     with OptionValues
     with Mappings {
 
-  val allowedRange: DateRange = DateRange(
-    LocalDate.of(2000, 1, 1),
-    LocalDate.of(2400, 1, 1)
-  )
-
   val dateFormErrors: DateFormErrors = DateFormErrors(
     required = "error.required.all",
     requiredDay = "error.required.day",
@@ -57,33 +52,41 @@ class DateRangeMappingsSpec
   )
 
   val defaultTaxYear: TaxYear = TaxYear(2022)
+  val start: LocalDate = defaultTaxYear.starts
+  val end: LocalDate = defaultTaxYear.finishes
 
   val form: Form[DateRange] = formWithDuplicates(Nil)
+
+  val allowedDateRange: DateRange = DateRange(start, end)
 
   def formWithDuplicates(duplicateRanges: List[DateRange]): Form[DateRange] = Form(
     "value" -> dateRange(
       startDateErrors = dateFormErrors,
       endDateErrors = dateFormErrors,
       invalidRangeError = "error.invalid.range",
-      allowedRange = Some(allowedRange),
-      startDateAllowedDateRangeError = Some("error.startDate.outsideRange"),
-      endDateAllowedDateRangeError = Some("error.endDate.outsideRange"),
-      duplicateRangeError = Some("error.duplicate"),
+      allowedRange = DateRange(start, end),
+      startDateAllowedDateRangeError = "error.startDate.outsideRange",
+      endDateAllowedDateRangeError = "error.endDate.outsideRange",
+      overlappedStartDateError = "error.overlapped.start",
+      overlappedEndDateError = "error.overlapped.end",
       duplicateRanges = duplicateRanges,
       previousDateRangeError = Some("error.previousStartDate"),
       index = refineMV(1),
-      taxYear = TaxYear(3000),
-      errorTaxYear = Some("error.beforeTaxYear")
+      taxYear = defaultTaxYear,
+      errorStartBefore = "error.startBefore",
+      errorStartAfter = "error.startAfter",
+      errorEndBefore = "error.endBefore",
+      errorEndAfter = "error.endAfter"
     )
   )
 
   val validDate: Gen[LocalDate] = datesBetween(
-    min = allowedRange.from,
-    max = allowedRange.to
+    min = allowedDateRange.from.plusDays(1),
+    max = allowedDateRange.to.minusDays(1)
   )
 
-  val invalidStartDate: Gen[LocalDate] = datesBetween(earliestDate, allowedRange.from.minusDays(1))
-  val invalidEndDate: Gen[LocalDate] = datesBetween(allowedRange.to.plusDays(1), latestDate)
+  val invalidStartDate: Gen[LocalDate] = datesBetween(earliestDate, allowedDateRange.from.minusDays(1))
+  val invalidEndDate: Gen[LocalDate] = datesBetween(allowedDateRange.to.plusDays(1), latestDate)
   val invalidDate: Gen[LocalDate] = Gen.oneOf(invalidStartDate, invalidEndDate)
 
   def range(date: Gen[LocalDate]): Gen[DateRange] =
@@ -114,13 +117,13 @@ class DateRangeMappingsSpec
 
   "must bind valid data" in {
 
-    forAll(range(validDate) -> "valid date") { range =>
-      val data = makeData(range)
+    val range = DateRange(start.plusDays(1), end)
+    val data = makeData(range)
 
-      val result = form.bind(data)
+    val result = form.bind(data)
 
-      result.value.value mustEqual range
-    }
+    result.errors mustEqual Nil
+    result.value.value mustEqual range
   }
 
   "must fail to bind an empty date" in {
@@ -133,88 +136,33 @@ class DateRangeMappingsSpec
     )
   }
 
-  "must fail to bind if end date is before start date" in {
+  "must fail to bind if start date is before start of tax year" in {
+    val range = DateRange(defaultTaxYear.starts.minusDays(1), defaultTaxYear.finishes)
+    val data = makeData(range.from, range.to)
+    val result = form.bind(data)
 
-    forAll(range(validDate) -> "valid range") { range =>
-      val data = makeData(range.to, range.from)
-
-      val result = form.bind(data)
-
-      result.errors must contain only
-        FormError("value.endDate", "error.invalid.range", List(range.to.show, range.from.show))
-    }
+    result.errors must contain only
+      FormError("value.startDate", "error.startAfter", List(defaultTaxYear.starts.show))
   }
 
-  "must fail to bind if start date is outside date range" in {
+  "must fail to bind if end date is after end of tax year" in {
+    val range = DateRange(defaultTaxYear.starts, defaultTaxYear.finishes.plusDays(1))
+    val data = makeData(range.from, range.to)
+    val result = form.bind(data)
 
-    forAll(invalidStartDate -> "invalid start date", validDate -> "valid end date") { (startDate, endDate) =>
-      val data = makeData(startDate, endDate)
-
-      val result = form.bind(data)
-
-      result.errors must contain only
-        FormError(
-          "value.startDate",
-          "error.startDate.outsideRange",
-          List(allowedRange.from.show, allowedRange.to.show)
-        )
-    }
-  }
-
-  "must fail to bind if end date is outside date range" in {
-
-    forAll(validDate -> "valid start date", invalidEndDate -> "invalid end date") { (startDate, endDate) =>
-      val data = makeData(startDate, endDate)
-
-      val result = form.bind(data)
-
-      result.errors must contain only
-        FormError(
-          "value.endDate",
-          "error.endDate.outsideRange",
-          List(allowedRange.from.show, allowedRange.to.show)
-        )
-    }
-  }
-
-  "must fail to bind if start and end date are outside range" in {
-
-    forAll(range(invalidDate) -> "invalid range") { range =>
-      val data = makeData(range)
-
-      val result = form.bind(data)
-
-      val expectedStartDateError = FormError(
-        "value.startDate",
-        "error.startDate.outsideRange",
-        List(allowedRange.from.show, allowedRange.to.show)
-      )
-
-      val expectedEndDateError = FormError(
-        "value.endDate",
-        "error.endDate.outsideRange",
-        List(allowedRange.from.show, allowedRange.to.show)
-      )
-
-      result.errors must contain allElementsOf List(
-        expectedStartDateError,
-        expectedEndDateError
-      )
-
-    }
+    result.errors must contain only
+      FormError("value.endDate", "error.endBefore", List(defaultTaxYear.finishes.plusDays(1).show))
   }
 
   "must fail to bind if date range intersects another date range" in {
+    val range = DateRange(start.plusDays(1), end.minusDays(1))
+    val data = makeData(range)
+    val excludedRanges = List(allowedDateRange)
 
-    forAll(range(validDate)) { range =>
-      val data = makeData(range)
-      val excludedRanges = List(allowedRange)
+    val result = formWithDuplicates(excludedRanges).bind(data)
 
-      val result = formWithDuplicates(excludedRanges).bind(data)
-
-      result.errors must contain only
-        FormError("value.startDate", "error.duplicate", List(allowedRange.from.show, allowedRange.to.show))
-    }
+    result.errors must contain only
+      FormError("value.startDate", "error.overlapped.start", List(allowedDateRange.from.show, allowedDateRange.to.show))
   }
 
   "must unbind a date" in {
