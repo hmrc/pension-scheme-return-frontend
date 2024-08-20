@@ -63,69 +63,75 @@ class BasicDetailsCheckYourAnswersController @Inject()(
     extends PSRController
     with SchemeDetailNavigationUtils {
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     onPageLoadCommon(srn, mode)
   }
 
   def onPageLoadViewOnly(srn: Srn, mode: Mode, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    identifyAndRequireData(srn, mode, year, current, previous).async { implicit request =>
       onPageLoadCommon(srn, mode)
     }
 
-  def onPageLoadCommon(srn: Srn, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
-    schemeDateService.taxYearOrAccountingPeriods(srn) match {
-      case Some(periods) =>
-        val currentUserAnswers = request.userAnswers
-        (
-          for {
-            schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
-            activeBankAccount <- requiredPage(ActiveBankAccountPage(srn))
-            whyNoBankAccount = currentUserAnswers.get(WhyNoBankAccountPage(srn))
-            whichTaxYearPage = currentUserAnswers.get(WhichTaxYearPage(srn))
-            userName <- loggedInUserNameOrRedirect
-          } yield {
-            val compilationOrSubmissionDate = currentUserAnswers.get(CompilationOrSubmissionDatePage(srn))
-            val journeyByPassed = isJourneyByPassed(srn)
-            val result = Ok(
-              view(
-                viewModel(
-                  srn,
-                  mode,
-                  schemeMemberNumbers,
-                  activeBankAccount,
-                  whyNoBankAccount,
-                  whichTaxYearPage,
-                  periods,
-                  userName,
-                  request.schemeDetails,
-                  request.pensionSchemeId.value,
-                  request.pensionSchemeId.isPSP,
-                  viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-                    getBasicDetailsTaskListStatus(currentUserAnswers, request.previousUserAnswers.get) == Updated
-                  } else {
-                    false
-                  },
-                  optYear = request.year,
-                  optCurrentVersion = request.currentVersion,
-                  optPreviousVersion = request.previousVersion,
-                  compilationOrSubmissionDate = compilationOrSubmissionDate,
-                  journeyByPassed = journeyByPassed
+  def onPageLoadCommon(srn: Srn, mode: Mode)(implicit request: DataRequest[AnyContent]): Future[Result] = {
+    val journeyByPassedF =
+      if (isUserAnswersAlreadySubmittedAndNotModified(srn)) isJourneyBypassed(srn) else Future.successful(Right(false))
+    journeyByPassedF.map(
+      eitherJourneyNavigationResultOrRecovery =>
+        schemeDateService.taxYearOrAccountingPeriods(srn) match {
+          case Some(periods) =>
+            val currentUserAnswers = request.userAnswers
+            (
+              for {
+                schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
+                activeBankAccount <- requiredPage(ActiveBankAccountPage(srn))
+                whyNoBankAccount = currentUserAnswers.get(WhyNoBankAccountPage(srn))
+                whichTaxYearPage = currentUserAnswers.get(WhichTaxYearPage(srn))
+                userName <- loggedInUserNameOrRedirect
+                journeyByPassed <- eitherJourneyNavigationResultOrRecovery
+              } yield {
+                val compilationOrSubmissionDate = currentUserAnswers.get(CompilationOrSubmissionDatePage(srn))
+                val result = Ok(
+                  view(
+                    viewModel(
+                      srn,
+                      mode,
+                      schemeMemberNumbers,
+                      activeBankAccount,
+                      whyNoBankAccount,
+                      whichTaxYearPage,
+                      periods,
+                      userName,
+                      request.schemeDetails,
+                      request.pensionSchemeId,
+                      request.pensionSchemeId.isPSP,
+                      viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+                        getBasicDetailsTaskListStatus(currentUserAnswers, request.previousUserAnswers.get) == Updated
+                      } else {
+                        false
+                      },
+                      optYear = request.year,
+                      optCurrentVersion = request.currentVersion,
+                      optPreviousVersion = request.previousVersion,
+                      compilationOrSubmissionDate = compilationOrSubmissionDate,
+                      journeyByPassed = journeyByPassed
+                    )
+                  )
                 )
-              )
-            )
-            if (journeyByPassed) {
-              result
-                .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
-                .addingToSession(
-                  (SUBMISSION_DATE, schemeDateService.submissionDateAsString(compilationOrSubmissionDate.get))
-                )
-            } else {
-              result
-            }
-          }
-        ).merge
-      case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-    }
+                if (journeyByPassed) {
+                  result
+                    .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
+                    .addingToSession(
+                      (SUBMISSION_DATE, schemeDateService.submissionDateAsString(compilationOrSubmissionDate.get))
+                    )
+                } else {
+                  result
+                }
+              }
+            ).merge
+          case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    )
+  }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     psrSubmissionService
@@ -149,7 +155,8 @@ class BasicDetailsCheckYourAnswersController @Inject()(
               }
               val regularJourney = navigator
                 .nextPage(BasicDetailsCheckYourAnswersPage(srn), NormalMode, request.userAnswers)
-              calculateNavigation(srn, byPassedJourney, regularJourney).map(Redirect)
+              isJourneyBypassed(srn)
+                .map(res => res.map(if (_) Redirect(byPassedJourney) else Redirect(regularJourney)).merge)
             }
 
           // Transform Either[Result, Future[Result]] into a Future[Result]
@@ -159,19 +166,24 @@ class BasicDetailsCheckYourAnswersController @Inject()(
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
+    identifyAndRequireData(srn, ViewOnlyMode, year, current, previous).async { implicit request =>
+      val byPassedJourney = Redirect(routes.ReturnSubmittedController.onPageLoad(srn))
+      val regularJourney = Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous))
+      isJourneyBypassed(srn).map(res => res.map(if (_) byPassedJourney else regularJourney).merge)
     }
 
-  def onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
+  def onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] = {
+    val newCurrent = (current - 1).max(0)
+    val newPrevious = (previous - 1).max(0)
+    identifyAndRequireData(srn, ViewOnlyMode, year, newCurrent, newPrevious).async {
       Future.successful(
         Redirect(
           controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
-            .onPageLoadViewOnly(srn, year, (current - 1).max(0), (previous - 1).max(0))
+            .onPageLoadViewOnly(srn, year, newCurrent, newPrevious)
         )
       )
     }
+  }
 
   private def buildAuditEvent(taxYear: DateRange, schemeMemberNumbers: SchemeMemberNumbers, userName: String)(
     implicit req: DataRequest[_]
@@ -200,7 +212,7 @@ object BasicDetailsCheckYourAnswersController {
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
     schemeAdminName: String,
     schemeDetails: SchemeDetails,
-    pensionSchemeId: String,
+    pensionSchemeId: PensionSchemeId,
     isPSP: Boolean,
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
@@ -234,7 +246,7 @@ object BasicDetailsCheckYourAnswersController {
       ).withMarginBottom(Margin.Fixed60Bottom),
       refresh = None,
       buttonText = if (journeyByPassed) {
-        "basicDetailsCheckYourAnswersController.button.view.submission.confirmation"
+        "site.view.submission.confirmation"
       } else {
         "site.saveAndContinue"
       },
@@ -269,7 +281,11 @@ object BasicDetailsCheckYourAnswersController {
               compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
             title = "basicDetailsCheckYourAnswersController.viewOnly.title",
             heading = "basicDetailsCheckYourAnswersController.viewOnly.heading",
-            buttonText = "site.return.to.tasklist",
+            buttonText = if (journeyByPassed) {
+              "site.view.submission.confirmation"
+            } else {
+              "site.return.to.tasklist"
+            },
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
                 controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
@@ -295,7 +311,7 @@ object BasicDetailsCheckYourAnswersController {
     schemeMemberNumbers: SchemeMemberNumbers,
     schemeAdminName: String,
     schemeDetails: SchemeDetails,
-    pensionSchemeId: String,
+    pensionSchemeId: PensionSchemeId,
     isPSP: Boolean
   )(
     implicit messages: Messages
@@ -325,7 +341,7 @@ object BasicDetailsCheckYourAnswersController {
           } else {
             "basicDetailsCheckYourAnswersController.schemeDetails.adminId"
           },
-          pensionSchemeId
+          pensionSchemeId.value
         ).withOneHalfWidth()
       ) ++
         (taxYearOrAccountingPeriods match {
@@ -437,7 +453,9 @@ object BasicDetailsCheckYourAnswersController {
     )
   )
 
-  private def isJourneyByPassed(srn: Srn)(implicit request: DataRequest[AnyContent]): Boolean = {
+  private def isUserAnswersAlreadySubmittedAndNotModified(
+    srn: Srn
+  )(implicit request: DataRequest[AnyContent]): Boolean = {
     val isAlreadySubmitted: Boolean = request.userAnswers.get(FbStatus(srn)).exists(_.isSubmitted)
     val isPureAnswerStayUnchanged: Boolean = request.pureUserAnswers.fold(false)(_.data == request.userAnswers.data)
     isAlreadySubmitted && isPureAnswerStayUnchanged
