@@ -107,7 +107,8 @@ object TotalProceedsSaleLandPropertyController {
     MoneyFormErrors(
       "totalProceedsSaleLandProperty.error.required",
       "totalProceedsSaleLandProperty.error.invalid",
-      (Constants.maxMoneyValue, "totalProceedsSaleLandProperty.error.tooLarge")
+      (Constants.maxMoneyValue, "totalProceedsSaleLandProperty.error.tooLarge"),
+      (Constants.minPosMoneyValue, "totalProceedsSaleLandProperty.error.tooSmall")
     )
   )
 

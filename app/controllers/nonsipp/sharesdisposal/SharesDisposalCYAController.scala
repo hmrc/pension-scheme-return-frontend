@@ -68,7 +68,7 @@ class SharesDisposalCYAController @Inject()(
             .set(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex), NoPointOfEntry)
             .getOrElse(request.userAnswers)
         )
-      onPageLoadCommon(srn, shareIndex, disposalIndex, mode)(implicitly)
+      onPageLoadCommon(srn, shareIndex, disposalIndex, mode)
 
     }
 
@@ -82,7 +82,7 @@ class SharesDisposalCYAController @Inject()(
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, shareIndex, disposalIndex, mode)(implicitly)
+      onPageLoadCommon(srn, shareIndex, disposalIndex, mode)
     }
 
   def onPageLoadCommon(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode)(

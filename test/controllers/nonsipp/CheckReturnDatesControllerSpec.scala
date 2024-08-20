@@ -16,34 +16,39 @@
 
 package controllers.nonsipp
 
-import services.SchemeDetailsService
+import services.{SaveService, SchemeDetailsService}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import viewmodels.implicits._
 import play.api.mvc.Call
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.YesNoPageView
-import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
+import pages.nonsipp.{BasicDetailsCompletedPage, CheckReturnDatesPage, WhichTaxYearPage}
 import forms.YesNoPageFormProvider
 import org.mockito.stubbing.OngoingStubbing
-import models.{MinimalSchemeDetails, NormalMode}
+import models.{MinimalSchemeDetails, NormalMode, UserAnswers}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import utils.DateTimeUtils
 import play.api.inject.guice.GuiceableModule
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, SectionCompleted, YesNoPageViewModel}
 
 import scala.concurrent.Future
 
 class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckPropertyChecks { self =>
 
   private val mockSchemeDetailsService = mock[SchemeDetailsService]
+  private implicit val mockSaveService: SaveService = mock[SaveService]
 
   override val additionalBindings: List[GuiceableModule] =
     List(
       bind[SchemeDetailsService].toInstance(mockSchemeDetailsService)
     )
+
+  override protected def beforeEach(): Unit =
+    MockSaveService.save()
 
   private val userAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
 
@@ -161,6 +166,46 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
       journeyRecoveryPage(onSubmit)
         .before(setSchemeDetails(Some(minimalSchemeDetails)))
         .updateName("onSubmit" + _)
+    )
+
+    val userAnswersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+    act.like(
+      redirectToPage(
+        call = onSubmit,
+        page = controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode),
+        userAnswers = userAnswers
+          .unsafeSet(BasicDetailsCompletedPage(srn), SectionCompleted)
+          .unsafeSet(CheckReturnDatesPage(srn), true),
+        previousUserAnswers = emptyUserAnswers,
+        form = formData(form, true): _*
+      ).before(
+          setSchemeDetails(Some(minimalSchemeDetails))
+        )
+        .withName(
+          "onSubmit redirect to basic details CYA when basicDetails are completed and answers is the same as previous answer"
+        )
+    )
+
+    act.like(
+      redirectToPage(
+        call = onSubmit,
+        page = controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode),
+        userAnswers = userAnswers
+          .unsafeSet(CheckReturnDatesPage(srn), false),
+        previousUserAnswers = emptyUserAnswers,
+        mockSaveService = Some(mockSaveService),
+        form = formData(form, true): _*
+      ).before {
+          setSchemeDetails(Some(minimalSchemeDetails))
+        }
+        .withName(
+          "onSubmit redirect to next page when the user has not finished the basic details section yet"
+        )
+        .after {
+          MockSaveService.capture(userAnswersCaptor)
+          userAnswersCaptor.getValue.get(CheckReturnDatesPage(srn)) mustEqual Some(true)
+        }
     )
 
     act.like(

@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp
 
-import viewmodels.DisplayMessage.{InlineMessage, Message}
+import pages.QuestionPage
+import models.SchemeId.Srn
+import play.api.libs.json.{__, JsPath}
+import viewmodels.models.SectionCompleted
 
-case class DatePageViewModel(
-  legend: Option[Message],
-  header: InlineMessage,
-  hint: Option[Message] = None
-)
+case class BasicDetailsCompletedPage(srn: Srn) extends QuestionPage[SectionCompleted] {
+  override def path: JsPath = __ \ toString
+
+  override def toString: String = "basicDetailsCompleted"
+}

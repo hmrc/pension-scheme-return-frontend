@@ -128,7 +128,7 @@ object SharesIndividualSellerNINumberController {
           .Conditional(Message("sharesIndividualSellerNINumber.yes.conditional", individualName), FieldType.Input),
         no = YesNoViewModel
           .Conditional(Message("sharesIndividualSellerNINumber.no.conditional", individualName), FieldType.Textarea)
-      ),
+      ).withHint("sharesIndividualSellerNINumber.hint"),
       routes.SharesIndividualSellerNINumberController.onSubmit(srn, index, mode)
     )
 }

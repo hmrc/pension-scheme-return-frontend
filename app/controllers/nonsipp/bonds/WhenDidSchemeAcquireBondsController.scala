@@ -139,7 +139,11 @@ object WhenDidSchemeAcquireBondsController {
         "whenDidSchemeAcquireBonds.heading",
         schemeName
       ),
-      DatePageViewModel(None, Message("whenDidSchemeAcquireBonds.heading", schemeName)),
+      DatePageViewModel(
+        None,
+        Message("whenDidSchemeAcquireBonds.heading", schemeName),
+        Some("whenDidSchemeAcquireBonds.hint")
+      ),
       routes.WhenDidSchemeAcquireBondsController.onSubmit(srn, index, mode)
     )
 }

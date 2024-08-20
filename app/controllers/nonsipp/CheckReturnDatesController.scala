@@ -19,17 +19,19 @@ package controllers.nonsipp
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
+import controllers.PSRController
 import cats.implicits.toShow
 import controllers.actions._
+import pages.nonsipp.accountingperiod.AccountingPeriods
 import forms.YesNoPageFormProvider
+import play.api.i18n.MessagesApi
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import pages.nonsipp._
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
-import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import models.requests.DataRequest
@@ -52,8 +54,7 @@ class CheckReturnDatesController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends PSRController {
 
   private val form = CheckReturnDatesController.form(formProvider)
 
@@ -77,11 +78,33 @@ class CheckReturnDatesController @Inject()(
           .bindFromRequest()
           .fold(
             formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel))),
-            value =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckReturnDatesPage(srn), value))
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(CheckReturnDatesPage(srn), mode, updatedAnswers))
+            value => {
+
+              val sameAsPreviousAnswers = request.userAnswers.get(CheckReturnDatesPage(srn)).contains(value)
+              val basicDetailsCompleted = request.userAnswers.get(BasicDetailsCompletedPage(srn)).nonEmpty
+
+              if (sameAsPreviousAnswers && basicDetailsCompleted) {
+                Future.successful(
+                  Redirect(
+                    controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
+                  )
+                )
+              } else {
+                for {
+                  updatedAnswers <- (
+                    request.userAnswers.get(CheckReturnDatesPage(srn)) match {
+                      case Some(false) if value =>
+                        request.userAnswers
+                          .set(CheckReturnDatesPage(srn), value)
+                          .remove(AccountingPeriods(srn))
+                          .remove(BasicDetailsCompletedPage(srn))
+                      case _ => request.userAnswers.set(CheckReturnDatesPage(srn), value)
+                    }
+                  ).mapK[Future]
+                  _ <- saveService.save(updatedAnswers)
+                } yield Redirect(navigator.nextPage(CheckReturnDatesPage(srn), mode, updatedAnswers))
+              }
+            }
           )
       }
     }

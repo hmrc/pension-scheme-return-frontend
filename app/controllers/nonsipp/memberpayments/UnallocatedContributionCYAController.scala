@@ -53,7 +53,7 @@ class UnallocatedContributionCYAController @Inject()(
     extends PSRController {
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    onPageLoadCommon(srn, mode)(implicitly)
+    onPageLoadCommon(srn, mode)
   }
 
   def onPageLoadViewOnly(srn: Srn, mode: Mode, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -165,7 +165,7 @@ object UnallocatedContributionCYAController {
           updated = viewOnlyUpdated,
           link = (optYear, optCurrentVersion, optPreviousVersion) match {
             case (Some(year), Some(currentVersion), Some(previousVersion))
-                if (year.nonEmpty && currentVersion > 1 && previousVersion > 0) =>
+                if currentVersion > 1 && previousVersion > 0 =>
               Some(
                 LinkMessage(
                   "unallocatedEmployerCYA.viewOnly.link",

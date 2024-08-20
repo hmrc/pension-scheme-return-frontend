@@ -63,7 +63,7 @@ class BondsDisposalCYAController @Inject()(
           .set(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex), NoPointOfEntry)
           .getOrElse(request.userAnswers)
       )
-      onPageLoadCommon(srn, bondIndex, disposalIndex, mode)(implicitly)
+      onPageLoadCommon(srn, bondIndex, disposalIndex, mode)
     }
 
   def onPageLoadViewOnly(
@@ -76,7 +76,7 @@ class BondsDisposalCYAController @Inject()(
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, bondIndex, disposalIndex, mode)(implicitly)
+      onPageLoadCommon(srn, bondIndex, disposalIndex, mode)
     }
 
   def onPageLoadCommon(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode)(

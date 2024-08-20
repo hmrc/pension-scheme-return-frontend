@@ -63,7 +63,7 @@ class AssetDisposalCYAController @Inject()(
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn, index, disposalIndex, mode)(implicitly)
+      onPageLoadCommon(srn, index, disposalIndex, mode)
     }
 
   def onPageLoadViewOnly(
@@ -76,7 +76,7 @@ class AssetDisposalCYAController @Inject()(
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, index, disposalIndex, mode)(implicitly)
+      onPageLoadCommon(srn, index, disposalIndex, mode)
     }
 
   def onPageLoadCommon(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode)(

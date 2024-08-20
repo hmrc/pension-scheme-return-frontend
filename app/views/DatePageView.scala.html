@@ -34,6 +34,10 @@
 
         <h1 class="govuk-heading-l">@renderMessage(viewModel.heading)</h1>
 
+        @if(viewModel.page.hint.isDefined) {
+            <div class="govuk-hint">@renderMessage(viewModel.page.hint.get)</div>
+        }
+
         @govukDateInput(
             DateViewModel(
                 field = form("value"),
@@ -42,7 +46,6 @@
                     .getOrElse(LegendViewModel(renderMessage(viewModel.heading)).asPageHeading(LegendSize.Large).withCssClass("govuk-visually-hidden"))
             )
         )
-
         @govukButton(
             ButtonViewModel(renderMessage(viewModel.buttonText))
         )
