@@ -1689,6 +1689,7 @@ landOrPropertySellerConnectedParty.error.required = Select yes if the seller is 
 
 individualSellerNi.title = Do you know the seller’s National Insurance number?
 individualSellerNi.heading = Do you know {0}’s National Insurance number?
+individualSellerNi.hint = This number will only be used to check if they are a connected party.
 individualSellerNi.yes.conditional = What is {0}’s National Insurance number?
 individualSellerNi.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
 individualSellerNi.error.required = Select yes if you know the seller’s National Insurance number
@@ -1891,6 +1892,7 @@ removeLandOrProperty.error.required = Select yes if you are sure you want to rem
 
 whenWasPropertySold.title = When was the land or property sold?
 whenWasPropertySold.heading = When was {0} sold?
+whenWasPropertySold.hint = For example, 27 6 2024
 whenWasPropertySold.dateOfSale.error.required.all = Enter the date the scheme sold this land or property
 whenWasPropertySold.dateOfSale.error.required.day = Date the scheme sold this land or property must include day
 whenWasPropertySold.dateOfSale.error.required.month = Date the scheme sold this land or property must include month
@@ -2003,6 +2005,7 @@ totalProceedsSaleLandProperty.list1 = total sale proceeds of any land or interes
 totalProceedsSaleLandProperty.list2 = premiums received on the disposal of a leasehold interest in land
 totalProceedsSaleLandProperty.error.required = Enter the total proceeds from the sale, in pounds and pence
 totalProceedsSaleLandProperty.error.invalid = Total proceeds from the sale must be an amount of money, like 123 or 123.45
+totalProceedsSaleLandProperty.error.tooSmall = Total proceeds from the sale must be 0.01 or more
 totalProceedsSaleLandProperty.error.tooLarge = Total proceeds from the sale must be 999999999.99 or less
 
 landOrPropertyDisposalBuyerConnectedParty.title = Is the buyer a connected party?
@@ -3170,6 +3173,7 @@ otherAssets.whyDoesSchemeHoldAssets.radioList3 = Transfer from another scheme
 
 otherAssets.whenDidSchemeAcquireAssets.title = When did the scheme acquire this asset?
 otherAssets.whenDidSchemeAcquireAssets.heading = When did {0} acquire this asset?
+otherAssets.whenDidSchemeAcquireAssets.hint = For example, 27 6 2024
 otherAssets.whenDidSchemeAcquireAssets.error.required.all = Enter the date the scheme acquired this asset
 otherAssets.whenDidSchemeAcquireAssets.error.required.day = Date the scheme acquired this asset must include a day
 otherAssets.whenDidSchemeAcquireAssets.error.required.month = Date the scheme acquired this asset must include a month
@@ -3188,6 +3192,7 @@ otherAssets.individualNameOfOtherAssetSeller.error.invalid = Seller’s name mus
 
 otherAssets.otherAssetIndividualSellerNINumber.title = Do you know the seller’s National Insurance number?
 otherAssets.otherAssetIndividualSellerNINumber.heading = Do you know {0}’s National Insurance number?
+otherAssets.otherAssetIndividualSellerNINumber.hint = This number will only be used to check if they are a connected party.
 otherAssets.otherAssetIndividualSellerNINumber.yes.conditional = What is {0}’s National Insurance number?
 otherAssets.otherAssetIndividualSellerNINumber.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
 otherAssets.otherAssetIndividualSellerNINumber.error.required = Select yes if you know the seller’s National Insurance number
@@ -3468,6 +3473,7 @@ howWasAssetDisposedOf.error.required = Select how the asset was disposed of
 
 whenWasAssetSold.title = When was the asset sold?
 whenWasAssetSold.heading = When was the asset sold?
+whenWasAssetSold.hint = For example, 27 6 2024
 whenWasAssetSold.error.required.all =  Enter the date this asset was sold
 whenWasAssetSold.error.required.day = Date this asset was sold must include a day
 whenWasAssetSold.error.required.month = Date this asset was sold must include  a month
@@ -3501,6 +3507,7 @@ assetDisposal.individualNameOfAssetBuyer.error.invalid.characters = Buyer’s na
 
 assetIndividualBuyerNiNumber.title = Do you know the buyer’s National Insurance number?
 assetIndividualBuyerNiNumber.heading = Do you know {0}’s National Insurance number?
+assetIndividualBuyerNiNumber.hint = This number will only be used to check if they are a connected party.
 assetIndividualBuyerNiNumber.yes.conditional = What is {0}’s National Insurance number?
 assetIndividualBuyerNiNumber.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
 assetIndividualBuyerNiNumber.no.conditional.error.required = Enter the reason you cannot provide the buyer’s National Insurance number

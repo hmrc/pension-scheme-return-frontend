@@ -130,7 +130,7 @@ object AssetIndividualBuyerNiNumberController {
           .Conditional(Message("assetIndividualBuyerNiNumber.yes.conditional", individualName), FieldType.Input),
         no = YesNoViewModel
           .Conditional(Message("assetIndividualBuyerNiNumber.no.conditional", individualName), FieldType.Textarea)
-      ),
+      ).withHint("assetIndividualBuyerNiNumber.hint"),
       routes.AssetIndividualBuyerNiNumberController.onSubmit(srn, assetIndex, disposalIndex, mode)
     )
 }

@@ -118,7 +118,7 @@ object IndividualSellerNiController {
           .Conditional(Message("individualSellerNi.yes.conditional", individualName), FieldType.Input),
         no = YesNoViewModel
           .Conditional(Message("individualSellerNi.no.conditional", individualName), FieldType.Textarea)
-      ),
+      ).withHint("individualSellerNi.hint"),
       routes.IndividualSellerNiController.onSubmit(srn, index, mode)
     )
 }
