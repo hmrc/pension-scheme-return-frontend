@@ -80,7 +80,7 @@ class PsrSubmissionService @Inject()(
             val isAnyUpdated = initialUA.data != currentUA.data
             if (isAnyUpdated) {
               (
-                minimalRequiredSubmissionTransformer.transformToEtmp(srn, initialUA),
+                minimalRequiredSubmissionTransformer.transformToEtmp(srn, initialUA, isSubmitted),
                 currentUA.get(CheckReturnDatesPage(srn)),
                 schemeDateService.schemeDate(srn)
               ).mapN {
