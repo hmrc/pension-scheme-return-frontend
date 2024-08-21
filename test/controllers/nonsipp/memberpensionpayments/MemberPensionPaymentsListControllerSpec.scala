@@ -37,6 +37,8 @@ import pages.nonsipp.memberpensionpayments.{
 }
 import eu.timepit.refined.refineMV
 
+import scala.concurrent.Future
+
 class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.MemberPensionPaymentsListController.onPageLoad(srn, page = 1, NormalMode)
@@ -116,9 +118,12 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
-        .before(MockPsrSubmissionService.submitPsrDetails())
+        .before(
+          when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(())))
+        )
         .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )
@@ -215,7 +220,7 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               List.empty,
               noUserAnswers,
-              viewOnlyUpdated = true,
+              viewOnlyUpdated = false,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),

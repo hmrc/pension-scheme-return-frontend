@@ -99,7 +99,7 @@ class MemberPensionPaymentsListController @Inject()(
             getCompletedOrUpdatedTaskListStatus(
               request.userAnswers,
               request.previousUserAnswers.get,
-              pages.nonsipp.memberpensionpayments.Paths.membersPayments
+              pages.nonsipp.memberpensionpayments.Paths.memberDetails \ "pensionAmountReceived"
             ) == Updated
           } else {
             false
@@ -167,14 +167,11 @@ class MemberPensionPaymentsListController @Inject()(
                 updatedUserAnswers <- buildUserAnswerBySelection(srn, value, optionList.flatten.size)
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (value) {
-                  psrSubmissionService.submitPsrDetails(
+                  psrSubmissionService.submitPsrDetailsWithUA(
                     srn,
+                    updatedUserAnswers,
                     fallbackCall = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
                       .onPageLoad(srn, page, mode)
-                  )(
-                    implicitly,
-                    implicitly,
-                    request = DataRequest(request.request, updatedUserAnswers)
                   )
                 } else {
                   Future.successful(Some(()))
