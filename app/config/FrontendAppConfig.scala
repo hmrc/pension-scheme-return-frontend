@@ -55,13 +55,16 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   val pensionsAdministrator: Service = config.get[Service]("microservice.services.pensionAdministrator")
   val pensionsScheme: Service = config.get[Service]("microservice.services.pensionsScheme")
   val pensionSchemeReturn: Service = config.get[Service]("microservice.services.pensionSchemeReturn")
+  private val pensionSchemeReturnFrontend: Service =
+    config.get[Service]("microservice.services.pensionSchemeReturnFrontend")
 
   val addressLookup: Service = config.get[Service]("microservice.services.address-lookup")
 
   val upscan: Service = config.get[Service]("microservice.services.upscan")
   val upscanMaxFileSize: Int = config.get[Int]("microservice.services.upscan.maxFileSize")
   val upscanMaxFileSizeMB: String = s"${upscanMaxFileSize}MB"
-  val secureUpscanCallBack: Boolean = config.getOptional[Boolean]("microservice.services.upscan.secure").getOrElse(true)
+  val upscanCallbackEndpoint: String =
+    s"${pensionSchemeReturnFrontend.baseUrl}${config.get[String]("urls.upscanCallback")}"
 
   val emailService: Service = config.get[Service]("microservice.services.email")
   val emailApiUrl: String = emailService.baseUrl

@@ -58,9 +58,6 @@ class UploadMemberDetailsController @Inject()(
     extends PSRController
     with I18nSupport {
 
-  private def callBackUrl(implicit req: Request[_]): String =
-    controllers.routes.UploadCallbackController.callback.absoluteURL(secure = config.secureUpscanCallBack)
-
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val redirectTag = "upload-member-details"
     val successRedirectUrl = config.urls.upscan.successEndpoint.format(srn.value, redirectTag)
@@ -70,7 +67,8 @@ class UploadMemberDetailsController @Inject()(
     val uploadKey = UploadKey.fromRequest(srn)
 
     for {
-      initiateResponse <- uploadService.initiateUpscan(callBackUrl, successRedirectUrl, failureRedirectUrl)
+      initiateResponse <- uploadService
+        .initiateUpscan(config.upscanCallbackEndpoint, successRedirectUrl, failureRedirectUrl)
       _ <- uploadService.registerUploadRequest(uploadKey, Reference(initiateResponse.fileReference.reference))
       updatedUserAnswers <- request.userAnswers.set(UploadStatusPage(srn), UploadInitiated).mapK[Future]
       _ <- saveService.save(updatedUserAnswers)

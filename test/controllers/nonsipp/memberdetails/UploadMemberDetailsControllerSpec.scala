@@ -20,7 +20,6 @@ import play.api.test.FakeRequest
 import services.{AuditService, SchemeDateService, UploadService}
 import play.api.mvc.Call
 import controllers.ControllerBaseSpec
-import play.api.inject.bind
 import views.html.UploadView
 import controllers.nonsipp.memberdetails.UploadMemberDetailsController.viewModel
 import models.{DateRange, UpscanFileReference, UpscanInitiateResponse}
@@ -29,6 +28,8 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import play.api.inject.bind
+import config.FrontendAppConfig
 
 import scala.concurrent.Future
 
@@ -68,15 +69,24 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
       when(mockUploadService.initiateUpscan(any(), any(), any())(any()))
         .thenReturn(Future.successful(upscanInitiateResponse))
 
+      val appConfig = app.injector.instanceOf[FrontendAppConfig]
+      val expectedCallbackUrl = appConfig.upscanCallbackEndpoint
+      val callbackCaptor: ArgumentCaptor[String] = ArgumentCaptor.forClass(classOf[String])
       val successCaptor: ArgumentCaptor[String] = ArgumentCaptor.forClass(classOf[String])
       val failureCaptor: ArgumentCaptor[String] = ArgumentCaptor.forClass(classOf[String])
       val request = FakeRequest(onPageLoad)
       route(app, request).value.futureValue
 
-      verify(mockUploadService).initiateUpscan(any(), successCaptor.capture(), failureCaptor.capture())(any())
+      verify(mockUploadService).initiateUpscan(
+        callbackCaptor.capture(),
+        successCaptor.capture(),
+        failureCaptor.capture()
+      )(any())
 
+      val actualCallbackUrl = callbackCaptor.getValue
       val actualSuccessUrl = successCaptor.getValue
       val actualFailureUrl = failureCaptor.getValue
+      actualCallbackUrl mustBe expectedCallbackUrl
       actualSuccessUrl must endWith("/submit-upload-member-details-file")
       actualFailureUrl must endWith("/upload-member-details-file")
     }
