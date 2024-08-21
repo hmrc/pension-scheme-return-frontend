@@ -17,7 +17,7 @@
 package services
 
 import utils.nonsipp.TaskListCipUtils.transformTaskListToCipFormat
-import models.audit.PSRCompileAuditEvent
+import models.audit.{ExtendedAuditEvent, PSRCompileAuditEvent, PSRSubmissionAuditEvent}
 import play.api.mvc.Call
 import connectors.PSRConnector
 import cats.implicits._
@@ -78,7 +78,7 @@ class PsrSubmissionService @Inject()(
         _.flatMap(
           initialUA => {
             val isAnyUpdated = initialUA.data != currentUA.data
-            if (isAnyUpdated) {
+            if (isSubmitted || isAnyUpdated) {
               (
                 minimalRequiredSubmissionTransformer.transformToEtmp(srn, initialUA, isSubmitted),
                 currentUA.get(CheckReturnDatesPage(srn)),
@@ -86,18 +86,19 @@ class PsrSubmissionService @Inject()(
               ).mapN {
                 (minimalRequiredSubmission, checkReturnDates, taxYear) =>
                   {
+                    val submissionRequest: PsrSubmission = PsrSubmission(
+                      minimalRequiredSubmission = minimalRequiredSubmission,
+                      checkReturnDates = checkReturnDates,
+                      loans = loansTransformer.transformToEtmp(srn, initialUA),
+                      assets = assetsTransformer.transformToEtmp(srn, initialUA),
+                      membersPayments = memberPaymentsTransformer
+                        .transformToEtmp(srn, currentUA, initialUA, request.previousUserAnswers),
+                      shares = sharesTransformer.transformToEtmp(srn, initialUA),
+                      psrDeclaration = Option.when(isSubmitted)(declarationTransformer.transformToEtmp)
+                    )
                     psrConnector
                       .submitPsrDetails(
-                        PsrSubmission(
-                          minimalRequiredSubmission = minimalRequiredSubmission,
-                          checkReturnDates = checkReturnDates,
-                          loans = loansTransformer.transformToEtmp(srn, initialUA),
-                          assets = assetsTransformer.transformToEtmp(srn, initialUA),
-                          membersPayments = memberPaymentsTransformer
-                            .transformToEtmp(srn, currentUA, initialUA, request.previousUserAnswers),
-                          shares = sharesTransformer.transformToEtmp(srn, initialUA),
-                          psrDeclaration = Option.when(isSubmitted)(declarationTransformer.transformToEtmp)
-                        ),
+                        submissionRequest,
                         schemeAdministratorOrPractitionerName,
                         request.schemeDetails.schemeName
                       )
@@ -105,7 +106,7 @@ class PsrSubmissionService @Inject()(
                         case Left(message: String) =>
                           throw PostPsrException(message, fallbackCall.url)
                         case Right(()) =>
-                          auditService.sendExtendedEvent(buildAuditEvent(taxYear))
+                          auditService.sendExtendedEvent(buildAuditEvent(taxYear, isSubmitted, submissionRequest))
                           Future.unit
                       }
                   }
@@ -118,23 +119,40 @@ class PsrSubmissionService @Inject()(
       )
   }
 
-  private def buildAuditEvent(taxYear: DateRange)(
+  private def buildAuditEvent(taxYear: DateRange, isSubmitted: Boolean, submissionRequest: PsrSubmission)(
     implicit req: DataRequest[_]
-  ) =
-    PSRCompileAuditEvent(
-      schemeName = req.schemeDetails.schemeName,
-      schemeAdministratorOrPractitionerName,
-      psaOrPspId = req.pensionSchemeId.value,
-      schemeTaxReference = req.schemeDetails.pstr,
-      affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
-      credentialRole = if (req.pensionSchemeId.isPSP) PSP else PSA,
-      taxYear = taxYear,
-      taskList = Json
-        .toJson(
-          transformTaskListToCipFormat(
-            getSectionList(req.srn, req.schemeDetails.schemeName, req.userAnswers, req.pensionSchemeId),
-            messagesApi
-          ).list
-        )
-    )
+  ): ExtendedAuditEvent = {
+    val affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual"
+    val credentialRole = if (req.pensionSchemeId.isPSP) PSP else PSA
+
+    if (isSubmitted) {
+      PSRSubmissionAuditEvent(
+        schemeName = req.schemeDetails.schemeName,
+        schemeAdministratorOrPractitionerName,
+        psaOrPspId = req.pensionSchemeId.value,
+        schemeTaxReference = req.schemeDetails.pstr,
+        affinityGroup = affinityGroup,
+        credentialRole = credentialRole,
+        taxYear = taxYear,
+        psrSubmission = submissionRequest
+      )
+    } else {
+      PSRCompileAuditEvent(
+        schemeName = req.schemeDetails.schemeName,
+        schemeAdministratorOrPractitionerName,
+        psaOrPspId = req.pensionSchemeId.value,
+        schemeTaxReference = req.schemeDetails.pstr,
+        affinityGroup = affinityGroup,
+        credentialRole = credentialRole,
+        taxYear = taxYear,
+        taskList = Json
+          .toJson(
+            transformTaskListToCipFormat(
+              getSectionList(req.srn, req.schemeDetails.schemeName, req.userAnswers, req.pensionSchemeId),
+              messagesApi
+            ).list
+          )
+      )
+    }
+  }
 }
