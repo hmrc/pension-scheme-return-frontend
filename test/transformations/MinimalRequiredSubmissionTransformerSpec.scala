@@ -32,12 +32,13 @@ import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.Mockito
 import org.scalatest.freespec.AnyFreeSpec
 import org.mockito.Mockito.{times, verify, when}
-import pages.nonsipp.{CheckReturnDatesPage, FbVersionPage, WhichTaxYearPage}
+import pages.nonsipp.{CheckReturnDatesPage, FbStatus, FbVersionPage, WhichTaxYearPage}
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import models._
 import models.SchemeMemberNumbers._
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.mockito.MockitoSugar.mock
+import viewmodels.models.{Compiled, Submitted}
 
 import java.time.LocalDate
 
@@ -105,8 +106,8 @@ class MinimalRequiredSubmissionTransformerSpec
       result mustBe Some(
         MinimalRequiredSubmission(
           ReportDetails(
-            fbVersion = None,
-            fbstatus = None,
+            fbVersion = Some("000"),
+            fbstatus = Some(Compiled),
             pstr = request.schemeDetails.pstr,
             periodStart = dateRange.from,
             periodEnd = dateRange.to,
@@ -156,8 +157,8 @@ class MinimalRequiredSubmissionTransformerSpec
       result mustBe Some(
         MinimalRequiredSubmission(
           ReportDetails(
-            fbVersion = None,
-            fbstatus = None,
+            fbVersion = Some("000"),
+            fbstatus = Some(Compiled),
             pstr = request.schemeDetails.pstr,
             periodStart = dateRange.from,
             periodEnd = dateRange.to,
@@ -296,6 +297,50 @@ class MinimalRequiredSubmissionTransformerSpec
           userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode)) mustBe None
         }
       )
+    }
+  }
+
+  "getVersionAndStatus" - {
+    "should return (000, Compiled)" - {
+      "when no fbVersion and fbStatus exist" in {
+        val userAnswers = emptyUserAnswers
+        val result = transformer.getVersionAndStatus(srn, userAnswers, isSubmitted = false)
+        result mustBe (Some("000"), Compiled)
+      }
+    }
+    "should return (001, Compiled)" - {
+      "when fbVersion exists" in {
+        val userAnswers = emptyUserAnswers
+          .unsafeSet(FbVersionPage(srn), "001")
+        val result = transformer.getVersionAndStatus(srn, userAnswers, isSubmitted = false)
+        result mustBe (Some("001"), Compiled)
+      }
+    }
+    "should return (001, Submitted)" - {
+      "when fbVersion exists" in {
+        val userAnswers = emptyUserAnswers
+          .unsafeSet(FbVersionPage(srn), "001")
+        val result = transformer.getVersionAndStatus(srn, userAnswers, isSubmitted = true)
+        result mustBe (Some("001"), Submitted)
+      }
+    }
+    "should return (None, Compiled)" - {
+      "when fbVersion is 001 and fbStatus is submitted" in {
+        val userAnswers = emptyUserAnswers
+          .unsafeSet(FbVersionPage(srn), "001")
+          .unsafeSet(FbStatus(srn), Submitted)
+        val result = transformer.getVersionAndStatus(srn, userAnswers, isSubmitted = false)
+        result mustBe (None, Compiled)
+      }
+    }
+    "should return (002, Compiled)" - {
+      "when fbVersion is 002 and fbStatus is submitted" in {
+        val userAnswers = emptyUserAnswers
+          .unsafeSet(FbVersionPage(srn), "002")
+          .unsafeSet(FbStatus(srn), Submitted)
+        val result = transformer.getVersionAndStatus(srn, userAnswers, isSubmitted = false)
+        result mustBe (Some("002"), Compiled)
+      }
     }
   }
 }

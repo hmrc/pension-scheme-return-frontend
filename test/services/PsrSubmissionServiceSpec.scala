@@ -26,7 +26,7 @@ import utils.UserAnswersUtils.UserAnswersOps
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import models.DateRange
 import models.requests.{AllowedAccessRequest, DataRequest}
-import org.mockito.ArgumentCaptor
+import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import org.mockito.ArgumentMatchers.any
 import services.PsrSubmissionServiceSpec._
 import play.api.test.FakeRequest
@@ -42,7 +42,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import java.time.LocalDate
 
 class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
@@ -102,7 +101,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
         .thenReturn(Future.successful(None))
       whenReady(service.submitPsrDetails(srn, fallbackCall = fallbackCall)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, never).transformToEtmp(any(), any())(any())
+        verify(mockMinimalRequiredSubmissionTransformer, never).transformToEtmp(any(), any(), any())(any())
         verify(mockLoansTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockAssetsTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
@@ -119,7 +118,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
         .thenReturn(Future.successful(Some(defaultUserAnswers)))
       whenReady(service.submitPsrDetails(srn, fallbackCall = fallbackCall)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, never).transformToEtmp(any(), any())(any())
+        verify(mockMinimalRequiredSubmissionTransformer, never).transformToEtmp(any(), any(), any())(any())
         verify(mockLoansTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockAssetsTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
@@ -135,10 +134,10 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     "shouldn't submit PsrDetails request when userAnswer is empty (initial and current UAs are different)" in {
       when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
         .thenReturn(Future.successful(Some(emptyUserAnswers)))
-      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any())(any()))
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any(), any())(any()))
         .thenReturn(Some(minimalRequiredSubmission))
       whenReady(service.submitPsrDetails(srn, fallbackCall = fallbackCall)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any(), any())(any())
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any(), any(), any())(any())
         verify(mockLoansTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockAssetsTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
@@ -158,7 +157,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             .unsafeSet(CheckReturnDatesPage(srn), checkReturnDatesAnswer)
           val request = DataRequest(allowedAccessRequest, userAnswers)
 
-          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any())(any()))
+          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any(), any())(any()))
             .thenReturn(Some(minimalRequiredSubmission))
           when(mockLoansTransformer.transformToEtmp(any(), any())(any())).thenReturn(None)
           when(mockMemberPaymentsTransformerTransformer.transformToEtmp(any(), any(), any(), any())).thenReturn(None)
@@ -172,7 +171,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           whenReady(
             service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
           ) { result: Option[Unit] =>
-            verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any(), any())(any())
+            verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any(), any(), any())(any())
             verify(mockLoansTransformer, times(1)).transformToEtmp(any(), any())(any())
             verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
             verify(mockSharesTransformer, times(1)).transformToEtmp(any(), any())(any())
@@ -198,7 +197,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         .unsafeSet(CheckReturnDatesPage(srn), false)
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any())(any()))
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any(), any())(any()))
         .thenReturn(Some(minimalRequiredSubmission))
       when(mockLoansTransformer.transformToEtmp(any(), any())(any())).thenReturn(optLoans)
       when(mockMemberPaymentsTransformerTransformer.transformToEtmp(any(), any(), any(), any()))
@@ -212,7 +211,8 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       whenReady(
         service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
       ) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any(), any())(any())
+        verify(mockMinimalRequiredSubmissionTransformer, times(1))
+          .transformToEtmp(any(), any(), ArgumentMatchers.eq(false))(any())
         verify(mockLoansTransformer, times(1)).transformToEtmp(any(), any())(any())
         verify(mockMemberPaymentsTransformerTransformer, times(1)).transformToEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
@@ -238,7 +238,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         .unsafeSet(CheckReturnDatesPage(srn), false)
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any())(any()))
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any(), any())(any()))
         .thenReturn(Some(minimalRequiredSubmission))
       when(mockLoansTransformer.transformToEtmp(any(), any())(any())).thenReturn(optLoans)
       when(mockMemberPaymentsTransformerTransformer.transformToEtmp(any(), any(), any(), any()))
@@ -252,7 +252,8 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
       whenReady(service.submitPsrDetails(srn = srn, isSubmitted = true, fallbackCall)(implicitly, implicitly, request)) {
         result: Option[Unit] =>
-          verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any(), any())(any())
+          verify(mockMinimalRequiredSubmissionTransformer, times(1))
+            .transformToEtmp(any(), any(), ArgumentMatchers.eq(true))(any())
           verify(mockLoansTransformer, times(1)).transformToEtmp(any(), any())(any())
           verify(mockMemberPaymentsTransformerTransformer, times(1)).transformToEtmp(any(), any(), any(), any())
           verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
