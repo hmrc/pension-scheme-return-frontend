@@ -56,9 +56,9 @@ class JourneyRecoveryController @Inject()(
         .map(url => Ok(continueView(url, config.reportAProblemUrl, answersSavedDisplayVersion))) //if there is a URL passed in, continue button goes to that URL
         .getOrElse(
           Ok(
-            startAgainView( //if we have SRN in the session, continue button goes to tasklist, otherwise to MPS dashboard
+            startAgainView( //if we have SRN in the session, continue button goes to tasklist, otherwise to MPS overview
               url = Srn(request.session.get(SRN).getOrElse(""))
-                .fold(config.urls.managePensionsSchemes.dashboard) { srn =>
+                .fold(config.urls.managePensionsSchemes.overview) { srn =>
                   controllers.nonsipp.routes.TaskListController.onPageLoad(srn).url
                 },
               reportAProblemUrl = config.reportAProblemUrl
