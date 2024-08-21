@@ -66,7 +66,7 @@ class JourneyRecoveryControllerSpec extends ControllerBaseSpec with TestValues {
         running(application) {
           val appConfig = application.injector.instanceOf[FrontendAppConfig]
           val expectedReportAProblemUrl = appConfig.reportAProblemUrl
-          val expectedRedirectUrl = appConfig.urls.managePensionsSchemes.dashboard
+          val expectedRedirectUrl = appConfig.urls.managePensionsSchemes.overview
           val continueUrl = RedirectUrl("https://foo.com")
           val request = FakeRequest(GET, routes.JourneyRecoveryController.onPageLoad(Some(continueUrl)).url)
 
@@ -93,7 +93,7 @@ class JourneyRecoveryControllerSpec extends ControllerBaseSpec with TestValues {
             val appConfig = application.injector.instanceOf[FrontendAppConfig]
             val expectedReportAProblemUrl = appConfig.reportAProblemUrl
 
-            val expectedRedirectUrl = appConfig.urls.managePensionsSchemes.dashboard
+            val expectedRedirectUrl = appConfig.urls.managePensionsSchemes.overview
 
             val request = FakeRequest(GET, routes.JourneyRecoveryController.onPageLoad().url)
 
