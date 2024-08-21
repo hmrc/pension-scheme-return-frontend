@@ -42,6 +42,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+
 import java.time.LocalDate
 
 class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
@@ -114,7 +115,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       }
     }
 
-    "shouldn't submit PsrDetails request when initial UA and current UA are same" in {
+    "shouldn't submit PsrDetails request when initial UA and current UA are same and isSubmitted false" in {
       when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
         .thenReturn(Future.successful(Some(defaultUserAnswers)))
       whenReady(service.submitPsrDetails(srn, fallbackCall = fallbackCall)) { result: Option[Unit] =>
@@ -233,7 +234,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       }
     }
 
-    s"submitPsrDetails request successfully with PsrDeclaration when isSubmitted is true" in {
+    s"submitPsrDetails request successfully with PsrDeclaration when isSubmitted is true and (initial UA current UA) are same" in {
       val userAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), false)
       val request = DataRequest(allowedAccessRequest, userAnswers)
@@ -249,6 +250,47 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       when(mockDeclarationTransformer.transformToEtmp(any())).thenReturn(declaration)
       when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
         .thenReturn(Future.successful(Some(emptyUserAnswers)))
+
+      whenReady(service.submitPsrDetails(srn = srn, isSubmitted = true, fallbackCall)(implicitly, implicitly, request)) {
+        result: Option[Unit] =>
+          verify(mockMinimalRequiredSubmissionTransformer, times(1))
+            .transformToEtmp(any(), any(), ArgumentMatchers.eq(true))(any())
+          verify(mockLoansTransformer, times(1)).transformToEtmp(any(), any())(any())
+          verify(mockMemberPaymentsTransformerTransformer, times(1)).transformToEtmp(any(), any(), any(), any())
+          verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
+          verify(mockSharesTransformer, times(1)).transformToEtmp(any(), any())(any())
+          verify(mockDeclarationTransformer, times(1)).transformToEtmp(any())
+          verify(mockConnector, times(1)).submitPsrDetails(psrSubmissionCaptor.capture(), any(), any())(any(), any())
+          verify(mockAuditService, times(1)).sendExtendedEvent(psrSubmissionAuditEventCaptor.capture())(any(), any())
+          verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
+
+          psrSubmissionCaptor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+          psrSubmissionCaptor.getValue.checkReturnDates mustBe false
+          psrSubmissionCaptor.getValue.loans mustBe optLoans
+          psrSubmissionCaptor.getValue.assets mustBe optAssets
+          psrSubmissionCaptor.getValue.shares mustBe optShares
+          psrSubmissionCaptor.getValue.psrDeclaration mustBe Some(declaration)
+          psrSubmissionAuditEventCaptor.getValue.psrSubmission mustBe psrSubmissionCaptor.getValue
+          result mustBe Some(())
+      }
+    }
+
+    "should submit PsrDetails request when initial UA and current UA are same but isSubmitted true" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(CheckReturnDatesPage(srn), false)
+      val request = DataRequest(allowedAccessRequest, userAnswers)
+
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any(), any())(any()))
+        .thenReturn(Some(minimalRequiredSubmission))
+      when(mockLoansTransformer.transformToEtmp(any(), any())(any())).thenReturn(optLoans)
+      when(mockMemberPaymentsTransformerTransformer.transformToEtmp(any(), any(), any(), any()))
+        .thenReturn(optMemberPayments)
+      when(mockAssetsTransformer.transformToEtmp(any(), any())(any())).thenReturn(optAssets)
+      when(mockSharesTransformer.transformToEtmp(any(), any())(any())).thenReturn(optShares)
+      when(mockConnector.submitPsrDetails(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(())))
+      when(mockDeclarationTransformer.transformToEtmp(any())).thenReturn(declaration)
+      when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
+        .thenReturn(Future.successful(Some(userAnswers)))
 
       whenReady(service.submitPsrDetails(srn = srn, isSubmitted = true, fallbackCall)(implicitly, implicitly, request)) {
         result: Option[Unit] =>
