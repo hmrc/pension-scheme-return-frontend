@@ -22,7 +22,6 @@ import config.Refined.Max3
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import org.apache.pekko.stream.scaladsl.Source
-import forms.YesNoPageFormProvider
 import org.mockito.stubbing.OngoingStubbing
 import models._
 import models.UploadStatus.UploadStatus
@@ -33,6 +32,8 @@ import org.mockito.Mockito._
 import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
 import cats.data.NonEmptyList
 import views.html.YesNoPageView
+import forms.YesNoPageFormProvider
+import pages.nonsipp.memberdetails.upload.UploadStatusPage
 
 import scala.concurrent.Future
 
@@ -76,8 +77,10 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
   "CheckMemberDetailsFileController" - {
 
     act.like(
-      renderView(onPageLoad) { implicit app => implicit request =>
-        injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, Some(fileName), NormalMode))
+      renderView(onPageLoad, defaultUserAnswers.unsafeSet(UploadStatusPage(srn), UploadSubmitted)) {
+        implicit app => implicit request =>
+          injected[YesNoPageView]
+            .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, Some(fileName), NormalMode))
       }.before({
           mockTaxYear(dateRange)
           mockGetUploadStatus(Some(uploadedSuccessfully))
@@ -88,13 +91,20 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
         })
     )
 
-    act.like(renderPrePopView(onPageLoad, CheckMemberDetailsFilePage(srn), true) { implicit app => implicit request =>
-      injected[YesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, Some(fileName), NormalMode))
-    }.before({
-      mockTaxYear(dateRange)
-      mockGetUploadStatus(Some(uploadedSuccessfully))
-    }))
+    act.like(
+      renderPrePopView(
+        onPageLoad,
+        CheckMemberDetailsFilePage(srn),
+        true,
+        defaultUserAnswers.unsafeSet(UploadStatusPage(srn), UploadSubmitted)
+      ) { implicit app => implicit request =>
+        injected[YesNoPageView]
+          .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, Some(fileName), NormalMode))
+      }.before({
+        mockTaxYear(dateRange)
+        mockGetUploadStatus(Some(uploadedSuccessfully))
+      })
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

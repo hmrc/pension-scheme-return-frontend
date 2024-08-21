@@ -28,17 +28,17 @@ import eu.timepit.refined.refineMV
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriodRecordVersionPage, AccountingPeriods}
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
+import viewmodels.models.{Compiled, Submitted}
 import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.Mockito
 import org.scalatest.freespec.AnyFreeSpec
 import org.mockito.Mockito.{times, verify, when}
-import pages.nonsipp.{CheckReturnDatesPage, FbStatus, FbVersionPage, WhichTaxYearPage}
+import pages.nonsipp._
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import models._
 import models.SchemeMemberNumbers._
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.mockito.MockitoSugar.mock
-import viewmodels.models.{Compiled, Submitted}
 
 import java.time.LocalDate
 

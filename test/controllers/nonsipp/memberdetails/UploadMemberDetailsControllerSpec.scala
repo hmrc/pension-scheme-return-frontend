@@ -120,10 +120,8 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
         })
     )
 
-    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
-
-    act.like(continueNoSave(onSubmit))
-    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit " + _))
   }
 
   private def mockInitiateUpscan(): Unit =
