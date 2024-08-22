@@ -92,34 +92,41 @@ class BorrowInstancesListController @Inject()(
 
   def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
     implicit request: DataRequest[AnyContent]
-  ): Result = {
-    val (borrowingStatus, incompleteBorrowingUrl) = getBorrowingTaskListStatusAndLink(request.userAnswers, srn)
+  ): Result =
+    borrowDetails(srn).map { instances =>
+      if (viewOnlyViewModel.isEmpty && instances.isEmpty) {
+        Redirect(controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode))
+      } else {
 
-    if (borrowingStatus == TaskListStatus.Completed) {
-      borrowDetails(srn)
-        .map(
-          instances =>
-            Ok(
-              view(
-                form,
-                BorrowInstancesListController.viewModel(
-                  srn,
-                  mode,
-                  page,
-                  instances,
-                  request.schemeDetails.schemeName,
-                  viewOnlyViewModel
+        val (borrowingStatus, incompleteBorrowingUrl) = getBorrowingTaskListStatusAndLink(request.userAnswers, srn)
+
+        if (borrowingStatus == TaskListStatus.Completed) {
+          borrowDetails(srn)
+            .map(
+              instances =>
+                Ok(
+                  view(
+                    form,
+                    BorrowInstancesListController.viewModel(
+                      srn,
+                      mode,
+                      page,
+                      instances,
+                      request.schemeDetails.schemeName,
+                      viewOnlyViewModel
+                    )
+                  )
                 )
-              )
             )
-        )
-        .merge
-    } else if (borrowingStatus == TaskListStatus.InProgress) {
-      Redirect(incompleteBorrowingUrl)
-    } else {
-      Redirect(controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode))
-    }
-  }
+            .merge
+        } else if (borrowingStatus == TaskListStatus.InProgress) {
+          Redirect(incompleteBorrowingUrl)
+        } else {
+          Redirect(controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode))
+        }
+      }
+    }.merge
+
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     borrowDetails(srn).map { instances =>

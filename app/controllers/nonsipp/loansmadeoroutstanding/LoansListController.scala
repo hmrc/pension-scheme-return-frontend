@@ -99,33 +99,38 @@ class LoansListController @Inject()(
 
   def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
     implicit request: DataRequest[AnyContent]
-  ): Result = {
-    val status = getLoansTaskListStatus(request.userAnswers, srn)
-    if (status == TaskListStatus.Completed) {
-      loanRecipients(srn)
-        .map(
-          recipients =>
-            Ok(
-              view(
-                form,
-                viewModel(
-                  srn,
-                  page,
-                  mode,
-                  recipients,
-                  request.schemeDetails.schemeName,
-                  viewOnlyViewModel
+  ): Result =
+    loanRecipients(srn).map { recipients =>
+      if (viewOnlyViewModel.isEmpty && recipients.isEmpty) {
+        Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
+      } else {
+        val status = getLoansTaskListStatus(request.userAnswers, srn)
+        if (status == TaskListStatus.Completed) {
+          loanRecipients(srn)
+            .map(
+              recipients =>
+                Ok(
+                  view(
+                    form,
+                    viewModel(
+                      srn,
+                      page,
+                      mode,
+                      recipients,
+                      request.schemeDetails.schemeName,
+                      viewOnlyViewModel
+                    )
+                  )
                 )
-              )
             )
-        )
-        .merge
-    } else if (status == TaskListStatus.InProgress) {
-      Redirect(getIncompleteLoansLink(request.userAnswers, srn))
-    } else {
-      Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
-    }
-  }
+            .merge
+        } else if (status == TaskListStatus.InProgress) {
+          Redirect(getIncompleteLoansLink(request.userAnswers, srn))
+        } else {
+          Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
+        }
+      }
+    }.merge
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     loanRecipients(srn).map { recipients =>
