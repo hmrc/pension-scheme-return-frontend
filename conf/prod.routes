@@ -1,3 +1,5 @@
 # Add all the application routes to the app.routes file
-->         /pension-scheme-return     app.Routes
-->         /                          health.Routes
+->         /pension-scheme-return       app.Routes
+->         /                            health.Routes
+
+POST       /fileupload/upscan-callback upscan.UploadCallbackController.callback

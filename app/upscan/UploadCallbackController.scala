@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package upscan
 
 import services.UploadService
 import play.api.mvc.{Action, MessagesControllerComponents}
