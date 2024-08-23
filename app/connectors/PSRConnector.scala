@@ -135,7 +135,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
             // TODO verify if there are still 503 returned on QA
             // just logging errors to be able to continue on QA env
             logger.error(
-              s"getVersions for $pstr and years $startDates returned http response $response.status - returning empty Seq"
+              s"getVersions for $pstr and years $startDates returned http response ${response.status} - returning empty Seq"
             )
             Seq.empty[PsrVersionsForYearsResponse]
         }
@@ -168,7 +168,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
             // TODO verify if there are still 503 returned on QA
             // just logging errors to be able to continue on QA env
             logger.error(
-              s"getVersions for $pstr and $startDate returned http response $response.status - returning empty Seq"
+              s"getVersions for $pstr and $startDate returned http response ${response.status} - returning empty Seq"
             )
             Seq.empty[PsrVersionsResponse]
         }
@@ -197,7 +197,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
             }
           case _ =>
             logger.error(
-              s"getOverview for $pstr and $fromDate - $toDate returned http response $response.status - returning empty Seq"
+              s"getOverview for $pstr and $fromDate - $toDate returned http response ${response.status} - returning empty Seq"
             )
             None
         }
