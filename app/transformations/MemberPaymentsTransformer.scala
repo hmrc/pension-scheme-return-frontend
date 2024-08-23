@@ -16,6 +16,7 @@
 
 package transformations
 
+import pages.nonsipp.memberdetails._
 import com.google.inject.Singleton
 import pages.nonsipp.memberdetails.MembersDetailsPage._
 import config.Refined.{Max300, Max50}
@@ -27,8 +28,6 @@ import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransferOutMember
 import models.softdelete.SoftDeletedMember
 import cats.syntax.traverse._
 import pages.nonsipp.employercontributions._
-import utils.Diff
-import pages.nonsipp.memberdetails._
 import pages.nonsipp.membercontributions.{
   MemberContributionsListPage,
   MemberContributionsPage,
@@ -189,9 +188,10 @@ class MemberPaymentsTransformer @Inject()(
               val same = normalisedInitialMember == normalisedCurrentMember
               if (!same) {
                 logger.info(s"member $index has changed, removing memberPSRVersion")
-                if (logger.isDebugEnabled) {
-                  logger.debug(Diff(normalisedInitialMember, normalisedCurrentMember).mkString(" - "))
-                }
+//                // we can still use this on localhost if needed:
+//                if (logger.isDebugEnabled) {
+//                  logger.debug(Diff(normalisedInitialMember, normalisedCurrentMember).mkString(" - "))
+//                }
               }
               currentMemberDetail.copy(
                 memberPSRVersion = if (same) currentMemberDetail.memberPSRVersion else None
