@@ -107,6 +107,14 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
         )
     })
 
+    act.like(
+      redirectToPage(
+        onPageLoad,
+        moneyBorrowedPageLoad,
+        noBorrowingsUserAnswers
+      ).withName("No borrowInstances added redirects to yes-no page")
+    )
+
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
     act.like(redirectNextPage(onSubmit, "value" -> "false"))
 
@@ -199,13 +207,6 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
       }.withName("OnPageLoadViewOnly renders ok with no borrowings")
     )
 
-    act.like(
-      redirectToPage(
-        onPageLoad,
-        moneyBorrowedPageLoad,
-        noBorrowingsUserAnswers
-      ).withName("No borrowInstances added redirects to yes-no page")
-    )
 
     act.like(
       redirectToPage(

@@ -150,6 +150,14 @@ class LoansListControllerSpec extends ControllerBaseSpec {
       ).withName("Not Started Journey")
     )
 
+    act.like(
+      redirectToPage(
+        onPageLoad,
+        onLoansMadePageLoad,
+        noLoansUserAnswers
+      ).withName("No loans added redirects to yes-no page")
+    )
+
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
@@ -229,13 +237,6 @@ class LoansListControllerSpec extends ControllerBaseSpec {
       }.withName("OnPageLoadViewOnly renders ok with no loans")
     )
 
-    act.like(
-      redirectToPage(
-        onPageLoad,
-        onLoansMadePageLoad,
-        noLoansUserAnswers
-      ).withName("No loans added redirects to yes-no page")
-    )
 
     act.like(
       redirectToPage(
