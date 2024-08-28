@@ -30,14 +30,17 @@ import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import pages.nonsipp.FbVersionPage
 import org.scalatest.BeforeAndAfterEach
+import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
+import pages.nonsipp.schemedesignatory.HowManyMembersPage
 
 import scala.concurrent.Future
-
 import java.time.LocalDateTime
 
 class PsaDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfterEach {
   private val populatedUserAnswers = {
-    defaultUserAnswers.unsafeSet(FbVersionPage(srn), version)
+    defaultUserAnswers
+      .unsafeSet(FbVersionPage(srn), version)
+      .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersUnderThreshold)
   }
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
   private implicit val mockEmailConnector: EmailConnector = mock[EmailConnector]
@@ -96,6 +99,34 @@ class PsaDeclarationControllerSpec extends ControllerBaseSpec with BeforeAndAfte
           verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
           emailAuditEventCaptor.getValue.schemeAdministratorOrPractitionerName mustEqual defaultMinimalDetails.individualDetails.get.fullName
         })
+        .withName("agree and continue should submit PSR details, send email and audit ")
+    )
+
+    act.like(
+      agreeAndContinue(
+        onSubmit,
+        populatedUserAnswers
+          .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
+          .unsafeSet(LoansMadeOrOutstandingPage(srn), false)
+      ).before({
+          when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(schemeDatePeriod))
+          when(mockSchemeDateService.returnPeriodsAsJsonString(any())(any())).thenReturn("")
+          when(mockSchemeDateService.submissionDateAsString(any())).thenReturn("")
+          when(mockSchemeDateService.now()).thenReturn(LocalDateTime.now())
+          when(mockAuditService.sendEvent(emailAuditEventCaptor.capture())(any(), any()))
+            .thenReturn(Future.successful(AuditResult.Success))
+          MockPsrSubmissionService.submitPsrDetailsBypassed()
+          MockEmailConnector.sendEmail(email, templateId)
+        })
+        .after({
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsBypassed(any(), any())(any(), any(), any())
+          verify(mockEmailConnector, times(1))
+            .sendEmail(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())(any(), any())
+          verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+          emailAuditEventCaptor.getValue.schemeAdministratorOrPractitionerName mustEqual defaultMinimalDetails.individualDetails.get.fullName
+        })
+        .withName("agree and continue should submit PSR details bypassed, send email and audit ")
     )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

@@ -26,7 +26,7 @@
 
 @(form: Form[_], viewmodel: FormPageViewModel[TextInputViewModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, viewmodel.title.toMessage)) {
+@layout(pageTitle = title(form, viewmodel.title.toMessage), notificationBanner = viewmodel.optNotificationBanner) {
 
   @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
 

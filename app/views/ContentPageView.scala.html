@@ -43,8 +43,7 @@
    }
 
 } else {
-
-        @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
+        @layout(pageTitle = titleNoForm(viewmodel.title.toMessage), notificationBanner = viewmodel.optNotificationBanner) {
 
             @if(viewmodel.page.isLargeHeading) {
                 <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>

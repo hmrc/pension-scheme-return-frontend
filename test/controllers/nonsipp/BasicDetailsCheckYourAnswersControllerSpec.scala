@@ -42,11 +42,11 @@ import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriodRec
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import play.api.i18n.Messages
 import pages.nonsipp.declaration.PensionSchemeDeclarationPage
+import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
 import scala.concurrent.Future
-
 import java.time.{LocalDate, LocalDateTime}
 
 class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with CommonTestValues {
@@ -403,6 +403,28 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             .after {
               verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
               verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+            }
+        )
+      }
+
+      "(7) should proceed to declaration when member numbers updated from below threshold to over threshold (e.g. loans exist)" - {
+
+        act.like(
+          redirectToPage(
+            onSubmit,
+            controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn),
+            currentTaxYearUserAnswersWithManyMembers
+              .unsafeSet(LoansMadeOrOutstandingPage(srn), false),
+            emptyUserAnswers
+          ).before {
+              mockTaxYear(currentReturnTaxYear)
+              mockVersions(Seq.empty[PsrVersionsResponse])
+              MockPsrSubmissionService.submitPsrDetails()
+            }
+            .after {
+              verify(mockPsrVersionsService, times(1)).getVersions(any(), any())(any(), any())
+              verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+              verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any(), any())(any(), any(), any())
             }
         )
       }
