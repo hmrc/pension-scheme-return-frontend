@@ -16,19 +16,20 @@
 
 package controllers
 
-import services.PsrVersionsService
+import services.{PsrRetrievalService, PsrVersionsService}
 import utils.DateTimeUtils
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Constants
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.WhichTaxYearPage
-import models.backend.responses.ReportStatus
 import models._
 import controllers.ReturnsSubmittedController.viewModel
 import play.api.i18n.MessagesApi
 import views.html.ReturnsSubmittedView
 import models.SchemeId.Srn
+import utils.nonsipp.SchemeDetailNavigationUtils
+import models.backend.responses.ReportStatus
 import viewmodels.DisplayMessage.{LinkMessage, Message}
 import viewmodels.models._
 
@@ -40,10 +41,12 @@ class ReturnsSubmittedController @Inject()(
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  psrVersionsService: PsrVersionsService,
+  val psrVersionsService: PsrVersionsService,
+  val psrRetrievalService: PsrRetrievalService,
   view: ReturnsSubmittedView
 )(implicit ec: ExecutionContext)
-    extends PSRController {
+    extends PSRController
+    with SchemeDetailNavigationUtils {
 
   def onPageLoad(srn: Srn, page: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -58,19 +61,20 @@ class ReturnsSubmittedController @Inject()(
               .reverse
               .map { psrVersionsResponse =>
                 val maxReportVersion = reportVersions.max
+                val currentVersion = psrVersionsResponse.reportVersion
                 val submitter =
-                  if (psrVersionsResponse.reportVersion == maxReportVersion && psrVersionsResponse.reportStatus == ReportStatus.ReportStatusCompiled) {
+                  if (currentVersion == maxReportVersion && psrVersionsResponse.reportStatus == ReportStatus.ReportStatusCompiled) {
                     "returnsSubmitted.inProgress"
                   } else {
                     getSubmitter(psrVersionsResponse)
                   }
                 List(
-                  TableElem(Message(psrVersionsResponse.reportVersion.toString)),
+                  TableElem(Message(currentVersion.toString)),
                   TableElem(
                     Message(DateTimeUtils.formatHtml(psrVersionsResponse.compilationOrSubmissionDate.toLocalDate))
                   ),
                   TableElem(Message(submitter)),
-                  if (psrVersionsResponse.reportVersion == maxReportVersion) {
+                  if (currentVersion == maxReportVersion) {
                     if (psrVersionsResponse.reportStatus == ReportStatus.ReportStatusCompiled) {
                       TableElem(
                         LinkMessage(
@@ -95,13 +99,8 @@ class ReturnsSubmittedController @Inject()(
                     TableElem(
                       LinkMessage(
                         Message("site.view"),
-                        controllers.nonsipp.routes.ViewOnlyTaskListController
-                          .onPageLoad(
-                            srn,
-                            formatDateForApi(dateRange.from),
-                            psrVersionsResponse.reportVersion,
-                            psrVersionsResponse.reportVersion - 1
-                          )
+                        controllers.routes.ReturnsSubmittedController
+                          .onSelectToView(srn, formatDateForApi(dateRange.from), currentVersion, currentVersion - 1)
                           .url
                       )
                     )
@@ -109,7 +108,6 @@ class ReturnsSubmittedController @Inject()(
                 )
               }
               .toList
-            val schemeName = request.schemeDetails.schemeName
             Ok(
               view(
                 viewModel(
@@ -118,7 +116,7 @@ class ReturnsSubmittedController @Inject()(
                   listRetHistorySummary,
                   DateTimeUtils.formatHtml(dateRange.from),
                   DateTimeUtils.formatHtml(dateRange.to),
-                  schemeName
+                  request.schemeDetails.schemeName
                 )
               )
             )
@@ -129,6 +127,29 @@ class ReturnsSubmittedController @Inject()(
   def onSelect(srn: Srn, fbNumber: String): Action[AnyContent] =
     identifyAndRequireData(srn, fbNumber).async {
       Future.successful(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
+    }
+
+  def onSelectToView(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, current, previous).async { implicit request =>
+      val byPassedJourney =
+        Redirect(
+          controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoadViewOnly(
+            srn,
+            year,
+            current,
+            previous
+          )
+        )
+      val regularJourney = Redirect(
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(
+            srn,
+            year,
+            current,
+            previous
+          )
+      )
+      isJourneyBypassed(srn).map(res => res.map(if (_) byPassedJourney else regularJourney).merge)
     }
 }
 

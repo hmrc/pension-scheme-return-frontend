@@ -254,9 +254,9 @@ class OverviewController @Inject()(
           Future.successful(Redirect(sippUrl).addingToSession("fbNumber" -> fbNumber))
         case _ =>
           val byPassedJourney =
-            controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode)
-          val regularJourney = controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
-          calculateNavigation(srn, byPassedJourney, regularJourney).map(Redirect)
+            Redirect(controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode))
+          val regularJourney = Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
+          isJourneyBypassed(srn).map(res => res.map(if (_) byPassedJourney else regularJourney).merge)
       }
     }
 }
