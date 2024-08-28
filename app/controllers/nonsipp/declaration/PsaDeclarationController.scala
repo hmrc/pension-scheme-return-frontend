@@ -19,7 +19,6 @@ package controllers.nonsipp.declaration
 import services._
 import models.audit.PSRSubmissionEmailAuditEvent
 import utils.DateTimeUtils
-import viewmodels.implicits._
 import play.api.mvc._
 import connectors.{EmailConnector, EmailStatus}
 import controllers.PSRController
@@ -29,6 +28,8 @@ import _root_.config.Constants._
 import uk.gov.hmrc.http.HeaderCarrier
 import models.{DateRange, NormalMode, UserAnswers}
 import models.requests.DataRequest
+import viewmodels.implicits._
+import utils.nonsipp.MemberCountUtils.hasMemberNumbersChangedToOver99
 import views.html.ContentPageView
 import models.SchemeId.Srn
 import pages.nonsipp.FbVersionPage
@@ -61,7 +62,12 @@ class PsaDeclarationController @Inject()(
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      Ok(view(PsaDeclarationController.viewModel(srn)))
+      Ok(
+        view(
+          PsaDeclarationController
+            .viewModel(srn, hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId))
+        )
+      )
     }
 
   def onSubmit(srn: Srn): Action[AnyContent] =
@@ -73,11 +79,18 @@ class PsaDeclarationController @Inject()(
           val now = schemeDateService.now()
 
           for {
-            _ <- psrSubmissionService.submitPsrDetails(
-              srn = srn,
-              isSubmitted = true,
-              fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
-            )
+            _ <- if (hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId)) {
+              psrSubmissionService.submitPsrDetailsBypassed(
+                srn = srn,
+                fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
+              )
+            } else {
+              psrSubmissionService.submitPsrDetails(
+                srn = srn,
+                isSubmitted = true,
+                fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
+              )
+            }
             _ <- sendEmail(
               loggedInUserNameOrBlank,
               request.minimalDetails.email,
@@ -152,12 +165,23 @@ class PsaDeclarationController @Inject()(
 
 object PsaDeclarationController {
 
-  def viewModel(srn: Srn): FormPageViewModel[ContentPageViewModel] =
+  def viewModel(srn: Srn, hasNumberOfMembersChangedToOver99: Boolean = false): FormPageViewModel[ContentPageViewModel] =
     FormPageViewModel(
       Message("psaDeclaration.title"),
       Message("psaDeclaration.heading"),
       ContentPageViewModel(),
-      routes.PsaDeclarationController.onSubmit(srn)
+      routes.PsaDeclarationController.onSubmit(srn),
+      optNotificationBanner = if (hasNumberOfMembersChangedToOver99) {
+        Some(
+          (
+            "psaDeclaration.notification.title",
+            "psaDeclaration.notification.header",
+            "psaDeclaration.notification.paragraph"
+          )
+        )
+      } else {
+        None
+      }
     ).withButtonText(Message("site.agreeAndContinue"))
       .withDescription(
         ParagraphMessage("psaDeclaration.paragraph") ++

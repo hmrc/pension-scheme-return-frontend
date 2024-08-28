@@ -120,6 +120,43 @@ class PsrSubmissionService @Inject()(
       )
   }
 
+  def submitPsrDetailsBypassed(
+    srn: Srn,
+    fallbackCall: Call
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
+    (
+      (
+        minimalRequiredSubmissionTransformer.transformToEtmp(srn, request.userAnswers, true),
+        request.userAnswers.get(CheckReturnDatesPage(srn)),
+        schemeDateService.schemeDate(srn)
+      ).mapN { (minimalRequiredSubmission, checkReturnDates, taxYear) =>
+        {
+          val submissionRequest: PsrSubmission = PsrSubmission(
+            minimalRequiredSubmission = minimalRequiredSubmission,
+            checkReturnDates = checkReturnDates,
+            loans = None,
+            assets = None,
+            membersPayments = None,
+            shares = None,
+            psrDeclaration = Some(declarationTransformer.transformToEtmp)
+          )
+          psrConnector
+            .submitPsrDetails(
+              submissionRequest,
+              schemeAdministratorOrPractitionerName,
+              request.schemeDetails.schemeName
+            )
+            .flatMap {
+              case Left(message: String) =>
+                throw PostPsrException(message, fallbackCall.url)
+              case Right(()) =>
+                auditService.sendExtendedEvent(buildAuditEvent(taxYear, true, submissionRequest))
+                Future.unit
+            }
+        }
+      }
+    ).sequence
+
   private def buildAuditEvent(taxYear: DateRange, isSubmitted: Boolean, submissionRequest: PsrSubmission)(
     implicit req: DataRequest[_]
   ): ExtendedAuditEvent = {

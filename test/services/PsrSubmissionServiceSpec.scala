@@ -329,6 +329,41 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           result mustBe Some(())
       }
     }
+
+    "should submit PsrDetails bypassed" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(CheckReturnDatesPage(srn), false)
+      val request = DataRequest(allowedAccessRequest, userAnswers)
+
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any(), any())(any()))
+        .thenReturn(Some(minimalRequiredSubmission))
+      when(mockConnector.submitPsrDetails(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(())))
+      when(mockDeclarationTransformer.transformToEtmp(any())).thenReturn(declaration)
+      when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
+        .thenReturn(Future.successful(Some(userAnswers)))
+
+      whenReady(service.submitPsrDetailsBypassed(srn = srn, fallbackCall)(implicitly, implicitly, request)) {
+        result: Option[Unit] =>
+          verify(mockMinimalRequiredSubmissionTransformer, times(1))
+            .transformToEtmp(any(), any(), ArgumentMatchers.eq(true))(any())
+          verify(mockLoansTransformer, never).transformToEtmp(any(), any())(any())
+          verify(mockMemberPaymentsTransformerTransformer, never).transformToEtmp(any(), any(), any(), any())
+          verify(mockAssetsTransformer, never).transformToEtmp(any(), any())(any())
+          verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
+          verify(mockDeclarationTransformer, times(1)).transformToEtmp(any())
+          verify(mockConnector, times(1)).submitPsrDetails(psrSubmissionCaptor.capture(), any(), any())(any(), any())
+          verify(mockAuditService, times(1)).sendExtendedEvent(psrSubmissionAuditEventCaptor.capture())(any(), any())
+          verify(mockSessionRepository, never).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
+
+          psrSubmissionCaptor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+          psrSubmissionCaptor.getValue.checkReturnDates mustBe false
+          psrSubmissionCaptor.getValue.loans mustBe None
+          psrSubmissionCaptor.getValue.assets mustBe None
+          psrSubmissionCaptor.getValue.shares mustBe None
+          psrSubmissionCaptor.getValue.psrDeclaration mustBe Some(declaration)
+          result mustBe Some(())
+      }
+    }
   }
 }
 

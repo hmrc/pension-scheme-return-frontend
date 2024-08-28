@@ -19,7 +19,6 @@ package controllers.nonsipp.declaration
 import services._
 import models.audit.PSRSubmissionEmailAuditEvent
 import utils.DateTimeUtils
-import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import connectors.{EmailConnector, EmailStatus}
@@ -28,6 +27,8 @@ import config.FrontendAppConfig
 import config.Constants._
 import controllers.actions._
 import models.{DateRange, NormalMode, UserAnswers}
+import viewmodels.implicits._
+import utils.nonsipp.MemberCountUtils.hasMemberNumbersChangedToOver99
 import views.html.PsaIdInputView
 import models.SchemeId.Srn
 import pages.nonsipp.FbVersionPage
@@ -68,7 +69,8 @@ class PspDeclarationController @Inject()(
       Ok(
         view(
           form.fromUserAnswers(PspDeclarationPage(srn)),
-          PspDeclarationController.viewModel(srn)
+          PspDeclarationController
+            .viewModel(srn, hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId))
         )
       )
     }
@@ -76,6 +78,8 @@ class PspDeclarationController @Inject()(
   def onSubmit(srn: Srn): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val fbVersion = request.userAnswers.get(FbVersionPage(srn)).getOrElse(defaultFbVersion) // 000 as no versions yet - initial submission
+      val hasNumberOfMembersChangedToOver99 =
+        hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId)
       schemeDateService.schemeDate(srn) match {
         case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         case Some(dates) =>
@@ -90,7 +94,7 @@ class PspDeclarationController @Inject()(
                   BadRequest(
                     view(
                       formWithErrors,
-                      PspDeclarationController.viewModel(srn)
+                      PspDeclarationController.viewModel(srn, hasNumberOfMembersChangedToOver99)
                     )
                   )
                 ),
@@ -99,11 +103,18 @@ class PspDeclarationController @Inject()(
                   updatedAnswers <- Future
                     .fromTry(request.userAnswers.set(PspDeclarationPage(srn), answer))
                   _ <- saveService.save(updatedAnswers)
-                  _ <- psrSubmissionService.submitPsrDetails(
-                    srn = srn,
-                    isSubmitted = true,
-                    fallbackCall = controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
-                  )
+                  _ <- if (hasNumberOfMembersChangedToOver99) {
+                    psrSubmissionService.submitPsrDetailsBypassed(
+                      srn = srn,
+                      fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
+                    )
+                  } else {
+                    psrSubmissionService.submitPsrDetails(
+                      srn = srn,
+                      isSubmitted = true,
+                      fallbackCall = controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
+                    )
+                  }
                   _ <- sendEmail(
                     loggedInUserNameOrBlank,
                     request.minimalDetails.email,
@@ -188,12 +199,23 @@ object PspDeclarationController {
     authorisingPsaId
   )
 
-  def viewModel(srn: Srn): FormPageViewModel[TextInputViewModel] =
+  def viewModel(srn: Srn, hasNumberOfMembersChangedToOver99: Boolean = false): FormPageViewModel[TextInputViewModel] =
     FormPageViewModel(
       Message("pspDeclaration.title"),
       Message("pspDeclaration.heading"),
       TextInputViewModel(Some(Message("pspDeclaration.psaId.label")), isFixedLength = true),
-      routes.PspDeclarationController.onSubmit(srn)
+      routes.PspDeclarationController.onSubmit(srn),
+      optNotificationBanner = if (hasNumberOfMembersChangedToOver99) {
+        Some(
+          (
+            "pspDeclaration.notification.title",
+            "pspDeclaration.notification.header",
+            "pspDeclaration.notification.paragraph"
+          )
+        )
+      } else {
+        None
+      }
     ).withButtonText(Message("site.agreeAndContinue"))
       .withDescription(
         ParagraphMessage("pspDeclaration.paragraph") ++

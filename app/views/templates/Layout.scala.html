@@ -22,6 +22,7 @@
     appConfig: FrontendAppConfig,
     govukLayout: GovukLayout,
     govukBackLink: GovukBackLink,
+    govukNotificationBanner: GovukNotificationBanner,
     hmrcHead: HmrcHead,
     hmrcStandardHeader: HmrcStandardHeader,
     hmrcStandardFooter: HmrcStandardFooter,
@@ -33,7 +34,7 @@
     alphaBanner: StandardBetaBanner
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, refresh: Option[Int] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, refresh: Option[Int] = None, notificationBanner: Option[(String, String, String)] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @head = {
 
@@ -74,6 +75,24 @@
 
     @if(showBackLink) {
         @govukBackLink(BackLinkViewModel(href = "#").withCssClass("js-visible"))
+    }
+
+    @if(notificationBanner.isDefined) {
+        @govukNotificationBanner(NotificationBanner(
+            content = HtmlContent(
+                s"""
+                | <h3 class="govuk-notification-banner__heading">
+                |   ${renderMessage(notificationBanner.get._2)}
+                | </h3>
+                | <p class="govuk-body">${renderMessage(notificationBanner.get._3)}</p>
+                |""".stripMargin
+            ),
+            disableAutoFocus = Some(true),
+            title = notificationBanner.get._1,
+            titleHeadingLevel = Some(3),
+            role = Some("alert"),
+            classes = "govuk-!-margin-top-7 govuk-!-margin-bottom-2"
+        ))
     }
 }
 
