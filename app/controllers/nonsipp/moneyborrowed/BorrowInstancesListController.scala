@@ -127,7 +127,6 @@ class BorrowInstancesListController @Inject()(
       }
     }.merge
 
-
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     borrowDetails(srn).map { instances =>
       if (instances.length == maxBorrows) {

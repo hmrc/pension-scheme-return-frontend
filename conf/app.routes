@@ -457,3 +457,4 @@ GET         /:srn/select-start                                                  
 GET         /:srn/select-continue                                                                              controllers.OverviewController.onSelectContinue(srn: Srn, taxYear: String, version: String, reportType: String)
 GET         /:srn/view-change/submitted-returns/:page                                                          controllers.ReturnsSubmittedController.onPageLoad(srn: Srn, page: Int)
 GET         /:srn/view-change/select-submitted-returns                                                         controllers.ReturnsSubmittedController.onSelect(srn: Srn, fbNumber: String)
+GET         /:srn/view-change/select-submitted-returns-to-view/:year/:current/:previous                        controllers.ReturnsSubmittedController.onSelectToView(srn: Srn, year: String, current: Int, previous: Int)

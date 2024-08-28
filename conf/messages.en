@@ -31,6 +31,7 @@ site.error = Error
 site.or = or
 site.submittedOn = Submitted on {0}
 site.return.to.tasklist = Return to task list for this version
+site.view.submission.confirmation = View submission confirmation
 
 date.day = Day
 date.day.lower = day
@@ -1273,7 +1274,6 @@ basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers.hidden = n
 basicDetailsCheckYourAnswersController.viewOnly.title = Basic details
 basicDetailsCheckYourAnswersController.viewOnly.heading = Basic details
 basicDetailsCheckYourAnswersController.viewOnly.link = View previous version of basic details (opens in new tab)
-basicDetailsCheckYourAnswersController.button.view.submission.confirmation = View submission confirmation
 
 individualRecipientName.title = What is the recipient’s name?
 individualRecipientName.heading = What is the recipient’s name?

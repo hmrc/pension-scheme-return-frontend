@@ -45,7 +45,8 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit =
     controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onSubmit(srn, page, NormalMode)
 
-  private lazy val moneyBorrowedPageLoad = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode)
+  private lazy val moneyBorrowedPageLoad =
+    controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode)
   private lazy val onSubmitViewOnly =
     controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onSubmitViewOnly(
       srn,
@@ -191,22 +192,20 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
         onPageLoadViewOnly,
         userAnswers = noBorrowingsUserAnswers,
         optPreviousAnswers = Some(previousUserAnswers)
-      ) { implicit app =>
-        implicit request =>
-          injected[ListView].apply(
-            form(new YesNoPageFormProvider()),
-            viewModel(
-              srn,
-              mode = ViewOnlyMode,
-              page = 1,
-              borrowingInstances = List(),
-              schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
-            )
+      ) { implicit app => implicit request =>
+        injected[ListView].apply(
+          form(new YesNoPageFormProvider()),
+          viewModel(
+            srn,
+            mode = ViewOnlyMode,
+            page = 1,
+            borrowingInstances = List(),
+            schemeName,
+            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
           )
+        )
       }.withName("OnPageLoadViewOnly renders ok with no borrowings")
     )
-
 
     act.like(
       redirectToPage(

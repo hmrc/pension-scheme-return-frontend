@@ -18,7 +18,7 @@ package utils.nonsipp
 
 import services.{PsrRetrievalService, PsrVersionsService}
 import pages.nonsipp.schemedesignatory.HowManyMembersPage
-import play.api.mvc.{AnyContent, Call}
+import play.api.mvc.{AnyContent, Result}
 import controllers.PSRController
 import models.SchemeId.Srn
 import cats.implicits.catsSyntaxApplicativeId
@@ -35,22 +35,22 @@ trait SchemeDetailNavigationUtils { _: PSRController =>
   protected val psrRetrievalService: PsrRetrievalService
 
   /**
-   * This method determines whether the user proceeds directly to the regularJourney page or skips to the byPassedJourney page.
+   * This method determines whether the user has ability to proceed the byPassedJourney page.
    *
    * This is dependent on two factors: (1) the number of Active & Deferred members in the scheme, and (2) whether any
    * 'full' returns have been submitted for this scheme before.
    *
    * If the number of Active + Deferred members > 99, and no 'full' returns have been submitted for this scheme, then
-   * the user will skip to the byPassedJourney page. In all other cases, they will proceed to the regularJourney page.
+   * the user is able to skip to the byPassedJourney page and returns true. In all other cases, returns false.
    *
    * A 'full' return must include at least 1 member, while a 'skipped' return will contain no member details at all, so
    * we use {{{.get(memberDetails).getOrElse(JsObject.empty).as[JsObject] == JsObject.empty}}} to determine whether or
    * not a retrieved set of `UserAnswers` refers to a 'full' or 'skipped' return.
    */
-  def calculateNavigation(srn: Srn, byPassedJourney: Call, regularJourney: Call)(
+  def isJourneyBypassed(srn: Srn)(
     implicit request: DataRequest[AnyContent],
     ec: ExecutionContext
-  ): Future[Call] = {
+  ): Future[Either[Result, Boolean]] = {
 
     // Determine if the member threshold is reached
     val currentSchemeMembers = request.userAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
@@ -81,27 +81,20 @@ trait SchemeDetailNavigationUtils { _: PSRController =>
                 )
 
                 latestReturnFromPreviousTaxYear.map { previousUserAnswers =>
-                  val noFullReturnSubmittedLastTaxYear =
-                    previousUserAnswers.get(memberDetails).getOrElse(JsObject.empty).as[JsObject] == JsObject.empty
-
-                  if (noFullReturnSubmittedLastTaxYear) { // Redirect triggered: no 'full' returns submitted last year
-                    byPassedJourney
-                  } else { // No shortcut redirect triggered: 'full' return submitted last year
-                    regularJourney
-                  }
+                  Right(previousUserAnswers.get(memberDetails).getOrElse(JsObject.empty).as[JsObject] == JsObject.empty)
                 }
-              } else { // shortcut redirect triggered: no returns of any kind submitted last year
-                byPassedJourney.pure[Future]
+              } else { // shortcut triggered: no returns of any kind submitted last year
+                Right(true).pure[Future]
               }
             }.flatten
           case None => // Couldn't get current return's tax year, so something's gone wrong
-            controllers.routes.JourneyRecoveryController.onPageLoad().pure[Future]
+            Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())).pure[Future]
         }
-      } else { // No shortcut redirect: full return was submitted earlier this tax year
-        regularJourney.pure[Future]
+      } else { // No shortcut : full return was submitted earlier this tax year
+        Right(false).pure[Future]
       }
-    } else { // No shortcut redirect: too few Active & Deferred members
-      regularJourney.pure[Future]
+    } else { // No shortcut : too few Active & Deferred members
+      Right(false).pure[Future]
     }
   }
 }

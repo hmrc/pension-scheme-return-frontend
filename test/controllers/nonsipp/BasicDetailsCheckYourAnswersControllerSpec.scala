@@ -24,7 +24,7 @@ import play.api.inject.bind
 import cats.implicits.toShow
 import eu.timepit.refined.refineMV
 import pages.nonsipp._
-import models.backend.responses._
+import models.backend.responses.PsrVersionsResponse
 import org.mockito.stubbing.OngoingStubbing
 import models._
 import org.mockito.ArgumentMatchers.any
@@ -79,6 +79,11 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
     to = LocalDate.of(2023, 4, 5)
   )
 
+  private val previousReturnTaxYear = DateRange(
+    from = LocalDate.of(2021, 4, 6),
+    to = LocalDate.of(2022, 4, 5)
+  )
+
   private val index1of3: Max3 = refineMV(1)
   private val recordVersion = "001"
   private val currentReturnTaxYearSubmissionDate = LocalDateTime.of(2023, 4, 5, 0, 0, 0)
@@ -118,23 +123,40 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
     .unsafeSet(MemberStatus(srn, index1of300), New)
     .unsafeSet(MemberDetailsCompletedPage(srn, index1of300), SectionCompleted)
 
+  private val previousTaxYearUserAnswersWithFewMembersWithMemberDetails = defaultUserAnswers
+    .unsafeSet(WhichTaxYearPage(srn), previousReturnTaxYear)
+    .unsafeSet(ActiveBankAccountPage(srn), true)
+    .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersUnderThreshold)
+    .unsafeSet(MemberDetailsPage(srn, index1of300), memberDetails)
+    .unsafeSet(DoesMemberHaveNinoPage(srn, index1of300), false)
+    .unsafeSet(NoNINOPage(srn, index1of300), noninoReason)
+    .unsafeSet(MemberStatus(srn, index1of300), New)
+    .unsafeSet(MemberDetailsCompletedPage(srn, index1of300), SectionCompleted)
+
+  private val previousTaxYearUserAnswersWithManyMembers = defaultUserAnswers
+    .unsafeSet(WhichTaxYearPage(srn), previousReturnTaxYear)
+    .unsafeSet(ActiveBankAccountPage(srn), true)
+    .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
+
+  private val previousTaxYearUserAnswersWithManyMembersWithMemberDetails = previousTaxYearUserAnswersWithManyMembers
+    .unsafeSet(MemberDetailsPage(srn, index1of300), memberDetails)
+    .unsafeSet(DoesMemberHaveNinoPage(srn, index1of300), false)
+    .unsafeSet(NoNINOPage(srn, index1of300), noninoReason)
+    .unsafeSet(MemberStatus(srn, index1of300), New)
+    .unsafeSet(MemberDetailsCompletedPage(srn, index1of300), SectionCompleted)
+
   // This handles the latest return from the previous tax year
-  override def beforeAll(): Unit = {
-    when(mockPsrVersionsService.getVersions(any(), any())(any(), any()))
-      .thenReturn(Future.successful(versionsResponse)) // Redirect Test 3 - full return submitted last tax year
-      .thenReturn(Future.successful(Seq.empty[PsrVersionsResponse])) // Redirect Test 4 - no return submitted last tax year
-      .thenReturn(Future.successful(versionsResponse)) // Redirect Test 5 - skipped return submitted last tax year
-    // Not triggered in any other tests
+  override def beforeAll(): Unit =
     when(
       mockPsrRetrievalService.getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
     ).thenReturn(Future.successful(fullUserAnswers)) // Redirect Test 3 - full return submitted last tax year
       .thenReturn(Future.successful(skippedUserAnswers)) // Redirect Test 5 - skipped return submitted last tax year
-    // Not triggered in any other tests
-  }
+  // Not triggered in any other tests
 
   override def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
     reset(mockSchemeDateService)
+    reset(mockPsrVersionsService)
   }
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
@@ -163,7 +185,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
           Left(currentReturnTaxYear),
           individualDetails.fullName,
           defaultSchemeDetails,
-          psaId.value,
+          psaId,
           psaId.isPSP,
           viewOnlyUpdated = false,
           journeyByPassed = false
@@ -172,18 +194,21 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
     }.before { mockTaxYear(currentReturnTaxYear) }
       .after {
         verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+        verify(mockSchemeDateService, never).submissionDateAsString(any())
+        verify(mockSchemeDateService, never).returnPeriodsAsJsonString(any())(any())
+        verify(mockPsrVersionsService, never).getVersions(any(), any())(any(), any())
       }
       .withName("when Initial UserAnswers empty"))
 
-    val alreadySubmittedUserAnswer = currentTaxYearUserAnswersWithFewMembers
+    val currentTaxYearWithFewMembersAlreadySubmittedUserAnswer = currentTaxYearUserAnswersWithFewMembers
       .unsafeSet(FbStatus(srn), Submitted)
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
 
     act.like(
       renderView(
         onPageLoadWithCheckMode,
-        alreadySubmittedUserAnswer,
-        alreadySubmittedUserAnswer
+        currentTaxYearWithFewMembersAlreadySubmittedUserAnswer,
+        currentTaxYearWithFewMembersAlreadySubmittedUserAnswer
       ) { implicit app => implicit request =>
         injected[CheckYourAnswersView].apply(
           viewModel(
@@ -196,7 +221,46 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             Left(currentReturnTaxYear),
             individualDetails.fullName,
             defaultSchemeDetails,
-            psaId.value,
+            psaId,
+            psaId.isPSP,
+            viewOnlyUpdated = false,
+            journeyByPassed = false
+          )
+        )
+      }.before {
+          mockTaxYear(currentReturnTaxYear)
+        }
+        .after {
+          verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+          verify(mockSchemeDateService, never).submissionDateAsString(any())
+          verify(mockSchemeDateService, never).returnPeriodsAsJsonString(any())(any())
+          verify(mockPsrVersionsService, never).getVersions(any(), any())(any(), any())
+        }
+        .withName("when Initial UserAnswers & Current UserAnswers are same but bypassed journey requirements not meet")
+    )
+
+    val currentTaxYearWithManyMembersAlreadySubmittedUserAnswer = currentTaxYearUserAnswersWithManyMembers
+      .unsafeSet(FbStatus(srn), Submitted)
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+
+    act.like(
+      renderView(
+        onPageLoadWithCheckMode,
+        currentTaxYearWithManyMembersAlreadySubmittedUserAnswer,
+        currentTaxYearWithManyMembersAlreadySubmittedUserAnswer
+      ) { implicit app => implicit request =>
+        injected[CheckYourAnswersView].apply(
+          viewModel(
+            srn,
+            CheckMode,
+            memberNumbersOverThreshold,
+            activeBankAccount = true,
+            whyNoBankAccount = None,
+            whichTaxYearPage = Some(currentReturnTaxYear),
+            Left(currentReturnTaxYear),
+            individualDetails.fullName,
+            defaultSchemeDetails,
+            psaId,
             psaId.isPSP,
             viewOnlyUpdated = false,
             journeyByPassed = true
@@ -206,13 +270,15 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
           mockTaxYear(currentReturnTaxYear)
           mockSubmissionDate
           mockReturnPeriods
+          mockVersions(Seq.empty[PsrVersionsResponse])
         }
         .after {
           verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
           verify(mockSchemeDateService, times(1)).submissionDateAsString(any())
           verify(mockSchemeDateService, times(1)).returnPeriodsAsJsonString(any())(any())
+          verify(mockPsrVersionsService, times(1)).getVersions(any(), any())(any(), any())
         }
-        .withName("when Initial UserAnswers and current UserAnswers are not same")
+        .withName("when Initial UserAnswers & Current UserAnswers are same and bypassed journey requirements meet")
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
@@ -269,9 +335,11 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             emptyUserAnswers
           ).before {
               mockTaxYear(currentReturnTaxYear)
+              mockVersions(versionsResponse)
               MockPsrSubmissionService.submitPsrDetails()
             }
             .after {
+              verify(mockPsrVersionsService, times(1)).getVersions(any(), any())(any(), any())
               verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
               verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
             }
@@ -288,9 +356,11 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             emptyUserAnswers
           ).before {
               mockTaxYear(currentReturnTaxYear)
+              mockVersions(Seq.empty[PsrVersionsResponse])
               MockPsrSubmissionService.submitPsrDetails()
             }
             .after {
+              verify(mockPsrVersionsService, times(1)).getVersions(any(), any())(any(), any())
               verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
               verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
             }
@@ -307,9 +377,11 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
             skippedUserAnswers
           ).before {
               mockTaxYear(currentReturnTaxYear)
+              mockVersions(versionsResponse)
               MockPsrSubmissionService.submitPsrDetails()
             }
             .after {
+              verify(mockPsrVersionsService, times(1)).getVersions(any(), any())(any(), any())
               verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
               verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
             }
@@ -477,7 +549,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
               Left(dateRange),
               individualDetails.fullName,
               defaultSchemeDetails,
-              psaId.value,
+              psaId,
               psaId.isPSP,
               viewOnlyUpdated = false,
               optYear = Some(yearString),
@@ -507,7 +579,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
               Left(dateRange),
               individualDetails.fullName,
               defaultSchemeDetails,
-              psaId.value,
+              psaId,
               psaId.isPSP,
               viewOnlyUpdated = true,
               optYear = Some(yearString),
@@ -521,15 +593,51 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
         .withName("OnPageLoadViewOnly renders ok with changed flag")
     )
 
+    val updatedUserAnswersWithSubmissionDetails = updatedUserAnswers
+      .unsafeSet(FbStatus(srn), Submitted)
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
     act.like(
-      redirectToPage(
-        onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
-      ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      renderView(
+        onPageLoadViewOnly,
+        userAnswers = updatedUserAnswersWithSubmissionDetails,
+        pureUserAnswers = updatedUserAnswersWithSubmissionDetails,
+        optPreviousAnswers = None
+      ) { implicit app => implicit request =>
+        injected[CheckYourAnswersView].apply(
+          viewModel(
+            srn,
+            ViewOnlyMode,
+            memberNumbersOverThreshold,
+            activeBankAccount = true,
+            whyNoBankAccount = None,
+            whichTaxYearPage = Some(dateRange),
+            Left(dateRange),
+            individualDetails.fullName,
+            defaultSchemeDetails,
+            psaId,
+            psaId.isPSP,
+            viewOnlyUpdated = false,
+            optYear = Some(yearString),
+            optCurrentVersion = Some(submissionNumberTwo),
+            optPreviousVersion = Some(submissionNumberOne),
+            compilationOrSubmissionDate = Some(submissionDateTwo),
+            journeyByPassed = true
+          )
         )
-        .withName("Submit redirects to view only tasklist")
+      }.before {
+          mockTaxYear(dateRange)
+          mockSubmissionDate
+          mockReturnPeriods
+          mockVersions(Seq.empty)
+        }
+        .after {
+          verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
+          verify(mockSchemeDateService, times(1)).submissionDateAsString(any())
+          verify(mockSchemeDateService, times(1)).returnPeriodsAsJsonString(any())(any())
+          verify(mockPsrVersionsService, times(1)).getVersions(any(), any())(any(), any())
+        }
+        .withName("OnPageLoadViewOnly renders ok with byPassed journey button")
     )
 
     act.like(
@@ -540,6 +648,104 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
       ).withName(
         "Submit previous view only redirects to BasicDetailsCheckYourAnswersController for the previous submission"
       )
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).withName("Submit redirects to view only tasklist")
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ReturnSubmittedController.onPageLoad(srn),
+        currentTaxYearUserAnswersWithManyMembers
+      ).before(
+          mockVersions(Seq.empty[PsrVersionsResponse])
+        )
+        .after(
+          verify(mockPsrVersionsService, times(1)).getVersions(any(), any())(any(), any())
+        )
+        .withName(
+          "Should proceed to return submitted page when previously many members with no details, currently many members"
+        )
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne),
+        currentTaxYearUserAnswersWithFewMembers
+      ).after(
+          verify(mockPsrVersionsService, never).getVersions(any(), any())(any(), any())
+        )
+        .withName(
+          "Should proceed to view only task list when previously many members with no details, currently few members"
+        )
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne),
+        currentTaxYearUserAnswersWithManyMembers,
+        previousTaxYearUserAnswersWithManyMembersWithMemberDetails
+      ).after(
+          verify(mockPsrVersionsService, never).getVersions(any(), any())(any(), any())
+        )
+        .withName(
+          "Should proceed to view only task list when previously many members with details, currently many members"
+        )
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne),
+        currentTaxYearUserAnswersWithFewMembers,
+        previousTaxYearUserAnswersWithManyMembersWithMemberDetails
+      ).after(
+          verify(mockPsrVersionsService, never).getVersions(any(), any())(any(), any())
+        )
+        .withName(
+          "Should proceed to view only task list when previously many members with details, currently few members"
+        )
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne),
+        currentTaxYearUserAnswersWithManyMembers,
+        previousTaxYearUserAnswersWithFewMembersWithMemberDetails
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName(
+          "Should proceed to view only task list when previously few members with details, currently many members"
+        )
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne),
+        currentTaxYearUserAnswersWithFewMembers,
+        previousTaxYearUserAnswersWithFewMembersWithMemberDetails
+      ).after(
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        )
+        .withName(
+          "Should proceed to view only task list when previously few members with details, currently few members"
+        )
     )
   }
 
@@ -565,7 +771,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
     taxYearOrAccountingPeriods,
     schemeAdminName,
     schemeDetails,
-    pensionSchemeId.value,
+    pensionSchemeId,
     pensionSchemeId.isPSP,
     viewOnlyUpdated = false,
     journeyByPassed = journeyByPassed
@@ -581,4 +787,10 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
 
   private def mockReturnPeriods: OngoingStubbing[String] =
     when(mockSchemeDateService.returnPeriodsAsJsonString(any())(any())).thenReturn("")
+
+  private def mockVersions(
+    seqOfPsrVersionsResponse: Seq[PsrVersionsResponse]
+  ): OngoingStubbing[Future[Seq[PsrVersionsResponse]]] =
+    when(mockPsrVersionsService.getVersions(any(), any())(any(), any()))
+      .thenReturn(Future.successful(seqOfPsrVersionsResponse))
 }
