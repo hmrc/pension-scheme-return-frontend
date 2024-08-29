@@ -220,7 +220,11 @@ class OverviewController @Inject()(
       reportType match {
         case PsrReportType.Sipp.name =>
           val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippStartJourney}"
-          Future.successful(Redirect(sippUrl))
+          Future.successful(
+            Redirect(sippUrl)
+              .addingToSession("taxYear" -> taxYear)
+              .addingToSession("version" -> version)
+          )
         case _ =>
           val yearFrom = LocalDate.parse(taxYear)
           val yearTo = yearFrom.plusYears(1).minusDays(1)
@@ -236,11 +240,15 @@ class OverviewController @Inject()(
     }
 
   def onSelectContinue(srn: Srn, taxYear: String, version: String, reportType: String): Action[AnyContent] =
-    identifyAndRequireData(srn, taxYear, version).async { _ =>
+    identifyAndRequireData(srn, taxYear, version).async { implicit request =>
       reportType match {
         case PsrReportType.Sipp.name =>
           val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippContinueJourney}"
-          Future.successful(Redirect(sippUrl))
+          Future.successful(
+            Redirect(sippUrl)
+              .addingToSession("taxYear" -> taxYear)
+              .addingToSession("version" -> version)
+          )
         case _ =>
           Future.successful(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
       }
