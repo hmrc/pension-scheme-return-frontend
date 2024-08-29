@@ -222,8 +222,8 @@ class OverviewController @Inject()(
           val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippStartJourney}"
           Future.successful(
             Redirect(sippUrl)
-              .addingToSession("taxYear" -> taxYear)
-              .addingToSession("version" -> version)
+              .addingToSession(Constants.TAX_YEAR -> taxYear)
+              .addingToSession(Constants.VERSION -> version)
           )
         case _ =>
           val yearFrom = LocalDate.parse(taxYear)
@@ -246,8 +246,8 @@ class OverviewController @Inject()(
           val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippContinueJourney}"
           Future.successful(
             Redirect(sippUrl)
-              .addingToSession("taxYear" -> taxYear)
-              .addingToSession("version" -> version)
+              .addingToSession(Constants.TAX_YEAR -> taxYear)
+              .addingToSession(Constants.VERSION -> version)
           )
         case _ =>
           Future.successful(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
@@ -259,7 +259,7 @@ class OverviewController @Inject()(
       reportType match {
         case PsrReportType.Sipp.name =>
           val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippViewAndChange}"
-          Future.successful(Redirect(sippUrl).addingToSession("fbNumber" -> fbNumber))
+          Future.successful(Redirect(sippUrl).addingToSession(Constants.FB_NUMBER -> fbNumber))
         case _ =>
           val byPassedJourney =
             Redirect(controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode))

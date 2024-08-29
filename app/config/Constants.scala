@@ -36,6 +36,10 @@ object Constants {
   val PSA = "PSA"
   val PSP = "PSP"
 
+  val TAX_YEAR = "taxYear"
+  val VERSION = "version"
+  val FB_NUMBER = "fbNumber"
+
   val delimitedPSA = "DELIMITED_PSAID"
   val detailsNotFound = "no match found"
 
