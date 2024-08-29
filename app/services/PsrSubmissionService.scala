@@ -132,7 +132,17 @@ class PsrSubmissionService @Inject()(
       ).mapN { (minimalRequiredSubmission, checkReturnDates, taxYear) =>
         {
           val submissionRequest: PsrSubmission = PsrSubmission(
-            minimalRequiredSubmission = minimalRequiredSubmission,
+            minimalRequiredSubmission = MinimalRequiredSubmission(
+              minimalRequiredSubmission.reportDetails,
+              minimalRequiredSubmission.accountingPeriodDetails,
+              minimalRequiredSubmission.schemeDesignatory.copy(
+                totalCashStart = None,
+                totalCashEnd = None,
+                totalPayments = None,
+                totalAssetValueStart = None,
+                totalAssetValueEnd = None
+              )
+            ),
             checkReturnDates = checkReturnDates,
             loans = None,
             assets = None,

@@ -24,7 +24,7 @@ import cats.data.NonEmptyList
 import transformations._
 import utils.UserAnswersUtils.UserAnswersOps
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
-import models.DateRange
+import models.{DateRange, NormalMode}
 import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import org.mockito.ArgumentMatchers.any
@@ -36,13 +36,13 @@ import org.mockito.Mockito._
 import models.requests.psr._
 import config.Constants.{PSP, UNCHANGED_SESSION_PREFIX}
 import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowMuchCashPage, ValueOfAssetsPage}
 import play.api.libs.json.{JsArray, JsValue}
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import java.time.LocalDate
 
 class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
@@ -333,10 +333,21 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     "should submit PsrDetails bypassed" in {
       val userAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), false)
+        .unsafeSet(HowMuchCashPage(srn, NormalMode), moneyInPeriod)
+        .unsafeSet(ValueOfAssetsPage(srn, NormalMode), moneyInPeriod)
+        .unsafeSet(FeesCommissionsWagesSalariesPage(srn, NormalMode), money)
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
       when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any(), any())(any()))
-        .thenReturn(Some(minimalRequiredSubmission))
+        .thenReturn(
+          Some(
+            MinimalRequiredSubmission(
+              minimalRequiredSubmission.reportDetails,
+              minimalRequiredSubmission.accountingPeriodDetails,
+              minimalRequiredSubmission.schemeDesignatory.copy(totalPayments = Some(money.value))
+            )
+          )
+        )
       when(mockConnector.submitPsrDetails(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(())))
       when(mockDeclarationTransformer.transformToEtmp(any())).thenReturn(declaration)
       when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))

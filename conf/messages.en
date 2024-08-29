@@ -332,7 +332,7 @@ psaDeclaration.listItem2 = the information you have provided in this tax return 
 psaDeclaration.listItem3 = you understand that if you have made a false statement in this tax return, you may be liable to a penalty, and that false statements may also lead to prosecution
 psaDeclaration.notification.title = Important
 psaDeclaration.notification.header = The number of scheme members has changed and it is now over 100
-psaDeclaration.notification.paragraph = Any member or asset information previoushly added to your return will be removed. Select agree and continue.
+psaDeclaration.notification.paragraph = Any member or asset information previously added to your return will be removed. Select agree and continue.
 
 pspDeclaration.title = Declaration
 pspDeclaration.heading = Declaration
@@ -348,7 +348,7 @@ pspDeclaration.psaId.error.invalid.characters = Enter a scheme administrator’s
 pspDeclaration.psaId.error.invalid.noMatch = Enter an administrator’s ID that is linked to the scheme
 pspDeclaration.notification.title = Important
 pspDeclaration.notification.header = The number of scheme members has changed and it is now over 100
-pspDeclaration.notification.paragraph = Any member or asset information previoushly added to your return will be removed. Select agree and continue.
+pspDeclaration.notification.paragraph = Any member or asset information previously added to your return will be removed. Select agree and continue.
 
 nationalInsuranceNumber.title = Does the member have a National Insurance number?
 nationalInsuranceNumber.heading = Does {0} have a National Insurance number?
