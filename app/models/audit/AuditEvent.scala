@@ -35,13 +35,13 @@ trait BasicAuditEvent extends AuditEvent {
     credentialRole match {
       case PSA =>
         Map(
-          "PensionSchemeAdministratorId" -> psaOrPspId,
-          "SchemeAdministratorName" -> schemeAdministratorOrPractitionerName
+          "pensionSchemeAdministratorId" -> psaOrPspId,
+          "schemeAdministratorName" -> schemeAdministratorOrPractitionerName
         )
       case _ =>
         Map(
-          "PensionSchemePractitionerId" -> psaOrPspId,
-          "SchemePractitionerName" -> schemeAdministratorOrPractitionerName
+          "pensionSchemePractitionerId" -> psaOrPspId,
+          "schemePractitionerName" -> schemeAdministratorOrPractitionerName
         )
     }
 }
@@ -58,13 +58,13 @@ trait ExtendedAuditEvent extends AuditEvent {
     credentialRole match {
       case PSA =>
         Json.obj(
-          "PensionSchemeAdministratorId" -> psaOrPspId,
-          "SchemeAdministratorName" -> schemeAdministratorOrPractitionerName
+          "pensionSchemeAdministratorId" -> psaOrPspId,
+          "schemeAdministratorName" -> schemeAdministratorOrPractitionerName
         )
       case _ =>
         Json.obj(
-          "PensionSchemePractitionerId" -> psaOrPspId,
-          "SchemePractitionerName" -> schemeAdministratorOrPractitionerName
+          "pensionSchemePractitionerId" -> psaOrPspId,
+          "schemePractitionerName" -> schemeAdministratorOrPractitionerName
         )
     }
 }

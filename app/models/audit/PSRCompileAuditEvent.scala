@@ -35,12 +35,12 @@ case class PSRCompileAuditEvent(
   override def details: JsObject = {
 
     val compiledDetails = Json.obj(
-      "SchemeName" -> schemeName,
-      "PensionSchemeTaxReference" -> schemeTaxReference,
-      "AffinityGroup" -> affinityGroup,
-      "CredentialRole(PSA/PSP)" -> credentialRole,
-      "TaxYear" -> taxYear.toYearFormat,
-      "Sections" -> taskList
+      "schemeName" -> schemeName,
+      "pensionSchemeTaxReference" -> schemeTaxReference,
+      "affinityGroup" -> affinityGroup,
+      "credentialRole(PSA/PSP)" -> credentialRole,
+      "taxYear" -> taxYear.toYearFormat,
+      "sections" -> taskList
     )
 
     psaOrPspIdDetails(credentialRole, psaOrPspId, schemeAdministratorOrPractitionerName) ++ compiledDetails

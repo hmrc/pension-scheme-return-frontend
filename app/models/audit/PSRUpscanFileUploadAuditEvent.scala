@@ -36,26 +36,26 @@ case class PSRUpscanFileUploadAuditEvent(
   override def details: Map[String, String] = {
 
     val common = Map(
-      "SchemeName" -> schemeName,
-      "PensionSchemeTaxReference" -> schemeTaxReference,
-      "AffinityGroup" -> affinityGroup,
-      "CredentialRole(PSA/PSP)" -> credentialRole,
-      "TaxYear" -> taxYear.toYearFormat
+      "schemeName" -> schemeName,
+      "pensionSchemeTaxReference" -> schemeTaxReference,
+      "affinityGroup" -> affinityGroup,
+      "credentialRole(PSA/PSP)" -> credentialRole,
+      "taxYear" -> taxYear.toYearFormat
     )
 
     val outcomeMap = outcome match {
       case UploadStatus.Failed(failure) =>
         Map(
-          "UploadStatus" -> "Failed",
-          "FailureDetail" -> failure.failureReason,
-          "FailureMessage" -> failure.message
+          "uploadStatus" -> "Failed",
+          "failureDetail" -> failure.failureReason,
+          "failureMessage" -> failure.message
         )
 
       case UploadStatus.Success(_, _, _, size) =>
         Map(
-          "UploadStatus" -> "Success",
-          "FileSize" -> size.getOrElse(0L).toString,
-          "UploadTime" -> uploadTimeInMilliSeconds.toString
+          "uploadStatus" -> "Success",
+          "fileSize" -> size.getOrElse(0L).toString,
+          "uploadTime" -> uploadTimeInMilliSeconds.toString
         )
     }
 

@@ -76,16 +76,16 @@ class AuditServiceSpec extends BaseSpec with TestValues {
 
       val dataEvent = captor.getValue
       val expectedDataEvent = Map(
-        "SchemeName" -> schemeName,
-        "SchemeAdministratorName" -> "testAdminName",
-        "PensionSchemeAdministratorId" -> psaId.value,
-        "PensionSchemeTaxReference" -> pstr,
-        "AffinityGroup" -> "testAffinity",
-        "CredentialRole(PSA/PSP)" -> PSA,
-        "TaxYear" -> s"${dateRange.from.getYear}-${dateRange.to.getYear}",
-        "HowManyMembers" -> "1",
-        "HowManyDeferredMembers" -> "2",
-        "HowManyPensionerMembers" -> "3"
+        "schemeName" -> schemeName,
+        "schemeAdministratorName" -> "testAdminName",
+        "pensionSchemeAdministratorId" -> psaId.value,
+        "pensionSchemeTaxReference" -> pstr,
+        "affinityGroup" -> "testAffinity",
+        "credentialRole(PSA/PSP)" -> PSA,
+        "taxYear" -> s"${dateRange.from.getYear}-${dateRange.to.getYear}",
+        "howManyMembers" -> "1",
+        "howManyDeferredMembers" -> "2",
+        "howManyPensionerMembers" -> "3"
       )
 
       dataEvent.auditSource mustEqual testAppName
@@ -117,16 +117,16 @@ class AuditServiceSpec extends BaseSpec with TestValues {
 
       val dataEvent = captor.getValue
       val expectedDataEvent = Map(
-        "SchemeName" -> schemeName,
-        "SchemePractitionerName" -> "testAdminName",
-        "PensionSchemePractitionerId" -> pspId.value,
-        "PensionSchemeTaxReference" -> pstr,
-        "AffinityGroup" -> "testAffinity",
-        "CredentialRole(PSA/PSP)" -> PSP,
-        "TaxYear" -> s"${dateRange.from.getYear}-${dateRange.to.getYear}",
-        "HowManyMembers" -> "1",
-        "HowManyDeferredMembers" -> "2",
-        "HowManyPensionerMembers" -> "3"
+        "schemeName" -> schemeName,
+        "schemePractitionerName" -> "testAdminName",
+        "pensionSchemePractitionerId" -> pspId.value,
+        "pensionSchemeTaxReference" -> pstr,
+        "affinityGroup" -> "testAffinity",
+        "credentialRole(PSA/PSP)" -> PSP,
+        "taxYear" -> s"${dateRange.from.getYear}-${dateRange.to.getYear}",
+        "howManyMembers" -> "1",
+        "howManyDeferredMembers" -> "2",
+        "howManyPensionerMembers" -> "3"
       )
 
       dataEvent.auditSource mustEqual testAppName
@@ -156,14 +156,14 @@ class AuditServiceSpec extends BaseSpec with TestValues {
 
       val extendedDataEvent = captor.getValue
       val expectedExtendedDataEvent = Json.obj(
-        "SchemeName" -> schemeName,
-        "SchemeAdministratorName" -> "testAdminName",
-        "PensionSchemeAdministratorId" -> psaId.value,
-        "PensionSchemeTaxReference" -> pstr,
-        "AffinityGroup" -> "testAffinity",
-        "CredentialRole(PSA/PSP)" -> PSA,
-        "TaxYear" -> s"${dateRange.from.getYear}-${dateRange.to.getYear}",
-        "Sections" -> Json.toJson(taskListInAuditEvent)
+        "schemeName" -> schemeName,
+        "schemeAdministratorName" -> "testAdminName",
+        "pensionSchemeAdministratorId" -> psaId.value,
+        "pensionSchemeTaxReference" -> pstr,
+        "affinityGroup" -> "testAffinity",
+        "credentialRole(PSA/PSP)" -> PSA,
+        "taxYear" -> s"${dateRange.from.getYear}-${dateRange.to.getYear}",
+        "sections" -> Json.toJson(taskListInAuditEvent)
       )
 
       extendedDataEvent.auditSource mustEqual testAppName
@@ -193,14 +193,14 @@ class AuditServiceSpec extends BaseSpec with TestValues {
 
       val extendedDataEvent = captor.getValue
       val expectedExtendedDataEvent = Json.obj(
-        "SchemeName" -> schemeName,
-        "SchemePractitionerName" -> "testAdminName",
-        "PensionSchemePractitionerId" -> pspId.value,
-        "PensionSchemeTaxReference" -> pstr,
-        "AffinityGroup" -> "testAffinity",
-        "CredentialRole(PSA/PSP)" -> PSP,
-        "TaxYear" -> s"${dateRange.from.getYear}-${dateRange.to.getYear}",
-        "Sections" -> Json.toJson(taskListInAuditEvent)
+        "schemeName" -> schemeName,
+        "schemePractitionerName" -> "testAdminName",
+        "pensionSchemePractitionerId" -> pspId.value,
+        "pensionSchemeTaxReference" -> pstr,
+        "affinityGroup" -> "testAffinity",
+        "credentialRole(PSA/PSP)" -> PSP,
+        "taxYear" -> s"${dateRange.from.getYear}-${dateRange.to.getYear}",
+        "sections" -> Json.toJson(taskListInAuditEvent)
       )
 
       extendedDataEvent.auditSource mustEqual testAppName

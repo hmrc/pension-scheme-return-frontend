@@ -37,15 +37,15 @@ case class PSRFileValidationAuditEvent(
   override def details: Map[String, String] = {
 
     val common = Map(
-      "SchemeName" -> schemeName,
-      "PensionSchemeTaxReference" -> schemeTaxReference,
-      "AffinityGroup" -> affinityGroup,
-      "CredentialRole(PSA/PSP)" -> credentialRole,
-      "TaxYear" -> taxYear.toYearFormat,
-      "ValidationCheckStatus" -> validationCheckStatus,
-      "FileValidationTimeInMilliSeconds" -> fileValidationTimeInMilliSeconds.toString,
-      "NumberOfEntries" -> numberOfEntries.toString,
-      "NumberOfFailures" -> numberOfFailures.toString
+      "schemeName" -> schemeName,
+      "pensionSchemeTaxReference" -> schemeTaxReference,
+      "affinityGroup" -> affinityGroup,
+      "credentialRole(PSA/PSP)" -> credentialRole,
+      "taxYear" -> taxYear.toYearFormat,
+      "validationCheckStatus" -> validationCheckStatus,
+      "fileValidationTimeInMilliSeconds" -> fileValidationTimeInMilliSeconds.toString,
+      "numberOfEntries" -> numberOfEntries.toString,
+      "numberOfFailures" -> numberOfFailures.toString
     )
 
     psaOrPspIdDetails(credentialRole, psaOrPspId, schemeAdministratorOrPractitionerName) ++ common

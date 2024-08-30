@@ -36,14 +36,14 @@ case class PSRStartAuditEvent(
   override def details: Map[String, String] = {
 
     val common = Map(
-      "SchemeName" -> schemeName,
-      "PensionSchemeTaxReference" -> schemeTaxReference,
-      "AffinityGroup" -> affinityGroup,
-      "CredentialRole(PSA/PSP)" -> credentialRole,
-      "TaxYear" -> taxYear.toYearFormat,
-      "HowManyMembers" -> howManyMembers.toString,
-      "HowManyDeferredMembers" -> howManyDeferredMembers.toString,
-      "HowManyPensionerMembers" -> howManyPensionerMembers.toString
+      "schemeName" -> schemeName,
+      "pensionSchemeTaxReference" -> schemeTaxReference,
+      "affinityGroup" -> affinityGroup,
+      "credentialRole(PSA/PSP)" -> credentialRole,
+      "taxYear" -> taxYear.toYearFormat,
+      "howManyMembers" -> howManyMembers.toString,
+      "howManyDeferredMembers" -> howManyDeferredMembers.toString,
+      "howManyPensionerMembers" -> howManyPensionerMembers.toString
     )
 
     psaOrPspIdDetails(credentialRole, psaOrPspId, schemeAdministratorOrPractitionerName) ++ common

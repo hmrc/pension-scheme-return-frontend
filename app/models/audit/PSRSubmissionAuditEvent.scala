@@ -39,13 +39,13 @@ case class PSRSubmissionAuditEvent(
   override def details: JsObject = {
 
     val submissionDetails = Json.obj(
-      "SchemeName" -> schemeName,
-      "PensionSchemeTaxReference" -> schemeTaxReference,
-      "AffinityGroup" -> affinityGroup,
-      "CredentialRole(PSA/PSP)" -> credentialRole,
-      "TaxYear" -> taxYear.toYearFormat,
-      "Date" -> LocalDate.now(ZoneId.of("Europe/London")).format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
-      "Payload" -> Json.toJson(psrSubmission)
+      "schemeName" -> schemeName,
+      "pensionSchemeTaxReference" -> schemeTaxReference,
+      "affinityGroup" -> affinityGroup,
+      "credentialRole(PSA/PSP)" -> credentialRole,
+      "taxYear" -> taxYear.toYearFormat,
+      "date" -> LocalDate.now(ZoneId.of("Europe/London")).format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
+      "payload" -> Json.toJson(psrSubmission)
     )
     psaOrPspIdDetails(credentialRole, psaOrPspId, schemeAdministratorOrPractitionerName) ++ submissionDetails
   }
