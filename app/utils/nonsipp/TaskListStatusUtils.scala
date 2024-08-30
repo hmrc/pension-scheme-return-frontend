@@ -44,7 +44,7 @@ import pages.nonsipp.memberdetails._
 import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
 import pages.nonsipp.membercontributions._
 import pages.nonsipp.accountingperiod.Paths.accountingPeriodDetails
-import pages.nonsipp.memberreceivedpcls.{PclsMemberListPage, PensionCommencementLumpSumPage}
+import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
 import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, PensionPaymentsReceivedPage}
 import eu.timepit.refined.{refineMV, refineV}
 import viewmodels.models.TaskListStatus._
@@ -333,38 +333,24 @@ object TaskListStatusUtils {
   }
 
   def getPclsStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val wereContributions = userAnswers.get(PensionCommencementLumpSumPage(srn))
-    val listPage = userAnswers.get(PclsMemberListPage(srn))
+    val werePcls = userAnswers.get(PensionCommencementLumpSumPage(srn))
+    val numRecorded = userAnswers.get(PensionCommencementLumpSumAmountPage.all(srn)).getOrElse(Map.empty).size
 
-    (wereContributions, listPage) match {
-      case (None, _) =>
-        (
-          getNotStartedOrCannotStartYetStatus(userAnswers, srn),
-          controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
-      case (Some(false), _) =>
-        (
-          Completed,
-          controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
-      case (Some(true), Some(true)) =>
-        (
-          Completed,
-          controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
-            .onPageLoad(srn, 1, NormalMode)
-            .url
-        )
-      case (Some(true), _) =>
-        (
-          InProgress,
-          controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
-            .onPageLoad(srn, 1, NormalMode)
-            .url
-        )
+    val firstQuestionPageUrl =
+      controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    val listPageUrl =
+      controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
+
+    (werePcls, numRecorded) match {
+      case (None, _) => (getNotStartedOrCannotStartYetStatus(userAnswers, srn), firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0) => (InProgress, firstQuestionPageUrl)
+      case (Some(true), _) => (Recorded(numRecorded, "pcls"), listPageUrl)
     }
   }
 
