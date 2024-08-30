@@ -311,38 +311,24 @@ object TaskListStatusUtils {
   }
 
   def getMemberContributionStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val wereContributions = userAnswers.get(MemberContributionsPage(srn))
-    val memberContributionsListPage = userAnswers.get(MemberContributionsListPage(srn))
+    val wereMemberContributions = userAnswers.get(MemberContributionsPage(srn))
+    val numRecorded = userAnswers.get(AllTotalMemberContributionPages(srn)).getOrElse(Map.empty).size
 
-    (wereContributions, memberContributionsListPage) match {
-      case (None, _) =>
-        (
-          getNotStartedOrCannotStartYetStatus(userAnswers, srn),
-          controllers.nonsipp.membercontributions.routes.MemberContributionsController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
-      case (Some(false), _) =>
-        (
-          Completed,
-          controllers.nonsipp.membercontributions.routes.MemberContributionsController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
-      case (Some(true), Some(true)) =>
-        (
-          Completed,
-          controllers.nonsipp.membercontributions.routes.MemberContributionListController
-            .onPageLoad(srn, 1, NormalMode)
-            .url
-        )
-      case (Some(true), _) =>
-        (
-          InProgress,
-          controllers.nonsipp.membercontributions.routes.MemberContributionListController
-            .onPageLoad(srn, 1, NormalMode)
-            .url
-        )
+    val firstQuestionPageUrl =
+      controllers.nonsipp.membercontributions.routes.MemberContributionsController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    val listPageUrl =
+      controllers.nonsipp.membercontributions.routes.MemberContributionListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
+
+    (wereMemberContributions, numRecorded) match {
+      case (None, _) => (getNotStartedOrCannotStartYetStatus(userAnswers, srn), firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0) => (InProgress, firstQuestionPageUrl)
+      case (Some(true), _) => (Recorded(numRecorded, "contributions"), listPageUrl)
     }
   }
 
