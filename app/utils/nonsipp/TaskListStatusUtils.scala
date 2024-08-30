@@ -39,7 +39,7 @@ import pages.nonsipp.otherassetsdisposal.{
   OtherAssetsDisposalPage,
   OtherAssetsDisposalProgress
 }
-import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
+import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowMuchCashPage}
 import pages.nonsipp.bonds._
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
@@ -60,17 +60,18 @@ import viewmodels.models.{SectionCompleted, SectionStatus, TaskListStatus}
 object TaskListStatusUtils {
 
   def getBasicSchemeDetailsTaskListStatus(
-    srn: Srn,
-    userAnswers: UserAnswers,
-    pensionSchemeId: PensionSchemeId,
+    checkReturnDates: Option[Boolean],
+    accountingPeriods: Option[List[DateRange]],
     activeBankAccount: Option[Boolean],
-    whyNoBankAccountPage: Option[String]
+    whyNoBankAccount: Option[String],
+    howManyMembers: Option[SchemeMemberNumbers]
   ): TaskListStatus.TaskListStatus with Serializable =
-    (userAnswers.get(HowManyMembersPage(srn, pensionSchemeId)), activeBankAccount, whyNoBankAccountPage) match {
-      case (None, _, _) => InProgress
-      case (Some(_), Some(true), _) => Completed
-      case (Some(_), Some(false), Some(_)) => Completed
-      case (Some(_), Some(false), None) => InProgress
+    (checkReturnDates, accountingPeriods, activeBankAccount, whyNoBankAccount, howManyMembers) match {
+      case (Some(true), None, Some(true), None, Some(_)) => Recorded
+      case (Some(true), None, Some(false), Some(_), Some(_)) => Recorded
+      case (Some(false), Some(dateRangeList), Some(true), None, Some(_)) if dateRangeList.nonEmpty => Recorded
+      case (Some(false), Some(dateRangeList), Some(false), Some(_), Some(_)) if dateRangeList.nonEmpty => Recorded
+      case (_, _, _, _, _) => InProgress
     }
 
   def getFinancialDetailsTaskListStatus(userAnswers: UserAnswers, srn: Srn): TaskListStatus = {

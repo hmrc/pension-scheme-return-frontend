@@ -231,7 +231,7 @@ object ViewOnlyTaskListController {
     previousVersion: Int
   ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.members"
-    val membersTaskListStatus = getCompletedOrUpdatedTaskListStatus(
+    val membersTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
       pages.nonsipp.memberdetails.Paths.personalDetails
@@ -288,7 +288,7 @@ object ViewOnlyTaskListController {
         pages.nonsipp.receivetransfer.Paths.memberTransfersIn
       )
 
-    val transferOutTaskListStatus = getCompletedOrUpdatedTaskListStatus(
+    val transferOutTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
       pages.nonsipp.membertransferout.Paths.memberTransfersOut
@@ -447,14 +447,14 @@ object ViewOnlyTaskListController {
   ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.shares"
 
-    val sharesTaskListStatus = getCompletedOrUpdatedTaskListStatus(
+    val sharesTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
       pages.nonsipp.shares.Paths.shareTransactions,
       Some("disposedSharesTransaction")
     )
 
-    val sharesDisposalsTaskListStatus = getCompletedOrUpdatedTaskListStatus(
+    val sharesDisposalsTaskListStatus: TaskListStatus = getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
       pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction

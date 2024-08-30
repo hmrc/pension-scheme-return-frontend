@@ -16,7 +16,7 @@
 
 package utils.nonsipp
 
-import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
+import pages.nonsipp.schemedesignatory._
 import viewmodels.implicits._
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
 import pages.nonsipp.otherassetsheld.OtherAssetsCompleted
@@ -134,33 +134,42 @@ object TaskListUtils {
     userAnswers: UserAnswers,
     pensionSchemeId: PensionSchemeId
   ): TaskListItemViewModel = {
+
+    val checkReturnDates = userAnswers.get(CheckReturnDatesPage(srn))
+    val accountingPeriods = userAnswers.get(AccountingPeriods(srn))
     val activeBankAccount = userAnswers.get(ActiveBankAccountPage(srn))
-    val whyNoBankAccountPage = userAnswers.get(WhyNoBankAccountPage(srn))
+    val whyNoBankAccount = userAnswers.get(WhyNoBankAccountPage(srn))
+    val howManyMembers = userAnswers.get(HowManyMembersPage(srn, pensionSchemeId))
 
     val taskListStatus: TaskListStatus =
-      getBasicSchemeDetailsTaskListStatus(srn, userAnswers, pensionSchemeId, activeBankAccount, whyNoBankAccountPage)
+      getBasicSchemeDetailsTaskListStatus(
+        checkReturnDates,
+        accountingPeriods,
+        activeBankAccount,
+        whyNoBankAccount,
+        howManyMembers
+      )
 
     TaskListItemViewModel(
       LinkMessage(
         Message(messageKey(prefix, "details.title", taskListStatus), schemeName),
         taskListStatus match {
-          case Completed =>
+          case Recorded =>
             controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode).url
-          case _ =>
-            val checkReturnDates = userAnswers.get(CheckReturnDatesPage(srn))
-            lazy val accountingPeriods = userAnswers.get(AccountingPeriods(srn))
-
+          case InProgress =>
             if (checkReturnDates.isEmpty) {
               controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
-            } else if (!checkReturnDates.get && accountingPeriods.isEmpty) {
+            } else if (!checkReturnDates.get && accountingPeriods.getOrElse(List.empty).isEmpty) {
               controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
             } else if (activeBankAccount.isEmpty) {
               controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode).url
-            } else if (!activeBankAccount.get && whyNoBankAccountPage.isEmpty) {
+            } else if (!activeBankAccount.get && whyNoBankAccount.isEmpty) {
               controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode).url
             } else {
               controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, NormalMode).url
             }
+          case _ =>
+            controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       ),
       taskListStatus
