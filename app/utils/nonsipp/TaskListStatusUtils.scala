@@ -45,7 +45,7 @@ import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, T
 import pages.nonsipp.membercontributions._
 import pages.nonsipp.accountingperiod.Paths.accountingPeriodDetails
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
-import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, PensionPaymentsReceivedPage}
+import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import eu.timepit.refined.{refineMV, refineV}
 import viewmodels.models.TaskListStatus._
 import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
@@ -356,37 +356,26 @@ object TaskListStatusUtils {
 
   def getPensionPaymentsStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val werePensionPayments = userAnswers.get(PensionPaymentsReceivedPage(srn))
-    val listPage = userAnswers.get(MemberPensionPaymentsListPage(srn))
+    val numRecorded = userAnswers
+      .get(TotalAmountPensionPaymentsPage.all(srn))
+      .getOrElse(Map.empty)
+      .count({ case (memberIndex, amount) => !amount.isZero })
 
-    (werePensionPayments, listPage) match {
-      case (None, _) =>
-        (
-          getNotStartedOrCannotStartYetStatus(userAnswers, srn),
-          controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
-      case (Some(false), _) =>
-        (
-          Completed,
-          controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
-      case (Some(true), Some(true)) =>
-        (
-          Completed,
-          controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
-            .onPageLoad(srn, 1, NormalMode)
-            .url
-        )
-      case (Some(true), _) =>
-        (
-          InProgress,
-          controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
-            .onPageLoad(srn, 1, NormalMode)
-            .url
-        )
+    val firstQuestionPageUrl =
+      controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    val listPageUrl =
+      controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
+
+    (werePensionPayments, numRecorded) match {
+      case (None, _) => (getNotStartedOrCannotStartYetStatus(userAnswers, srn), firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0) => (InProgress, firstQuestionPageUrl)
+      case (Some(true), _) => (Recorded(numRecorded, "payments"), listPageUrl)
     }
   }
 
