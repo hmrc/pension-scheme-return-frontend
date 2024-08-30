@@ -142,7 +142,7 @@ object TaskListUtils {
     val howManyMembers = userAnswers.get(HowManyMembersPage(srn, pensionSchemeId))
 
     val taskListStatus: TaskListStatus =
-      getBasicSchemeDetailsTaskListStatus(
+      getBasicDetailsTaskListStatus(
         checkReturnDates,
         accountingPeriods,
         activeBankAccount,
@@ -183,7 +183,12 @@ object TaskListUtils {
     userAnswers: UserAnswers
   ): TaskListItemViewModel = {
 
-    val taskListStatus: TaskListStatus = getFinancialDetailsTaskListStatus(userAnswers, srn)
+    val howMuchCash = userAnswers.get(HowMuchCashPage(srn, NormalMode))
+    val valueOfAssets = userAnswers.get(ValueOfAssetsPage(srn, NormalMode))
+    val feesCommissionsWagesSalaries = userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
+
+    val taskListStatus: TaskListStatus =
+      getFinancialDetailsTaskListStatus(howMuchCash, valueOfAssets, feesCommissionsWagesSalaries)
 
     TaskListItemViewModel(
       LinkMessage(
@@ -191,19 +196,22 @@ object TaskListUtils {
         taskListStatus match {
           case NotStarted =>
             controllers.nonsipp.schemedesignatory.routes.HowMuchCashController.onPageLoad(srn, NormalMode).url
-          case Completed =>
+          case Recorded =>
             controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
               .onPageLoad(srn, NormalMode)
               .url
-          case _ =>
-            val valueOfAssets = userAnswers.get(ValueOfAssetsPage(srn, NormalMode))
-            if (valueOfAssets.isEmpty) {
+          case InProgress =>
+            if (howMuchCash.isEmpty) {
+              controllers.nonsipp.schemedesignatory.routes.HowMuchCashController.onPageLoad(srn, NormalMode).url
+            } else if (valueOfAssets.isEmpty) {
               controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController.onPageLoad(srn, NormalMode).url
             } else {
               controllers.nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController
                 .onPageLoad(srn, NormalMode)
                 .url
             }
+          case _ =>
+            controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       ),
       taskListStatus

@@ -196,7 +196,7 @@ object ViewOnlyTaskListController {
           .onPageLoadViewOnly(srn, year, currentVersion, previousVersion)
           .url
       ),
-      getBasicDetailsTaskListStatus(currentUA, previousUA)
+      getBasicDetailsCompletedOrUpdated(currentUA, previousUA)
     )
 
   private def getFinancialDetailsTaskListItem(
@@ -216,7 +216,7 @@ object ViewOnlyTaskListController {
           .onPageLoadViewOnly(srn, year, currentVersion, previousVersion)
           .url
       ),
-      getFinancialDetailsTaskListStatus(currentUA, previousUA)
+      getFinancialDetailsCompletedOrUpdated(currentUA, previousUA)
     )
 
 //--Members-----------------------------------------------------------------------------------------------------------//

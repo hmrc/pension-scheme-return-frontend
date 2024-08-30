@@ -22,7 +22,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
 import controllers.PSRController
-import utils.nonsipp.TaskListStatusUtils.getFinancialDetailsTaskListStatus
+import utils.nonsipp.TaskListStatusUtils.getFinancialDetailsCompletedOrUpdated
 import controllers.actions._
 import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
 import viewmodels.models.TaskListStatus.Updated
@@ -85,7 +85,7 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
               periods,
               request.schemeDetails,
               viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-                getFinancialDetailsTaskListStatus(request.userAnswers, request.previousUserAnswers.get) == Updated
+                getFinancialDetailsCompletedOrUpdated(request.userAnswers, request.previousUserAnswers.get) == Updated
               } else {
                 false
               },

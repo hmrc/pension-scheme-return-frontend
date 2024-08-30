@@ -17,6 +17,11 @@
 package utils.nonsipp
 
 import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
+import pages.nonsipp.otherassetsdisposal.{
+  OtherAssetsDisposalCompleted,
+  OtherAssetsDisposalPage,
+  OtherAssetsDisposalProgress
+}
 import models.ConditionalYesNo._
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
@@ -34,12 +39,6 @@ import play.api.libs.json.{JsObject, JsPath}
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsCompleted, SurrenderedBenefitsPage}
 import models._
 import pages.nonsipp.loansmadeoroutstanding._
-import pages.nonsipp.otherassetsdisposal.{
-  OtherAssetsDisposalCompleted,
-  OtherAssetsDisposalPage,
-  OtherAssetsDisposalProgress
-}
-import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowMuchCashPage}
 import pages.nonsipp.bonds._
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
@@ -59,7 +58,7 @@ import viewmodels.models.{SectionCompleted, SectionStatus, TaskListStatus}
 
 object TaskListStatusUtils {
 
-  def getBasicSchemeDetailsTaskListStatus(
+  def getBasicDetailsTaskListStatus(
     checkReturnDates: Option[Boolean],
     accountingPeriods: Option[List[DateRange]],
     activeBankAccount: Option[Boolean],
@@ -74,15 +73,16 @@ object TaskListStatusUtils {
       case (_, _, _, _, _) => InProgress
     }
 
-  def getFinancialDetailsTaskListStatus(userAnswers: UserAnswers, srn: Srn): TaskListStatus = {
-    val totalSalaries = userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
-    val howMuchCash = userAnswers.get(HowMuchCashPage(srn, NormalMode))
-    (howMuchCash, totalSalaries) match {
-      case (Some(_), Some(_)) => Completed
-      case (None, _) => NotStarted
-      case (Some(_), None) => InProgress
+  def getFinancialDetailsTaskListStatus(
+    howMuchCash: Option[MoneyInPeriod],
+    valueOfAssets: Option[MoneyInPeriod],
+    feesCommissionsWagesSalaries: Option[Money]
+  ): TaskListStatus =
+    (howMuchCash, valueOfAssets, feesCommissionsWagesSalaries) match {
+      case (None, None, None) => NotStarted
+      case (Some(_), Some(_), Some(_)) => Recorded
+      case (_, _, _) => InProgress
     }
-  }
 
   def getMembersTaskListStatus(userAnswers: UserAnswers, srn: Srn): TaskListStatus = {
     val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
@@ -894,7 +894,7 @@ object TaskListStatusUtils {
     }
   }
 
-  def getFinancialDetailsTaskListStatus(currentUA: UserAnswers, previousUA: UserAnswers): TaskListStatus =
+  def getFinancialDetailsCompletedOrUpdated(currentUA: UserAnswers, previousUA: UserAnswers): TaskListStatus =
     if (currentUA.get(schemeDesignatory \ "totalAssetValue") ==
         previousUA.get(schemeDesignatory \ "totalAssetValue")
       &&
@@ -908,7 +908,7 @@ object TaskListStatusUtils {
       Updated
     }
 
-  def getBasicDetailsTaskListStatus(currentUA: UserAnswers, previousUA: UserAnswers): TaskListStatus = {
+  def getBasicDetailsCompletedOrUpdated(currentUA: UserAnswers, previousUA: UserAnswers): TaskListStatus = {
     val accountingPeriodsSame = currentUA.get(accountingPeriodDetails \ "accountingPeriods") == previousUA.get(
       accountingPeriodDetails \ "accountingPeriods"
     )
@@ -931,8 +931,8 @@ object TaskListStatusUtils {
   }
 
   def userAnswersUnchangedAllSections(currentUA: UserAnswers, previousUA: UserAnswers): Boolean = {
-    (getBasicDetailsTaskListStatus(currentUA, previousUA) == Completed) &&
-    (getFinancialDetailsTaskListStatus(currentUA, previousUA) == Completed) &&
+    (getBasicDetailsCompletedOrUpdated(currentUA, previousUA) == Completed) &&
+    (getFinancialDetailsCompletedOrUpdated(currentUA, previousUA) == Completed) &&
     (getCompletedOrUpdatedTaskListStatus(
       currentUA,
       previousUA,
