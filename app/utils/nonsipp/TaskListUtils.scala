@@ -58,23 +58,34 @@ object TaskListUtils {
     srn: Srn,
     isPsp: Boolean,
     isLinkActive: Boolean,
+    noChangesSincePreviousVersion: Boolean,
     schemeName: String
   ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.declaration"
 
+//    val isChanged = userAnswersUnchangedAllSections(userAnswers, previousAnswers.get)
+
     TaskListSectionViewModel(
       s"$prefix.title",
       if (isLinkActive) {
-        val psaOrPspDeclarationUrl =
+        val psaOrPspDeclarationUrl = {
           if (isPsp) {
             controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn).url
           } else {
             controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn).url
           }
-        LinkMessage(
-          s"$prefix.complete",
-          psaOrPspDeclarationUrl
-        )
+        }
+        if (noChangesSincePreviousVersion) {
+          LinkMessage(
+            s"$prefix.view",
+            psaOrPspDeclarationUrl
+          )
+        } else {
+          LinkMessage(
+            s"$prefix.complete",
+            psaOrPspDeclarationUrl
+          )
+        }
       } else {
         Message(s"$prefix.incomplete")
       },
@@ -89,6 +100,36 @@ object TaskListUtils {
     srn: Srn,
     schemeName: String,
     userAnswers: UserAnswers,
+    pensionSchemeId: PensionSchemeId,
+    noChangesSincePreviousVersion: Boolean
+  ): List[TaskListSectionViewModel] = {
+
+    val sectionListWithoutDeclaration = getSectionListWithoutDeclaration(srn, schemeName, userAnswers, pensionSchemeId)
+
+    val (numberOfCompletedWithoutDeclaration, numberOfTotalWithoutDeclaration) = evaluateCompletedTotalTuple(
+      sectionListWithoutDeclaration
+    )
+
+    val isLinkActive = numberOfTotalWithoutDeclaration == numberOfCompletedWithoutDeclaration
+
+    val declarationSectionViewModel =
+      getDeclarationSection(
+        srn,
+        pensionSchemeId.isPSP,
+        isLinkActive,
+        noChangesSincePreviousVersion,
+        schemeName
+      )
+
+    sectionListWithoutDeclaration :+ declarationSectionViewModel
+
+  }
+
+  def getSectionListOne(
+    srn: Srn,
+    schemeName: String,
+    userAnswers: UserAnswers,
+    hasChanged: Boolean,
     pensionSchemeId: PensionSchemeId
   ): List[TaskListSectionViewModel] = {
 
@@ -105,6 +146,7 @@ object TaskListUtils {
         srn,
         pensionSchemeId.isPSP,
         isLinkActive,
+        hasChanged,
         schemeName
       )
 

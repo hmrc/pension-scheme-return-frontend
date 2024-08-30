@@ -103,7 +103,7 @@ object TaskListController {
     noChangesSincePreviousVersion: Boolean
   ): PageViewModel[TaskListViewModel] = {
 
-    val sectionList = getSectionList(srn, schemeName, userAnswers, pensionSchemeId)
+    val sectionList = getSectionList(srn, schemeName, userAnswers, pensionSchemeId, noChangesSincePreviousVersion)
 
     val (numberOfCompleted, numberOfTotal) = evaluateCompletedTotalTuple(sectionList)
 
