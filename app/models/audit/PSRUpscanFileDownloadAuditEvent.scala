@@ -35,13 +35,13 @@ case class PSRUpscanFileDownloadAuditEvent(
   override def details: Map[String, String] = {
 
     val common = Map(
-      "SchemeName" -> schemeName,
-      "PensionSchemeTaxReference" -> schemeTaxReference,
-      "AffinityGroup" -> affinityGroup,
-      "CredentialRole(PSA/PSP)" -> credentialRole,
-      "TaxYear" -> taxYear.toYearFormat,
-      "DownloadStatus" -> downloadStatus,
-      "DownloadTime" -> downloadTimeInMilliSeconds.toString
+      "schemeName" -> schemeName,
+      "pensionSchemeTaxReference" -> schemeTaxReference,
+      "affinityGroup" -> affinityGroup,
+      "credentialRole(PSA/PSP)" -> credentialRole,
+      "taxYear" -> taxYear.toYearFormat,
+      "downloadStatus" -> downloadStatus,
+      "downloadTime" -> downloadTimeInMilliSeconds.toString
     )
 
     psaOrPspIdDetails(credentialRole, psaOrPspId, schemeAdministratorOrPractitionerName) ++ common
