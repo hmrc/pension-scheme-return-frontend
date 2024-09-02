@@ -458,11 +458,19 @@ class MemberPaymentsTransformer @Inject()(
    *    - if they are the same, they are not new members.
    *    - if they are different, check if they were added in the latest version of the return (memberStatus is NEW, psrStatus is Compiled and return’s fbVersion == memberPSRVersion)
    *      - if so, they are changed members.
-   *      - if not, they are new members.
+   *      - if not, do the same check but check psrStatus is Submitted (memberStatus is NEW, psrStatus is Submitted and return’s fbVersion == memberPSRVersion)
+   *        - if so, this means the member is changed
+   *          (this is because psrStatus is only Submitted directly after a PSR declaration submission and the user has logged out / in before making another POST to ETMP)
+   *        - if not, they are new members.
    *
    * fetchingPreviousVersion - used to indicate that the PSR retrieval service is calling this method when fetching the previous version
    *                         - this is required as when this happens, there won't be a previousVersionUA yet
    *                         - we can't rely on the absence of previousVersionUA to determine this as the PSR connector can return None if not found and in some cases it is required to be there
+   *
+   * Bug: We check members against the previous version by index, this is an issue because we keep members in index whether we delete them or not
+   *      but when we POST members to ETMP, we group non-deleted members first and then append the deleted members to the end, changing the order
+   *      we only do this because we need to save the indexes in our cache for active members as we use Refined types to constrain the number of members
+   *      we have a ticket on the backlog to fix this (remove Refined type and just have an int)
    */
   private def identifyNewMembers(
     srn: Srn,
@@ -476,20 +484,24 @@ class MemberPaymentsTransformer @Inject()(
         s"""[identifyNewMembers] identifying members that are safe to hard delete with PSR version $psrVersion, psrStatus $psrStatus and previous version useranswers are ${previousVersionUA
           .fold("empty")(_ => "non-empty")}"""
       )
+
       previousVersionUA match {
         case Some(previousUA) =>
           logger.info(s"[identifyNewMembers] Previous PSR version found for srn $srn")
-          buildMemberDetails(srn, previousUA).left.map(new Exception(_)).toTry.flatMap { previousMemberDetails =>
-            Success(
-              currentMemberDetails.toList.flatMap {
-                case (index, currentMemberDetail) if previousMemberDetails.get(index).contains(currentMemberDetail) =>
-                  None
-                case (_, currentMemberDetail) if currentMemberDetail.state.changed => None
-                case (index, currentMemberDetail) if currentMemberDetail.state._new && psrStatus.exists(_.isCompiled) =>
-                  Some(index)
-                case _ => None
-              }
-            )
+          buildMemberDetails(srn, previousUA).left.map(new Exception(_)).toTry.map { previousMemberDetails =>
+            currentMemberDetails.toList.flatMap {
+              case (index, currentMemberDetail) if previousMemberDetails.get(index).contains(currentMemberDetail) =>
+                None
+              case (_, currentMemberDetail) if currentMemberDetail.state.changed => None
+              case (_, currentMemberDetail)
+                  if currentMemberDetail.state._new
+                    && psrStatus.exists(_.isSubmitted)
+                    && currentMemberDetail.memberPSRVersion.exists(psrVersion.contains) =>
+                None
+              case (index, currentMemberDetail) if currentMemberDetail.state._new && psrStatus.exists(_.isCompiled) =>
+                Some(index)
+              case _ => None
+            }
           }
         // No previous version UserAnswers so this must be either pre-first submission or just after the first submission
         case None =>
@@ -506,17 +518,16 @@ class MemberPaymentsTransformer @Inject()(
 
           Success(
             versionedMembersWithETMPStatus.flatMap {
-              // Added in current version of the submission but return has just been submitted
+              // Added in current version of the submission but return has just been submitted, not safe to hard delete
               case (index, memberVersion, Some(MemberState.New))
-                  if ua.get(FbVersionPage(srn)).contains(memberVersion) &&
-                    ua.get(FbStatus(srn)).exists(_.isSubmitted) =>
+                  if psrVersion.contains(memberVersion) && psrStatus.exists(_.isSubmitted) =>
                 logger.info(
                   s"[identifyNewMembers] member at index $index is part of a freshly made submission. Not safe to hard delete"
                 )
                 None
-              // Added in current version of the submission, safe to soft delete
+              // Added in current version of the submission, safe to hard delete
               case (index, memberVersion, Some(MemberState.New | MemberState.Changed))
-                  if ua.get(FbVersionPage(srn)).contains(memberVersion) && psrStatus.exists(_.isCompiled) =>
+                  if psrVersion.contains(memberVersion) && psrStatus.exists(_.isCompiled) =>
                 logger.info(
                   s"[identifyNewMembers] member at index $index was added in the current version of the submission without a previous version. safe to hard delete"
                 )
