@@ -132,7 +132,7 @@ object TaskListStatusUtils {
           .url
     )
 
-    val someReportedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+    val someRecordedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
       _ => listPageUrl,
       index =>
         controllers.nonsipp.common.routes.IdentityTypeController
@@ -144,8 +144,8 @@ object TaskListStatusUtils {
       case (None, _) => (NotStarted, firstQuestionPageUrl)
       case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
       case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
-      case (Some(true), _) => (Recorded(numRecorded, "loans"), someReportedCalculatedUrl)
-      // Todo: check if smart navigation is required when 1+ have been reported - if not, use listPageUrl instead.
+      case (Some(true), _) => (Recorded(numRecorded, "loans"), someRecordedCalculatedUrl)
+      // Todo: check if smart navigation is required when 1+ have been recorded - if not, use listPageUrl instead.
     }
   }
 
@@ -232,7 +232,7 @@ object TaskListStatusUtils {
 
   def getTransferOutStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereTransfersIn = userAnswers.get(SchemeTransferOutPage(srn))
-    val numReported =
+    val numRecorded =
       userAnswers.map(TransfersOutSectionCompleted.all(srn)).flatten(_._2).count(_._2 == SectionCompleted)
 
     val firstQuestionPageUrl =
@@ -245,17 +245,17 @@ object TaskListStatusUtils {
         .onPageLoad(srn, 1, NormalMode)
         .url
 
-    (wereTransfersIn, numReported) match {
+    (wereTransfersIn, numRecorded) match {
       case (None, _) => (getNotStartedOrCannotStartYetStatus(userAnswers, srn), firstQuestionPageUrl)
       case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
       case (Some(true), 0) => (InProgress, firstQuestionPageUrl)
-      case (Some(true), _) => (Recorded(numReported, "transfers"), memberListPageUrl)
+      case (Some(true), _) => (Recorded(numRecorded, "transfers"), memberListPageUrl)
     }
   }
 
   def getSurrenderedBenefitsStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereSurrenderedBenefits = userAnswers.get(SurrenderedBenefitsPage(srn))
-    val numReported = userAnswers.get(SurrenderedBenefitsCompleted.all(srn)).getOrElse(Map.empty).size
+    val numRecorded = userAnswers.get(SurrenderedBenefitsCompleted.all(srn)).getOrElse(Map.empty).size
 
     val firstQuestionPageUrl =
       controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsController
@@ -267,11 +267,11 @@ object TaskListStatusUtils {
         .onPageLoad(srn, 1, NormalMode)
         .url
 
-    (wereSurrenderedBenefits, numReported) match {
+    (wereSurrenderedBenefits, numRecorded) match {
       case (None, _) => (getNotStartedOrCannotStartYetStatus(userAnswers, srn), firstQuestionPageUrl)
       case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
       case (Some(true), 0) => (InProgress, firstQuestionPageUrl)
-      case (Some(true), _) => (Recorded(numReported, "surrenders"), memberListPageUrl)
+      case (Some(true), _) => (Recorded(numRecorded, "surrenders"), memberListPageUrl)
     }
   }
 
@@ -392,7 +392,7 @@ object TaskListStatusUtils {
           .url
     )
 
-    val someReportedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+    val someRecordedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
       _ => listPageUrl,
       index =>
         controllers.nonsipp.landorproperty.routes.LandPropertyInUKController
@@ -404,8 +404,8 @@ object TaskListStatusUtils {
       case (None, _) => (NotStarted, firstQuestionPageUrl)
       case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
       case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
-      case (Some(true), _) => (Recorded(numRecorded, "landOrProperties"), someReportedCalculatedUrl)
-      // Todo: check if smart navigation is required when 1+ have been reported - if not, use listPageUrl instead.
+      case (Some(true), _) => (Recorded(numRecorded, "landOrProperties"), someRecordedCalculatedUrl)
+      // Todo: check if smart navigation is required when 1+ have been recorded - if not, use listPageUrl instead.
     }
   }
 
@@ -462,7 +462,7 @@ object TaskListStatusUtils {
       index => controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, index, NormalMode).url
     )
 
-    val someReportedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+    val someRecordedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
       _ => listPageUrl,
       index => controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, index, NormalMode).url
     )
@@ -471,8 +471,8 @@ object TaskListStatusUtils {
       case (None, _) => (NotStarted, firstQuestionPageUrl)
       case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
       case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
-      case (Some(true), _) => (Recorded(numRecorded, "borrowings"), someReportedCalculatedUrl)
-      // Todo: check if smart navigation is required when 1+ have been reported - if not, use listPageUrl instead.
+      case (Some(true), _) => (Recorded(numRecorded, "borrowings"), someRecordedCalculatedUrl)
+      // Todo: check if smart navigation is required when 1+ have been recorded - if not, use listPageUrl instead.
     }
   }
 
@@ -500,8 +500,8 @@ object TaskListStatusUtils {
     }
 
   def getSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val wereSharesReported = userAnswers.get(DidSchemeHoldAnySharesPage(srn))
-    val numReported = userAnswers.get(SharesCompleted.all(srn)).getOrElse(Map.empty).size
+    val wereShares = userAnswers.get(DidSchemeHoldAnySharesPage(srn))
+    val numRecorded = userAnswers.get(SharesCompleted.all(srn)).getOrElse(Map.empty).size
 
     val firstQuestionPageUrl =
       controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController
@@ -522,23 +522,23 @@ object TaskListStatusUtils {
       index => controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, index, NormalMode).url
     )
 
-    val someReportedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+    val someRecordedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
       _ => listPageUrl,
       index => controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, index, NormalMode).url
     )
 
-    (wereSharesReported, numReported) match {
+    (wereShares, numRecorded) match {
       case (None, _) => (NotStarted, firstQuestionPageUrl)
       case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
       case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
-      case (Some(true), _) => (Recorded(numReported, "shares"), someReportedCalculatedUrl)
-      // Todo: check if smart navigation is required when 1+ have been reported - if not, use listPageUrl instead.
+      case (Some(true), _) => (Recorded(numRecorded, "shares"), someRecordedCalculatedUrl)
+      // Todo: check if smart navigation is required when 1+ have been recorded - if not, use listPageUrl instead.
     }
   }
 
   def getSharesDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val sharesDisposalsMade = userAnswers.get(SharesDisposalPage(srn))
-    val numReported = userAnswers.map(SharesDisposalProgress.all(srn)).flatten(_._2).count(_._2.completed)
+    val numRecorded = userAnswers.map(SharesDisposalProgress.all(srn)).flatten(_._2).count(_._2.completed)
 
     val firstQuestionPageUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
       .onPageLoad(srn, NormalMode)
@@ -548,11 +548,11 @@ object TaskListStatusUtils {
       .onPageLoad(srn, page = 1)
       .url
 
-    (sharesDisposalsMade, numReported) match {
+    (sharesDisposalsMade, numRecorded) match {
       case (None, _) => (NotStarted, firstQuestionPageUrl)
       case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
       case (Some(true), 0) => (InProgress, firstQuestionPageUrl)
-      case (Some(true), _) => (Recorded(numReported, "disposals"), disposalsListPageUrl)
+      case (Some(true), _) => (Recorded(numRecorded, "disposals"), disposalsListPageUrl)
     }
   }
 
@@ -576,15 +576,14 @@ object TaskListStatusUtils {
       case (_, Some(amount)) =>
         if (amount == Money(0)) (Recorded(0, ""), firstQuestionPageUrl) else (Recorded, cyaPageUrl)
       // The condition above is necessary because there is no boolean field in ETMP where we can store the answer to
-      // the first question page, so a value of 0.00 stored in ETMP indicates that no Quoted Shares were reported.
+      // the first question page, so a value of 0.00 stored in ETMP indicates that no Quoted Shares were recorded.
       case _ => (NotStarted, firstQuestionPageUrl)
     }
   }
 
   def getBondsTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    //todo: carry on!
-    val wereBondsReported = userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
-    val numReported = userAnswers.get(BondsCompleted.all(srn)).getOrElse(Map.empty).size
+    val wereBonds = userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
+    val numRecorded = userAnswers.get(BondsCompleted.all(srn)).getOrElse(Map.empty).size
 
     val firstQuestionPageUrl =
       controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
@@ -605,17 +604,17 @@ object TaskListStatusUtils {
       index => controllers.nonsipp.bonds.routes.NameOfBondsController.onPageLoad(srn, index, NormalMode).url
     )
 
-    val someReportedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+    val someRecordedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
       _ => listPageUrl,
       index => controllers.nonsipp.bonds.routes.NameOfBondsController.onPageLoad(srn, index, NormalMode).url
     )
 
-    (wereBondsReported, numReported) match {
+    (wereBonds, numRecorded) match {
       case (None, _) => (NotStarted, firstQuestionPageUrl)
       case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
       case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
-      case (Some(true), _) => (Recorded(numReported, "bonds"), someReportedCalculatedUrl)
-      // Todo: check if smart navigation is required when 1+ have been reported - if not, use listPageUrl instead.
+      case (Some(true), _) => (Recorded(numRecorded, "bonds"), someRecordedCalculatedUrl)
+      // Todo: check if smart navigation is required when 1+ have been recorded - if not, use listPageUrl instead.
     }
   }
 
@@ -653,32 +652,45 @@ object TaskListStatusUtils {
   }
 
   def getOtherAssetsTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val defaultLink =
+    val wereOtherAssets = userAnswers.get(OtherAssetsHeldPage(srn))
+    val numRecorded = userAnswers.get(OtherAssetsCompleted.all(srn)).getOrElse(Map.empty).size
+
+    val firstQuestionPageUrl =
       controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController
         .onPageLoad(srn, NormalMode)
         .url
-    val assetsListPageUrl =
+
+    val listPageUrl =
       controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
         .onPageLoad(srn, 1, NormalMode)
         .url
 
-    val hadAssetsPage = userAnswers.get(OtherAssetsHeldPage(srn))
-    val assetsStatusPage = userAnswers.get(OtherAssetsJourneyStatus(srn))
     val firstPages = userAnswers.get(WhatIsOtherAssetPages(srn))
     val lastPages = userAnswers.map(OtherAssetsCompleted.all(srn))
     val incompleteIndex: Int = getIncompleteIndex(firstPages, Some(lastPages))
+
     val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
-      _ => assetsListPageUrl,
+      _ => firstQuestionPageUrl,
       index =>
-        controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController.onPageLoad(srn, index, NormalMode).url
+        controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController
+          .onPageLoad(srn, index, NormalMode)
+          .url
     )
 
-    (hadAssetsPage, assetsStatusPage) match {
-      case (None, _) => (NotStarted, defaultLink)
-      case (Some(false), _) => (Completed, defaultLink)
-      case (Some(true), None) => (InProgress, inProgressCalculatedUrl)
-      case (Some(true), Some(SectionStatus.Completed)) => (Completed, assetsListPageUrl)
-      case (Some(true), Some(SectionStatus.InProgress)) => (InProgress, inProgressCalculatedUrl)
+    val someRecordedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+      _ => listPageUrl,
+      index =>
+        controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController
+          .onPageLoad(srn, index, NormalMode)
+          .url
+    )
+
+    (wereOtherAssets, numRecorded) match {
+      case (None, _) => (NotStarted, firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
+      case (Some(true), _) => (Recorded(numRecorded, "otherAssets"), someRecordedCalculatedUrl)
+      // Todo: check if smart navigation is required when 1+ have been recorded - if not, use listPageUrl instead.
     }
   }
 
