@@ -22,7 +22,6 @@ lazy val root = Project(appName, file("."))
   .settings(
     semanticdbEnabled := true,
     semanticdbVersion := scalafixSemanticdb.revision,
-    scalafixScalaBinaryVersion := "2.13",
     RoutesKeys.routesImport ++= Seq(
       "models._",
       "models.ManualOrUpload._",
