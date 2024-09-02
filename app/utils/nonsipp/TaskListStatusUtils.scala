@@ -380,7 +380,7 @@ object TaskListStatusUtils {
   }
 
   def getUnallocatedContributionsStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val wereUnallocatedContributionsMade = userAnswers.get(UnallocatedEmployerContributionsPage(srn))
+    val wereUnallocatedContributions = userAnswers.get(UnallocatedEmployerContributionsPage(srn))
     val amount = userAnswers.get(UnallocatedEmployerAmountPage(srn))
 
     val firstQuestionPageUrl =
@@ -393,13 +393,14 @@ object TaskListStatusUtils {
         .onPageLoad(srn, NormalMode)
         .url
 
-    (wereUnallocatedContributionsMade, amount) match {
+    (wereUnallocatedContributions, amount) match {
       case (None, _) => (getNotStartedOrCannotStartYetStatus(userAnswers, srn), firstQuestionPageUrl)
       case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
       case (Some(true), None) => (InProgress, firstQuestionPageUrl)
       case (Some(true), Some(_)) => (Recorded, cyaPageUrl)
     }
   }
+
   def getLandOrPropertyTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val heldPageUrl =
       controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode).url
@@ -546,48 +547,35 @@ object TaskListStatusUtils {
   }
 
   def getBorrowingTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val moneyBorrowedPageUrl =
+    val wereBorrowings = userAnswers.get(MoneyBorrowedPage(srn))
+    val numRecorded = userAnswers.get(WhySchemeBorrowedMoneyPages(srn)).getOrElse(Map.empty).size
+
+    val firstQuestionPageUrl =
       controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode).url
+
     val listPageUrl =
       controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, 1, NormalMode).url
 
-    def lenderNamePageUrl(index: Max5000) =
-      controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, index, NormalMode).url
-
-    val moneyBorrowedPage = userAnswers.get(MoneyBorrowedPage(srn))
     val firstPages = userAnswers.get(LenderNamePages(srn))
     val lastPages = userAnswers.get(WhySchemeBorrowedMoneyPages(srn))
-    (
-      moneyBorrowedPage,
-      firstPages,
-      lastPages
-    ) match {
-      case (None, _, _) => (NotStarted, moneyBorrowedPageUrl)
-      case (
-          Some(moneyBorrowed),
-          firstPages,
-          lastPages
-          ) =>
-        if (!moneyBorrowed) {
-          (Completed, listPageUrl)
-        } else {
-          val countFirstPages = firstPages.getOrElse(List.empty).size
-          val countLastPages = lastPages.getOrElse(List.empty).size
+    val incompleteIndex: Int = getIncompleteIndex(firstPages, lastPages)
 
-          val incompleteIndex: Int = getIncompleteIndex(firstPages, lastPages)
-          val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
-            _ => listPageUrl,
-            index => lenderNamePageUrl(index)
-          )
+    val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+      _ => firstQuestionPageUrl,
+      index => controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, index, NormalMode).url
+    )
 
-          if (countFirstPages + countLastPages == 0) {
-            (InProgress, lenderNamePageUrl(refineMV(1)))
-          } else if (countFirstPages > countLastPages) {
-            (InProgress, inProgressCalculatedUrl)
-          } else {
-            (Completed, listPageUrl)
-          }
-        }
+    val someReportedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+      _ => listPageUrl,
+      index => controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, index, NormalMode).url
+    )
+
+    (wereBorrowings, numRecorded) match {
+      case (None, _) => (NotStarted, firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
+      case (Some(true), _) => (Recorded(numRecorded, "borrowings"), someReportedCalculatedUrl)
+      // Todo: check if smart navigation is required when 1+ have been reported - if not, use listPageUrl instead.
     }
   }
 
