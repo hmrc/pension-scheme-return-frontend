@@ -582,30 +582,40 @@ object TaskListStatusUtils {
   }
 
   def getBondsTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val defaultLink =
+    //todo: carry on!
+    val wereBondsReported = userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
+    val numReported = userAnswers.get(BondsCompleted.all(srn)).getOrElse(Map.empty).size
+
+    val firstQuestionPageUrl =
       controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
         .onPageLoad(srn, NormalMode)
         .url
-    val bondsListPageUrl =
+
+    val listPageUrl =
       controllers.nonsipp.bonds.routes.BondsListController
         .onPageLoad(srn, 1, NormalMode)
         .url
-    val hadBondsPage = userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
-    val bondStatusPage = userAnswers.get(BondsJourneyStatus(srn))
+
     val firstPages = userAnswers.get(NameOfBondsPages(srn))
     val lastPages = userAnswers.map(BondsCompleted.all(srn))
     val incompleteIndex: Int = getIncompleteIndex(firstPages, Some(lastPages))
+
     val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
-      _ => bondsListPageUrl,
+      _ => firstQuestionPageUrl,
       index => controllers.nonsipp.bonds.routes.NameOfBondsController.onPageLoad(srn, index, NormalMode).url
     )
 
-    (hadBondsPage, bondStatusPage) match {
-      case (None, _) => (NotStarted, defaultLink)
-      case (Some(false), _) => (Completed, defaultLink)
-      case (Some(true), None) => (InProgress, inProgressCalculatedUrl)
-      case (Some(true), Some(SectionStatus.Completed)) => (Completed, bondsListPageUrl)
-      case (Some(true), Some(SectionStatus.InProgress)) => (InProgress, inProgressCalculatedUrl)
+    val someReportedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+      _ => listPageUrl,
+      index => controllers.nonsipp.bonds.routes.NameOfBondsController.onPageLoad(srn, index, NormalMode).url
+    )
+
+    (wereBondsReported, numReported) match {
+      case (None, _) => (NotStarted, firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
+      case (Some(true), _) => (Recorded(numReported, "bonds"), someReportedCalculatedUrl)
+      // Todo: check if smart navigation is required when 1+ have been reported - if not, use listPageUrl instead.
     }
   }
 
