@@ -20,11 +20,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import controllers.PSRController
-import utils.nonsipp.TaskListStatusUtils.{
-  getCompletedOrUpdatedTaskListStatus,
-  getIncompleteLoansLink,
-  getLoansTaskListStatus
-}
+import utils.nonsipp.TaskListStatusUtils.{getCompletedOrUpdatedTaskListStatus, getLoansTaskListStatusAndLink}
 import cats.implicits._
 import _root_.config.Constants
 import pages.nonsipp.accountingperiod.AccountingPeriodListPage
@@ -104,11 +100,11 @@ class LoansListController @Inject()(
       if (viewOnlyViewModel.isEmpty && recipients.isEmpty) {
         Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
       } else {
-        val status = getLoansTaskListStatus(request.userAnswers, srn)
-        if (status == TaskListStatus.NotStarted) {
+        val (loansStatus, incompleteLoansUrl) = getLoansTaskListStatusAndLink(request.userAnswers, srn)
+        if (loansStatus == TaskListStatus.NotStarted) {
           Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
-        } else if (status == TaskListStatus.InProgress) {
-          Redirect(getIncompleteLoansLink(request.userAnswers, srn))
+        } else if (loansStatus == TaskListStatus.InProgress) {
+          Redirect(incompleteLoansUrl)
         } else {
           loanRecipients(srn)
             .map(

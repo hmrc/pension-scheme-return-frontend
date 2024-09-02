@@ -106,82 +106,47 @@ object TaskListStatusUtils {
     }
   }
 
-  def getLoansTaskListStatus(userAnswers: UserAnswers, srn: Srn): TaskListStatus with Serializable = {
-    val loansMadePage = userAnswers.get(LoansMadeOrOutstandingPage(srn))
-    val whoReceivedPages = userAnswers.get(IdentityTypes(srn, IdentitySubject.LoanRecipient))
-    val arrearsPages = userAnswers.get(OutstandingArrearsOnLoanPages(srn))
-    val sponsoringPages = userAnswers.get(RecipientSponsoringEmployerConnectedPartyPages(srn))
-    val connectedPartyPages = userAnswers.get(IsIndividualRecipientConnectedPartyPages(srn))
-    (loansMadePage, whoReceivedPages, arrearsPages, sponsoringPages, connectedPartyPages) match {
-      case (None, _, _, _, _) => NotStarted
-      case (Some(loansMade), whoReceived, arrears, sponsoring, connected) =>
-        if (!loansMade) {
-          Recorded(0, "")
-        } else {
-          val countLoanTransactions = whoReceived.getOrElse(List.empty).size
-          val countLastPage = arrears.getOrElse(List.empty).size
-          if (countLoanTransactions + countLastPage == 0) {
-            InProgress
-          } else if (countLoanTransactions > countLastPage) {
-            InProgress
-          } else {
-            val countSponsoringAndConnectedPages = sponsoring.getOrElse(List.empty).size + connected
-              .getOrElse(List.empty)
-              .size
-            if (countSponsoringAndConnectedPages < countLastPage) {
-              InProgress
-            } else {
-              Recorded(countLastPage, "loans")
-            }
-          }
-        }
-    }
-  }
+  def getLoansTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val wereLoans = userAnswers.get(LoansMadeOrOutstandingPage(srn))
+    val numRecorded = userAnswers.get(OutstandingArrearsOnLoanPages(srn)).getOrElse(Map.empty).size
 
-  def getIncompleteLoansLink(userAnswers: UserAnswers, srn: Srn): String = {
-    val whoReceivedTheLoanPages = userAnswers.get(IdentityTypes(srn, IdentitySubject.LoanRecipient))
-    val outstandingArrearsOnLoanPages = userAnswers.get(OutstandingArrearsOnLoanPages(srn))
-    val sponsoringPages = userAnswers.get(RecipientSponsoringEmployerConnectedPartyPages(srn))
-    val connectedPartyPages = userAnswers.get(IsIndividualRecipientConnectedPartyPages(srn))
+    val firstQuestionPageUrl =
+      controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
+        .onPageLoad(srn, NormalMode)
+        .url
 
-    val incompleteIndex =
-      (whoReceivedTheLoanPages, outstandingArrearsOnLoanPages, sponsoringPages, connectedPartyPages) match {
-        case (None, _, _, _) => 1
-        case (Some(_), None, _, _) => 1
-        case (Some(whoReceived), arrears, sponsoring, connected) =>
-          if (whoReceived.isEmpty) {
-            1
-          } else {
-            val whoReceivedIndexes = (0 until whoReceived.size).toList
-            val arrearsIndexes = arrears.getOrElse(List.empty).map(_._1.toInt).toList
-            val sponsoringAndConnectedIndexes = sponsoring.getOrElse(List.empty).map(_._1.toInt).toList ++ connected
-              .getOrElse(List.empty)
-              .map(_._1.toInt)
-              .toList
-            val filtered = whoReceivedIndexes.filter(arrearsIndexes.indexOf(_) < 0)
-            val filteredSC = whoReceivedIndexes.filter(sponsoringAndConnectedIndexes.indexOf(_) < 0)
-            if (filtered.isEmpty && filteredSC.isEmpty) {
-              1
-            } else {
-              if (filteredSC.isEmpty) {
-                filtered.head + 1 // index based on arrears page missing
-              } else {
-                filteredSC.head + 1 // index based on sponsoring employer or individual connected party
-              }
-            }
-          }
-      }
+    val listPageUrl =
+      controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
 
-    refineV[OneTo5000](incompleteIndex).fold(
-      _ =>
-        controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
-          .onPageLoad(srn, 1, NormalMode)
-          .url,
+    val firstPages = userAnswers.get(IdentityTypes(srn, IdentitySubject.LoanRecipient))
+    val lastPages = userAnswers.get(OutstandingArrearsOnLoanPages(srn))
+    val incompleteIndex: Int = getIncompleteIndex(firstPages, lastPages)
+
+    val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+      _ => firstQuestionPageUrl,
       index =>
         controllers.nonsipp.common.routes.IdentityTypeController
           .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
           .url
     )
+
+    val someReportedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+      _ => listPageUrl,
+      index =>
+        controllers.nonsipp.common.routes.IdentityTypeController
+          .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
+          .url
+    )
+
+    (wereLoans, numRecorded) match {
+      case (None, _) => (NotStarted, firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
+      case (Some(true), _) => (Recorded(numRecorded, "loans"), someReportedCalculatedUrl)
+      // Todo: check if smart navigation is required when 1+ have been reported - if not, use listPageUrl instead.
+    }
   }
 
   def getNotStartedOrCannotStartYetStatus(userAnswers: UserAnswers, srn: Srn): TaskListStatus =
@@ -551,10 +516,14 @@ object TaskListStatusUtils {
     val numRecorded = userAnswers.get(WhySchemeBorrowedMoneyPages(srn)).getOrElse(Map.empty).size
 
     val firstQuestionPageUrl =
-      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode).url
+      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController
+        .onPageLoad(srn, NormalMode)
+        .url
 
     val listPageUrl =
-      controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, 1, NormalMode).url
+      controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
 
     val firstPages = userAnswers.get(LenderNamePages(srn))
     val lastPages = userAnswers.get(WhySchemeBorrowedMoneyPages(srn))

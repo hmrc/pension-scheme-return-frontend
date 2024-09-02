@@ -370,34 +370,24 @@ object TaskListUtils {
 
   private def loansSection(srn: Srn, schemeName: String, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = s"nonsipp.tasklist.loans"
-    val taskListStatus: TaskListStatus = getLoansTaskListStatus(userAnswers, srn)
-    val borrowingStatus = getBorrowingTaskListStatusAndLink(userAnswers, srn)
+    val (loansStatus, loansLink) = getLoansTaskListStatusAndLink(userAnswers, srn)
+    val (borrowingStatus, borrowingLink) = getBorrowingTaskListStatusAndLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          Message(messageKey(prefix, "loansmade.title", taskListStatus), schemeName),
-          taskListStatus match {
-            case NotStarted =>
-              controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
-                .onPageLoad(srn, NormalMode)
-                .url
-            case Completed | Recorded(_, _) =>
-              controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
-                .onPageLoad(srn, 1, NormalMode)
-                .url
-            case InProgress => getIncompleteLoansLink(userAnswers, srn)
-          }
+          Message(messageKey(prefix, "loansmade.title", loansStatus), schemeName),
+          loansLink
         ),
-        taskListStatus
+        loansStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
-          Message(messageKey(prefix, "moneyborrowed.title", borrowingStatus._1), schemeName),
-          borrowingStatus._2
+          Message(messageKey(prefix, "moneyborrowed.title", borrowingStatus), schemeName),
+          borrowingLink
         ),
-        borrowingStatus._1
+        borrowingStatus
       )
     )
   }
