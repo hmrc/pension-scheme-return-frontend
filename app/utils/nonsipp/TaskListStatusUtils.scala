@@ -25,7 +25,7 @@ import pages.nonsipp.otherassetsdisposal.{
 import models.ConditionalYesNo._
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
-import config.Refined.{Max5000, OneTo5000}
+import config.Refined.OneTo5000
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInJourneyStatus}
@@ -46,7 +46,7 @@ import pages.nonsipp.membercontributions._
 import pages.nonsipp.accountingperiod.Paths.accountingPeriodDetails
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
 import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import viewmodels.models.TaskListStatus._
 import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import pages.nonsipp.common.IdentityTypes
@@ -367,119 +367,47 @@ object TaskListStatusUtils {
   }
 
   def getLandOrPropertyTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val heldPageUrl =
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode).url
-    val listPageUrl =
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, 1, NormalMode).url
-    def inUkPageUrl(index: Max5000) =
-      controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, index, NormalMode).url
+    val wereLandOrProperties = userAnswers.get(LandOrPropertyHeldPage(srn))
+    val numRecorded = userAnswers.get(LandOrPropertyCompleted.all(srn)).getOrElse(Map.empty).size
 
-    val landOrPropertyHeldPage = userAnswers.get(LandOrPropertyHeldPage(srn))
+    val firstQuestionPageUrl =
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    val listPageUrl =
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
+
     val firstPages = userAnswers.get(LandPropertyInUKPages(srn))
     val lastPages = userAnswers.get(LandOrPropertyTotalIncomePages(srn))
-    val lastLesseeSubJourneyPages = userAnswers.get(IsLesseeConnectedPartyPages(srn))
-    val firstLesseeSubJourneyPages = userAnswers.get(IsLandPropertyLeasedPages(srn))
-    val whyDoesSchemeHoldLandPropertyPages = userAnswers.get(WhyDoesSchemeHoldLandPropertyPages(srn))
-    val landPropertyIndependentValuationPages = userAnswers.get(LandPropertyIndependentValuationPages(srn))
-    (
-      landOrPropertyHeldPage,
-      firstPages,
-      lastPages,
-      firstLesseeSubJourneyPages,
-      lastLesseeSubJourneyPages,
-      whyDoesSchemeHoldLandPropertyPages,
-      landPropertyIndependentValuationPages
-    ) match {
-      case (None, _, _, _, _, _, _) => (NotStarted, heldPageUrl)
-      case (
-          Some(landOrPropertyHeld),
-          firstPages,
-          lastPages,
-          firstLesseeSubjourney,
-          lastLesseeSubjourney,
-          whyHeldPages,
-          indepValPages
-          ) =>
-        if (!landOrPropertyHeld) {
-          (Completed, heldPageUrl)
-        } else {
-          val countFirstPages = firstPages.getOrElse(List.empty).size
-          val countLastPages = lastPages.getOrElse(List.empty).size
-          val countLastLesseeSubjourney = lastLesseeSubjourney.getOrElse(List.empty).size
-          val countFirstLesseeSubjourney = firstLesseeSubjourney.getOrElse(List.empty).count(b => !b._2)
-          val countAcquisitionContributionSubJourney =
-            whyHeldPages.getOrElse(List.empty).count(b => b._2 != SchemeHoldLandProperty.Transfer)
-          val countIndepValPages = indepValPages.getOrElse(List.empty).size
+    val incompleteIndex: Int = getIncompleteIndex(firstPages, lastPages)
 
-          val incompleteIndex: Int = getLandOrPropertyIncompleteIndex(
-            firstPages,
-            lastPages,
-            whyHeldPages,
-            indepValPages,
-            firstLesseeSubjourney,
-            lastLesseeSubjourney
-          )
-          val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
-            _ => listPageUrl,
-            index => inUkPageUrl(index)
-          )
+    val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+      _ => firstQuestionPageUrl,
+      index =>
+        controllers.nonsipp.landorproperty.routes.LandPropertyInUKController
+          .onPageLoad(srn, index, NormalMode)
+          .url
+    )
 
-          if (countFirstPages + countLastPages == 0) {
-            (InProgress, inUkPageUrl(refineMV(1)))
-          } else if (countFirstPages > countLastPages) {
-            (InProgress, inProgressCalculatedUrl)
-          } else {
-            if ((countLastLesseeSubjourney + countFirstLesseeSubjourney) != countLastPages ||
-              countAcquisitionContributionSubJourney != countIndepValPages) {
-              (InProgress, inProgressCalculatedUrl)
-            } else {
-              (Completed, listPageUrl)
-            }
-          }
-        }
+    val someReportedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+      _ => listPageUrl,
+      index =>
+        controllers.nonsipp.landorproperty.routes.LandPropertyInUKController
+          .onPageLoad(srn, index, NormalMode)
+          .url
+    )
+
+    (wereLandOrProperties, numRecorded) match {
+      case (None, _) => (NotStarted, firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
+      case (Some(true), _) => (Recorded(numRecorded, "landOrProperties"), someReportedCalculatedUrl)
+      // Todo: check if smart navigation is required when 1+ have been reported - if not, use listPageUrl instead.
     }
   }
-
-  private def getLandOrPropertyIncompleteIndex(
-    firstPages: Option[Map[String, Boolean]],
-    lastPages: Option[Map[String, Money]],
-    whyHeldPages: Option[Map[String, SchemeHoldLandProperty]],
-    indepValPages: Option[Map[String, Boolean]],
-    firstLesseeSubjourney: Option[Map[String, Boolean]],
-    lastLesseeSubjourney: Option[Map[String, Boolean]]
-  ): Int =
-    (firstPages, lastPages, whyHeldPages, indepValPages, firstLesseeSubjourney, lastLesseeSubjourney) match {
-      case (None, _, _, _, _, _) => 1
-      case (Some(_), None, _, _, _, _) => 1
-      case (Some(first), last, whyHeld, indepVal, firstLessee, lastLessee) =>
-        if (first.isEmpty) {
-          1
-        } else {
-          val firstIndexes = (0 until first.size).toList
-          val lastIndexes = last.getOrElse(List.empty).map(_._1.toInt).toList
-          val whyHeldIndexes =
-            whyHeld.getOrElse(List.empty).filter(b => b._2 != SchemeHoldLandProperty.Transfer).map(_._1.toInt).toList
-          val indepValIndexes = indepVal.getOrElse(List.empty).map(_._1.toInt).toList
-          val firstLesseeIndexes = firstLessee.getOrElse(List.empty).filter(b => !b._2).map(_._1.toInt).toList
-          val lastLesseeIndexes = lastLessee.getOrElse(List.empty).map(_._1.toInt).toList
-          val lesseeIndexes = firstLesseeIndexes ++ lastLesseeIndexes
-
-          val filtered = firstIndexes.filter(lastIndexes.indexOf(_) < 0)
-          val filteredWhyHeld = whyHeldIndexes.filter(indepValIndexes.indexOf(_) < 0)
-          val filteredLessee = lastIndexes.filter(lesseeIndexes.indexOf(_) < 0)
-          if (filtered.isEmpty && filteredWhyHeld.isEmpty && filteredLessee.isEmpty) {
-            1
-          } else {
-            if (filtered.nonEmpty) {
-              filtered.head + 1 // index based on last page missing
-            } else if (filteredWhyHeld.nonEmpty) {
-              filteredWhyHeld.head + 1 // index based on whyHeld and indepVal indexes
-            } else {
-              filteredLessee.head + 1 // index based on lessee and indepVal indexes
-            }
-          }
-        }
-    }
 
   def getLandOrPropertyDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val atLeastOneCompleted =
@@ -580,7 +508,7 @@ object TaskListStatusUtils {
         .onPageLoad(srn, NormalMode)
         .url
 
-    val sharesListPageUrl =
+    val listPageUrl =
       controllers.nonsipp.shares.routes.SharesListController
         .onPageLoad(srn, 1, NormalMode)
         .url
@@ -595,7 +523,7 @@ object TaskListStatusUtils {
     )
 
     val someReportedCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
-      _ => sharesListPageUrl,
+      _ => listPageUrl,
       index => controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, index, NormalMode).url
     )
 
@@ -604,7 +532,7 @@ object TaskListStatusUtils {
       case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
       case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
       case (Some(true), _) => (Recorded(numReported, "shares"), someReportedCalculatedUrl)
-      // Todo: check if smart navigation is required when 1+ have been reported - if not, use sharesListPageUrl instead.
+      // Todo: check if smart navigation is required when 1+ have been reported - if not, use listPageUrl instead.
     }
   }
 
