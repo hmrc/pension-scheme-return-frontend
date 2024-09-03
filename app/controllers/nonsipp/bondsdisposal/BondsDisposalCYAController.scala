@@ -151,7 +151,7 @@ class BondsDisposalCYAController @Inject()(
     identifyAndRequireData(srn).async { implicit request =>
       for {
         updatedUserAnswers <- Future.fromTry(
-          request.userAnswers.set(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionCompleted)
+          request.userAnswers.set(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.Completed)
         )
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(

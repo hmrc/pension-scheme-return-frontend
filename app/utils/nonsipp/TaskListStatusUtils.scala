@@ -48,7 +48,7 @@ import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import pages.nonsipp.common.IdentityTypes
 import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutSectionCompleted}
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
-import pages.nonsipp.bondsdisposal.{BondsDisposalCompleted, BondsDisposalPage, BondsDisposalProgress}
+import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsDisposalProgress}
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
 import viewmodels.models.{SectionCompleted, SectionStatus, TaskListStatus}
 
@@ -615,35 +615,24 @@ object TaskListStatusUtils {
   }
 
   def getBondsDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val wereBondsDisposals = userAnswers.get(BondsDisposalPage(srn))
+    val numRecorded = userAnswers.map(BondsDisposalProgress.all(srn)).flatten(_._2).count(_._2.completed)
 
-    val didSchemeDisposeBonds = userAnswers.get(BondsDisposalPage(srn))
+    val firstQuestionPageUrl =
+      controllers.nonsipp.bondsdisposal.routes.BondsDisposalController
+        .onPageLoad(srn, NormalMode)
+        .url
 
-    val anyJourneysCompleted =
-      userAnswers
-        .map(BondsDisposalProgress.all(srn))
-        .values
-        .exists(_.values.nonEmpty)
+    val listPageUrl =
+      controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
+        .onPageLoad(srn, page = 1)
+        .url
 
-    val sectionCompleted: Boolean = userAnswers.get(BondsDisposalCompleted(srn)).fold(false)(_ => true)
-
-    val initialDisposalUrl = controllers.nonsipp.bondsdisposal.routes.BondsDisposalController
-      .onPageLoad(srn, NormalMode)
-      .url
-
-    val disposalListPage = controllers.nonsipp.bondsdisposal.routes.BondsDisposalListController
-      .onPageLoad(srn, page = 1, NormalMode)
-      .url
-
-    val disposalCompletedListPage = controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-      .onPageLoad(srn, page = 1)
-      .url
-
-    didSchemeDisposeBonds match {
-      case None => (TaskListStatus.NotStarted, initialDisposalUrl)
-      case Some(false) => (TaskListStatus.Completed, initialDisposalUrl)
-      case Some(true) if sectionCompleted => (TaskListStatus.Completed, disposalCompletedListPage)
-      case Some(true) if anyJourneysCompleted => (TaskListStatus.InProgress, disposalCompletedListPage)
-      case Some(true) => (TaskListStatus.InProgress, disposalListPage)
+    (wereBondsDisposals, numRecorded) match {
+      case (None, _) => (NotStarted, firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0) => (InProgress, firstQuestionPageUrl)
+      case (Some(true), _) => (Recorded(numRecorded, "disposals"), listPageUrl)
     }
   }
 

@@ -110,13 +110,15 @@ object StartReportingAssetsDisposalController {
     assets.flatMap { assetData =>
       val completedDisposalsPerAssetKeys = userAnswers
         .map(OtherAssetsDisposalProgress.all(srn, assetData.index))
-        .keys
+        .toList
+        .filter(progress => progress._2.completed)
+        .map(_._1)
 
       if (Constants.maxDisposalPerOtherAsset == completedDisposalsPerAssetKeys.size) {
         List[ListRadiosRow]().empty
       } else {
 
-        val isAssetShouldBeRemovedFromList = completedDisposalsPerAssetKeys.toList
+        val isAssetShouldBeRemovedFromList = completedDisposalsPerAssetKeys
           .map(_.toIntOption)
           .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
           .flatMap(

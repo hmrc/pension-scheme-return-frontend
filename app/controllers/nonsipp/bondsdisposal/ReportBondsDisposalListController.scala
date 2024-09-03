@@ -221,24 +221,20 @@ class ReportBondsDisposalListController @Inject()(
   private def getDisposals(srn: Srn)(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
     request.userAnswers
       .map(BondsDisposalProgress.all(srn))
-      .filter(_._2.nonEmpty)
       .map {
-        case (key, sectionCompleted) =>
-          val maybeBondsIndex: Either[Result, Max5000] =
-            refineStringIndex[Max5000.Refined](key).getOrRecoverJourney
-
-          val maybeDisposalIndexes: Either[Result, List[Max50]] =
-            sectionCompleted.keys.toList
-              .map(refineStringIndex[Max50.Refined])
-              .traverse(_.getOrRecoverJourney)
-
-          for {
-            bondIndex <- maybeBondsIndex
-            disposalIndexes <- maybeDisposalIndexes
-          } yield (bondIndex, disposalIndexes)
+        case (key, secondaryMap) =>
+          key -> secondaryMap.filter { case (_, status) => status.completed }
       }
       .toList
-      .sequence
+      .traverse {
+        case (key, sectionCompleted) =>
+          for {
+            bondsIndex <- refineStringIndex[Max5000.Refined](key).getOrRecoverJourney
+            disposalIndexes <- sectionCompleted.keys.toList
+              .map(refineStringIndex[Max50.Refined])
+              .traverse(_.getOrRecoverJourney)
+          } yield (bondsIndex, disposalIndexes)
+      }
       .map(_.toMap)
 
   private def getBondsDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(
