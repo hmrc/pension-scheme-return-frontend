@@ -24,7 +24,7 @@ import pages.nonsipp.otherassetsheld._
 import config.Refined.OneTo5000
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
-import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInJourneyStatus}
+import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInSectionCompleted}
 import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
 import pages.nonsipp.sharesdisposal._
 import play.api.libs.json.{JsObject, JsPath}
@@ -172,49 +172,30 @@ object TaskListStatusUtils {
   }
 
   def getTransferInStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val status = userAnswers.get(TransfersInJourneyStatus(srn))
     val wereTransfersIn = userAnswers.get(DidSchemeReceiveTransferPage(srn))
-    (wereTransfersIn, status) match {
-      case (None, _) =>
-        (
-          getNotStartedOrCannotStartYetStatus(userAnswers, srn),
-          controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
-      case (Some(false), _) =>
-        (
-          Completed,
-          controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController
-            .onPageLoad(srn, NormalMode)
-            .url
-        )
-      case (Some(true), None) =>
-        (
-          InProgress,
-          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-            .onPageLoad(srn, 1, NormalMode)
-            .url
-        )
-      case (Some(true), Some(SectionStatus.InProgress)) =>
-        (
-          InProgress,
-          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-            .onPageLoad(srn, 1, NormalMode)
-            .url
-        )
-      case (Some(true), Some(SectionStatus.Completed)) =>
-        (
-          Completed,
-          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-            .onPageLoad(srn, 1, NormalMode)
-            .url
-        )
+    val numRecorded =
+      userAnswers.map(TransfersInSectionCompleted.all(srn)).flatten(_._2).count(_._2 == SectionCompleted)
+
+    val firstQuestionPageUrl =
+      controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    val listPageUrl =
+      controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
+
+    (wereTransfersIn, numRecorded) match {
+      case (None, _) => (getNotStartedOrCannotStartYetStatus(userAnswers, srn), firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0) => (InProgress, firstQuestionPageUrl)
+      case (Some(true), _) => (Recorded(numRecorded, "transfers"), listPageUrl)
     }
   }
 
   def getTransferOutStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val wereTransfersIn = userAnswers.get(SchemeTransferOutPage(srn))
+    val wereTransfersOut = userAnswers.get(SchemeTransferOutPage(srn))
     val numRecorded =
       userAnswers.map(TransfersOutSectionCompleted.all(srn)).flatten(_._2).count(_._2 == SectionCompleted)
 
@@ -223,16 +204,16 @@ object TaskListStatusUtils {
         .onPageLoad(srn, NormalMode)
         .url
 
-    val memberListPageUrl =
+    val listPageUrl =
       controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
         .onPageLoad(srn, 1, NormalMode)
         .url
 
-    (wereTransfersIn, numRecorded) match {
+    (wereTransfersOut, numRecorded) match {
       case (None, _) => (getNotStartedOrCannotStartYetStatus(userAnswers, srn), firstQuestionPageUrl)
       case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
       case (Some(true), 0) => (InProgress, firstQuestionPageUrl)
-      case (Some(true), _) => (Recorded(numRecorded, "transfers"), memberListPageUrl)
+      case (Some(true), _) => (Recorded(numRecorded, "transfers"), listPageUrl)
     }
   }
 
