@@ -16,7 +16,7 @@
 
 package utils.nonsipp
 
-import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
+import pages.nonsipp.employercontributions.{EmployerContributionsCompleted, EmployerContributionsPage}
 import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalPage, OtherAssetsDisposalProgress}
 import models.ConditionalYesNo._
 import pages.nonsipp.shares._
@@ -46,7 +46,7 @@ import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutSecti
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
 import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsDisposalProgress}
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
-import viewmodels.models.{SectionCompleted, SectionStatus, TaskListStatus}
+import viewmodels.models.{SectionCompleted, TaskListStatus}
 
 object TaskListStatusUtils {
 
@@ -146,29 +146,26 @@ object TaskListStatusUtils {
     }
 
   def getEmployerContributionStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val status = userAnswers
-      .get(EmployerContributionsSectionStatus(srn))
-      .fold[TaskListStatus](getNotStartedOrCannotStartYetStatus(userAnswers, srn)) {
-        case SectionStatus.InProgress => TaskListStatus.InProgress
-        case SectionStatus.Completed => TaskListStatus.Completed
-      }
-    val wereContributions = userAnswers.get(EmployerContributionsPage(srn))
-    val link = (status, wereContributions) match {
-      case (TaskListStatus.InProgress, Some(true)) =>
-        controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-          .onPageLoad(srn, 1, NormalMode)
-          .url
-      case (TaskListStatus.Completed, Some(true)) =>
-        controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-          .onPageLoad(srn, 1, NormalMode)
-          .url
-      case _ =>
-        controllers.nonsipp.employercontributions.routes.EmployerContributionsController
-          .onPageLoad(srn, NormalMode)
-          .url
+    val wereEmployerContributions = userAnswers.get(EmployerContributionsPage(srn))
+    val numRecorded =
+      userAnswers.map(EmployerContributionsCompleted.all(srn)).flatten(_._2).count(_._2 == SectionCompleted)
 
+    val firstQuestionPageUrl =
+      controllers.nonsipp.employercontributions.routes.EmployerContributionsController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    val listPageUrl =
+      controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
+
+    (wereEmployerContributions, numRecorded) match {
+      case (None, _) => (getNotStartedOrCannotStartYetStatus(userAnswers, srn), firstQuestionPageUrl)
+      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0) => (InProgress, firstQuestionPageUrl)
+      case (Some(true), _) => (Recorded(numRecorded, "contributions"), listPageUrl)
     }
-    (status, link)
   }
 
   def getTransferInStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
