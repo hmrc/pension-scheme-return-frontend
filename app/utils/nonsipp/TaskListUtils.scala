@@ -17,19 +17,16 @@
 package utils.nonsipp
 
 import pages.nonsipp.schemedesignatory._
+import pages.nonsipp.bonds.BondsCompleted
 import viewmodels.implicits._
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
 import pages.nonsipp.otherassetsheld.OtherAssetsCompleted
-import config.Refined.OneTo300
 import utils.nonsipp.TaskListStatusUtils._
 import pages.nonsipp.landorproperty.LandOrPropertyCompleted
-import eu.timepit.refined.refineV
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import pages.nonsipp.CheckReturnDatesPage
 import models._
 import viewmodels.models.TaskListStatus._
-import pages.nonsipp.bonds.BondsCompleted
-import pages.nonsipp.memberdetails._
 import cats.data.NonEmptyList
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage._
@@ -220,92 +217,46 @@ object TaskListUtils {
 
   private def membersSection(srn: Srn, schemeName: String, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.members"
-    val taskListStatus = getMembersTaskListStatus(userAnswers, srn)
+    val (membersStatus, membersLink) = getMembersTaskListStatusAndLink(userAnswers, srn)
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          Message(messageKey(prefix, "details.title", taskListStatus), schemeName),
-          taskListStatus match {
-            case NotStarted =>
-              controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn).url
-            case Completed | Recorded(_, _) =>
-              controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-                .onPageLoad(srn, 1, ManualOrUpload.Manual)
-                .url
-            case _ =>
-              val incompleteIndex = getIncompleteMembersIndex(userAnswers, srn)
-              refineV[OneTo300](incompleteIndex).fold(
-                _ =>
-                  controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-                    .onPageLoad(srn, 1, ManualOrUpload.Manual)
-                    .url,
-                index => {
-                  val doesMemberHaveNino = userAnswers.get(DoesMemberHaveNinoPage(srn, index))
-                  if (doesMemberHaveNino.isEmpty) {
-                    controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
-                      .onPageLoad(srn, index, NormalMode)
-                      .url
-                  } else if (doesMemberHaveNino.getOrElse(false)) {
-                    controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
-                      .onPageLoad(srn, index, NormalMode)
-                      .url
-                  } else {
-                    controllers.nonsipp.memberdetails.routes.NoNINOController
-                      .onPageLoad(srn, index, NormalMode)
-                      .url
-                  }
-                }
-              )
-          }
+          Message(messageKey(prefix, "details.title", membersStatus), schemeName),
+          membersLink
         ),
-        taskListStatus
+        membersStatus
       )
     )
-  }
-
-  private def getIncompleteMembersIndex(userAnswers: UserAnswers, srn: Srn): Int = {
-    val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
-    val ninoPages = userAnswers.get(MemberDetailsNinoPages(srn))
-    val noNinoPages = userAnswers.get(NoNinoPages(srn))
-    (membersDetailsPages, ninoPages, noNinoPages) match {
-      case (None, _, _) => 1
-      case (Some(_), None, None) => 1
-      case (Some(memberDetails), ninos, noNinos) =>
-        if (memberDetails.isEmpty) {
-          1
-        } else {
-          val memberDetailsIndexes = memberDetails.map(_._1.toInt).toList
-          val ninoIndexes = ninos.getOrElse(List.empty).map(_._1.toInt).toList
-          val noninoIndexes = noNinos.getOrElse(List.empty).map(_._1.toInt).toList
-          val finishedIndexes = ninoIndexes ++ noninoIndexes
-          val filtered = memberDetailsIndexes.filter(finishedIndexes.indexOf(_) < 0)
-          if (filtered.isEmpty) {
-            1
-          } else {
-            filtered.head + 1
-          }
-        }
-    }
   }
 
   private def memberPaymentsSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.memberpayments"
 
     // change to check if members section is complete to start
-    val (employerContributionStatus, employerContributionLink) = getEmployerContributionStatusAndLink(userAnswers, srn)
+    val (employerContributionStatus, employerContributionLink) =
+      getEmployerContributionStatusAndLink(userAnswers, srn)
 
-    val (transferInStatus, transferInLink) = getTransferInStatusAndLink(userAnswers, srn)
-    val (transferOutStatus, transferOutLink) = getTransferOutStatusAndLink(userAnswers, srn)
-
-    val (memberContributionStatus, memberContributionLink) = getMemberContributionStatusAndLink(userAnswers, srn)
-    val (pclsMemberStatus, pclsMemberLink) = getPclsStatusAndLink(userAnswers, srn)
-
-    val (surrenderedBenefitsStatus, surrenderedBenefitsLink) = getSurrenderedBenefitsStatusAndLink(userAnswers, srn)
-
-    val (pensionPaymentsStatus, pensionPaymentsLink) = getPensionPaymentsStatusAndLink(userAnswers, srn)
     val (unallocatedContributionsStatus, unallocatedContributionsLink) =
       getUnallocatedContributionsStatusAndLink(userAnswers, srn)
+
+    val (memberContributionStatus, memberContributionLink) =
+      getMemberContributionStatusAndLink(userAnswers, srn)
+
+    val (transferInStatus, transferInLink) =
+      getTransferInStatusAndLink(userAnswers, srn)
+
+    val (transferOutStatus, transferOutLink) =
+      getTransferOutStatusAndLink(userAnswers, srn)
+
+    val (pclsMemberStatus, pclsMemberLink) =
+      getPclsStatusAndLink(userAnswers, srn)
+
+    val (pensionPaymentsStatus, pensionPaymentsLink) =
+      getPensionPaymentsStatusAndLink(userAnswers, srn)
+
+    val (surrenderedBenefitsStatus, surrenderedBenefitsLink) =
+      getSurrenderedBenefitsStatusAndLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",

@@ -21,7 +21,7 @@ import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalPage, OtherAssetsDi
 import models.ConditionalYesNo._
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
-import config.Refined.OneTo5000
+import config.Refined.{OneTo300, OneTo5000}
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInSectionCompleted}
@@ -76,25 +76,45 @@ object TaskListStatusUtils {
       case (_, _, _) => InProgress
     }
 
-  def getMembersTaskListStatus(userAnswers: UserAnswers, srn: Srn): TaskListStatus = {
+  def getMembersTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
-    val ninoPages = userAnswers.get(MemberDetailsNinoPages(srn))
-    val noNinoPages = userAnswers.get(NoNinoPages(srn))
-    (membersDetailsPages, ninoPages, noNinoPages) match {
-      case (None, _, _) => NotStarted
-      case (Some(_), None, None) => InProgress
-      case (Some(memberDetails), _, _) =>
-        if (memberDetails.isEmpty) {
-          NotStarted
+    val numRecorded = userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty).size
+
+    val firstQuestionPageUrl =
+      controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController
+        .onPageLoad(srn)
+        .url
+
+    val listPageUrl =
+      controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+        .onPageLoad(srn, 1, ManualOrUpload.Manual)
+        .url
+
+    val inProgressCalculatedUrl = refineV[OneTo300](getIncompleteMembersIndex(userAnswers, srn)).fold(
+      _ => firstQuestionPageUrl,
+      index => {
+        val doesMemberHaveNino = userAnswers.get(DoesMemberHaveNinoPage(srn, index))
+        if (doesMemberHaveNino.isEmpty) {
+          controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
+            .onPageLoad(srn, index, NormalMode)
+            .url
+        } else if (doesMemberHaveNino.getOrElse(false)) {
+          controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
+            .onPageLoad(srn, index, NormalMode)
+            .url
         } else {
-          val countMemberDetails = memberDetails.size
-          val countCompletedMembers = userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty).size
-          if (countMemberDetails > countCompletedMembers) {
-            InProgress
-          } else {
-            Recorded(countCompletedMembers, "members")
-          }
+          controllers.nonsipp.memberdetails.routes.NoNINOController
+            .onPageLoad(srn, index, NormalMode)
+            .url
         }
+      }
+    )
+
+    (membersDetailsPages, numRecorded) match {
+      case (None, 0) => (NotStarted, firstQuestionPageUrl)
+      case (Some(memberDetails), 0) if memberDetails.isEmpty => (NotStarted, firstQuestionPageUrl) //Last member removed
+      case (Some(_), 0) => (InProgress, inProgressCalculatedUrl)
+      case (Some(_), _) => (Recorded(numRecorded, "members"), listPageUrl)
     }
   }
 
@@ -132,17 +152,15 @@ object TaskListStatusUtils {
     }
   }
 
-  def getNotStartedOrCannotStartYetStatus(userAnswers: UserAnswers, srn: Srn): TaskListStatus =
-    getMembersTaskListStatus(userAnswers, srn) match {
+  private def getNotStartedOrCannotStartYetStatus(userAnswers: UserAnswers, srn: Srn): TaskListStatus =
+    getMembersTaskListStatusAndLink(userAnswers, srn)._1 match {
       case TaskListStatus.InProgress =>
         userAnswers.get(MembersDetailsCompletedPages(srn)) match {
           case Some(completed) => TaskListStatus.NotStarted
           case None => TaskListStatus.UnableToStart
         }
-      case TaskListStatus.Completed => TaskListStatus.NotStarted
       case TaskListStatus.Recorded(_, _) => TaskListStatus.NotStarted
-      case TaskListStatus.UnableToStart => TaskListStatus.UnableToStart
-      case TaskListStatus.NotStarted => TaskListStatus.UnableToStart
+      case _ => TaskListStatus.UnableToStart
     }
 
   def getEmployerContributionStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
@@ -436,6 +454,31 @@ object TaskListStatusUtils {
           }
         }
     }
+
+  private def getIncompleteMembersIndex(userAnswers: UserAnswers, srn: Srn): Int = {
+    val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
+    val ninoPages = userAnswers.get(MemberDetailsNinoPages(srn))
+    val noNinoPages = userAnswers.get(NoNinoPages(srn))
+    (membersDetailsPages, ninoPages, noNinoPages) match {
+      case (None, _, _) => 1
+      case (Some(_), None, None) => 1
+      case (Some(memberDetails), ninos, noNinos) =>
+        if (memberDetails.isEmpty) {
+          1
+        } else {
+          val memberDetailsIndexes = memberDetails.map(_._1.toInt).toList
+          val ninoIndexes = ninos.getOrElse(List.empty).map(_._1.toInt).toList
+          val noninoIndexes = noNinos.getOrElse(List.empty).map(_._1.toInt).toList
+          val finishedIndexes = ninoIndexes ++ noninoIndexes
+          val filtered = memberDetailsIndexes.filter(finishedIndexes.indexOf(_) < 0)
+          if (filtered.isEmpty) {
+            1
+          } else {
+            filtered.head + 1
+          }
+        }
+    }
+  }
 
   def getSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereShares = userAnswers.get(DidSchemeHoldAnySharesPage(srn))
