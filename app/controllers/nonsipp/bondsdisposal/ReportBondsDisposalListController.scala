@@ -101,14 +101,14 @@ class ReportBondsDisposalListController @Inject()(
   def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
     implicit request: DataRequest[AnyContent]
   ): Result =
-    getDisposals(srn).map { disposals =>
-      val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+    getCompletedDisposals(srn).map { completedDisposals =>
+      val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
       val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
       val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
-      getBondsDisposalsWithIndexes(srn, disposals)
+      getBondsDisposalsWithIndexes(srn, completedDisposals)
         .map(
           bondsDisposalsWithIndexes =>
-            if (viewOnlyViewModel.nonEmpty || disposals.values.exists(_.nonEmpty)) {
+            if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
               Ok(
                 view(
                   form,
@@ -134,9 +134,9 @@ class ReportBondsDisposalListController @Inject()(
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      getDisposals(srn)
-        .traverse { disposals =>
-          val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+      getCompletedDisposals(srn)
+        .traverse { completedDisposals =>
+          val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
           val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
           if (numberOfDisposals == maxPossibleNumberOfDisposals) {
@@ -148,7 +148,7 @@ class ReportBondsDisposalListController @Inject()(
               .bindFromRequest()
               .fold(
                 errors =>
-                  getBondsDisposalsWithIndexes(srn, disposals)
+                  getBondsDisposalsWithIndexes(srn, completedDisposals)
                     .map(
                       indexes =>
                         BadRequest(
@@ -218,7 +218,7 @@ class ReportBondsDisposalListController @Inject()(
       )
     }
 
-  private def getDisposals(srn: Srn)(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
+  private def getCompletedDisposals(srn: Srn)(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
     request.userAnswers
       .map(BondsDisposalProgress.all(srn))
       .map {
