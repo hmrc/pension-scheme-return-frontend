@@ -94,6 +94,7 @@ object TaskListStatusUtils {
       _ => firstQuestionPageUrl,
       index => {
         val doesMemberHaveNino = userAnswers.get(DoesMemberHaveNinoPage(srn, index))
+        val reasonNoNino = userAnswers.get(NoNINOPage(srn, index))
         if (doesMemberHaveNino.isEmpty) {
           controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
             .onPageLoad(srn, index, NormalMode)
@@ -102,8 +103,12 @@ object TaskListStatusUtils {
           controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
             .onPageLoad(srn, index, NormalMode)
             .url
-        } else {
+        } else if (reasonNoNino.isEmpty) {
           controllers.nonsipp.memberdetails.routes.NoNINOController
+            .onPageLoad(srn, index, NormalMode)
+            .url
+        } else {
+          controllers.nonsipp.memberdetails.routes.SchemeMemberDetailsAnswersController
             .onPageLoad(srn, index, NormalMode)
             .url
         }

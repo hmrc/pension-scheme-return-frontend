@@ -218,7 +218,9 @@ class ReportBondsDisposalListController @Inject()(
       )
     }
 
-  private def getCompletedDisposals(srn: Srn)(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
+  private def getCompletedDisposals(
+    srn: Srn
+  )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
     request.userAnswers
       .map(BondsDisposalProgress.all(srn))
       .map {
