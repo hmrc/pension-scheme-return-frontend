@@ -296,6 +296,52 @@ trait CommonTestValues {
       |]
       |""".stripMargin
   )
+  val getVersionsForYearsJsonWithInvalidFirstName: JsValue = Json.parse(
+    """
+      |[
+      |    {
+      |        "startDate": "2020-04-06",
+      |        "data": [
+      |           {
+      |                "reportFormBundleNumber": "223456785022",
+      |                "reportVersion": 2,
+      |                "reportStatus": "SubmittedAndSuccessfullyProcessed",
+      |                "compilationOrSubmissionDate": "2020-04-07T12:00:00",
+      |                "reportSubmitterDetails": {
+      |                    "reportSubmittedBy": "PSP",
+      |                    "individualDetails": {
+      |                        "firstName": 1,
+      |                        "lastName": "last"
+      |                    }
+      |                },
+      |                "psaDetails": {
+      |                    "psaOrganisationOrPartnershipDetails": {
+      |                        "organisationOrPartnershipName": "psaOrgName"
+      |                    }
+      |                }
+      |            },
+      |            {
+      |                "reportFormBundleNumber": "123456785011",
+      |                "reportVersion": 1,
+      |                "reportStatus": "SubmittedAndSuccessfullyProcessed",
+      |                "compilationOrSubmissionDate": "2020-04-06T12:00:00",
+      |                "reportSubmitterDetails": {
+      |                    "reportSubmittedBy": "PSP",
+      |                    "organisationOrPartnershipDetails": {
+      |                        "organisationOrPartnershipName": "pspOrgName"
+      |                    }
+      |                },
+      |                "psaDetails": {
+      |                    "psaOrganisationOrPartnershipDetails": {
+      |                        "organisationOrPartnershipName": "psaOrgName"
+      |                    }
+      |                }
+      |            }
+      |        ]
+      |    }
+      |]
+      |""".stripMargin
+  )
   val getVersionsForYears403Json: JsValue = Json.parse(
     """
       |{

@@ -65,7 +65,7 @@ class MinimalDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: 
         case e @ WithStatusCode(FORBIDDEN) if e.message.contains(Constants.delimitedPSA) =>
           Left(DelimitedAdmin)
       }
-      .tapError(_ => Future.successful(logger.error(s"Failed to fetch minimal details for $idType and $idValue")))
+      .tapError(_ => Future.successful(logger.warn(s"Failed to fetch minimal details for $idType and $idValue")))
 }
 
 @ImplementedBy(classOf[MinimalDetailsConnectorImpl])
