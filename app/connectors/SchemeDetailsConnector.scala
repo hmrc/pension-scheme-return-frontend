@@ -56,7 +56,7 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
       .execute[Option[SchemeDetails]]
       .tapError { t =>
         Future.successful(
-          logger.error(s"Failed to fetch scheme details $schemeId for psa with message ${t.getMessage}")
+          logger.warn(s"Failed to fetch scheme details $schemeId for psa with message ${t.getMessage}")
         )
       }
 
@@ -76,7 +76,7 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
       .execute[Option[SchemeDetails]]
       .tapError { t =>
         Future.successful(
-          logger.error(s"Failed to fetch scheme details $schemeId for psp with message ${t.getMessage}")
+          logger.warn(s"Failed to fetch scheme details $schemeId for psp with message ${t.getMessage}")
         )
       }
 

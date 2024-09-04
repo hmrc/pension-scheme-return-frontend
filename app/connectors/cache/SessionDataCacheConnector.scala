@@ -39,13 +39,13 @@ class SessionDataCacheConnectorImpl @Inject()(config: FrontendAppConfig, http: H
     http
       .get(url"${url(cacheId)}")
       .execute[Option[SessionData]]
-      .tapError(t => Future.successful(logger.error(s"Failed to fetch $cacheId with message ${t.getMessage}")))
+      .tapError(t => Future.successful(logger.warn(s"Failed to fetch $cacheId with message ${t.getMessage}")))
 
   override def remove(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
       .delete(url"${url(cacheId)}")
       .execute[Unit]
-      .tapError(t => Future.successful(logger.error(s"Failed to delete $cacheId with message ${t.getMessage}")))
+      .tapError(t => Future.successful(logger.warn(s"Failed to delete $cacheId with message ${t.getMessage}")))
 }
 
 @ImplementedBy(classOf[SessionDataCacheConnectorImpl])

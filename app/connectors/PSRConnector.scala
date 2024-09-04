@@ -121,20 +121,20 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
                 response.json
                   .as[Seq[PsrVersionsForYearsResponse]]
               case JsError(errors) =>
-                logger.error(
+                logger.warn(
                   s"getVersions for $pstr and years $startDates returned http response 200 but could not parse the response body"
                 )
                 throw JsResultException(errors)
             }
           case NOT_FOUND =>
-            logger.error(
+            logger.warn(
               s"getVersions for $pstr and years $startDates returned http response 404 - returning empty Seq"
             )
             Seq.empty[PsrVersionsForYearsResponse]
           case _ =>
             // TODO verify if there are still 503 returned on QA
             // just logging errors to be able to continue on QA env
-            logger.error(
+            logger.warn(
               s"getVersions for $pstr and years $startDates returned http response ${response.status} - returning empty Seq"
             )
             Seq.empty[PsrVersionsForYearsResponse]
@@ -156,18 +156,18 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
                 response.json
                   .as[Seq[PsrVersionsResponse]]
               case JsError(errors) =>
-                logger.error(
+                logger.warn(
                   s"getVersions for $pstr and $startDate returned http response 200 but could not parse the response body"
                 )
                 throw JsResultException(errors)
             }
           case NOT_FOUND =>
-            logger.error(s"getVersions for $pstr and $startDate returned http response 404 - returning empty Seq")
+            logger.warn(s"getVersions for $pstr and $startDate returned http response 404 - returning empty Seq")
             Seq.empty[PsrVersionsResponse]
           case _ =>
             // TODO verify if there are still 503 returned on QA
             // just logging errors to be able to continue on QA env
-            logger.error(
+            logger.warn(
               s"getVersions for $pstr and $startDate returned http response ${response.status} - returning empty Seq"
             )
             Seq.empty[PsrVersionsResponse]
@@ -196,7 +196,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
               case JsError(errors) => throw JsResultException(errors)
             }
           case _ =>
-            logger.error(
+            logger.warn(
               s"getOverview for $pstr and $fromDate - $toDate returned http response ${response.status} - returning empty Seq"
             )
             None
