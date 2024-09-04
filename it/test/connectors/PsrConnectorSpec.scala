@@ -20,9 +20,10 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import org.scalatest.exceptions.TestFailedException
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
+import play.api.libs.json.{JsResultException, Json, JsonValidationError, __}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.CommonTestValues
@@ -208,6 +209,24 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
       val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate)).futureValue
 
       result mustBe List()
+    }
+
+    "return JsResultException when the first name is invalid" in runningApplication { implicit app =>
+      stubGet(
+        getVersionsForYearsUrl,
+        ok(Json.stringify(getVersionsForYearsJsonWithInvalidFirstName))
+      )
+
+      val err: TestFailedException = intercept[TestFailedException](
+        connector.getVersionsForYears(commonPstr, Seq(commonStartDate)).futureValue
+      )
+
+      err.cause match {
+        case Some(JsResultException(List((path, List(JsonValidationError(List(jsErr))))))) =>
+          path mustBe __ \ 0 \ "data" \ 0 \ "reportSubmitterDetails" \ "individualDetails" \ "firstName"
+          jsErr mustBe "error.expected.jsstring"
+        case _ => fail("Expected JsResultException with a single error")
+      }
     }
   }
 
