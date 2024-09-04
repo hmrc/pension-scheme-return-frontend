@@ -79,15 +79,15 @@ class UploadRepository @Inject()(
       .map(_ => ())
 
   def getUploadDetails(key: UploadKey): Future[Option[UploadDetails]] =
-    collection.find(equal("id", key.toBson())).headOption().map(_.map(toUploadDetails))
+    collection.find(equal("id", key.toBson)).headOption().map(_.map(toUploadDetails))
 
   def updateStatus(reference: Reference, newStatus: UploadStatus): Future[Unit] =
     collection
       .findOneAndUpdate(
-        filter = equal("reference", reference.toBson()),
+        filter = equal("reference", reference.toBson),
         update = combine(
-          set("status", SensitiveUploadStatus(newStatus).toBson()),
-          set("lastUpdated", Instant.now(clock).toBson())
+          set("status", SensitiveUploadStatus(newStatus).toBson),
+          set("lastUpdated", Instant.now(clock).toBson)
         ),
         options = FindOneAndUpdateOptions().upsert(false)
       )
@@ -97,10 +97,10 @@ class UploadRepository @Inject()(
   def setUploadResult(key: UploadKey, result: Upload): Future[Unit] =
     collection
       .findOneAndUpdate(
-        filter = equal("id", key.toBson()),
+        filter = equal("id", key.toBson),
         update = combine(
-          set("result", SensitiveUpload(result).toBson()),
-          set("lastUpdated", Instant.now(clock).toBson())
+          set("result", SensitiveUpload(result).toBson),
+          set("lastUpdated", Instant.now(clock).toBson)
         )
       )
       .toFuture()
@@ -108,13 +108,13 @@ class UploadRepository @Inject()(
 
   def getUploadResult(key: UploadKey): Future[Option[Upload]] =
     collection
-      .find(equal("id", key.value.toBson()))
+      .find(equal("id", key.value.toBson))
       .headOption()
       .map(_.flatMap(_.result.map(_.decryptedValue)))
 
   def remove(key: UploadKey): Future[Unit] =
     collection
-      .deleteOne(equal("id", key.toBson()))
+      .deleteOne(equal("id", key.toBson))
       .toFuture()
       .map(_ => ())
 
