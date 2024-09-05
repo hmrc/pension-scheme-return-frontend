@@ -16,20 +16,17 @@
 
 package utils.nonsipp
 
-import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
+import pages.nonsipp.schemedesignatory._
+import pages.nonsipp.bonds.BondsCompleted
 import viewmodels.implicits._
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
 import pages.nonsipp.otherassetsheld.OtherAssetsCompleted
-import config.Refined.OneTo300
 import utils.nonsipp.TaskListStatusUtils._
 import pages.nonsipp.landorproperty.LandOrPropertyCompleted
-import eu.timepit.refined.refineV
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import pages.nonsipp.CheckReturnDatesPage
 import models._
 import viewmodels.models.TaskListStatus._
-import pages.nonsipp.bonds.BondsCompleted
-import pages.nonsipp.memberdetails._
 import cats.data.NonEmptyList
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage._
@@ -94,11 +91,11 @@ object TaskListUtils {
 
     val sectionListWithoutDeclaration = getSectionListWithoutDeclaration(srn, schemeName, userAnswers, pensionSchemeId)
 
-    val (numberOfCompletedWithoutDeclaration, numberOfTotalWithoutDeclaration) = evaluateCompletedTotalTuple(
+    val (numSectionsReadyForSubmission, numSectionsTotal) = evaluateReadyForSubmissionTotalTuple(
       sectionListWithoutDeclaration
     )
 
-    val isLinkActive = numberOfTotalWithoutDeclaration == numberOfCompletedWithoutDeclaration
+    val isLinkActive = numSectionsTotal == numSectionsReadyForSubmission
 
     val declarationSectionViewModel =
       getDeclarationSection(
@@ -134,33 +131,44 @@ object TaskListUtils {
     userAnswers: UserAnswers,
     pensionSchemeId: PensionSchemeId
   ): TaskListItemViewModel = {
+
+    val checkReturnDates = userAnswers.get(CheckReturnDatesPage(srn))
+    val accountingPeriods = userAnswers.get(AccountingPeriods(srn))
     val activeBankAccount = userAnswers.get(ActiveBankAccountPage(srn))
-    val whyNoBankAccountPage = userAnswers.get(WhyNoBankAccountPage(srn))
+    val whyNoBankAccount = userAnswers.get(WhyNoBankAccountPage(srn))
+    val howManyMembers = userAnswers.get(HowManyMembersPage(srn, pensionSchemeId))
 
     val taskListStatus: TaskListStatus =
-      getBasicSchemeDetailsTaskListStatus(srn, userAnswers, pensionSchemeId, activeBankAccount, whyNoBankAccountPage)
+      getBasicDetailsTaskListStatus(
+        checkReturnDates,
+        accountingPeriods,
+        activeBankAccount,
+        whyNoBankAccount,
+        howManyMembers
+      )
 
     TaskListItemViewModel(
       LinkMessage(
         Message(messageKey(prefix, "details.title", taskListStatus), schemeName),
         taskListStatus match {
-          case Completed =>
+          case Recorded =>
             controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode).url
-          case _ =>
-            val checkReturnDates = userAnswers.get(CheckReturnDatesPage(srn))
-            lazy val accountingPeriods = userAnswers.get(AccountingPeriods(srn))
-
+          case InProgress =>
             if (checkReturnDates.isEmpty) {
               controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
-            } else if (!checkReturnDates.get && accountingPeriods.isEmpty) {
+            } else if (!checkReturnDates.get && accountingPeriods.getOrElse(List.empty).isEmpty) {
               controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
             } else if (activeBankAccount.isEmpty) {
               controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode).url
-            } else if (!activeBankAccount.get && whyNoBankAccountPage.isEmpty) {
+            } else if (!activeBankAccount.get && whyNoBankAccount.isEmpty) {
               controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode).url
-            } else {
+            } else if (howManyMembers.isEmpty) {
               controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, NormalMode).url
+            } else {
+              controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
             }
+          case _ =>
+            controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       ),
       taskListStatus
@@ -174,7 +182,12 @@ object TaskListUtils {
     userAnswers: UserAnswers
   ): TaskListItemViewModel = {
 
-    val taskListStatus: TaskListStatus = getFinancialDetailsTaskListStatus(userAnswers, srn)
+    val howMuchCash = userAnswers.get(HowMuchCashPage(srn, NormalMode))
+    val valueOfAssets = userAnswers.get(ValueOfAssetsPage(srn, NormalMode))
+    val feesCommissionsWagesSalaries = userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
+
+    val taskListStatus: TaskListStatus =
+      getFinancialDetailsTaskListStatus(howMuchCash, valueOfAssets, feesCommissionsWagesSalaries)
 
     TaskListItemViewModel(
       LinkMessage(
@@ -182,19 +195,22 @@ object TaskListUtils {
         taskListStatus match {
           case NotStarted =>
             controllers.nonsipp.schemedesignatory.routes.HowMuchCashController.onPageLoad(srn, NormalMode).url
-          case Completed =>
+          case Recorded =>
             controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
               .onPageLoad(srn, NormalMode)
               .url
-          case _ =>
-            val valueOfAssets = userAnswers.get(ValueOfAssetsPage(srn, NormalMode))
-            if (valueOfAssets.isEmpty) {
+          case InProgress =>
+            if (howMuchCash.isEmpty) {
+              controllers.nonsipp.schemedesignatory.routes.HowMuchCashController.onPageLoad(srn, NormalMode).url
+            } else if (valueOfAssets.isEmpty) {
               controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController.onPageLoad(srn, NormalMode).url
             } else {
               controllers.nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController
                 .onPageLoad(srn, NormalMode)
                 .url
             }
+          case _ =>
+            controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       ),
       taskListStatus
@@ -203,92 +219,46 @@ object TaskListUtils {
 
   private def membersSection(srn: Srn, schemeName: String, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.members"
-    val taskListStatus = getMembersTaskListStatus(userAnswers, srn)
+    val (membersStatus, membersLink) = getMembersTaskListStatusAndLink(userAnswers, srn)
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          Message(messageKey(prefix, "details.title", taskListStatus), schemeName),
-          taskListStatus match {
-            case NotStarted =>
-              controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn).url
-            case Completed =>
-              controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-                .onPageLoad(srn, 1, ManualOrUpload.Manual)
-                .url
-            case _ =>
-              val incompleteIndex = getIncompleteMembersIndex(userAnswers, srn)
-              refineV[OneTo300](incompleteIndex).fold(
-                _ =>
-                  controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-                    .onPageLoad(srn, 1, ManualOrUpload.Manual)
-                    .url,
-                index => {
-                  val doesMemberHaveNino = userAnswers.get(DoesMemberHaveNinoPage(srn, index))
-                  if (doesMemberHaveNino.isEmpty) {
-                    controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
-                      .onPageLoad(srn, index, NormalMode)
-                      .url
-                  } else if (doesMemberHaveNino.getOrElse(false)) {
-                    controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
-                      .onPageLoad(srn, index, NormalMode)
-                      .url
-                  } else {
-                    controllers.nonsipp.memberdetails.routes.NoNINOController
-                      .onPageLoad(srn, index, NormalMode)
-                      .url
-                  }
-                }
-              )
-          }
+          Message(messageKey(prefix, "details.title", membersStatus), schemeName),
+          membersLink
         ),
-        taskListStatus
+        membersStatus
       )
     )
-  }
-
-  private def getIncompleteMembersIndex(userAnswers: UserAnswers, srn: Srn): Int = {
-    val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
-    val ninoPages = userAnswers.get(MemberDetailsNinoPages(srn))
-    val noNinoPages = userAnswers.get(NoNinoPages(srn))
-    (membersDetailsPages, ninoPages, noNinoPages) match {
-      case (None, _, _) => 1
-      case (Some(_), None, None) => 1
-      case (Some(memberDetails), ninos, noNinos) =>
-        if (memberDetails.isEmpty) {
-          1
-        } else {
-          val memberDetailsIndexes = memberDetails.map(_._1.toInt).toList
-          val ninoIndexes = ninos.getOrElse(List.empty).map(_._1.toInt).toList
-          val noninoIndexes = noNinos.getOrElse(List.empty).map(_._1.toInt).toList
-          val finishedIndexes = ninoIndexes ++ noninoIndexes
-          val filtered = memberDetailsIndexes.filter(finishedIndexes.indexOf(_) < 0)
-          if (filtered.isEmpty) {
-            1
-          } else {
-            filtered.head + 1
-          }
-        }
-    }
   }
 
   private def memberPaymentsSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.memberpayments"
 
     // change to check if members section is complete to start
-    val (employerContributionStatus, employerContributionLink) = getEmployerContributionStatusAndLink(userAnswers, srn)
+    val (employerContributionStatus, employerContributionLink) =
+      getEmployerContributionStatusAndLink(userAnswers, srn)
 
-    val (transferInStatus, transferInLink) = getTransferInStatusAndLink(userAnswers, srn)
-    val (transferOutStatus, transferOutLink) = getTransferOutStatusAndLink(userAnswers, srn)
-
-    val (memberContributionStatus, memberContributionLink) = getMemberContributionStatusAndLink(userAnswers, srn)
-    val (pclsMemberStatus, pclsMemberLink) = getPclsStatusAndLink(userAnswers, srn)
-
-    val (surrenderedBenefitsStatus, surrenderedBenefitsLink) = getSurrenderedBenefitsStatusAndLink(userAnswers, srn)
-
-    val (pensionPaymentsStatus, pensionPaymentsLink) = getPensionPaymentsStatusAndLink(userAnswers, srn)
     val (unallocatedContributionsStatus, unallocatedContributionsLink) =
       getUnallocatedContributionsStatusAndLink(userAnswers, srn)
+
+    val (memberContributionStatus, memberContributionLink) =
+      getMemberContributionStatusAndLink(userAnswers, srn)
+
+    val (transferInStatus, transferInLink) =
+      getTransferInStatusAndLink(userAnswers, srn)
+
+    val (transferOutStatus, transferOutLink) =
+      getTransferOutStatusAndLink(userAnswers, srn)
+
+    val (pclsMemberStatus, pclsMemberLink) =
+      getPclsStatusAndLink(userAnswers, srn)
+
+    val (pensionPaymentsStatus, pensionPaymentsLink) =
+      getPensionPaymentsStatusAndLink(userAnswers, srn)
+
+    val (surrenderedBenefitsStatus, surrenderedBenefitsLink) =
+      getSurrenderedBenefitsStatusAndLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -353,34 +323,24 @@ object TaskListUtils {
 
   private def loansSection(srn: Srn, schemeName: String, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = s"nonsipp.tasklist.loans"
-    val taskListStatus: TaskListStatus = getLoansTaskListStatus(userAnswers, srn)
-    val borrowingStatus = getBorrowingTaskListStatusAndLink(userAnswers, srn)
+    val (loansStatus, loansLink) = getLoansTaskListStatusAndLink(userAnswers, srn)
+    val (borrowingStatus, borrowingLink) = getBorrowingTaskListStatusAndLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          Message(messageKey(prefix, "loansmade.title", taskListStatus), schemeName),
-          taskListStatus match {
-            case NotStarted =>
-              controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
-                .onPageLoad(srn, NormalMode)
-                .url
-            case Completed =>
-              controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
-                .onPageLoad(srn, 1, NormalMode)
-                .url
-            case InProgress => getIncompleteLoansLink(userAnswers, srn)
-          }
+          Message(messageKey(prefix, "loansmade.title", loansStatus), schemeName),
+          loansLink
         ),
-        taskListStatus
+        loansStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
-          Message(messageKey(prefix, "moneyborrowed.title", borrowingStatus._1), schemeName),
-          borrowingStatus._2
+          Message(messageKey(prefix, "moneyborrowed.title", borrowingStatus), schemeName),
+          borrowingLink
         ),
-        borrowingStatus._1
+        borrowingStatus
       )
     )
   }
@@ -535,10 +495,15 @@ object TaskListUtils {
       case _ => s"$prefix.change.$suffix"
     }
 
-  def evaluateCompletedTotalTuple(sections: List[TaskListSectionViewModel]): (Int, Int) = {
+  def evaluateReadyForSubmissionTotalTuple(sections: List[TaskListSectionViewModel]): (Int, Int) = {
     val items = sections.flatMap(_.items.fold(_ => Nil, _.toList))
-    val numberOfCompleted = items.count(_.status == Completed)
-    val numberOfTotal = items.length
-    (numberOfCompleted, numberOfTotal)
+    val numSectionsTotal = items.length
+    val numSectionsUnableToStart = items.count(_.status == UnableToStart)
+    val numSectionsNotStarted = items.count(_.status == NotStarted)
+    val numSectionsInProgress = items.count(_.status == InProgress)
+    val numSectionsReadyForSubmission =
+      numSectionsTotal - (numSectionsUnableToStart + numSectionsNotStarted + numSectionsInProgress)
+
+    (numSectionsReadyForSubmission, numSectionsTotal)
   }
 }

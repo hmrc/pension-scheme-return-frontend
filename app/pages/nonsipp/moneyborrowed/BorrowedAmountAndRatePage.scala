@@ -29,8 +29,3 @@ case class BorrowedAmountAndRatePage(srn: Srn, index: Max5000) extends QuestionP
 
   override def toString: String = "interestRate"
 }
-case class BorrowedAmountAndRatePages(srn: Srn) extends QuestionPage[Map[String, (Money, Percentage)]] {
-  override def path: JsPath = Paths.moneyBorrowed \ toString
-
-  override def toString: String = "interestRate"
-}

@@ -21,7 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
 import controllers.{nonsipp, PSRController}
-import utils.nonsipp.TaskListStatusUtils.getBasicDetailsTaskListStatus
+import utils.nonsipp.TaskListStatusUtils.getBasicDetailsCompletedOrUpdated
 import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
@@ -105,7 +105,7 @@ class BasicDetailsCheckYourAnswersController @Inject()(
                       request.pensionSchemeId,
                       request.pensionSchemeId.isPSP,
                       viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-                        getBasicDetailsTaskListStatus(currentUserAnswers, request.previousUserAnswers.get) == Updated
+                        getBasicDetailsCompletedOrUpdated(currentUserAnswers, request.previousUserAnswers.get) == Updated
                       } else {
                         false
                       },

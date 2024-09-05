@@ -65,7 +65,7 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
         (
           for {
             indexes <- userAnswers
-              .map(BorrowedAmountAndRatePages(srn))
+              .map(LenderNamePages(srn))
               .keys
               .toList
               .traverse(_.toIntOption)
