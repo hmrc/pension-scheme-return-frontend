@@ -162,8 +162,10 @@ object TaskListUtils {
               controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode).url
             } else if (!activeBankAccount.get && whyNoBankAccount.isEmpty) {
               controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode).url
-            } else {
+            } else if (howManyMembers.isEmpty) {
               controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, NormalMode).url
+            } else {
+              controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
             }
           case _ =>
             controllers.routes.JourneyRecoveryController.onPageLoad().url
