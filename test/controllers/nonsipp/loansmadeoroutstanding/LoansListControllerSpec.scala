@@ -79,6 +79,15 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(SecurityGivenForLoanPage(srn, indexThree), ConditionalYesNo.yes[Unit, Security](security))
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, indexThree), ConditionalYesNo.yes[Unit, Money](money))
 
+  private val inProgressUserAnswers = defaultUserAnswers
+    .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+    .unsafeSet(IdentityTypePage(srn, indexOne, subject), IdentityType.Individual)
+    .unsafeSet(IndividualRecipientNamePage(srn, indexOne), "recipientName3")
+    .unsafeSet(IndividualRecipientNinoPage(srn, indexOne), ConditionalYesNo.yes[String, Nino](ninoGen.sample.value))
+    .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, indexOne), false)
+    .unsafeSet(DatePeriodLoanPage(srn, indexOne), (localDate, money, loanPeriod))
+    .unsafeSet(AmountOfTheLoanPage(srn, indexOne), (money, money, money))
+
   private lazy val onPageLoad = routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.LoansListController.onSubmit(srn, page = 1, NormalMode)
   private lazy val onLoansMadePageLoad = routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
@@ -133,15 +142,14 @@ class LoansListControllerSpec extends ControllerBaseSpec {
       )
     }.withName("Completed Journey"))
 
-    // Todo: Uncomment and fix as part of [1387]
-//    act.like(
-//      redirectToPage(
-//        onPageLoad,
-//        controllers.nonsipp.common.routes.IdentityTypeController
-//          .onPageLoad(srn, indexThree, NormalMode, IdentitySubject.LoanRecipient),
-//        completedUserAnswers.remove(OutstandingArrearsOnLoanPage(srn, indexThree)).get
-//      ).withName("Incomplete Journey")
-//    )
+    act.like(
+      redirectToPage(
+        onPageLoad,
+        controllers.nonsipp.common.routes.IdentityTypeController
+          .onPageLoad(srn, indexOne, NormalMode, IdentitySubject.LoanRecipient),
+        inProgressUserAnswers
+      ).withName("Incomplete Journey")
+    )
 
     act.like(
       redirectToPage(
