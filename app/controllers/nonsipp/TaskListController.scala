@@ -105,17 +105,17 @@ object TaskListController {
 
     val sectionList = getSectionList(srn, schemeName, userAnswers, pensionSchemeId, noChangesSincePreviousVersion)
 
-    val (numberOfCompleted, numberOfTotal) = evaluateCompletedTotalTuple(sectionList)
+    val (numSectionsReadyForSubmission, numSectionsTotal) = evaluateReadyForSubmissionTotalTuple(sectionList)
 
-    val allSectionsCompleted = numberOfCompleted == numberOfTotal
+    val allSectionsReadyForSubmission = numSectionsReadyForSubmission == numSectionsTotal
 
     val displayNotSubmittedMessage = (hasHistory, noChangesSincePreviousVersion) match {
-      // In Compile mode, if all sections completed, display message
-      case (false, _) => allSectionsCompleted
+      // In Compile mode, if all sections ready for submission, display message
+      case (false, _) => allSectionsReadyForSubmission
       // In View & Change mode, if userAnswers unchanged, don't display message
       case (true, true) => false
-      // In View & Change mode, if userAnswers changed & all sections completed, display message
-      case (true, false) => allSectionsCompleted
+      // In View & Change mode, if userAnswers changed & all sections ready for submission, display message
+      case (true, false) => allSectionsReadyForSubmission
     }
 
     val historyLink = if (hasHistory) {
@@ -146,6 +146,8 @@ object TaskListController {
       Message("nonsipp.tasklist.title", startDate.show, endDate.show),
       Message("nonsipp.tasklist.heading", startDate.show, endDate.show),
       viewModel
-    ).withDescription(ParagraphMessage(Message("nonsipp.tasklist.description", numberOfCompleted, numberOfTotal)))
+    ).withDescription(
+      ParagraphMessage(Message("nonsipp.tasklist.description", numSectionsReadyForSubmission, numSectionsTotal))
+    )
   }
 }

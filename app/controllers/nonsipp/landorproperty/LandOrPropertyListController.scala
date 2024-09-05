@@ -94,7 +94,12 @@ class LandOrPropertyListController @Inject()(
   ): Result = {
     val userAnswers = request.userAnswers
     val (status, incompleteLandOrPropertyUrl) = getLandOrPropertyTaskListStatusAndLink(userAnswers, srn)
-    if (status == TaskListStatus.Completed) {
+
+    if (status == TaskListStatus.NotStarted) {
+      Redirect(routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode))
+    } else if (status == TaskListStatus.InProgress) {
+      Redirect(incompleteLandOrPropertyUrl)
+    } else {
       val addresses = userAnswers.map(LandOrPropertyAddressLookupPages(srn))
       val viewModel =
         LandOrPropertyListController.viewModel(
@@ -106,10 +111,6 @@ class LandOrPropertyListController @Inject()(
           viewOnlyViewModel
         )
       Ok(view(form, viewModel))
-    } else if (status == TaskListStatus.InProgress) {
-      Redirect(incompleteLandOrPropertyUrl)
-    } else {
-      Redirect(routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode))
     }
   }
 

@@ -23,7 +23,7 @@ import models.SchemeId.Srn
 import eu.timepit.refined.refineV
 import models.{HowDisposed, Money, UserAnswers}
 import pages.nonsipp.bondsdisposal._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import models.requests.DataRequest
 import eu.timepit.refined.api.Refined
 import models.HowDisposed.{Other, Sold}
@@ -256,7 +256,8 @@ class BondsTransformer @Inject() extends Transformer {
 
               for {
                 disposalUA0 <- disposalUA
-                disposalUA1 <- disposalUA0.set(BondsDisposalProgress(srn, index, disposalIndex), SectionCompleted)
+                disposalUA1 <- disposalUA0
+                  .set(BondsDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
                 disposalUA2 <- disposalUA1.set(howWereBondsDisposed._1, howWereBondsDisposed._2)
                 disposalUA3 <- disposalUA2.set(totalNowHeld._1, totalNowHeld._2)
                 disposalUA4 <- optWhenWereBondsSoldPage

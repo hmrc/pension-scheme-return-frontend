@@ -122,7 +122,7 @@ object SharesDisposalListController {
         List[ListRadiosRow]().empty
       } else {
 
-        val isShareShouldBeRemovedFromList = completedDisposalsPerShareKeys.toList
+        val isShareShouldBeRemovedFromList = completedDisposalsPerShareKeys
           .map(_.toIntOption)
           .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
           .flatMap(

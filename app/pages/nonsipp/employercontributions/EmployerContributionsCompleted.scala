@@ -25,7 +25,6 @@ import viewmodels.models.SectionCompleted
 import config.Refined.{Max300, Max50}
 import pages.{IndexedQuestionPage, QuestionPage}
 
-// TODO: deprecated in favour of EmployerContributionsProgress
 case class EmployerContributionsCompleted(srn: Srn, memberIndex: Max300, secondaryIndex: Max50)
     extends QuestionPage[SectionCompleted.type] {
 
@@ -35,6 +34,14 @@ case class EmployerContributionsCompleted(srn: Srn, memberIndex: Max300, seconda
 }
 
 object EmployerContributionsCompleted {
+  def all(srn: Srn): IndexedQuestionPage[Map[String, SectionCompleted.type]] =
+    new IndexedQuestionPage[Map[String, SectionCompleted.type]] {
+
+      override def path: JsPath = JsPath \ toString
+
+      override def toString: String = "employerContributionsCompleted"
+    }
+
   def all(srn: Srn, memberIndex: Max300): IndexedQuestionPage[SectionCompleted.type] =
     new IndexedQuestionPage[SectionCompleted.type] {
 

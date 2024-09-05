@@ -100,7 +100,11 @@ class BorrowInstancesListController @Inject()(
 
         val (borrowingStatus, incompleteBorrowingUrl) = getBorrowingTaskListStatusAndLink(request.userAnswers, srn)
 
-        if (borrowingStatus == TaskListStatus.Completed) {
+        if (borrowingStatus == TaskListStatus.NotStarted) {
+          Redirect(controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode))
+        } else if (borrowingStatus == TaskListStatus.InProgress) {
+          Redirect(incompleteBorrowingUrl)
+        } else {
           borrowDetails(srn)
             .map(
               instances =>
@@ -119,10 +123,6 @@ class BorrowInstancesListController @Inject()(
                 )
             )
             .merge
-        } else if (borrowingStatus == TaskListStatus.InProgress) {
-          Redirect(incompleteBorrowingUrl)
-        } else {
-          Redirect(controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode))
         }
       }
     }.merge

@@ -20,14 +20,9 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import controllers.PSRController
-import utils.nonsipp.TaskListStatusUtils.{
-  getCompletedOrUpdatedTaskListStatus,
-  getIncompleteLoansLink,
-  getLoansTaskListStatus
-}
+import utils.nonsipp.TaskListStatusUtils.{getCompletedOrUpdatedTaskListStatus, getLoansTaskListStatusAndLink}
 import cats.implicits._
 import _root_.config.Constants
-import pages.nonsipp.accountingperiod.AccountingPeriodListPage
 import _root_.config.Constants.maxLoans
 import forms.YesNoPageFormProvider
 import pages.nonsipp.loansmadeoroutstanding._
@@ -104,8 +99,12 @@ class LoansListController @Inject()(
       if (viewOnlyViewModel.isEmpty && recipients.isEmpty) {
         Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
       } else {
-        val status = getLoansTaskListStatus(request.userAnswers, srn)
-        if (status == TaskListStatus.Completed) {
+        val (loansStatus, incompleteLoansUrl) = getLoansTaskListStatusAndLink(request.userAnswers, srn)
+        if (loansStatus == TaskListStatus.NotStarted) {
+          Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
+        } else if (loansStatus == TaskListStatus.InProgress) {
+          Redirect(incompleteLoansUrl)
+        } else {
           loanRecipients(srn)
             .map(
               recipients =>
@@ -124,10 +123,6 @@ class LoansListController @Inject()(
                 )
             )
             .merge
-        } else if (status == TaskListStatus.InProgress) {
-          Redirect(getIncompleteLoansLink(request.userAnswers, srn))
-        } else {
-          Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
         }
       }
     }.merge
@@ -135,7 +130,7 @@ class LoansListController @Inject()(
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     loanRecipients(srn).map { recipients =>
       if (recipients.length == maxLoans) {
-        Redirect(navigator.nextPage(AccountingPeriodListPage(srn, addPeriod = false, mode), mode, request.userAnswers))
+        Redirect(navigator.nextPage(LoansListPage(srn, addLoan = false), mode, request.userAnswers))
       } else {
 
         val viewModel =

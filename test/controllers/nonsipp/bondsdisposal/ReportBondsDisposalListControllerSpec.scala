@@ -23,7 +23,7 @@ import views.html.ListView
 import eu.timepit.refined.refineMV
 import models._
 import pages.nonsipp.bondsdisposal._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
@@ -84,10 +84,10 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(BondsDisposalPage(srn), true)
     //Bond 1 - disposal data 1
     .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne), HowDisposed.Sold)
-    .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne), SectionCompleted)
+    .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne), SectionJourneyStatus.Completed)
     //Bond 1 - disposal data 2
     .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexTwo), HowDisposed.Sold)
-    .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexTwo), SectionCompleted)
+    .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexTwo), SectionJourneyStatus.Completed)
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
@@ -218,5 +218,4 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
       )
     )
   }
-
 }

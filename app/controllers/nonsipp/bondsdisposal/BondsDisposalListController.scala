@@ -111,13 +111,15 @@ object BondsDisposalListController {
     bondsList.flatMap { bondsData =>
       val completedDisposalsPerBondKeys = userAnswers
         .map(BondsDisposalProgress.all(srn, bondsData.index))
-        .keys
+        .toList
+        .filter(progress => progress._2.completed)
+        .map(_._1)
 
       if (maxDisposalPerBond == completedDisposalsPerBondKeys.size) {
         List[ListRadiosRow]().empty
       } else {
 
-        val isBondShouldBeRemovedFromList = completedDisposalsPerBondKeys.toList
+        val isBondShouldBeRemovedFromList = completedDisposalsPerBondKeys
           .map(_.toIntOption)
           .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
           .flatMap(_.map(disposalIndex => userAnswers.get(BondsStillHeldPage(srn, bondsData.index, disposalIndex))))

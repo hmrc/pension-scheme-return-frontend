@@ -88,4 +88,15 @@ object TaskListStatus {
   case object Completed extends TaskListStatus("tasklist.completed")
 
   case object Updated extends TaskListStatus("tasklist.updated")
+
+  case object Recorded extends TaskListStatus("tasklist.recorded")
+
+  case class Recorded(numRecorded: Int, itemKey: String)
+      extends TaskListStatus(
+        numRecorded match {
+          case 0 => Message("tasklist.noneRecorded")
+          case 1 => Message("tasklist.numItems", numRecorded, itemKey ++ ".singular")
+          case _ => Message("tasklist.numItems", numRecorded, itemKey ++ ".plural")
+        }
+      )
 }

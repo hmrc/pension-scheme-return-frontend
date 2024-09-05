@@ -115,16 +115,15 @@ class LandOrPropertyDisposalListController @Inject()(
   private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
     implicit request: DataRequest[_]
   ): Result = {
-    val (status, incompleteDisposalUrl) = getLandOrPropertyDisposalsTaskListStatusWithLink(request.userAnswers, srn)
-
+    val (status, _) = getLandOrPropertyDisposalsTaskListStatusWithLink(request.userAnswers, srn)
     logger.info(s"Land or property disposal status is $status")
 
-    if (viewOnlyViewModel.nonEmpty || status == TaskListStatus.Completed) {
-      getDisposals(srn).map { disposals =>
-        val numberOfDisposal = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+    getCompletedDisposals(srn).map { completedDisposals =>
+      if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
+        val numberOfDisposal = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
         val numberOfAddresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
         val maxPossibleNumberOfDisposals = maxLandOrPropertyDisposals * numberOfAddresses
-        getAddressesWithIndexes(srn, disposals).map { indexes =>
+        getAddressesWithIndexes(srn, completedDisposals).map { indexes =>
           Ok(
             view(
               form,
@@ -141,17 +140,15 @@ class LandOrPropertyDisposalListController @Inject()(
             )
           )
         }.merge
-      }.merge
-    } else if (status == TaskListStatus.InProgress) {
-      Redirect(incompleteDisposalUrl)
-    } else {
-      Redirect(routes.LandOrPropertyDisposalController.onPageLoad(srn, NormalMode))
-    }
+      } else {
+        Redirect(routes.LandOrPropertyDisposalController.onPageLoad(srn, NormalMode))
+      }
+    }.merge
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    getDisposals(srn).map { disposals =>
-      val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+    getCompletedDisposals(srn).map { completedDisposals =>
+      val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
       val numberOfAddresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
       val maxPossibleNumberOfDisposals = maxLandOrPropertyDisposals * numberOfAddresses
       if (numberOfDisposals == maxPossibleNumberOfDisposals) {
@@ -163,7 +160,7 @@ class LandOrPropertyDisposalListController @Inject()(
           .bindFromRequest()
           .fold(
             errors =>
-              getAddressesWithIndexes(srn, disposals)
+              getAddressesWithIndexes(srn, completedDisposals)
                 .map(
                   indexes =>
                     BadRequest(
@@ -196,7 +193,7 @@ class LandOrPropertyDisposalListController @Inject()(
       )
     }
 
-  private def getDisposals(
+  private def getCompletedDisposals(
     srn: Srn
   )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
     request.userAnswers

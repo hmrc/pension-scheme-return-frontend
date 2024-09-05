@@ -23,7 +23,7 @@ import config.Refined.{Max50, Max5000}
 import models.SchemeId.Srn
 import shapeless.{::, HList, HNil}
 import pages.nonsipp.bondsdisposal._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.SectionJourneyStatus
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.refineMV
 
@@ -40,7 +40,7 @@ class BondsDisposalMongoController @Inject()(
 
   override type Pages =
     PageWithValue[Boolean] ::
-      PageWithValue[SectionCompleted] ::
+      PageWithValue[SectionJourneyStatus] ::
       PageWithValue[HowDisposed] ::
       PageWithValue[Int] ::
       HNil
@@ -50,7 +50,7 @@ class BondsDisposalMongoController @Inject()(
   override def pages(srn: Srn, index: Max5000, secondaryIndex: Max50): Pages = HList(
     (
       PageWithValue(BondsDisposalPage(srn), true),
-      PageWithValue(BondsDisposalProgress(srn, index, secondaryIndex), SectionCompleted),
+      PageWithValue(BondsDisposalProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed),
       PageWithValue(HowWereBondsDisposedOfPage(srn, index, secondaryIndex), Transferred),
       PageWithValue(BondsStillHeldPage(srn, index, secondaryIndex), 3)
     )
