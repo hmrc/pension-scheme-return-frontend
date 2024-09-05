@@ -23,7 +23,6 @@ import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.{getCompletedOrUpdatedTaskListStatus, getLoansTaskListStatusAndLink}
 import cats.implicits._
 import _root_.config.Constants
-import pages.nonsipp.accountingperiod.AccountingPeriodListPage
 import _root_.config.Constants.maxLoans
 import forms.YesNoPageFormProvider
 import pages.nonsipp.loansmadeoroutstanding._
@@ -131,7 +130,7 @@ class LoansListController @Inject()(
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     loanRecipients(srn).map { recipients =>
       if (recipients.length == maxLoans) {
-        Redirect(navigator.nextPage(AccountingPeriodListPage(srn, addPeriod = false, mode), mode, request.userAnswers))
+        Redirect(navigator.nextPage(LoansListPage(srn, addLoan = false), mode, request.userAnswers))
       } else {
 
         val viewModel =
