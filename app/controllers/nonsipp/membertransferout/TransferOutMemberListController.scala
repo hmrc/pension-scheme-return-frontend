@@ -321,6 +321,13 @@ object TransferOutMemberListController {
         ("transferOut.memberList.title.plural", "transferOut.memberList.heading.plural")
       }
 
+    val sumTransfersOut = memberList.flatten.zipWithIndex.map {
+      case (_, index) =>
+        refineV[OneTo300](index + 1).toOption
+          .map(nextIndex => userAnswers.map(ReceivingSchemeNamePages(srn, nextIndex)).size)
+          .getOrElse(0)
+    }.sum
+
     // in view-only mode or with direct url edit page value can be higher than needed
     val currentPage = if ((page - 1) * Constants.transferOutListSize >= memberListSize) 1 else page
 
@@ -405,7 +412,11 @@ object TransferOutMemberListController {
             submittedText =
               compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
             title = "transferOut.memberList.viewOnly.title",
-            heading = "transferOut.memberList.viewOnly.heading",
+            heading = sumTransfersOut match {
+              case 0 => Message("transferOut.memberList.viewOnly.heading")
+              case 1 => Message("transferOut.memberList.viewOnly.singular")
+              case _ => Message("transferOut.memberList.viewOnly.plural", sumTransfersOut)
+            },
             buttonText = "site.return.to.tasklist",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>

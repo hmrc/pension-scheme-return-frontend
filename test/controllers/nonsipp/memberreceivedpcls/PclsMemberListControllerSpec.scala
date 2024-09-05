@@ -32,13 +32,16 @@ import controllers.nonsipp.memberreceivedpcls.PclsMemberListController._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models._
-import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.SectionCompleted
 
 import scala.concurrent.Future
+
+import java.time.LocalDate
 
 class PclsMemberListControllerSpec extends ControllerBaseSpec {
 
@@ -87,6 +90,82 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(PensionCommencementLumpSumPage(srn), true)
 
   "PclsMemberListController" - {
+
+    "viewModel should show 'Pension commencement lump sum' when there are 0 PCLS" in {
+
+      val userAnswersWithNoPcls = userAnswers
+        .unsafeSet(PensionCommencementLumpSumPage(srn), false)
+
+      val memberList: List[Option[NameDOB]] = List.empty
+
+      val result = PclsMemberListController.viewModel(
+        srn,
+        page = 1,
+        ViewOnlyMode,
+        memberList,
+        userAnswersWithNoPcls,
+        viewOnlyUpdated = false,
+        noPageEnabled = true
+      )
+
+      result.optViewOnlyDetails.value.heading mustBe Message("pcls.MemberList.viewOnly.heading")
+      result.page.rows.size mustBe 0
+    }
+
+    "viewModel should show 1 Pension commencement lump sum when there is 1 PCLS" in {
+
+      val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
+
+      val userAnswersWithOnePcls = userAnswers
+        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails1)
+        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+        .unsafeSet(PensionCommencementLumpSumAmountPage(srn, refineMV(1)), pensionCommencementLumpSumGen.sample.value)
+        .unsafeSet(PensionCommencementLumpSumPage(srn), true)
+
+      val memberList: List[Option[NameDOB]] = List(Some(memberDetails1))
+
+      val result = PclsMemberListController.viewModel(
+        srn,
+        page = 1,
+        ViewOnlyMode,
+        memberList,
+        userAnswersWithOnePcls,
+        viewOnlyUpdated = false,
+        noPageEnabled = false
+      )
+
+      result.optViewOnlyDetails.value.heading mustBe Message("pcls.MemberList.viewOnly.withValue", Message("1"))
+      result.page.rows.size mustBe 1
+    }
+
+    "viewModel should show 2 Pension commencement lump sums when there are 2 PCLS" in {
+
+      val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
+      val memberDetails2 = NameDOB("testFirstName2", "testLastName2", LocalDate.of(1991, 6, 15))
+
+      val userAnswersWithTwoPcls = userAnswers
+        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails1)
+        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+        .unsafeSet(PensionCommencementLumpSumAmountPage(srn, refineMV(1)), pensionCommencementLumpSumGen.sample.value)
+        .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails2)
+        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(2)), SectionCompleted)
+        .unsafeSet(PensionCommencementLumpSumAmountPage(srn, refineMV(2)), pensionCommencementLumpSumGen.sample.value)
+        .unsafeSet(PensionCommencementLumpSumPage(srn), true)
+
+      val memberList: List[Option[NameDOB]] = List(Some(memberDetails1), Some(memberDetails2))
+
+      val result = PclsMemberListController.viewModel(
+        srn,
+        page = 1,
+        ViewOnlyMode,
+        memberList,
+        userAnswersWithTwoPcls,
+        viewOnlyUpdated = false,
+        noPageEnabled = false
+      )
+
+      result.optViewOnlyDetails.value.heading mustBe Message("pcls.MemberList.viewOnly.withValue", Message("2"))
+    }
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)

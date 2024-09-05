@@ -21,19 +21,26 @@ import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.TwoColumnsTripleAction
-import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransferReceivedMemberListPage}
+import pages.nonsipp.receivetransfer.{
+  DidSchemeReceiveTransferPage,
+  TransferReceivedMemberListPage,
+  TransfersInSectionCompletedForMember
+}
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models._
-import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
 import controllers.nonsipp.receivetransfer.TransferReceivedMemberListController._
 import eu.timepit.refined.refineMV
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.SectionCompleted
 
 import scala.concurrent.Future
+
+import java.time.LocalDate
 
 class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
 
@@ -80,6 +87,72 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
   }
 
   "TransferReceivedMemberListController" - {
+
+    "viewModel should show 'No transfers' when there are no transfers" in {
+      val userAnswersWithNoTransfers = userAnswers
+        .unsafeSet(DidSchemeReceiveTransferPage(srn), false)
+
+      val memberList: List[Option[NameDOB]] = List.empty
+
+      val result = TransferReceivedMemberListController.viewModel(
+        srn,
+        page = 1,
+        ViewOnlyMode,
+        memberList,
+        userAnswersWithNoTransfers,
+        viewOnlyUpdated = false,
+        schemeName = schemeName,
+        noPageEnabled = true
+      )
+
+      result.optViewOnlyDetails.value.heading mustBe Message("transferIn.MemberList.viewOnly.noTransfers")
+      result.page.rows.size mustBe 0
+    }
+
+    "viewModel should show '1 Transfer in' when there is 1 transfer in" in {
+      val userAnswersWithOneTransfer = userAnswers
+        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+        .unsafeSet(TransfersInSectionCompletedForMember(srn, refineMV(1)), Map("transfer1" -> SectionCompleted))
+
+      val memberList: List[Option[NameDOB]] = userAnswersWithOneTransfer.membersOptionList(srn)
+
+      val result = TransferReceivedMemberListController.viewModel(
+        srn,
+        page = 1,
+        ViewOnlyMode,
+        memberList,
+        userAnswersWithOneTransfer,
+        viewOnlyUpdated = false,
+        schemeName = schemeName,
+        noPageEnabled = false
+      )
+      result.optViewOnlyDetails.value.heading mustBe Message("transferIn.MemberList.viewOnly.singular")
+    }
+
+    "viewModel should show '2 Transfers in' when there are 2 transfers" in {
+      val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
+      val memberDetails2 = NameDOB("testFirstName2", "testLastName2", LocalDate.of(1991, 6, 15))
+
+      val userAnswersWithTwoTransfers = userAnswers
+        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails1)
+        .unsafeSet(TransfersInSectionCompletedForMember(srn, refineMV(1)), Map("transfer1" -> SectionCompleted))
+        .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails2)
+        .unsafeSet(TransfersInSectionCompletedForMember(srn, refineMV(2)), Map("transfer2" -> SectionCompleted))
+
+      val memberList: List[Option[NameDOB]] = List(Some(memberDetails1), Some(memberDetails2))
+
+      val result = TransferReceivedMemberListController.viewModel(
+        srn,
+        page = 1,
+        ViewOnlyMode,
+        memberList,
+        userAnswersWithTwoTransfers,
+        viewOnlyUpdated = false,
+        schemeName = schemeName,
+        noPageEnabled = false
+      )
+      result.optViewOnlyDetails.value.heading mustBe Message("transferIn.MemberList.viewOnly.plural", Message("2"))
+    }
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)

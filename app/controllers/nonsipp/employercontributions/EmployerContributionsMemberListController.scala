@@ -216,17 +216,17 @@ class EmployerContributionsMemberListController @Inject()(
 
   private def buildEmployerContributions(srn: Srn, indexes: List[(Max300, Option[NameDOB])])(
     implicit request: DataRequest[_]
-  ): List[EmployerContributions] = indexes.flatMap {
+  ): List[MemberWithEmployerContributions] = indexes.flatMap {
     case (index, Some(nameDOB)) =>
       Some(
-        EmployerContributions(
+        MemberWithEmployerContributions(
           memberIndex = index,
           employerFullName = nameDOB.fullName,
           contributions = request.userAnswers
             .employerContributionsProgress(srn, index)
             .map {
               case (secondaryIndex, status) =>
-                Contributions(secondaryIndex, status)
+                EmployerContributions(secondaryIndex, status)
             }
         )
       )
@@ -243,85 +243,100 @@ object EmployerContributionsMemberListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    employerContributions: List[EmployerContributions],
+    memberWithEmployerContributions: List[MemberWithEmployerContributions],
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None
   ): List[List[TableElem]] =
-    employerContributions.map { employerContribution =>
-      val noContributions = employerContribution.contributions.isEmpty
-      val onlyInProgressContributions = employerContribution.contributions.forall(_.status.inProgress)
+    memberWithEmployerContributions.map { memberWithEmployerContributions =>
+      val noContributions = memberWithEmployerContributions.contributions.isEmpty
+      val onlyInProgressContributions = memberWithEmployerContributions.contributions.forall(_.status.inProgress)
 
       if (noContributions || onlyInProgressContributions) {
         List(
           TableElem(
-            employerContribution.employerFullName
+            memberWithEmployerContributions.employerFullName
           ),
           TableElem(
             Message("employerContributions.MemberList.status.no.contributions")
           ),
           if (mode != ViewOnlyMode) {
             TableElem.add(
-              employerContribution.contributions.find(_.status.inProgress) match {
-                case Some(Contributions(_, InProgress(url))) => url
+              memberWithEmployerContributions.contributions.find(_.status.inProgress) match {
+                case Some(EmployerContributions(_, InProgress(url))) => url
                 case None =>
                   controllers.nonsipp.employercontributions.routes.EmployerNameController
-                    .onSubmit(srn, employerContribution.memberIndex, refineMV(1), mode)
+                    .onSubmit(srn, memberWithEmployerContributions.memberIndex, refineMV(1), mode)
                     .url
               },
-              Message("employerContributions.MemberList.add.hidden.text", employerContribution.employerFullName)
+              Message(
+                "employerContributions.MemberList.add.hidden.text",
+                memberWithEmployerContributions.employerFullName
+              )
             )
           } else {
             TableElem.empty
           },
+          // Remove link
           TableElem.empty
         )
       } else {
         List(
           TableElem(
-            employerContribution.employerFullName
+            memberWithEmployerContributions.employerFullName
           ),
           TableElem(
-            if (employerContribution.contributions.size == 1) {
+            if (memberWithEmployerContributions.contributions.size == 1) {
               Message(
                 "employerContributions.MemberList.status.single.contribution",
-                employerContribution.contributions.size
+                memberWithEmployerContributions.contributions.size
               )
             } else {
               Message(
                 "employerContributions.MemberList.status.some.contributions",
-                employerContribution.contributions.count(_.status.completed)
+                memberWithEmployerContributions.contributions.count(_.status.completed)
               )
             }
           ),
+          // Change link
           (mode, optYear, optCurrentVersion, optPreviousVersion) match {
             case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
               TableElem.view(
                 controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
                   .onPageLoadViewOnly(
                     srn,
-                    employerContribution.memberIndex,
+                    memberWithEmployerContributions.memberIndex,
                     page = 1,
                     year = year,
                     current = currentVersion,
                     previous = previousVersion
                   ),
-                Message("employerContributions.MemberList.remove.hidden.text", employerContribution.employerFullName)
+                Message(
+                  "employerContributions.MemberList.remove.hidden.text",
+                  memberWithEmployerContributions.employerFullName
+                )
               )
             case _ =>
               TableElem.change(
                 controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                  .onSubmit(srn, employerContribution.memberIndex, page = 1, CheckMode),
-                Message("employerContributions.MemberList.change.hidden.text", employerContribution.employerFullName)
+                  .onSubmit(srn, memberWithEmployerContributions.memberIndex, page = 1, CheckMode),
+                Message(
+                  "employerContributions.MemberList.change.hidden.text",
+                  memberWithEmployerContributions.employerFullName
+                )
               )
           },
+          // Remove link
           if (mode == ViewOnlyMode) {
             TableElem.empty
           } else {
             TableElem.remove(
               controllers.nonsipp.employercontributions.routes.WhichEmployerContributionRemoveController
-                .onSubmit(srn, employerContribution.memberIndex),
-              Message("employerContributions.MemberList.remove.hidden.text", employerContribution.employerFullName)
+                .onSubmit(srn, memberWithEmployerContributions.memberIndex),
+              Message(
+                "employerContributions.MemberList.remove.hidden.text",
+                memberWithEmployerContributions.employerFullName
+              )
             )
           }
         )
@@ -332,7 +347,7 @@ object EmployerContributionsMemberListController {
     srn: Srn,
     page: Int,
     mode: Mode,
-    employerContributions: List[EmployerContributions],
+    employerContributions: List[MemberWithEmployerContributions],
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
@@ -411,6 +426,7 @@ object EmployerContributionsMemberListController {
       onSubmit = controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
         .onSubmit(srn, page, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
+        val sumContributions: Int = employerContributions.map(_.contributions.size).sum
         Some(
           ViewOnlyDetailsViewModel(
             updated = viewOnlyUpdated,
@@ -436,7 +452,11 @@ object EmployerContributionsMemberListController {
             submittedText =
               compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
             title = "employerContributions.MemberList.viewOnly.title",
-            heading = "employerContributions.MemberList.viewOnly.heading",
+            heading = sumContributions match {
+              case 0 => Message("employerContributions.MemberList.viewOnly.noContributions")
+              case 1 => Message("employerContributions.MemberList.viewOnly.singular")
+              case _ => Message("employerContributions.MemberList.viewOnly.plural", sumContributions)
+            },
             buttonText = "site.return.to.tasklist",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
@@ -457,13 +477,13 @@ object EmployerContributionsMemberListController {
     )
   }
 
-  protected[employercontributions] case class EmployerContributions(
+  protected[employercontributions] case class MemberWithEmployerContributions(
     memberIndex: Max300,
     employerFullName: String,
-    contributions: List[Contributions]
+    contributions: List[EmployerContributions]
   )
 
-  protected[employercontributions] case class Contributions(
+  protected[employercontributions] case class EmployerContributions(
     contributionIndex: Max50,
     status: SectionJourneyStatus
   )
