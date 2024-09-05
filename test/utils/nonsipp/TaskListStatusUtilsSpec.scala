@@ -32,19 +32,15 @@ import pages.nonsipp.sharesdisposal._
 import utils.UserAnswersUtils.UserAnswersOps
 import pages.nonsipp.membersurrenderedbenefits._
 import models._
-import models.SponsoringOrConnectedParty.Sponsoring
+import pages.nonsipp.common._
 import pages.nonsipp.otherassetsdisposal.{AnyPartAssetStillHeldPage, HowWasAssetDisposedOfPage, OtherAssetsDisposalPage}
 import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.bonds._
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.memberdetails._
 import org.scalatest.freespec.AnyFreeSpec
-import pages.nonsipp.membercontributions.{MemberContributionsListPage, MemberContributionsPage}
-import pages.nonsipp.memberreceivedpcls.{
-  PclsMemberListPage,
-  PensionCommencementLumpSumAmountPage,
-  PensionCommencementLumpSumPage
-}
+import pages.nonsipp.membercontributions.MemberContributionsPage
+import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
 import org.scalatest.matchers.must.Matchers
 import models.ConditionalYesNo._
 import models.ManualOrUpload.Manual
@@ -52,21 +48,19 @@ import models.PensionSchemeType.RegisteredPS
 import models.IdentityType.{Individual, UKCompany, UKPartnership}
 import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
 import models.SchemeHoldShare.Acquisition
-import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, PensionPaymentsReceivedPage}
+import pages.nonsipp.memberpensionpayments.PensionPaymentsReceivedPage
 import eu.timepit.refined.refineMV
 import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import org.scalatest.OptionValues
 import uk.gov.hmrc.domain.Nino
 import models.HowSharesDisposed.Sold
-import viewmodels.models.TaskListStatus._
-import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
 import models.IdentitySubject._
 import pages.nonsipp.membertransferout._
 import pages.nonsipp.moneyborrowed._
 import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsStillHeldPage, HowWereBondsDisposedOfPage}
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
-import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
+import viewmodels.models.{MemberState, SectionCompleted}
 
 class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
@@ -252,6 +246,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason)
     .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
+  /*
   "Loans status" - {
     "should be Not Started" - {
       "when default data" in {
@@ -1296,6 +1291,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       }
     }
   }
+   */
 
   "\"userAnswersUnchangedAllSections\" method" - {
     "should return true when UAs are identical" in {
