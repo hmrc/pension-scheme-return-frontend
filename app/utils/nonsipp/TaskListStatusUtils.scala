@@ -619,7 +619,8 @@ object TaskListStatusUtils {
 
   private def getIncompleteIndex[A, B](firstPages: Option[Map[String, A]], lastPages: Option[Map[String, B]]): Int =
     (firstPages, lastPages) match {
-      case (None, _) => 1
+      case (None, None) => 0
+      case (None, Some(_)) => 1
       case (Some(_), None) => 1
       case (Some(first), Some(last)) =>
         if (first.isEmpty) {
