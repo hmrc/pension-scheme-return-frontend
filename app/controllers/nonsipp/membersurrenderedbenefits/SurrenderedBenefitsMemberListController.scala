@@ -315,6 +315,16 @@ object SurrenderedBenefitsMemberListController {
     val title = "surrenderedBenefits.memberList.title"
     val heading = "surrenderedBenefits.memberList.heading"
 
+    val sumSurrenderedBenefits = memberList.flatten.indices.foldLeft(0) { (count, index) =>
+      refineV[OneTo300](index + 1) match {
+        case Right(memberIndex) =>
+          userAnswers.get(SurrenderedBenefitsAmountPage(srn, memberIndex)) match {
+            case Some(amount) if !amount.isZero => count + 1
+            case _ => count
+          }
+        case Left(_) => count
+      }
+    }
     val memberListSize = memberList.flatten.size
     // in view-only mode or with direct url edit page value can be higher than needed
     val currentPage = if ((page - 1) * Constants.surrenderedBenefitsListSize >= memberListSize) 1 else page
@@ -395,7 +405,11 @@ object SurrenderedBenefitsMemberListController {
             submittedText =
               compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
             title = "surrenderedBenefits.memberList.viewOnly.title",
-            heading = "surrenderedBenefits.memberList.viewOnly.heading",
+            heading = sumSurrenderedBenefits match {
+              case 0 => Message("surrenderedBenefits.memberList.viewOnly.heading")
+              case 1 => Message("surrenderedBenefits.memberList.viewOnly.singular")
+              case _ => Message("surrenderedBenefits.memberList.viewOnly.plural", sumSurrenderedBenefits)
+            },
             buttonText = "site.return.to.tasklist",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>

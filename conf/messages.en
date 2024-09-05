@@ -865,6 +865,9 @@ pcls.memberList.remove.hidden.text = PCLS for {0}
 
 pcls.MemberList.viewOnly.title = Pension commencement lump sum
 pcls.MemberList.viewOnly.heading = Pension commencement lump sum
+pcls.MemberList.viewOnly.withValue = {0} pension commencement lump sum
+
+
 pcls.MemberList.viewOnly.link = View previous version of pension commencement lump sum (opens in new tab)
 pcls.MemberList.view.none = Did any member receive a pension commencement lump sum during the period of this return?
 
@@ -948,8 +951,12 @@ surrenderedBenefits.memberList.radios.error.required = Select yes if you have fi
 surrenderedBenefits.memberList.pagination.label = Showing {0} - {1} of {2} members
 surrenderedBenefits.memberList.status.no.items = No surrendered benefits
 surrenderedBenefits.memberList.status.some.item = Surrendered benefits reported
+
 surrenderedBenefits.memberList.viewOnly.title = Surrendered benefits
 surrenderedBenefits.memberList.viewOnly.heading = Surrendered benefits
+surrenderedBenefits.memberList.viewOnly.singular = 1 surrendered benefit
+surrenderedBenefits.memberList.viewOnly.plural = {0} surrendered benefits
+
 surrenderedBenefits.memberList.viewOnly.link = View previous version of surrendered benefits (opens in new tab)
 surrenderedBenefits.memberList.add.hidden.text = surrendered benefits for {0}
 surrenderedBenefits.memberList.view.none = Did any member surrender benefits within {0} during the period of this return?
@@ -2428,8 +2435,15 @@ transferIn.MemberList.pagination.label = Showing {0} - {1} of {2} members
 transferIn.MemberList.status.no.contributions = No transfers in
 transferIn.MemberList.singleStatus.some.contribution = {0} transfer in
 transferIn.MemberList.status.some.contributions = {0} transfers in
+
 transferIn.MemberList.viewOnly.title = Transfers in
 transferIn.MemberList.viewOnly.heading = Transfers in
+
+transferIn.MemberList.viewOnly.noTransfers = Transfers in
+transferIn.MemberList.viewOnly.singular = 1 transfer in
+transferIn.MemberList.viewOnly.plural = {0} transfers in
+
+
 transferIn.MemberList.viewOnly.link = View previous version of transfers in (opens in new tab)
 transferIn.MemberList.view.none = Did {0} receive a transfer for any member during the period of this return?
 
@@ -2454,7 +2468,11 @@ employerContributions.MemberList.add.hidden.text = employer contributions for {0
 employerContributions.MemberList.change.hidden.text = employer contributions for {0}
 employerContributions.MemberList.remove.hidden.text = employer contributions for {0}
 employerContributions.MemberList.viewOnly.title = Employer contributions
-employerContributions.MemberList.viewOnly.heading = Employer contributions
+
+employerContributions.MemberList.viewOnly.noContributions = Employer contributions
+employerContributions.MemberList.viewOnly.singular = 1 employer contribution
+employerContributions.MemberList.viewOnly.plural = {0} employer contributions
+
 employerContributions.MemberList.viewOnly.link = View previous version of employer contributions (opens in new tab)
 employerContributions.MemberList.view.none = Were employer contributions made for any member during the period of this return?
 
@@ -2470,8 +2488,14 @@ ReportContribution.MemberList.pagination.label = Showing {0} - {1} of {2} member
 ReportContribution.MemberList.add.hidden.text = member contributions for {0}
 ReportContribution.MemberList.change.hidden.text = member contributions for {0}
 ReportContribution.MemberList.remove.hidden.text = member contributions for {0}
+
 ReportContribution.MemberList.viewOnly.title = Member contributions
 ReportContribution.MemberList.viewOnly.heading = Member contributions
+
+ReportContribution.MemberList.viewOnly.noContributions = Member contributions
+ReportContribution.MemberList.viewOnly.singular = 1 member contribution
+ReportContribution.MemberList.viewOnly.plural = {0} member contributions
+
 ReportContribution.MemberList.viewOnly.link = View previous version of member contributions (opens in new tab)
 ReportContribution.MemberList.view.none = Were member contributions made by or for any member during the period of this return?
 
@@ -2627,10 +2651,14 @@ transferOut.memberList.radios = Have you finished reporting transfers out?
 transferOut.memberList.radios.error.required = Select yes if you have finished reporting transfers out
 transferOut.memberList.pagination.label = Showing {0} - {1} of {2} members
 transferOut.memberList.status.no.contributions =  No transfers out
-transferOut.memberList.singleStatus.some.contribution = {0} transfer out
+transferOut.memberList.singleStatus.some.contribution = 1 transfer out
 transferOut.memberList.status.some.contributions = {0} transfers out
 transferOut.memberList.viewOnly.title = Transfers out
+
 transferOut.memberList.viewOnly.heading = Transfers out
+transferOut.memberList.viewOnly.singular = 1 transfer out
+transferOut.memberList.viewOnly.plural = {0} transfers out
+
 transferOut.memberList.viewOnly.link = View previous version of transfers out (opens in new tab)
 transferOut.memberList.add.hidden.text = transfers out for {0}
 transferOut.memberList.view.none = Did {0} make a transfer out for any member during the period of this return?

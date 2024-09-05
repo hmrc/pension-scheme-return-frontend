@@ -23,7 +23,7 @@ import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import models.{NormalMode, ViewOnlyMode}
-import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.employercontributions._
 import services.PsrSubmissionService
@@ -32,6 +32,8 @@ import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPag
 import org.mockito.Mockito._
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
+import viewmodels.DisplayMessage.Message
+import viewmodels.models._
 
 import scala.concurrent.Future
 
@@ -71,12 +73,12 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
     )
     .unsafeSet(EmployerContributionsPage(srn), true)
 
-  val employerContributions: List[EmployerContributions] = List(
-    EmployerContributions(
+  val employerContributions: List[MemberWithEmployerContributions] = List(
+    MemberWithEmployerContributions(
       memberIndex = refineMV(1),
       employerFullName = memberDetails.fullName,
       contributions = List(
-        Contributions(
+        EmployerContributions(
           contributionIndex = refineMV(1),
           status = SectionJourneyStatus.Completed
         )
@@ -97,6 +99,73 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
   )
 
   "EmployerContributionsMemberListController" - {
+
+    "viewModel should show Employer Contributions when there are 0 contributions" in {
+      val employerContributionsEmpty: List[MemberWithEmployerContributions] = List.empty
+      val result: FormPageViewModel[ActionTableViewModel] = viewModel(
+        srn,
+        page,
+        mode = ViewOnlyMode,
+        employerContributionsEmpty,
+        viewOnlyUpdated = false,
+        noPageEnabled = false
+      )
+      result.optViewOnlyDetails.value.heading shouldBe Message(
+        "employerContributions.MemberList.viewOnly.noContributions"
+      )
+    }
+
+    "viewModel should show 1 Employer Contribution when there is 1 contribution" in {
+      val employerContributionsSingle: List[MemberWithEmployerContributions] = List(
+        MemberWithEmployerContributions(
+          memberIndex = refineMV(1),
+          employerFullName = "Test Member",
+          contributions = List(
+            EmployerContributions(
+              contributionIndex = refineMV(1),
+              status = SectionJourneyStatus.Completed
+            )
+          )
+        )
+      )
+      val result = viewModel(
+        srn,
+        page,
+        mode = ViewOnlyMode,
+        employerContributionsSingle,
+        viewOnlyUpdated = false,
+        noPageEnabled = false
+      )
+      result.optViewOnlyDetails.value.heading shouldBe Message("employerContributions.MemberList.viewOnly.singular")
+    }
+
+    "viewModel should show 2 Employer Contributions when there are 2 contributions" in {
+      val employerContributionsMultiple: List[MemberWithEmployerContributions] = List.fill(2)(
+        MemberWithEmployerContributions(
+          memberIndex = refineMV(1),
+          employerFullName = "Test Member",
+          contributions = List(
+            EmployerContributions(
+              contributionIndex = refineMV(1),
+              status = SectionJourneyStatus.Completed
+            )
+          )
+        )
+      )
+
+      val result = viewModel(
+        srn,
+        page,
+        mode = ViewOnlyMode,
+        employerContributionsMultiple,
+        viewOnlyUpdated = false,
+        noPageEnabled = false
+      )
+      result.optViewOnlyDetails.value.heading shouldBe Message(
+        "employerContributions.MemberList.viewOnly.plural",
+        Message("2")
+      )
+    }
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[TwoColumnsTripleAction].apply(
@@ -184,27 +253,44 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
     )
 
-    val noUserAnswers = currentUserAnswers
+    val userAnswersNoEmployerContributions = defaultUserAnswers
+      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
       .unsafeSet(EmployerContributionsPage(srn), false)
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
+    val previousUserAnswersNoEmployerContributions = currentUserAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
 
     act.like(
-      renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-        implicit app => implicit request =>
-          injected[TwoColumnsTripleAction].apply(
-            form(injected[YesNoPageFormProvider]),
-            viewModel(
-              srn,
-              page,
-              mode = ViewOnlyMode,
-              List.empty,
-              viewOnlyUpdated = false,
-              optYear = Some(yearString),
-              optCurrentVersion = Some(submissionNumberTwo),
-              optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo),
-              noPageEnabled = true
-            )
+      renderView(
+        onPageLoadViewOnly,
+        userAnswers = userAnswersNoEmployerContributions,
+        optPreviousAnswers = Some(previousUserAnswersNoEmployerContributions)
+      ) { implicit app => implicit request =>
+        injected[TwoColumnsTripleAction].apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(
+            srn,
+            page,
+            mode = ViewOnlyMode,
+            employerContributions = List(
+              MemberWithEmployerContributions(
+                memberIndex = refineMV(1),
+                employerFullName = memberDetails.fullName,
+                contributions = Nil
+              )
+            ),
+            viewOnlyUpdated = false,
+            optYear = Some(yearString),
+            optCurrentVersion = Some(submissionNumberTwo),
+            optPreviousVersion = Some(submissionNumberOne),
+            compilationOrSubmissionDate = Some(submissionDateTwo),
+            noPageEnabled = true
           )
+        )
       }.withName("OnPageLoadViewOnly renders ok NO records")
     )
 
@@ -229,4 +315,5 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
       )
     )
   }
+
 }

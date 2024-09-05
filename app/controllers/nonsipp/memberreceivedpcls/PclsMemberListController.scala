@@ -342,6 +342,11 @@ object PclsMemberListController {
             .onPageLoad(srn, _, NormalMode)
       }
     )
+    val sumPcls = memberList.flatten.zipWithIndex.count {
+      case (_, index) =>
+        refineV[OneTo300](index + 1).toOption
+          .exists(nextIndex => userAnswers.get(PensionCommencementLumpSumAmountPage(srn, nextIndex)).isDefined)
+    }
 
     FormPageViewModel(
       mode = mode,
@@ -409,7 +414,10 @@ object PclsMemberListController {
             submittedText =
               compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
             title = "pcls.MemberList.viewOnly.title",
-            heading = "pcls.MemberList.viewOnly.heading",
+            heading = sumPcls match {
+              case 0 => Message("pcls.MemberList.viewOnly.heading")
+              case _ => Message("pcls.MemberList.viewOnly.withValue", sumPcls)
+            },
             buttonText = "site.return.to.tasklist",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
