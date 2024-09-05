@@ -58,8 +58,8 @@ object TaskListStatusUtils {
     howManyMembers: Option[SchemeMemberNumbers]
   ): TaskListStatus =
     (checkReturnDates, accountingPeriods, activeBankAccount, whyNoBankAccount, howManyMembers) match {
-      case (Some(true), None, Some(true), None, Some(_)) => Recorded
-      case (Some(true), None, Some(false), Some(_), Some(_)) => Recorded
+      case (Some(true), _, Some(true), None, Some(_)) => Recorded
+      case (Some(true), _, Some(false), Some(_), Some(_)) => Recorded
       case (Some(false), Some(dateRangeList), Some(true), None, Some(_)) if dateRangeList.nonEmpty => Recorded
       case (Some(false), Some(dateRangeList), Some(false), Some(_), Some(_)) if dateRangeList.nonEmpty => Recorded
       case (_, _, _, _, _) => InProgress
@@ -619,8 +619,6 @@ object TaskListStatusUtils {
 
   private def getIncompleteIndex[A, B](firstPages: Option[Map[String, A]], lastPages: Option[Map[String, B]]): Int =
     (firstPages, lastPages) match {
-      case (None, None) => 0
-      case (None, Some(_)) => 1
       case (Some(_), None) => 1
       case (Some(first), Some(last)) =>
         if (first.isEmpty) {
@@ -636,6 +634,7 @@ object TaskListStatusUtils {
             filtered.head + 1
           }
         }
+      case _ => 0
     }
 
   private def getIncompleteMembersIndex(userAnswers: UserAnswers, srn: Srn): Int = {

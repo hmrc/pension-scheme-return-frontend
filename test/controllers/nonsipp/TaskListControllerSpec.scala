@@ -19,23 +19,25 @@ package controllers.nonsipp
 import services.PsrVersionsService
 import models.ConditionalYesNo._
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
-import pages.nonsipp.otherassetsheld.OtherAssetsCompleted
+import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, OtherAssetsHeldPage, WhatIsOtherAssetPage}
+import config.Refined.{Max3, Max5000}
 import controllers.ControllerBaseSpec
 import views.html.TaskListView
 import eu.timepit.refined.refineMV
-import pages.nonsipp.sharesdisposal._
 import models._
 import pages.nonsipp.loansmadeoroutstanding._
-import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage}
+import pages.nonsipp.moneyborrowed._
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus, TaskListStatus}
-import models.SponsoringOrConnectedParty.Sponsoring
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.otherassetsdisposal._
 import pages.nonsipp.schemedesignatory._
-import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
 import org.mockito.Mockito.when
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage, UnregulatedOrConnectedBondsHeldPage}
+import pages.nonsipp.accountingperiod.AccountingPeriodPage
+import pages.nonsipp.sharesdisposal._
 import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import play.api.inject
 import viewmodels.models.TaskListStatus.TaskListStatus
@@ -46,6 +48,9 @@ import scala.concurrent.Future
 class TaskListControllerSpec extends ControllerBaseSpec {
 
   val pensionSchemeId: PensionSchemeId = pensionSchemeIdGen.sample.value
+  val index1of3: Max3 = refineMV(1)
+  val index1of5000: Max5000 = refineMV(1)
+  val reason = "reason"
 
   private val mockPsrVersionsService = mock[PsrVersionsService]
 
@@ -82,6 +87,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     "schemeDetailsSection - basic details" - {
+
       "inProgress" - {
 
         "stopped at check dates page" in {
@@ -129,6 +135,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           )
 
         }
+
         "stopped at reason no bank account page" in {
           val userAnswersPopulated =
             defaultUserAnswers
@@ -147,7 +154,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           )
         }
 
-        "stopped at reason no bank account page when how many members already populated" in {
+        "stopped at reason no bank account page (answer changed) when how many members already populated" in {
           val userAnswersPopulated =
             defaultUserAnswers
               .unsafeSet(CheckReturnDatesPage(srn), true)
@@ -166,11 +173,31 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           )
         }
 
+        "stopped at check return dates page (answer changed) when how many members already populated" in {
+          val userAnswersPopulated =
+            defaultUserAnswers
+              .unsafeSet(CheckReturnDatesPage(srn), false)
+              .unsafeSet(ActiveBankAccountPage(srn), true)
+              .unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(1, 1, 1))
+
+          testViewModel(
+            userAnswersPopulated,
+            0,
+            0,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.change.details.title",
+            expectedLinkUrl = controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
+          )
+        }
+
         "stopped at how many members page" in {
           val userAnswersPopulated =
             defaultUserAnswers
-              .unsafeSet(CheckReturnDatesPage(srn), true)
-              .unsafeSet(ActiveBankAccountPage(srn), true)
+              .unsafeSet(CheckReturnDatesPage(srn), false)
+              .unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), dateRange)
+              .unsafeSet(ActiveBankAccountPage(srn), false)
+              .unsafeSet(WhyNoBankAccountPage(srn), reason)
 
           testViewModel(
             userAnswersPopulated,
@@ -185,27 +212,102 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         }
       }
 
-      // Todo: Uncomment and fix as part of [1387]
-//      "completed" in {
-//        val userAnswersWithHowManyMembers =
-//          defaultUserAnswers
-//            .unsafeSet(ActiveBankAccountPage(srn), true)
-//            .unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(1, 1, 1))
-//
-//        testViewModel(
-//          userAnswersWithHowManyMembers,
-//          0,
-//          0,
-//          expectedStatus = TaskListStatus.Completed,
-//          expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
-//          expectedLinkContentKey = "nonsipp.tasklist.schemedetails.change.details.title",
-//          expectedLinkUrl =
-//            controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode).url
-//        )
-//      }
+      "recorded" - {
+
+        "with CheckReturnDatesPage true and ActiveBankAccountPage true" in {
+
+          val userAnswersWithHowManyMembers =
+            defaultUserAnswers
+              .unsafeSet(CheckReturnDatesPage(srn), true)
+              // AccountingPeriodPage not set
+              .unsafeSet(ActiveBankAccountPage(srn), true)
+              // WhyNoBankAccount not set
+              .unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(1, 1, 1))
+
+          testViewModel(
+            userAnswersWithHowManyMembers,
+            0,
+            0,
+            expectedStatus = TaskListStatus.Recorded,
+            expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.change.details.title",
+            expectedLinkUrl =
+              controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode).url
+          )
+        }
+
+        "with CheckReturnDatesPage true and ActiveBankAccountPage false" in {
+
+          val userAnswersWithHowManyMembers =
+            defaultUserAnswers
+              .unsafeSet(CheckReturnDatesPage(srn), true)
+              .unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), dateRange)
+              // AccountingPeriodPage has been set here even though CheckReturnDatesPage is set to true because this
+              // mimics the transformation that occurs when we GET a submitted return from ETMP.
+              .unsafeSet(ActiveBankAccountPage(srn), false)
+              .unsafeSet(WhyNoBankAccountPage(srn), reason)
+              .unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(1, 1, 1))
+
+          testViewModel(
+            userAnswersWithHowManyMembers,
+            0,
+            0,
+            expectedStatus = TaskListStatus.Recorded,
+            expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.change.details.title",
+            expectedLinkUrl =
+              controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode).url
+          )
+        }
+
+        "with CheckReturnDatesPage false and ActiveBankAccountPage true" in {
+
+          val userAnswersWithHowManyMembers =
+            defaultUserAnswers
+              .unsafeSet(CheckReturnDatesPage(srn), false)
+              .unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), dateRange)
+              .unsafeSet(ActiveBankAccountPage(srn), true)
+              // WhyNoBankAccount not set
+              .unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(1, 1, 1))
+
+          testViewModel(
+            userAnswersWithHowManyMembers,
+            0,
+            0,
+            expectedStatus = TaskListStatus.Recorded,
+            expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.change.details.title",
+            expectedLinkUrl =
+              controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode).url
+          )
+        }
+
+        "with CheckReturnDatesPage false and ActiveBankAccountPage false" in {
+
+          val userAnswersWithHowManyMembers =
+            defaultUserAnswers
+              .unsafeSet(CheckReturnDatesPage(srn), false)
+              .unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), dateRange)
+              .unsafeSet(ActiveBankAccountPage(srn), false)
+              .unsafeSet(WhyNoBankAccountPage(srn), reason)
+              .unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(1, 1, 1))
+
+          testViewModel(
+            userAnswersWithHowManyMembers,
+            0,
+            0,
+            expectedStatus = TaskListStatus.Recorded,
+            expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.change.details.title",
+            expectedLinkUrl =
+              controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode).url
+          )
+        }
+      }
     }
 
     "schemeDetailsSection - financial details" - {
+
       "notStarted" in {
         testViewModel(
           defaultUserAnswers,
@@ -218,6 +320,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
             controllers.nonsipp.schemedesignatory.routes.HowMuchCashController.onPageLoad(srn, NormalMode).url
         )
       }
+
       "inProgress" - {
 
         "stopped after how much cash page" in {
@@ -236,6 +339,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
               controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController.onPageLoad(srn, NormalMode).url
           )
         }
+
         "stopped after value of assets page" in {
           val userAnswersPopulated =
             defaultUserAnswers
@@ -256,33 +360,28 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         }
       }
 
-      // Todo: Uncomment and fix as part of [1387]
-//      "completed" in {
-//        val userAnswersWithPopulatedAnswers =
-//          defaultUserAnswers
-//            .unsafeSet(HowMuchCashPage(srn, NormalMode), MoneyInPeriod(Money(1), Money(2)))
-//            .unsafeSet(FeesCommissionsWagesSalariesPage(srn, NormalMode), Money(1))
-//
-//        testViewModel(
-//          userAnswersWithPopulatedAnswers,
-//          0,
-//          1,
-//          expectedStatus = TaskListStatus.Completed,
-//          expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
-//          expectedLinkContentKey = "nonsipp.tasklist.schemedetails.change.finances.title",
-//          expectedLinkUrl = controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
-//            .onPageLoad(srn, NormalMode)
-//            .url
-//        )
-//      }
+      "recorded" in {
+        val userAnswersWithPopulatedAnswers =
+          defaultUserAnswers
+            .unsafeSet(HowMuchCashPage(srn, NormalMode), MoneyInPeriod(Money(1), Money(2)))
+            .unsafeSet(ValueOfAssetsPage(srn, NormalMode), MoneyInPeriod(Money(1), Money(2)))
+            .unsafeSet(FeesCommissionsWagesSalariesPage(srn, NormalMode), Money(1))
+
+        testViewModel(
+          userAnswersWithPopulatedAnswers,
+          0,
+          1,
+          expectedStatus = TaskListStatus.Recorded,
+          expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
+          expectedLinkContentKey = "nonsipp.tasklist.schemedetails.change.finances.title",
+          expectedLinkUrl = controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      }
     }
 
     "membersSection" - {
-      val userAnswersOneMember = defaultUserAnswers
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-        .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
-        .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
       "notStarted" in {
         testViewModel(
@@ -297,85 +396,106 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       }
 
       "inProgress" - {
-        // Todo: Uncomment and fix as part of [1387]
-//        "DoesMemberHaveNinoPage is missing" in {
-//          val userAnswers = userAnswersOneMember
-//            .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
-//
-//          testViewModel(
-//            userAnswers,
-//            1,
-//            0,
-//            expectedStatus = TaskListStatus.InProgress,
-//            expectedTitleKey = "nonsipp.tasklist.members.title",
-//            expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
-//            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
-//              .onPageLoad(srn, refineMV(2), NormalMode)
-//              .url
-//          )
-//        }
 
-        // Todo: Uncomment and fix as part of [1387]
-//        "nino missing" in {
-//          val userAnswers = userAnswersOneMember
-//            .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
-//            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(2)), true)
-//
-//          testViewModel(
-//            userAnswers,
-//            1,
-//            0,
-//            expectedStatus = TaskListStatus.InProgress,
-//            expectedTitleKey = "nonsipp.tasklist.members.title",
-//            expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
-//            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
-//              .onPageLoad(srn, refineMV(2), NormalMode)
-//              .url
-//          )
-//        }
+        "DoesMemberHaveNinoPage is missing" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
 
-        // Todo: Uncomment and fix as part of [1387]
-//        "no nino reason is missing" in {
-//          val userAnswers = userAnswersOneMember
-//            .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
-//            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(2)), false)
-//            .unsafeSet(MemberDetailsPage(srn, refineMV(3)), memberDetails)
-//            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(3)), true)
-//            .unsafeSet(MemberDetailsNinoPage(srn, refineMV(3)), nino)
-//            .unsafeSet(MemberDetailsPage(srn, refineMV(4)), memberDetails)
-//            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(4)), false)
-//            .unsafeSet(NoNINOPage(srn, refineMV(4)), noninoReason)
-//
-//          testViewModel(
-//            userAnswers,
-//            1,
-//            0,
-//            expectedStatus = TaskListStatus.InProgress,
-//            expectedTitleKey = "nonsipp.tasklist.members.title",
-//            expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
-//            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.NoNINOController
-//              .onPageLoad(srn, refineMV(2), NormalMode)
-//              .url
-//          )
-//        }
+          testViewModel(
+            userAnswers,
+            1,
+            0,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.members.title",
+            expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
+              .onPageLoad(srn, refineMV(1), NormalMode)
+              .url
+          )
+        }
+
+        "MemberDetailsNinoPage is missing" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
+
+          testViewModel(
+            userAnswers,
+            1,
+            0,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.members.title",
+            expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
+              .onPageLoad(srn, refineMV(1), NormalMode)
+              .url
+          )
+        }
+
+        "NoNINOPage is missing" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
+
+          testViewModel(
+            userAnswers,
+            1,
+            0,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.members.title",
+            expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.NoNINOController
+              .onPageLoad(srn, refineMV(1), NormalMode)
+              .url
+          )
+        }
       }
 
-      "Recorded" in {
-        testViewModel(
-          userAnswersOneMember,
-          1,
-          0,
-          expectedStatus = TaskListStatus.Recorded(1, "members"),
-          expectedTitleKey = "nonsipp.tasklist.members.title",
-          expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
-          expectedLinkUrl = controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-            .onPageLoad(srn, 1, ManualOrUpload.Manual)
-            .url
-        )
+      "Recorded" - {
+
+        "with NINO" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
+            .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
+            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+
+          testViewModel(
+            userAnswers,
+            1,
+            0,
+            expectedStatus = TaskListStatus.Recorded(1, "members"),
+            expectedTitleKey = "nonsipp.tasklist.members.title",
+            expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+              .onPageLoad(srn, 1, ManualOrUpload.Manual)
+              .url
+          )
+        }
+
+        "with reason for no NINO" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
+            .unsafeSet(NoNINOPage(srn, refineMV(1)), reason)
+            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+
+          testViewModel(
+            userAnswers,
+            1,
+            0,
+            expectedStatus = TaskListStatus.Recorded(1, "members"),
+            expectedTitleKey = "nonsipp.tasklist.members.title",
+            expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+              .onPageLoad(srn, 1, ManualOrUpload.Manual)
+              .url
+          )
+        }
       }
     }
 
-    "loansSection" - {
+    "loansSection" - { // Also tested in TaskListStatusUtilsSpec
 
       "notStarted" in {
         testViewModel(
@@ -391,104 +511,24 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "inProgress" - {
+      "inProgress" in {
+        val userAnswersWithLoans =
+          defaultUserAnswers
+            .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+            .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
+            .unsafeSet(IndividualRecipientNamePage(srn, refineMV(1)), "First Last")
 
-        // Todo: Uncomment and fix as part of [1387]
-//        "stopped after the second IdentitySubject page" in {
-//          val userAnswersWithLoans =
-//            defaultUserAnswers
-//              .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
-//              .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
-//              .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), true)
-//              .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
-//              .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
-//
-//          testViewModel(
-//            userAnswersWithLoans,
-//            3,
-//            0,
-//            expectedStatus = TaskListStatus.InProgress,
-//            expectedTitleKey = "nonsipp.tasklist.loans.title",
-//            expectedLinkContentKey = "nonsipp.tasklist.loans.change.loansmade.title",
-//            expectedLinkUrl = controllers.nonsipp.common.routes.IdentityTypeController
-//              .onPageLoad(srn, refineMV(2), NormalMode, IdentitySubject.LoanRecipient)
-//              .url
-//          )
-//        }
-
-        // Todo: Uncomment and fix as part of [1387]
-//        "stopped later on in the journey" in {
-//          val userAnswersWithLoans =
-//            defaultUserAnswers
-//              .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
-//              .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
-//              .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), true)
-//              .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
-//              .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
-//              .unsafeSet(CompanyRecipientNamePage(srn, refineMV(2)), "CompanyRecipientName")
-//
-//          testViewModel(
-//            userAnswersWithLoans,
-//            3,
-//            0,
-//            expectedStatus = TaskListStatus.InProgress,
-//            expectedTitleKey = "nonsipp.tasklist.loans.title",
-//            expectedLinkContentKey = "nonsipp.tasklist.loans.change.loansmade.title",
-//            expectedLinkUrl = controllers.nonsipp.common.routes.IdentityTypeController
-//              .onPageLoad(srn, refineMV(2), NormalMode, IdentitySubject.LoanRecipient)
-//              .url
-//          )
-//        }
-
-        // Todo: Uncomment and fix as part of [1387]
-//        "sponsoring answer is missing - change journey" in {
-//          val userAnswersWithLoans =
-//            defaultUserAnswers
-//              .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
-//              .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
-//              .unsafeSet(IndividualRecipientNamePage(srn, refineMV(1)), "First Last")
-//              .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), true)
-//              .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
-//              .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
-//              .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(2)), ConditionalYesNo.yes[Unit, Money](money))
-//
-//          testViewModel(
-//            userAnswersWithLoans,
-//            3,
-//            0,
-//            expectedStatus = TaskListStatus.InProgress,
-//            expectedTitleKey = "nonsipp.tasklist.loans.title",
-//            expectedLinkContentKey = "nonsipp.tasklist.loans.change.loansmade.title",
-//            expectedLinkUrl = controllers.nonsipp.common.routes.IdentityTypeController
-//              .onPageLoad(srn, refineMV(2), NormalMode, IdentitySubject.LoanRecipient)
-//              .url
-//          )
-//        }
-
-        // Todo: Uncomment and fix as part of [1387]
-//        "individual connected party answer is missing - change journey" in {
-//          val userAnswersWithLoans =
-//            defaultUserAnswers
-//              .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
-//              .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
-//              .unsafeSet(IndividualRecipientNamePage(srn, refineMV(1)), "First Last")
-//              .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
-//              .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
-//              .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(2)), Sponsoring)
-//              .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(2)), ConditionalYesNo.yes[Unit, Money](money))
-//
-//          testViewModel(
-//            userAnswersWithLoans,
-//            3,
-//            0,
-//            expectedStatus = TaskListStatus.InProgress,
-//            expectedTitleKey = "nonsipp.tasklist.loans.title",
-//            expectedLinkContentKey = "nonsipp.tasklist.loans.change.loansmade.title",
-//            expectedLinkUrl = controllers.nonsipp.common.routes.IdentityTypeController
-//              .onPageLoad(srn, refineMV(1), NormalMode, IdentitySubject.LoanRecipient)
-//              .url
-//          )
-//        }
+        testViewModel(
+          userAnswersWithLoans,
+          3,
+          0,
+          expectedStatus = TaskListStatus.InProgress,
+          expectedTitleKey = "nonsipp.tasklist.loans.title",
+          expectedLinkContentKey = "nonsipp.tasklist.loans.change.loansmade.title",
+          expectedLinkUrl = controllers.nonsipp.common.routes.IdentityTypeController
+            .onPageLoad(srn, refineMV(1), NormalMode, IdentitySubject.LoanRecipient)
+            .url
+        )
       }
 
       "Recorded" in {
@@ -496,10 +536,8 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           defaultUserAnswers
             .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
             .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
-            .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), false)
-            .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
             .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
-            .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(2)), Sponsoring)
+            .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
             .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(2)), ConditionalYesNo.yes[Unit, Money](money))
 
         testViewModel(
@@ -515,7 +553,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "borrowingSection" - {
+    "borrowingSection" - { // Also tested in TaskListStatusUtilsSpec
       "notStarted" in {
         testViewModel(
           defaultUserAnswers,
@@ -530,47 +568,46 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      "inProgress" - {
-        "stopped after money borrowed value yes page" in {
-          val userAnswersWithBorrowings =
-            defaultUserAnswers
-              .unsafeSet(MoneyBorrowedPage(srn), true)
-              .unsafeSet(LenderNamePages(srn), Map("0" -> lenderName))
+      "inProgress" in {
+        val userAnswersWithBorrowings =
+          defaultUserAnswers
+            .unsafeSet(MoneyBorrowedPage(srn), true)
+            .unsafeSet(LenderNamePages(srn), Map("0" -> lenderName))
 
-          testViewModel(
-            userAnswersWithBorrowings,
-            3,
-            1,
-            expectedStatus = TaskListStatus.InProgress,
-            expectedTitleKey = "nonsipp.tasklist.loans.title",
-            expectedLinkContentKey = "nonsipp.tasklist.loans.change.moneyborrowed.title",
-            expectedLinkUrl = controllers.nonsipp.moneyborrowed.routes.LenderNameController
-              .onPageLoad(srn, refineMV(1), NormalMode)
-              .url
-          )
-        }
+        testViewModel(
+          userAnswersWithBorrowings,
+          3,
+          1,
+          expectedStatus = TaskListStatus.InProgress,
+          expectedTitleKey = "nonsipp.tasklist.loans.title",
+          expectedLinkContentKey = "nonsipp.tasklist.loans.change.moneyborrowed.title",
+          expectedLinkUrl = controllers.nonsipp.moneyborrowed.routes.LenderNameController
+            .onPageLoad(srn, refineMV(1), NormalMode)
+            .url
+        )
       }
 
-      // Todo: Uncomment and fix as part of [1387]
-//      "completed" in {
-//        val userAnswersWithBorrowings =
-//          defaultUserAnswers
-//            .unsafeSet(MoneyBorrowedPage(srn), false)
-//
-//        testViewModel(
-//          userAnswersWithBorrowings,
-//          3,
-//          1,
-//          expectedStatus = TaskListStatus.Completed,
-//          expectedTitleKey = "nonsipp.tasklist.loans.title",
-//          expectedLinkContentKey = "nonsipp.tasklist.loans.change.moneyborrowed.title",
-//          expectedLinkUrl =
-//            controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, 1, NormalMode).url
-//        )
-//      }
+      "recorded" in {
+        val userAnswersWithBorrowings =
+          defaultUserAnswers
+            .unsafeSet(MoneyBorrowedPage(srn), true)
+            .unsafeSet(LenderNamePage(srn, index1of5000), lenderName)
+            .unsafeSet(WhySchemeBorrowedMoneyPage(srn, index1of5000), reason)
+
+        testViewModel(
+          userAnswersWithBorrowings,
+          3,
+          1,
+          expectedStatus = TaskListStatus.Recorded(1, "borrowings"),
+          expectedTitleKey = "nonsipp.tasklist.loans.title",
+          expectedLinkContentKey = "nonsipp.tasklist.loans.change.moneyborrowed.title",
+          expectedLinkUrl =
+            controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, 1, NormalMode).url
+        )
+      }
     }
 
-    "shares section" - {
+    "shares section" - { // Also tested in TaskListStatusUtilsSpec
       "notStarted" in {
         testViewModel(
           defaultUserAnswers,
@@ -737,7 +774,8 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "quotedSharesSection" - {
+    "quotedSharesSection" - { // Also tested in TaskListStatusUtilsSpec
+
       "notStarted and only visible with shares answered" in {
         testViewModel(
           defaultUserAnswers.unsafeSet(DidSchemeHoldAnySharesPage(srn), true),
@@ -773,7 +811,8 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "bonds section" - {
+    "bonds section" - { // Also tested in TaskListStatusUtilsSpec
+
       "notStarted" in {
         testViewModel(
           defaultUserAnswers,
@@ -788,27 +827,48 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      // Todo: Uncomment and fix as part of [1387]
-//      "completed" in {
-//        val userAnswersWithData =
-//          defaultUserAnswers
-//            .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), false)
-//
-//        testViewModel(
-//          userAnswersWithData,
-//          6,
-//          0,
-//          expectedStatus = TaskListStatus.Completed,
-//          expectedTitleKey = "nonsipp.tasklist.bonds.title",
-//          expectedLinkContentKey = "nonsipp.tasklist.bonds.change.unregulatedorconnected.title",
-//          expectedLinkUrl = controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
-//            .onPageLoad(srn, NormalMode)
-//            .url
-//        )
-//      }
+      "inProgress" in {
+        val userAnswersWithData =
+          defaultUserAnswers
+            .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
+            .unsafeSet(NameOfBondsPage(srn, index1of5000), nameOfBonds)
+
+        testViewModel(
+          userAnswersWithData,
+          6,
+          0,
+          expectedStatus = TaskListStatus.InProgress,
+          expectedTitleKey = "nonsipp.tasklist.bonds.title",
+          expectedLinkContentKey = "nonsipp.tasklist.bonds.change.unregulatedorconnected.title",
+          expectedLinkUrl = controllers.nonsipp.bonds.routes.NameOfBondsController
+            .onPageLoad(srn, index1of5000, NormalMode)
+            .url
+        )
+      }
+
+      "recorded" in {
+        val userAnswersWithData =
+          defaultUserAnswers
+            .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
+            .unsafeSet(NameOfBondsPage(srn, index1of5000), nameOfBonds)
+            .unsafeSet(BondsCompleted(srn, index1of5000), SectionCompleted)
+
+        testViewModel(
+          userAnswersWithData,
+          6,
+          0,
+          expectedStatus = TaskListStatus.Recorded(1, "bonds"),
+          expectedTitleKey = "nonsipp.tasklist.bonds.title",
+          expectedLinkContentKey = "nonsipp.tasklist.bonds.change.unregulatedorconnected.title",
+          expectedLinkUrl = controllers.nonsipp.bonds.routes.BondsListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+      }
     }
 
-    "other assets section" - {
+    "other assets section" - { // Also tested in TaskListStatusUtilsSpec
+
       "notStarted" in {
         testViewModel(
           defaultUserAnswers,
@@ -823,24 +883,44 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      // Todo: Uncomment and fix as part of [1387]
-//      "completed" in {
-//        val userAnswersWithData =
-//          defaultUserAnswers
-//            .unsafeSet(OtherAssetsHeldPage(srn), false)
-//
-//        testViewModel(
-//          userAnswersWithData,
-//          7,
-//          0,
-//          expectedStatus = TaskListStatus.Completed,
-//          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
-//          expectedLinkContentKey = "nonsipp.tasklist.otherassets.change.title",
-//          expectedLinkUrl = controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController
-//            .onPageLoad(srn, NormalMode)
-//            .url
-//        )
-//      }
+      "inProgress" in {
+        val userAnswersWithData =
+          defaultUserAnswers
+            .unsafeSet(OtherAssetsHeldPage(srn), true)
+            .unsafeSet(WhatIsOtherAssetPage(srn, index1of5000), otherAssetDescription)
+
+        testViewModel(
+          userAnswersWithData,
+          7,
+          0,
+          expectedStatus = TaskListStatus.InProgress,
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassets.change.title",
+          expectedLinkUrl = controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController
+            .onPageLoad(srn, index1of5000, NormalMode)
+            .url
+        )
+      }
+
+      "recorded" in {
+        val userAnswersWithData =
+          defaultUserAnswers
+            .unsafeSet(OtherAssetsHeldPage(srn), true)
+            .unsafeSet(WhatIsOtherAssetPage(srn, index1of5000), otherAssetDescription)
+            .unsafeSet(OtherAssetsCompleted(srn, index1of5000), SectionCompleted)
+
+        testViewModel(
+          userAnswersWithData,
+          7,
+          0,
+          expectedStatus = TaskListStatus.Recorded(1, "otherAssets"),
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassets.change.title",
+          expectedLinkUrl = controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
+            .onPageLoad(srn, 1, NormalMode)
+            .url
+        )
+      }
     }
 
     "otherAssetsDisposalSection" - {
@@ -859,98 +939,94 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
 
-      // Todo: Uncomment and fix as part of [1387]
-//      "completed (with 'No' selection on first page) and only visible with an asset existing" in {
-//        val userAnswersWithData = defaultUserAnswers
-//          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
-//          .unsafeSet(OtherAssetsDisposalPage(srn), false)
-//          .unsafeSet(OtherAssetsDisposalCompleted(srn), SectionCompleted)
-//
-//        testViewModel(
-//          userAnswersWithData,
-//          7,
-//          1,
-//          expectedStatus = TaskListStatus.Completed,
-//          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
-//          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.change.title",
-//          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController
-//            .onPageLoad(srn, NormalMode)
-//            .url
-//        )
-//      }
+      "recorded (with 'No' selection on first page) and only visible with an asset existing" in {
+        val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(OtherAssetsDisposalPage(srn), false)
+          .unsafeSet(OtherAssetsDisposalCompleted(srn), SectionCompleted)
 
-      // Todo: Uncomment and fix as part of [1387]
-//      "inProgress (with only 1 incomplete disposal) and only visible with an asset existing" in {
-//        val userAnswersWithData = defaultUserAnswers
-//          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
-//          .unsafeSet(OtherAssetsDisposalPage(srn), true)
-//          // Other Assets 1 - Disposal 1 - Incomplete journey:
-//          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Sold)
-//          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
-//
-//        testViewModel(
-//          userAnswersWithData,
-//          7,
-//          1,
-//          expectedStatus = TaskListStatus.InProgress,
-//          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
-//          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.change.title",
-//          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController
-//            .onPageLoad(srn, page = 1)
-//            .url
-//        )
-//      }
+        testViewModel(
+          userAnswersWithData,
+          7,
+          1,
+          expectedStatus = TaskListStatus.Recorded(0, ""),
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.change.title",
+          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      }
 
-      // Todo: Uncomment and fix as part of [1387]
-//      "inProgress (with 1 complete and 1 incomplete disposal) and only visible with an asset existing" in {
-//        val userAnswersWithData = defaultUserAnswers
-//          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
-//          .unsafeSet(OtherAssetsDisposalPage(srn), true)
-//          // Other Asset 1 - Disposal 1 - Complete journey:
-//          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
-//          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
-//          .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(1), refineMV(1)), true)
-//          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
-//          // Other Assets 1 - Disposal 2 - Incomplete journey:
-//          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(2)), HowDisposed.Sold)
-//          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(2)), SectionJourneyStatus.InProgress("x"))
-//
-//        testViewModel(
-//          userAnswersWithData,
-//          7,
-//          1,
-//          expectedStatus = TaskListStatus.InProgress,
-//          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
-//          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.change.title",
-//          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-//            .onPageLoad(srn, page = 1)
-//            .url
-//        )
-//      }
+      "inProgress (with only 1 incomplete disposal) and only visible with an asset existing" in {
+        val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          // Other Assets 1 - Disposal 1 - Incomplete journey:
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Sold)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
 
-      // Todo: Uncomment and fix as part of [1387]
-//      "completed (with only 1 complete disposal) and only visible with an asset existing" in {
-//        val userAnswersWithData = defaultUserAnswers
-//          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
-//          .unsafeSet(OtherAssetsDisposalPage(srn), true)
-//          // Other Asset 1 - Disposal 1 - Complete journey:
-//          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
-//          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
-//          .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(1), refineMV(1)), true)
-//          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
-//
-//        testViewModel(
-//          userAnswersWithData,
-//          7,
-//          1,
-//          expectedStatus = TaskListStatus.Completed,
-//          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
-//          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.change.title",
-//          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-//            .onPageLoad(srn, page = 1)
-//            .url
-//        )
-//      }
+        testViewModel(
+          userAnswersWithData,
+          7,
+          1,
+          expectedStatus = TaskListStatus.InProgress,
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.change.title",
+          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      }
+
+      "recorded (with 1 complete and 1 incomplete disposal) and only visible with an asset existing" in {
+        val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          // Other Asset 1 - Disposal 1 - Complete journey:
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(1), refineMV(1)), true)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+          // Other Assets 1 - Disposal 2 - Incomplete journey:
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(2)), HowDisposed.Sold)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(2)), SectionJourneyStatus.InProgress("x"))
+
+        testViewModel(
+          userAnswersWithData,
+          7,
+          1,
+          expectedStatus = TaskListStatus.Recorded(1, "disposals"),
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.change.title",
+          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+            .onPageLoad(srn, page = 1)
+            .url
+        )
+      }
+
+      "recorded (with only 1 complete disposal) and only visible with an asset existing" in {
+        val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(OtherAssetsDisposalPage(srn), true)
+          // Other Asset 1 - Disposal 1 - Complete journey:
+          .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.InProgress("x"))
+          .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(1), refineMV(1)), true)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+
+        testViewModel(
+          userAnswersWithData,
+          7,
+          1,
+          expectedStatus = TaskListStatus.Recorded(1, "disposals"),
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.change.title",
+          expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
+            .onPageLoad(srn, page = 1)
+            .url
+        )
+      }
 
       "notStarted (with removal of only complete disposal) and only visible with an asset existing" in {
         val userAnswersWithData = defaultUserAnswers
