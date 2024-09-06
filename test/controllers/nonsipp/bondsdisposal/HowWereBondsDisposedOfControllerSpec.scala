@@ -56,7 +56,35 @@ class HowWereBondsDisposedOfControllerSpec extends ControllerBaseSpec {
             form(injected[RadioListFormProvider]).fill(HowDisposed.Sold),
             viewModel(srn, bondIndex, disposalIndex, NormalMode)
           )
-      }
+      }.withName("return OK and the correct pre-populated view for a GET (Sold)")
+    )
+
+    act.like(
+      renderPrePopView(
+        onPageLoad,
+        HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex),
+        HowDisposed.Transferred
+      ) { implicit app => implicit request =>
+        injected[RadioListView]
+          .apply(
+            form(injected[RadioListFormProvider]).fill(HowDisposed.Transferred),
+            viewModel(srn, bondIndex, disposalIndex, NormalMode)
+          )
+      }.withName("return OK and the correct pre-populated view for a GET (Transferred)")
+    )
+
+    act.like(
+      renderPrePopView(
+        onPageLoad,
+        HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex),
+        HowDisposed.Other("test details")
+      ) { implicit app => implicit request =>
+        injected[RadioListView]
+          .apply(
+            form(injected[RadioListFormProvider]).fill(HowDisposed.Other("test details")),
+            viewModel(srn, bondIndex, disposalIndex, NormalMode)
+          )
+      }.withName("return OK and the correct pre-populated view for a GET (Other)")
     )
 
     act.like(redirectNextPage(onSubmit, "value" -> "Sold"))

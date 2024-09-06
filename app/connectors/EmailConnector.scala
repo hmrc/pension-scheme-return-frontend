@@ -120,12 +120,9 @@ class EmailConnector @Inject()(
             EmailNotSent
         }
       }
-      .recoverWith(logExceptions)
-  }
-
-  private def logExceptions: PartialFunction[Throwable, Future[EmailStatus]] = {
-    case t: Throwable =>
-      logger.warn("Unable to connect to Email Service", t)
-      Future.successful(EmailNotSent)
+      .recoverWith { t =>
+        logger.warn("Unable to connect to Email Service", t)
+        Future.successful(EmailNotSent)
+      }
   }
 }
