@@ -63,7 +63,7 @@ class ViewOnlyReturnSubmittedControllerSpec extends ControllerBaseSpec with Comm
   private val versionNumber: Int = 1
   private val pensionSchemeEnquiriesUrl =
     "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/pension-scheme-enquiries"
-  private val mpsDashboardUrl = "http://localhost:8204/manage-pension-schemes/overview"
+  private val mpsDashboardUrl = "http://localhost:8204/manage-pension-schemes/pension-scheme-summary/" + srn.value
 
   "ViewOnlyReturnSubmittedController" - {
 
