@@ -65,7 +65,7 @@ class ReturnSubmittedController @Inject()(
                 Json.parse(returnPeriods).as[NonEmptyList[DateRange]],
                 LocalDateTime.parse(submissionDate, DateTimeFormatter.ISO_DATE_TIME),
                 config.urls.pensionSchemeEnquiry,
-                config.urls.managePensionsSchemes.dashboard
+                config.urls.managePensionsSchemes.schemeSummaryDashboard(srn)
               )
             )
           )
@@ -106,15 +106,15 @@ object ReturnSubmittedController {
         ParagraphMessage("returnSubmitted.whatHappensNext.paragraph1") ++
           ParagraphMessage(
             "returnSubmitted.whatHappensNext.paragraph2",
-            LinkMessage("returnSubmitted.whatHappensNext.paragraph2.link", pensionSchemeEnquiriesUrl)
-          ) ++
-          ParagraphMessage("returnSubmitted.whatHappensNext.paragraph3") ++
-          ListMessage.Bullet(
-            Message("returnSubmitted.whatHappensNext.list1") ++ LinkMessage(
-              Message("returnSubmitted.whatHappensNext.list1.link", schemeName),
+            LinkMessage(
+              Message("returnSubmitted.whatHappensNext.paragraph2.link", schemeName),
               managePensionSchemeDashboardUrl
             ),
-            LinkMessage("returnSubmitted.whatHappensNext.list2", "javascript:window.print();")
+            "returnSubmitted.whatHappensNext.paragraph2.linkMessage"
+          ) ++
+          ParagraphMessage(
+            "returnSubmitted.whatHappensNext.paragraph3",
+            LinkMessage("returnSubmitted.whatHappensNext.list2", "#print")
           )
     )
 
