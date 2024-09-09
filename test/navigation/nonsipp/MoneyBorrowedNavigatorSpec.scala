@@ -160,21 +160,20 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
   }
 
   "BorrowInstancesListPage" - {
-    // Todo: Uncomment and fix as part of [1387]
-//    "Record at index 1" - {
-//      act.like(
-//        normalmode
-//          .navigateTo(
-//            srn => BorrowInstancesListPage(srn, addBorrow = true),
-//            (srn, mode) =>
-//              controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, refineMV(2), mode),
-//            srn =>
-//              defaultUserAnswers
-//                .unsafeSet(BorrowedAmountAndRatePage(srn, refineMV(1)), (money, percentage))
-//          )
-//          .withName("Add Borrow instance with a record at index 1")
-//      )
-//    }
+    "Record at index 1" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            srn => BorrowInstancesListPage(srn, addBorrow = true),
+            (srn, mode) =>
+              controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, refineMV(2), mode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(LenderNamePage(srn, refineMV(1)), "LenderName")
+          )
+          .withName("Add Borrow instance with a record at index 1")
+      )
+    }
 
     "Record at index 2" - {
       act.like(

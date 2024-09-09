@@ -26,6 +26,7 @@ import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models._
+import viewmodels.models.SectionCompleted
 import eu.timepit.refined.api.Refined
 import org.mockito.ArgumentMatchers.any
 import controllers.nonsipp.landorproperty.LandOrPropertyListController._
@@ -53,7 +54,7 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, indexOne), (leaseName, money, localDate))
     .unsafeSet(IsLesseeConnectedPartyPage(srn, indexOne), true)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, indexOne), money)
-    .unsafeSet(RemovePropertyPage(srn, indexOne), true)
+    .unsafeSet(LandOrPropertyCompleted(srn, indexOne), SectionCompleted)
     .unsafeSet(LandPropertyInUKPage(srn, indexTwo), true)
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, indexTwo), address2)
     .unsafeSet(LandRegistryTitleNumberPage(srn, indexTwo), ConditionalYesNo.yes[String, String]("some-number"))
@@ -102,25 +103,24 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
 
   "LandOrPropertyListController" - {
 
-    // Todo: Uncomment and fix as part of [1387]
-//    act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
-//      injected[ListView].apply(
-//        form(new YesNoPageFormProvider()),
-//        viewModel(
-//          srn,
-//          1,
-//          NormalMode,
-//          addresses,
-//          schemeName
-//        )
-//      )
-//    }.withName("Completed Journey"))
+    act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
+      injected[ListView].apply(
+        form(new YesNoPageFormProvider()),
+        viewModel(
+          srn,
+          1,
+          NormalMode,
+          addresses,
+          schemeName
+        )
+      )
+    }.withName("Completed Journey"))
 
     act.like(
       redirectToPage(
         onPageLoad,
-        controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, indexTwo, NormalMode),
-        completedUserAnswers.remove(LandOrPropertyTotalIncomePage(srn, indexTwo)).get
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode),
+        completedUserAnswers.remove(LandOrPropertyCompleted(srn, indexOne)).get
       ).withName("Incomplete Journey")
     )
 
@@ -156,44 +156,42 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
       compilationOrSubmissionDate = Some(submissionDateTwo)
     )
 
-    // Todo: Uncomment and fix as part of [1387]
-//    act.like(
-//      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-//        implicit app => implicit request =>
-//          injected[ListView].apply(
-//            form(injected[YesNoPageFormProvider]),
-//            viewModel(
-//              srn,
-//              page,
-//              mode = ViewOnlyMode,
-//              addresses,
-//              schemeName,
-//              Some(viewOnlyViewModel)
-//            )
-//          )
-//      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
-//    )
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[ListView].apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              addresses,
+              schemeName,
+              Some(viewOnlyViewModel)
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
+    )
 
     val updatedUserAnswers = currentUserAnswers
       .unsafeSet(IsLesseeConnectedPartyPage(srn, indexOne), false)
 
-    // Todo: Uncomment and fix as part of [1387]
-//    act.like(
-//      renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(defaultUserAnswers)) {
-//        implicit app => implicit request =>
-//          injected[ListView].apply(
-//            form(injected[YesNoPageFormProvider]),
-//            viewModel(
-//              srn,
-//              page,
-//              mode = ViewOnlyMode,
-//              addresses,
-//              schemeName,
-//              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
-//            )
-//          )
-//      }.withName("OnPageLoadViewOnly renders ok with changed flag")
-//    )
+    act.like(
+      renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(defaultUserAnswers)) {
+        implicit app => implicit request =>
+          injected[ListView].apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              addresses,
+              schemeName,
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+            )
+          )
+      }.withName("OnPageLoadViewOnly renders ok with changed flag")
+    )
 
     act.like(
       renderView(
