@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
+package pages.nonsipp.membersurrenderedbenefits
+
 import config.Refined.Max300
 import eu.timepit.refined.refineMV
-import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCompletedPage
 import viewmodels.models.SectionCompleted
 import pages.behaviours.PageBehaviours
 
@@ -25,12 +26,13 @@ class SurrenderedBenefitsCompletedPageSpec extends PageBehaviours {
   "SurrenderedBenefitsCompletedPage" - {
 
     val index = refineMV[Max300.Refined](1)
+    val srn = srnGen.sample.value
 
-    beRetrievable[SectionCompleted](SurrenderedBenefitsCompletedPage(srnGen.sample.value, index))
+    beRetrievable[SectionCompleted](SurrenderedBenefitsCompletedPage(srn, index))
 
-    beSettable[SectionCompleted](SurrenderedBenefitsCompletedPage(srnGen.sample.value, index))
+    beSettable[SectionCompleted](SurrenderedBenefitsCompletedPage(srn, index))
 
-    beRemovable[SectionCompleted](SurrenderedBenefitsCompletedPage(srnGen.sample.value, index))
+    beRemovable[SectionCompleted](SurrenderedBenefitsCompletedPage(srn, index))
 
   }
 }

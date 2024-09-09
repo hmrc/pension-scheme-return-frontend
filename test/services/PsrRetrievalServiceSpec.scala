@@ -84,7 +84,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
   "PSRRetrievalService" - {
 
     "should not getPsrDetails return data when not found" in {
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any())(any(), any()))
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
       whenReady(
         service.getAndTransformStandardPsrDetails(None, Some(pstr), Some(version), fallbackCall)(
@@ -106,7 +106,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
     "should getPsrDetails return data when only minimal data was found in etmp" in {
       when(mockMinimalRequiredSubmissionTransformer.transformFromEtmp(any(), any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any())(any(), any()))
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(any(), any()))
         .thenReturn(
           Future.successful(
             Some(
@@ -145,7 +145,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Try(defaultUserAnswers))
       when(mockLoansTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any())(any(), any()))
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(any(), any()))
         .thenReturn(
           Future.successful(
             Some(
@@ -184,7 +184,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Try(defaultUserAnswers))
       when(mockAssetsTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any())(any(), any()))
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(any(), any()))
         .thenReturn(
           Future.successful(
             Some(
@@ -224,7 +224,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       when(mockMemberPaymentsTransformer.transformFromEtmp(any(), any(), any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
 
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any())(any(), any()))
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(any(), any()))
         .thenReturn(
           Future.successful(
             Some(
@@ -264,7 +264,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       when(mockSharesTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
 
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any())(any(), any()))
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(any(), any()))
         .thenReturn(
           Future.successful(
             Some(
@@ -303,7 +303,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         .thenReturn(Try(defaultUserAnswers))
       when(mockDeclarationTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
-      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any())(any(), any()))
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any(), any(), any(), any(), any())(any(), any()))
         .thenReturn(
           Future.successful(
             Some(

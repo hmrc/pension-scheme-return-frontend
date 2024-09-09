@@ -64,10 +64,10 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
     "onPageLoads returns OK and the correct view - when empty responses returned" in runningApplication {
       implicit app =>
-        when(mockPsrOverviewService.getOverview(any(), any(), any())(any(), any())).thenReturn(
+        when(mockPsrOverviewService.getOverview(any(), any(), any(), any())(any(), any())).thenReturn(
           Future.successful(Some(Seq()))
         )
-        when(mockPsrVersionsService.getVersionsForYears(any(), any())(any(), any())).thenReturn(
+        when(mockPsrVersionsService.getVersionsForYears(any(), any(), any())(any(), any())).thenReturn(
           Future.successful(Seq())
         )
 
@@ -88,10 +88,10 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
     "onPageLoads returns OK and expected content - when submitted responses returned" in runningApplication {
       implicit app =>
-        when(mockPsrOverviewService.getOverview(any(), any(), any())(any(), any())).thenReturn(
+        when(mockPsrOverviewService.getOverview(any(), any(), any(), any())(any(), any())).thenReturn(
           Future.successful(Some(overviewResponse))
         )
-        when(mockPsrVersionsService.getVersionsForYears(any(), any())(any(), any())).thenReturn(
+        when(mockPsrVersionsService.getVersionsForYears(any(), any(), any())(any(), any())).thenReturn(
           Future.successful(versionsForYearsResponse)
         )
         val request = FakeRequest(GET, onPageLoad)
@@ -111,10 +111,10 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
     "onPageLoads returns OK and expected content - when in progress responses returned" in runningApplication {
       implicit app =>
-        when(mockPsrOverviewService.getOverview(any(), any(), any())(any(), any())).thenReturn(
+        when(mockPsrOverviewService.getOverview(any(), any(), any(), any())(any(), any())).thenReturn(
           Future.successful(Some(overviewResponse))
         )
-        when(mockPsrVersionsService.getVersionsForYears(any(), any())(any(), any())).thenReturn(
+        when(mockPsrVersionsService.getVersionsForYears(any(), any(), any())(any(), any())).thenReturn(
           Future.successful(versionsForYearsInProgressResponse)
         )
         val request = FakeRequest(GET, onPageLoad)
@@ -205,7 +205,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
     }
 
     "onSelectViewAndChange redirects to the BasicDetailsCYA page when members over threshold and no previous userAnswers and no previous psr return at all" in {
-      when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(
+      when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any())).thenReturn(
         Future.successful(Seq())
       )
       val currentUA = emptyUserAnswers
@@ -226,7 +226,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
     "onSelectViewAndChange redirects to the BasicDetailsCYA page " +
       "when members over threshold and no previous userAnswers and no previous psr return with memberDetails" in {
-      when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(
+      when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any())).thenReturn(
         Future.successful(versionsResponse)
       )
       when(
@@ -254,7 +254,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
       val currentUA = emptyUserAnswers
         .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
         .unsafeSet(WhichTaxYearPage(srn), dateRange)
-      when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(
+      when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any())).thenReturn(
         Future.successful(versionsResponse)
       )
       when(

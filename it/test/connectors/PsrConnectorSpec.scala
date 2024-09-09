@@ -20,10 +20,11 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import models.SchemeId.Srn
 import org.scalatest.exceptions.TestFailedException
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsResultException, Json, JsonValidationError, __}
+import play.api.libs.json.{__, JsResultException, Json, JsonValidationError}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.CommonTestValues
@@ -80,6 +81,7 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
           .withHeader("Content-Type", "application/json")
           .withHeader("userName", "userName")
           .withHeader("schemeName", "schemeName")
+          .withHeader("srn", "S0000000042")
       )
 
       val result =
@@ -91,7 +93,8 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
             Some(commonVersion),
             commonFallbackCall,
             commonUserName,
-            commonSchemeName
+            commonSchemeName,
+            Srn(commonSrn).get
           )
           .futureValue
 
@@ -108,6 +111,7 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
           .withHeader("Content-Type", "application/json")
           .withHeader("userName", "userName")
           .withHeader("schemeName", "schemeName")
+          .withHeader("srn", "S0000000042")
       )
 
       val result =
@@ -119,7 +123,8 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
             None,
             commonFallbackCall,
             commonUserName,
-            commonSchemeName
+            commonSchemeName,
+            Srn(commonSrn).get
           )
           .futureValue
 
@@ -137,6 +142,7 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
           .withHeader("Content-Type", "application/json")
           .withHeader("userName", "userName")
           .withHeader("schemeName", "schemeName")
+          .withHeader("srn", "S0000000042")
       )
 
       val result =
@@ -148,7 +154,8 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
             None,
             commonFallbackCall,
             commonUserName,
-            commonSchemeName
+            commonSchemeName,
+            Srn(commonSrn).get
           )
           .futureValue
 
@@ -165,10 +172,13 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
           .withHeader("Content-Type", "application/json")
           .withHeader("userName", "userName")
           .withHeader("schemeName", "schemeName")
+          .withHeader("srn", "S0000000042")
       )
 
       val result: Either[String, Unit] =
-        connector.submitPsrDetails(minimalSubmissionData, commonUserName, commonSchemeName).futureValue
+        connector
+          .submitPsrDetails(minimalSubmissionData, commonUserName, commonSchemeName, Srn(commonSrn).get)
+          .futureValue
 
       result mustBe Right(())
     }
@@ -179,11 +189,11 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
     "return getVersionsForYears for start date and end date" in runningApplication { implicit app =>
       stubGet(
         getVersionsForYearsUrl,
-        ok(Json.stringify(getVersionsForYearsJson))
+        ok(Json.stringify(getVersionsForYearsJson)).withHeader("srn", "S0000000042")
       )
 
       val result = connector
-        .getVersionsForYears(commonPstr, Seq(commonStartDate))
+        .getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get)
         .futureValue
 
       result mustBe versionsForYearsResponse
@@ -192,10 +202,10 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
     "return empty list when getVersionsForYears called and 403 returned" in runningApplication { implicit app =>
       stubGet(
         getVersionsForYearsUrl,
-        forbidden().withBody(Json.stringify(getVersionsForYears403Json))
+        forbidden().withBody(Json.stringify(getVersionsForYears403Json)).withHeader("srn", "S0000000042")
       )
 
-      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate)).futureValue
+      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get).futureValue
 
       result mustBe List()
     }
@@ -203,10 +213,10 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
     "return empty list when getVersionsForYears called and data not found" in runningApplication { implicit app =>
       stubGet(
         getVersionsForYearsUrl,
-        forbidden().withBody(Json.stringify(getVersionsForYearsNotFoundJson))
+        forbidden().withBody(Json.stringify(getVersionsForYearsNotFoundJson)).withHeader("srn", "S0000000042")
       )
 
-      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate)).futureValue
+      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get).futureValue
 
       result mustBe List()
     }
@@ -214,11 +224,11 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
     "return JsResultException when the first name is invalid" in runningApplication { implicit app =>
       stubGet(
         getVersionsForYearsUrl,
-        ok(Json.stringify(getVersionsForYearsJsonWithInvalidFirstName))
+        ok(Json.stringify(getVersionsForYearsJsonWithInvalidFirstName)).withHeader("srn", "S0000000042")
       )
 
       val err: TestFailedException = intercept[TestFailedException](
-        connector.getVersionsForYears(commonPstr, Seq(commonStartDate)).futureValue
+        connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get).futureValue
       )
 
       err.cause match {
@@ -235,11 +245,11 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
     "return getVersions data for a start date" in runningApplication { implicit app =>
       stubGet(
         getVersionsUrl,
-        ok(Json.stringify(getVersionsJson))
+        ok(Json.stringify(getVersionsJson)).withHeader("srn", "S0000000042")
       )
 
       val result = connector
-        .getVersions(commonPstr, commonStartDate)
+        .getVersions(commonPstr, commonStartDate, Srn(commonSrn).get)
         .futureValue
 
       result mustBe versionsResponse
@@ -248,10 +258,10 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
     "return empty list when getVersionsForYears called and 403 returned" in runningApplication { implicit app =>
       stubGet(
         getVersionsUrl,
-        forbidden().withBody(Json.stringify(getVersionsForYears403Json))
+        forbidden().withBody(Json.stringify(getVersionsForYears403Json)).withHeader("srn", "S0000000042")
       )
 
-      val result = connector.getVersions(commonPstr, commonStartDate).futureValue
+      val result = connector.getVersions(commonPstr, commonStartDate, Srn(commonSrn).get).futureValue
 
       result mustBe List()
     }
@@ -259,10 +269,10 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
     "return empty list when getVersions called and data not found" in runningApplication { implicit app =>
       stubGet(
         getVersionsUrl,
-        forbidden().withBody(Json.stringify(getVersionsForYearsNotFoundJson))
+        forbidden().withBody(Json.stringify(getVersionsForYearsNotFoundJson)).withHeader("srn", "S0000000042")
       )
 
-      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate)).futureValue
+      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get).futureValue
 
       result mustBe List()
     }
@@ -277,10 +287,10 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
           "fromDate" -> commonStartDate,
           "toDate" -> commonEndDate
         ),
-        ok(Json.stringify(overviewJson))
+        ok(Json.stringify(overviewJson)).withHeader("srn", "S0000000042")
       )
 
-      val result = connector.getOverview(commonPstr, commonStartDate, commonEndDate).futureValue
+      val result = connector.getOverview(commonPstr, commonStartDate, commonEndDate, Srn(commonSrn).get).futureValue
 
       result mustBe Some(overviewResponse)
     }
@@ -292,10 +302,10 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
           "fromDate" -> commonEndDate,
           "toDate" -> commonStartDate
         ),
-        forbidden().withBody(Json.stringify(overviewJson))
+        forbidden().withBody(Json.stringify(overviewJson)).withHeader("srn", "S0000000042")
       )
 
-      val result = connector.getOverview(commonPstr, commonEndDate, commonStartDate).futureValue
+      val result = connector.getOverview(commonPstr, commonEndDate, commonStartDate, Srn(commonSrn).get).futureValue
 
       result mustBe None
     }

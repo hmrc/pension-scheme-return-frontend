@@ -53,7 +53,8 @@ class ReturnsSubmittedController @Inject()(
       request.userAnswers.get(WhichTaxYearPage(srn)) match {
         case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         case Some(dateRange: DateRange) =>
-          val response = psrVersionsService.getVersions(request.schemeDetails.pstr, formatDateForApi(dateRange.from))
+          val response =
+            psrVersionsService.getVersions(request.schemeDetails.pstr, formatDateForApi(dateRange.from), srn)
           response.map { seqPsrVersionsResponse =>
             val reportVersions = seqPsrVersionsResponse.map(_.reportVersion)
             val listRetHistorySummary = seqPsrVersionsResponse
