@@ -1614,10 +1614,10 @@ financialDetailsCheckYourAnswersController.totalCashInStartDate = Total cash {0}
 financialDetailsCheckYourAnswersController.totalCashInStartDate.hidden = total cash in all bank accounts, on {0}
 financialDetailsCheckYourAnswersController.totalCashInEndDate = Total cash {0} held in all bank accounts on {1}?
 financialDetailsCheckYourAnswersController.totalCashInEndDate.hidden = total cash in all bank accounts, on {0}
-financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate = Value of {0}’s assets, including cash, on {1}?
-financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate.hidden = value of scheme assets, including cash, on {0}
-financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate = What was the total value of {0}’s assets, including cash, on {1}?
-financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate.hidden = total value of scheme assets, including cash, on {0}
+financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate = Value of {0}’s assets, minus liabilities, on {1}?
+financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate.hidden = value of scheme assets, minus liabilities, on {0}
+financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate = What was the total value of {0}’s assets, minus liabilities, on {1}?
+financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate.hidden = total value of scheme assets, minus liabilities, on {0}
 financialDetailsCheckYourAnswersController.feeCommissionWagesSalary = How much did {0} pay in fees or commissions of over 10%?
 financialDetailsCheckYourAnswersController.feeCommissionWagesSalary.hidden = how much the scheme paid in fees or commissions of over 10%
 
