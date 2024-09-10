@@ -17,6 +17,7 @@
 package services
 
 import connectors.PSRConnector
+import models.SchemeId.Srn
 import models.backend.responses.{PsrVersionsForYearsResponse, PsrVersionsResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -26,15 +27,15 @@ import javax.inject.{Inject, Singleton}
 
 @Singleton
 class PsrVersionsService @Inject()(psrConnector: PSRConnector) {
-  def getVersionsForYears(pstr: String, startDates: Seq[String])(
+  def getVersionsForYears(pstr: String, startDates: Seq[String], srn: Srn)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsForYearsResponse]] =
-    psrConnector.getVersionsForYears(pstr, startDates)
+    psrConnector.getVersionsForYears(pstr, startDates, srn)
 
-  def getVersions(pstr: String, startDate: String)(
+  def getVersions(pstr: String, startDate: String, srn: Srn)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsResponse]] =
-    psrConnector.getVersions(pstr, startDate)
+    psrConnector.getVersions(pstr, startDate, srn)
 }

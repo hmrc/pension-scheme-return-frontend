@@ -68,7 +68,8 @@ trait SchemeDetailNavigationUtils { _: PSRController =>
         request.userAnswers.get(WhichTaxYearPage(srn)) match {
           case Some(currentReturnTaxYear) =>
             val previousTaxYear = formatDateForApi(currentReturnTaxYear.from.minusYears(1))
-            val previousTaxYearVersions = psrVersionsService.getVersions(request.schemeDetails.pstr, previousTaxYear)
+            val previousTaxYearVersions =
+              psrVersionsService.getVersions(request.schemeDetails.pstr, previousTaxYear, srn)
 
             previousTaxYearVersions.map { psrVersionsResponses =>
               if (psrVersionsResponses.nonEmpty) {

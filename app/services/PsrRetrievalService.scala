@@ -86,7 +86,8 @@ class PsrRetrievalService @Inject()(
         optPsrVersion,
         fallBackCall,
         schemeAdministratorOrPractitionerName,
-        request.schemeDetails.schemeName
+        request.schemeDetails.schemeName,
+        request.srn
       )
 
   def transformPsrDetails(
