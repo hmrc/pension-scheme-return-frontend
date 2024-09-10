@@ -108,7 +108,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockMemberPaymentsTransformerTransformer, never).transformToEtmp(any(), any(), any(), any())
         verify(mockDeclarationTransformer, never).transformToEtmp(any())
-        verify(mockConnector, never).submitPsrDetails(any(), any(), any())(any(), any())
+        verify(mockConnector, never).submitPsrDetails(any(), any(), any(), any())(any(), any())
         verify(mockAuditService, never).sendExtendedEvent(any())(any(), any())
         verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
         result mustBe None
@@ -125,7 +125,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockMemberPaymentsTransformerTransformer, never).transformToEtmp(any(), any(), any(), any())
         verify(mockDeclarationTransformer, never).transformToEtmp(any())
-        verify(mockConnector, never).submitPsrDetails(any(), any(), any())(any(), any())
+        verify(mockConnector, never).submitPsrDetails(any(), any(), any(), any())(any(), any())
         verify(mockAuditService, never).sendExtendedEvent(any())(any(), any())
         verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
         result mustBe Some(())
@@ -144,7 +144,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockMemberPaymentsTransformerTransformer, never).transformToEtmp(any(), any(), any(), any())
         verify(mockDeclarationTransformer, never).transformToEtmp(any())
-        verify(mockConnector, never).submitPsrDetails(any(), any(), any())(any(), any())
+        verify(mockConnector, never).submitPsrDetails(any(), any(), any(), any())(any(), any())
         verify(mockAuditService, never).sendExtendedEvent(any())(any(), any())
         verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
         result mustBe None
@@ -164,31 +164,33 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockMemberPaymentsTransformerTransformer.transformToEtmp(any(), any(), any(), any())).thenReturn(None)
           when(mockAssetsTransformer.transformToEtmp(any(), any())(any())).thenReturn(None)
           when(mockSharesTransformer.transformToEtmp(any(), any())(any())).thenReturn(None)
-          when(mockConnector.submitPsrDetails(any(), any(), any())(any(), any()))
+          when(mockConnector.submitPsrDetails(any(), any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(Right(())))
           when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
             .thenReturn(Future.successful(Some(emptyUserAnswers)))
 
           whenReady(
             service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
-          ) { result: Option[Unit] =>
-            verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any(), any(), any())(any())
-            verify(mockLoansTransformer, times(1)).transformToEtmp(any(), any())(any())
-            verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
-            verify(mockSharesTransformer, times(1)).transformToEtmp(any(), any())(any())
-            verify(mockDeclarationTransformer, never).transformToEtmp(any())
-            verify(mockConnector, times(1)).submitPsrDetails(psrSubmissionCaptor.capture(), any(), any())(any(), any())
-            verify(mockAuditService, times(1)).sendExtendedEvent(psrCompileAuditEventCaptor.capture())(any(), any())
-            verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
+          ) {
+            result: Option[Unit] =>
+              verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any(), any(), any())(any())
+              verify(mockLoansTransformer, times(1)).transformToEtmp(any(), any())(any())
+              verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
+              verify(mockSharesTransformer, times(1)).transformToEtmp(any(), any())(any())
+              verify(mockDeclarationTransformer, never).transformToEtmp(any())
+              verify(mockConnector, times(1))
+                .submitPsrDetails(psrSubmissionCaptor.capture(), any(), any(), any())(any(), any())
+              verify(mockAuditService, times(1)).sendExtendedEvent(psrCompileAuditEventCaptor.capture())(any(), any())
+              verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
 
-            psrSubmissionCaptor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-            psrSubmissionCaptor.getValue.checkReturnDates mustBe checkReturnDatesAnswer
-            psrSubmissionCaptor.getValue.loans mustBe None
-            psrSubmissionCaptor.getValue.assets mustBe None
-            psrSubmissionCaptor.getValue.shares mustBe None
-            psrSubmissionCaptor.getValue.psrDeclaration mustBe None
-            psrCompileAuditEventCaptor.getValue.taskList must not be JsArray(Array.empty[JsValue])
-            result mustBe Some(())
+              psrSubmissionCaptor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+              psrSubmissionCaptor.getValue.checkReturnDates mustBe checkReturnDatesAnswer
+              psrSubmissionCaptor.getValue.loans mustBe None
+              psrSubmissionCaptor.getValue.assets mustBe None
+              psrSubmissionCaptor.getValue.shares mustBe None
+              psrSubmissionCaptor.getValue.psrDeclaration mustBe None
+              psrCompileAuditEventCaptor.getValue.taskList must not be JsArray(Array.empty[JsValue])
+              result mustBe Some(())
           }
         }
     )
@@ -205,7 +207,8 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         .thenReturn(optMemberPayments)
       when(mockAssetsTransformer.transformToEtmp(any(), any())(any())).thenReturn(optAssets)
       when(mockSharesTransformer.transformToEtmp(any(), any())(any())).thenReturn(optShares)
-      when(mockConnector.submitPsrDetails(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(())))
+      when(mockConnector.submitPsrDetails(any(), any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(Right(())))
       when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
         .thenReturn(Future.successful(Some(emptyUserAnswers)))
 
@@ -219,7 +222,10 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
         verify(mockSharesTransformer, times(1)).transformToEtmp(any(), any())(any())
         verify(mockDeclarationTransformer, never).transformToEtmp(any())
-        verify(mockConnector, times(1)).submitPsrDetails(psrSubmissionCaptor.capture(), any(), any())(any(), any())
+        verify(mockConnector, times(1)).submitPsrDetails(psrSubmissionCaptor.capture(), any(), any(), any())(
+          any(),
+          any()
+        )
         verify(mockAuditService, times(1)).sendExtendedEvent(psrCompileAuditEventCaptor.capture())(any(), any())
         verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
 
@@ -246,7 +252,8 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         .thenReturn(optMemberPayments)
       when(mockAssetsTransformer.transformToEtmp(any(), any())(any())).thenReturn(optAssets)
       when(mockSharesTransformer.transformToEtmp(any(), any())(any())).thenReturn(optShares)
-      when(mockConnector.submitPsrDetails(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(())))
+      when(mockConnector.submitPsrDetails(any(), any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(Right(())))
       when(mockDeclarationTransformer.transformToEtmp(any())).thenReturn(declaration)
       when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
         .thenReturn(Future.successful(Some(emptyUserAnswers)))
@@ -260,7 +267,10 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
           verify(mockSharesTransformer, times(1)).transformToEtmp(any(), any())(any())
           verify(mockDeclarationTransformer, times(1)).transformToEtmp(any())
-          verify(mockConnector, times(1)).submitPsrDetails(psrSubmissionCaptor.capture(), any(), any())(any(), any())
+          verify(mockConnector, times(1)).submitPsrDetails(psrSubmissionCaptor.capture(), any(), any(), any())(
+            any(),
+            any()
+          )
           verify(mockAuditService, times(1)).sendExtendedEvent(psrSubmissionAuditEventCaptor.capture())(any(), any())
           verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
 
@@ -287,7 +297,8 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         .thenReturn(optMemberPayments)
       when(mockAssetsTransformer.transformToEtmp(any(), any())(any())).thenReturn(optAssets)
       when(mockSharesTransformer.transformToEtmp(any(), any())(any())).thenReturn(optShares)
-      when(mockConnector.submitPsrDetails(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(())))
+      when(mockConnector.submitPsrDetails(any(), any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(Right(())))
       when(mockDeclarationTransformer.transformToEtmp(any())).thenReturn(declaration)
       when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
         .thenReturn(Future.successful(Some(userAnswers)))
@@ -301,7 +312,10 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
           verify(mockSharesTransformer, times(1)).transformToEtmp(any(), any())(any())
           verify(mockDeclarationTransformer, times(1)).transformToEtmp(any())
-          verify(mockConnector, times(1)).submitPsrDetails(psrSubmissionCaptor.capture(), any(), any())(any(), any())
+          verify(mockConnector, times(1)).submitPsrDetails(psrSubmissionCaptor.capture(), any(), any(), any())(
+            any(),
+            any()
+          )
           verify(mockAuditService, times(1)).sendExtendedEvent(psrSubmissionAuditEventCaptor.capture())(any(), any())
           verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
 

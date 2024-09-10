@@ -17,13 +17,14 @@
 package connectors
 
 import config.FrontendAppConfig
-import handlers.GetPsrException
 import play.api.libs.ws.WSRequest
 import models.requests.psr.PsrSubmission
 import models.AnswersSavedDisplayVersion
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import play.api.mvc.Call
+import handlers.GetPsrException
+import models.SchemeId.Srn
 import play.api.Logger
 import play.api.libs.json._
 import models.backend.responses.{OverviewResponse, PsrVersionsForYearsResponse, PsrVersionsResponse}
@@ -50,12 +51,13 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
   def submitPsrDetails(
     psrSubmission: PsrSubmission,
     userName: String,
-    schemeName: String
+    schemeName: String,
+    srn: Srn
   )(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] =
     http
       .post(url"$submitStandardUrl")
       .withBody(Json.toJson(psrSubmission))
-      .transform(buildHeaders(_, userName, schemeName))
+      .transform(buildHeaders(_, userName, schemeName, srn))
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -72,7 +74,8 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
     optPsrVersion: Option[String],
     fallBackCall: Call,
     userName: String,
-    schemeName: String
+    schemeName: String,
+    srn: Srn
   )(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[PsrSubmission]] = {
     val queryParams = (optPeriodStartDate, optPsrVersion, optFbNumber) match {
       case (Some(startDate), Some(version), _) =>
@@ -85,7 +88,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
     }
     http
       .get(url"${getStandardUrl(pstr)}?$queryParams")
-      .transform(buildHeaders(_, userName, schemeName))
+      .transform(buildHeaders(_, userName, schemeName, srn))
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -106,12 +109,13 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
       }
   }
 
-  def getVersionsForYears(pstr: String, startDates: Seq[String])(
+  def getVersionsForYears(pstr: String, startDates: Seq[String], srn: Srn)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsForYearsResponse]] =
     http
       .get(url"${versionsForYearsUrl(pstr, startDates)}")
+      .transform(_.addHttpHeaders("srn" -> srn.value))
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -141,12 +145,13 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
         }
       }
 
-  def getVersions(pstr: String, startDate: String)(
+  def getVersions(pstr: String, startDate: String, srn: Srn)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsResponse]] =
     http
       .get(url"${versionsUrl(pstr, startDate)}")
+      .transform(_.addHttpHeaders("srn" -> srn.value))
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -174,7 +179,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
         }
       }
 
-  def getOverview(pstr: String, fromDate: String, toDate: String)(
+  def getOverview(pstr: String, fromDate: String, toDate: String, srn: Srn)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[Seq[OverviewResponse]]] = {
@@ -187,6 +192,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
 
     http
       .get(url"${overviewUrl(pstr)}?$queryParams")
+      .transform(_.addHttpHeaders("srn" -> srn.value))
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -204,10 +210,11 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
       }
   }
 
-  private def buildHeaders(wsRequest: WSRequest, userName: String, schemeName: String): WSRequest =
+  private def buildHeaders(wsRequest: WSRequest, userName: String, schemeName: String, srn: Srn): WSRequest =
     wsRequest.addHttpHeaders(
       "Content-Type" -> "application/json",
       "userName" -> userName,
-      "schemeName" -> schemeName
+      "schemeName" -> schemeName,
+      "srn" -> srn.value
     )
 }

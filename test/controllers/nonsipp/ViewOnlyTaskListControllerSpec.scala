@@ -78,7 +78,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     )
 
   override def beforeEach(): Unit =
-    when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(Future.successful(Seq()))
+    when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any())).thenReturn(Future.successful(Seq()))
 
   // Set test values
   private val index1of300: Max300 = refineMV(1)

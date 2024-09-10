@@ -54,7 +54,7 @@ class TaskListController @Inject()(
       case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       case Some(dates) =>
         for {
-          response <- psrVersionsService.getVersions(request.schemeDetails.pstr, formatDateForApi(dates.from))
+          response <- psrVersionsService.getVersions(request.schemeDetails.pstr, formatDateForApi(dates.from), srn)
           hasHistory = response
             .exists(
               psrVersionsResponse =>

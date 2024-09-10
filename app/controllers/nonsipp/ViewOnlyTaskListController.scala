@@ -40,15 +40,14 @@ import models._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class ViewOnlyTaskListController @Inject()(
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: TaskListView
-)(implicit ec: ExecutionContext)
-    extends PSRController
+) extends PSRController
     with I18nSupport {
 
   private val logger = Logger(getClass)

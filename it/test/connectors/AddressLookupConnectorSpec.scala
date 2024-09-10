@@ -23,7 +23,6 @@ import models.{ALFAddress, ALFAddressResponse, ALFCountry, PensionSchemeId}
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.test.Helpers.baseApplicationBuilder.injector
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -51,13 +50,15 @@ class AddressLookupConnectorSpec extends BaseConnectorSpec {
   "lookup" - {
 
     "return address lookup details" in runningApplication { implicit app =>
-      val md = addressGen.sample.value
-      stubGet("psaId", psaId.value,
+      stubGet(
+        "psaId",
+        psaId.value,
         ok(
           Json.stringify(
             Json.arr(
               Json.obj(
-                "id" -> "test id", "address" -> Json.obj(
+                "id" -> "test id",
+                "address" -> Json.obj(
                   "lines" -> Json.arr("line one"),
                   "town" -> "town",
                   "postcode" -> "ZZ1 1ZZ",
@@ -73,9 +74,13 @@ class AddressLookupConnectorSpec extends BaseConnectorSpec {
 
       val resultOne = connector.lookup("ZZ1 1ZZ", Some("town")).futureValue
 
-      result mustBe List(ALFAddressResponse("test id", ALFAddress(List("line one"), "town", "ZZ1 1ZZ", ALFCountry("code", "address"))))
+      result mustBe List(
+        ALFAddressResponse("test id", ALFAddress(List("line one"), "town", "ZZ1 1ZZ", ALFCountry("code", "address")))
+      )
 
-      resultOne mustBe List(ALFAddressResponse("test id", ALFAddress(List("line one"), "town", "ZZ1 1ZZ", ALFCountry("code", "address"))))
+      resultOne mustBe List(
+        ALFAddressResponse("test id", ALFAddress(List("line one"), "town", "ZZ1 1ZZ", ALFCountry("code", "address")))
+      )
 
     }
 

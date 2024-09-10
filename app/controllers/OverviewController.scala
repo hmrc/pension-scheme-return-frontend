@@ -206,9 +206,9 @@ class OverviewController @Inject()(
       val toDate = formatDateForApi(allDates.head._2.from)
       val fromDate = formatDateForApi(allDates.last._2.from)
       for {
-        overviewResponse <- psrOverviewService.getOverview(request.schemeDetails.pstr, fromDate, toDate)
+        overviewResponse <- psrOverviewService.getOverview(request.schemeDetails.pstr, fromDate, toDate, srn)
         versionsForYearsResponse <- psrVersionsService
-          .getVersionsForYears(request.schemeDetails.pstr, allDates.drop(1).map(dates => dates._2.from.toString))
+          .getVersionsForYears(request.schemeDetails.pstr, allDates.drop(1).map(dates => dates._2.from.toString), srn)
         outstanding = outstandingData(srn, overviewResponse)
         previous = previousData(srn, versionsForYearsResponse, overviewResponse, outstanding)
       } yield Ok(view(outstanding, previous, request.schemeDetails.schemeName))

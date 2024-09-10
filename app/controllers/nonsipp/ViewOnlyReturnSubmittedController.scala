@@ -59,7 +59,7 @@ class ViewOnlyReturnSubmittedController @Inject()(
           Some("%03d".format(version)),
           controllers.routes.OverviewController.onPageLoad(srn)
         )
-        psrVersionsResponse <- psrVersionsService.getVersions(request.schemeDetails.pstr, year)
+        psrVersionsResponse <- psrVersionsService.getVersions(request.schemeDetails.pstr, year, srn)
         viewModel = ViewOnlyReturnSubmittedController.viewModel(
           srn,
           request.schemeDetails.schemeName,

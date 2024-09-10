@@ -26,6 +26,7 @@ import java.time.{LocalDate, LocalDateTime}
 
 trait CommonTestValues {
   val commonPstr = "testPstr"
+  val commonSrn = "S0000000042"
   val commonStartDate = "2022-04-06"
   val commonEndDate = "2024-04-06"
   val commonVersion = "001"

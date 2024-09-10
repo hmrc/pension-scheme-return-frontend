@@ -61,7 +61,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    when(mockPsrVersionsService.getVersions(any(), any())(any(), any())).thenReturn(Future.successful(Seq()))
+    when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any())).thenReturn(Future.successful(Seq()))
   }
 
   "TaskListController" - {
@@ -74,7 +74,6 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       dateRange.to,
       defaultUserAnswers,
       pensionSchemeId,
-      hasHistory = false,
       noChangesSincePreviousVersion = false
     )
     lazy val onPageLoad = routes.TaskListController.onPageLoad(srn)
@@ -1073,7 +1072,6 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       dateRange.to,
       userAnswersPopulated,
       pensionSchemeId,
-      hasHistory = false,
       noChangesSincePreviousVersion = false
     )
     val sections = customViewModel.page.sections.toList
