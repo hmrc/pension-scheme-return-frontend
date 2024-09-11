@@ -345,6 +345,12 @@ object MemberPensionPaymentsListController {
         ("memberPensionPayments.memberList.title.plural", "memberPensionPayments.memberList.heading.plural")
       }
 
+    val sumPensionPayments: Int = memberList.flatten.zipWithIndex.count {
+      case (_, index) =>
+        refineV[OneTo300](index + 1).toOption
+          .exists(nextIndex => userAnswers.get(TotalAmountPensionPaymentsPage(srn, nextIndex)).isDefined)
+    }
+
     // in view-only mode or with direct url edit page value can be higher than needed
     val currentPage = if ((page - 1) * Constants.memberPensionPayments >= memberListSize) 1 else page
     val pagination = Pagination(
@@ -428,7 +434,11 @@ object MemberPensionPaymentsListController {
             submittedText =
               compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
             title = "memberPensionPayments.memberList.viewOnly.title",
-            heading = "memberPensionPayments.memberList.viewOnly.heading",
+            heading = sumPensionPayments match {
+              case 0 => Message("memberPensionPayments.memberList.viewOnly.heading")
+              case 1 => Message("memberPensionPayments.memberList.viewOnly.singular")
+              case _ => Message("memberPensionPayments.memberList.viewOnly.plural", sumPensionPayments)
+            },
             buttonText = "site.return.to.tasklist",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>

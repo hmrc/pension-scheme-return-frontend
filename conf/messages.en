@@ -2743,8 +2743,12 @@ memberPensionPayments.memberList.noPensionPayments = No pension payments
 memberPensionPayments.memberList.add.hidden.text = pension payments for {0}
 memberPensionPayments.memberList.change.hidden.text = pension payments for {0}
 memberPensionPayments.memberList.remove.hidden.text = pension payments for {0}
+
 memberPensionPayments.memberList.viewOnly.title = Pension payments
 memberPensionPayments.memberList.viewOnly.heading = Pension payments
+memberPensionPayments.memberList.viewOnly.singular = 1 pension payment
+memberPensionPayments.memberList.viewOnly.plural = {0} pension payments
+
 memberPensionPayments.memberList.viewOnly.link = View previous version of pension payments (opens in new tab)
 memberPensionPayments.memberList.view.none = Did any member receive pension payments from {0} during the period of this return?
 

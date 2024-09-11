@@ -25,7 +25,6 @@ import views.html.TwoColumnsTripleAction
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models._
-import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
@@ -36,8 +35,12 @@ import pages.nonsipp.memberpensionpayments.{
   TotalAmountPensionPaymentsPage
 }
 import eu.timepit.refined.refineMV
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.SectionCompleted
 
 import scala.concurrent.Future
+
+import java.time.LocalDate
 
 class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
 
@@ -77,6 +80,86 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(PensionPaymentsReceivedPage(srn), true)
 
   "MemberPensionPaymentsListController" - {
+
+    "viewModel should show 'Pension payments' when there are 0 payments" in {
+      val userAnswersWithNoPayments = userAnswers
+        .unsafeSet(PensionPaymentsReceivedPage(srn), false)
+
+      val memberList: List[Option[NameDOB]] = List.empty
+
+      val result = MemberPensionPaymentsListController.viewModel(
+        srn,
+        page = 1,
+        ViewOnlyMode,
+        memberList,
+        userAnswersWithNoPayments,
+        viewOnlyUpdated = false,
+        schemeName = schemeName,
+        noPageEnabled = true
+      )
+
+      result.optViewOnlyDetails.value.heading mustBe Message("memberPensionPayments.memberList.viewOnly.heading")
+      result.page.rows.size mustBe 0
+    }
+
+    "viewModel should show 1 pension payment when there is 1 payment" in {
+      val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
+
+      val userAnswersWithOnePayment = userAnswers
+        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails1)
+        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+        .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(1)), money)
+        .unsafeSet(PensionPaymentsReceivedPage(srn), true)
+
+      val memberList: List[Option[NameDOB]] = List(Some(memberDetails1))
+
+      val result = MemberPensionPaymentsListController.viewModel(
+        srn,
+        page = 1,
+        ViewOnlyMode,
+        memberList,
+        userAnswersWithOnePayment,
+        viewOnlyUpdated = false,
+        schemeName = schemeName,
+        noPageEnabled = false
+      )
+
+      result.optViewOnlyDetails.value.heading mustBe Message("memberPensionPayments.memberList.viewOnly.singular")
+
+      result.page.rows.size mustBe 1
+    }
+
+    "viewModel should show 2 pension payments when there are 2 payments" in {
+      val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
+      val memberDetails2 = NameDOB("testFirstName2", "testLastName2", LocalDate.of(1991, 6, 15))
+
+      val userAnswersWithTwoPayments = userAnswers
+        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails1)
+        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+        .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(1)), money)
+        .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails2)
+        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(2)), SectionCompleted)
+        .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(2)), money)
+        .unsafeSet(PensionPaymentsReceivedPage(srn), true)
+
+      val memberList: List[Option[NameDOB]] = List(Some(memberDetails1), Some(memberDetails2))
+
+      val result = MemberPensionPaymentsListController.viewModel(
+        srn,
+        page = 1,
+        ViewOnlyMode,
+        memberList,
+        userAnswersWithTwoPayments,
+        viewOnlyUpdated = false,
+        schemeName = schemeName,
+        noPageEnabled = false
+      )
+
+      result.optViewOnlyDetails.value.heading mustBe Message(
+        "memberPensionPayments.memberList.viewOnly.plural",
+        Message("2")
+      )
+    }
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
