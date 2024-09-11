@@ -66,7 +66,6 @@ class ViewOnlyReturnSubmittedController @Inject()(
           retrievedUserAnswers,
           psrVersionsResponse,
           version,
-          config.urls.pensionSchemeEnquiry,
           config.urls.managePensionsSchemes.schemeSummaryDashboard(srn)
         )
       } yield Ok(view(viewModel))
@@ -81,7 +80,6 @@ object ViewOnlyReturnSubmittedController {
     retrievedUserAnswers: UserAnswers,
     psrVersionsResponse: Seq[PsrVersionsResponse],
     version: Int,
-    pensionSchemeEnquiriesUrl: String,
     managePensionSchemeDashboardUrl: String
   ): SubmissionViewModel = {
 

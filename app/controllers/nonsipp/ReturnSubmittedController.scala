@@ -64,7 +64,6 @@ class ReturnSubmittedController @Inject()(
                 request.minimalDetails.email,
                 Json.parse(returnPeriods).as[NonEmptyList[DateRange]],
                 LocalDateTime.parse(submissionDate, DateTimeFormatter.ISO_DATE_TIME),
-                config.urls.pensionSchemeEnquiry,
                 config.urls.managePensionsSchemes.schemeSummaryDashboard(srn)
               )
             )
@@ -83,7 +82,6 @@ object ReturnSubmittedController {
     email: String,
     returnPeriods: NonEmptyList[DateRange],
     submissionDate: LocalDateTime,
-    pensionSchemeEnquiriesUrl: String,
     managePensionSchemeDashboardUrl: String
   ): SubmissionViewModel =
     SubmissionViewModel(
