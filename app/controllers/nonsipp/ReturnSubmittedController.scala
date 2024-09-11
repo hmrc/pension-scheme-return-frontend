@@ -55,6 +55,11 @@ class ReturnSubmittedController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identify.andThen(allowAccess(srn)).async {
     implicit request =>
+      val dashboardLink = if (request.pensionSchemeId.isPSP) {
+        config.urls.managePensionsSchemes.schemeSummaryPSPDashboard(srn)
+      } else {
+        config.urls.managePensionsSchemes.schemeSummaryDashboard(srn)
+      }
       (request.session.get(RETURN_PERIODS), request.session.get(SUBMISSION_DATE))
         .mapN { (returnPeriods, submissionDate) =>
           Ok(
@@ -64,7 +69,7 @@ class ReturnSubmittedController @Inject()(
                 request.minimalDetails.email,
                 Json.parse(returnPeriods).as[NonEmptyList[DateRange]],
                 LocalDateTime.parse(submissionDate, DateTimeFormatter.ISO_DATE_TIME),
-                config.urls.managePensionsSchemes.schemeSummaryDashboard(srn)
+                dashboardLink
               )
             )
           )
