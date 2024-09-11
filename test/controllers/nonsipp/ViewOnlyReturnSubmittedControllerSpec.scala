@@ -61,8 +61,6 @@ class ViewOnlyReturnSubmittedControllerSpec extends ControllerBaseSpec with Comm
 
   private val userAnswers: UserAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
   private val versionNumber: Int = 1
-  private val pensionSchemeEnquiriesUrl =
-    "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/pension-scheme-enquiries"
   private val mpsDashboardUrl = "http://localhost:8204/manage-pension-schemes/pension-scheme-summary/" + srn.value
 
   "ViewOnlyReturnSubmittedController" - {
@@ -77,7 +75,6 @@ class ViewOnlyReturnSubmittedControllerSpec extends ControllerBaseSpec with Comm
               userAnswers,
               versionsResponse,
               versionNumber,
-              pensionSchemeEnquiriesUrl,
               mpsDashboardUrl
             )
           )
@@ -95,7 +92,6 @@ class ViewOnlyReturnSubmittedControllerSpec extends ControllerBaseSpec with Comm
             emptyUserAnswers,
             versionsResponse,
             versionNumber,
-            pensionSchemeEnquiriesUrl,
             mpsDashboardUrl
           )
         )
@@ -112,7 +108,6 @@ class ViewOnlyReturnSubmittedControllerSpec extends ControllerBaseSpec with Comm
             userAnswers,
             Seq.empty[PsrVersionsResponse],
             versionNumber,
-            pensionSchemeEnquiriesUrl,
             mpsDashboardUrl
           )
         )
@@ -129,7 +124,6 @@ class ViewOnlyReturnSubmittedControllerSpec extends ControllerBaseSpec with Comm
             emptyUserAnswers,
             Seq.empty[PsrVersionsResponse],
             versionNumber,
-            pensionSchemeEnquiriesUrl,
             mpsDashboardUrl
           )
         )
