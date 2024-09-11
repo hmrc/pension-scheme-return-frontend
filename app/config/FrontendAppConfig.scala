@@ -131,6 +131,12 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
             srn.value
           )}"
 
+      def schemeSummaryPSPDashboard(srn: Srn): String =
+        s"$baseUrl${config
+          .get[String](path = "urls.manage-pension-schemes.schemeSummaryPSPDashboard")
+          .format(
+            srn.value
+          )}"
     }
 
     object pensionAdministrator {

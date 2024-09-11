@@ -52,6 +52,11 @@ class ViewOnlyReturnSubmittedController @Inject()(
 
   def onPageLoad(srn: Srn, year: String, version: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      val dashboardLink = if (request.pensionSchemeId.isPSP) {
+        config.urls.managePensionsSchemes.schemeSummaryPSPDashboard(srn)
+      } else {
+        config.urls.managePensionsSchemes.schemeSummaryDashboard(srn)
+      }
       for {
         retrievedUserAnswers <- psrRetrievalService.getAndTransformStandardPsrDetails(
           None,
@@ -66,7 +71,7 @@ class ViewOnlyReturnSubmittedController @Inject()(
           retrievedUserAnswers,
           psrVersionsResponse,
           version,
-          config.urls.managePensionsSchemes.schemeSummaryDashboard(srn)
+          dashboardLink
         )
       } yield Ok(view(viewModel))
     }
