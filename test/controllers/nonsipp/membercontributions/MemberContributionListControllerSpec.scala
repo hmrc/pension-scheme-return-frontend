@@ -31,13 +31,16 @@ import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models._
-import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.SectionCompleted
 
 import scala.concurrent.Future
+
+import java.time.LocalDate
 
 class MemberContributionListControllerSpec extends ControllerBaseSpec {
 
@@ -153,6 +156,89 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
     val previousUserAnswers = userAnswers
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+
+    "ViewModel should display 'Member Contributions' when there are 0 member contributions" in {
+      val userAnswersWithNoContributions = userAnswers
+        .unsafeSet(MemberContributionsPage(srn), true)
+        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+        .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), Money(0))
+
+      val memberList: List[Option[NameDOB]] = userAnswersWithNoContributions.membersOptionList(srn)
+
+      val result = MemberContributionListController.viewModel(
+        srn,
+        page = 1,
+        ViewOnlyMode,
+        memberList,
+        userAnswersWithNoContributions,
+        viewOnlyUpdated = false,
+        optYear = Some(yearString),
+        optCurrentVersion = Some(submissionNumberTwo),
+        optPreviousVersion = Some(submissionNumberOne),
+        compilationOrSubmissionDate = Some(submissionDateTwo),
+        noPageEnabled = false
+      )
+
+      result.optViewOnlyDetails.value.heading mustBe Message("ReportContribution.MemberList.viewOnly.noContributions")
+      result.page.rows.size mustBe 1
+    }
+
+    "ViewModel should display 'Member contribution' for 1 member contribution" in {
+      val userAnswersWithOneContribution = userAnswers
+        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+        .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), Money(1))
+
+      val memberList: List[Option[NameDOB]] = userAnswersWithOneContribution.membersOptionList(srn)
+
+      val result = MemberContributionListController.viewModel(
+        srn,
+        page = 1,
+        ViewOnlyMode,
+        memberList,
+        userAnswersWithOneContribution,
+        viewOnlyUpdated = false,
+        optYear = Some(yearString),
+        optCurrentVersion = Some(submissionNumberTwo),
+        optPreviousVersion = Some(submissionNumberOne),
+        compilationOrSubmissionDate = Some(submissionDateTwo),
+        noPageEnabled = false
+      )
+      result.optViewOnlyDetails.value.heading mustBe Message("ReportContribution.MemberList.viewOnly.singular")
+
+    }
+
+    "ViewModel should display '2 member contributions' for 2 member contributions" in {
+      val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
+      val memberDetails2 = NameDOB("testFirstName2", "testLastName2", LocalDate.of(1991, 6, 15))
+
+      val userAnswersWithTwoContributions = userAnswers
+        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails1)
+        .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), Money(10))
+        .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails2)
+        .unsafeSet(TotalMemberContributionPage(srn, refineMV(2)), Money(20))
+
+      val memberList: List[Option[NameDOB]] = List(Some(memberDetails1), Some(memberDetails2))
+
+      val result = MemberContributionListController.viewModel(
+        srn,
+        page = 1,
+        ViewOnlyMode,
+        memberList,
+        userAnswersWithTwoContributions,
+        viewOnlyUpdated = false,
+        optYear = Some(yearString),
+        optCurrentVersion = Some(submissionNumberTwo),
+        optPreviousVersion = Some(submissionNumberOne),
+        compilationOrSubmissionDate = Some(submissionDateTwo),
+        noPageEnabled = false
+      )
+
+      result.optViewOnlyDetails.value.heading mustBe Message(
+        "ReportContribution.MemberList.viewOnly.plural",
+        Message("2")
+      )
+
+    }
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {

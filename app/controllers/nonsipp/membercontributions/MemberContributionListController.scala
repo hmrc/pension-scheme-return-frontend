@@ -28,7 +28,7 @@ import _root_.config.Constants
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
-import _root_.config.Refined.OneTo300
+import _root_.config.Refined.{Max300, OneTo300}
 import viewmodels.implicits._
 import pages.nonsipp.membercontributions.{
   MemberContributionsListPage,
@@ -242,65 +242,59 @@ object MemberContributionListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    memberList: List[Option[NameDOB]],
-    userAnswers: UserAnswers,
+    memberList: List[(Max300, NameDOB, Option[Money])],
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None
   ): List[List[TableElem]] =
-    memberList.zipWithIndex
+    memberList
       .map {
-        case (Some(memberName), index) =>
-          refineV[OneTo300](index + 1) match {
-            case Left(_) => Nil
-            case Right(index) =>
-              val contributions = userAnswers.get(TotalMemberContributionPage(srn, index))
-              if (contributions.nonEmpty && !contributions.exists(_.isZero)) {
-                List(
-                  TableElem(memberName.fullName),
-                  TableElem("Member contributions reported"),
-                  (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-                    case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                      TableElem.view(
-                        controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
-                          .onPageLoadViewOnly(srn, index, year, currentVersion, previousVersion),
-                        Message("ReportContribution.MemberList.remove.hidden.text", memberName.fullName)
-                      )
-                    case _ =>
-                      TableElem.change(
-                        controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
-                          .onPageLoad(srn, index, CheckMode),
-                        Message("ReportContribution.MemberList.change.hidden.text", memberName.fullName)
-                      )
-                  },
-                  if (mode == ViewOnlyMode) {
-                    TableElem.empty
-                  } else {
-                    TableElem.remove(
-                      controllers.nonsipp.membercontributions.routes.RemoveMemberContributionController
-                        .onPageLoad(srn, index),
-                      Message("ReportContribution.MemberList.remove.hidden.text", memberName.fullName)
-                    )
-                  }
-                )
+        case (index, memberName, memberContribution) =>
+          if (memberContribution.exists(!_.isZero)) {
+            List(
+              TableElem(memberName.fullName),
+              TableElem("Member contributions reported"),
+              (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                  TableElem.view(
+                    controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
+                      .onPageLoadViewOnly(srn, index, year, currentVersion, previousVersion),
+                    Message("ReportContribution.MemberList.remove.hidden.text", memberName.fullName)
+                  )
+                case _ =>
+                  TableElem.change(
+                    controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
+                      .onPageLoad(srn, index, CheckMode),
+                    Message("ReportContribution.MemberList.change.hidden.text", memberName.fullName)
+                  )
+              },
+              if (mode == ViewOnlyMode) {
+                TableElem.empty
               } else {
-                List(
-                  TableElem(memberName.fullName),
-                  TableElem("No member contributions"),
-                  if (mode != ViewOnlyMode) {
-                    TableElem.add(
-                      controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
-                        .onSubmit(srn, index, mode),
-                      Message("ReportContribution.MemberList.add.hidden.text", memberName.fullName)
-                    )
-                  } else {
-                    TableElem.empty
-                  },
-                  TableElem.empty
+                TableElem.remove(
+                  controllers.nonsipp.membercontributions.routes.RemoveMemberContributionController
+                    .onPageLoad(srn, index),
+                  Message("ReportContribution.MemberList.remove.hidden.text", memberName.fullName)
                 )
               }
+            )
+          } else {
+            List(
+              TableElem(memberName.fullName),
+              TableElem("No member contributions"),
+              if (mode != ViewOnlyMode) {
+                TableElem.add(
+                  controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
+                    .onSubmit(srn, index, mode),
+                  Message("ReportContribution.MemberList.add.hidden.text", memberName.fullName)
+                )
+              } else {
+                TableElem.empty
+              },
+              TableElem.empty
+            )
           }
-        case _ => List.empty
+
       }
       .sortBy(_.headOption.map(_.text.toString))
 
@@ -324,6 +318,21 @@ object MemberContributionListController {
       } else {
         ("ReportContribution.MemberList.title.plural", "ReportContribution.MemberList.heading.plural")
       }
+
+    val membersWithContributions: List[(Max300, NameDOB, Option[Money])] = memberList.zipWithIndex
+      .flatMap {
+        case (Some(memberName), index) =>
+          refineV[OneTo300](index + 1) match {
+            case Right(index) =>
+              List((index, memberName, userAnswers.get(TotalMemberContributionPage(srn, index))))
+            case Left(_) => List.empty
+
+          }
+      }
+
+    val sumMemberContributions = membersWithContributions.count {
+      case (_, _, contribution) => contribution.exists(!_.isZero)
+    }
 
     // in view-only mode or with direct url edit page value can be higher than needed
     val currentPage =
@@ -363,7 +372,7 @@ object MemberContributionListController {
             TableElem.empty
           )
         ),
-        rows = rows(srn, mode, memberList, userAnswers, optYear, optCurrentVersion, optPreviousVersion),
+        rows = rows(srn, mode, membersWithContributions, optYear, optCurrentVersion, optPreviousVersion),
         radioText = Message("ReportContribution.MemberList.radios"),
         paginatedViewModel = Some(
           PaginatedViewModel(
@@ -408,7 +417,11 @@ object MemberContributionListController {
             submittedText =
               compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
             title = "ReportContribution.MemberList.viewOnly.title",
-            heading = "ReportContribution.MemberList.viewOnly.heading",
+            heading = sumMemberContributions match {
+              case 0 => Message("ReportContribution.MemberList.viewOnly.noContributions")
+              case 1 => Message("ReportContribution.MemberList.viewOnly.singular")
+              case _ => Message("ReportContribution.MemberList.viewOnly.plural", sumMemberContributions)
+            },
             buttonText = "site.return.to.tasklist",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>

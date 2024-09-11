@@ -21,7 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.OneTo300
+import config.Refined.{Max300, OneTo300}
 import controllers.PSRController
 import config.Constants.maxNotRelevant
 import forms.YesNoPageFormProvider
@@ -312,6 +312,21 @@ object TransferReceivedMemberListController {
         ("transferIn.MemberList.title.plural", "transferIn.MemberList.heading.plural")
       }
 
+    val membersWithTransfers: List[(Max300, NameDOB, Int)] = memberList.zipWithIndex
+      .flatMap {
+        case (Some(memberName), index) =>
+          refineV[OneTo300](index + 1) match {
+            case Right(refinedIndex) =>
+              val transferStatus =
+                userAnswers.get(TransfersInSectionCompletedForMember(srn, refinedIndex)).getOrElse(Map.empty)
+              val completedTransfers = transferStatus.values.count(_ == SectionCompleted)
+              List((refinedIndex, memberName, completedTransfers))
+            case Left(_) => List.empty
+          }
+        case _ => List.empty
+      }
+    val totalTransfersIn: Int = membersWithTransfers.map(_._3).sum
+
     // in view-only mode or with direct url edit page value can be higher than needed
     val currentPage = if ((page - 1) * Constants.transferInListSize >= memberList.flatten.size) 1 else page
     val pagination = Pagination(
@@ -395,7 +410,11 @@ object TransferReceivedMemberListController {
             submittedText =
               compilationOrSubmissionDate.fold(Some(Message("")))(date => Some(Message("site.submittedOn", date.show))),
             title = "transferIn.MemberList.viewOnly.title",
-            heading = "transferIn.MemberList.viewOnly.heading",
+            heading = totalTransfersIn match {
+              case 0 => Message("transferIn.MemberList.viewOnly.noTransfers")
+              case 1 => Message("transferIn.MemberList.viewOnly.singular")
+              case _ => Message("transferIn.MemberList.viewOnly.plural", totalTransfersIn)
+            },
             buttonText = "site.return.to.tasklist",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
