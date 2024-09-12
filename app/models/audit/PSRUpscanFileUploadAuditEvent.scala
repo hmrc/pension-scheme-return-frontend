@@ -31,7 +31,7 @@ case class PSRUpscanFileUploadAuditEvent(
   uploadTimeInMilliSeconds: Long
 ) extends BasicAuditEvent {
 
-  override def auditType: String = "PensionSchemeReturnFileUpscanUploadCheck"
+  override def auditType: String = "PensionSchemeReturnFileUpload"
 
   override def details: Map[String, String] = {
 
@@ -39,7 +39,7 @@ case class PSRUpscanFileUploadAuditEvent(
       "schemeName" -> schemeName,
       "pensionSchemeTaxReference" -> schemeTaxReference,
       "affinityGroup" -> affinityGroup,
-      "credentialRole(PSA/PSP)" -> credentialRole,
+      "credentialRolePsaPsp" -> credentialRole,
       "taxYear" -> taxYear.toYearFormat
     )
 
