@@ -42,7 +42,7 @@ case class PSRSubmissionAuditEvent(
       "schemeName" -> schemeName,
       "pensionSchemeTaxReference" -> schemeTaxReference,
       "affinityGroup" -> affinityGroup,
-      "credentialRole(PSA/PSP)" -> credentialRole,
+      "credentialRolePsaPsp" -> credentialRole,
       "taxYear" -> taxYear.toYearFormat,
       "date" -> LocalDate.now(ZoneId.of("Europe/London")).format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
       "payload" -> Json.toJson(psrSubmission)
