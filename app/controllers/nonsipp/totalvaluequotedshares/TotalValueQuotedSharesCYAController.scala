@@ -97,7 +97,7 @@ class TotalValueQuotedSharesCYAController @Inject()(
         Redirect(
           routes.TotalValueQuotedSharesCYAController
             .onPageLoadViewOnly(srn, year, (current - 1).max(0), (previous - 1).max(0))
-        )
+        ).flashing("showBackLink" -> "false")
       )
     }
   private def onPageLoadCommon(srn: Srn, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(

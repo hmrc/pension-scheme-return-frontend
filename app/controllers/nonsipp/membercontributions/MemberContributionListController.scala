@@ -198,7 +198,7 @@ class MemberContributionListController @Inject()(
         Redirect(
           controllers.nonsipp.membercontributions.routes.MemberContributionListController
             .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
+        ).flashing("showBackLink" -> "false")
       )
     }
 

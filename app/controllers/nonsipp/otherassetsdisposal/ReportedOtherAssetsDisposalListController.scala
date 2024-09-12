@@ -190,7 +190,7 @@ class ReportedOtherAssetsDisposalListController @Inject()(
         Redirect(
           controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
             .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
+        ).flashing("showBackLink" -> "false")
       )
     }
 

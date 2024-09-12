@@ -124,7 +124,7 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
         Redirect(
           controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
             .onPageLoadViewOnly(srn, year, (current - 1).max(0), (previous - 1).max(0))
-        )
+        ).flashing("showBackLink" -> "false")
       )
     }
 }

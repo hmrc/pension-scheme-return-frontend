@@ -25,7 +25,7 @@
 
 @(viewmodel: FormPageViewModel[CheckYourAnswersViewModel])(implicit request: Request[_], messages: Messages)
 
-    @layout(pageTitle = titleNoForm(if(viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.title.toMessage else viewmodel.title.toMessage)) {
+    @layout(pageTitle = titleNoForm(if(viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.title.toMessage else viewmodel.title.toMessage),showBackLink = request.flash.get("showBackLink").getOrElse("true").toBoolean) {
 
         @if(viewmodel.mode == NormalMode || viewmodel.mode == CheckMode) {
             <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>

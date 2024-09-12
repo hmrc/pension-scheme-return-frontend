@@ -148,7 +148,7 @@ class LandOrPropertyListController @Inject()(
         Redirect(
           routes.LandOrPropertyListController
             .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
+        ).flashing("showBackLink" -> "false")
       )
     }
 }

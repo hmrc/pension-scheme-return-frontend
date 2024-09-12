@@ -158,7 +158,7 @@ class LoansListController @Inject()(
       Future.successful(
         Redirect(
           routes.LoansListController.onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
+        ).flashing("showBackLink" -> "false")
       )
     }
 

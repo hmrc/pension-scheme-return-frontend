@@ -191,7 +191,7 @@ class OtherAssetsListController @Inject()(
         Redirect(
           controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
             .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
+        ).flashing("showBackLink" -> "false")
       )
     }
 

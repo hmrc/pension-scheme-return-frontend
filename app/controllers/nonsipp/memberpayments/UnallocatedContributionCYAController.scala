@@ -112,7 +112,7 @@ class UnallocatedContributionCYAController @Inject()(
         Redirect(
           controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
             .onPageLoadViewOnly(srn, year, (current - 1).max(0), (previous - 1).max(0))
-        )
+        ).flashing("showBackLink" -> "false")
       )
     }
 

@@ -214,7 +214,7 @@ class ReportBondsDisposalListController @Inject()(
         Redirect(
           controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
             .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
+        ).flashing("showBackLink" -> "false")
       )
     }
 

@@ -180,7 +180,7 @@ class BasicDetailsCheckYourAnswersController @Inject()(
         Redirect(
           controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
             .onPageLoadViewOnly(srn, year, newCurrent, newPrevious)
-        )
+        ).flashing("showBackLink" -> "false")
       )
     }
   }
