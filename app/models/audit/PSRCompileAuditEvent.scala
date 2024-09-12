@@ -38,7 +38,7 @@ case class PSRCompileAuditEvent(
       "schemeName" -> schemeName,
       "pensionSchemeTaxReference" -> schemeTaxReference,
       "affinityGroup" -> affinityGroup,
-      "credentialRole(PSA/PSP)" -> credentialRole,
+      "credentialRolePsaPsp" -> credentialRole,
       "taxYear" -> taxYear.toYearFormat,
       "sections" -> taskList
     )
