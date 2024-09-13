@@ -40,22 +40,24 @@ case class PSRUpscanFileUploadAuditEvent(
       "pensionSchemeTaxReference" -> schemeTaxReference,
       "affinityGroup" -> affinityGroup,
       "credentialRolePsaPsp" -> credentialRole,
-      "taxYear" -> taxYear.toYearFormat
+      "taxYear" -> taxYear.toYearFormat,
+      "fileUploadType" -> "MembersDetails",
+      "uploadTime" -> uploadTimeInMilliSeconds.toString
     )
 
     val outcomeMap = outcome match {
       case UploadStatus.Failed(failure) =>
         Map(
-          "uploadStatus" -> "Failed",
-          "failureDetail" -> failure.failureReason,
+          "fileUploadStatus" -> "Failed",
+          "typeOfError" -> failure.failureReason,
           "failureMessage" -> failure.message
         )
 
-      case UploadStatus.Success(_, _, _, size) =>
+      case UploadStatus.Success(_, _, downloadUrl, size) =>
         Map(
-          "uploadStatus" -> "Success",
-          "fileSize" -> size.getOrElse(0L).toString,
-          "uploadTime" -> uploadTimeInMilliSeconds.toString
+          "fileUploadStatus" -> "Success",
+          "fileReference" -> downloadUrl,
+          "fileSize" -> size.getOrElse(0L).toString
         )
     }
 
