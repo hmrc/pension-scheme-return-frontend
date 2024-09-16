@@ -66,7 +66,7 @@ private[mappings] class DateRangeFormatter(
   ): Either[Seq[FormError], LocalDate] =
     if (allowedRange.contains(date)) Right(date)
     else {
-      logger.error(s"[verifyRangeBounds] provided date ${date.show} is not within range ${allowedRange.toString}")
+      logger.info(s"[verifyRangeBounds] provided date ${date.show} is not within range ${allowedRange.toString}")
       Left(List(FormError(key, error, List(allowedRange.from.show, allowedRange.to.show))))
     }
 
@@ -96,18 +96,18 @@ private[mappings] class DateRangeFormatter(
   // Verify provided date is after the start of the tax year or before the end of the tax year
   private def verifyTaxYear(key: String, range: DateRange): Either[Seq[FormError], DateRange] =
     if (range.from.isBefore(taxYear.starts)) {
-      logger.error(
+      logger.info(
         s"[verifyTaxYear] provided start date ${range.from.show} is before the start of the tax year ${taxYear.starts.show}"
       )
       Left(List(FormError(s"$key.startDate", errorStartAfter, List(taxYear.starts.show))))
     } else if (range.from.isAfter(taxYear.finishes)) {
-      logger.error(s"[verifyTaxYear] provided start date ${range.from.show} is after the end of the tax year")
+      logger.info(s"[verifyTaxYear] provided start date ${range.from.show} is after the end of the tax year")
       Left(List(FormError(s"$key.startDate", errorStartBefore, List(taxYear.finishes.plusDays(1).show))))
     } else if (range.to.isBefore(taxYear.starts)) {
-      logger.error(s"[verifyTaxYear] provided end date ${range.to.show} is before the start of the tax year")
+      logger.info(s"[verifyTaxYear] provided end date ${range.to.show} is before the start of the tax year")
       Left(List(FormError(s"$key.endDate", errorEndAfter, List(taxYear.starts.minusDays(1).show))))
     } else if (range.to.isAfter(taxYear.finishes)) {
-      logger.error(s"[verifyTaxYear] provided end date ${range.to.show} is after the end of the tax year")
+      logger.info(s"[verifyTaxYear] provided end date ${range.to.show} is after the end of the tax year")
       Left(List(FormError(s"$key.endDate", errorEndBefore, List(taxYear.finishes.plusDays(1).show))))
     } else Right(range)
 
@@ -119,7 +119,7 @@ private[mappings] class DateRangeFormatter(
         case Some(error) =>
           val indexDate = duplicateRanges(index.value - 2)
           if (!indexDate.to.plusDays(1).isEqual(range.from)) {
-            logger.error(s"[verifyPreviousDateRange] provided date ${range.from.show} is a duplicate date}")
+            logger.info(s"[verifyPreviousDateRange] provided date ${range.from.show} is a duplicate date}")
             Left(Seq(FormError(s"$key.startDate", error, List(duplicateRanges.last.to.plusDays(1).show))))
           } else {
             Right(range)
