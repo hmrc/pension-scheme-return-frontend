@@ -69,7 +69,7 @@ class ReportBondsDisposalListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)
+      onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
   def onPageLoadViewOnly(
@@ -80,6 +80,7 @@ class ReportBondsDisposalListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    val showBackLink = true
     val viewOnlyViewModel = ViewOnlyViewModel(
       viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
         getCompletedOrUpdatedTaskListStatus(
@@ -95,10 +96,16 @@ class ReportBondsDisposalListController @Inject()(
       previousVersion = previous,
       compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
     )
-    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel), showBackLink)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+  def onPageLoadCommon(
+    srn: Srn,
+    page: Int,
+    mode: Mode,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
+  )(
     implicit request: DataRequest[AnyContent]
   ): Result =
     getCompletedDisposals(srn).map { completedDisposals =>
@@ -121,7 +128,8 @@ class ReportBondsDisposalListController @Inject()(
                     maxPossibleNumberOfDisposals,
                     request.userAnswers,
                     request.schemeDetails.schemeName,
-                    viewOnlyViewModel
+                    viewOnlyViewModel,
+                    showBackLink = showBackLink
                   )
                 )
               )
@@ -162,7 +170,8 @@ class ReportBondsDisposalListController @Inject()(
                               numberOfDisposals,
                               maxPossibleNumberOfDisposals,
                               request.userAnswers,
-                              request.schemeDetails.schemeName
+                              request.schemeDetails.schemeName,
+                              showBackLink = true
                             )
                           )
                         )
@@ -208,15 +217,32 @@ class ReportBondsDisposalListController @Inject()(
       )
     }
 
-  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
+  def onPreviousViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] = identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) {
+    implicit request =>
+      val showBackLink = false
+      val viewOnlyViewModel = ViewOnlyViewModel(
+        viewOnlyUpdated = request.previousUserAnswers match {
+          case Some(previousUserAnswers) =>
+            getCompletedOrUpdatedTaskListStatus(
+              request.userAnswers,
+              previousUserAnswers,
+              pages.nonsipp.bondsdisposal.Paths.bondsDisposed
+            ) == Updated
+          case _ => false
+        },
+        year = year,
+        currentVersion = (current - 1).max(0),
+        previousVersion = (previous - 1).max(0),
+        compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
       )
-    }
+      onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
+  }
 
   private def getCompletedDisposals(
     srn: Srn
@@ -340,7 +366,8 @@ object ReportBondsDisposalListController {
     maxPossibleNumberOfDisposals: Int,
     userAnswers: UserAnswers,
     schemeName: String,
-    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
   ): FormPageViewModel[ListViewModel] = {
 
     val (title, heading) = ((mode, numberOfDisposals) match {
@@ -378,7 +405,8 @@ object ReportBondsDisposalListController {
       numberOfDisposals,
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
-          routes.ReportBondsDisposalListController.onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
+          routes.ReportBondsDisposalListController
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
         case None =>
           routes.ReportBondsDisposalListController.onPageLoad(srn, _)
       }
@@ -461,7 +489,8 @@ object ReportBondsDisposalListController {
                 .onSubmit(srn, page, mode)
           }
         )
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 

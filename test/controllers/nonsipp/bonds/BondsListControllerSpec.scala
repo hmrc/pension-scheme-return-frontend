@@ -98,7 +98,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       injected[ListView]
         .apply(
           form(injected[YesNoPageFormProvider]),
-          viewModel(srn, page, NormalMode, bondsData, schemeName)
+          viewModel(srn, page, NormalMode, bondsData, schemeName, showBackLink = true)
         )
     })
 
@@ -107,7 +107,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
         injected[ListView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, page, NormalMode, bondsData, schemeName)
+            viewModel(srn, page, NormalMode, bondsData, schemeName, showBackLink = true)
           )
       }
     )
@@ -152,7 +152,8 @@ class BondsListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               bondsData,
               schemeName,
-              Some(viewOnlyViewModel)
+              Some(viewOnlyViewModel),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -172,7 +173,8 @@ class BondsListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               List(bondData.copy(nameOfBonds = "Name")),
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -190,13 +192,30 @@ class BondsListControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectToPage(
+      renderView(
         onPreviousViewOnly,
-        controllers.nonsipp.bonds.routes.BondsListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
-      )
+        userAnswers = currentUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[ListView].apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(
+            srn,
+            1,
+            mode = ViewOnlyMode,
+            bondsData,
+            schemeName,
+            Some(
+              viewOnlyViewModel.copy(
+                currentVersion = (submissionNumberTwo - 1).max(0),
+                previousVersion = (submissionNumberOne - 1).max(0)
+              )
+            ),
+            showBackLink = false
+          )
+        )
+      }.withName("Submit previous view only renders the controller with parameters for the previous submission")
     )
+
   }
 }

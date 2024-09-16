@@ -138,7 +138,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
           sharesDisposalsWithIndexes,
           completedUserAnswers,
           schemeName,
-          viewOnlyViewModel = None
+          viewOnlyViewModel = None,
+          showBackLink = true
         )
       )
     }.withName("Completed Journey"))
@@ -189,7 +190,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
                 sharesDisposalsWithIndexes,
                 completedUserAnswers,
                 schemeName,
-                viewOnlyViewModel = Some(viewOnlyViewModel)
+                viewOnlyViewModel = Some(viewOnlyViewModel),
+                showBackLink = true
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -211,7 +213,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
                 sharesDisposalsWithIndexes,
                 updatedUserAnswers,
                 schemeName,
-                viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+                viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+                showBackLink = true
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -232,7 +235,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
             Map(),
             noDisposalsUserAnswers,
             schemeName,
-            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+            showBackLink = true
           )
         )
       }.withName("OnPageLoadViewOnly renders ok with no disposals")
@@ -250,14 +254,33 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectToPage(
+      renderView(
         onPreviousViewOnly,
-        controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
-      )
+        userAnswers = currentUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[ListView].apply(
+          form(new YesNoPageFormProvider()),
+          viewModel(
+            srn,
+            page,
+            mode = ViewOnlyMode,
+            sharesDisposalsWithIndexes,
+            completedUserAnswers,
+            schemeName,
+            viewOnlyViewModel = Some(
+              viewOnlyViewModel.copy(
+                viewOnlyUpdated = false,
+                currentVersion = (submissionNumberTwo - 1).max(0),
+                previousVersion = (submissionNumberOne - 1).max(0)
+              )
+            ),
+            showBackLink = false
+          )
+        )
+      }.withName("OnPreviousViewOnly renders the view correctly")
     )
+
   }
 
 }

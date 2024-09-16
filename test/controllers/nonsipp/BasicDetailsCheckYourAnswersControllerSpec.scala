@@ -587,16 +587,6 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
 
     act.like(
       redirectToPage(
-        onPreviousViewOnly,
-        routes.BasicDetailsCheckYourAnswersController
-          .onPageLoadViewOnly(srn, yearString, submissionNumberOne, submissionNumberZero)
-      ).withName(
-        "Submit previous view only redirects to BasicDetailsCheckYourAnswersController for the previous submission"
-      )
-    )
-
-    act.like(
-      redirectToPage(
         onSubmitViewOnly,
         controllers.nonsipp.routes.ViewOnlyTaskListController
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)

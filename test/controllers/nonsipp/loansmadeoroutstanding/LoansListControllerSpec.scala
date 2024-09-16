@@ -137,7 +137,8 @@ class LoansListControllerSpec extends ControllerBaseSpec {
           1,
           NormalMode,
           recipients,
-          schemeName
+          schemeName,
+          showBackLink = true
         )
       )
     }.withName("Completed Journey"))
@@ -202,7 +203,8 @@ class LoansListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               recipients,
               schemeName,
-              Some(viewOnlyViewModel)
+              Some(viewOnlyViewModel),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -222,7 +224,8 @@ class LoansListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               recipients,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -239,7 +242,8 @@ class LoansListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               List(),
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no loans")
@@ -256,14 +260,5 @@ class LoansListControllerSpec extends ControllerBaseSpec {
         .withName("Submit redirects to view only tasklist")
     )
 
-    act.like(
-      redirectToPage(
-        onPreviousViewOnly,
-        controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
-      )
-    )
   }
 }

@@ -65,7 +65,7 @@ class TransferOutMemberListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)
+      onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
   def onPageLoadViewOnly(
@@ -76,10 +76,11 @@ class TransferOutMemberListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)
+    val showBackLink = true
+    onPageLoadCommon(srn, page, mode, showBackLink)
   }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(
     implicit request: DataRequest[AnyContent]
   ): Result = {
     val userAnswers = request.userAnswers
@@ -108,7 +109,8 @@ class TransferOutMemberListController @Inject()(
           optPreviousVersion = request.previousVersion,
           compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
           schemeName = request.schemeDetails.schemeName,
-          noPageEnabled
+          noPageEnabled,
+          showBackLink = showBackLink
         )
       val filledForm = userAnswers.fillForm(TransferOutMemberListPage(srn), form)
       Ok(view(filledForm, viewModel))
@@ -189,15 +191,18 @@ class TransferOutMemberListController @Inject()(
       )
     }
 
-  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
-      )
+  def onPreviousViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) { implicit request =>
+      val showBackLink = false
+      onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
+
 }
 
 object TransferOutMemberListController {
@@ -310,7 +315,8 @@ object TransferOutMemberListController {
     optPreviousVersion: Option[Int] = None,
     compilationOrSubmissionDate: Option[LocalDateTime] = None,
     schemeName: String,
-    noPageEnabled: Boolean
+    noPageEnabled: Boolean,
+    showBackLink: Boolean = true
   ): FormPageViewModel[ActionTableViewModel] = {
 
     val memberListSize = memberList.flatten.size
@@ -440,7 +446,8 @@ object TransferOutMemberListController {
         )
       } else {
         None
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 }

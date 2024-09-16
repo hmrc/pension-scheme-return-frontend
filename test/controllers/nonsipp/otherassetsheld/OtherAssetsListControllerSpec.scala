@@ -95,7 +95,7 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
       injected[ListView]
         .apply(
           form(injected[YesNoPageFormProvider]),
-          viewModel(srn, page, NormalMode, otherAssetsData, schemeName)
+          viewModel(srn, page, NormalMode, otherAssetsData, schemeName, showBackLink = true)
         )
     })
 
@@ -104,7 +104,7 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
         injected[ListView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, page, NormalMode, otherAssetsData, schemeName)
+            viewModel(srn, page, NormalMode, otherAssetsData, schemeName, showBackLink = true)
           )
       }
     )
@@ -149,7 +149,8 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               otherAssetsData,
               schemeName,
-              Some(viewOnlyViewModel)
+              Some(viewOnlyViewModel),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -169,7 +170,8 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               otherAssetsData,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -187,13 +189,30 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectToPage(
+      renderView(
         onPreviousViewOnly,
-        controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
-      )
+        userAnswers = currentUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[ListView].apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(
+            srn,
+            page,
+            mode = ViewOnlyMode,
+            data = otherAssetsData,
+            schemeName = schemeName,
+            viewOnlyViewModel = Some(
+              viewOnlyViewModel.copy(
+                currentVersion = (submissionNumberTwo - 1).max(0),
+                previousVersion = (submissionNumberOne - 1).max(0)
+              )
+            ),
+            showBackLink = false
+          )
+        )
+      }.withName("OnPreviousViewOnly renders the correct view with decreased submission numbers")
     )
+
   }
 }

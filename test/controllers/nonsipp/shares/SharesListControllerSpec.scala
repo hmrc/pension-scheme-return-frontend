@@ -112,7 +112,7 @@ class SharesListControllerSpec extends ControllerBaseSpec {
       injected[ListView]
         .apply(
           form(injected[YesNoPageFormProvider]),
-          viewModel(srn, page, NormalMode, sharesData, schemeName)
+          viewModel(srn, page, NormalMode, sharesData, schemeName, showBackLink = true)
         )
     })
 
@@ -121,7 +121,7 @@ class SharesListControllerSpec extends ControllerBaseSpec {
         injected[ListView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, page, NormalMode, sharesData, schemeName)
+            viewModel(srn, page, NormalMode, sharesData, schemeName, showBackLink = true)
           )
       }
     )
@@ -168,7 +168,8 @@ class SharesListControllerSpec extends ControllerBaseSpec {
                 mode = ViewOnlyMode,
                 sharesData,
                 schemeName,
-                Some(viewOnlyViewModel)
+                Some(viewOnlyViewModel),
+                showBackLink = true
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -189,7 +190,8 @@ class SharesListControllerSpec extends ControllerBaseSpec {
                 mode = ViewOnlyMode,
                 List(shareData.copy(companyName = "changed")),
                 schemeName,
-                viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+                viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+                showBackLink = true
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -207,31 +209,38 @@ class SharesListControllerSpec extends ControllerBaseSpec {
                 mode = ViewOnlyMode,
                 List(),
                 schemeName,
-                viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+                viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+                showBackLink = true
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with no shares")
     )
 
     act.like(
-      redirectToPage(
-        onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
-      ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only taskList")
-    )
-
-    act.like(
-      redirectToPage(
+      renderView(
         onPreviousViewOnly,
-        controllers.nonsipp.shares.routes.SharesListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
-      )
+        userAnswers = currentUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[ListView]
+          .apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              sharesData,
+              schemeName,
+              viewOnlyViewModel = Some(
+                viewOnlyViewModel.copy(
+                  currentVersion = (submissionNumberTwo - 1).max(0),
+                  previousVersion = (submissionNumberOne - 1).max(0)
+                )
+              ),
+              showBackLink = false
+            )
+          )
+      }.withName("OnPreviousViewOnly renders the view correctly")
     )
   }
 

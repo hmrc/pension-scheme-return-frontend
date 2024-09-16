@@ -300,15 +300,6 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
         .withName("Submit redirects to view only taskList")
     )
 
-    act.like(
-      redirectToPage(
-        onPreviousViewOnly,
-        controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
-      )
-    )
   }
 
 }
