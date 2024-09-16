@@ -65,7 +65,7 @@ class TransferReceivedMemberListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)
+      onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
   def onPageLoadViewOnly(
@@ -74,12 +74,13 @@ class TransferReceivedMemberListController @Inject()(
     mode: Mode,
     year: String,
     current: Int,
-    previous: Int
+    previous: Int,
+    showBackLink: Boolean
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)
+    onPageLoadCommon(srn, page, mode, showBackLink)
   }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(
     implicit request: DataRequest[AnyContent]
   ): Result = {
     val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
@@ -107,7 +108,8 @@ class TransferReceivedMemberListController @Inject()(
           optPreviousVersion = request.previousVersion,
           compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
           schemeName = request.schemeDetails.schemeName,
-          noPageEnabled = noPageEnabled
+          noPageEnabled = noPageEnabled,
+          showBackLink = showBackLink
         )
       val filledForm =
         request.userAnswers.get(TransferReceivedMemberListPage(srn)).fold(form)(form.fill)
@@ -191,7 +193,7 @@ class TransferReceivedMemberListController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
+            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0), showBackLink = false)
         )
       )
     }
@@ -302,7 +304,8 @@ object TransferReceivedMemberListController {
     optPreviousVersion: Option[Int] = None,
     compilationOrSubmissionDate: Option[LocalDateTime] = None,
     schemeName: String,
-    noPageEnabled: Boolean
+    noPageEnabled: Boolean,
+    showBackLink: Boolean = true
   ): FormPageViewModel[ActionTableViewModel] = {
 
     val (title, heading) =
@@ -336,7 +339,7 @@ object TransferReceivedMemberListController {
       call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
         case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
           controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion, showBackLink = true)
         case _ =>
           controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
             .onPageLoad(srn, _, NormalMode)
@@ -433,7 +436,8 @@ object TransferReceivedMemberListController {
         )
       } else {
         None
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 }

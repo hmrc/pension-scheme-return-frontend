@@ -146,7 +146,7 @@ class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         call = onSubmitViewOnly,
         page = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
-          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
+          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
       ).after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(never))
         .withName("Submit redirects to to Pension payments Member List page")
     )

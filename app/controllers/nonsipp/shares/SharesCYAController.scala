@@ -216,7 +216,7 @@ class SharesCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.shares.routes.SharesListController
-            .onPageLoadViewOnly(srn, page, year, current, previous)
+            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
         )
       )
     }

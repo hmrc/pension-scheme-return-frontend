@@ -162,7 +162,7 @@ class TransfersInCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-            .onPageLoadViewOnly(srn, page, year, current, previous)
+            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
         )
       )
     }

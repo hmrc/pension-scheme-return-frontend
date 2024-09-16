@@ -191,7 +191,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         Message(messageKey(prefix, "details.title")),
         controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
-          .onPageLoadViewOnly(srn, year, currentVersion, previousVersion)
+          .onPageLoadViewOnly(srn, year, currentVersion, previousVersion, showBackLink = true)
           .url
       ),
       getBasicDetailsCompletedOrUpdated(currentUA, previousUA)
@@ -211,7 +211,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         Message(messageKey(prefix, "finances.title")),
         controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
-          .onPageLoadViewOnly(srn, year, currentVersion, previousVersion)
+          .onPageLoadViewOnly(srn, year, currentVersion, previousVersion, showBackLink = true)
           .url
       ),
       getFinancialDetailsCompletedOrUpdated(currentUA, previousUA)
@@ -241,7 +241,7 @@ object ViewOnlyTaskListController {
         LinkMessage(
           Message(messageKey(prefix, "details.title")),
           controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-            .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion)
+            .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion, showBackLink = true)
             .url
         ),
         membersTaskListStatus
@@ -316,7 +316,7 @@ object ViewOnlyTaskListController {
         LinkMessage(
           messageKey(prefix, "employercontributions.title"),
           controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
             .url
         ),
         employerContributionsTaskListStatus
@@ -325,7 +325,7 @@ object ViewOnlyTaskListController {
         LinkMessage(
           messageKey(prefix, "unallocatedcontributions.title"),
           controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-            .onPageLoadViewOnly(srn, year, currentVersion, previousVersion)
+            .onPageLoadViewOnly(srn, year, currentVersion, previousVersion, showBackLink = true)
             .url
         ),
         unallocatedEmployerContributionsTaskListStatus
@@ -334,7 +334,7 @@ object ViewOnlyTaskListController {
         LinkMessage(
           messageKey(prefix, "memberContributions.title"),
           controllers.nonsipp.membercontributions.routes.MemberContributionListController
-            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
             .url
         ),
         memberContributionTaskListStatus
@@ -343,7 +343,7 @@ object ViewOnlyTaskListController {
         LinkMessage(
           messageKey(prefix, "transfersreceived.title"),
           controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
             .url
         ),
         transferInTaskListStatus
@@ -352,7 +352,7 @@ object ViewOnlyTaskListController {
         LinkMessage(
           messageKey(prefix, "transfersout.title"),
           controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
-            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
             .url
         ),
         transferOutTaskListStatus
@@ -361,7 +361,7 @@ object ViewOnlyTaskListController {
         LinkMessage(
           messageKey(prefix, "pcls.title"),
           controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
-            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
             .url
         ),
         pclsMemberTaskListStatus
@@ -370,7 +370,7 @@ object ViewOnlyTaskListController {
         LinkMessage(
           messageKey(prefix, "payments.title"),
           controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
-            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
             .url
         ),
         pensionPaymentsTaskListStatus
@@ -379,7 +379,7 @@ object ViewOnlyTaskListController {
         LinkMessage(
           messageKey(prefix, "surrenderedbenefits.title"),
           controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
-            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
             .url
         ),
         surrenderedBenefitsTaskListStatus
@@ -416,7 +416,7 @@ object ViewOnlyTaskListController {
         LinkMessage(
           Message(messageKey(prefix, "loansmade.title")),
           controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
-            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
             .url
         ),
         loansTaskListStatus
@@ -425,7 +425,7 @@ object ViewOnlyTaskListController {
         LinkMessage(
           Message(messageKey(prefix, "moneyborrowed.title")),
           controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
-            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+            .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
             .url
         ),
         borrowingTaskListStatus
@@ -462,7 +462,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey(prefix, "sponsoringemployer.title"),
         controllers.nonsipp.shares.routes.SharesListController
-          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
           .url
       ),
       sharesTaskListStatus
@@ -472,7 +472,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey("nonsipp.tasklist.sharesdisposal", "title"),
         controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
-          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
           .url
       ),
       sharesDisposalsTaskListStatus
@@ -521,7 +521,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey(prefix, "title"),
         controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
-          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
           .url
       ),
       landOrPropertyTaskListStatus
@@ -531,7 +531,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey("nonsipp.tasklist.landorpropertydisposal", "title"),
         controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
-          .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion)
+          .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion, showBackLink = true)
           .url
       ),
       landOrPropertyDisposalTaskListStatus
@@ -580,7 +580,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey(prefix, "unregulatedorconnected.title"),
         controllers.nonsipp.bonds.routes.BondsListController
-          .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion)
+          .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion, showBackLink = true)
           .url
       ),
       bondsTaskListStatus
@@ -590,7 +590,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey(prefix, "bondsdisposal.title"),
         controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
           .url
       ),
       bondsDisposalTaskListStatus
@@ -645,7 +645,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey(prefix, "quotedshares.title"),
         controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
-          .onPageLoadViewOnly(srn, year, currentVersion, previousVersion)
+          .onPageLoadViewOnly(srn, year, currentVersion, previousVersion, showBackLink = true)
           .url
       ),
       quotedSharesTaskListStatus
@@ -655,7 +655,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey(prefix, "title"),
         controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
-          .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion)
+          .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion, showBackLink = true)
           .url
       ),
       otherAssetsTaskListStatus
@@ -665,7 +665,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey("nonsipp.tasklist.otherassetsdisposal", "title"),
         controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
+          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
           .url
       ),
       otherAssetsDisposalTaskListStatus

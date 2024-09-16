@@ -241,7 +241,8 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
           srn,
           yearString,
           submissionNumberTwo,
-          submissionNumberOne
+          submissionNumberOne,
+          showBackLink = true
         ),
         userAnswers = overThresholdUA
       ).after {
@@ -266,7 +267,8 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
           srn,
           yearString,
           submissionNumberTwo,
-          submissionNumberOne
+          submissionNumberOne,
+          showBackLink = true
         ),
         userAnswers = overThresholdUA
       ).after {
@@ -296,7 +298,8 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
           srn,
           yearString,
           submissionNumberTwo,
-          submissionNumberOne
+          submissionNumberOne,
+          showBackLink = true
         ),
         userAnswers = overThresholdUA
       ).before {

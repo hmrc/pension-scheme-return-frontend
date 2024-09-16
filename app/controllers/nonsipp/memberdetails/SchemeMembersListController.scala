@@ -72,15 +72,16 @@ class SchemeMembersListController @Inject()(
     page: Int,
     year: String,
     current: Int,
-    previous: Int
+    previous: Int,
+    showBackLink: Boolean
   ): Action[AnyContent] =
     identifyAndRequireData(srn, ViewOnlyMode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, page, ManualOrUpload.Manual, ViewOnlyMode)
+      onPageLoadCommon(srn, page, ManualOrUpload.Manual, ViewOnlyMode, showBackLink)
     }
 
   def onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn, page, manualOrUpload, mode)
+      onPageLoadCommon(srn, page, manualOrUpload, mode, showBackLink = true)
     }
 
   def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -88,12 +89,12 @@ class SchemeMembersListController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
+            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0), showBackLink = false)
         )
       )
     }
 
-  def onPageLoadCommon(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode)(
+  def onPageLoadCommon(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode, showBackLink: Boolean)(
     implicit request: DataRequest[_]
   ): Result = {
     val completedMembers = request.userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty)
@@ -141,7 +142,8 @@ class SchemeMembersListController @Inject()(
                 optYear = request.year,
                 optCurrentVersion = request.currentVersion,
                 optPreviousVersion = request.previousVersion,
-                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+                showBackLink = showBackLink
               )
             )
           )
@@ -235,7 +237,8 @@ object SchemeMembersListController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    compilationOrSubmissionDate: Option[LocalDateTime] = None,
+    showBackLink: Boolean = true
   ): FormPageViewModel[ListViewModel] = {
 
     val lengthOfFilteredMembers = filteredMembers.length
@@ -291,7 +294,8 @@ object SchemeMembersListController {
       rows.size,
       call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
         case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-          routes.SchemeMembersListController.onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
+          routes.SchemeMembersListController
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion, showBackLink)
         case _ =>
           routes.SchemeMembersListController.onPageLoad(srn, _, manualOrUpload)
       }
@@ -375,7 +379,8 @@ object SchemeMembersListController {
                 .onSubmit(srn, page, mode)
           }
         )
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 }

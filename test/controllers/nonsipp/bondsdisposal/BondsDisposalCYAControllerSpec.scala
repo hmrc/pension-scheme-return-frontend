@@ -192,7 +192,7 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onSubmitViewOnly,
         controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
+          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )

@@ -54,7 +54,8 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
       1,
       yearString,
       submissionNumberTwo,
-      submissionNumberOne
+      submissionNumberOne,
+      showBackLink = true
     )
   private lazy val onPreviousViewOnly =
     routes.ReportBondsDisposalListController.onPreviousViewOnly(
@@ -115,7 +116,8 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
           maxPossibleNumberOfDisposals,
           completedUserAnswers,
           schemeName,
-          viewOnlyViewModel = None
+          viewOnlyViewModel = None,
+          showBackLink = true
         )
       )
     }.withName("Completed Journey"))
@@ -168,7 +170,8 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
               maxPossibleNumberOfDisposals,
               completedUserAnswers,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel)
+              viewOnlyViewModel = Some(viewOnlyViewModel),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
@@ -191,7 +194,8 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
               maxPossibleNumberOfDisposals,
               updatedUserAnswers,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -212,7 +216,7 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onPreviousViewOnly,
         controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
       ).withName(
         "Submit previous view only redirects to the controller with parameters for the previous submission"
       )

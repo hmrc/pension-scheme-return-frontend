@@ -122,7 +122,7 @@ class PclsCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
-            .onPageLoadViewOnly(srn, page, year, current, previous)
+            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
         )
       )
     }

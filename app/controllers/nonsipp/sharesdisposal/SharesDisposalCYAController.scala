@@ -251,7 +251,7 @@ class SharesDisposalCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
-            .onPageLoadViewOnly(srn, page, year, current, previous)
+            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
         )
       )
     }

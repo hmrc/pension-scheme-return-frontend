@@ -54,7 +54,8 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
       srn,
       yearString,
       submissionNumberTwo,
-      submissionNumberOne
+      submissionNumberOne,
+      showBackLink = true
     )
   private lazy val onSubmitViewOnly =
     controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController.onSubmitViewOnly(
@@ -210,7 +211,7 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onPreviousViewOnly,
         controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-          .onPageLoadViewOnly(srn, yearString, submissionNumberOne, submissionNumberZero)
+          .onPageLoadViewOnly(srn, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
       ).withName(
         "Submit previous view only redirects to UnallocatedContributionCYAController for the previous submission"
       )

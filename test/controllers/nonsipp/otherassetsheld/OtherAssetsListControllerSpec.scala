@@ -57,7 +57,8 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
     1,
     yearString,
     submissionNumberTwo,
-    submissionNumberOne
+    submissionNumberOne,
+    showBackLink = true
   )
   private lazy val onPreviousViewOnly = routes.OtherAssetsListController.onPreviousViewOnly(
     srn,
@@ -95,7 +96,7 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
       injected[ListView]
         .apply(
           form(injected[YesNoPageFormProvider]),
-          viewModel(srn, page, NormalMode, otherAssetsData, schemeName)
+          viewModel(srn, page, NormalMode, otherAssetsData, schemeName, showBackLink = true)
         )
     })
 
@@ -104,7 +105,7 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
         injected[ListView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, page, NormalMode, otherAssetsData, schemeName)
+            viewModel(srn, page, NormalMode, otherAssetsData, schemeName, showBackLink = true)
           )
       }
     )
@@ -149,7 +150,8 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               otherAssetsData,
               schemeName,
-              Some(viewOnlyViewModel)
+              Some(viewOnlyViewModel),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -169,7 +171,8 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               otherAssetsData,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -190,7 +193,7 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onPreviousViewOnly,
         controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
       ).withName(
         "Submit previous view only redirects to the controller with parameters for the previous submission"
       )

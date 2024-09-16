@@ -70,7 +70,7 @@ class ReportedSharesDisposalListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)
+      onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
   def onPageLoadViewOnly(
@@ -79,7 +79,8 @@ class ReportedSharesDisposalListController @Inject()(
     mode: Mode,
     year: String,
     current: Int,
-    previous: Int
+    previous: Int,
+    showBackLink: Boolean
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
     val viewOnlyViewModel = ViewOnlyViewModel(
       viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
@@ -96,10 +97,16 @@ class ReportedSharesDisposalListController @Inject()(
       previousVersion = previous,
       compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
     )
-    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel), showBackLink)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+  def onPageLoadCommon(
+    srn: Srn,
+    page: Int,
+    mode: Mode,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
+  )(
     implicit request: DataRequest[AnyContent]
   ): Result =
     getCompletedDisposals(srn).map { completedDisposals =>
@@ -114,7 +121,8 @@ class ReportedSharesDisposalListController @Inject()(
               completedDisposals,
               request.userAnswers,
               request.schemeDetails.schemeName,
-              viewOnlyViewModel
+              viewOnlyViewModel,
+              showBackLink = showBackLink
             )
           )
         )
@@ -143,7 +151,15 @@ class ReportedSharesDisposalListController @Inject()(
                   BadRequest(
                     view(
                       errors,
-                      viewModel(srn, page, mode, disposals, request.userAnswers, request.schemeDetails.schemeName)
+                      viewModel(
+                        srn,
+                        page,
+                        mode,
+                        disposals,
+                        request.userAnswers,
+                        request.schemeDetails.schemeName,
+                        showBackLink = true
+                      )
                     )
                   ).pure[Future],
                 reportAnotherDisposal =>
@@ -191,7 +207,7 @@ class ReportedSharesDisposalListController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
+            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0), showBackLink = false)
         )
       )
     }
@@ -312,7 +328,8 @@ object ReportedSharesDisposalListController {
     disposals: Map[Max5000, List[Max50]],
     userAnswers: UserAnswers,
     schemeName: String,
-    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
   ): FormPageViewModel[ListViewModel] = {
 
     val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
@@ -357,7 +374,8 @@ object ReportedSharesDisposalListController {
       numberOfDisposals,
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
-          routes.ReportedSharesDisposalListController.onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
+          routes.ReportedSharesDisposalListController
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion, showBackLink = true)
         case None =>
           routes.ReportedSharesDisposalListController.onPageLoad(srn, _)
       }
@@ -440,7 +458,8 @@ object ReportedSharesDisposalListController {
                 .onSubmit(srn, page, mode)
           }
         )
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 

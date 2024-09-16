@@ -39,7 +39,8 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
     srn,
     yearString,
     submissionNumberTwo,
-    submissionNumberOne
+    submissionNumberOne,
+    showBackLink = true
   )
   private lazy val onSubmitViewOnly = routes.FinancialDetailsCheckYourAnswersController.onSubmitViewOnly(
     srn,
@@ -179,7 +180,7 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
       redirectToPage(
         onPreviousViewOnly,
         routes.FinancialDetailsCheckYourAnswersController
-          .onPageLoadViewOnly(srn, yearString, submissionNumberOne, submissionNumberZero)
+          .onPageLoadViewOnly(srn, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
       ).withName(
         "Submit previous view only redirects to FinancialDetailsCheckYourAnswersController for the previous submission"
       )

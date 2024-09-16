@@ -199,7 +199,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onSubmitViewOnly,
         controllers.nonsipp.shares.routes.SharesListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )
