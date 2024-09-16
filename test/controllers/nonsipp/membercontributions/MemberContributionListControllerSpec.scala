@@ -57,7 +57,8 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
     1,
     yearString,
     submissionNumberTwo,
-    submissionNumberOne
+    submissionNumberOne,
+    showBackLink = true
   )
   private lazy val onPreviousViewOnly = routes.MemberContributionListController.onPreviousViewOnly(
     srn,
@@ -330,7 +331,7 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onPreviousViewOnly,
         controllers.nonsipp.membercontributions.routes.MemberContributionListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
       ).withName(
         "Submit previous view only redirects to the controller with parameters for the previous submission"
       )

@@ -208,7 +208,7 @@ class AssetDisposalCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-            .onPageLoadViewOnly(srn, page, year, current, previous)
+            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
         )
       )
     }

@@ -57,7 +57,8 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
     1,
     yearString,
     submissionNumberTwo,
-    submissionNumberOne
+    submissionNumberOne,
+    showBackLink = true
   )
   private lazy val onPreviousViewOnly = routes.TransferReceivedMemberListController.onPreviousViewOnly(
     srn,
@@ -304,7 +305,7 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onPreviousViewOnly,
         controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
       ).withName(
         "Submit previous view only redirects to the controller with parameters for the previous submission"
       )

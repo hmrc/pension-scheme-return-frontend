@@ -64,7 +64,7 @@ class OtherAssetsListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)
+      onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
   def onPageLoadViewOnly(
@@ -73,7 +73,8 @@ class OtherAssetsListController @Inject()(
     mode: Mode,
     year: String,
     current: Int,
-    previous: Int
+    previous: Int,
+    showBackLink: Boolean
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
     val viewOnlyViewModel = ViewOnlyViewModel(
       viewOnlyUpdated = request.previousUserAnswers match {
@@ -90,10 +91,16 @@ class OtherAssetsListController @Inject()(
       previousVersion = previous,
       compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
     )
-    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel), showBackLink)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+  def onPageLoadCommon(
+    srn: Srn,
+    page: Int,
+    mode: Mode,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
+  )(
     implicit request: DataRequest[AnyContent]
   ): Result = {
     val indexes: List[Max5000] =
@@ -112,7 +119,8 @@ class OtherAssetsListController @Inject()(
               mode,
               data,
               request.schemeDetails.schemeName,
-              viewOnlyViewModel
+              viewOnlyViewModel,
+              showBackLink = showBackLink
             )
           )
         )
@@ -140,7 +148,12 @@ class OtherAssetsListController @Inject()(
             errors => {
               otherAssetsData(srn, indexes)
                 .map { data =>
-                  BadRequest(view(errors, viewModel(srn, page, mode, data, request.schemeDetails.schemeName)))
+                  BadRequest(
+                    view(
+                      errors,
+                      viewModel(srn, page, mode, data, request.schemeDetails.schemeName, showBackLink = true)
+                    )
+                  )
                 }
                 .merge
                 .pure[Future]
@@ -190,7 +203,7 @@ class OtherAssetsListController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
+            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0), showBackLink = false)
         )
       )
     }
@@ -268,7 +281,8 @@ object OtherAssetsListController {
     mode: Mode,
     data: List[OtherAssetsData],
     schemeName: String,
-    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
   ): FormPageViewModel[ListViewModel] = {
     val lengthOfData = data.length
 
@@ -295,7 +309,7 @@ object OtherAssetsListController {
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
-            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion, showBackLink = true)
         case None =>
           controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onPageLoad(srn, _, mode)
       }
@@ -364,7 +378,8 @@ object OtherAssetsListController {
           onSubmit = controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
             .onSubmitViewOnly(srn, viewOnly.year, viewOnly.currentVersion, viewOnly.previousVersion)
         )
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 

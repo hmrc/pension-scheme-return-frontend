@@ -42,7 +42,8 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
       page = 1,
       yearString,
       submissionNumberOne,
-      submissionNumberZero
+      submissionNumberZero,
+      showBackLink = true
     )
   private lazy val onSubmitViewOnly =
     routes.LandOrPropertyDisposalListController.onSubmitViewOnly(
@@ -87,7 +88,8 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
             numberOfDisposals = 1,
             maxPossibleNumberOfDisposals = 50,
             schemeName,
-            viewOnlyViewModel = None
+            viewOnlyViewModel = None,
+            showBackLink = true
           )
         )
     })
@@ -130,7 +132,8 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
                 numberOfDisposals = 1,
                 maxPossibleNumberOfDisposals = 50,
                 schemeName,
-                viewOnlyViewModel = Some(viewOnlyViewModel)
+                viewOnlyViewModel = Some(viewOnlyViewModel),
+                showBackLink = true
               )
             )
         }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
@@ -156,7 +159,8 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
               numberOfDisposals = 1,
               maxPossibleNumberOfDisposals = 50,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
           )
         }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated true")
@@ -174,7 +178,7 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
         redirectToPage(
           onPreviousViewOnly,
           routes.LandOrPropertyDisposalListController
-            .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+            .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
         ).withName(
           "Submit previous view only redirects to the controller with parameters for the previous submission"
         )

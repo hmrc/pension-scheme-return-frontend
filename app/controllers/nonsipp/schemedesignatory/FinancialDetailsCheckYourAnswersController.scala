@@ -63,12 +63,21 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
     onPageLoadCommon(srn, mode)
   }
 
-  def onPageLoadViewOnly(srn: Srn, mode: Mode, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onPageLoadViewOnly(
+    srn: Srn,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int,
+    showBackLink: Boolean
+  ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, mode)
+      onPageLoadCommon(srn, mode, showBackLink)
     }
 
-  def onPageLoadCommon(srn: Srn, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+  def onPageLoadCommon(srn: Srn, mode: Mode, showBackLink: Boolean = true)(
+    implicit request: DataRequest[AnyContent]
+  ): Result =
     schemeDateService.taxYearOrAccountingPeriods(srn) match {
       case Some(periods) =>
         val howMuchCashPage = request.userAnswers.get(HowMuchCashPage(srn, mode))
@@ -92,7 +101,8 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
               optYear = request.year,
               optCurrentVersion = request.currentVersion,
               optPreviousVersion = request.previousVersion,
-              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+              showBackLink = showBackLink
             )
           )
         )
@@ -123,7 +133,7 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
-            .onPageLoadViewOnly(srn, year, (current - 1).max(0), (previous - 1).max(0))
+            .onPageLoadViewOnly(srn, year, (current - 1).max(0), (previous - 1).max(0), showBackLink = false)
         )
       )
     }
@@ -142,7 +152,8 @@ object FinancialDetailsCheckYourAnswersController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    compilationOrSubmissionDate: Option[LocalDateTime] = None,
+    showBackLink: Boolean = true
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,
@@ -199,7 +210,8 @@ object FinancialDetailsCheckYourAnswersController {
                 .onSubmit(srn, mode)
           }
         )
-      )
+      ),
+      showBackLink = showBackLink
     )
 
   private def sections(

@@ -177,7 +177,7 @@ class LoansCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
-            .onPageLoadViewOnly(srn, page, year, current, previous)
+            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
         )
       )
     }

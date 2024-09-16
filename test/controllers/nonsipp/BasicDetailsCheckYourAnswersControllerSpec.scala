@@ -58,7 +58,8 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
     srn,
     yearString,
     submissionNumberTwo,
-    submissionNumberOne
+    submissionNumberOne,
+    showBackLink = true
   )
   private lazy val onSubmitViewOnly = routes.BasicDetailsCheckYourAnswersController.onSubmitViewOnly(
     srn,
@@ -644,7 +645,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
       redirectToPage(
         onPreviousViewOnly,
         routes.BasicDetailsCheckYourAnswersController
-          .onPageLoadViewOnly(srn, yearString, submissionNumberOne, submissionNumberZero)
+          .onPageLoadViewOnly(srn, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
       ).withName(
         "Submit previous view only redirects to BasicDetailsCheckYourAnswersController for the previous submission"
       )

@@ -56,12 +56,21 @@ class UnallocatedContributionCYAController @Inject()(
     onPageLoadCommon(srn, mode)
   }
 
-  def onPageLoadViewOnly(srn: Srn, mode: Mode, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onPageLoadViewOnly(
+    srn: Srn,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int,
+    showBackLink: Boolean
+  ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, mode)
+      onPageLoadCommon(srn, mode, showBackLink)
     }
 
-  def onPageLoadCommon(srn: Srn, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+  def onPageLoadCommon(srn: Srn, mode: Mode, showBackLink: Boolean = true)(
+    implicit request: DataRequest[AnyContent]
+  ): Result =
     Ok(
       view(
         UnallocatedContributionCYAController.viewModel(
@@ -81,7 +90,8 @@ class UnallocatedContributionCYAController @Inject()(
           optYear = request.year,
           optCurrentVersion = request.currentVersion,
           optPreviousVersion = request.previousVersion,
-          compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+          showBackLink = showBackLink
         )
       )
     )
@@ -111,7 +121,7 @@ class UnallocatedContributionCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-            .onPageLoadViewOnly(srn, year, (current - 1).max(0), (previous - 1).max(0))
+            .onPageLoadViewOnly(srn, year, (current - 1).max(0), (previous - 1).max(0), showBackLink = false)
         )
       )
     }
@@ -128,7 +138,8 @@ object UnallocatedContributionCYAController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    compilationOrSubmissionDate: Option[LocalDateTime] = None,
+    showBackLink: Boolean = true
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,
@@ -195,7 +206,8 @@ object UnallocatedContributionCYAController {
                 .onSubmit(srn, mode)
           }
         )
-      )
+      ),
+      showBackLink = showBackLink
     )
 
   private def sections(

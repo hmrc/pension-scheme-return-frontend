@@ -56,7 +56,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
       1,
       yearString,
       submissionNumberTwo,
-      submissionNumberOne
+      submissionNumberOne,
+      showBackLink = true
     )
   private lazy val onPreviousViewOnly =
     controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController.onPreviousViewOnly(
@@ -138,7 +139,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
           sharesDisposalsWithIndexes,
           completedUserAnswers,
           schemeName,
-          viewOnlyViewModel = None
+          viewOnlyViewModel = None,
+          showBackLink = true
         )
       )
     }.withName("Completed Journey"))
@@ -189,7 +191,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
                 sharesDisposalsWithIndexes,
                 completedUserAnswers,
                 schemeName,
-                viewOnlyViewModel = Some(viewOnlyViewModel)
+                viewOnlyViewModel = Some(viewOnlyViewModel),
+                showBackLink = true
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -211,7 +214,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
                 sharesDisposalsWithIndexes,
                 updatedUserAnswers,
                 schemeName,
-                viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+                viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+                showBackLink = true
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -232,7 +236,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
             Map(),
             noDisposalsUserAnswers,
             schemeName,
-            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+            showBackLink = true
           )
         )
       }.withName("OnPageLoadViewOnly renders ok with no disposals")
@@ -253,7 +258,7 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onPreviousViewOnly,
         controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
       ).withName(
         "Submit previous view only redirects to the controller with parameters for the previous submission"
       )

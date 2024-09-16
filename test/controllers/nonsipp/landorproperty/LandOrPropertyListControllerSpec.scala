@@ -88,7 +88,8 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
     1,
     yearString,
     submissionNumberTwo,
-    submissionNumberOne
+    submissionNumberOne,
+    showBackLink = true
   )
   private lazy val onPreviousViewOnly = routes.LandOrPropertyListController.onPreviousViewOnly(
     srn,
@@ -111,7 +112,8 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
           1,
           NormalMode,
           addresses,
-          schemeName
+          schemeName,
+          showBackLink = true
         )
       )
     }.withName("Completed Journey"))
@@ -167,7 +169,8 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               addresses,
               schemeName,
-              Some(viewOnlyViewModel)
+              Some(viewOnlyViewModel),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -187,7 +190,8 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               addresses,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -207,7 +211,8 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
             mode = ViewOnlyMode,
             Map(),
             schemeName,
-            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+            showBackLink = true
           )
         )
       }.withName("OnPageLoadViewOnly renders ok with no land or property")
@@ -228,7 +233,7 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onPreviousViewOnly,
         controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
       ).withName(
         "Submit previous view only redirects to the controller with parameters for the previous submission"
       )

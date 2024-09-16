@@ -76,10 +76,12 @@ class SchemeMemberDetailsAnswersController @Inject()(
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)
+      onPageLoadCommon(srn, index, mode)
     }
 
-  def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+  def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(
+    implicit request: DataRequest[AnyContent]
+  ): Result =
     (
       for {
         memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index))
@@ -153,7 +155,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-            .onPageLoadViewOnly(srn, page, year, current, previous)
+            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
         )
       )
     }

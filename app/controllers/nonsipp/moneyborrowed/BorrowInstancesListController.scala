@@ -61,7 +61,7 @@ class BorrowInstancesListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)
+      onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
   def onPageLoadViewOnly(
@@ -70,7 +70,8 @@ class BorrowInstancesListController @Inject()(
     mode: Mode,
     year: String,
     current: Int,
-    previous: Int
+    previous: Int,
+    showBackLink: Boolean
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
     val viewOnlyViewModel = ViewOnlyViewModel(
       viewOnlyUpdated = request.previousUserAnswers match {
@@ -87,10 +88,16 @@ class BorrowInstancesListController @Inject()(
       previousVersion = previous,
       compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
     )
-    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel), showBackLink)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+  def onPageLoadCommon(
+    srn: Srn,
+    page: Int,
+    mode: Mode,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
+  )(
     implicit request: DataRequest[AnyContent]
   ): Result =
     borrowDetails(srn).map { instances =>
@@ -117,7 +124,8 @@ class BorrowInstancesListController @Inject()(
                       page,
                       instances,
                       request.schemeDetails.schemeName,
-                      viewOnlyViewModel
+                      viewOnlyViewModel,
+                      showBackLink = showBackLink
                     )
                   )
                 )
@@ -133,7 +141,7 @@ class BorrowInstancesListController @Inject()(
         Redirect(navigator.nextPage(BorrowInstancesListPage(srn, addBorrow = false), mode, request.userAnswers))
       } else {
         val viewModel =
-          BorrowInstancesListController.viewModel(srn, mode, page, instances, "")
+          BorrowInstancesListController.viewModel(srn, mode, page, instances, "", showBackLink = true)
 
         form
           .bindFromRequest()
@@ -160,7 +168,7 @@ class BorrowInstancesListController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
+            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0), showBackLink = false)
         )
       )
     }
@@ -254,7 +262,8 @@ object BorrowInstancesListController {
     page: Int,
     borrowingInstances: List[(Max5000, String, Money)],
     schemeName: String,
-    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
   ): FormPageViewModel[ListViewModel] = {
 
     val lengthOfBorrowingInstances = borrowingInstances.length
@@ -281,7 +290,8 @@ object BorrowInstancesListController {
       borrowingInstances.size,
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
-          routes.BorrowInstancesListController.onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
+          routes.BorrowInstancesListController
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion, showBackLink = true)
         case _ =>
           routes.BorrowInstancesListController.onPageLoad(srn, _, NormalMode)
       }
@@ -342,7 +352,8 @@ object BorrowInstancesListController {
           onSubmit = controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
             .onSubmitViewOnly(srn, viewOnly.year, viewOnly.currentVersion, viewOnly.previousVersion)
         )
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 }
