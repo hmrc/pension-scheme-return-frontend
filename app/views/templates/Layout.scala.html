@@ -59,6 +59,7 @@
 
 @additionalScripts = {
     <script src='@controllers.routes.Assets.versioned("javascripts/application.min.js")' @CSPNonce.attr></script>
+    <script @{CSPNonce.attr} src="@routes.Assets.versioned("javascripts/print.js")"></script>
 }
 
 @beforeContent = {

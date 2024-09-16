@@ -52,6 +52,11 @@ class ViewOnlyReturnSubmittedController @Inject()(
 
   def onPageLoad(srn: Srn, year: String, version: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      val dashboardLink = if (request.pensionSchemeId.isPSP) {
+        config.urls.managePensionsSchemes.schemeSummaryPSPDashboard(srn)
+      } else {
+        config.urls.managePensionsSchemes.schemeSummaryDashboard(srn)
+      }
       for {
         retrievedUserAnswers <- psrRetrievalService.getAndTransformStandardPsrDetails(
           None,
@@ -66,8 +71,7 @@ class ViewOnlyReturnSubmittedController @Inject()(
           retrievedUserAnswers,
           psrVersionsResponse,
           version,
-          config.urls.pensionSchemeEnquiry,
-          config.urls.managePensionsSchemes.dashboard
+          dashboardLink
         )
       } yield Ok(view(viewModel))
     }
@@ -81,7 +85,6 @@ object ViewOnlyReturnSubmittedController {
     retrievedUserAnswers: UserAnswers,
     psrVersionsResponse: Seq[PsrVersionsResponse],
     version: Int,
-    pensionSchemeEnquiriesUrl: String,
     managePensionSchemeDashboardUrl: String
   ): SubmissionViewModel = {
 
@@ -116,15 +119,15 @@ object ViewOnlyReturnSubmittedController {
         ParagraphMessage("returnSubmitted.whatHappensNext.paragraph1") ++
           ParagraphMessage(
             "returnSubmitted.whatHappensNext.paragraph2",
-            LinkMessage("returnSubmitted.whatHappensNext.paragraph2.link", pensionSchemeEnquiriesUrl)
-          ) ++
-          ParagraphMessage("returnSubmitted.whatHappensNext.paragraph3") ++
-          ListMessage.Bullet(
-            Message("returnSubmitted.whatHappensNext.list1") ++ LinkMessage(
-              Message("returnSubmitted.whatHappensNext.list1.link", schemeName),
+            LinkMessage(
+              Message("returnSubmitted.whatHappensNext.paragraph2.link", schemeName),
               managePensionSchemeDashboardUrl
             ),
-            LinkMessage("returnSubmitted.whatHappensNext.list2", "javascript:window.print();")
+            "returnSubmitted.whatHappensNext.paragraph2.linkMessage"
+          ) ++
+          ParagraphMessage(
+            "returnSubmitted.whatHappensNext.paragraph3",
+            LinkMessage("returnSubmitted.whatHappensNext.list2", "#print")
           )
     )
   }

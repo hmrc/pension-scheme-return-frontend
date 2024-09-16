@@ -55,6 +55,11 @@ class ReturnSubmittedController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identify.andThen(allowAccess(srn)).async {
     implicit request =>
+      val dashboardLink = if (request.pensionSchemeId.isPSP) {
+        config.urls.managePensionsSchemes.schemeSummaryPSPDashboard(srn)
+      } else {
+        config.urls.managePensionsSchemes.schemeSummaryDashboard(srn)
+      }
       (request.session.get(RETURN_PERIODS), request.session.get(SUBMISSION_DATE))
         .mapN { (returnPeriods, submissionDate) =>
           Ok(
@@ -64,8 +69,7 @@ class ReturnSubmittedController @Inject()(
                 request.minimalDetails.email,
                 Json.parse(returnPeriods).as[NonEmptyList[DateRange]],
                 LocalDateTime.parse(submissionDate, DateTimeFormatter.ISO_DATE_TIME),
-                config.urls.pensionSchemeEnquiry,
-                config.urls.managePensionsSchemes.dashboard
+                dashboardLink
               )
             )
           )
@@ -83,7 +87,6 @@ object ReturnSubmittedController {
     email: String,
     returnPeriods: NonEmptyList[DateRange],
     submissionDate: LocalDateTime,
-    pensionSchemeEnquiriesUrl: String,
     managePensionSchemeDashboardUrl: String
   ): SubmissionViewModel =
     SubmissionViewModel(
@@ -106,15 +109,15 @@ object ReturnSubmittedController {
         ParagraphMessage("returnSubmitted.whatHappensNext.paragraph1") ++
           ParagraphMessage(
             "returnSubmitted.whatHappensNext.paragraph2",
-            LinkMessage("returnSubmitted.whatHappensNext.paragraph2.link", pensionSchemeEnquiriesUrl)
-          ) ++
-          ParagraphMessage("returnSubmitted.whatHappensNext.paragraph3") ++
-          ListMessage.Bullet(
-            Message("returnSubmitted.whatHappensNext.list1") ++ LinkMessage(
-              Message("returnSubmitted.whatHappensNext.list1.link", schemeName),
+            LinkMessage(
+              Message("returnSubmitted.whatHappensNext.paragraph2.link", schemeName),
               managePensionSchemeDashboardUrl
             ),
-            LinkMessage("returnSubmitted.whatHappensNext.list2", "javascript:window.print();")
+            "returnSubmitted.whatHappensNext.paragraph2.linkMessage"
+          ) ++
+          ParagraphMessage(
+            "returnSubmitted.whatHappensNext.paragraph3",
+            LinkMessage("returnSubmitted.whatHappensNext.list2", "#print")
           )
     )
 
