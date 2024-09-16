@@ -87,7 +87,8 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
             numberOfDisposals = 1,
             maxPossibleNumberOfDisposals = 50,
             schemeName,
-            viewOnlyViewModel = None
+            viewOnlyViewModel = None,
+            showBackLink = true
           )
         )
     })
@@ -130,7 +131,8 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
                 numberOfDisposals = 1,
                 maxPossibleNumberOfDisposals = 50,
                 schemeName,
-                viewOnlyViewModel = Some(viewOnlyViewModel)
+                viewOnlyViewModel = Some(viewOnlyViewModel),
+                showBackLink = true
               )
             )
         }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
@@ -156,7 +158,8 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
               numberOfDisposals = 1,
               maxPossibleNumberOfDisposals = 50,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
           )
         }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated true")
@@ -171,14 +174,34 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
       )
 
       act.like(
-        redirectToPage(
+        renderView(
           onPreviousViewOnly,
-          routes.LandOrPropertyDisposalListController
-            .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-        ).withName(
-          "Submit previous view only redirects to the controller with parameters for the previous submission"
-        )
+          userAnswers = currentUserAnswers,
+          optPreviousAnswers = Some(previousUserAnswers)
+        ) { implicit app => implicit request =>
+          injected[ListView].apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              ViewOnlyMode,
+              page = 1,
+              addressesWithIndexes,
+              numberOfDisposals = 1,
+              maxPossibleNumberOfDisposals = 50,
+              schemeName,
+              viewOnlyViewModel = Some(
+                viewOnlyViewModel.copy(
+                  viewOnlyUpdated = false,
+                  currentVersion = (submissionNumberTwo - 1).max(0),
+                  previousVersion = (submissionNumberOne - 1).max(0)
+                )
+              ),
+              showBackLink = false
+            )
+          )
+        }.withName("OnPreviousViewOnly renders the view correctly")
       )
+
     }
   }
 }

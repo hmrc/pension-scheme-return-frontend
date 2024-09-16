@@ -69,7 +69,7 @@ class ReportedOtherAssetsDisposalListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)
+      onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
   def onPageLoadViewOnly(
@@ -80,6 +80,7 @@ class ReportedOtherAssetsDisposalListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    val showBackLink = true
     val viewOnlyViewModel = ViewOnlyViewModel(
       viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
         getCompletedOrUpdatedTaskListStatus(
@@ -95,10 +96,16 @@ class ReportedOtherAssetsDisposalListController @Inject()(
       previousVersion = previous,
       compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
     )
-    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel), showBackLink)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+  def onPageLoadCommon(
+    srn: Srn,
+    page: Int,
+    mode: Mode,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
+  )(
     implicit request: DataRequest[AnyContent]
   ): Result =
     getCompletedDisposals(srn).map { completedDisposals =>
@@ -113,7 +120,8 @@ class ReportedOtherAssetsDisposalListController @Inject()(
               completedDisposals,
               request.userAnswers,
               request.schemeDetails.schemeName,
-              viewOnlyViewModel
+              viewOnlyViewModel,
+              showBackLink = showBackLink
             )
           )
         )
@@ -141,7 +149,7 @@ class ReportedOtherAssetsDisposalListController @Inject()(
               .fold(
                 errors =>
                   BadRequest(
-                    view(errors, viewModel(srn, mode, page, disposals, request.userAnswers, ""))
+                    view(errors, viewModel(srn, mode, page, disposals, request.userAnswers, "", showBackLink = true))
                   ).pure[Future],
                 reportAnotherDisposal =>
                   for {
@@ -184,14 +192,35 @@ class ReportedOtherAssetsDisposalListController @Inject()(
       )
     }
 
-  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
-      )
+  def onPreviousViewOnly(
+                          srn: Srn,
+                          page: Int,
+                          year: String,
+                          current: Int,
+                          previous: Int
+                        ): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)).async {
+      implicit request =>
+        Future.successful {
+          val showBackLink = false
+          val viewOnlyViewModel = ViewOnlyViewModel(
+            viewOnlyUpdated = request.previousUserAnswers match {
+              case Some(previousUserAnswers) =>
+                getCompletedOrUpdatedTaskListStatus(
+                  request.userAnswers,
+                  previousUserAnswers,
+                  pages.nonsipp.otherassetsdisposal.Paths.assetsDisposed
+                ) == Updated
+              case None =>
+                false
+            },
+            year = year,
+            currentVersion = (current - 1).max(0),
+            previousVersion = (previous - 1).max(0),
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          )
+          onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
+        }
     }
 
   private def getCompletedDisposals(
@@ -304,7 +333,8 @@ object ReportedOtherAssetsDisposalListController {
     disposals: Map[Max5000, List[Max50]],
     userAnswers: UserAnswers,
     schemeName: String,
-    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
   ): FormPageViewModel[ListViewModel] = {
 
     val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
@@ -434,7 +464,8 @@ object ReportedOtherAssetsDisposalListController {
                 .onSubmit(srn, page, mode)
           }
         )
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 

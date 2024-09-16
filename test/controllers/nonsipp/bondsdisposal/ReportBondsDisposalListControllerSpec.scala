@@ -115,7 +115,8 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
           maxPossibleNumberOfDisposals,
           completedUserAnswers,
           schemeName,
-          viewOnlyViewModel = None
+          viewOnlyViewModel = None,
+          showBackLink = true
         )
       )
     }.withName("Completed Journey"))
@@ -168,7 +169,8 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
               maxPossibleNumberOfDisposals,
               completedUserAnswers,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel)
+              viewOnlyViewModel = Some(viewOnlyViewModel),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
@@ -191,7 +193,8 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
               maxPossibleNumberOfDisposals,
               updatedUserAnswers,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -209,13 +212,30 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectToPage(
-        onPreviousViewOnly,
-        controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
-      )
+      renderView(onPreviousViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
+        implicit app => implicit request =>
+          injected[ListView].apply(
+            form(new YesNoPageFormProvider()),
+            viewModel(
+              srn,
+              mode = ViewOnlyMode,
+              page,
+              bondsDisposalsWithIndexes,
+              numberOfDisposals,
+              maxPossibleNumberOfDisposals,
+              updatedUserAnswers,
+              schemeName,
+              viewOnlyViewModel = Some(
+                viewOnlyViewModel.copy(
+                  currentVersion = submissionNumberOne,
+                  previousVersion = submissionNumberZero
+                )
+              ),
+              showBackLink = false
+            )
+          )
+      }.withName("OnPreviousViewOnly renders view with parameters for the previous submission")
     )
+
   }
 }

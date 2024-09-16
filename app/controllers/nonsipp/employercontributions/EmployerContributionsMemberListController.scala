@@ -78,10 +78,13 @@ class EmployerContributionsMemberListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)
+    val showBackLink = true
+    onPageLoadCommon(srn, page, mode, showBackLink)
   }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean = true)(
+    implicit request: DataRequest[AnyContent]
+  ): Result = {
     val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
     if (optionList.flatten.nonEmpty) {
       optionList
@@ -111,7 +114,8 @@ class EmployerContributionsMemberListController @Inject()(
                 optCurrentVersion = request.currentVersion,
                 optPreviousVersion = request.previousVersion,
                 compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
-                noPageEnabled
+                noPageEnabled,
+                showBackLink = showBackLink
               )
             )
           )
@@ -204,14 +208,16 @@ class EmployerContributionsMemberListController @Inject()(
       )
     }
 
-  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
-      )
+  def onPreviousViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) { implicit request =>
+      val showBackLink = false
+      onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
   private def buildEmployerContributions(srn: Srn, indexes: List[(Max300, Option[NameDOB])])(
@@ -353,7 +359,8 @@ object EmployerContributionsMemberListController {
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
     compilationOrSubmissionDate: Option[LocalDateTime] = None,
-    noPageEnabled: Boolean
+    noPageEnabled: Boolean,
+    showBackLink: Boolean = true
   ): FormPageViewModel[ActionTableViewModel] = {
 
     val (title, heading) = if (employerContributions.size == 1) {
@@ -480,7 +487,8 @@ object EmployerContributionsMemberListController {
         )
       } else {
         None
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 

@@ -68,12 +68,21 @@ class BasicDetailsCheckYourAnswersController @Inject()(
     onPageLoadCommon(srn, mode)
   }
 
-  def onPageLoadViewOnly(srn: Srn, mode: Mode, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onPageLoadViewOnly(
+    srn: Srn,
+    mode: Mode,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous).async { implicit request =>
-      onPageLoadCommon(srn, mode)
+      val showBackLink = true
+      onPageLoadCommon(srn, mode, showBackLink)
     }
 
-  def onPageLoadCommon(srn: Srn, mode: Mode)(implicit request: DataRequest[AnyContent]): Future[Result] = {
+  def onPageLoadCommon(srn: Srn, mode: Mode, showBackLink: Boolean = true)(
+    implicit request: DataRequest[AnyContent]
+  ): Future[Result] = {
     val journeyByPassedF =
       if (isUserAnswersAlreadySubmittedAndNotModified(srn)) isJourneyBypassed(srn) else Future.successful(Right(false))
     journeyByPassedF.map(
@@ -114,7 +123,8 @@ class BasicDetailsCheckYourAnswersController @Inject()(
                       optCurrentVersion = request.currentVersion,
                       optPreviousVersion = request.previousVersion,
                       compilationOrSubmissionDate = compilationOrSubmissionDate,
-                      journeyByPassed = journeyByPassed
+                      journeyByPassed = journeyByPassed,
+                      showBackLink = showBackLink
                     )
                   )
                 )
@@ -184,13 +194,9 @@ class BasicDetailsCheckYourAnswersController @Inject()(
   def onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] = {
     val newCurrent = (current - 1).max(0)
     val newPrevious = (previous - 1).max(0)
-    identifyAndRequireData(srn, ViewOnlyMode, year, newCurrent, newPrevious).async {
-      Future.successful(
-        Redirect(
-          controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
-            .onPageLoadViewOnly(srn, year, newCurrent, newPrevious)
-        )
-      )
+    identifyAndRequireData(srn, ViewOnlyMode, year, newCurrent, newPrevious).async { implicit request =>
+      val showBackLink = false
+      onPageLoadCommon(srn, ViewOnlyMode, showBackLink)
     }
   }
 
@@ -228,7 +234,8 @@ object BasicDetailsCheckYourAnswersController {
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
     compilationOrSubmissionDate: Option[LocalDateTime] = None,
-    journeyByPassed: Boolean
+    journeyByPassed: Boolean,
+    showBackLink: Boolean = true
   )(implicit messages: Messages): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,
@@ -264,6 +271,7 @@ object BasicDetailsCheckYourAnswersController {
       } else {
         routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, mode)
       },
+      showBackLink = showBackLink,
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
         Some(
           ViewOnlyDetailsViewModel(
@@ -302,7 +310,8 @@ object BasicDetailsCheckYourAnswersController {
               case _ =>
                 controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
                   .onSubmit(srn, mode)
-            }
+            },
+            showBackLink = showBackLink
           )
         )
       } else {

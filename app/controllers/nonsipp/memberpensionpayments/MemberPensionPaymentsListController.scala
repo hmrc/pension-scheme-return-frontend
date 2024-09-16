@@ -69,7 +69,7 @@ class MemberPensionPaymentsListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)
+      onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
   def onPageLoadViewOnly(
@@ -80,10 +80,13 @@ class MemberPensionPaymentsListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)
+    val showBackLink = true
+    onPageLoadCommon(srn, page, mode, showBackLink)
   }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(
+    implicit request: DataRequest[AnyContent]
+  ): Result = {
     val userAnswers = request.userAnswers
     val optionList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
     if (optionList.flatten.nonEmpty) {
@@ -109,7 +112,8 @@ class MemberPensionPaymentsListController @Inject()(
           optPreviousVersion = request.previousVersion,
           compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
           schemeName = request.schemeDetails.schemeName,
-          noPageEnabled = noPageEnabled
+          noPageEnabled = noPageEnabled,
+          showBackLink = showBackLink
         )
       val filledForm =
         request.userAnswers.get(MemberPensionPaymentsListPage(srn)).fold(form)(form.fill)
@@ -156,7 +160,8 @@ class MemberPensionPaymentsListController @Inject()(
                         None,
                         None,
                         request.schemeDetails.schemeName,
-                        noPageEnabled
+                        noPageEnabled,
+                        showBackLink = true
                       )
                   )
                 )
@@ -194,14 +199,16 @@ class MemberPensionPaymentsListController @Inject()(
       )
     }
 
-  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
-      )
+  def onPreviousViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) { implicit request =>
+      val showBackLink = false
+      onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
   private def buildUserAnswerBySelection(srn: Srn, selection: Boolean, memberListSize: Int)(
@@ -334,7 +341,8 @@ object MemberPensionPaymentsListController {
     optPreviousVersion: Option[Int] = None,
     compilationOrSubmissionDate: Option[LocalDateTime] = None,
     schemeName: String,
-    noPageEnabled: Boolean
+    noPageEnabled: Boolean,
+    showBackLink: Boolean
   ): FormPageViewModel[ActionTableViewModel] = {
 
     val memberListSize = memberList.flatten.size
@@ -462,7 +470,8 @@ object MemberPensionPaymentsListController {
         )
       } else {
         None
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 }

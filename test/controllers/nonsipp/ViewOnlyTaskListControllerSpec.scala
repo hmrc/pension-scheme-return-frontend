@@ -152,7 +152,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(IndividualRecipientNamePage(srn, index1of5000), name)
     .unsafeSet(IndividualRecipientNinoPage(srn, index1of5000), ConditionalYesNo.yes[String, Nino](nino))
     .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, index1of5000), true)
-    .unsafeSet(DatePeriodLoanPage(srn, index1of5000), (localDate, money, loanPeriod))
+//    .unsafeSet(DatePeriodLoanPage(srn, index1of5000), (localDate, money, loanPeriod))
     .unsafeSet(AmountOfTheLoanPage(srn, index1of5000), (money, money, money))
     .unsafeSet(AreRepaymentsInstalmentsPage(srn, index1of5000), true)
     .unsafeSet(InterestOnLoanPage(srn, index1of5000), (money, percentage, money))
@@ -583,7 +583,13 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             expectedTitleKey = "nonsipp.tasklist.members.title",
             expectedLinkContentKey = "nonsipp.tasklist.members.view.details.title",
             expectedLinkUrl = controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-              .onPageLoadViewOnly(srn, page = 1, yearString, submissionNumberTwo, submissionNumberOne)
+              .onPageLoadViewOnly(
+                srn,
+                page = 1,
+                yearString,
+                submissionNumberTwo,
+                submissionNumberOne
+              )
               .url
           )
         }
@@ -598,7 +604,13 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
             expectedTitleKey = "nonsipp.tasklist.members.title",
             expectedLinkContentKey = "nonsipp.tasklist.members.view.details.title",
             expectedLinkUrl = controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-              .onPageLoadViewOnly(srn, page = 1, yearString, submissionNumberTwo, submissionNumberOne)
+              .onPageLoadViewOnly(
+                srn,
+                page = 1,
+                yearString,
+                submissionNumberTwo,
+                submissionNumberOne
+              )
               .url
           )
         }
