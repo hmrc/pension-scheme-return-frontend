@@ -80,7 +80,7 @@ class CheckMemberDetailsFileController @Inject()(
             logger.warn("Upload failed")
             Ok(view(preparedForm, viewModel(srn, Some(""), mode)))
           case Some(_: UploadStatus.InProgress.type) =>
-            logger.warn("Upload In progress, refreshing page")
+            logger.info("Upload In progress, refreshing page")
             Ok(view(preparedForm, viewModel(srn, None, mode)))
         }
       case _ =>
