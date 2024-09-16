@@ -28,7 +28,7 @@
 )
 @(form: Form[Boolean], viewmodel: FormPageViewModel[ActionTableViewModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.title.toMessage else viewmodel.title.toMessage)) {
+@layout(pageTitle = title(form, if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.title.toMessage else viewmodel.title.toMessage),showBackLink = viewmodel.showBackLink) {
 
     @formHelper(action = if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.onSubmit else viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
 

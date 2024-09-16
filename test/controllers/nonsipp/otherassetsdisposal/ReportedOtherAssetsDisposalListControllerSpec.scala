@@ -55,7 +55,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
       1,
       yearString,
       submissionNumberTwo,
-      submissionNumberOne
+      submissionNumberOne,
+      showBackLink = true
     )
   private lazy val onPreviousViewOnly =
     routes.ReportedOtherAssetsDisposalListController.onPreviousViewOnly(
@@ -131,7 +132,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
           otherAssetsDisposalsWithIndexes,
           completedUserAnswers,
           schemeName,
-          viewOnlyViewModel = None
+          viewOnlyViewModel = None,
+          showBackLink = true
         )
       )
     }.withName("Completed Journey"))
@@ -182,7 +184,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
               otherAssetsDisposalsWithIndexes,
               completedUserAnswers,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel)
+              viewOnlyViewModel = Some(viewOnlyViewModel),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
@@ -203,7 +206,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
               otherAssetsDisposalsWithIndexes,
               updatedUserAnswers,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -224,7 +228,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
             Map(),
             noDisposalsUserAnswers,
             schemeName,
-            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+            showBackLink = true
           )
         )
       }.withName("OnPageLoadViewOnly renders ok with no disposals")
@@ -245,7 +250,7 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onPreviousViewOnly,
         controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
       ).withName(
         "Submit previous view only redirects to the controller with parameters for the previous submission"
       )

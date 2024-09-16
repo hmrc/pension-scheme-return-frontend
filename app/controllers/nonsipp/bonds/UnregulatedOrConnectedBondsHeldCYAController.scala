@@ -137,7 +137,8 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
     identifyAndRequireData(srn).async {
       Future.successful(
         Redirect(
-          controllers.nonsipp.bonds.routes.BondsListController.onPageLoadViewOnly(srn, page, year, current, previous)
+          controllers.nonsipp.bonds.routes.BondsListController
+            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
         )
       )
     }

@@ -137,7 +137,7 @@ class MemberPensionPaymentsCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
-            .onPageLoadViewOnly(srn, page, year, current, previous)
+            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
         )
       )
     }

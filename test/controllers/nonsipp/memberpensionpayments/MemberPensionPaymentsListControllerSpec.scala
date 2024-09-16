@@ -57,7 +57,8 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
     1,
     yearString,
     submissionNumberTwo,
-    submissionNumberOne
+    submissionNumberOne,
+    showBackLink = true
   )
   private lazy val onPreviousViewOnly = routes.MemberPensionPaymentsListController.onPreviousViewOnly(
     srn,
@@ -95,7 +96,8 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
         userAnswersWithNoPayments,
         viewOnlyUpdated = false,
         schemeName = schemeName,
-        noPageEnabled = true
+        noPageEnabled = true,
+        showBackLink = true
       )
 
       result.optViewOnlyDetails.value.heading mustBe Message("memberPensionPayments.memberList.viewOnly.heading")
@@ -121,7 +123,8 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
         userAnswersWithOnePayment,
         viewOnlyUpdated = false,
         schemeName = schemeName,
-        noPageEnabled = false
+        noPageEnabled = false,
+        showBackLink = true
       )
 
       result.optViewOnlyDetails.value.heading mustBe Message("memberPensionPayments.memberList.viewOnly.singular")
@@ -152,7 +155,8 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
         userAnswersWithTwoPayments,
         viewOnlyUpdated = false,
         schemeName = schemeName,
-        noPageEnabled = false
+        noPageEnabled = false,
+        showBackLink = true
       )
 
       result.optViewOnlyDetails.value.heading mustBe Message(
@@ -174,7 +178,8 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
           userAnswers,
           viewOnlyUpdated = false,
           schemeName = schemeName,
-          noPageEnabled = false
+          noPageEnabled = false,
+          showBackLink = true
         )
       )
     })
@@ -194,7 +199,8 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
               userAnswers,
               viewOnlyUpdated = false,
               schemeName = schemeName,
-              noPageEnabled = false
+              noPageEnabled = false,
+              showBackLink = true
             )
           )
     })
@@ -255,7 +261,8 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
               optPreviousVersion = Some(submissionNumberOne),
               compilationOrSubmissionDate = Some(submissionDateTwo),
               schemeName = schemeName,
-              noPageEnabled = false
+              noPageEnabled = false,
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -283,7 +290,8 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
               optPreviousVersion = Some(submissionNumberOne),
               compilationOrSubmissionDate = Some(submissionDateTwo),
               schemeName = schemeName,
-              noPageEnabled = false
+              noPageEnabled = false,
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -309,7 +317,8 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
               optPreviousVersion = Some(submissionNumberOne),
               compilationOrSubmissionDate = Some(submissionDateTwo),
               schemeName = schemeName,
-              noPageEnabled = true
+              noPageEnabled = true,
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok NO records")
@@ -330,7 +339,7 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onPreviousViewOnly,
         controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
       ).withName(
         "Submit previous view only redirects to the controller with parameters for the previous submission"
       )

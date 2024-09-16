@@ -31,7 +31,8 @@ case class FormPageViewModel[+A](
   details: Option[FurtherDetailsViewModel] = None,
   onSubmit: Call,
   mode: Mode = NormalMode,
-  optViewOnlyDetails: Option[ViewOnlyDetailsViewModel] = None
+  optViewOnlyDetails: Option[ViewOnlyDetailsViewModel] = None,
+  showBackLink: Boolean = true
 ) {
 
   def withDescription(message: Option[DisplayMessage]): FormPageViewModel[A] =

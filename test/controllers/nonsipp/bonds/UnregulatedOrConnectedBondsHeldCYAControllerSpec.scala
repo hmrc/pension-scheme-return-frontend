@@ -159,7 +159,7 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
       redirectToPage(
         onSubmitViewOnly,
         controllers.nonsipp.bonds.routes.BondsListController
-          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
+          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )

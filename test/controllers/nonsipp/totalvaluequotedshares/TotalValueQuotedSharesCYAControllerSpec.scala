@@ -40,7 +40,8 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
       srn,
       yearString,
       submissionNumberTwo,
-      submissionNumberOne
+      submissionNumberOne,
+      showBackLink = true
     )
   private lazy val onSubmitViewOnly =
     routes.TotalValueQuotedSharesCYAController.onSubmitViewOnly(
@@ -82,7 +83,8 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
           Left(dateRange),
           defaultSchemeDetails,
           NormalMode,
-          None
+          None,
+          showBackLink = true
         )
       )
     }.before(mockTaxYear(dateRange)))
@@ -133,7 +135,8 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
                 Left(dateRange),
                 defaultSchemeDetails,
                 ViewOnlyMode,
-                Some(viewOnlyViewModel)
+                Some(viewOnlyViewModel),
+                showBackLink = true
               )
             )
         }.before(mockTaxYear(dateRange))
@@ -153,7 +156,8 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
               Left(dateRange),
               defaultSchemeDetails,
               ViewOnlyMode,
-              Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
           )
         }.before(mockTaxYear(dateRange))
@@ -173,7 +177,8 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
               Left(dateRange),
               defaultSchemeDetails,
               ViewOnlyMode,
-              Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
           )
         }.before(mockTaxYear(dateRange))
@@ -193,7 +198,8 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
                 Left(dateRange),
                 defaultSchemeDetails,
                 ViewOnlyMode,
-                Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+                Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+                showBackLink = true
               )
             )
         }.before(mockTaxYear(dateRange))
@@ -215,7 +221,7 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
         redirectToPage(
           onPreviousViewOnly,
           routes.TotalValueQuotedSharesCYAController
-            .onPageLoadViewOnly(srn, yearString, submissionNumberOne, submissionNumberZero)
+            .onPageLoadViewOnly(srn, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
         ).before(mockTaxYear(dateRange))
           .withName(
             "Submit previous view only redirects to TotalValueQuotedSharesCYAController for the previous submission"
