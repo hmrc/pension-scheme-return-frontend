@@ -110,7 +110,7 @@
         }
 
         @if(viewmodel.mode != ViewOnlyMode && viewmodel.page.showRadios && viewmodel.page.showInsetWithRadios) {
-            @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.page.inset)))
+
             @govukRadios(
                 RadiosViewModel.yesNo(
                         field = form("value"),

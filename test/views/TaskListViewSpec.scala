@@ -17,11 +17,12 @@
 package views
 
 import play.api.test.FakeRequest
+import controllers.TestValues
 import views.html.TaskListView
 import viewmodels.models.TaskListStatus.UnableToStart
 import viewmodels.models.{TaskListItemViewModel, TaskListViewModel}
 
-class TaskListViewSpec extends ViewSpec {
+class TaskListViewSpec extends ViewSpec with TestValues {
 
   runningApplication { implicit app =>
     val view = injected[TaskListView]
@@ -35,9 +36,9 @@ class TaskListViewSpec extends ViewSpec {
 
     "TaskListView" - {
 
-      act.like(renderTitle(viewModelGen)(view(_), _.title.key))
-      act.like(renderHeading(viewModelGen)(view(_), _.heading))
-      act.like(renderDescription(viewModelGen)(view(_), _.description))
+      act.like(renderTitle(viewModelGen)(view(_, schemeName), _.title.key))
+      act.like(renderHeading(viewModelGen)(view(_, schemeName), _.heading))
+      act.like(renderDescription(viewModelGen)(view(_, schemeName), _.description))
 
       "render task list section headers" in {
         forAll(viewModelGen) { viewmodel =>
@@ -47,7 +48,7 @@ class TaskListViewSpec extends ViewSpec {
                 s"${renderMessage(section.title)}"
             }.toList
 
-          h2(view(viewmodel)) must contain allElementsOf expected
+          h2(view(viewmodel, schemeName)) must contain allElementsOf expected
         }
       }
 
@@ -57,7 +58,7 @@ class TaskListViewSpec extends ViewSpec {
           val expected =
             items(viewmodel.page).filterNot(_.status == UnableToStart).map(i => AnchorTag(i.link))
 
-          anchors(view(viewmodel)) must contain allElementsOf expected
+          anchors(view(viewmodel, schemeName)) must contain allElementsOf expected
         }
       }
 
@@ -67,7 +68,7 @@ class TaskListViewSpec extends ViewSpec {
           val expected =
             items(viewmodel.page).filter(_.status == UnableToStart).map(i => renderMessage(i.link.content).body)
 
-          span(view(viewmodel)) must contain allElementsOf expected
+          span(view(viewmodel, schemeName)) must contain allElementsOf expected
         }
       }
 
@@ -78,7 +79,7 @@ class TaskListViewSpec extends ViewSpec {
             items(viewmodel.page).map(i => renderMessage(i.status.description).body.replace(" ", " "))
           }
 
-          span(view(viewmodel)) must contain allElementsOf expected
+          span(view(viewmodel, schemeName)) must contain allElementsOf expected
         }
       }
 
@@ -91,7 +92,7 @@ class TaskListViewSpec extends ViewSpec {
               .flatMap(allMessages)
               .map(_.key)
 
-          span(view(viewmodel)) must contain allElementsOf expected
+          span(view(viewmodel, schemeName)) must contain allElementsOf expected
         }
       }
 
@@ -101,7 +102,7 @@ class TaskListViewSpec extends ViewSpec {
           val expected =
             viewmodel.page.sections.toList.flatMap(_.postActionLink).map(AnchorTag(_))
 
-          anchors(view(viewmodel)) must contain allElementsOf expected
+          anchors(view(viewmodel, schemeName = "testSchemeName")) must contain allElementsOf expected
         }
       }
     }

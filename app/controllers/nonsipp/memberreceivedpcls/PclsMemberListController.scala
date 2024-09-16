@@ -352,14 +352,16 @@ object PclsMemberListController {
       mode = mode,
       title = Message(title, memberList.flatten.size),
       heading = Message(heading, memberList.flatten.size),
-      description = None,
-      page = ActionTableViewModel(
-        inset = ParagraphMessage(
+      description = Some(
+        ParagraphMessage(
           "pcls.memberlist.paragraph1"
         ) ++
           ParagraphMessage(
             "pcls.memberlist.paragraph2"
-          ),
+          )
+      ),
+      page = ActionTableViewModel(
+        inset = "",
         head = Some(
           List(
             TableElem("memberList.memberName"),

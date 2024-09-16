@@ -347,14 +347,16 @@ object TransferReceivedMemberListController {
       mode = mode,
       title = Message(title, memberList.flatten.size),
       heading = Message(heading, memberList.flatten.size),
-      description = None,
-      page = ActionTableViewModel(
-        inset = ParagraphMessage(
+      description = Some(
+        ParagraphMessage(
           "transferIn.MemberList.paragraph1"
         ) ++
           ParagraphMessage(
             "transferIn.MemberList.paragraph2"
-          ),
+          )
+      ),
+      page = ActionTableViewModel(
+        inset = "",
         head = Some(
           List(
             TableElem("memberList.memberName"),

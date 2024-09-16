@@ -346,10 +346,16 @@ object SurrenderedBenefitsMemberListController {
       mode = mode,
       title = Message(title, memberListSize),
       heading = Message(heading, memberListSize),
-      description = None,
+      description = Some(
+        ParagraphMessage(
+          "surrenderedBenefits.memberList.inset1"
+        ) ++
+          ParagraphMessage(
+            "surrenderedBenefits.memberList.inset2"
+          )
+      ),
       page = ActionTableViewModel(
-        inset = ParagraphMessage("surrenderedBenefits.memberList.inset1") ++
-          ParagraphMessage("surrenderedBenefits.memberList.inset2"),
+        inset = "",
         head = Some(
           List(
             TableElem("memberList.memberName"),

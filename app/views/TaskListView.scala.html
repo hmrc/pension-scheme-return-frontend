@@ -21,7 +21,7 @@
     taskListItems: TaskListItems
 )
 
-@(viewmodel: PageViewModel[TaskListViewModel])(implicit request: Request[_], messages: Messages)
+@(viewmodel: PageViewModel[TaskListViewModel], schemeName: String)(implicit request: Request[_], messages: Messages)
 
 @item(content: Html) = {
     <li class="govuk-task-list__item govuk-task-list__item--with-link">
@@ -32,6 +32,8 @@
 }
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage), showBackLink = false) {
+
+        <span class="govuk-caption-xl">@schemeName</span>
 
     <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)</h1>
 
