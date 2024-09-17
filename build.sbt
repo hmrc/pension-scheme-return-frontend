@@ -143,3 +143,5 @@ lazy val scaffoldTask =
         r => println(s"Success : $r)")
       )
   }
+
+addCommandAlias("testc", "; clean ; coverage ; test ; it/test ; coverageReport ;")
