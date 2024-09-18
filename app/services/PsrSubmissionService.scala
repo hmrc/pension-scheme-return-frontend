@@ -154,7 +154,8 @@ class PsrSubmissionService @Inject()(
             .submitPsrDetails(
               submissionRequest,
               schemeAdministratorOrPractitionerName,
-              request.schemeDetails.schemeName
+              request.schemeDetails.schemeName,
+              srn
             )
             .flatMap {
               case Left(message: String) =>
