@@ -51,22 +51,30 @@ class SharesFromConnectedPartyControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, acquisitionUserAnswers) { implicit app => implicit request =>
       injected[YesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, companyName, "", SchemeHoldShare.Acquisition, incomeTaxAct, NormalMode))
+        .apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(srn, index, companyName, "", SchemeHoldShare.Acquisition, incomeTaxAct, NormalMode)
+        )
     }.withName("Page renders for acquisition"))
 
-    act.like(renderView(onPageLoad,
-      defaultUserAnswers
-        .unsafeSet(SharesJourneyStatus(srn), Completed)
-        .unsafeSet(SharesCompleted(srn, index), SectionCompleted)
-        .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
-        .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty)
-        .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
-        .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Transfer)
-    ) { implicit app =>
-      implicit request =>
+    act.like(
+      renderView(
+        onPageLoad,
+        defaultUserAnswers
+          .unsafeSet(SharesJourneyStatus(srn), Completed)
+          .unsafeSet(SharesCompleted(srn, index), SectionCompleted)
+          .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
+          .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty)
+          .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
+          .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Transfer)
+      ) { implicit app => implicit request =>
         injected[YesNoPageView]
-          .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, "", companyName, SchemeHoldShare.Transfer, incomeTaxAct, NormalMode))
-    }.withName("Page renders for transfer"))
+          .apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(srn, index, "", companyName, SchemeHoldShare.Transfer, incomeTaxAct, NormalMode)
+          )
+      }.withName("Page renders for transfer")
+    )
 
     act.like(
       renderPrePopView(
@@ -76,7 +84,6 @@ class SharesFromConnectedPartyControllerSpec extends ControllerBaseSpec {
         acquisitionUserAnswers
           .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKPartnership)
           .unsafeSet(PartnershipShareSellerNamePage(srn, index), partnershipName)
-
       ) { implicit app => implicit request =>
         injected[YesNoPageView]
           .apply(
