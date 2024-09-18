@@ -106,8 +106,9 @@ class RemoveLandPropertyDisposalController @Inject()(
 
                 _ <- saveService.save(removedUserAnswers)
                 redirectTo <- psrSubmissionService
-                  .submitPsrDetails(
+                  .submitPsrDetailsWithUA(
                     srn,
+                    removedUserAnswers,
                     fallbackCall =
                       controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
                         .onPageLoad(srn, 1)
