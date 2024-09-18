@@ -93,7 +93,6 @@ class SharesFromConnectedPartyController @Inject()(
               }
               .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
           }
-
         }
       }
 
