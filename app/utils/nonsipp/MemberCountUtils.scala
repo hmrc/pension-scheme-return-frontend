@@ -16,7 +16,7 @@
 
 package utils.nonsipp
 
-import pages.nonsipp.schemedesignatory.HowManyMembersPage
+import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.memberreceivedpcls.Paths.memberDetails
 import utils.nonsipp.TaskListStatusUtils._
 import models.SchemeId.Srn
@@ -41,9 +41,15 @@ object MemberCountUtils {
       .get(memberDetails)
       .getOrElse(JsObject.empty)
       .as[JsObject] != JsObject.empty
-    lazy val loansExist = !noDataStatuses.contains(getLoansTaskListStatus(userAnswers, srn))
+    lazy val loansExist = !noDataStatuses.contains(getLoansTaskListStatusAndLink(userAnswers, srn)._1)
     lazy val borrowingsExist = !noDataStatuses.contains(getBorrowingTaskListStatusAndLink(userAnswers, srn)._1)
-    lazy val financialDetailsExist = !noDataStatuses.contains(getFinancialDetailsTaskListStatus(userAnswers, srn))
+    lazy val financialDetailsExist = !noDataStatuses.contains(
+      getFinancialDetailsTaskListStatus(
+        userAnswers.get(HowMuchCashPage(srn, NormalMode)),
+        userAnswers.get(ValueOfAssetsPage(srn, NormalMode)),
+        userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
+      )
+    )
     lazy val sharesExist = !noDataStatuses.contains(getSharesTaskListStatusAndLink(userAnswers, srn)._1)
     lazy val landOrPropertyExist = !noDataStatuses.contains(getLandOrPropertyTaskListStatusAndLink(userAnswers, srn)._1)
     lazy val bondsExist = !noDataStatuses.contains(getBondsTaskListStatusAndLink(userAnswers, srn)._1)
