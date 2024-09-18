@@ -355,14 +355,16 @@ object MemberContributionListController {
       mode = mode,
       title = Message(title, memberList.flatten.size),
       heading = Message(heading, memberList.flatten.size),
-      description = None,
-      page = ActionTableViewModel(
-        inset = ParagraphMessage(
+      description = Some(
+        ParagraphMessage(
           "ReportContribution.MemberList.paragraph1"
         ) ++
           ParagraphMessage(
             "ReportContribution.MemberList.paragraph2"
-          ),
+          )
+      ),
+      page = ActionTableViewModel(
+        inset = "",
         showInsetWithRadios = true,
         head = Some(
           List(

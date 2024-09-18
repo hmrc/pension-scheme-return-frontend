@@ -80,7 +80,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
       val view = injected[TaskListView]
-      view(viewModel)
+      view(viewModel, schemeName)
     }.withName("task list renders OK"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))

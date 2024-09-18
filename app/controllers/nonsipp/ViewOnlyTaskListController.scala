@@ -76,7 +76,7 @@ class ViewOnlyTaskListController @Inject()(
                 currentVersion,
                 previousVersion
               )
-              Future.successful(Ok(view(viewModel)))
+              Future.successful(Ok(view(viewModel, request.schemeDetails.schemeName)))
           }
       }
     }
@@ -134,8 +134,7 @@ object ViewOnlyTaskListController {
       Message("nonsipp.tasklist.heading", dateRange.from.show, dateRange.to.show),
       viewModel
     ).withDescription(
-      Heading2.small("nonsipp.tasklist.subheading.completed") ++
-        ParagraphMessage(Message("nonsipp.tasklist.description", numSectionsSubmitted, numSectionsTotal))
+      Heading2.small("nonsipp.tasklist.subheading.completed")
     )
   }
 
@@ -190,7 +189,7 @@ object ViewOnlyTaskListController {
   ): TaskListItemViewModel =
     TaskListItemViewModel(
       LinkMessage(
-        Message(messageKey(prefix, "details.title"), schemeName),
+        Message(messageKey(prefix, "details.title")),
         controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
           .onPageLoadViewOnly(srn, year, currentVersion, previousVersion)
           .url
@@ -210,7 +209,7 @@ object ViewOnlyTaskListController {
   ): TaskListItemViewModel =
     TaskListItemViewModel(
       LinkMessage(
-        Message(messageKey(prefix, "finances.title"), schemeName),
+        Message(messageKey(prefix, "finances.title")),
         controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
           .onPageLoadViewOnly(srn, year, currentVersion, previousVersion)
           .url
@@ -240,7 +239,7 @@ object ViewOnlyTaskListController {
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          Message(messageKey(prefix, "details.title"), schemeName),
+          Message(messageKey(prefix, "details.title")),
           controllers.nonsipp.memberdetails.routes.SchemeMembersListController
             .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion)
             .url
@@ -415,7 +414,7 @@ object ViewOnlyTaskListController {
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          Message(messageKey(prefix, "loansmade.title"), schemeName),
+          Message(messageKey(prefix, "loansmade.title")),
           controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
             .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
             .url
@@ -424,7 +423,7 @@ object ViewOnlyTaskListController {
       ),
       TaskListItemViewModel(
         LinkMessage(
-          Message(messageKey(prefix, "moneyborrowed.title"), schemeName),
+          Message(messageKey(prefix, "moneyborrowed.title")),
           controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
             .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
             .url

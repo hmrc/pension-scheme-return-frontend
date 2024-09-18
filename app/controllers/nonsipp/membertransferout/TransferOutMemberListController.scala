@@ -349,14 +349,16 @@ object TransferOutMemberListController {
       mode = mode,
       title = Message(title, memberListSize),
       heading = Message(heading, memberListSize),
-      description = None,
-      page = ActionTableViewModel(
-        inset = ParagraphMessage(
+      description = Some(
+        ParagraphMessage(
           "transferOut.memberList.paragraph1"
         ) ++
           ParagraphMessage(
             "transferOut.memberList.paragraph2"
-          ),
+          )
+      ),
+      page = ActionTableViewModel(
+        inset = "",
         head = Some(
           List(
             TableElem("memberList.memberName"),

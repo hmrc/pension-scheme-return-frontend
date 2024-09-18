@@ -382,14 +382,16 @@ object EmployerContributionsMemberListController {
       mode = mode,
       title = Message(title, employerContributions.size),
       heading = Message(heading, employerContributions.size),
-      description = None,
-      page = ActionTableViewModel(
-        inset = ParagraphMessage(
+      description = Some(
+        ParagraphMessage(
           "employerContributions.MemberList.paragraph1"
         ) ++
           ParagraphMessage(
             "employerContributions.MemberList.paragraph2"
-          ),
+          )
+      ),
+      page = ActionTableViewModel(
+        inset = "",
         head = Some(
           List(
             TableElem("memberList.memberName"),

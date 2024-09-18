@@ -116,40 +116,49 @@ object AccountingPeriodController {
     taxYear: TaxYear,
     usedAccountingPeriods: List[DateRange],
     index: Max3
-  ): Form[DateRange] = formProvider(
-    startDateErrors = DateFormErrors(
-      "accountingPeriod.startDate.error.required.all",
-      "accountingPeriod.startDate.error.required.day",
-      "accountingPeriod.startDate.error.required.month",
-      "accountingPeriod.startDate.error.required.year",
-      "accountingPeriod.startDate.error.required.two",
-      "accountingPeriod.startDate.error.invalid.date",
-      "accountingPeriod.startDate.error.invalid.characters"
-    ),
-    endDateErrors = DateFormErrors(
-      "accountingPeriod.endDate.error.required.all",
-      "accountingPeriod.endDate.error.required.day",
-      "accountingPeriod.endDate.error.required.month",
-      "accountingPeriod.endDate.error.required.year",
-      "accountingPeriod.endDate.error.required.two",
-      "accountingPeriod.endDate.error.invalid.date",
-      "accountingPeriod.endDate.error.invalid.characters"
-    ),
-    invalidRangeError = "accountingPeriod.endDate.error.range.invalid",
-    allowedRange = DateRange(taxYear.starts, taxYear.finishes),
-    startDateAllowedDateRangeError = "accountingPeriod.startDate.error.outsideTaxYear",
-    endDateAllowedDateRangeError = "accountingPeriod.endDate.error.outsideTaxYear",
-    overlappedStartDateError = "accountingPeriod.startDate.error.overlapped.start",
-    overlappedEndDateError = "accountingPeriod.startDate.error.overlapped.end",
-    duplicateRanges = usedAccountingPeriods,
-    previousDateRangeError = Some("accountingPeriod.startDate.error.previousDateError"),
-    index = index,
-    taxYear = taxYear,
-    errorStartBefore = "accountingPeriod.before.error.startBefore",
-    errorStartAfter = "accountingPeriod.before.error.startAfter",
-    errorEndBefore = "accountingPeriod.before.error.endBefore",
-    errorEndAfter = "accountingPeriod.before.error.endAfter"
-  )
+  ): Form[DateRange] = {
+
+    val message = if (index.value == 1) {
+      "accountingPeriod.before.error.firstStartDate"
+    } else {
+      "accountingPeriod.before.error.startAfter"
+    }
+
+    formProvider(
+      startDateErrors = DateFormErrors(
+        "accountingPeriod.startDate.error.required.all",
+        "accountingPeriod.startDate.error.required.day",
+        "accountingPeriod.startDate.error.required.month",
+        "accountingPeriod.startDate.error.required.year",
+        "accountingPeriod.startDate.error.required.two",
+        "accountingPeriod.startDate.error.invalid.date",
+        "accountingPeriod.startDate.error.invalid.characters"
+      ),
+      endDateErrors = DateFormErrors(
+        "accountingPeriod.endDate.error.required.all",
+        "accountingPeriod.endDate.error.required.day",
+        "accountingPeriod.endDate.error.required.month",
+        "accountingPeriod.endDate.error.required.year",
+        "accountingPeriod.endDate.error.required.two",
+        "accountingPeriod.endDate.error.invalid.date",
+        "accountingPeriod.endDate.error.invalid.characters"
+      ),
+      invalidRangeError = "accountingPeriod.endDate.error.range.invalid",
+      allowedRange = DateRange(taxYear.starts, taxYear.finishes),
+      startDateAllowedDateRangeError = "accountingPeriod.startDate.error.outsideTaxYear",
+      endDateAllowedDateRangeError = "accountingPeriod.endDate.error.outsideTaxYear",
+      overlappedStartDateError = "accountingPeriod.startDate.error.overlapped.start",
+      overlappedEndDateError = "accountingPeriod.startDate.error.overlapped.end",
+      duplicateRanges = usedAccountingPeriods,
+      previousDateRangeError = Some("accountingPeriod.startDate.error.previousDateError"),
+      index = index,
+      taxYear = taxYear,
+      errorStartBefore = "accountingPeriod.before.error.startBefore",
+      errorStartAfter = message,
+      errorEndBefore = "accountingPeriod.before.error.endBefore",
+      errorEndAfter = "accountingPeriod.before.error.endAfter"
+    )
+  }
 
   def viewModel(srn: Srn, index: Max3, mode: Mode): FormPageViewModel[DateRangeViewModel] = DateRangeViewModel(
     "accountingPeriod.title",

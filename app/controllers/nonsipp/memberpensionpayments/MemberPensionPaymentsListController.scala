@@ -371,14 +371,16 @@ object MemberPensionPaymentsListController {
       mode = mode,
       title = Message(title, memberListSize),
       heading = Message(heading, memberListSize),
-      description = None,
-      page = ActionTableViewModel(
-        inset = ParagraphMessage(
+      description = Some(
+        ParagraphMessage(
           "memberPensionPayments.memberList.paragraphOne"
         ) ++
           ParagraphMessage(
             "memberPensionPayments.memberList.paragraphTwo"
-          ),
+          )
+      ),
+      page = ActionTableViewModel(
+        inset = "",
         head = Some(
           List(
             TableElem("memberList.memberName"),
