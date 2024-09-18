@@ -16,7 +16,6 @@
 
 package services
 
-import models.audit.{PSRCompileAuditEvent, PSRSubmissionAuditEvent}
 import play.api.mvc.AnyContentAsEmpty
 import connectors.PSRConnector
 import controllers.TestValues
@@ -30,19 +29,21 @@ import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import org.mockito.ArgumentMatchers.any
 import services.PsrSubmissionServiceSpec._
 import play.api.test.FakeRequest
+import models.audit.{PSRCompileAuditEvent, PSRSubmissionAuditEvent}
+import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowMuchCashPage, ValueOfAssetsPage}
 import utils.BaseSpec
 import play.api.test.Helpers.stubMessagesApi
 import org.mockito.Mockito._
 import models.requests.psr._
 import config.Constants.{PSP, UNCHANGED_SESSION_PREFIX}
 import pages.nonsipp.CheckReturnDatesPage
-import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowMuchCashPage, ValueOfAssetsPage}
 import play.api.libs.json.{JsArray, JsValue}
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+
 import java.time.LocalDate
 
 class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
@@ -348,7 +349,8 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             )
           )
         )
-      when(mockConnector.submitPsrDetails(any(), any(), any())(any(), any())).thenReturn(Future.successful(Right(())))
+      when(mockConnector.submitPsrDetails(any(), any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(Right(())))
       when(mockDeclarationTransformer.transformToEtmp(any())).thenReturn(declaration)
       when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
         .thenReturn(Future.successful(Some(userAnswers)))
@@ -362,7 +364,10 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           verify(mockAssetsTransformer, never).transformToEtmp(any(), any())(any())
           verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
           verify(mockDeclarationTransformer, times(1)).transformToEtmp(any())
-          verify(mockConnector, times(1)).submitPsrDetails(psrSubmissionCaptor.capture(), any(), any())(any(), any())
+          verify(mockConnector, times(1)).submitPsrDetails(psrSubmissionCaptor.capture(), any(), any(), any())(
+            any(),
+            any()
+          )
           verify(mockAuditService, times(1)).sendExtendedEvent(psrSubmissionAuditEventCaptor.capture())(any(), any())
           verify(mockSessionRepository, never).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
 

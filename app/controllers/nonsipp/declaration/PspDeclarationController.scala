@@ -33,6 +33,7 @@ import views.html.PsaIdInputView
 import models.SchemeId.Srn
 import pages.nonsipp.FbVersionPage
 import navigation.Navigator
+import utils.nonsipp.SchemeDetailNavigationUtils
 import forms.TextFormProvider
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.i18n.MessagesApi
@@ -59,19 +60,32 @@ class PspDeclarationController @Inject()(
   view: PsaIdInputView,
   emailConnector: EmailConnector,
   config: FrontendAppConfig,
-  auditService: AuditService
+  auditService: AuditService,
+  val psrVersionsService: PsrVersionsService,
+  val psrRetrievalService: PsrRetrievalService
 )(implicit ec: ExecutionContext)
-    extends PSRController {
+    extends PSRController
+    with SchemeDetailNavigationUtils {
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
+    identifyAndRequireData(srn).async { implicit request =>
       def form: Form[String] = PspDeclarationController.form(formProvider, request.schemeDetails.authorisingPSAID)
-      Ok(
-        view(
-          form.fromUserAnswers(PspDeclarationPage(srn)),
-          PspDeclarationController
-            .viewModel(srn, hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId))
-        )
+      isJourneyBypassed(srn).map(
+        eitherJourneyNavigationResultOrRecovery =>
+          eitherJourneyNavigationResultOrRecovery.fold(
+            _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()),
+            isBypassed =>
+              Ok(
+                view(
+                  form.fromUserAnswers(PspDeclarationPage(srn)),
+                  PspDeclarationController
+                    .viewModel(
+                      srn,
+                      isBypassed && hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId)
+                    )
+                )
+              )
+          )
       )
     }
 
@@ -103,7 +117,9 @@ class PspDeclarationController @Inject()(
                   updatedAnswers <- Future
                     .fromTry(request.userAnswers.set(PspDeclarationPage(srn), answer))
                   _ <- saveService.save(updatedAnswers)
-                  _ <- if (hasNumberOfMembersChangedToOver99) {
+                  journeyByPassed <- isJourneyBypassed(srn)
+                  bypassed = journeyByPassed.getOrElse(false)
+                  _ <- if (bypassed && hasNumberOfMembersChangedToOver99) {
                     psrSubmissionService.submitPsrDetailsBypassed(
                       srn = srn,
                       fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
