@@ -82,7 +82,6 @@ class RemoveLandPropertyDisposalControllerSpec extends ControllerBaseSpec {
         })
         .after({
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-          reset(mockPsrSubmissionService)
         })
     )
 

@@ -45,7 +45,7 @@ class LandOrPropertyPostcodeLookupControllerSpec extends ControllerBaseSpec {
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    when(mockAddressService.postcodeLookup(any(), any())(any())).thenReturn(Future.successful(List(address)))
+    reset(mockAddressService)
   }
 
   "LandOrPropertyPostcodeLookupController" - {
@@ -56,7 +56,13 @@ class LandOrPropertyPostcodeLookupControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, "postcode" -> "ZZ1 1ZZ", "filter" -> ""))
+    act.like(
+      saveAndContinue(onSubmit, "postcode" -> "ZZ1 1ZZ", "filter" -> "")
+        .before(
+          when(mockAddressService.postcodeLookup(any(), any())(any())).thenReturn(Future.successful(List(address)))
+        )
+        .after(verify(mockAddressService, times(1)).postcodeLookup(any(), any())(any()))
+    )
 
     act.like(invalidForm(onSubmit))
 
