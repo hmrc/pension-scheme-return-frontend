@@ -36,7 +36,7 @@ import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models.Mode
 import utils.FunctionKUtils._
-import viewmodels.DisplayMessage.{ListMessage, ListType, Message}
+import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
@@ -141,20 +141,9 @@ object HowManyMembersController {
     Message("howManyMembers.heading", schemeName, endDate.show),
     TripleQuestion(
       form,
-      QuestionField.input("howManyMembers.field1"),
-      QuestionField.input("howManyMembers.field2"),
-      QuestionField.input("howManyMembers.field3")
-    ),
-    Option(
-      FurtherDetailsViewModel(
-        Message("howManyMembers.detailsComponentTitle"),
-        ListMessage(
-          ListType.Bullet,
-          "howManyMembers.List1",
-          "howManyMembers.List2",
-          "howManyMembers.List3"
-        )
-      )
+      QuestionField.input("howManyMembers.field1", hint = Some("howManyMembers.field1.hint")),
+      QuestionField.input("howManyMembers.field2", hint = Some("howManyMembers.field2.hint")),
+      QuestionField.input("howManyMembers.field3", hint = Some("howManyMembers.field3.hint"))
     ),
     routes.HowManyMembersController.onSubmit(srn, mode)
   )

@@ -79,7 +79,7 @@ class TaskListController @Inject()(
             hasHistory,
             noChangesSincePreviousVersion
           )
-        } yield Ok(view(viewModel))
+        } yield Ok(view(viewModel, request.schemeDetails.schemeName))
     }
   }
 }
@@ -146,8 +146,6 @@ object TaskListController {
       Message("nonsipp.tasklist.title", startDate.show, endDate.show),
       Message("nonsipp.tasklist.heading", startDate.show, endDate.show),
       viewModel
-    ).withDescription(
-      ParagraphMessage(Message("nonsipp.tasklist.description", numSectionsReadyForSubmission, numSectionsTotal))
     )
   }
 }

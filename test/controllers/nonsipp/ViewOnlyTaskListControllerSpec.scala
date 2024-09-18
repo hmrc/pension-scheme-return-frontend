@@ -487,7 +487,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     act.like(
       renderView(onPageLoadSubmissionTwo, currentUA, pureUA, Some(previousUA)) { implicit app => implicit request =>
         val view = injected[TaskListView]
-        view(viewModelSubmissionTwo)
+        view(viewModelSubmissionTwo, schemeName)
       }.withName("onPageLoad renders ok with indexes /2/1")
     )
 
@@ -496,7 +496,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     act.like(
       renderView(onPageLoadSubmissionOne, currentUA, pureUA, None) { implicit app => implicit request =>
         val view = injected[TaskListView]
-        view(viewModelVersionOne)
+        view(viewModelVersionOne, schemeName)
       }.withName("onPageLoad renders ok with indexes /1/0")
     )
 

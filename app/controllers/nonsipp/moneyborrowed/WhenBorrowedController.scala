@@ -167,7 +167,11 @@ object WhenBorrowedController {
     FormPageViewModel(
       "moneyBorrowed.WhenBorrowed.title",
       Message("moneyBorrowed.WhenBorrowed.heading", schemeName, lenderName, amountBorrowed),
-      DatePageViewModel(None, Message("moneyBorrowed.WhenBorrowed.heading", schemeName, lenderName, amountBorrowed)),
+      DatePageViewModel(
+        None,
+        Message("moneyBorrowed.WhenBorrowed.heading", schemeName, lenderName, amountBorrowed),
+        Some("moneyBorrowed.WhenBorrowed.hint")
+      ),
       controllers.nonsipp.moneyborrowed.routes.WhenBorrowedController.onSubmit(srn, index, mode)
     )
 }

@@ -113,7 +113,7 @@ object IndividualRecipientNinoController {
           .Conditional(Message("individualRecipientNino.yes.conditional", individualName), FieldType.Input),
         no = YesNoViewModel
           .Conditional(Message("individualRecipientNino.no.conditional", individualName), FieldType.Textarea)
-      ),
+      ).withHint("individualRecipientNino.hint"),
       routes.IndividualRecipientNinoController.onSubmit(srn, index, mode)
     )
 }

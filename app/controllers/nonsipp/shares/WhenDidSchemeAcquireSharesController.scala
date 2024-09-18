@@ -143,7 +143,11 @@ object WhenDidSchemeAcquireSharesController {
         schemeName,
         Message(s"whyDoesSchemeHoldShares.heading.type.$typeOfShares")
       ),
-      DatePageViewModel(None, Message("whenDidSchemeAcquireShares.heading", schemeName, typeOfShares)),
+      DatePageViewModel(
+        None,
+        Message("whenDidSchemeAcquireShares.heading", schemeName, typeOfShares),
+        Some("whenDidSchemeAcquireShares.hint")
+      ),
       routes.WhenDidSchemeAcquireSharesController.onSubmit(srn, index, mode)
     )
 }
