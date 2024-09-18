@@ -41,8 +41,8 @@ import viewmodels.models.{DateRangeViewModel, FormPageViewModel}
 import models.requests.DataRequest
 import play.api.data.Form
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
-
 import javax.inject.Named
 
 class AccountingPeriodController @Inject()(
@@ -111,19 +111,14 @@ class AccountingPeriodController @Inject()(
 
 object AccountingPeriodController {
 
+  val allowedStartDate: LocalDate = LocalDate.of(2021, 4, 6)
+
   def form(
-    formProvider: DateRangeFormProvider,
-    taxYear: TaxYear,
-    usedAccountingPeriods: List[DateRange],
-    index: Max3
-  ): Form[DateRange] = {
-
-    val message = if (index.value == 1) {
-      "accountingPeriod.before.error.firstStartDate"
-    } else {
-      "accountingPeriod.before.error.startAfter"
-    }
-
+            formProvider: DateRangeFormProvider,
+            taxYear: TaxYear,
+            usedAccountingPeriods: List[DateRange],
+            index: Max3
+          ): Form[DateRange] =
     formProvider(
       startDateErrors = DateFormErrors(
         "accountingPeriod.startDate.error.required.all",
@@ -144,7 +139,7 @@ object AccountingPeriodController {
         "accountingPeriod.endDate.error.invalid.characters"
       ),
       invalidRangeError = "accountingPeriod.endDate.error.range.invalid",
-      allowedRange = DateRange(taxYear.starts, taxYear.finishes),
+      allowedRange = DateRange(allowedStartDate, taxYear.finishes),
       startDateAllowedDateRangeError = "accountingPeriod.startDate.error.outsideTaxYear",
       endDateAllowedDateRangeError = "accountingPeriod.endDate.error.outsideTaxYear",
       overlappedStartDateError = "accountingPeriod.startDate.error.overlapped.start",
@@ -154,11 +149,10 @@ object AccountingPeriodController {
       index = index,
       taxYear = taxYear,
       errorStartBefore = "accountingPeriod.before.error.startBefore",
-      errorStartAfter = message,
+      errorStartAfter = "accountingPeriod.before.error.firstStartDate",
       errorEndBefore = "accountingPeriod.before.error.endBefore",
       errorEndAfter = "accountingPeriod.before.error.endAfter"
     )
-  }
 
   def viewModel(srn: Srn, index: Max3, mode: Mode): FormPageViewModel[DateRangeViewModel] = DateRangeViewModel(
     "accountingPeriod.title",

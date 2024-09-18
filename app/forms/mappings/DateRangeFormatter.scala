@@ -95,7 +95,7 @@ private[mappings] class DateRangeFormatter(
 
   // Verify provided date is after the start of the tax year or before the end of the tax year
   private def verifyTaxYear(key: String, range: DateRange): Either[Seq[FormError], DateRange] =
-    if (range.from.isBefore(taxYear.starts)) {
+    if (range.from.isBefore(LocalDate.of(2021, 4, 6))) {
       logger.info(
         s"[verifyTaxYear] provided start date ${range.from.show} is before the start of the tax year ${taxYear.starts.show}"
       )
