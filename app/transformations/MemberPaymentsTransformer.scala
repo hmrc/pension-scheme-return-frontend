@@ -488,21 +488,41 @@ class MemberPaymentsTransformer @Inject()(
       previousVersionUA match {
         case Some(previousUA) =>
           logger.info(s"[identifyNewMembers] Previous PSR version found for srn $srn")
-          buildMemberDetails(srn, previousUA).left.map(new Exception(_)).toTry.map { previousMemberDetails =>
-            currentMemberDetails.toList.flatMap {
-              case (index, currentMemberDetail) if previousMemberDetails.get(index).contains(currentMemberDetail) =>
-                None
-              case (_, currentMemberDetail) if currentMemberDetail.state.changed => None
-              case (_, currentMemberDetail)
-                  if currentMemberDetail.state._new
-                    && psrStatus.exists(_.isSubmitted)
-                    && currentMemberDetail.memberPSRVersion.exists(psrVersion.contains) =>
-                None
-              case (index, currentMemberDetail) if currentMemberDetail.state._new && psrStatus.exists(_.isCompiled) =>
-                Some(index)
-              case _ => None
+          buildMemberDetails(srn, previousUA).left
+            .map { err =>
+              logger.warn(s"[identifyNewMembers] Building member details for srn $srn has failed - error: $err")
+              new Exception(err)
             }
-          }
+            .toTry
+            .map { previousMemberDetails =>
+              currentMemberDetails.toList.flatMap {
+                case (index, currentMemberDetail) if currentMemberDetail.state.changed =>
+                  logger.info(s"[identifyNewMembers] Member at index $index is changed - NOT safe to hard delete")
+                  None
+                case (index, currentMemberDetail)
+                    if currentMemberDetail.state._new
+                      && psrStatus.exists(_.isSubmitted)
+                      && currentMemberDetail.memberPSRVersion.exists(psrVersion.contains) =>
+                  logger.info(
+                    s"[identifyNewMembers] Member at index $index is new but PSR status is Submitted - NOT safe to hard delete"
+                  )
+                  None
+                case (index, currentMemberDetail)
+                    if currentMemberDetail.state._new
+                      && psrStatus.exists(_.isCompiled)
+                      && currentMemberDetail.memberPSRVersion.exists(version => !psrVersion.contains(version)) =>
+                  logger.info(
+                    s"[identifyNewMembers] Member at index $index is new and PSR status is Compiled but member PSR version is NOT the same as record PSR version - NOT safe to hard delete"
+                  )
+                  None
+                case (index, currentMemberDetail) if currentMemberDetail.state._new && psrStatus.exists(_.isCompiled) =>
+                  logger.info(
+                    s"[identifyNewMembers] Member at index $index is new and PSR status is Compiled - safe to hard delete"
+                  )
+                  Some(index)
+                case _ => None
+              }
+            }
         // No previous version UserAnswers so this must be either pre-first submission or just after the first submission
         case None =>
           logger.info(s"[identifyNewMembers] Previous PSR version NOT found for srn $srn")
