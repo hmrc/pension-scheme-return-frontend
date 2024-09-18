@@ -305,12 +305,20 @@ trait ControllerBehaviours {
     continueNoSave(call, defaultUserAnswers, form: _*)
 
   def agreeAndContinue(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
+    agreeAndContinue(call, userAnswers, emptyUserAnswers)
+  def agreeAndContinue(
+    call: => Call,
+    userAnswers: UserAnswers,
+    previousUserAnswers: UserAnswers,
+    form: (String, String)*
+  ): BehaviourTest =
     "agree and continue to next page".hasBehaviour {
 
-      val appBuilder = applicationBuilder(Some(userAnswers))
-        .overrides(
-          navigatorBindings(testOnwardRoute): _*
-        )
+      val appBuilder =
+        applicationBuilder(userAnswers = Some(userAnswers), previousUserAnswers = Some(previousUserAnswers))
+          .overrides(
+            navigatorBindings(testOnwardRoute): _*
+          )
 
       running(_ => appBuilder) { app =>
         val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)

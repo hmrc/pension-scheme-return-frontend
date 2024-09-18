@@ -18,38 +18,33 @@ package controllers.nonsipp
 
 import play.api.test.FakeRequest
 import services._
-import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, SchemeDesignatoryRecordVersionPage}
-import config.Refined.{Max3, Max300}
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage}
+import config.Refined.Max3
+import controllers.{ControllerBaseSpec, TestUserAnswers}
 import play.api.inject.bind
 import cats.implicits.toShow
 import eu.timepit.refined.refineMV
+import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import pages.nonsipp._
 import models.backend.responses.PsrVersionsResponse
 import org.mockito.stubbing.OngoingStubbing
 import models._
+import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
+import play.api.i18n.Messages
 import org.mockito.ArgumentMatchers.any
 import play.api.test.Helpers.stubMessagesApi
-import pages.nonsipp.memberdetails._
 import org.mockito.Mockito._
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
-import viewmodels.models.MemberState.New
-import controllers.ControllerBaseSpec
 import cats.data.NonEmptyList
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriodRecordVersionPage}
-import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
-import play.api.i18n.Messages
-import pages.nonsipp.declaration.PensionSchemeDeclarationPage
-import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
 import scala.concurrent.Future
-import java.time.{LocalDate, LocalDateTime}
 
-class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with CommonTestValues {
+class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with CommonTestValues with TestUserAnswers {
 
   private lazy val onPageLoad = routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
   private lazy val onPageLoadWithCheckMode = routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode)
@@ -72,78 +67,6 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
     submissionNumberTwo,
     submissionNumberOne
   )
-
-  // Test data for various UserAnswers
-  private val currentReturnTaxYear = DateRange(
-    from = LocalDate.of(2022, 4, 6),
-    to = LocalDate.of(2023, 4, 5)
-  )
-
-  private val previousReturnTaxYear = DateRange(
-    from = LocalDate.of(2021, 4, 6),
-    to = LocalDate.of(2022, 4, 5)
-  )
-
-  private val index1of3: Max3 = refineMV(1)
-  private val recordVersion = "001"
-  private val currentReturnTaxYearSubmissionDate = LocalDateTime.of(2023, 4, 5, 0, 0, 0)
-  private val declarationData = DeclarationViewModel("PSP", "20000008", Some("A0000001"))
-  private val index1of300: Max300 = refineMV(1)
-
-  // UserAnswers for the current return from the current tax year
-  private val currentTaxYearUserAnswersWithFewMembers = defaultUserAnswers
-    .unsafeSet(WhichTaxYearPage(srn), currentReturnTaxYear)
-    .unsafeSet(ActiveBankAccountPage(srn), true)
-    .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersUnderThreshold)
-
-  private val currentTaxYearUserAnswersWithManyMembers = currentTaxYearUserAnswersWithFewMembers
-    .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
-
-  private val noTaxYearUserAnswers = currentTaxYearUserAnswersWithManyMembers
-    .unsafeRemove(WhichTaxYearPage(srn))
-
-  // UserAnswers for the previous return from the current tax year
-  private val skippedUserAnswers = defaultUserAnswers
-    .unsafeSet(WhichTaxYearPage(srn), currentReturnTaxYear)
-    .unsafeSet(CheckReturnDatesPage(srn), true)
-    .unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), currentReturnTaxYear)
-    .unsafeSet(AccountingPeriodRecordVersionPage(srn), recordVersion)
-    .unsafeSet(ActiveBankAccountPage(srn), true)
-    .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
-    .unsafeSet(SchemeDesignatoryRecordVersionPage(srn), recordVersion)
-    .unsafeSet(FbVersionPage(srn), recordVersion)
-    .unsafeSet(FbStatus(srn), Submitted)
-    .unsafeSet(CompilationOrSubmissionDatePage(srn), currentReturnTaxYearSubmissionDate)
-    .unsafeSet(PensionSchemeDeclarationPage(srn), declarationData)
-
-  private val fullUserAnswers = skippedUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, index1of300), memberDetails)
-    .unsafeSet(DoesMemberHaveNinoPage(srn, index1of300), false)
-    .unsafeSet(NoNINOPage(srn, index1of300), noninoReason)
-    .unsafeSet(MemberStatus(srn, index1of300), New)
-    .unsafeSet(MemberDetailsCompletedPage(srn, index1of300), SectionCompleted)
-
-  private val previousTaxYearUserAnswersWithFewMembersWithMemberDetails = defaultUserAnswers
-    .unsafeSet(WhichTaxYearPage(srn), previousReturnTaxYear)
-    .unsafeSet(ActiveBankAccountPage(srn), true)
-    .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersUnderThreshold)
-    .unsafeSet(MemberDetailsPage(srn, index1of300), memberDetails)
-    .unsafeSet(DoesMemberHaveNinoPage(srn, index1of300), false)
-    .unsafeSet(NoNINOPage(srn, index1of300), noninoReason)
-    .unsafeSet(MemberStatus(srn, index1of300), New)
-    .unsafeSet(MemberDetailsCompletedPage(srn, index1of300), SectionCompleted)
-
-  private val previousTaxYearUserAnswersWithManyMembers = defaultUserAnswers
-    .unsafeSet(WhichTaxYearPage(srn), previousReturnTaxYear)
-    .unsafeSet(ActiveBankAccountPage(srn), true)
-    .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
-
-  private val previousTaxYearUserAnswersWithManyMembersWithMemberDetails = previousTaxYearUserAnswersWithManyMembers
-    .unsafeSet(MemberDetailsPage(srn, index1of300), memberDetails)
-    .unsafeSet(DoesMemberHaveNinoPage(srn, index1of300), false)
-    .unsafeSet(NoNINOPage(srn, index1of300), noninoReason)
-    .unsafeSet(MemberStatus(srn, index1of300), New)
-    .unsafeSet(MemberDetailsCompletedPage(srn, index1of300), SectionCompleted)
 
   // This handles the latest return from the previous tax year
   override def beforeAll(): Unit =
@@ -422,7 +345,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
               MockPsrSubmissionService.submitPsrDetails()
             }
             .after {
-              verify(mockPsrVersionsService, times(1)).getVersions(any(), any())(any(), any())
+              verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any())
               verify(mockSchemeDateService, times(1)).taxYearOrAccountingPeriods(any())(any())
               verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any(), any())(any(), any(), any())
             }

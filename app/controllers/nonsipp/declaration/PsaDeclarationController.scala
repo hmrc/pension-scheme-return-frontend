@@ -25,7 +25,6 @@ import controllers.PSRController
 import _root_.config.FrontendAppConfig
 import controllers.actions._
 import _root_.config.Constants._
-import uk.gov.hmrc.http.HeaderCarrier
 import models.{DateRange, NormalMode, UserAnswers}
 import models.requests.DataRequest
 import viewmodels.implicits._
@@ -34,6 +33,8 @@ import views.html.ContentPageView
 import models.SchemeId.Srn
 import pages.nonsipp.FbVersionPage
 import navigation.Navigator
+import utils.nonsipp.SchemeDetailNavigationUtils
+import uk.gov.hmrc.http.HeaderCarrier
 import play.api.i18n.{I18nSupport, MessagesApi}
 import pages.nonsipp.declaration.PsaDeclarationPage
 import viewmodels.DisplayMessage._
@@ -55,18 +56,31 @@ class PsaDeclarationController @Inject()(
   saveService: SaveService,
   emailConnector: EmailConnector,
   config: FrontendAppConfig,
-  auditService: AuditService
+  auditService: AuditService,
+  val psrVersionsService: PsrVersionsService,
+  val psrRetrievalService: PsrRetrievalService
 )(implicit ec: ExecutionContext)
     extends PSRController
-    with I18nSupport {
+    with I18nSupport
+    with SchemeDetailNavigationUtils {
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
-      Ok(
-        view(
-          PsaDeclarationController
-            .viewModel(srn, hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId))
-        )
+    identifyAndRequireData(srn).async { implicit request =>
+      isJourneyBypassed(srn).map(
+        eitherJourneyNavigationResultOrRecovery =>
+          eitherJourneyNavigationResultOrRecovery.fold(
+            _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()),
+            isBypassed =>
+              Ok(
+                view(
+                  PsaDeclarationController
+                    .viewModel(
+                      srn,
+                      isBypassed && hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId)
+                    )
+                )
+              )
+          )
       )
     }
 
@@ -79,7 +93,9 @@ class PsaDeclarationController @Inject()(
           val now = schemeDateService.now()
 
           for {
-            _ <- if (hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId)) {
+            journeyByPassed <- isJourneyBypassed(srn)
+            bypassed = journeyByPassed.getOrElse(false)
+            _ <- if (bypassed && hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId)) {
               psrSubmissionService.submitPsrDetailsBypassed(
                 srn = srn,
                 fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)

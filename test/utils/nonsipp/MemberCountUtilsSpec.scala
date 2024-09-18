@@ -16,59 +16,24 @@
 
 package utils.nonsipp
 
+import pages.nonsipp.schemedesignatory._
+import org.scalatest.matchers.must.Matchers
+import pages.nonsipp.shares._
+import pages.nonsipp.otherassetsheld._
 import config.Refined._
 import controllers.TestValues
-import eu.timepit.refined.refineMV
-import generators.ModelGenerators.pensionSchemeIdGen
-import models.ConditionalYesNo._
-import models.HowSharesDisposed.Sold
-import models.IdentitySubject._
-import models.IdentityType.{Individual, UKCompany, UKPartnership}
-import models.ManualOrUpload.Manual
-import models.PensionSchemeType.RegisteredPS
-import models.SchemeHoldShare.Acquisition
-import models.SponsoringOrConnectedParty.Sponsoring
-import models.TypeOfShares.SponsoringEmployer
-import models._
-import org.scalatest.OptionValues
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
-import pages.nonsipp.bonds._
-import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsStillHeldPage, HowWereBondsDisposedOfPage}
-import pages.nonsipp.common._
-import pages.nonsipp.employercontributions._
 import pages.nonsipp.landorproperty._
-import pages.nonsipp.landorpropertydisposal.{
-  HowWasPropertyDisposedOfPage,
-  LandOrPropertyDisposalPage,
-  LandOrPropertyStillHeldPage
-}
-import pages.nonsipp.loansmadeoroutstanding._
-import pages.nonsipp.membercontributions.{MemberContributionsListPage, MemberContributionsPage}
-import pages.nonsipp.memberdetails._
-import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
-import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, PensionPaymentsReceivedPage}
-import pages.nonsipp.memberreceivedpcls.{
-  PclsMemberListPage,
-  PensionCommencementLumpSumAmountPage,
-  PensionCommencementLumpSumPage
-}
-import pages.nonsipp.membersurrenderedbenefits._
-import pages.nonsipp.membertransferout._
-import pages.nonsipp.moneyborrowed._
-import pages.nonsipp.otherassetsdisposal.{AnyPartAssetStillHeldPage, HowWasAssetDisposedOfPage, OtherAssetsDisposalPage}
-import pages.nonsipp.otherassetsheld._
-import pages.nonsipp.receivetransfer._
-import pages.nonsipp.schemedesignatory._
-import pages.nonsipp.shares._
-import pages.nonsipp.sharesdisposal._
-import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
-import uk.gov.hmrc.domain.Nino
+import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
-import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
-import viewmodels.models.TaskListStatus._
-import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
+import org.scalatest.OptionValues
+import generators.ModelGenerators.pensionSchemeIdGen
+import models._
+import pages.nonsipp.moneyborrowed._
+import pages.nonsipp.bonds._
+import pages.nonsipp.memberdetails._
+import org.scalatest.freespec.AnyFreeSpec
+import pages.nonsipp.loansmadeoroutstanding._
+import models.IdentitySubject._
 
 class MemberCountUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
