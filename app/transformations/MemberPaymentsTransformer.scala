@@ -517,7 +517,7 @@ class MemberPaymentsTransformer @Inject()(
                   None
                 case (index, currentMemberDetail) if currentMemberDetail.state._new && psrStatus.exists(_.isCompiled) =>
                   logger.info(
-                    s"[identifyNewMembers] Member at index $index is new and PSR status is Compiled - safe to hard delete"
+                    s"[identifyNewMembers] Member at index $index is new and PSR status is Compiled. PSR status is $psrVersion and member PSR version is ${currentMemberDetail.memberPSRVersion} - safe to hard delete"
                   )
                   Some(index)
                 case _ => None
