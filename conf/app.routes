@@ -150,7 +150,7 @@ GET         /:srn/members-uploaded                                              
 GET         /:srn/members-uploaded/:page                                                                       controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
 POST        /:srn/members-uploaded/:page                                                                       controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
 
-GET         /:srn/members/:page/view/:year/:current/:previous                                                  controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoadViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int, showBackLink:Boolean)
+GET         /:srn/members/:page/view/:year/:current/:previous                                                  controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoadViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int, showBackLink:Option[Boolean])
 GET         /:srn/members/:page/previous/:year/:current/:previous                                              controllers.nonsipp.memberdetails.SchemeMembersListController.onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int)
 GET         /:srn/submit-members/view/:year/:current/:previous                                                 controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
 

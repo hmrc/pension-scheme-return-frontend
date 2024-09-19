@@ -241,7 +241,7 @@ object ViewOnlyTaskListController {
         LinkMessage(
           Message(messageKey(prefix, "details.title")),
           controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-            .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion, showBackLink = true)
+            .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion, showBackLink = None)
             .url
         ),
         membersTaskListStatus

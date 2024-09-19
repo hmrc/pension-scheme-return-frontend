@@ -345,15 +345,16 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
         )
       }
     )
-    act.like(
-      redirectToPage(
-        onSubmitViewOnly,
-        controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-          .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
-      ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only tasklist")
-    )
+    act
+      .like(
+        redirectToPage(
+          onSubmitViewOnly,
+          controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+            .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+        ).after(
+            verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          )
+          .withName("Submit redirects to view only tasklist")
+    ) SchemeMemberDetailsAnswersControll
   }
 }

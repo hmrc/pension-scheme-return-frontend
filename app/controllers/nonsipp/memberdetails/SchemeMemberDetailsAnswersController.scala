@@ -155,7 +155,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
+            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = Some(true))
         )
       )
     }
