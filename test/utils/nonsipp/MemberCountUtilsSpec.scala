@@ -28,12 +28,11 @@ import utils.UserAnswersUtils.UserAnswersOps
 import org.scalatest.OptionValues
 import generators.ModelGenerators.pensionSchemeIdGen
 import models._
+import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.moneyborrowed._
 import pages.nonsipp.bonds._
 import pages.nonsipp.memberdetails._
 import org.scalatest.freespec.AnyFreeSpec
-import pages.nonsipp.loansmadeoroutstanding._
-import models.IdentitySubject._
 
 class MemberCountUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 

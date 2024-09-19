@@ -20,7 +20,7 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.FrontendAppConfig
 import cats.implicits.{catsSyntaxTuple2Semigroupal, toShow}
-import config.Constants.{RETURN_PERIODS, SUBMISSION_DATE}
+import config.Constants.{RETURN_PERIODS, SUBMISSION_DATE, SUBMISSION_VIEWED_FLAG}
 import controllers.actions._
 import play.api.libs.json.Json
 import models.requests.psr.MinimalRequiredSubmission.nonEmptyListFormat
@@ -72,7 +72,7 @@ class ReturnSubmittedController @Inject()(
                 dashboardLink
               )
             )
-          )
+          ).addingToSession((SUBMISSION_VIEWED_FLAG, String.valueOf(true)))
         }
         .fold(
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
