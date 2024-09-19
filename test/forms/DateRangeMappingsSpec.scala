@@ -57,7 +57,7 @@ class DateRangeMappingsSpec
 
   val form: Form[DateRange] = formWithDuplicates(Nil)
 
-  val allowedDateRange: DateRange = DateRange(start, end)
+  val allowedDateRange: DateRange = DateRange(LocalDate.of(2021, 4, 6), end)
 
   def formWithDuplicates(duplicateRanges: List[DateRange]): Form[DateRange] = Form(
     "value" -> dateRange(
@@ -136,22 +136,23 @@ class DateRangeMappingsSpec
     )
   }
 
-//  "must fail to bind if start date is before start of tax year" in {
-//    val range = DateRange(defaultTaxYear.starts.minusDays(1), defaultTaxYear.finishes)
-//    val data = makeData(range.from, range.to)
-//    val result = form.bind(data)
-//
-//    result.errors must contain only
-//      FormError("value.startDate", "error.startAfter", List(defaultTaxYear.starts.show))
-//  }
-
-  "must fail to bind if end date is after end of tax year" in {
-    val range = DateRange(defaultTaxYear.starts, defaultTaxYear.finishes.plusDays(1))
+  "must fail to bind if start date is before allowed date range" in {
+    val range = DateRange(allowedDateRange.from.minusDays(1), defaultTaxYear.finishes)
     val data = makeData(range.from, range.to)
     val result = form.bind(data)
 
     result.errors must contain only
-      FormError("value.endDate", "error.endBefore", List(defaultTaxYear.finishes.plusDays(1).show))
+      FormError("value.startDate", "error.startAfter", List(defaultTaxYear.starts.show))
+  }
+
+  "must fail to bind if end date is after end of tax year" in {
+    val endDate = LocalDate.of(2023, 4, 5)
+    val range = DateRange(defaultTaxYear.starts, endDate)
+    val data = makeData(range.from, range.to.plusDays(1))
+    val result = form.bind(data)
+
+    result.errors must contain only
+      FormError("value.endDate", "error.endBefore", List(endDate.show))
   }
 
   "must fail to bind if date range intersects another date range" in {

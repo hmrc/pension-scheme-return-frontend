@@ -95,20 +95,20 @@ private[mappings] class DateRangeFormatter(
 
   // Verify provided date is after the start of the tax year or before the end of the tax year
   private def verifyTaxYear(key: String, range: DateRange): Either[Seq[FormError], DateRange] =
-    if (range.from.isBefore(LocalDate.of(2021, 4, 6))) {
+    if (range.from.isBefore(allowedRange.from)) {
       logger.info(
-        s"[verifyTaxYear] provided start date ${range.from.show} is before the start of the tax year ${taxYear.starts.show}"
+        s"[verifyTaxYear] provided start date ${range.from.show} is before the allowed date range ${allowedRange.from.show}"
       )
-      Left(List(FormError(s"$key.startDate", errorStartAfter, List(taxYear.starts.show))))
+      Left(List(FormError(s"$key.startDate", errorStartAfter, List(allowedRange.from.show))))
     } else if (range.from.isAfter(taxYear.finishes)) {
       logger.info(s"[verifyTaxYear] provided start date ${range.from.show} is after the end of the tax year")
-      Left(List(FormError(s"$key.startDate", errorStartBefore, List(taxYear.finishes.plusDays(1).show))))
-    } else if (range.to.isBefore(taxYear.starts)) {
+      Left(List(FormError(s"$key.startDate", errorStartBefore, List(taxYear.finishes.show))))
+    } else if (range.to.isBefore(allowedRange.from)) {
       logger.info(s"[verifyTaxYear] provided end date ${range.to.show} is before the start of the tax year")
-      Left(List(FormError(s"$key.endDate", errorEndAfter, List(taxYear.starts.minusDays(1).show))))
+      Left(List(FormError(s"$key.endDate", errorEndAfter, List(allowedRange.from.minusDays(1).show))))
     } else if (range.to.isAfter(taxYear.finishes)) {
       logger.info(s"[verifyTaxYear] provided end date ${range.to.show} is after the end of the tax year")
-      Left(List(FormError(s"$key.endDate", errorEndBefore, List(taxYear.finishes.plusDays(1).show))))
+      Left(List(FormError(s"$key.endDate", errorEndBefore, List(taxYear.finishes.show))))
     } else Right(range)
 
   private def verifyPreviousDateRange(key: String, range: DateRange, index: Max3): Either[Seq[FormError], DateRange] =

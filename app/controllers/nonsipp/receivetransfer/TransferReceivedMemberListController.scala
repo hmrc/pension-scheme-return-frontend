@@ -343,18 +343,23 @@ object TransferReceivedMemberListController {
       }
     )
 
+    val normalModeMessage =
+      if (mode == NormalMode)
+        Option(
+          ParagraphMessage(
+            "transferIn.MemberList.paragraph1"
+          ) ++
+            ParagraphMessage(
+              "transferIn.MemberList.paragraph2"
+            )
+        )
+      else Option(ParagraphMessage(""))
+
     FormPageViewModel(
       mode = mode,
       title = Message(title, memberList.flatten.size),
       heading = Message(heading, memberList.flatten.size),
-      description = Some(
-        ParagraphMessage(
-          "transferIn.MemberList.paragraph1"
-        ) ++
-          ParagraphMessage(
-            "transferIn.MemberList.paragraph2"
-          )
-      ),
+      description = normalModeMessage,
       page = ActionTableViewModel(
         inset = "",
         head = Some(
