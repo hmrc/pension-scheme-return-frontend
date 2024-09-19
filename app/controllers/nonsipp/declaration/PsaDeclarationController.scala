@@ -66,22 +66,36 @@ class PsaDeclarationController @Inject()(
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      isJourneyBypassed(srn).map(
-        eitherJourneyNavigationResultOrRecovery =>
-          eitherJourneyNavigationResultOrRecovery.fold(
-            _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()),
-            isBypassed =>
-              Ok(
-                view(
-                  PsaDeclarationController
-                    .viewModel(
-                      srn,
-                      isBypassed && hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId)
+      request.session
+        .get(SUBMISSION_VIEWED_FLAG)
+        .fold(
+          isJourneyBypassed(srn).map(
+            eitherJourneyNavigationResultOrRecovery =>
+              eitherJourneyNavigationResultOrRecovery.fold(
+                _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()),
+                isBypassed =>
+                  Ok(
+                    view(
+                      PsaDeclarationController
+                        .viewModel(
+                          srn,
+                          isBypassed && hasMemberNumbersChangedToOver99(
+                            request.userAnswers,
+                            srn,
+                            request.pensionSchemeId
+                          )
+                        )
                     )
-                )
+                  )
               )
           )
-      )
+        )(
+          _ =>
+            Future.successful(
+              Redirect(controllers.routes.OverviewController.onPageLoad(srn))
+                .removingFromSession(SUBMISSION_VIEWED_FLAG)
+            )
+        )
     }
 
   def onSubmit(srn: Srn): Action[AnyContent] =
