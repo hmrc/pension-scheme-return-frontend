@@ -17,7 +17,6 @@
 package controllers.nonsipp
 
 import services._
-import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
 import controllers.{nonsipp, PSRController}
@@ -32,6 +31,8 @@ import models.requests.DataRequest
 import _root_.config.Refined.Max3
 import models.audit.PSRStartAuditEvent
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
+import viewmodels.implicits._
+import utils.nonsipp.MemberCountUtils.hasMemberNumbersChangedToOver99
 import cats.data.{EitherT, NonEmptyList}
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
@@ -134,35 +135,43 @@ class BasicDetailsCheckYourAnswersController @Inject()(
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    psrSubmissionService
-      .submitPsrDetails(srn, fallbackCall = controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
-      .map {
-        case None =>
-          Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-        case Some(_) =>
-          val eitherResultOrFutureResult: Either[Result, Future[Result]] =
-            for {
-              taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
-              schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
-              userName <- loggedInUserNameOrRedirect
-              _ = auditService.sendEvent(buildAuditEvent(taxYear, schemeMemberNumbers, userName))
-            } yield {
-              // Determine next page in case of Declaration redirect
-              val byPassedJourney = if (request.pensionSchemeId.isPSP) {
-                nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
-              } else {
-                nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
-              }
-              val regularJourney = navigator
-                .nextPage(BasicDetailsCheckYourAnswersPage(srn), NormalMode, request.userAnswers)
-              isJourneyBypassed(srn)
-                .map(res => res.map(if (_) Redirect(byPassedJourney) else Redirect(regularJourney)).merge)
-            }
+    if (hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId)) {
+      auditAndRedirect(srn)(implicitly)
+    } else {
+      psrSubmissionService
+        .submitPsrDetails(srn, fallbackCall = controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
+        .map {
+          case None =>
+            Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          case Some(_) =>
+            auditAndRedirect(srn)(implicitly)
+        }
+        .flatten
+    }
+  }
 
-          // Transform Either[Result, Future[Result]] into a Future[Result]
-          EitherT(eitherResultOrFutureResult.sequence).merge
+  private def auditAndRedirect(srn: Srn)(implicit request: DataRequest[AnyContent]): Future[Result] = {
+    val eitherResultOrFutureResult: Either[Result, Future[Result]] =
+      for {
+        taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
+        schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
+        userName <- loggedInUserNameOrRedirect
+        _ = auditService.sendEvent(buildAuditEvent(taxYear, schemeMemberNumbers, userName))
+      } yield {
+        // Determine next page in case of Declaration redirect
+        val byPassedJourney = if (request.pensionSchemeId.isPSP) {
+          nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
+        } else {
+          nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
+        }
+        val regularJourney = navigator
+          .nextPage(BasicDetailsCheckYourAnswersPage(srn), NormalMode, request.userAnswers)
+        isJourneyBypassed(srn)
+          .map(res => res.map(if (_) Redirect(byPassedJourney) else Redirect(regularJourney)).merge)
       }
-      .flatten
+
+    // Transform Either[Result, Future[Result]] into a Future[Result]
+    EitherT(eitherResultOrFutureResult.sequence).merge
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =

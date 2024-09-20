@@ -16,7 +16,6 @@
 
 package services
 
-import models.audit.{PSRCompileAuditEvent, PSRSubmissionAuditEvent}
 import play.api.mvc.AnyContentAsEmpty
 import connectors.PSRConnector
 import controllers.TestValues
@@ -24,12 +23,14 @@ import cats.data.NonEmptyList
 import transformations._
 import utils.UserAnswersUtils.UserAnswersOps
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
-import models.DateRange
+import models.{DateRange, NormalMode}
 import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import org.mockito.ArgumentMatchers.any
 import services.PsrSubmissionServiceSpec._
 import play.api.test.FakeRequest
+import models.audit.{PSRCompileAuditEvent, PSRSubmissionAuditEvent}
+import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowMuchCashPage, ValueOfAssetsPage}
 import utils.BaseSpec
 import play.api.test.Helpers.stubMessagesApi
 import org.mockito.Mockito._
@@ -326,6 +327,56 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           psrSubmissionCaptor.getValue.shares mustBe optShares
           psrSubmissionCaptor.getValue.psrDeclaration mustBe Some(declaration)
           psrSubmissionAuditEventCaptor.getValue.psrSubmission mustBe psrSubmissionCaptor.getValue
+          result mustBe Some(())
+      }
+    }
+
+    "should submit PsrDetails bypassed" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(CheckReturnDatesPage(srn), false)
+        .unsafeSet(HowMuchCashPage(srn, NormalMode), moneyInPeriod)
+        .unsafeSet(ValueOfAssetsPage(srn, NormalMode), moneyInPeriod)
+        .unsafeSet(FeesCommissionsWagesSalariesPage(srn, NormalMode), money)
+      val request = DataRequest(allowedAccessRequest, userAnswers)
+
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any(), any())(any()))
+        .thenReturn(
+          Some(
+            MinimalRequiredSubmission(
+              minimalRequiredSubmission.reportDetails,
+              minimalRequiredSubmission.accountingPeriodDetails,
+              minimalRequiredSubmission.schemeDesignatory.copy(totalPayments = Some(money.value))
+            )
+          )
+        )
+      when(mockConnector.submitPsrDetails(any(), any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(Right(())))
+      when(mockDeclarationTransformer.transformToEtmp(any())).thenReturn(declaration)
+      when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
+        .thenReturn(Future.successful(Some(userAnswers)))
+
+      whenReady(service.submitPsrDetailsBypassed(srn = srn, fallbackCall)(implicitly, implicitly, request)) {
+        result: Option[Unit] =>
+          verify(mockMinimalRequiredSubmissionTransformer, times(1))
+            .transformToEtmp(any(), any(), ArgumentMatchers.eq(true))(any())
+          verify(mockLoansTransformer, never).transformToEtmp(any(), any())(any())
+          verify(mockMemberPaymentsTransformerTransformer, never).transformToEtmp(any(), any(), any(), any())
+          verify(mockAssetsTransformer, never).transformToEtmp(any(), any())(any())
+          verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
+          verify(mockDeclarationTransformer, times(1)).transformToEtmp(any())
+          verify(mockConnector, times(1)).submitPsrDetails(psrSubmissionCaptor.capture(), any(), any(), any())(
+            any(),
+            any()
+          )
+          verify(mockAuditService, times(1)).sendExtendedEvent(psrSubmissionAuditEventCaptor.capture())(any(), any())
+          verify(mockSessionRepository, never).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
+
+          psrSubmissionCaptor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+          psrSubmissionCaptor.getValue.checkReturnDates mustBe false
+          psrSubmissionCaptor.getValue.loans mustBe None
+          psrSubmissionCaptor.getValue.assets mustBe None
+          psrSubmissionCaptor.getValue.shares mustBe None
+          psrSubmissionCaptor.getValue.psrDeclaration mustBe Some(declaration)
           result mustBe Some(())
       }
     }

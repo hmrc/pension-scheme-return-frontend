@@ -63,6 +63,10 @@ trait MockBehaviours {
       when(mock.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(())))
 
+    def submitPsrDetailsBypassed()(implicit mock: PsrSubmissionService): OngoingStubbing[Future[Option[Unit]]] =
+      when(mock.submitPsrDetailsBypassed(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(())))
+
     object verify {
       def submitPsrDetailsWithUA(v: VerificationMode)(implicit mock: PsrSubmissionService): Future[Option[Unit]] =
         Mockito.verify(mock, v).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())

@@ -31,7 +31,8 @@ case class FormPageViewModel[+A](
   details: Option[FurtherDetailsViewModel] = None,
   onSubmit: Call,
   mode: Mode = NormalMode,
-  optViewOnlyDetails: Option[ViewOnlyDetailsViewModel] = None
+  optViewOnlyDetails: Option[ViewOnlyDetailsViewModel] = None,
+  optNotificationBanner: Option[(String, String, String)] = None
 ) {
 
   def withDescription(message: Option[DisplayMessage]): FormPageViewModel[A] =
@@ -100,5 +101,24 @@ object FormPageViewModel {
       Message("site.saveAndContinue"),
       details,
       onSubmit
+    )
+
+  def apply[A](
+    title: Message,
+    heading: InlineMessage,
+    page: A,
+    onSubmit: Call,
+    optNotificationBanner: Option[(String, String, String)]
+  ): FormPageViewModel[A] =
+    FormPageViewModel(
+      title,
+      heading,
+      None,
+      page,
+      refresh = None,
+      Message("site.saveAndContinue"),
+      None,
+      onSubmit,
+      optNotificationBanner = optNotificationBanner
     )
 }
