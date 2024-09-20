@@ -41,6 +41,7 @@
         field  = form("dates.startDate"),
         legend = LegendViewModel(viewmodel.page.startDateLabel.toMessage)
       )
+      .withId("dates.startDate")
     )
 
     @govukDateInput(
@@ -48,6 +49,7 @@
         field  = form("dates.endDate"),
         legend = LegendViewModel(viewmodel.page.endDateLabel.toMessage)
       )
+      .withId("dates.endDate")
     )
 
     @govukButton(

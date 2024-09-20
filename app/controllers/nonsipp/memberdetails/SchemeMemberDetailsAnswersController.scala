@@ -172,25 +172,31 @@ object SchemeMemberDetailsAnswersController {
     List(
       CheckYourAnswersRowViewModel("memberDetails.firstName", memberDetails.firstName)
         .withAction(
-          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index, CheckMode).url)
-            .withVisuallyHiddenContent("memberDetails.firstName")
+          SummaryAction(
+            "site.change",
+            routes.MemberDetailsController.onPageLoad(srn, index, CheckMode).url + "#firstName"
+          ).withVisuallyHiddenContent("memberDetails.firstName")
         ),
       CheckYourAnswersRowViewModel("memberDetails.lastName", memberDetails.lastName)
         .withAction(
-          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index, CheckMode).url)
-            .withVisuallyHiddenContent("memberDetails.lastName")
+          SummaryAction(
+            "site.change",
+            routes.MemberDetailsController.onPageLoad(srn, index, CheckMode).url + "#lastName"
+          ).withVisuallyHiddenContent("memberDetails.lastName")
         ),
       CheckYourAnswersRowViewModel("memberDetails.dateOfBirth", memberDetails.dob.show)
         .withAction(
-          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index, CheckMode).url)
-            .withVisuallyHiddenContent("memberDetails.dateOfBirth")
+          SummaryAction(
+            "site.change",
+            routes.MemberDetailsController.onPageLoad(srn, index, CheckMode).url + "#dateOfBirth"
+          ).withVisuallyHiddenContent("memberDetails.dateOfBirth")
         ),
       CheckYourAnswersRowViewModel(
         Message("nationalInsuranceNumber.heading", memberDetails.fullName),
         booleanToMessage(hasNINO)
       ).withAction(
         SummaryAction("site.change", routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, CheckMode).url)
-          .withVisuallyHiddenContent("nationalInsuranceNumber.heading")
+          .withVisuallyHiddenContent("memberDetailsCYA.nationalInsuranceNumber.hidden", memberDetails.fullName)
       )
     ) ++
       ninoRow(maybeNino, memberDetails.fullName, srn, index) ++
@@ -208,7 +214,7 @@ object SchemeMemberDetailsAnswersController {
           CheckYourAnswersRowViewModel(Message("memberDetailsNino.heading", memberName), nino.value)
             .withAction(
               SummaryAction("site.change", routes.MemberDetailsNinoController.onPageLoad(srn, index, CheckMode).url)
-                .withVisuallyHiddenContent("memberDetailsNino.heading")
+                .withVisuallyHiddenContent("memberDetailsCYA.nino.hidden", memberName)
             )
         )
     )
@@ -225,7 +231,7 @@ object SchemeMemberDetailsAnswersController {
           CheckYourAnswersRowViewModel(Message("noNINO.heading", memberName), noNinoReason)
             .withAction(
               SummaryAction("site.change", routes.NoNINOController.onPageLoad(srn, index, CheckMode).url)
-                .withVisuallyHiddenContent("noNINO.heading")
+                .withVisuallyHiddenContent("memberDetailsCYA.noNINO.hidden", memberName)
             )
         )
     )
