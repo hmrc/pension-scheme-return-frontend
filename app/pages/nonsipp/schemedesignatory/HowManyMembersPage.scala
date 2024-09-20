@@ -21,9 +21,18 @@ import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.{PensionSchemeId, SchemeMemberNumbers}
 
+//@deprecated("`request: PensionSchemeId` is unused - use HowManyMembersPage.bySrn instead")
 case class HowManyMembersPage(srn: Srn, request: PensionSchemeId) extends QuestionPage[SchemeMemberNumbers] {
 
   override def path: JsPath = Paths.schemeDesignatory \ toString
 
   override def toString: String = "howManyMembersPage"
+}
+
+object HowManyMembersPage {
+  def bySrn(srn: Srn): QuestionPage[SchemeMemberNumbers] = new QuestionPage[SchemeMemberNumbers] {
+    override def path: JsPath = Paths.schemeDesignatory \ toString
+
+    override def toString: String = "howManyMembersPage"
+  }
 }
