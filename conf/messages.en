@@ -321,6 +321,9 @@ memberDetails.dateOfBirth.upload.error.future = Member’s date of birth must be
 memberDetails.dateOfBirth.upload.error.after = Member’s date of birth must be after {0}
 memberDetails.dateOfBirth.upload.error.format = Member’s date of birth must be in the format 01/08/1970
 
+memberDetailsCYA.nationalInsuranceNumber.hidden = whether {0} have a National Insurance number
+memberDetailsCYA.nino.hidden = {0}’s National Insurance number
+memberDetailsCYA.noNINO.hidden = reason {0} does not have a National Insurance number
 memberDetailsCYA.viewOnly.title = Member’s details
 memberDetailsCYA.viewOnly.heading = {0}’s details
 memberDetailsCYA.viewOnly.link = View previous version of member's details (opens in new tab)
