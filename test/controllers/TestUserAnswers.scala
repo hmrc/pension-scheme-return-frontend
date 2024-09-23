@@ -22,14 +22,13 @@ import config.Refined.{Max3, Max300}
 import viewmodels.models.MemberState.New
 import eu.timepit.refined.refineMV
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriodRecordVersionPage}
-import models.{DateRange, NormalMode}
+import models.{DateRange, NormalMode, UserAnswers}
 import pages.nonsipp.declaration.PensionSchemeDeclarationPage
 import viewmodels.models.{DeclarationViewModel, SectionCompleted, Submitted}
 import pages.nonsipp._
 import org.scalatest.OptionValues
 
 import java.time.{LocalDate, LocalDateTime}
-import models.UserAnswers
 
 trait TestUserAnswers extends ControllerBaseSpec with TestValues {
   _: OptionValues =>
