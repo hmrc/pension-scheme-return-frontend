@@ -110,19 +110,24 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
           minimalRequiredSubmission.reportDetails.periodEnd
         )
       )
+      accPeriodSameAsTaxYear = minimalRequiredSubmission.accountingPeriodDetails.accountingPeriods.size == 1 &&
+        minimalRequiredSubmission.accountingPeriodDetails.accountingPeriods.head._1
+          .isEqual(minimalRequiredSubmission.reportDetails.periodStart) &&
+        minimalRequiredSubmission.accountingPeriodDetails.accountingPeriods.head._2
+          .isEqual(minimalRequiredSubmission.reportDetails.periodEnd)
       ua1 <- ua0.set(
         CheckReturnDatesPage(srn),
-        minimalRequiredSubmission.accountingPeriodDetails.accountingPeriods.size == 1 &&
-          minimalRequiredSubmission.accountingPeriodDetails.accountingPeriods.head._1
-            .isEqual(minimalRequiredSubmission.reportDetails.periodStart) &&
-          minimalRequiredSubmission.accountingPeriodDetails.accountingPeriods.head._2
-            .isEqual(minimalRequiredSubmission.reportDetails.periodEnd)
+        accPeriodSameAsTaxYear
       )
-      ua2 <- ua1.set(
-        AccountingPeriods(srn),
-        minimalRequiredSubmission.accountingPeriodDetails.accountingPeriods.toList
-          .map(x => DateRange(x._1, x._2))
-      )
+      ua2 <- if (accPeriodSameAsTaxYear) {
+        Try(ua1)
+      } else {
+        ua1.set(
+          AccountingPeriods(srn),
+          minimalRequiredSubmission.accountingPeriodDetails.accountingPeriods.toList
+            .map(x => DateRange(x._1, x._2))
+        )
+      }
       openBankAccount = minimalRequiredSubmission.schemeDesignatory.openBankAccount
       ua3 <- ua2.set(
         ActiveBankAccountPage(srn),

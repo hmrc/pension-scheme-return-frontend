@@ -298,6 +298,50 @@ class MinimalRequiredSubmissionTransformerSpec
         }
       )
     }
+
+    "should transform minimal details without accounting period" in {
+
+      val userAnswers = emptyUserAnswers
+      val minimalRequiredSubmission = MinimalRequiredSubmission(
+        ReportDetails(
+          fbVersion = Some("001"),
+          fbstatus = None,
+          pstr = request.schemeDetails.pstr,
+          periodStart = dateRange.from,
+          periodEnd = dateRange.to,
+          compilationOrSubmissionDate = None
+        ),
+        AccountingPeriodDetails(Some("001"), NonEmptyList.of((dateRange.from, dateRange.to))),
+        SchemeDesignatory(
+          Some("001"),
+          openBankAccount = true,
+          None,
+          2,
+          3,
+          4,
+          None,
+          None,
+          Some(money.value),
+          Some(2 * money.value),
+          None
+        )
+      )
+
+      val result = transformer.transformFromEtmp(
+        userAnswers,
+        allowedAccessRequest.srn,
+        allowedAccessRequest.pensionSchemeId,
+        minimalRequiredSubmission
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(CheckReturnDatesPage(srn)) mustBe Some(true)
+          val aps = userAnswers.get(AccountingPeriods(srn))
+          aps mustBe None
+        }
+      )
+    }
   }
 
   "getVersionAndStatus" - {
