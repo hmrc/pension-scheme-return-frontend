@@ -53,14 +53,13 @@
       }
 
     } else {
-      <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
       @viewmodel.description.map(renderMessage)
 
       @govukInput(
         InputViewModel(
           field = form("value"),
-          label = LabelViewModel(renderMessage(viewmodel.heading)).withCssClass("govuk-visually-hidden")
+          label = LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading()
         )
         .withHint(viewmodel.page.firstField.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
         .asNumeric()

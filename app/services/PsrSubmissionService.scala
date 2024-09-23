@@ -125,48 +125,46 @@ class PsrSubmissionService @Inject()(
     fallbackCall: Call
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
     (
-      (
-        minimalRequiredSubmissionTransformer.transformToEtmp(srn, request.userAnswers, true),
-        request.userAnswers.get(CheckReturnDatesPage(srn)),
-        schemeDateService.schemeDate(srn)
-      ).mapN { (minimalRequiredSubmission, checkReturnDates, taxYear) =>
-        {
-          val submissionRequest: PsrSubmission = PsrSubmission(
-            minimalRequiredSubmission = MinimalRequiredSubmission(
-              minimalRequiredSubmission.reportDetails,
-              minimalRequiredSubmission.accountingPeriodDetails,
-              minimalRequiredSubmission.schemeDesignatory.copy(
-                totalCashStart = None,
-                totalCashEnd = None,
-                totalPayments = None,
-                totalAssetValueStart = None,
-                totalAssetValueEnd = None
-              )
-            ),
-            checkReturnDates = checkReturnDates,
-            loans = None,
-            assets = None,
-            membersPayments = None,
-            shares = None,
-            psrDeclaration = Some(declarationTransformer.transformToEtmp)
-          )
-          psrConnector
-            .submitPsrDetails(
-              submissionRequest,
-              schemeAdministratorOrPractitionerName,
-              request.schemeDetails.schemeName,
-              srn
+      minimalRequiredSubmissionTransformer.transformToEtmp(srn, request.userAnswers, isSubmitted = true),
+      request.userAnswers.get(CheckReturnDatesPage(srn)),
+      schemeDateService.schemeDate(srn)
+    ).mapN { (minimalRequiredSubmission, checkReturnDates, taxYear) =>
+      {
+        val submissionRequest: PsrSubmission = PsrSubmission(
+          minimalRequiredSubmission = MinimalRequiredSubmission(
+            minimalRequiredSubmission.reportDetails,
+            minimalRequiredSubmission.accountingPeriodDetails,
+            minimalRequiredSubmission.schemeDesignatory.copy(
+              totalCashStart = None,
+              totalCashEnd = None,
+              totalPayments = None,
+              totalAssetValueStart = None,
+              totalAssetValueEnd = None
             )
-            .flatMap {
-              case Left(message: String) =>
-                throw PostPsrException(message, fallbackCall.url)
-              case Right(()) =>
-                auditService.sendExtendedEvent(buildAuditEvent(taxYear, true, submissionRequest))
-                Future.unit
-            }
-        }
+          ),
+          checkReturnDates = checkReturnDates,
+          loans = None,
+          assets = None,
+          membersPayments = None,
+          shares = None,
+          psrDeclaration = Some(declarationTransformer.transformToEtmp)
+        )
+        psrConnector
+          .submitPsrDetails(
+            submissionRequest,
+            schemeAdministratorOrPractitionerName,
+            request.schemeDetails.schemeName,
+            srn
+          )
+          .flatMap {
+            case Left(message: String) =>
+              throw PostPsrException(message, fallbackCall.url)
+            case Right(()) =>
+              auditService.sendExtendedEvent(buildAuditEvent(taxYear, isSubmitted = true, submissionRequest))
+              Future.unit
+          }
       }
-    ).sequence
+    }.sequence
 
   private def buildAuditEvent(taxYear: DateRange, isSubmitted: Boolean, submissionRequest: PsrSubmission)(
     implicit req: DataRequest[_]
