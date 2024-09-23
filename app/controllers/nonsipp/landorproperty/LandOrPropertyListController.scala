@@ -68,9 +68,9 @@ class LandOrPropertyListController @Inject()(
     mode: Mode,
     year: String,
     current: Int,
-    previous: Int,
-    showBackLink: Boolean
+    previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    val showBackLink = true
     val viewOnlyViewModel = ViewOnlyViewModel(
       viewOnlyUpdated = request.previousUserAnswers match {
         case Some(previousUserAnswers) =>
@@ -151,14 +151,30 @@ class LandOrPropertyListController @Inject()(
     }
 
   def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          routes.LandOrPropertyListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0), showBackLink = false)
-        )
-      )
+    identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)).async {
+      implicit request =>
+        Future.successful {
+          val showBackLink = false
+          val viewOnlyViewModel = ViewOnlyViewModel(
+            viewOnlyUpdated = request.previousUserAnswers match {
+              case Some(previousUserAnswers) =>
+                getCompletedOrUpdatedTaskListStatus(
+                  request.userAnswers,
+                  previousUserAnswers,
+                  pages.nonsipp.landorproperty.Paths.landOrProperty,
+                  Some("disposedPropertyTransaction")
+                ) == Updated
+              case _ => false
+            },
+            year = year,
+            currentVersion = (current - 1).max(0),
+            previousVersion = (previous - 1).max(0),
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          )
+          onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
+        }
     }
+
 }
 
 object LandOrPropertyListController {
@@ -257,7 +273,7 @@ object LandOrPropertyListController {
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.LandOrPropertyListController
-            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion, showBackLink = true)
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
         case _ =>
           routes.LandOrPropertyListController.onPageLoad(srn, _, NormalMode)
       }

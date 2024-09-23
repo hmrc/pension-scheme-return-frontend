@@ -462,7 +462,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey(prefix, "sponsoringemployer.title"),
         controllers.nonsipp.shares.routes.SharesListController
-          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
+          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
           .url
       ),
       sharesTaskListStatus
@@ -472,7 +472,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey("nonsipp.tasklist.sharesdisposal", "title"),
         controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
-          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
+          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
           .url
       ),
       sharesDisposalsTaskListStatus
@@ -521,7 +521,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey(prefix, "title"),
         controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
-          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
+          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
           .url
       ),
       landOrPropertyTaskListStatus
@@ -531,7 +531,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey("nonsipp.tasklist.landorpropertydisposal", "title"),
         controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
-          .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion, showBackLink = true)
+          .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion)
           .url
       ),
       landOrPropertyDisposalTaskListStatus
@@ -580,7 +580,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey(prefix, "unregulatedorconnected.title"),
         controllers.nonsipp.bonds.routes.BondsListController
-          .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion, showBackLink = true)
+          .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion)
           .url
       ),
       bondsTaskListStatus
@@ -590,7 +590,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey(prefix, "bondsdisposal.title"),
         controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
+          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
           .url
       ),
       bondsDisposalTaskListStatus
@@ -645,7 +645,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey(prefix, "quotedshares.title"),
         controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
-          .onPageLoadViewOnly(srn, year, currentVersion, previousVersion, showBackLink = true)
+          .onPageLoadViewOnly(srn, year, currentVersion, previousVersion)
           .url
       ),
       quotedSharesTaskListStatus
@@ -655,7 +655,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey(prefix, "title"),
         controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
-          .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion, showBackLink = true)
+          .onPageLoadViewOnly(srn, page = 1, year, currentVersion, previousVersion)
           .url
       ),
       otherAssetsTaskListStatus
@@ -665,7 +665,7 @@ object ViewOnlyTaskListController {
       LinkMessage(
         messageKey("nonsipp.tasklist.otherassetsdisposal", "title"),
         controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion, showBackLink = true)
+          .onPageLoadViewOnly(srn, 1, year, currentVersion, previousVersion)
           .url
       ),
       otherAssetsDisposalTaskListStatus

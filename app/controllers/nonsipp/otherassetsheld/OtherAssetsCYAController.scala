@@ -228,7 +228,7 @@ class OtherAssetsCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
-            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
+            .onPageLoadViewOnly(srn, page, year, current, previous)
         )
       )
     }

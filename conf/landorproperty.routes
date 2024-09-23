@@ -153,8 +153,8 @@ GET         /:srn/change-land-property-list/:page                            con
 POST        /:srn/change-land-property-list/:page                            controllers.nonsipp.landorproperty.LandOrPropertyListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
 
 POST        /:srn/change-land-property-list/:page                                   controllers.nonsipp.landorproperty.LandOrPropertyListController.onSubmit(srn: Srn, page: Int, mode: Mode = ViewOnlyMode)
-GET         /:srn/land-property-list/view/:year/:current/:previous                  controllers.nonsipp.landorproperty.LandOrPropertyListController.onPageLoadViewOnly(srn: Srn, page: Int = 1, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int,showBackLink:Boolean)
-GET         /:srn/land-property-list/:page/view/:year/:current/:previous            controllers.nonsipp.landorproperty.LandOrPropertyListController.onPageLoadViewOnly(srn: Srn, page: Int, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int,showBackLink:Boolean)
+GET         /:srn/land-property-list/view/:year/:current/:previous                  controllers.nonsipp.landorproperty.LandOrPropertyListController.onPageLoadViewOnly(srn: Srn, page: Int = 1, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/land-property-list/:page/view/:year/:current/:previous            controllers.nonsipp.landorproperty.LandOrPropertyListController.onPageLoadViewOnly(srn: Srn, page: Int, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
 GET         /:srn/land-property-list/:page/previous/:year/:current/:previous        controllers.nonsipp.landorproperty.LandOrPropertyListController.onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int)
 GET         /:srn/submit-land-property-list/view/:year/:current/:previous           controllers.nonsipp.landorproperty.LandOrPropertyListController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
 

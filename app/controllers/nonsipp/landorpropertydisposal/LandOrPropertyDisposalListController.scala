@@ -68,10 +68,10 @@ class LandOrPropertyDisposalListController @Inject()(
     page: Int,
     year: String,
     current: Int,
-    previous: Int,
-    showBackLink: Boolean
+    previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, ViewOnlyMode, year, current, previous) { implicit request =>
+      val showBackLink = true
       val viewOnlyViewModel = ViewOnlyViewModel(
         viewOnlyUpdated = request.previousUserAnswers match {
           case Some(previousUserAnswers) =>
@@ -103,14 +103,41 @@ class LandOrPropertyDisposalListController @Inject()(
       onPageLoadCommon(srn, page, mode, showBackLink = true)
     }
 
-  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          routes.LandOrPropertyDisposalListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0), showBackLink = false)
-        )
-      )
+  def onPreviousViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)).async {
+      implicit request =>
+        Future.successful {
+          val showBackLink = false
+          val viewOnlyViewModel = ViewOnlyViewModel(
+            viewOnlyUpdated = request.previousUserAnswers match {
+              case Some(previousUserAnswers) =>
+                val updated = getCompletedOrUpdatedTaskListStatus(
+                  request.userAnswers,
+                  previousUserAnswers,
+                  pages.nonsipp.landorpropertydisposal.Paths.disposalPropertyTransaction
+                ) == Updated
+                logger.info(s"""[ViewOnlyMode] Status for land or property disposal list is ${if (updated) "updated"
+                else "not updated"}""")
+                updated
+              case None =>
+                logger.info(
+                  s"[ViewOnlyMode] no previous submission version, Status for land or property disposal list is not updated"
+                )
+                false
+            },
+            year = year,
+            currentVersion = (current - 1).max(0),
+            previousVersion = (previous - 1).max(0),
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          )
+          onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
+        }
     }
 
   private def onPageLoadCommon(
@@ -341,7 +368,7 @@ object LandOrPropertyDisposalListController {
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.LandOrPropertyDisposalListController
-            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion, showBackLink = true)
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
         case None =>
           routes.LandOrPropertyDisposalListController.onPageLoad(srn, _)
       }

@@ -173,7 +173,7 @@ class BondsDisposalCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
+            .onPageLoadViewOnly(srn, page, year, current, previous)
         )
       )
     }

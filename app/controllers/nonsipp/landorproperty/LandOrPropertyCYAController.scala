@@ -210,7 +210,7 @@ class LandOrPropertyCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
-            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
+            .onPageLoadViewOnly(srn, page, year, current, previous)
         )
       )
     }

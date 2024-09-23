@@ -42,8 +42,7 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
       page = 1,
       yearString,
       submissionNumberOne,
-      submissionNumberZero,
-      showBackLink = true
+      submissionNumberZero
     )
   private lazy val onSubmitViewOnly =
     routes.LandOrPropertyDisposalListController.onSubmitViewOnly(
@@ -172,16 +171,6 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
           controllers.nonsipp.routes.ViewOnlyTaskListController
             .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
         ).withName("Submit redirects to view only tasklist")
-      )
-
-      act.like(
-        redirectToPage(
-          onPreviousViewOnly,
-          routes.LandOrPropertyDisposalListController
-            .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
-        ).withName(
-          "Submit previous view only redirects to the controller with parameters for the previous submission"
-        )
       )
     }
   }

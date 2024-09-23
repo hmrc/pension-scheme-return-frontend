@@ -18,7 +18,7 @@ POST        /:srn/change-remove-quoted-shares-managed-funds                     
 
 GET         /:srn/check-answers-quoted-shares-managed-funds                                                    controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesCYAController.onPageLoad(srn: Srn)
 POST        /:srn/check-answers-quoted-shares-managed-funds                                                    controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesCYAController.onSubmit(srn: Srn)
-GET         /:srn/check-answers-quoted-shares-managed-funds-managed-funds/view/:year/:current/:previous        controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesCYAController.onPageLoadViewOnly(srn: Srn, year: String, current: Int, previous: Int,showBackLink:Boolean)
+GET         /:srn/check-answers-quoted-shares-managed-funds-managed-funds/view/:year/:current/:previous        controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesCYAController.onPageLoadViewOnly(srn: Srn, year: String, current: Int, previous: Int)
 POST        /:srn/check-answers-quoted-shares-managed-funds-managed-funds/view/:year/:current/:previous        controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesCYAController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
 GET         /:srn/check-answers-quoted-shares-managed-funds-managed-funds/previous/:year/:current/:previous    controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesCYAController.onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int)
 
@@ -126,8 +126,8 @@ POST        /:srn/shares-list/:page                                             
 GET         /:srn/change-shares-list/:page                                         controllers.nonsipp.shares.SharesListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
 POST        /:srn/change-shares-list/:page                                         controllers.nonsipp.shares.SharesListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
 POST        /:srn/change-shares-list/:page                                           controllers.nonsipp.shares.SharesListController.onSubmit(srn: Srn, page: Int, mode: Mode = ViewOnlyMode)
-GET         /:srn/shares-list/view/:year/:current/:previous                          controllers.nonsipp.shares.SharesListController.onPageLoadViewOnly(srn: Srn, page: Int = 1, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int,showBackLink:Boolean)
-GET         /:srn/shares-list/:page/view/:year/:current/:previous                    controllers.nonsipp.shares.SharesListController.onPageLoadViewOnly(srn: Srn, page: Int, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int,showBackLink:Boolean)
+GET         /:srn/shares-list/view/:year/:current/:previous                          controllers.nonsipp.shares.SharesListController.onPageLoadViewOnly(srn: Srn, page: Int = 1, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
+GET         /:srn/shares-list/:page/view/:year/:current/:previous                    controllers.nonsipp.shares.SharesListController.onPageLoadViewOnly(srn: Srn, page: Int, mode: Mode = ViewOnlyMode, year: String, current: Int, previous: Int)
 GET         /:srn/shares-list/:page/previous/:year/:current/:previous                controllers.nonsipp.shares.SharesListController.onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int)
 GET         /:srn/submit-shares-list/view/:year/:current/:previous                   controllers.nonsipp.shares.SharesListController.onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int)
 

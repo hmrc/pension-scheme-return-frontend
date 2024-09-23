@@ -78,9 +78,9 @@ class ReportedOtherAssetsDisposalListController @Inject()(
     mode: Mode,
     year: String,
     current: Int,
-    previous: Int,
-    showBackLink: Boolean
+    previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    val showBackLink = true
     val viewOnlyViewModel = ViewOnlyViewModel(
       viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
         getCompletedOrUpdatedTaskListStatus(
@@ -192,15 +192,32 @@ class ReportedOtherAssetsDisposalListController @Inject()(
       )
     }
 
-  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0), showBackLink = false)
-        )
+  def onPreviousViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] = identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) {
+    implicit request =>
+      val showBackLink = false
+      val viewOnlyViewModel = ViewOnlyViewModel(
+        viewOnlyUpdated = if (ViewOnlyMode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+          getCompletedOrUpdatedTaskListStatus(
+            request.userAnswers,
+            request.previousUserAnswers.get,
+            pages.nonsipp.otherassetsdisposal.Paths.assetsDisposed
+          ) == Updated
+        } else {
+          false
+        },
+        year = year,
+        currentVersion = (current - 1).max(0),
+        previousVersion = (previous - 1).max(0),
+        compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
       )
-    }
+      onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
+  }
 
   private def getCompletedDisposals(
     srn: Srn
@@ -360,7 +377,7 @@ object ReportedOtherAssetsDisposalListController {
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.ReportedOtherAssetsDisposalListController
-            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion, showBackLink = true)
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
         case None =>
           routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, _)
       }

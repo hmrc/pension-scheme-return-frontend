@@ -57,8 +57,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
     1,
     yearString,
     submissionNumberTwo,
-    submissionNumberOne,
-    showBackLink = true
+    submissionNumberOne
   )
   private lazy val onPreviousViewOnly = routes.BondsListController.onPreviousViewOnly(
     srn,
@@ -193,13 +192,30 @@ class BondsListControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectToPage(
+      renderView(
         onPreviousViewOnly,
-        controllers.nonsipp.bonds.routes.BondsListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
-      )
+        userAnswers = currentUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[ListView].apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(
+            srn,
+            1,
+            mode = ViewOnlyMode,
+            bondsData,
+            schemeName,
+            Some(
+              viewOnlyViewModel.copy(
+                currentVersion = (submissionNumberTwo - 1).max(0),
+                previousVersion = (submissionNumberOne - 1).max(0)
+              )
+            ),
+            showBackLink = false
+          )
+        )
+      }.withName("Submit previous view only renders the controller with parameters for the previous submission")
     )
+
   }
 }

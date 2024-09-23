@@ -131,13 +131,8 @@ class SchemeMembersListController @Inject()(
                       previousUserAnswers,
                       pages.nonsipp.memberdetails.Paths.personalDetails
                     ) == Updated
-                    logger.info(s"""[ViewOnlyMode] Status for member details list is ${if (updated) "updated"
-                    else "not updated"}""")
                     updated
                   case (ViewOnlyMode, None) =>
-                    logger.info(
-                      s"[ViewOnlyMode] no previous submiossion version, Status for member details list is not udpated"
-                    )
                     false
                   case _ => false
                 },

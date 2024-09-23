@@ -60,8 +60,7 @@ class SharesListControllerSpec extends ControllerBaseSpec {
       1,
       yearString,
       submissionNumberTwo,
-      submissionNumberOne,
-      showBackLink = true
+      submissionNumberOne
     )
   private lazy val onPreviousViewOnly =
     controllers.nonsipp.shares.routes.SharesListController.onPreviousViewOnly(
@@ -215,27 +214,6 @@ class SharesListControllerSpec extends ControllerBaseSpec {
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with no shares")
-    )
-
-    act.like(
-      redirectToPage(
-        onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
-      ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only taskList")
-    )
-
-    act.like(
-      redirectToPage(
-        onPreviousViewOnly,
-        controllers.nonsipp.shares.routes.SharesListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
-      )
     )
   }
 

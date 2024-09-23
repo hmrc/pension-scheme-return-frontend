@@ -218,7 +218,7 @@ class LandPropertyDisposalCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
-            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
+            .onPageLoadViewOnly(srn, page, year, current, previous)
         )
       )
     }
