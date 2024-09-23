@@ -1047,7 +1047,7 @@ uploadMemberDetails.error.size = The selected file must be smaller than {0}
 howToUpload.title = Download template file
 howToUpload.heading = Download template file
 howToUpload.linkMessage = Download the template .csv file
-howToUpload.linkMessage1 = and use this to enter the information. Do not change or delete the header row (row 1) or change the order of the columns in the template file.
+howToUpload.linkMessage1 = and use this to enter the information. Do not change or delete the header row (row 1) or the guidance text row (row 2), or change the order of the columns in the template file.
 
 checkMemberDetailsFile.title = Check your member details file
 checkMemberDetailsFile.heading = Check your member details file
