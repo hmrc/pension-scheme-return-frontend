@@ -14,7 +14,10 @@
  * limitations under the License.
  *@
 
+@import config.FrontendAppConfig
+
 @this(
+    appConfig: FrontendAppConfig,
     layout: templates.Layout,
     govukButton: GovukButton
 )
@@ -27,11 +30,12 @@
 
     <p class="govuk-body">@messages("journeyRecovery.guidance1")</p>
 
-    @if(answersSavedDisplayVersion == 1) {
-        <p class="govuk-body">@messages("journeyRecovery.guidance2.version1")</p>
-    }
     @if(answersSavedDisplayVersion == 2) {
-        <p class="govuk-body">@messages("journeyRecovery.guidance2.version2")</p>
+        <p class="govuk-body">@messages("journeyRecovery.optionalGuidance2.paragraph")</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("journeyRecovery.optionalGuidance2.bullet1")</li>
+            <li>@messages("journeyRecovery.optionalGuidance2.bullet2", (appConfig.timeout / 60))</li>
+        </ul>
     }
 
     <p class="govuk-body">@messages("journeyRecovery.guidance3")
