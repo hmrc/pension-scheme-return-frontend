@@ -40,8 +40,7 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
       srn,
       yearString,
       submissionNumberTwo,
-      submissionNumberOne,
-      showBackLink = true
+      submissionNumberOne
     )
   private lazy val onSubmitViewOnly =
     routes.TotalValueQuotedSharesCYAController.onSubmitViewOnly(
@@ -217,16 +216,6 @@ class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {
           .withName("Submit redirects to view only tasklist")
       )
 
-      act.like(
-        redirectToPage(
-          onPreviousViewOnly,
-          routes.TotalValueQuotedSharesCYAController
-            .onPageLoadViewOnly(srn, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
-        ).before(mockTaxYear(dateRange))
-          .withName(
-            "Submit previous view only redirects to TotalValueQuotedSharesCYAController for the previous submission"
-          )
-      )
     }
 
   }

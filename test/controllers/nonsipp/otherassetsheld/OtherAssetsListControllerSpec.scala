@@ -57,8 +57,7 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
     1,
     yearString,
     submissionNumberTwo,
-    submissionNumberOne,
-    showBackLink = true
+    submissionNumberOne
   )
   private lazy val onPreviousViewOnly = routes.OtherAssetsListController.onPreviousViewOnly(
     srn,
@@ -189,14 +188,5 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
         .withName("Submit redirects to view only tasklist")
     )
 
-    act.like(
-      redirectToPage(
-        onPreviousViewOnly,
-        controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
-      )
-    )
   }
 }

@@ -57,8 +57,7 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
     1,
     yearString,
     submissionNumberTwo,
-    submissionNumberOne,
-    showBackLink = true
+    submissionNumberOne
   )
   private lazy val onPreviousViewOnly = routes.MemberPensionPaymentsListController.onPreviousViewOnly(
     srn,
@@ -333,16 +332,6 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )
         .withName("Submit redirects to view only tasklist")
-    )
-
-    act.like(
-      redirectToPage(
-        onPreviousViewOnly,
-        controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
-      )
     )
   }
 }

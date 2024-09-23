@@ -54,8 +54,7 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
       srn,
       yearString,
       submissionNumberTwo,
-      submissionNumberOne,
-      showBackLink = true
+      submissionNumberOne
     )
   private lazy val onSubmitViewOnly =
     controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController.onSubmitViewOnly(
@@ -207,15 +206,6 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
         .withName("Submit redirects to view only tasklist")
     )
 
-    act.like(
-      redirectToPage(
-        onPreviousViewOnly,
-        controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-          .onPageLoadViewOnly(srn, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
-      ).withName(
-        "Submit previous view only redirects to UnallocatedContributionCYAController for the previous submission"
-      )
-    )
   }
 
   private def mockTaxYear(

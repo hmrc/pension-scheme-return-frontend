@@ -39,8 +39,7 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
     srn,
     yearString,
     submissionNumberTwo,
-    submissionNumberOne,
-    showBackLink = true
+    submissionNumberOne
   )
   private lazy val onSubmitViewOnly = routes.FinancialDetailsCheckYourAnswersController.onSubmitViewOnly(
     srn,
@@ -176,15 +175,6 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
         .withName("Submit redirects to view only tasklist")
     )
 
-    act.like(
-      redirectToPage(
-        onPreviousViewOnly,
-        routes.FinancialDetailsCheckYourAnswersController
-          .onPageLoadViewOnly(srn, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
-      ).withName(
-        "Submit previous view only redirects to FinancialDetailsCheckYourAnswersController for the previous submission"
-      )
-    )
   }
   private def mockTaxYear(
     taxYear: DateRange

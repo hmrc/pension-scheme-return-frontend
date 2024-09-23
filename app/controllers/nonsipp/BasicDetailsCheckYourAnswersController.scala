@@ -72,10 +72,10 @@ class BasicDetailsCheckYourAnswersController @Inject()(
     mode: Mode,
     year: String,
     current: Int,
-    previous: Int,
-    showBackLink: Boolean
+    previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous).async { implicit request =>
+      val showBackLink = true
       onPageLoadCommon(srn, mode, showBackLink)
     }
 
@@ -185,13 +185,9 @@ class BasicDetailsCheckYourAnswersController @Inject()(
   def onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] = {
     val newCurrent = (current - 1).max(0)
     val newPrevious = (previous - 1).max(0)
-    identifyAndRequireData(srn, ViewOnlyMode, year, newCurrent, newPrevious).async {
-      Future.successful(
-        Redirect(
-          controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
-            .onPageLoadViewOnly(srn, year, newCurrent, newPrevious, showBackLink = false)
-        )
-      )
+    identifyAndRequireData(srn, ViewOnlyMode, year, newCurrent, newPrevious).async { implicit request =>
+      val showBackLink = false
+      onPageLoadCommon(srn, ViewOnlyMode, showBackLink)
     }
   }
 

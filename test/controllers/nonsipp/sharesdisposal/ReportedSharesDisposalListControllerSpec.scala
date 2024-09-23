@@ -56,8 +56,7 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
       1,
       yearString,
       submissionNumberTwo,
-      submissionNumberOne,
-      showBackLink = true
+      submissionNumberOne
     )
   private lazy val onPreviousViewOnly =
     controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController.onPreviousViewOnly(
@@ -254,15 +253,6 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
         .withName("Submit redirects to view only taskList")
     )
 
-    act.like(
-      redirectToPage(
-        onPreviousViewOnly,
-        controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
-      )
-    )
   }
 
 }

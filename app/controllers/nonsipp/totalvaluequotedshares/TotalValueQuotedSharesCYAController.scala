@@ -67,10 +67,10 @@ class TotalValueQuotedSharesCYAController @Inject()(
     srn: Srn,
     year: String,
     current: Int,
-    previous: Int,
-    showBackLink: Boolean = true
+    previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, ViewOnlyMode, year, current, previous) { implicit request =>
+      val showBackLink = true
       val viewOnlyViewModel = ViewOnlyViewModel(
         viewOnlyUpdated = request.previousUserAnswers match {
           case Some(previousUserAnswers) =>
@@ -97,15 +97,40 @@ class TotalValueQuotedSharesCYAController @Inject()(
       onPageLoadCommon(srn, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
     }
 
-  def onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn, ViewOnlyMode, year, current, previous).async {
-      Future.successful(
-        Redirect(
-          routes.TotalValueQuotedSharesCYAController
-            .onPageLoadViewOnly(srn, year, (current - 1).max(0), (previous - 1).max(0), showBackLink = false)
-        )
+  def onPreviousViewOnly(
+    srn: Srn,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] = identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) {
+    implicit request =>
+      val showBackLink = false
+      val viewOnlyViewModel = ViewOnlyViewModel(
+        viewOnlyUpdated = request.previousUserAnswers match {
+          case Some(previousUserAnswers) =>
+            val updated = getCompletedOrUpdatedTaskListStatus(
+              request.userAnswers,
+              previousUserAnswers,
+              Paths.quotedShares
+            ) == Updated
+            logger.info(s"""[ViewOnlyMode] Status for quoted shares is ${if (updated) "updated"
+            else "not updated"}""")
+            updated
+          case None =>
+            logger.info(
+              s"[ViewOnlyMode] no previous submission version, Status for quoted shares is not updated"
+            )
+            false
+          case _ => false
+        },
+        year = year,
+        currentVersion = (current - 1).max(0),
+        previousVersion = (previous - 1).max(0),
+        compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
       )
-    }
+      onPageLoadCommon(srn, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
+  }
+
   private def onPageLoadCommon(
     srn: Srn,
     mode: Mode,

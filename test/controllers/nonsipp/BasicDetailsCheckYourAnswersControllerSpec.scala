@@ -58,8 +58,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
     srn,
     yearString,
     submissionNumberTwo,
-    submissionNumberOne,
-    showBackLink = true
+    submissionNumberOne
   )
   private lazy val onSubmitViewOnly = routes.BasicDetailsCheckYourAnswersController.onSubmitViewOnly(
     srn,
@@ -639,16 +638,6 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
           verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any())
         }
         .withName("OnPageLoadViewOnly renders ok with byPassed journey button")
-    )
-
-    act.like(
-      redirectToPage(
-        onPreviousViewOnly,
-        routes.BasicDetailsCheckYourAnswersController
-          .onPageLoadViewOnly(srn, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
-      ).withName(
-        "Submit previous view only redirects to BasicDetailsCheckYourAnswersController for the previous submission"
-      )
     )
 
     act.like(

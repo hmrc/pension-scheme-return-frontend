@@ -76,9 +76,9 @@ class EmployerContributionsMemberListController @Inject()(
     mode: Mode,
     year: String,
     current: Int,
-    previous: Int,
-    showBackLink: Boolean
+    previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    val showBackLink = true
     onPageLoadCommon(srn, page, mode, showBackLink)
   }
 
@@ -208,14 +208,16 @@ class EmployerContributionsMemberListController @Inject()(
       )
     }
 
-  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0), showBackLink = false)
-        )
-      )
+  def onPreviousViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) { implicit request =>
+      val showBackLink = false
+      onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
   private def buildEmployerContributions(srn: Srn, indexes: List[(Max300, Option[NameDOB])])(
@@ -376,7 +378,7 @@ object EmployerContributionsMemberListController {
       call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
         case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
           controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion, showBackLink = true)
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
         case _ =>
           controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
             .onPageLoad(srn, _, NormalMode)

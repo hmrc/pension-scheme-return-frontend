@@ -55,8 +55,7 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
       1,
       yearString,
       submissionNumberTwo,
-      submissionNumberOne,
-      showBackLink = true
+      submissionNumberOne
     )
   private lazy val onPreviousViewOnly =
     routes.ReportedOtherAssetsDisposalListController.onPreviousViewOnly(
@@ -247,14 +246,34 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectToPage(
+      renderView(
         onPreviousViewOnly,
-        controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
+        userAnswers = currentUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[ListView].apply(
+          form(new YesNoPageFormProvider()),
+          viewModel(
+            srn,
+            mode = ViewOnlyMode,
+            page,
+            otherAssetsDisposalsWithIndexes,
+            completedUserAnswers,
+            schemeName,
+            viewOnlyViewModel = Some(
+              viewOnlyViewModel.copy(
+                currentVersion = submissionNumberOne,
+                previousVersion = submissionNumberZero
+              )
+            ),
+            showBackLink = false
+          )
+        )
+      }.withName(
+        "onPreviousViewOnly renders the view with the correct parameters for the previous submission"
       )
     )
+
   }
 
 }

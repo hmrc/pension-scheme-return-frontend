@@ -73,9 +73,9 @@ class SharesListController @Inject()(
     mode: Mode,
     year: String,
     current: Int,
-    previous: Int,
-    showBackLink: Boolean
+    previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    val showBackLink = true
     val viewOnlyViewModel = ViewOnlyViewModel(
       viewOnlyUpdated = request.previousUserAnswers match {
         case Some(previousUserAnswers) =>
@@ -190,15 +190,32 @@ class SharesListController @Inject()(
       )
     }
 
-  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          controllers.nonsipp.shares.routes.SharesListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0), showBackLink = false)
-        )
+  def onPreviousViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] = identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) {
+    implicit request =>
+      val showBackLink = false
+      val viewOnlyViewModel = ViewOnlyViewModel(
+        viewOnlyUpdated = request.previousUserAnswers match {
+          case Some(previousUserAnswers) =>
+            getCompletedOrUpdatedTaskListStatus(
+              request.userAnswers,
+              previousUserAnswers,
+              pages.nonsipp.shares.Paths.shareTransactions
+            ) == Updated
+          case _ => false
+        },
+        year = year,
+        currentVersion = (current - 1).max(0),
+        previousVersion = (previous - 1).max(0),
+        compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
       )
-    }
+      onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
+  }
 
   private def sharesData(srn: Srn, indexes: List[Max5000])(
     implicit req: DataRequest[_]
@@ -314,7 +331,7 @@ object SharesListController {
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.SharesListController
-            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion, showBackLink = true)
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
         case _ =>
           routes.SharesListController.onPageLoad(srn, _, NormalMode)
       }

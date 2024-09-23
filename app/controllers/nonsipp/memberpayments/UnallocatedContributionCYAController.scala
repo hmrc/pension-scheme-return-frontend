@@ -61,10 +61,10 @@ class UnallocatedContributionCYAController @Inject()(
     mode: Mode,
     year: String,
     current: Int,
-    previous: Int,
-    showBackLink: Boolean
+    previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+      val showBackLink = true
       onPageLoadCommon(srn, mode, showBackLink)
     }
 
@@ -116,14 +116,15 @@ class UnallocatedContributionCYAController @Inject()(
       Future.successful(Redirect(routes.ViewOnlyTaskListController.onPageLoad(srn, year, current, previous)))
     }
 
-  def onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn, ViewOnlyMode, year, current, previous).async {
-      Future.successful(
-        Redirect(
-          controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-            .onPageLoadViewOnly(srn, year, (current - 1).max(0), (previous - 1).max(0), showBackLink = false)
-        )
-      )
+  def onPreviousViewOnly(
+    srn: Srn,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) { implicit request =>
+      val showBackLink = false
+      onPageLoadCommon(srn, ViewOnlyMode, showBackLink)
     }
 
 }
