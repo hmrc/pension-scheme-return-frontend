@@ -32,6 +32,6 @@ tmp
 bin
 /*.iml
 /*.ipr
-/.classpath
 *.iws
 /.bsp/sbt.json
+/.java-version
