@@ -109,7 +109,7 @@ class CheckMemberDetailsFileController @Inject()(
                 }
                 validated <- {
                   auditDownload(srn, source._1, startTime)
-                  uploadValidator.validateCSV(source._2, srn, request, None)
+                  uploadValidator.validateCSV(source._2, None)
                 }
                 _ <- {
                   auditValidation(srn, validated)

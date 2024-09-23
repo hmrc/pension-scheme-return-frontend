@@ -34,7 +34,6 @@ import views.html.TaskListView
 import models.SchemeId.Srn
 import pages.nonsipp.{CompilationOrSubmissionDatePage, WhichTaxYearPage}
 import play.api.Logger
-import utils.nonsipp.TaskListUtils.evaluateReadyForSubmissionTotalTuple
 import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models._
 import viewmodels.DisplayMessage._
@@ -106,10 +105,10 @@ object ViewOnlyTaskListController {
       .fold(Message(""))(date => Message("site.submittedOn", date.show))
 
     val sectionListWithoutDeclaration = List(
-      schemeDetailsSection(schemeName, currentUA, previousUA, srn, year, currentVersion, previousVersion),
-      membersSection(schemeName, currentUA, previousUA, srn, year, currentVersion, previousVersion),
+      schemeDetailsSection(currentUA, previousUA, srn, year, currentVersion, previousVersion),
+      membersSection(currentUA, previousUA, srn, year, currentVersion, previousVersion),
       memberPaymentsSection(currentUA, previousUA, srn, year, currentVersion, previousVersion),
-      loansSection(schemeName, currentUA, previousUA, srn, year, currentVersion, previousVersion),
+      loansSection(currentUA, previousUA, srn, year, currentVersion, previousVersion),
       sharesSection(currentUA, previousUA, srn, year, currentVersion, previousVersion),
       landOrPropertySection(currentUA, previousUA, srn, year, currentVersion, previousVersion),
       bondsSection(currentUA, previousUA, srn, year, currentVersion, previousVersion),
@@ -127,8 +126,6 @@ object ViewOnlyTaskListController {
       sectionListWithoutDeclaration.tail :+ declarationSectionViewModel: _*
     )
 
-    val (numSectionsSubmitted, numSectionsTotal) = evaluateReadyForSubmissionTotalTuple(viewModel.sections.toList)
-
     PageViewModel(
       Message("nonsipp.tasklist.title", dateRange.from.show, dateRange.to.show),
       Message("nonsipp.tasklist.heading", dateRange.from.show, dateRange.to.show),
@@ -143,7 +140,6 @@ object ViewOnlyTaskListController {
 //--Scheme details----------------------------------------------------------------------------------------------------//
 
   private def schemeDetailsSection(
-    schemeName: String,
     currentUA: UserAnswers,
     previousUA: UserAnswers,
     srn: Srn,
@@ -155,7 +151,6 @@ object ViewOnlyTaskListController {
     TaskListSectionViewModel(
       s"$prefix.title",
       getBasicSchemeDetailsTaskListItem(
-        schemeName,
         prefix,
         currentUA,
         previousUA,
@@ -165,7 +160,6 @@ object ViewOnlyTaskListController {
         previousVersion
       ),
       getFinancialDetailsTaskListItem(
-        schemeName,
         prefix,
         currentUA,
         previousUA,
@@ -178,7 +172,6 @@ object ViewOnlyTaskListController {
   }
 
   private def getBasicSchemeDetailsTaskListItem(
-    schemeName: String,
     prefix: String,
     currentUA: UserAnswers,
     previousUA: UserAnswers,
@@ -198,7 +191,6 @@ object ViewOnlyTaskListController {
     )
 
   private def getFinancialDetailsTaskListItem(
-    schemeName: String,
     prefix: String,
     currentUA: UserAnswers,
     previousUA: UserAnswers,
@@ -220,7 +212,6 @@ object ViewOnlyTaskListController {
 //--Members-----------------------------------------------------------------------------------------------------------//
 
   private def membersSection(
-    schemeName: String,
     currentUA: UserAnswers,
     previousUA: UserAnswers,
     srn: Srn,
@@ -390,7 +381,6 @@ object ViewOnlyTaskListController {
 //--Loans made and money borrowed-------------------------------------------------------------------------------------//
 
   private def loansSection(
-    schemeName: String,
     currentUA: UserAnswers,
     previousUA: UserAnswers,
     srn: Srn,

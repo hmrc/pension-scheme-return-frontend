@@ -119,7 +119,7 @@ object TaskListController {
     endDate: LocalDate,
     userAnswers: UserAnswers,
     pensionSchemeId: PensionSchemeId,
-    hasHistory: Boolean = false,
+    hasHistory: Boolean,
     noChangesSincePreviousVersion: Boolean
   ): PageViewModel[TaskListViewModel] = {
 

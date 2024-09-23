@@ -79,6 +79,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       dateRange.to,
       populatedUserAnswers,
       pensionSchemeId,
+      hasHistory = false,
       noChangesSincePreviousVersion = false
     )
     lazy val onPageLoad = routes.TaskListController.onPageLoad(srn)
@@ -1085,6 +1086,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       dateRange.to,
       userAnswersPopulated,
       pensionSchemeId,
+      hasHistory = false,
       noChangesSincePreviousVersion = false
     )
     val sections = customViewModel.page.sections.toList
