@@ -72,11 +72,11 @@ class SchemeMembersListController @Inject()(
     page: Int,
     year: String,
     current: Int,
-    previous: Int,
-    showBackLink: Option[Boolean]
+    previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, ViewOnlyMode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, page, ManualOrUpload.Manual, ViewOnlyMode, showBackLink.getOrElse(true))
+      val showBackLink = true
+      onPageLoadCommon(srn, page, ManualOrUpload.Manual, ViewOnlyMode, showBackLink)
     }
 
   def onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode): Action[AnyContent] =
@@ -84,21 +84,16 @@ class SchemeMembersListController @Inject()(
       onPageLoadCommon(srn, page, manualOrUpload, mode, showBackLink = true)
     }
 
-  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-            .onPageLoadViewOnly(
-              srn,
-              page,
-              year,
-              (current - 1).max(0),
-              (previous - 1).max(0),
-              showBackLink = Some(false)
-            )
-        )
-      )
+  def onPreviousViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) { implicit request =>
+      val showBackLink = false
+      onPageLoadCommon(srn, page, ManualOrUpload.Manual, ViewOnlyMode, showBackLink)
     }
 
   def onPageLoadCommon(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode, showBackLink: Boolean)(
@@ -302,7 +297,7 @@ object SchemeMembersListController {
       call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
         case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
           routes.SchemeMembersListController
-            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion, Some(showBackLink))
+            .onPreviousViewOnly(srn, _, year, currentVersion, previousVersion)
         case _ =>
           routes.SchemeMembersListController.onPageLoad(srn, _, manualOrUpload)
       }

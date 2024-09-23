@@ -124,7 +124,7 @@ class MoneyBorrowedCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
-            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
+            .onPageLoadViewOnly(srn, page, year, current, previous)
         )
       )
     }

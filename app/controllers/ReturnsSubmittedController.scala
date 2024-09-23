@@ -138,8 +138,7 @@ class ReturnsSubmittedController @Inject()(
             srn,
             year,
             current,
-            previous,
-            showBackLink = true
+            previous
           )
         )
       val regularJourney = Redirect(

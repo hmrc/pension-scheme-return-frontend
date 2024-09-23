@@ -43,8 +43,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
     1,
     yearString,
     submissionNumberTwo,
-    submissionNumberOne,
-    showBackLink = true
+    submissionNumberOne
   )
   lazy val onPreviousViewOnly: Call = routes.SchemeMembersListController.onPreviousViewOnly(
     srn,
@@ -282,7 +281,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
         redirectToPage(
           onPreviousViewOnly,
           routes.SchemeMembersListController
-            .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
+            .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
         ).withName(
           "Submit previous view only redirects to the controller with parameters for the previous submission"
         )

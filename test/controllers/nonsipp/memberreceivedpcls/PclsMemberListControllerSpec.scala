@@ -58,8 +58,7 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
     1,
     yearString,
     submissionNumberTwo,
-    submissionNumberOne,
-    showBackLink = true
+    submissionNumberOne
   )
   private lazy val onPreviousViewOnly = routes.PclsMemberListController.onPreviousViewOnly(
     srn,
@@ -325,7 +324,7 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onPreviousViewOnly,
         controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
       ).withName(
         "Submit previous view only redirects to the controller with parameters for the previous submission"
       )

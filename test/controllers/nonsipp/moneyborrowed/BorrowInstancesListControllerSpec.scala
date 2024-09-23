@@ -60,8 +60,7 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
       1,
       yearString,
       submissionNumberTwo,
-      submissionNumberOne,
-      showBackLink = true
+      submissionNumberOne
     )
   private lazy val onPreviousViewOnly =
     controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPreviousViewOnly(
@@ -227,7 +226,7 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
       redirectToPage(
         onPreviousViewOnly,
         controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero, showBackLink = false)
+          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
       ).withName(
         "Submit previous view only redirects to the controller with parameters for the previous submission"
       )

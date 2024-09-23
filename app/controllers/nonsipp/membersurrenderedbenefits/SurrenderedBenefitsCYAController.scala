@@ -141,7 +141,7 @@ class SurrenderedBenefitsCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
-            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
+            .onPageLoadViewOnly(srn, page, year, current, previous)
         )
       )
     }

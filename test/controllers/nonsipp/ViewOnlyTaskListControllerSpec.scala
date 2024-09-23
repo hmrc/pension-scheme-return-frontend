@@ -516,7 +516,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
               expectedLinkContentKey = "nonsipp.tasklist.schemedetails.view.details.title",
               expectedLinkUrl = controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
-                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -531,7 +531,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
               expectedLinkContentKey = "nonsipp.tasklist.schemedetails.view.details.title",
               expectedLinkUrl = controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
-                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -549,7 +549,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
               expectedLinkContentKey = "nonsipp.tasklist.schemedetails.view.finances.title",
               expectedLinkUrl = controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
-                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -564,7 +564,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
               expectedLinkContentKey = "nonsipp.tasklist.schemedetails.view.finances.title",
               expectedLinkUrl = controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
-                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -588,8 +588,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
                 page = 1,
                 yearString,
                 submissionNumberTwo,
-                submissionNumberOne,
-                showBackLink = true
+                submissionNumberOne
               )
               .url
           )
@@ -610,8 +609,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
                 page = 1,
                 yearString,
                 submissionNumberTwo,
-                submissionNumberOne,
-                showBackLink = true
+                submissionNumberOne
               )
               .url
           )
@@ -633,7 +631,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.employercontributions.title",
               expectedLinkUrl =
                 controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-                  .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                  .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                   .url
             )
           }
@@ -649,7 +647,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.employercontributions.title",
               expectedLinkUrl =
                 controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-                  .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                  .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                   .url
             )
           }
@@ -667,7 +665,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.unallocatedcontributions.title",
               expectedLinkUrl = controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -682,7 +680,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.unallocatedcontributions.title",
               expectedLinkUrl = controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -700,7 +698,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.memberContributions.title",
               expectedLinkUrl = controllers.nonsipp.membercontributions.routes.MemberContributionListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -715,7 +713,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.memberContributions.title",
               expectedLinkUrl = controllers.nonsipp.membercontributions.routes.MemberContributionListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -732,7 +730,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.transfersreceived.title",
               expectedLinkUrl = controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -747,7 +745,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.transfersreceived.title",
               expectedLinkUrl = controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -765,7 +763,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.transfersout.title",
               expectedLinkUrl = controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -780,7 +778,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.transfersout.title",
               expectedLinkUrl = controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -798,7 +796,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.pcls.title",
               expectedLinkUrl = controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -813,7 +811,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.pcls.title",
               expectedLinkUrl = controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -831,7 +829,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.payments.title",
               expectedLinkUrl = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -846,7 +844,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.memberpayments.title",
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.payments.title",
               expectedLinkUrl = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -865,7 +863,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.surrenderedbenefits.title",
               expectedLinkUrl =
                 controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
-                  .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                  .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                   .url
             )
           }
@@ -881,7 +879,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedLinkContentKey = "nonsipp.tasklist.memberpayments.view.surrenderedbenefits.title",
               expectedLinkUrl =
                 controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
-                  .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                  .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                   .url
             )
           }
@@ -902,7 +900,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.loans.title",
               expectedLinkContentKey = "nonsipp.tasklist.loans.view.loansmade.title",
               expectedLinkUrl = controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -917,7 +915,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.loans.title",
               expectedLinkContentKey = "nonsipp.tasklist.loans.view.loansmade.title",
               expectedLinkUrl = controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -935,7 +933,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.loans.title",
               expectedLinkContentKey = "nonsipp.tasklist.loans.view.moneyborrowed.title",
               expectedLinkUrl = controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -950,7 +948,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.loans.title",
               expectedLinkContentKey = "nonsipp.tasklist.loans.view.moneyborrowed.title",
               expectedLinkUrl = controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -971,7 +969,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.shares.title",
               expectedLinkContentKey = "nonsipp.tasklist.shares.view.sponsoringemployer.title",
               expectedLinkUrl = controllers.nonsipp.shares.routes.SharesListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -986,7 +984,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.shares.title",
               expectedLinkContentKey = "nonsipp.tasklist.shares.view.sponsoringemployer.title",
               expectedLinkUrl = controllers.nonsipp.shares.routes.SharesListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -1050,7 +1048,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.shares.title",
               expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.view.title",
               expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -1065,7 +1063,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.shares.title",
               expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.view.title",
               expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -1083,7 +1081,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.quotedshares.title",
               expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
-                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -1098,7 +1096,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.quotedshares.title",
               expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
-                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -1119,7 +1117,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.landorproperty.title",
               expectedLinkContentKey = "nonsipp.tasklist.landorproperty.view.title",
               expectedLinkUrl = controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -1134,7 +1132,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.landorproperty.title",
               expectedLinkContentKey = "nonsipp.tasklist.landorproperty.view.title",
               expectedLinkUrl = controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -1203,8 +1201,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
                   page = 1,
                   yearString,
                   current = submissionNumberTwo,
-                  previous = submissionNumberOne,
-                  showBackLink = true
+                  previous = submissionNumberOne
                 )
                 .url
             )
@@ -1225,8 +1222,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
                   page = 1,
                   yearString,
                   current = submissionNumberTwo,
-                  previous = submissionNumberOne,
-                  showBackLink = true
+                  previous = submissionNumberOne
                 )
                 .url
             )
@@ -1248,7 +1244,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.bonds.title",
               expectedLinkContentKey = "nonsipp.tasklist.bonds.view.unregulatedorconnected.title",
               expectedLinkUrl = controllers.nonsipp.bonds.routes.BondsListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -1263,7 +1259,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.bonds.title",
               expectedLinkContentKey = "nonsipp.tasklist.bonds.view.unregulatedorconnected.title",
               expectedLinkUrl = controllers.nonsipp.bonds.routes.BondsListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -1327,7 +1323,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.bonds.title",
               expectedLinkContentKey = "nonsipp.tasklist.bonds.view.bondsdisposal.title",
               expectedLinkUrl = controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -1342,7 +1338,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.bonds.title",
               expectedLinkContentKey = "nonsipp.tasklist.bonds.view.bondsdisposal.title",
               expectedLinkUrl = controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -1363,7 +1359,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.title",
               expectedLinkUrl = controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -1378,7 +1374,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassets.view.title",
               expectedLinkUrl = controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -1442,7 +1438,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.view.title",
               expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }
@@ -1457,7 +1453,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
               expectedTitleKey = "nonsipp.tasklist.otherassets.title",
               expectedLinkContentKey = "nonsipp.tasklist.otherassetsdisposal.view.title",
               expectedLinkUrl = controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne, showBackLink = true)
+                .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
                 .url
             )
           }

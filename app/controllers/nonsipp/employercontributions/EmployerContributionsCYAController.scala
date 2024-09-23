@@ -144,7 +144,7 @@ class EmployerContributionsCYAController @Inject()(
       Future.successful(
         Redirect(
           controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-            .onPageLoadViewOnly(srn, page, year, current, previous, showBackLink = true)
+            .onPageLoadViewOnly(srn, page, year, current, previous)
         )
       )
     }
