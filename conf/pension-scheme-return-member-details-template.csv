@@ -1,2 +1,28 @@
-First name,Last name,National Insurance number,Reason for no National Insurance number,Date of birth
-John,Smith,QQ123456C,e.g. Under 16,01/01/1970
+"What you need to do  
+
+Enter your data from row 3 onwards.
+
+Complete the questions per member marked horizontally across the columns. ",First name of scheme member (mandatory),Last name of scheme member (mandatory),Member National Insurance number,"If no National Insurance number for member, give reason",Member date of birth (mandatory)
+"Question help information. 
+
+Questions that are mandatory are stated. Notes and hint text is underneath each question to help make sure that there are no errors in the template file upload.
+","Enter the first name of the scheme member. 
+
+Must only include letters a to z, hyphens, apostrophes and spaces. Hyphens are accepted.
+
+Mandatory question.","Enter the last name of the scheme member. 
+
+Must only include letters a to z, hyphens, apostrophes and spaces. Hyphens are accepted.
+
+Mandatory question.","Enter the individuals National Insurance number. 
+If you do not know this, add the reason why you do not have this in the next column. 
+
+9 characters in alphanumeric in the format for example: QQ123456B.
+
+Mandatory question.","Enter reason for not having the members National Insurance number.
+
+Maximum of 160 characters.
+
+Mandatory question if no National Insurance number.","Use the format 21/01/1970.
+
+Mandatory question."

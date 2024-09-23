@@ -17,13 +17,12 @@
 package controllers.nonsipp.memberdetails
 
 import play.api.mvc._
-import play.api.Configuration
 
 import scala.concurrent.ExecutionContext
 
 import javax.inject.Inject
 
-class DownloadPensionSchemeTemplateController @Inject()(config: Configuration, cc: ControllerComponents)(
+class DownloadPensionSchemeTemplateController @Inject()(cc: ControllerComponents)(
   implicit ec: ExecutionContext
 ) extends AbstractController(cc) {
 

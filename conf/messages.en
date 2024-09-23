@@ -1047,7 +1047,7 @@ uploadMemberDetails.error.size = The selected file must be smaller than {0}
 howToUpload.title = Download template file
 howToUpload.heading = Download template file
 howToUpload.linkMessage = Download the template .csv file
-howToUpload.linkMessage1 = and use this to enter the information. Do not change or delete the header row (row 1) or change the order of the columns in the template file.
+howToUpload.linkMessage1 = and use this to enter the information. Do not change or delete the header row (row 1) or the guidance text row (row 2), or change the order of the columns in the template file.
 
 checkMemberDetailsFile.title = Check your member details file
 checkMemberDetailsFile.heading = Check your member details file
@@ -1378,8 +1378,8 @@ partnershipRecipientName.error.invalid.characters = Recipient’s partnership na
 
 fileUploadTooManyRows.title = Your member details file has too many rows
 fileUploadTooManyRows.heading = Your member details file has too many rows
-fileUploadTooManyRows.paragraph1 = We cannot accept the file you uploaded as it contains too many rows. The maximum number of rows it can have is 300.
-fileUploadTooManyRows.paragraph2 = Remove the additional rows and upload it again, or upload a different file.
+fileUploadTooManyRows.paragraph1 = We cannot accept the file you uploaded as it contains too many rows. The maximum number of data rows you can add is 300.
+fileUploadTooManyRows.paragraph2 = Remove the additional rows and upload it again, or upload a different file. Do not delete rows 1 and 2.
 
 loanRecipient.partnershipRecipientUtr.title = Do you know the recipient’s Unique Taxpayer Reference (UTR)?
 loanRecipient.partnershipRecipientUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?

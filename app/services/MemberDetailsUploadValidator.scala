@@ -85,8 +85,6 @@ class MemberDetailsUploadValidator @Inject()(
 
   def validateCSV(
     source: Source[ByteString, _],
-    srn: Srn,
-    request: DataRequest[AnyContent],
     validDateThreshold: Option[LocalDate]
   )(implicit mat: Materializer, messages: Messages): Future[(Upload, Int, Long)] = {
     val startTime = System.currentTimeMillis
@@ -97,21 +95,19 @@ class MemberDetailsUploadValidator @Inject()(
       header = csvHeader.zipWithIndex
         .map { case (key, index) => CsvHeaderKey(key, indexToCsvKey(index), index) }
       validated <- csvFrames
-        .drop(1) // drop csv header and process rows
+        .drop(2) // drop csv header + first example row
         .statefulMap[UploadState, Upload](() => UploadState.init)(
           (state, bs) => {
             counter.incrementAndGet()
             if (state.row > Constants.maxSchemeMembers) {
               state.next() -> UploadMaxRowsError
             } else {
-              val parts = bs.map(_.utf8String)
+              val parts = bs.map(_.utf8String).drop(1) // drops the first column
               validateMemberDetails(
                 header,
                 parts,
                 state.previousNinos,
                 state.row,
-                srn,
-                request,
                 validDateThreshold: Option[LocalDate]
               ) match {
                 case None => state.next() -> UploadFormatError
@@ -153,8 +149,6 @@ class MemberDetailsUploadValidator @Inject()(
     csvData: List[String],
     previousNinos: List[Nino],
     row: Int,
-    srn: Srn,
-    request: DataRequest[AnyContent],
     validDateThreshold: Option[LocalDate]
   )(implicit messages: Messages): Option[ValidatedNel[ValidationError, UploadMemberDetails]] =
     for {
@@ -163,7 +157,7 @@ class MemberDetailsUploadValidator @Inject()(
       dob <- getCSVValue(UploadKeys.dateOfBirth, headerKeys, csvData)
       maybeNino <- getOptionalCSVValue(UploadKeys.nino, headerKeys, csvData)
       maybeNoNinoReason <- getOptionalCSVValue(UploadKeys.reasonForNoNino, headerKeys, csvData)
-      validatedNameDOB <- validateNameDOB(firstName, lastName, dob, row, srn, request, validDateThreshold)
+      validatedNameDOB <- validateNameDOB(firstName, lastName, dob, row, validDateThreshold)
       memberFullName = s"${firstName.value} ${lastName.value}"
       maybeValidatedNino = maybeNino.value.flatMap { nino =>
         validateNino(maybeNino.as(nino), memberFullName, previousNinos, row)
@@ -186,8 +180,6 @@ class MemberDetailsUploadValidator @Inject()(
     lastName: CsvValue[String],
     dob: CsvValue[String],
     row: Int,
-    srn: Srn,
-    request: DataRequest[AnyContent],
     validDateThreshold: Option[LocalDate]
   )(implicit messages: Messages): Option[ValidatedNel[ValidationError, NameDOB]] = {
     val dobDayKey = s"${nameDOBFormProvider.dateOfBirth}.day"
@@ -337,7 +329,9 @@ class MemberDetailsUploadValidator @Inject()(
   ): Option[CsvValue[Option[String]]] =
     headerKeys
       .find(_.key.toLowerCase() == key.toLowerCase())
-      .map(foundKey => CsvValue(foundKey, csvData.get(foundKey.index).flatMap(s => if (s.isEmpty) None else Some(s))))
+      .map(
+        foundKey => CsvValue(foundKey, csvData.get(foundKey.index - 1).flatMap(s => if (s.isEmpty) None else Some(s)))
+      )
 
   private def formToResult[A](
     form: Form[A],
@@ -363,10 +357,14 @@ class MemberDetailsUploadValidator @Inject()(
     )
 
   private def indexToCsvKey(index: Int): String =
-    if (index == 0) aToZ.head.toString
-    else {
+    if (index == 0) {
+      aToZ.head.toString
+    } else {
       val (quotient, remainder) = index /% aToZ.size
-      if (quotient == 0) aToZ(remainder).toString
-      else indexToCsvKey(quotient - 1) + indexToCsvKey(remainder)
+      if (quotient == 0) {
+        aToZ(remainder).toString
+      } else {
+        indexToCsvKey(quotient - 1) + indexToCsvKey(remainder)
+      }
     }
 }
