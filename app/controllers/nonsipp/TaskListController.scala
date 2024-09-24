@@ -17,6 +17,7 @@
 package controllers.nonsipp
 
 import services.PsrVersionsService
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
@@ -24,12 +25,14 @@ import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
 import cats.implicits.toShow
 import controllers.actions._
+import pages.nonsipp.accountingperiod.AccountingPeriods
 import models.backend.responses.ReportStatus
 import viewmodels.models.TaskListStatus._
 import play.api.i18n.MessagesApi
+import models.requests.DataRequest
 import views.html.TaskListView
 import models.SchemeId.Srn
-import pages.nonsipp.{CompilationOrSubmissionDatePage, WhichTaxYearPage}
+import pages.nonsipp.{CheckReturnDatesPage, CompilationOrSubmissionDatePage, WhichTaxYearPage}
 import utils.nonsipp.TaskListUtils._
 import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models._
@@ -50,37 +53,54 @@ class TaskListController @Inject()(
     extends PSRController {
 
   def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    request.userAnswers.get(WhichTaxYearPage(srn)) match {
-      case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      case Some(dates) =>
-        for {
-          response <- psrVersionsService.getVersions(request.schemeDetails.pstr, formatDateForApi(dates.from), srn)
-          hasHistory = response
-            .exists(
-              psrVersionsResponse =>
-                psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndInProgress
-                  || psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndSuccessfullyProcessed
-            )
-          noChangesSincePreviousVersion = if (!hasHistory || request.previousUserAnswers.isEmpty) {
-            true
-          } else {
-            userAnswersUnchangedAllSections(
-              request.userAnswers,
-              request.previousUserAnswers.get
-            )
-          }
-          viewModel = TaskListController.viewModel(
-            srn,
-            request.schemeDetails.schemeName,
-            dates.from,
-            dates.to,
-            request.userAnswers,
-            request.pensionSchemeId,
-            hasHistory,
-            noChangesSincePreviousVersion
+    withCompletedBasicDetails(srn) { dates =>
+      for {
+        response <- psrVersionsService.getVersions(request.schemeDetails.pstr, formatDateForApi(dates.from), srn)
+        hasHistory = response
+          .exists(
+            psrVersionsResponse =>
+              psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndInProgress
+                || psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndSuccessfullyProcessed
           )
-        } yield Ok(view(viewModel, request.schemeDetails.schemeName))
+        noChangesSincePreviousVersion = if (!hasHistory || request.previousUserAnswers.isEmpty) {
+          true
+        } else {
+          userAnswersUnchangedAllSections(
+            request.userAnswers,
+            request.previousUserAnswers.get
+          )
+        }
+        viewModel = TaskListController.viewModel(
+          srn,
+          request.schemeDetails.schemeName,
+          dates.from,
+          dates.to,
+          request.userAnswers,
+          request.pensionSchemeId,
+          hasHistory,
+          noChangesSincePreviousVersion
+        )
+      } yield Ok(view(viewModel, request.schemeDetails.schemeName))
     }
+  }
+
+  private def withCompletedBasicDetails(
+    srn: Srn
+  )(f: DateRange => Future[Result])(implicit request: DataRequest[_]): Future[Result] = {
+    val basicDetails: Option[DateRange] = for {
+      _ <- request.userAnswers.get(CheckReturnDatesPage(srn)).flatMap {
+        case false => request.userAnswers.get(AccountingPeriods(srn))
+        case _ => Some(())
+      }
+      _ <- request.userAnswers.get(ActiveBankAccountPage(srn)).flatMap {
+        case false => request.userAnswers.get(WhyNoBankAccountPage(srn))
+        case _ => Some(())
+      }
+      _ <- request.userAnswers.get(HowManyMembersPage.bySrn(srn))
+      dates <- request.userAnswers.get(WhichTaxYearPage(srn))
+    } yield dates
+
+    basicDetails.fold(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))(f)
   }
 }
 

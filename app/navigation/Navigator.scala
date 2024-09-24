@@ -16,10 +16,15 @@
 
 package navigation
 
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
 import play.api.mvc.Call
 import pages._
+import models.SchemeId.Srn
 import controllers.nonsipp.routes
+import pages.nonsipp.accountingperiod.AccountingPeriods
+import utils.nonsipp.TaskListStatusUtils
 import models._
+import viewmodels.models.TaskListStatus
 import models.requests.DataRequest
 import pages.nonsipp.CheckReturnDatesPage
 import play.api.libs.json.JsObject
@@ -32,17 +37,14 @@ class RootNavigator @Inject()() extends Navigator {
   val journeys: List[JourneyNavigator] =
     List(new JourneyNavigator {
       override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
-        case WhatYouWillNeedPage(srn) => {
+        case WhatYouWillNeedPage(srn) =>
           val isDataEmpty = userAnswers.data.decryptedValue == JsObject.empty
-          val isCheckReturnDatesPage = userAnswers.get(CheckReturnDatesPage(srn))
-          if (isDataEmpty) {
-            routes.WhichTaxYearController.onPageLoad(srn, NormalMode)
-          } else if (isCheckReturnDatesPage.isEmpty) {
+          val isCheckReturnDatesPageEmpty = userAnswers.get(CheckReturnDatesPage(srn)).isEmpty
+          if (isDataEmpty || isCheckReturnDatesPageEmpty || isBasicDetailsIncomplete(srn, userAnswers)) {
             routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
           } else {
             controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
           }
-        }
       }
 
       override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
@@ -52,6 +54,15 @@ class RootNavigator @Inject()() extends Navigator {
   override def defaultNormalMode: Call = controllers.routes.IndexController.onPageLoad()
 
   override def defaultCheckMode: Call = controllers.routes.IndexController.onPageLoad()
+
+  private def isBasicDetailsIncomplete(srn: Srn, userAnswers: UserAnswers): Boolean =
+    TaskListStatusUtils.getBasicDetailsTaskListStatus(
+      userAnswers.get(CheckReturnDatesPage(srn)),
+      userAnswers.get(AccountingPeriods(srn)),
+      userAnswers.get(ActiveBankAccountPage(srn)),
+      userAnswers.get(WhyNoBankAccountPage(srn)),
+      userAnswers.get(HowManyMembersPage.bySrn(srn))
+    ) == TaskListStatus.InProgress
 }
 
 trait Navigator {

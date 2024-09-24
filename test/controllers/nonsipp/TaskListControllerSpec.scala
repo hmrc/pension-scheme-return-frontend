@@ -65,14 +65,19 @@ class TaskListControllerSpec extends ControllerBaseSpec {
   }
 
   "TaskListController" - {
-    val populatedUserAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
+    val populatedUserAnswers = defaultUserAnswers
+      .unsafeSet(WhichTaxYearPage(srn), dateRange)
+      .unsafeSet(CheckReturnDatesPage(srn), true)
+      .unsafeSet(ActiveBankAccountPage(srn), true)
+      .unsafeSet(HowManyMembersPage.bySrn(srn), schemeMemberNumbers)
+      .unsafeSet(WhichTaxYearPage(srn), dateRange)
 
     lazy val viewModel = TaskListController.viewModel(
       srn,
       schemeName,
       dateRange.from,
       dateRange.to,
-      defaultUserAnswers,
+      populatedUserAnswers,
       pensionSchemeId,
       noChangesSincePreviousVersion = false
     )
@@ -82,6 +87,14 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       val view = injected[TaskListView]
       view(viewModel, schemeName)
     }.withName("task list renders OK"))
+
+    act.like(
+      redirectToPage(
+        onPageLoad,
+        controllers.routes.JourneyRecoveryController.onPageLoad(),
+        defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
+      )
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 

@@ -18,7 +18,7 @@ package navigation
 
 import utils.BaseSpec
 import pages._
-import controllers.nonsipp.routes
+import pages.nonsipp.CheckReturnDatesPage
 import models.NormalMode
 
 class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -39,10 +39,10 @@ class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             WhatYouWillNeedPage,
-            (srn, _) => routes.WhichTaxYearController.onPageLoad(srn, NormalMode),
-            srn => emptyUserAnswers
+            (srn, _) => controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode),
+            _ => emptyUserAnswers
           )
-          .withName("go from start page to which tax year page")
+          .withName("go from start page to check return dates page when answers are empty")
       )
 
       act.like(
@@ -50,9 +50,23 @@ class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateTo(
             WhatYouWillNeedPage,
             (srn, _) => controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode),
-            srn => defaultUserAnswers
+            _ => defaultUserAnswers
           )
-          .withName("go from start page to check return dates page")
+          .withName(
+            "go from start page to check return dates page when answers are non empty but check dates returns page is empty"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            WhatYouWillNeedPage,
+            (srn, _) => controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode),
+            srn => defaultUserAnswers.set(CheckReturnDatesPage(srn), true).get
+          )
+          .withName(
+            "go from start page to check return dates page when answers are non empty but basic details are incomplete"
+          )
       )
     }
 
