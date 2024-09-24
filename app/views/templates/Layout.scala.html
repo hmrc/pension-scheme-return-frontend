@@ -110,7 +110,7 @@
     pageTitle   = Some(pageTitle),
     headBlock   = Some(head),
     headerBlock = Some(hmrcStandardHeader(
-        serviceUrl  = Some(routes.IndexController.onPageLoad().url),
+        serviceUrl  = Some(appConfig.urls.managePensionsSchemes.overview),
         signOutUrl  = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut().url) else None,
         phaseBanner = Some(alphaBanner(appConfig.feedbackUrl))
     )),

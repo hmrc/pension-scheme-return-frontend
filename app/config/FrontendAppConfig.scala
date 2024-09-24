@@ -125,7 +125,7 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
       val contactHmrc: String = baseUrl + config.get[String]("urls.manage-pension-schemes.contactHmrc")
       val cannotAccessDeregistered: String =
         baseUrl + config.get[String]("urls.manage-pension-schemes.cannotAccessDeregistered")
-      val dashboard: String = baseUrl + config.get[String]("urls.manage-pension-schemes.overview")
+      val overview: String = baseUrl + config.get[String]("urls.manage-pension-schemes.overview")
 
       def schemeSummaryDashboard(srn: Srn): String =
         s"$baseUrl${config
