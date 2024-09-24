@@ -57,7 +57,7 @@ class DateRangeMappingsSpec
 
   val form: Form[DateRange] = formWithDuplicates(Nil)
 
-  val allowedDateRange: DateRange = DateRange(start, end)
+  val allowedDateRange: DateRange = DateRange(LocalDate.of(2021, 4, 6), end)
 
   def formWithDuplicates(duplicateRanges: List[DateRange]): Form[DateRange] = Form(
     "value" -> dateRange(
@@ -136,8 +136,8 @@ class DateRangeMappingsSpec
     )
   }
 
-  "must fail to bind if start date is before start of tax year" in {
-    val range = DateRange(defaultTaxYear.starts.minusDays(1), defaultTaxYear.finishes)
+  "must fail to bind if start date is before allowed date range" in {
+    val range = DateRange(allowedDateRange.from.minusDays(1), defaultTaxYear.finishes)
     val data = makeData(range.from, range.to)
     val result = form.bind(data)
 
