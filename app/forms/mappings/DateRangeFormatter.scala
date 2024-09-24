@@ -108,7 +108,7 @@ private[mappings] class DateRangeFormatter(
       Left(List(FormError(s"$key.endDate", errorEndAfter, List(allowedRange.from.minusDays(1).show))))
     } else if (range.to.isAfter(taxYear.finishes)) {
       logger.info(s"[verifyTaxYear] provided end date ${range.to.show} is after the end of the tax year")
-      Left(List(FormError(s"$key.endDate", errorEndBefore, List(taxYear.finishes.show))))
+      Left(List(FormError(s"$key.endDate", errorEndBefore, List(taxYear.finishes.plusDays(1).show))))
     } else Right(range)
 
   private def verifyPreviousDateRange(key: String, range: DateRange, index: Max3): Either[Seq[FormError], DateRange] =

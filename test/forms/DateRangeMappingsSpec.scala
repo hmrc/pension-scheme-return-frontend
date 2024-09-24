@@ -146,13 +146,12 @@ class DateRangeMappingsSpec
   }
 
   "must fail to bind if end date is after end of tax year" in {
-    val endDate = LocalDate.of(2023, 4, 5)
-    val range = DateRange(defaultTaxYear.starts, endDate)
-    val data = makeData(range.from, range.to.plusDays(1))
+    val range = DateRange(defaultTaxYear.starts, defaultTaxYear.finishes.plusDays(1))
+    val data = makeData(range.from, range.to)
     val result = form.bind(data)
 
     result.errors must contain only
-      FormError("value.endDate", "error.endBefore", List(endDate.show))
+      FormError("value.endDate", "error.endBefore", List(defaultTaxYear.finishes.plusDays(1).show))
   }
 
   "must fail to bind if date range intersects another date range" in {
