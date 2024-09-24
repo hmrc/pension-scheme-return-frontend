@@ -73,6 +73,7 @@
             field = form(s"value.${index + 1}"),
             label = LabelViewModel(renderMessage(field.label))
         )
+        .withId(s"value.${index + 1}")
         .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
         .withWidth(width.fold[InputWidth](InputWidth.Fixed10)(identity))
     )
@@ -84,6 +85,7 @@
             field = form(s"value.${index + 1}"),
             label = LabelViewModel(renderMessage(field.label))
         )
+        .withId(s"value.${index + 1}")
         .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
         .asNumeric()
         .withWidth(InputWidth.Fixed10)
@@ -97,6 +99,7 @@
             field = form(s"value.${index + 1}"),
             label = LabelViewModel(renderMessage(field.label))
         )
+        .withId(s"value.${index + 1}")
         .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
         .asNumeric()
         .withWidth(InputWidth.Fixed3)
@@ -109,7 +112,9 @@
         DateViewModel(
             field  = form(s"value.${index + 1}"),
             legend = LegendViewModel(renderMessage(field.label))
-        ).withHint(HintViewModel(renderMessage(field.hint.getOrElse(""))))
+        )
+        .withId(s"value.${index + 1}")
+        .withHint(HintViewModel(renderMessage(field.hint.getOrElse(""))))
     )
 }
 
