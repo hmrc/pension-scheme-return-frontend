@@ -345,18 +345,23 @@ object TransferOutMemberListController {
       }
     )
 
+    val normalModeMessage =
+      if (mode == NormalMode)
+        Option(
+          ParagraphMessage(
+            "transferOut.memberList.paragraph1"
+          ) ++
+            ParagraphMessage(
+              "transferOut.memberList.paragraph2"
+            )
+        )
+      else Option(ParagraphMessage(""))
+
     FormPageViewModel(
       mode = mode,
       title = Message(title, memberListSize),
       heading = Message(heading, memberListSize),
-      description = Some(
-        ParagraphMessage(
-          "transferOut.memberList.paragraph1"
-        ) ++
-          ParagraphMessage(
-            "transferOut.memberList.paragraph2"
-          )
-      ),
+      description = normalModeMessage,
       page = ActionTableViewModel(
         inset = "",
         head = Some(

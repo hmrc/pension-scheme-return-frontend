@@ -24,6 +24,8 @@ import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, On
 import play.api.Configuration
 import play.api.i18n.Lang
 
+import java.time.LocalDate
+
 @Singleton
 class FrontendAppConfig @Inject()(config: Configuration) { self =>
 
@@ -71,6 +73,7 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   val emailApiUrl: String = emailService.baseUrl
   val emailSendForce: Boolean = config.getOptional[Boolean]("email.force").getOrElse(false)
   val fileReturnTemplateId: String = config.get[String]("email.fileReturnTemplateId")
+  val allowedStartDateRange: LocalDate = LocalDate.parse(config.get[String]("schemeStartDate"))
 
   def eventReportingEmailCallback(
     psaOrPsp: String,

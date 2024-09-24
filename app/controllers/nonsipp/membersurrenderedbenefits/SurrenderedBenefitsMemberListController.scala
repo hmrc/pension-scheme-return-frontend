@@ -342,18 +342,23 @@ object SurrenderedBenefitsMemberListController {
       }
     )
 
+    val normalModeMessage =
+      if (mode == NormalMode)
+        Option(
+          ParagraphMessage(
+            "surrenderedBenefits.memberList.inset1"
+          ) ++
+            ParagraphMessage(
+              "surrenderedBenefits.memberList.inset2"
+            )
+        )
+      else Option(ParagraphMessage(""))
+
     FormPageViewModel(
       mode = mode,
       title = Message(title, memberListSize),
       heading = Message(heading, memberListSize),
-      description = Some(
-        ParagraphMessage(
-          "surrenderedBenefits.memberList.inset1"
-        ) ++
-          ParagraphMessage(
-            "surrenderedBenefits.memberList.inset2"
-          )
-      ),
+      description = normalModeMessage,
       page = ActionTableViewModel(
         inset = "",
         head = Some(

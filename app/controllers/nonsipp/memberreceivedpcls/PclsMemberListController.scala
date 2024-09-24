@@ -348,18 +348,23 @@ object PclsMemberListController {
           .exists(nextIndex => userAnswers.get(PensionCommencementLumpSumAmountPage(srn, nextIndex)).isDefined)
     }
 
+    val normalModeMessage =
+      if (mode == NormalMode)
+        Option(
+          ParagraphMessage(
+            "pcls.memberlist.paragraph1"
+          ) ++
+            ParagraphMessage(
+              "pcls.memberlist.paragraph2"
+            )
+        )
+      else Option(ParagraphMessage(""))
+
     FormPageViewModel(
       mode = mode,
       title = Message(title, memberList.flatten.size),
       heading = Message(heading, memberList.flatten.size),
-      description = Some(
-        ParagraphMessage(
-          "pcls.memberlist.paragraph1"
-        ) ++
-          ParagraphMessage(
-            "pcls.memberlist.paragraph2"
-          )
-      ),
+      description = normalModeMessage,
       page = ActionTableViewModel(
         inset = "",
         head = Some(

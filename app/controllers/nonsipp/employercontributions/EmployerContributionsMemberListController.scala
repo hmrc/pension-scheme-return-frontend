@@ -378,18 +378,23 @@ object EmployerContributionsMemberListController {
       }
     )
 
+    val normalModeMessage =
+      if (mode == NormalMode)
+        Option(
+          ParagraphMessage(
+            "employerContributions.MemberList.paragraph1"
+          ) ++
+            ParagraphMessage(
+              "employerContributions.MemberList.paragraph2"
+            )
+        )
+      else Option(ParagraphMessage(""))
+
     FormPageViewModel(
       mode = mode,
       title = Message(title, employerContributions.size),
       heading = Message(heading, employerContributions.size),
-      description = Some(
-        ParagraphMessage(
-          "employerContributions.MemberList.paragraph1"
-        ) ++
-          ParagraphMessage(
-            "employerContributions.MemberList.paragraph2"
-          )
-      ),
+      description = normalModeMessage,
       page = ActionTableViewModel(
         inset = "",
         head = Some(

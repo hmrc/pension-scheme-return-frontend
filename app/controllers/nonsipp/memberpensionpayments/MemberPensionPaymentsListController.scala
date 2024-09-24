@@ -367,18 +367,23 @@ object MemberPensionPaymentsListController {
       }
     )
 
+    val normalModeMessage =
+      if (mode == NormalMode)
+        Option(
+          ParagraphMessage(
+            "memberPensionPayments.memberList.paragraphOne"
+          ) ++
+            ParagraphMessage(
+              "memberPensionPayments.memberList.paragraphTwo"
+            )
+        )
+      else Option(ParagraphMessage(""))
+
     FormPageViewModel(
       mode = mode,
       title = Message(title, memberListSize),
       heading = Message(heading, memberListSize),
-      description = Some(
-        ParagraphMessage(
-          "memberPensionPayments.memberList.paragraphOne"
-        ) ++
-          ParagraphMessage(
-            "memberPensionPayments.memberList.paragraphTwo"
-          )
-      ),
+      description = normalModeMessage,
       page = ActionTableViewModel(
         inset = "",
         head = Some(

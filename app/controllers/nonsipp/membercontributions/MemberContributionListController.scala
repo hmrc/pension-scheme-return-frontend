@@ -351,18 +351,23 @@ object MemberContributionListController {
       }
     )
 
+    val normalModeMessage =
+      if (mode == NormalMode)
+        Option(
+          ParagraphMessage(
+            "ReportContribution.MemberList.paragraph1"
+          ) ++
+            ParagraphMessage(
+              "ReportContribution.MemberList.paragraph2"
+            )
+        )
+      else Option(ParagraphMessage(""))
+
     FormPageViewModel(
       mode = mode,
       title = Message(title, memberList.flatten.size),
       heading = Message(heading, memberList.flatten.size),
-      description = Some(
-        ParagraphMessage(
-          "ReportContribution.MemberList.paragraph1"
-        ) ++
-          ParagraphMessage(
-            "ReportContribution.MemberList.paragraph2"
-          )
-      ),
+      description = normalModeMessage,
       page = ActionTableViewModel(
         inset = "",
         showInsetWithRadios = true,
