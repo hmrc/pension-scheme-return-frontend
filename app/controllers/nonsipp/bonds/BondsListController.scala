@@ -282,7 +282,7 @@ object BondsListController {
                   controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                     .onPageLoadViewOnly(srn, index, year, current, previous)
                     .url,
-                  Message("bondsList.row.change.hiddenText", bondsMessage)
+                  Message("bondsList.row.view.hiddenText", bondsMessage)
                 )
               case _ =>
                 ListRow(

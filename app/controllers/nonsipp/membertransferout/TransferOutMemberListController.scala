@@ -272,7 +272,7 @@ object TransferOutMemberListController {
                             current = currentVersion,
                             previous = previousVersion
                           ),
-                        Message("transferOut.memberList.add.hidden.text", memberName.fullName)
+                        memberName.fullName
                       )
                     case _ =>
                       TableElem(

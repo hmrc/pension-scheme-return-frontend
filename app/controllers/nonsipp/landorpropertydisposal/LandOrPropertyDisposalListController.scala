@@ -304,7 +304,7 @@ object LandOrPropertyDisposalListController {
                       viewOnly.previousVersion
                     )
                     .url,
-                  Message("landOrPropertyDisposalList.row.change.hidden", address.addressLine1)
+                  Message("landOrPropertyDisposalList.row.view.hidden", address.addressLine1)
                 )
               )
             case (((index, disposalIndexes), address), None) =>

@@ -254,7 +254,7 @@ object BorrowInstancesListController {
                     controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
                       .onPageLoadViewOnly(srn, index, year, current, previous)
                       .url,
-                    Message("borrowList.row.change.hidden", amount.displayAs, lenderName)
+                    Message("borrowList.row.view.hidden", amount.displayAs, lenderName)
                   )
                 )
               case _ =>
