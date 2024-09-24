@@ -274,7 +274,7 @@ object OtherAssetsListController {
                   controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                     .onPageLoadViewOnly(srn, index, year, current, previous)
                     .url,
-                  Message("otherAssets.list.row.change.hiddenText", otherAssetsMessage)
+                  Message("otherAssets.list.row.view.hiddenText", otherAssetsMessage)
                 )
               case _ =>
                 ListRow(

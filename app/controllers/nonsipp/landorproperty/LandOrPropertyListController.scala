@@ -214,7 +214,7 @@ object LandOrPropertyListController {
                         routes.LandOrPropertyCYAController
                           .onPageLoadViewOnly(srn, index, year, current, previous)
                           .url,
-                        Message("landOrPropertyList.row.change.hiddenText", address.addressLine1)
+                        Message("landOrPropertyList.row.view.hiddenText", address.addressLine1)
                       )
                     )
                   case _ =>

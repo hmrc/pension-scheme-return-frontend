@@ -281,16 +281,16 @@ object SharesListController {
                   controllers.nonsipp.shares.routes.SharesCYAController
                     .onPageLoadViewOnly(srn, index, year, current, previous)
                     .url,
-                  Message("sharesList.row.change.hiddenText", sharesMessage)
+                  Message("site.view.param", sharesMessage)
                 )
               case _ =>
                 ListRow(
                   sharesMessage,
                   changeUrl =
                     controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode).url,
-                  changeHiddenText = Message("sharesList.row.change.hiddenText", sharesMessage),
+                  changeHiddenText = Message("site.change.param", sharesMessage),
                   removeUrl = routes.RemoveSharesController.onPageLoad(srn, index, mode).url,
-                  removeHiddenText = Message("sharesList.row.remove.hiddenText", sharesMessage)
+                  removeHiddenText = Message("site.remove.param", sharesMessage)
                 )
             }
         }
