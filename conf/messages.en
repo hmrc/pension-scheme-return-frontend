@@ -16,7 +16,7 @@ site.start = Start
 
 site.continue = Continue
 site.saveAndContinue = Save and continue
-site.agreeAndContinue = Agree and continue
+site.agreeAndContinue = Agree and submit
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
