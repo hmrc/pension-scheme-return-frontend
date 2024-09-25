@@ -352,7 +352,7 @@ pspDeclaration.psaId.error.invalid.characters = Enter a scheme administrator’s
 pspDeclaration.psaId.error.invalid.noMatch = Enter an administrator’s ID that is linked to the scheme
 pspDeclaration.notification.title = Important
 pspDeclaration.notification.header = The number of scheme members has changed and it is now over 100
-pspDeclaration.notification.paragraph = Any member or asset information previously added to your return will be removed. Select agree and continue.
+pspDeclaration.notification.paragraph = Any member or asset information previously added to your return will be removed. Select agree and submit.
 
 nationalInsuranceNumber.title = Does the member have a National Insurance number?
 nationalInsuranceNumber.heading = Does {0} have a National Insurance number?
