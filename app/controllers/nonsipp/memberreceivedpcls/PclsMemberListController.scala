@@ -64,7 +64,7 @@ class PclsMemberListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)
+      onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
   def onPageLoadViewOnly(
@@ -75,10 +75,13 @@ class PclsMemberListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    onPageLoadCommon(srn, page, mode)
+    val showBackLink = true
+    onPageLoadCommon(srn, page, mode, showBackLink)
   }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(
+    implicit request: DataRequest[AnyContent]
+  ): Result = {
     val ua = request.userAnswers
     val optionList: List[Option[NameDOB]] = ua.membersOptionList(srn)
 
@@ -104,7 +107,8 @@ class PclsMemberListController @Inject()(
           optCurrentVersion = request.currentVersion,
           optPreviousVersion = request.previousVersion,
           compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
-          noPageEnabled = noPageEnabled
+          noPageEnabled = noPageEnabled,
+          showBackLink = showBackLink
         )
       val filledForm =
         request.userAnswers.get(PclsMemberListPage(srn)).fold(form)(form.fill)
@@ -186,14 +190,16 @@ class PclsMemberListController @Inject()(
       )
     }
 
-  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
-      )
+  def onPreviousViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) { implicit request =>
+      val showBackLink = false
+      onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
   private def buildUserAnswerBySelection(srn: Srn, selection: Boolean, memberListSize: Int)(
@@ -322,7 +328,8 @@ object PclsMemberListController {
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
     compilationOrSubmissionDate: Option[LocalDateTime] = None,
-    noPageEnabled: Boolean
+    noPageEnabled: Boolean,
+    showBackLink: Boolean = true
   ): FormPageViewModel[ActionTableViewModel] = {
     val title = "pcls.memberlist.title"
     val heading = "pcls.memberlist.heading"
@@ -441,7 +448,8 @@ object PclsMemberListController {
         )
       } else {
         None
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 }

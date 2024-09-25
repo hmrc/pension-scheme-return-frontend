@@ -75,25 +75,28 @@ class SchemeMembersListController @Inject()(
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, ViewOnlyMode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, page, ManualOrUpload.Manual, ViewOnlyMode)
+      val showBackLink = true
+      onPageLoadCommon(srn, page, ManualOrUpload.Manual, ViewOnlyMode, showBackLink)
     }
 
   def onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn, page, manualOrUpload, mode)
+      onPageLoadCommon(srn, page, manualOrUpload, mode, showBackLink = true)
     }
 
-  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
-      )
+  def onPreviousViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) { implicit request =>
+      val showBackLink = false
+      onPageLoadCommon(srn, page, ManualOrUpload.Manual, ViewOnlyMode, showBackLink)
     }
 
-  def onPageLoadCommon(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode)(
+  def onPageLoadCommon(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode, showBackLink: Boolean)(
     implicit request: DataRequest[_]
   ): Result = {
     val completedMembers = request.userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty)
@@ -128,20 +131,16 @@ class SchemeMembersListController @Inject()(
                       previousUserAnswers,
                       pages.nonsipp.memberdetails.Paths.personalDetails
                     ) == Updated
-                    logger.info(s"""[ViewOnlyMode] Status for member details list is ${if (updated) "updated"
-                    else "not updated"}""")
                     updated
                   case (ViewOnlyMode, None) =>
-                    logger.info(
-                      s"[ViewOnlyMode] no previous submiossion version, Status for member details list is not udpated"
-                    )
                     false
                   case _ => false
                 },
                 optYear = request.year,
                 optCurrentVersion = request.currentVersion,
                 optPreviousVersion = request.previousVersion,
-                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+                showBackLink = showBackLink
               )
             )
           )
@@ -235,7 +234,8 @@ object SchemeMembersListController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    compilationOrSubmissionDate: Option[LocalDateTime] = None,
+    showBackLink: Boolean = true
   ): FormPageViewModel[ListViewModel] = {
 
     val lengthOfFilteredMembers = filteredMembers.length
@@ -291,7 +291,8 @@ object SchemeMembersListController {
       rows.size,
       call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
         case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-          routes.SchemeMembersListController.onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
+          routes.SchemeMembersListController
+            .onPreviousViewOnly(srn, _, year, currentVersion, previousVersion)
         case _ =>
           routes.SchemeMembersListController.onPageLoad(srn, _, manualOrUpload)
       }
@@ -375,7 +376,8 @@ object SchemeMembersListController {
                 .onSubmit(srn, page, mode)
           }
         )
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 }

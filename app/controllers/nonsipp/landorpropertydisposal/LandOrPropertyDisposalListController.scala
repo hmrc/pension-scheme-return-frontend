@@ -71,6 +71,7 @@ class LandOrPropertyDisposalListController @Inject()(
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, ViewOnlyMode, year, current, previous) { implicit request =>
+      val showBackLink = true
       val viewOnlyViewModel = ViewOnlyViewModel(
         viewOnlyUpdated = request.previousUserAnswers match {
           case Some(previousUserAnswers) =>
@@ -79,13 +80,8 @@ class LandOrPropertyDisposalListController @Inject()(
               previousUserAnswers,
               pages.nonsipp.landorpropertydisposal.Paths.disposalPropertyTransaction
             ) == Updated
-            logger.info(s"""[ViewOnlyMode] Status for land or property disposal list is ${if (updated) "updated"
-            else "not updated"}""")
             updated
           case None =>
-            logger.info(
-              s"[ViewOnlyMode] no previous submission version, Status for land or property disposal list is not updated"
-            )
             false
           case _ => false
         },
@@ -94,25 +90,52 @@ class LandOrPropertyDisposalListController @Inject()(
         previousVersion = previous,
         compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
       )
-      onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel))
+      onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
     }
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn, page, mode)
+      onPageLoadCommon(srn, page, mode, showBackLink = true)
     }
 
-  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          routes.LandOrPropertyDisposalListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
-      )
+  def onPreviousViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)).async {
+      implicit request =>
+        Future.successful {
+          val showBackLink = false
+          val viewOnlyViewModel = ViewOnlyViewModel(
+            viewOnlyUpdated = request.previousUserAnswers match {
+              case Some(previousUserAnswers) =>
+                getCompletedOrUpdatedTaskListStatus(
+                  request.userAnswers,
+                  previousUserAnswers,
+                  pages.nonsipp.otherassetsdisposal.Paths.assetsDisposed
+                ) == Updated
+              case None =>
+                false
+            },
+            year = year,
+            currentVersion = (current - 1).max(0),
+            previousVersion = (previous - 1).max(0),
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          )
+          onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
+        }
     }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+  private def onPageLoadCommon(
+    srn: Srn,
+    page: Int,
+    mode: Mode,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
+  )(
     implicit request: DataRequest[_]
   ): Result = {
     val (status, _) = getLandOrPropertyDisposalsTaskListStatusWithLink(request.userAnswers, srn)
@@ -135,7 +158,8 @@ class LandOrPropertyDisposalListController @Inject()(
                 numberOfDisposal,
                 maxPossibleNumberOfDisposals,
                 request.schemeDetails.schemeName,
-                viewOnlyViewModel
+                viewOnlyViewModel,
+                showBackLink = showBackLink
               )
             )
           )
@@ -173,7 +197,8 @@ class LandOrPropertyDisposalListController @Inject()(
                           indexes,
                           numberOfDisposals,
                           maxPossibleNumberOfDisposals,
-                          request.schemeDetails.schemeName
+                          request.schemeDetails.schemeName,
+                          showBackLink = true
                         )
                       )
                     )
@@ -306,7 +331,8 @@ object LandOrPropertyDisposalListController {
     numberOfDisposals: Int,
     maxPossibleNumberOfDisposals: Int,
     schemeName: String,
-    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
   ): FormPageViewModel[ListViewModel] = {
 
     val (title, heading) = ((mode, numberOfDisposals) match {
@@ -330,7 +356,8 @@ object LandOrPropertyDisposalListController {
       totalSize = numberOfDisposals,
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
-          routes.LandOrPropertyDisposalListController.onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
+          routes.LandOrPropertyDisposalListController
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
         case None =>
           routes.LandOrPropertyDisposalListController.onPageLoad(srn, _)
       }
@@ -393,7 +420,8 @@ object LandOrPropertyDisposalListController {
           onSubmit = controllers.nonsipp.membercontributions.routes.MemberContributionListController
             .onSubmitViewOnly(srn, viewOnly.year, viewOnly.currentVersion, viewOnly.previousVersion)
         )
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 }

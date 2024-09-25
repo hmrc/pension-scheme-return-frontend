@@ -37,6 +37,8 @@ import viewmodels.models._
 
 import scala.concurrent.Future
 
+import java.time.LocalDateTime
+
 class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.EmployerContributionsMemberListController.onPageLoad(srn, page = 1, NormalMode)
@@ -305,15 +307,24 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
         .withName("Submit redirects to view only tasklist")
     )
 
-    act.like(
-      redirectToPage(
-        onPreviousViewOnly,
-        controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
+    val submissionDateOne1 = LocalDateTime.of(2019, 11, 12, 0, 0)
+    val submissionDateTwo2 = LocalDateTime.of(2020, 11, 12, 0, 0)
+
+    val submissionNumber2 = 2
+    val submissionNumber1 = 1
+    val submissionNumber0 = 0
+
+    val previousUserAnswersS = userAnswers
+      .unsafeSet(FbVersionPage(srn), "001")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne1)
+      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+      .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+      .unsafeSet(
+        EmployerContributionsProgress(srn, refineMV(1), refineMV(1)),
+        SectionJourneyStatus.Completed
       )
-    )
+      .unsafeSet(EmployerContributionsPage(srn), true)
+
   }
 
 }

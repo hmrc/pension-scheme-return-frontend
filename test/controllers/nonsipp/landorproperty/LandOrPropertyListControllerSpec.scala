@@ -111,7 +111,8 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
           1,
           NormalMode,
           addresses,
-          schemeName
+          schemeName,
+          showBackLink = true
         )
       )
     }.withName("Completed Journey"))
@@ -167,7 +168,8 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               addresses,
               schemeName,
-              Some(viewOnlyViewModel)
+              Some(viewOnlyViewModel),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -187,7 +189,8 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               addresses,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -207,7 +210,8 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
             mode = ViewOnlyMode,
             Map(),
             schemeName,
-            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+            showBackLink = true
           )
         )
       }.withName("OnPageLoadViewOnly renders ok with no land or property")
@@ -224,14 +228,29 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
         .withName("Submit redirects to view only tasklist")
     )
 
-    act.like(
-      redirectToPage(
-        onPreviousViewOnly,
-        controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
+    renderView(
+      onPreviousViewOnly,
+      userAnswers = currentUserAnswers,
+      optPreviousAnswers = Some(previousUserAnswers)
+    ) { implicit app => implicit request =>
+      injected[ListView].apply(
+        form(injected[YesNoPageFormProvider]),
+        viewModel(
+          srn,
+          page,
+          mode = ViewOnlyMode,
+          addresses,
+          schemeName,
+          Some(
+            viewOnlyViewModel.copy(
+              currentVersion = (submissionNumberTwo - 1).max(0),
+              previousVersion = (submissionNumberOne - 1).max(0)
+            )
+          ),
+          showBackLink = false
+        )
       )
-    )
+    }.withName("OnPreviousViewOnly renders the view correctly")
+
   }
 }

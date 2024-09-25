@@ -131,7 +131,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
           otherAssetsDisposalsWithIndexes,
           completedUserAnswers,
           schemeName,
-          viewOnlyViewModel = None
+          viewOnlyViewModel = None,
+          showBackLink = true
         )
       )
     }.withName("Completed Journey"))
@@ -182,7 +183,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
               otherAssetsDisposalsWithIndexes,
               completedUserAnswers,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel)
+              viewOnlyViewModel = Some(viewOnlyViewModel),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
@@ -203,7 +205,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
               otherAssetsDisposalsWithIndexes,
               updatedUserAnswers,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+              showBackLink = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -224,7 +227,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
             Map(),
             noDisposalsUserAnswers,
             schemeName,
-            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+            showBackLink = true
           )
         )
       }.withName("OnPageLoadViewOnly renders ok with no disposals")
@@ -242,14 +246,34 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectToPage(
+      renderView(
         onPreviousViewOnly,
-        controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
+        userAnswers = currentUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[ListView].apply(
+          form(new YesNoPageFormProvider()),
+          viewModel(
+            srn,
+            mode = ViewOnlyMode,
+            page,
+            otherAssetsDisposalsWithIndexes,
+            completedUserAnswers,
+            schemeName,
+            viewOnlyViewModel = Some(
+              viewOnlyViewModel.copy(
+                currentVersion = submissionNumberOne,
+                previousVersion = submissionNumberZero
+              )
+            ),
+            showBackLink = false
+          )
+        )
+      }.withName(
+        "onPreviousViewOnly renders the view with the correct parameters for the previous submission"
       )
     )
+
   }
 
 }

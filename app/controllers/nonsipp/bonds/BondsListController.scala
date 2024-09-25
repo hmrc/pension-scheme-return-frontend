@@ -66,7 +66,7 @@ class BondsListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)
+      onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
   def onPageLoadViewOnly(
@@ -77,6 +77,7 @@ class BondsListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    val showBackLink = true
     val viewOnlyViewModel = ViewOnlyViewModel(
       viewOnlyUpdated = request.previousUserAnswers match {
         case Some(previousUserAnswers) =>
@@ -93,10 +94,16 @@ class BondsListController @Inject()(
       previousVersion = previous,
       compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
     )
-    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel), showBackLink)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+  def onPageLoadCommon(
+    srn: Srn,
+    page: Int,
+    mode: Mode,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
+  )(
     implicit request: DataRequest[AnyContent]
   ): Result = {
     val indexes: List[Max5000] = request.userAnswers.map(BondsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
@@ -114,7 +121,8 @@ class BondsListController @Inject()(
               mode,
               data,
               request.schemeDetails.schemeName,
-              viewOnlyViewModel
+              viewOnlyViewModel,
+              showBackLink = showBackLink
             )
           )
         )
@@ -141,7 +149,12 @@ class BondsListController @Inject()(
             errors => {
               bondsData(srn, indexes)
                 .map { data =>
-                  BadRequest(view(errors, viewModel(srn, page, mode, data, request.schemeDetails.schemeName)))
+                  BadRequest(
+                    view(
+                      errors,
+                      viewModel(srn, page, mode, data, request.schemeDetails.schemeName, showBackLink = true)
+                    )
+                  )
                 }
                 .merge
                 .pure[Future]
@@ -185,15 +198,33 @@ class BondsListController @Inject()(
       )
     }
 
-  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          controllers.nonsipp.bonds.routes.BondsListController
-            .onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
+  def onPreviousViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] = identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) {
+    implicit request =>
+      val showBackLink = false
+      val viewOnlyViewModel = ViewOnlyViewModel(
+        viewOnlyUpdated = request.previousUserAnswers match {
+          case Some(previousUserAnswers) =>
+            getCompletedOrUpdatedTaskListStatus(
+              request.userAnswers,
+              previousUserAnswers,
+              pages.nonsipp.bonds.Paths.bondTransactions,
+              Some("bondsDisposed")
+            ) == Updated
+          case _ => false
+        },
+        year = year,
+        currentVersion = (current - 1).max(0),
+        previousVersion = (previous - 1).max(0),
+        compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
       )
-    }
+      onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
+  }
 
   private def bondsData(srn: Srn, indexes: List[Max5000])(
     implicit req: DataRequest[_]
@@ -275,7 +306,8 @@ object BondsListController {
     mode: Mode,
     data: List[BondsData],
     schemeName: String,
-    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
   ): FormPageViewModel[ListViewModel] = {
     val lengthOfData = data.length
 
@@ -372,7 +404,8 @@ object BondsListController {
           onSubmit = controllers.nonsipp.bonds.routes.BondsListController
             .onSubmitViewOnly(srn, viewOnly.year, viewOnly.currentVersion, viewOnly.previousVersion)
         )
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 

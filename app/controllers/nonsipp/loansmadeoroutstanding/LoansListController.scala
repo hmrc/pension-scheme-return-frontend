@@ -62,7 +62,7 @@ class LoansListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, page, mode)
+      onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
   def onPageLoadViewOnly(
@@ -73,6 +73,7 @@ class LoansListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    val showBackLink = true
     val viewOnlyViewModel = ViewOnlyViewModel(
       viewOnlyUpdated = request.previousUserAnswers match {
         case Some(previousUserAnswers) =>
@@ -89,10 +90,16 @@ class LoansListController @Inject()(
       compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
     )
 
-    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel))
+    onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel), showBackLink)
   }
 
-  def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+  def onPageLoadCommon(
+    srn: Srn,
+    page: Int,
+    mode: Mode,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
+  )(
     implicit request: DataRequest[AnyContent]
   ): Result =
     loanRecipients(srn).map { recipients =>
@@ -117,7 +124,8 @@ class LoansListController @Inject()(
                       mode,
                       recipients,
                       request.schemeDetails.schemeName,
-                      viewOnlyViewModel
+                      viewOnlyViewModel,
+                      showBackLink = showBackLink
                     )
                   )
                 )
@@ -134,7 +142,7 @@ class LoansListController @Inject()(
       } else {
 
         val viewModel =
-          LoansListController.viewModel(srn, page, mode, recipients, "")
+          LoansListController.viewModel(srn, page, mode, recipients, "", showBackLink = true)
 
         form
           .bindFromRequest()
@@ -153,13 +161,32 @@ class LoansListController @Inject()(
       )
     }
 
-  def onPreviousViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn).async {
-      Future.successful(
-        Redirect(
-          routes.LoansListController.onPageLoadViewOnly(srn, page, year, (current - 1).max(0), (previous - 1).max(0))
-        )
+  def onPreviousViewOnly(
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) { implicit request =>
+      val showBackLink = false
+      val viewOnlyViewModel = ViewOnlyViewModel(
+        viewOnlyUpdated = request.previousUserAnswers match {
+          case Some(previousUserAnswers) =>
+            getCompletedOrUpdatedTaskListStatus(
+              request.userAnswers,
+              previousUserAnswers,
+              pages.nonsipp.loansmadeoroutstanding.Paths.loans
+            ) == Updated
+          case _ => false
+        },
+        year = year,
+        currentVersion = (current - 1).max(0),
+        previousVersion = (previous - 1).max(0),
+        compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
       )
+
+      onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
     }
 
   private def loanRecipients(
@@ -260,7 +287,8 @@ object LoansListController {
     mode: Mode,
     recipients: List[(Max5000, String, Money)],
     schemeName: String,
-    viewOnlyViewModel: Option[ViewOnlyViewModel] = None
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
   ): FormPageViewModel[ListViewModel] = {
 
     val (title, heading) = ((mode, recipients.length) match {
@@ -288,7 +316,8 @@ object LoansListController {
       recipients.size,
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
-          routes.LoansListController.onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
+          routes.LoansListController
+            .onPageLoadViewOnly(srn, _, year, currentVersion, previousVersion)
         case _ =>
           routes.LoansListController.onPageLoad(srn, _, NormalMode)
       }
@@ -350,7 +379,8 @@ object LoansListController {
           onSubmit = routes.LoansListController
             .onSubmitViewOnly(srn, viewOnly.year, viewOnly.currentVersion, viewOnly.previousVersion)
         )
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 }

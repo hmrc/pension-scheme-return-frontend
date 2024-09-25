@@ -61,10 +61,16 @@ class TotalValueQuotedSharesCYAController @Inject()(
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn, NormalMode)
+      onPageLoadCommon(srn, NormalMode, showBackLink = true)
     }
-  def onPageLoadViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
+  def onPageLoadViewOnly(
+    srn: Srn,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
     identifyAndRequireData(srn, ViewOnlyMode, year, current, previous) { implicit request =>
+      val showBackLink = true
       val viewOnlyViewModel = ViewOnlyViewModel(
         viewOnlyUpdated = request.previousUserAnswers match {
           case Some(previousUserAnswers) =>
@@ -73,13 +79,8 @@ class TotalValueQuotedSharesCYAController @Inject()(
               previousUserAnswers,
               Paths.quotedShares
             ) == Updated
-            logger.info(s"""[ViewOnlyMode] Status for quoted shares is ${if (updated) "updated"
-            else "not updated"}""")
             updated
           case None =>
-            logger.info(
-              s"[ViewOnlyMode] no previous submission version, Status for quoted shares is not updated"
-            )
             false
           case _ => false
         },
@@ -88,19 +89,44 @@ class TotalValueQuotedSharesCYAController @Inject()(
         previousVersion = previous,
         compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
       )
-      onPageLoadCommon(srn, ViewOnlyMode, Some(viewOnlyViewModel))
+      onPageLoadCommon(srn, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
     }
 
-  def onPreviousViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
-    identifyAndRequireData(srn, ViewOnlyMode, year, current, previous).async {
-      Future.successful(
-        Redirect(
-          routes.TotalValueQuotedSharesCYAController
-            .onPageLoadViewOnly(srn, year, (current - 1).max(0), (previous - 1).max(0))
-        )
+  def onPreviousViewOnly(
+    srn: Srn,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] = identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) {
+    implicit request =>
+      val showBackLink = false
+      val viewOnlyViewModel = ViewOnlyViewModel(
+        viewOnlyUpdated = request.previousUserAnswers match {
+          case Some(previousUserAnswers) =>
+            val updated = getCompletedOrUpdatedTaskListStatus(
+              request.userAnswers,
+              previousUserAnswers,
+              Paths.quotedShares
+            ) == Updated
+            updated
+          case None =>
+            false
+          case _ => false
+        },
+        year = year,
+        currentVersion = (current - 1).max(0),
+        previousVersion = (previous - 1).max(0),
+        compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
       )
-    }
-  private def onPageLoadCommon(srn: Srn, mode: Mode, viewOnlyViewModel: Option[ViewOnlyViewModel] = None)(
+      onPageLoadCommon(srn, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
+  }
+
+  private def onPageLoadCommon(
+    srn: Srn,
+    mode: Mode,
+    viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
+    showBackLink: Boolean
+  )(
     implicit request: DataRequest[_]
   ) =
     schemeDateService.taxYearOrAccountingPeriods(srn) match {
@@ -114,7 +140,8 @@ class TotalValueQuotedSharesCYAController @Inject()(
               periods,
               request.schemeDetails,
               mode,
-              viewOnlyViewModel
+              viewOnlyViewModel,
+              showBackLink = showBackLink
             )
           )
         )
@@ -150,7 +177,8 @@ object TotalValueQuotedSharesCYAController {
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
     schemeDetails: SchemeDetails,
     mode: Mode,
-    viewOnlyViewModel: Option[ViewOnlyViewModel]
+    viewOnlyViewModel: Option[ViewOnlyViewModel],
+    showBackLink: Boolean
   ): FormPageViewModel[CheckYourAnswersViewModel] = {
     val (title, heading) = mode.fold(
       normal = ("checkYourAnswers.title", "checkYourAnswers.heading"),
@@ -209,7 +237,8 @@ object TotalValueQuotedSharesCYAController {
           onSubmit = routes.TotalValueQuotedSharesCYAController
             .onSubmitViewOnly(srn, viewOnly.year, viewOnly.currentVersion, viewOnly.previousVersion)
         )
-      }
+      },
+      showBackLink = showBackLink
     )
   }
 

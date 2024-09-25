@@ -103,7 +103,8 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
             NormalMode,
             page = 1,
             borrowingInstances = List((index, lenderName, money)),
-            schemeName
+            schemeName,
+            showBackLink = true
           )
         )
     })
@@ -160,7 +161,8 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
                 page = 1,
                 borrowingInstances = List((index, lenderName, money)),
                 schemeName,
-                Some(viewOnlyViewModel)
+                Some(viewOnlyViewModel),
+                showBackLink = true
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -181,7 +183,8 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
                 page = 1,
                 borrowingInstances = List((index, lenderName, money)),
                 schemeName,
-                viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+                viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+                showBackLink = true
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -201,7 +204,8 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
             page = 1,
             borrowingInstances = List(),
             schemeName,
-            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true))
+            viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
+            showBackLink = true
           )
         )
       }.withName("OnPageLoadViewOnly renders ok with no borrowings")
@@ -219,14 +223,32 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectToPage(
+      renderView(
         onPreviousViewOnly,
-        controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
-          .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-      ).withName(
-        "Submit previous view only redirects to the controller with parameters for the previous submission"
-      )
+        userAnswers = currentUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[ListView]
+          .apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              mode = ViewOnlyMode,
+              page = 1,
+              borrowingInstances = List((index, lenderName, money)),
+              schemeName,
+              viewOnlyViewModel = Some(
+                viewOnlyViewModel.copy(
+                  currentVersion = submissionNumberOne,
+                  previousVersion = submissionNumberZero
+                )
+              ),
+              showBackLink = false
+            )
+          )
+      }.withName("OnPreviousViewOnly renders view with parameters for the previous submission")
     )
+
   }
 
 }

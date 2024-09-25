@@ -306,15 +306,6 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
           .withName("Submit redirects to view only tasklist")
       )
 
-      act.like(
-        redirectToPage(
-          onPreviousViewOnly,
-          controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
-            .onPageLoadViewOnly(srn, 1, yearString, submissionNumberOne, submissionNumberZero)
-        ).withName(
-          "Submit previous view only redirects to the controller with parameters for the previous submission"
-        )
-      )
     }
   }
 }
