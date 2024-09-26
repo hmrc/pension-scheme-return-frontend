@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.memberreceivedpcls
 
-import services.{PsrSubmissionService, SaveService}
+import services.SaveService
 import play.api.mvc._
 import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
@@ -55,8 +55,7 @@ class PclsMemberListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
   formProvider: YesNoPageFormProvider,
-  saveService: SaveService,
-  psrSubmissionService: PsrSubmissionService
+  saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -162,22 +161,8 @@ class PclsMemberListController @Inject()(
               for {
                 updatedUserAnswers <- buildUserAnswerBySelection(srn, value, optionList.flatten.size)
                 _ <- saveService.save(updatedUserAnswers)
-                submissionResult <- if (value) {
-                  psrSubmissionService.submitPsrDetailsWithUA(
-                    srn,
-                    updatedUserAnswers,
-                    fallbackCall =
-                      controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController.onPageLoad(srn, page, mode)
-                  )
-                } else {
-                  Future.successful(Some(()))
-                }
-              } yield submissionResult.getOrRecoverJourney(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(PclsMemberListPage(srn), mode, request.userAnswers)
-                  )
+              } yield Redirect(
+                navigator.nextPage(PclsMemberListPage(srn), mode, request.userAnswers)
               )
           )
       }

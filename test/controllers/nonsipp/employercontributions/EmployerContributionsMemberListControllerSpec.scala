@@ -35,8 +35,6 @@ import controllers.nonsipp.employercontributions.EmployerContributionsMemberList
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
-import scala.concurrent.Future
-
 class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.EmployerContributionsMemberListController.onPageLoad(srn, page = 1, NormalMode)
@@ -86,13 +84,7 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
     )
   )
 
-  private val mockPsrSubmissionService = mock[PsrSubmissionService]
-
-  override def beforeEach(): Unit = {
-    reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(())))
-  }
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -190,8 +182,17 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
           )
     })
 
-    act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
+
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

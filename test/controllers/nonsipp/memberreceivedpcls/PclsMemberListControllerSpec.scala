@@ -39,8 +39,6 @@ import org.mockito.Mockito._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 
-import scala.concurrent.Future
-
 import java.time.LocalDate
 
 class PclsMemberListControllerSpec extends ControllerBaseSpec {
@@ -76,12 +74,6 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
-
-  override protected def beforeEach(): Unit = {
-    reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(())))
-  }
 
   private val userAnswers: UserAnswers =
     defaultUserAnswers
@@ -205,16 +197,14 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
-        .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        })
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
     )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
-        .after({
-          verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        })
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))

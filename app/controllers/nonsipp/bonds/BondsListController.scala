@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.bonds
 
-import services.{PsrSubmissionService, SaveService}
+import services.SaveService
 import pages.nonsipp.bonds._
 import viewmodels.implicits._
 import play.api.mvc._
@@ -55,7 +55,6 @@ class BondsListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
   formProvider: YesNoPageFormProvider,
-  psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -169,21 +168,8 @@ class BondsListController @Inject()(
                       .set(BondsListPage(srn), addAnother)
                   )
                 _ <- saveService.save(updatedUserAnswers)
-                submissionResult <- if (!addAnother) {
-                  psrSubmissionService.submitPsrDetailsWithUA(
-                    srn,
-                    updatedUserAnswers,
-                    fallbackCall = controllers.nonsipp.bonds.routes.BondsListController.onPageLoad(srn, page, mode)
-                  )
-                } else {
-                  Future.successful(Some(()))
-                }
-              } yield submissionResult.getOrRecoverJourney(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(BondsListPage(srn), mode, updatedUserAnswers)
-                  )
+              } yield Redirect(
+                navigator.nextPage(BondsListPage(srn), mode, updatedUserAnswers)
               )
           )
       }

@@ -38,8 +38,6 @@ import eu.timepit.refined.refineMV
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 
-import scala.concurrent.Future
-
 import java.time.LocalDate
 
 class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
@@ -206,23 +204,14 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
-        .before(
-          when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(())))
-        )
-        .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-          reset(mockPsrSubmissionService)
-        })
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
     )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
-        .before(MockPsrSubmissionService.submitPsrDetails())
-        .after({
-          verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any(), any())(any(), any(), any())
-          reset(mockPsrSubmissionService)
-        })
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))

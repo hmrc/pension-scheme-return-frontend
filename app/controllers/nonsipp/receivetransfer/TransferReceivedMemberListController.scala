@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.receivetransfer
 
-import services.{PsrSubmissionService, SaveService}
+import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
@@ -56,8 +56,7 @@ class TransferReceivedMemberListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
   saveService: SaveService,
-  formProvider: YesNoPageFormProvider,
-  psrSubmissionService: PsrSubmissionService
+  formProvider: YesNoPageFormProvider
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -165,17 +164,8 @@ class TransferReceivedMemberListController @Inject()(
                       .set(TransferReceivedMemberListPage(srn), finishedAddingTransfers)
                   )
                 _ <- saveService.save(updatedUserAnswers)
-                _ <- if (finishedAddingTransfers)
-                  psrSubmissionService.submitPsrDetailsWithUA(
-                    srn,
-                    updatedUserAnswers,
-                    fallbackCall = controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-                      .onPageLoad(srn, page, mode)
-                  )
-                else Future.successful(Some(()))
               } yield Redirect(
-                navigator
-                  .nextPage(TransferReceivedMemberListPage(srn), mode, updatedUserAnswers)
+                navigator.nextPage(TransferReceivedMemberListPage(srn), mode, updatedUserAnswers)
               )
           )
       }

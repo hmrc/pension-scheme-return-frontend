@@ -68,6 +68,9 @@ trait MockBehaviours {
         .thenReturn(Future.successful(Some(())))
 
     object verify {
+      def submitPsrDetails(v: VerificationMode)(implicit mock: PsrSubmissionService): Future[Option[Unit]] =
+        Mockito.verify(mock, v).submitPsrDetails(any(), any(), any())(any(), any(), any())
+
       def submitPsrDetailsWithUA(v: VerificationMode)(implicit mock: PsrSubmissionService): Future[Option[Unit]] =
         Mockito.verify(mock, v).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
     }

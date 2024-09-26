@@ -27,7 +27,7 @@ import _root_.config.Constants
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
 import pages.nonsipp.employercontributions._
-import services.{PsrSubmissionService, SaveService}
+import services.SaveService
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
 import controllers.actions._
@@ -58,7 +58,6 @@ class EmployerContributionsMemberListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   saveService: SaveService,
   view: TwoColumnsTripleAction,
-  psrSubmissionService: PsrSubmissionService,
   formProvider: YesNoPageFormProvider
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -183,19 +182,8 @@ class EmployerContributionsMemberListController @Inject()(
                     .set(EmployerContributionsMemberListPage(srn), value)
                 )
                 _ <- saveService.save(updatedUserAnswers)
-                submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
-                  srn,
-                  updatedUserAnswers,
-                  fallbackCall =
-                    controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-                      .onPageLoad(srn, page, mode)
-                )
-              } yield submissionResult.getOrRecoverJourney(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
-                  )
+              } yield Redirect(
+                navigator.nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
               )
           )
       }

@@ -35,8 +35,6 @@ import org.mockito.Mockito._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 
-import scala.concurrent.Future
-
 import java.time.LocalDate
 
 class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
@@ -66,7 +64,7 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[Max300.Refined](1)
   private val page = 1
 
-  private val mockPsrSubmissionService = mock[PsrSubmissionService]
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   val userAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
@@ -76,12 +74,6 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
-
-  override protected def beforeEach(): Unit = {
-    reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(())))
-  }
 
   "TransferOutMemberListController" - {
 
@@ -200,8 +192,17 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
           )
     })
 
-    act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
+
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
