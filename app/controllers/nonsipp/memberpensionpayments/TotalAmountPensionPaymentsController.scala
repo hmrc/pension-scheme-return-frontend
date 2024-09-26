@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberpensionpayments
 
 import controllers.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsController._
-import services.{PsrSubmissionService, SaveService}
+import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
@@ -49,8 +49,7 @@ class TotalAmountPensionPaymentsController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: MoneyFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: MoneyView,
-  psrSubmissionService: PsrSubmissionService
+  view: MoneyView
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -103,17 +102,8 @@ class TotalAmountPensionPaymentsController @Inject()(
                   request.userAnswers.transformAndSet(TotalAmountPensionPaymentsPage(srn, index), value)
                 )
               _ <- saveService.save(updatedAnswers)
-              submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
-                srn,
-                updatedAnswers,
-                fallbackCall = controllers.nonsipp.memberpensionpayments.routes.TotalAmountPensionPaymentsController
-                  .onPageLoad(srn, index, mode)
-              )
-            } yield submissionResult.getOrRecoverJourney(
-              _ =>
-                Redirect(
-                  navigator.nextPage(TotalAmountPensionPaymentsPage(srn, index), mode, updatedAnswers)
-                )
+            } yield Redirect(
+              navigator.nextPage(TotalAmountPensionPaymentsPage(srn, index), mode, updatedAnswers)
             )
         )
     }

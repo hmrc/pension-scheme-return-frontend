@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.otherassetsheld
 
-import services.{PsrSubmissionService, SaveService}
+import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils._
@@ -55,7 +55,6 @@ class OtherAssetsListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
   formProvider: YesNoPageFormProvider,
-  psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -170,22 +169,8 @@ class OtherAssetsListController @Inject()(
                       .set(OtherAssetsListPage(srn), addAnother)
                   )
                 _ <- saveService.save(updatedUserAnswers)
-                submissionResult <- if (!addAnother) {
-                  psrSubmissionService.submitPsrDetailsWithUA(
-                    srn,
-                    updatedUserAnswers,
-                    fallbackCall =
-                      controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onPageLoad(srn, page, mode)
-                  )
-                } else {
-                  Future.successful(Some(()))
-                }
-              } yield submissionResult.getOrRecoverJourney(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(OtherAssetsListPage(srn), mode, updatedUserAnswers)
-                  )
+              } yield Redirect(
+                navigator.nextPage(OtherAssetsListPage(srn), mode, updatedUserAnswers)
               )
           )
       }

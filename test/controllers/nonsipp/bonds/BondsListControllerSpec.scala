@@ -32,13 +32,11 @@ import pages.nonsipp.bonds._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 
-import scala.concurrent.Future
-
 class BondsListControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
   private val page = 1
-  private val mockPsrSubmissionService = mock[PsrSubmissionService]
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   private lazy val onPageLoad =
     routes.BondsListController.onPageLoad(srn, page, NormalMode)
@@ -82,12 +80,6 @@ class BondsListControllerSpec extends ControllerBaseSpec {
   )
   private val bondsData = List(bondData)
 
-  override protected def beforeEach(): Unit = {
-    reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(())))
-  }
-
   override protected val additionalBindings: List[GuiceableModule] = List(
     inject.bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
@@ -112,8 +104,17 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       }
     )
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
+
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.sharesdisposal
 
-import services.{PsrSubmissionService, SaveService}
+import services.SaveService
 import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController._
 import viewmodels.implicits._
 import com.google.inject.Inject
@@ -59,7 +59,6 @@ class ReportedSharesDisposalListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
   formProvider: YesNoPageFormProvider,
-  psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -166,25 +165,12 @@ class ReportedSharesDisposalListController @Inject()(
                       .setWhen(!reportAnotherDisposal)(SharesDisposalCompleted(srn), SectionCompleted)
                       .mapK[Future]
                     _ <- saveService.save(updatedUserAnswers)
-                    submissionResult <- if (!reportAnotherDisposal) {
-                      psrSubmissionService.submitPsrDetailsWithUA(
-                        srn,
-                        updatedUserAnswers,
-                        fallbackCall = controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
-                          .onPageLoad(srn, page)
-                      )
-                    } else {
-                      Future.successful(Some(()))
-                    }
-                  } yield submissionResult.getOrRecoverJourney(
-                    _ =>
-                      Redirect(
-                        navigator.nextPage(
-                          ReportedSharesDisposalListPage(srn, reportAnotherDisposal),
-                          mode,
-                          request.userAnswers
-                        )
-                      )
+                  } yield Redirect(
+                    navigator.nextPage(
+                      ReportedSharesDisposalListPage(srn, reportAnotherDisposal),
+                      mode,
+                      request.userAnswers
+                    )
                   )
               )
           }

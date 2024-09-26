@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.membertransferout
 
-import services.{PsrSubmissionService, SaveService}
+import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
@@ -56,8 +56,7 @@ class TransferOutMemberListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
   formProvider: YesNoPageFormProvider,
-  saveService: SaveService,
-  psrSubmissionService: PsrSubmissionService
+  saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -165,20 +164,8 @@ class TransferOutMemberListController @Inject()(
                       .set(TransferOutMemberListPage(srn), finishedAddingTransfers)
                   )
                 _ <- saveService.save(updatedUserAnswers)
-                submissionResult <- if (finishedAddingTransfers)
-                  psrSubmissionService.submitPsrDetailsWithUA(
-                    srn,
-                    updatedUserAnswers,
-                    fallbackCall = controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
-                      .onPageLoad(srn, 1, NormalMode)
-                  )
-                else Future.successful(Some(()))
-              } yield submissionResult.getOrRecoverJourney(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(TransferOutMemberListPage(srn), mode, request.userAnswers)
-                  )
+              } yield Redirect(
+                navigator.nextPage(TransferOutMemberListPage(srn), mode, request.userAnswers)
               )
           )
       }

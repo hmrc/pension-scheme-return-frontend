@@ -32,7 +32,7 @@ import controllers.nonsipp.memberdetails.SchemeMembersListController._
 import viewmodels.models.{MemberState, SectionCompleted}
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails._
-import org.mockito.Mockito.times
+import org.mockito.Mockito._
 
 class SchemeMembersListControllerSpec extends ControllerBaseSpec {
 
@@ -133,7 +133,8 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
           routes.PensionSchemeMembersController.onPageLoad(srn),
           userAnswersWithMembersDetails,
           "value" -> "true"
-        )
+        ).before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+          .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
       )
 
       "when user answers has 300 members" - {
@@ -143,15 +144,17 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
             routes.HowToUploadController.onPageLoad(srn),
             userAnswersWith300MembersDetails,
             "value" -> "true"
-          )
+          ).before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+            .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
         )
       }
 
       act.like(
         redirectNextPage(onSubmitManual, "value" -> "false")
           .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-          .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(1)))
+          .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
       )
+
       act.like(invalidForm(onSubmitManual))
       act.like(journeyRecoveryPage(onSubmitManual).updateName("onSubmit" + _))
     }
@@ -191,7 +194,8 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
           routes.PensionSchemeMembersController.onPageLoad(srn),
           userAnswersWithMembersDetails,
           "value" -> "true"
-        )
+        ).before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+          .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
       )
 
       "when user answers has more than 300 members" - {
@@ -201,11 +205,17 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
             routes.HowToUploadController.onPageLoad(srn),
             userAnswersWith300MembersDetails,
             "value" -> "true"
-          )
+          ).before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+            .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
         )
       }
 
-      act.like(redirectNextPage(onSubmitUpload, "value" -> "false"))
+      act.like(
+        redirectNextPage(onSubmitUpload, "value" -> "false")
+          .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+          .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+      )
+
       act.like(invalidForm(onSubmitUpload))
       act.like(journeyRecoveryPage(onSubmitUpload).updateName("onSubmit" + _))
     }

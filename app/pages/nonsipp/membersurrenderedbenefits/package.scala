@@ -32,7 +32,7 @@ package object membersurrenderedbenefits {
   def surrenderBenefitsPages(srn: Srn, index: Max300): List[QuestionPage[_]] = List(
     SurrenderedBenefitsAmountPage(srn, index),
     WhenDidMemberSurrenderBenefitsPage(srn, index),
-    WhyDidMemberSurrenderBenefitsPage(srn, index)
+    WhyDidMemberSurrenderBenefitsPage(srn, index),
+    SurrenderedBenefitsCompletedPage(srn, index)
   )
-
 }
