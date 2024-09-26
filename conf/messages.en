@@ -579,7 +579,7 @@ shares.classOfShares.error.length = The class of the shares held in this company
 
 shares.costOfShares.title = What was the total cost of the shares in this company, in pounds and pence?
 shares.costOfShares.heading = What was the total cost of the shares in {0}, in pounds and pence?
-shares.costOfShares.hint = Include all costs related to the transaction. If the shares were not acquired or subscribed for, provide the total value.
+shares.costOfShares.hint = Include all costs related to the transaction. If the shares were contributed or transferred in, provide the total value.
 shares.costOfShares.error.required = Enter the total cost of the shares, in pounds and pence
 shares.costOfShares.error.invalid = Total cost of the shares must be an amount of money, like 123 or 123.45
 shares.costOfShares.error.tooSmall = Total cost of the shares must be 0.01 or more
@@ -3077,7 +3077,7 @@ whenDidSchemeAcquireBonds.dateOfAcquired.error.after = Date the scheme acquired 
 
 bonds.costOfBonds.title = What was the total cost of these bonds, in pounds and pence?
 bonds.costOfBonds.heading = What was the total cost of these bonds, in pounds and pence?
-bonds.costOfBonds.hint = Include all costs related to the transaction. If the bonds were not acquired, provide the total value.
+bonds.costOfBonds.hint = Include all costs related to the transaction. If the bonds were contributed or transferred in, provide the total value.
 bonds.costOfBonds.error.required = Enter the total cost of the bonds, in pounds and pence
 bonds.costOfBonds.error.invalid = Total cost of the bonds must be an amount of money, like 123 or 123.45
 bonds.costOfBonds.error.tooSmall = Total cost of the bonds must be 0.01 or more
@@ -3297,7 +3297,7 @@ otherAssets.sellerConnectedParty.error.required = Select yes if the seller is a 
 
 otherAssets.costOfOtherAsset.title = What was the total cost of the asset, in pounds and pence?
 otherAssets.costOfOtherAsset.heading = What was the total cost of the asset, in pounds and pence?
-otherAssets.costOfOtherAsset.hint = Include all costs related to the transaction. If the asset was not acquired, provide the total value.
+otherAssets.costOfOtherAsset.hint = Include all costs related to the transaction. If the asset was contributed or transferred in, provide the total value.
 otherAssets.costOfOtherAsset.error.required = Enter the total cost of the asset, in pounds and pence
 otherAssets.costOfOtherAsset.error.invalid = Total cost of the asset must be an amount of money, like 123 or 123.45
 otherAssets.costOfOtherAsset.error.tooSmall = Total cost of the asset must be 0.01 or more
