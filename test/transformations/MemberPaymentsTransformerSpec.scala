@@ -317,7 +317,6 @@ class MemberPaymentsTransformerSpec
     totalAmountPensionPaymentsPage = None
   )
 
-  // TODO: when each section is updated, check/update page values for that section
   private val userAnswersNoSections = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
     .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
@@ -330,28 +329,27 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(EmployerContributionsPage(srn), false)
     .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
     .unsafeSet(EmployerContributionsMemberListPage(srn), true)
-    // unallocated employer contributions - to be checked/updated
+    // unallocated employer contributions
     .unsafeSet(UnallocatedEmployerContributionsPage(srn), false)
-    // member contributions - to be checked/updated
+    // member contributions
     .unsafeSet(MemberContributionsPage(srn), false)
     .unsafeSet(MemberContributionsListPage(srn), false)
-    // transfers in - to be checked/updated
+    // transfers in
     .unsafeSet(TransfersInJourneyStatus(srn), SectionStatus.Completed)
     .unsafeSet(DidSchemeReceiveTransferPage(srn), false)
     .unsafeSet(TransferReceivedMemberListPage(srn), true)
-    // pcls - to be checked/updated
+    // pcls
     .unsafeSet(PensionCommencementLumpSumPage(srn), false)
     .unsafeSet(PclsMemberListPage(srn), false)
-    // transfers out - to be checked/updated
+    // transfers out
     .unsafeSet(SchemeTransferOutPage(srn), false)
     .unsafeSet(TransferOutMemberListPage(srn), true)
     .unsafeSet(TransfersOutJourneyStatus(srn), SectionStatus.Completed)
-    // pension surrender - to be checked/updated
-//    .unsafeSet(SurrenderedBenefitsCompletedPage(srn, index), SectionCompleted)
+    // pension surrender
     .unsafeSet(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.Completed)
     .unsafeSet(SurrenderedBenefitsPage(srn), false)
     .unsafeSet(SurrenderedBenefitsMemberListPage(srn), true)
-    // pension payments - to be checked/updated
+    // pension payments
     .unsafeSet(PensionPaymentsReceivedPage(srn), false)
     .unsafeSet(PensionPaymentsJourneyStatus(srn), SectionStatus.Completed)
     .unsafeSet(MemberPensionPaymentsListPage(srn), true)
