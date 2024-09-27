@@ -352,6 +352,14 @@ trait CommonTestValues {
       |""".stripMargin
   )
 
+  val getVersions503Json: JsValue = Json.parse(
+    """
+      |{
+      |    "statusCode": 503,
+      |    "message": "returned 503"
+      |}
+      |""".stripMargin
+  )
   val getVersionsForYearsNotFoundJson: JsValue = Json.parse(
     """
       |    {

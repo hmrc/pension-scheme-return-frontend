@@ -175,8 +175,6 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
         .withName("Submit redirects to view only tasklist")
     )
 
-
-
   }
   private def mockTaxYear(
     taxYear: DateRange

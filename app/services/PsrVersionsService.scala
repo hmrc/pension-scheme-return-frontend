@@ -31,11 +31,11 @@ class PsrVersionsService @Inject()(psrConnector: PSRConnector) {
     implicit hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsForYearsResponse]] =
-    psrConnector.getVersionsForYears(pstr, startDates, srn)
+    psrConnector.getVersionsForYears(pstr, startDates, srn, controllers.routes.OverviewController.onPageLoad(srn))
 
   def getVersions(pstr: String, startDate: String, srn: Srn)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsResponse]] =
-    psrConnector.getVersions(pstr, startDate, srn)
+    psrConnector.getVersions(pstr, startDate, srn, controllers.routes.OverviewController.onPageLoad(srn))
 }
