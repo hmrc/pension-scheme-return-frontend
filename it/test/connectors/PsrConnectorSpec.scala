@@ -20,11 +20,12 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import handlers.GetPsrException
 import models.SchemeId.Srn
 import org.scalatest.exceptions.TestFailedException
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{__, JsResultException, Json, JsonValidationError}
+import play.api.libs.json.{JsResultException, Json, JsonValidationError, __}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.CommonTestValues
@@ -193,19 +194,31 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
       )
 
       val result = connector
-        .getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get)
+        .getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get))
         .futureValue
 
       result mustBe versionsForYearsResponse
     }
 
-    "return empty list when getVersionsForYears called and 403 returned" in runningApplication { implicit app =>
+    "throw GetPsrException when getVersionsForYears called and 403 returned" in runningApplication { implicit app =>
       stubGet(
         getVersionsForYearsUrl,
         forbidden().withBody(Json.stringify(getVersionsForYears403Json)).withHeader("srn", "S0000000042")
       )
+      val err: TestFailedException = intercept[TestFailedException](
+        connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)).futureValue
+      )
 
-      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get).futureValue
+      err.cause.get mustBe a[GetPsrException]
+    }
+
+    "return empty list when getVersionsForYears called and 503 returned" in runningApplication { implicit app =>
+      stubGet(
+        getVersionsForYearsUrl,
+        serviceUnavailable().withBody(Json.stringify(getVersions503Json)).withHeader("srn", "S0000000042")
+      )
+
+      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)).futureValue
 
       result mustBe List()
     }
@@ -213,10 +226,10 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
     "return empty list when getVersionsForYears called and data not found" in runningApplication { implicit app =>
       stubGet(
         getVersionsForYearsUrl,
-        forbidden().withBody(Json.stringify(getVersionsForYearsNotFoundJson)).withHeader("srn", "S0000000042")
+        notFound().withBody(Json.stringify(getVersionsForYearsNotFoundJson)).withHeader("srn", "S0000000042")
       )
 
-      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get).futureValue
+      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)).futureValue
 
       result mustBe List()
     }
@@ -228,7 +241,7 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
       )
 
       val err: TestFailedException = intercept[TestFailedException](
-        connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get).futureValue
+        connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)).futureValue
       )
 
       err.cause match {
@@ -249,22 +262,36 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
       )
 
       val result = connector
-        .getVersions(commonPstr, commonStartDate, Srn(commonSrn).get)
+        .getVersions(commonPstr, commonStartDate, Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get))
         .futureValue
 
       result mustBe versionsResponse
     }
 
-    "return empty list when getVersionsForYears called and 403 returned" in runningApplication { implicit app =>
+    "throw GetPsrException when getVersionsForYears called and 403 returned" in runningApplication { implicit app =>
       stubGet(
         getVersionsUrl,
         forbidden().withBody(Json.stringify(getVersionsForYears403Json)).withHeader("srn", "S0000000042")
       )
 
-      val result = connector.getVersions(commonPstr, commonStartDate, Srn(commonSrn).get).futureValue
+      val err: TestFailedException = intercept[TestFailedException](
+        connector.getVersions(commonPstr, commonStartDate, Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)).futureValue
+      )
+
+      err.cause.get mustBe a[GetPsrException]
+    }
+
+    "return empty list when getVersionsForYears called and 503 returned" in runningApplication { implicit app =>
+      stubGet(
+        getVersionsUrl,
+        serviceUnavailable().withBody(Json.stringify(getVersions503Json)).withHeader("srn", "S0000000042")
+      )
+
+      val result = connector.getVersions(commonPstr, commonStartDate, Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)).futureValue
 
       result mustBe List()
     }
+
 
     "return empty list when getVersions called and data not found" in runningApplication { implicit app =>
       stubGet(
@@ -272,7 +299,7 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
         forbidden().withBody(Json.stringify(getVersionsForYearsNotFoundJson)).withHeader("srn", "S0000000042")
       )
 
-      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get).futureValue
+      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)).futureValue
 
       result mustBe List()
     }
