@@ -267,7 +267,7 @@ trait Mappings extends Formatters with Constraints {
     text(requiredKey, args.toList)
       .verifying(verify[String](invalidKey, s => Crn.isValid(s.toUpperCase), args: _*))
       .verifying(verify[String](minMaxLengthErrorKey, s => Crn.isLengthInRange(s.toUpperCase), args: _*))
-      .transform[Crn](s => Crn(s.toUpperCase), _.crn.toUpperCase)
+      .transform[Crn](s => Crn(s.toUpperCase.replaceAll(" ", "")), _.crn.toUpperCase)
 
   def ninoNoDuplicates(
     requiredKey: String,
