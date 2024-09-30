@@ -19,8 +19,6 @@ package controllers.nonsipp.memberpensionpayments
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc._
-import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.Max300
 import controllers.PSRController
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -32,6 +30,7 @@ import views.html.YesNoPageView
 import models.SchemeId.Srn
 import pages.nonsipp.memberpensionpayments._
 import controllers.actions._
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
 
@@ -65,42 +64,26 @@ class PensionPaymentsReceivedController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
         value =>
-          if (value) {
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(PensionPaymentsReceivedPage(srn), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(PensionPaymentsReceivedPage(srn), mode, updatedAnswers))
-          } else {
-            val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
-
-            val zippedOptionList: List[(Max300, Option[NameDOB])] = optionList
-              .zipWithRefinedIndexToList[Max300.Refined]
-
-            val pensionPaymentsPages: List[UserAnswers.Compose] = zippedOptionList
-              .flatMap {
-                case (index, Some(_)) => List(_.set(TotalAmountPensionPaymentsPage(srn, index), Money(0)))
-                case _ => Nil
-              }
-
-            for {
-              updatedAnswers <- Future.fromTry(
-                request.userAnswers
-                  .set(PensionPaymentsReceivedPage(srn), value)
-                  .compose(pensionPaymentsPages)
-                  .set(MemberPensionPaymentsListPage(srn), true)
-                  .set(PensionPaymentsJourneyStatus(srn), SectionStatus.Completed)
-              )
-              _ <- saveService.save(updatedAnswers)
-              submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
+          for {
+            updatedAnswers <- request.userAnswers
+              .set(PensionPaymentsReceivedPage(srn), value)
+              .setWhen(!value)(PensionPaymentsJourneyStatus(srn), SectionStatus.Completed)
+              .mapK[Future]
+            _ <- saveService.save(updatedAnswers)
+            submissionResult <- if (!value) {
+              psrSubmissionService.submitPsrDetailsWithUA(
                 srn,
                 updatedAnswers,
                 fallbackCall = controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
                   .onPageLoad(srn, mode)
               )
-            } yield submissionResult.getOrRecoverJourney(
+            } else {
+              Future.successful(Some(()))
+            }
+          } yield submissionResult
+            .getOrRecoverJourney(
               _ => Redirect(navigator.nextPage(PensionPaymentsReceivedPage(srn), mode, updatedAnswers))
             )
-          }
       )
   }
 }

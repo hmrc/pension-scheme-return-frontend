@@ -160,10 +160,6 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
         .map(t => t._2.toString -> t._1)
         .toMap
 
-    // todo: use zipWithRefinedIndex instead - indexes that can't be refined get suppressed (they do not get added to the list)
-    def zipWithRefinedIndexToList[I: Validate[Int, *]]: List[(Refined[Int, I], A)] =
-      l.zipWithIndex.flatMap { case (a, index) => refineIndex(index).map(_ -> a) }
-
     def zipWithRefinedIndex[I: Validate[Int, *]]: Either[Result, List[(Refined[Int, I], A)]] =
       l.zipWithIndex.traverse { case (a, index) => refineIndex(index).map(_ -> a).getOrRecoverJourney }
   }
