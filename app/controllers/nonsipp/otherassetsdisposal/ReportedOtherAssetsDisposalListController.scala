@@ -193,12 +193,12 @@ class ReportedOtherAssetsDisposalListController @Inject()(
     }
 
   def onPreviousViewOnly(
-                          srn: Srn,
-                          page: Int,
-                          year: String,
-                          current: Int,
-                          previous: Int
-                        ): Action[AnyContent] =
+    srn: Srn,
+    page: Int,
+    year: String,
+    current: Int,
+    previous: Int
+  ): Action[AnyContent] =
     identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)).async {
       implicit request =>
         Future.successful {

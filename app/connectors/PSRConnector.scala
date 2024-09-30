@@ -109,7 +109,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
       }
   }
 
-  def getVersionsForYears(pstr: String, startDates: Seq[String], srn: Srn)(
+  def getVersionsForYears(pstr: String, startDates: Seq[String], srn: Srn, fallBackCall: Call)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsForYearsResponse]] =
@@ -135,17 +135,20 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
               s"getVersions for $pstr and years $startDates returned http response 404 - returning empty Seq"
             )
             Seq.empty[PsrVersionsForYearsResponse]
-          case _ =>
-            // TODO verify if there are still 503 returned on QA
-            // just logging errors to be able to continue on QA env
+          case SERVICE_UNAVAILABLE =>
             logger.warn(
-              s"getVersions for $pstr and years $startDates returned http response ${response.status} - returning empty Seq"
+              s"getVersions for $pstr and years $startDates returned http response 503 - returning empty Seq"
             )
             Seq.empty[PsrVersionsForYearsResponse]
+          case _ =>
+            logger.warn(
+              s"getVersions for $pstr and years $startDates returned http response ${response.status}"
+            )
+            throw GetPsrException(s"${response.body}", fallBackCall.url, AnswersSavedDisplayVersion.NoDisplay)
         }
       }
 
-  def getVersions(pstr: String, startDate: String, srn: Srn)(
+  def getVersions(pstr: String, startDate: String, srn: Srn, fallBackCall: Call)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsResponse]] =
@@ -169,13 +172,16 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
           case NOT_FOUND =>
             logger.warn(s"getVersions for $pstr and $startDate returned http response 404 - returning empty Seq")
             Seq.empty[PsrVersionsResponse]
+          case SERVICE_UNAVAILABLE =>
+            logger.warn(
+              s"getVersions for $pstr and $startDate returned http response 503 - returning empty Seq"
+            )
+            Seq.empty[PsrVersionsResponse]
           case _ =>
-            // TODO verify if there are still 503 returned on QA
-            // just logging errors to be able to continue on QA env
             logger.warn(
               s"getVersions for $pstr and $startDate returned http response ${response.status} - returning empty Seq"
             )
-            Seq.empty[PsrVersionsResponse]
+            throw GetPsrException(s"${response.body}", fallBackCall.url, AnswersSavedDisplayVersion.NoDisplay)
         }
       }
 
