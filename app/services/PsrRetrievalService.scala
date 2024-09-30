@@ -40,7 +40,6 @@ class PsrRetrievalService @Inject()(
   declarationTransformer: DeclarationTransformer
 ) extends PsrBaseService {
 
-  // todo should return Option.None on 404 instead of empty user answers
   def getAndTransformStandardPsrDetails(
     optFbNumber: Option[String] = None,
     optPeriodStartDate: Option[String] = None,
@@ -51,22 +50,16 @@ class PsrRetrievalService @Inject()(
     implicit request: DataRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext
-  ): Future[UserAnswers] = {
-
-    val srn = request.srn
-
-    val emptyUserAnswers = UserAnswers(request.getUserId + srn)
-
+  ): Future[Option[UserAnswers]] =
     getStandardPsrDetails(
       optFbNumber,
       optPeriodStartDate,
       optPsrVersion,
       fallBackCall
     ).flatMap {
-      case Some(psrDetails) => transformPsrDetails(psrDetails, fetchingPreviousVersion)
-      case _ => Future(emptyUserAnswers)
+      case Some(psrDetails) => transformPsrDetails(psrDetails, fetchingPreviousVersion).flatMap(ua => Future(Some(ua)))
+      case _ => Future(None)
     }
-  }
 
   def getStandardPsrDetails(
     optFbNumber: Option[String] = None,
@@ -98,12 +91,12 @@ class PsrRetrievalService @Inject()(
   ): Future[UserAnswers] =
     Future.fromTry {
       val srn = request.srn
-      val emptyUserAnswers = UserAnswers(request.getUserId + srn)
+      val emptyUerAnswers = UserAnswers(request.getUserId + srn)
 
       for {
         transformedMinimalUa <- minimalRequiredSubmissionTransformer
           .transformFromEtmp(
-            emptyUserAnswers,
+            emptyUerAnswers,
             srn,
             request.pensionSchemeId,
             psrDetails.minimalRequiredSubmission

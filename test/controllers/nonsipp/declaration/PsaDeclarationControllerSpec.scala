@@ -131,8 +131,8 @@ class PsaDeclarationControllerSpec
           when(
             mockPsrRetrievalService
               .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
-          ).thenReturn(Future.successful(emptyUserAnswers))
-            .thenReturn(Future.successful(emptyUserAnswers))
+          ).thenReturn(Future.successful(None))
+            .thenReturn(Future.successful(None))
           when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(versionsResponse))
           MockPsrSubmissionService.submitPsrDetailsBypassed()
@@ -168,8 +168,8 @@ class PsaDeclarationControllerSpec
           when(
             mockPsrRetrievalService
               .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
-          ).thenReturn(Future.successful(fullUserAnswers))
-            .thenReturn(Future.successful(fullUserAnswers))
+          ).thenReturn(Future.successful(Some(fullUserAnswers)))
+            .thenReturn(Future.successful(Some(fullUserAnswers)))
           when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any()))
             .thenReturn(Future.successful(versionsResponse))
           MockPsrSubmissionService.submitPsrDetails()

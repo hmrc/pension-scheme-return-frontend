@@ -281,7 +281,7 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
           when(
             mockPsrRetrievalService
               .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
-          ).thenReturn(Future.successful(emptyUserAnswers))
+          ).thenReturn(Future.successful(None))
         }
         .withName(
           "onSelectToView redirects ok the BasicDetailsCYA page when members over threshold and no " +
@@ -306,7 +306,7 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
           when(
             mockPsrRetrievalService
               .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
-          ).thenReturn(Future.successful(overThresholdUA))
+          ).thenReturn(Future.successful(Some(overThresholdUA)))
         }
         .after {
           verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any())

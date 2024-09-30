@@ -58,7 +58,7 @@ class DataRetrievalETMPAction(
           _ = logger.info(
             s"[VersionForYear] Fetching current PSR version by year $year and version ${"%03d".format(current)}"
           )
-          currentReturn <- psrRetrievalService.getAndTransformStandardPsrDetails(
+          optCurrentReturn <- psrRetrievalService.getAndTransformStandardPsrDetails(
             None,
             Some(year),
             Some("%03d".format(current)),
@@ -66,7 +66,7 @@ class DataRetrievalETMPAction(
           )(hc = implicitly, ec = implicitly, request = dataRequest)
         } yield OptionalDataRequest(
           request,
-          userAnswers = Some(currentReturn),
+          userAnswers = optCurrentReturn,
           pureUa,
           previousUserAnswers = None,
           Some(year),
@@ -91,25 +91,19 @@ class DataRetrievalETMPAction(
         for {
           pureUa <- sessionRepository.get(UNCHANGED_SESSION_PREFIX + userAnswersKey)
           _ = logger.info(s"[Compare] Fetching previous PSR version ${"%03d".format(previous)}")
-          previousReturn <- psrRetrievalService.getAndTransformStandardPsrDetails(
+          previousUa <- psrRetrievalService.getAndTransformStandardPsrDetails(
             optPeriodStartDate = Some(year),
             optPsrVersion = Some("%03d".format(previous)),
             fallBackCall = controllers.routes.OverviewController.onPageLoad(request.srn),
             fetchingPreviousVersion = true
           )(hc = implicitly, ec = implicitly, request = dataRequest)
-          previousUa = if (previousReturn.data == emptyUserAnswers(request).data) {
-            logger.info("[Compare] Fetching previous return was empty, setting previousUserAnswers to None")
-            None
-          } else {
-            logger.info("[Compare] Fetching previous return was ok, setting previousUserAnswers to Some")
-            Some(previousReturn)
-          }
           _ = logger.info(s"[Compare] Fetching current PSR version ${"%03d".format(current)}")
-          currentReturn <- psrRetrievalService.getAndTransformStandardPsrDetails(
+          optCurrentReturn <- psrRetrievalService.getAndTransformStandardPsrDetails(
             optPeriodStartDate = Some(year),
             optPsrVersion = Some("%03d".format(current)),
             fallBackCall = controllers.routes.OverviewController.onPageLoad(request.srn)
           )(hc = implicitly, ec = implicitly, request = dataRequest.copy(previousUserAnswers = previousUa))
+          currentReturn = optCurrentReturn.getOrElse(emptyUserAnswers(request))
         } yield OptionalDataRequest(
           request,
           Some(currentReturn),
@@ -158,6 +152,10 @@ class DataRetrievalETMPAction(
                         fallBackCall = controllers.routes.OverviewController.onPageLoad(request.srn),
                         fetchingPreviousVersion = true
                       )(hc = implicitly, ec = implicitly, request = dataRequest)
+                      .flatMap {
+                        case Some(value) => Future.successful(value)
+                        case None => Future.successful(emptyUserAnswers(request))
+                      }
                 }
             }
             .map(_.flatten)

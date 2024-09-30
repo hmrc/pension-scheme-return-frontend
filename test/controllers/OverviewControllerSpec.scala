@@ -232,7 +232,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
       when(
         mockPsrRetrievalService
           .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
-      ).thenReturn(Future.successful(emptyUserAnswers))
+      ).thenReturn(Future.successful(None))
       val currentUA = emptyUserAnswers
         .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
         .unsafeSet(WhichTaxYearPage(srn), dateRange)
@@ -260,7 +260,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
       when(
         mockPsrRetrievalService
           .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
-      ).thenReturn(Future.successful(currentUA))
+      ).thenReturn(Future.successful(Some(currentUA)))
       running(_ => applicationBuilder(userAnswers = Some(currentUA))) { app =>
         val request = FakeRequest(GET, onSelectViewAndChange)
 

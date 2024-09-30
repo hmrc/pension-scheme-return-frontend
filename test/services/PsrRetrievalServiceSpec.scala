@@ -92,15 +92,14 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           implicitly,
           implicitly
         )
-      ) { result: UserAnswers =>
+      ) { result: Option[UserAnswers] =>
         verify(mockMinimalRequiredSubmissionTransformer, never).transformFromEtmp(any(), any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any(), any(), any())
         verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
-        result mustBe a[UserAnswers]
-        result.data.decryptedValue mustBe JsObject.empty
+        result mustBe None
       }
     }
     "should getPsrDetails return data when only minimal data was found in etmp" in {
@@ -128,15 +127,15 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           implicitly,
           implicitly
         )
-      ) { result: UserAnswers =>
+      ) { result: Option[UserAnswers] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any(), any(), any())
         verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
-        result mustBe a[UserAnswers]
-        result.data.decryptedValue must not be JsObject.empty
+        result.get mustBe a[UserAnswers]
+        result.get.data.decryptedValue must not be JsObject.empty
       }
     }
 
@@ -167,15 +166,15 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           implicitly,
           implicitly
         )
-      ) { result: UserAnswers =>
+      ) { result: Option[UserAnswers] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockLoansTransformer, times(1)).transformFromEtmp(any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any(), any(), any())
         verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
-        result mustBe a[UserAnswers]
-        result.data.decryptedValue must not be JsObject.empty
+        result.get mustBe a[UserAnswers]
+        result.get.data.decryptedValue must not be JsObject.empty
       }
     }
 
@@ -206,15 +205,15 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           implicitly,
           implicitly
         )
-      ) { result: UserAnswers =>
+      ) { result: Option[UserAnswers] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, times(1)).transformFromEtmp(any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any(), any(), any())
         verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
-        result mustBe a[UserAnswers]
-        result.data.decryptedValue must not be JsObject.empty
+        result.get mustBe a[UserAnswers]
+        result.get.data.decryptedValue must not be JsObject.empty
       }
     }
 
@@ -246,15 +245,15 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           implicitly,
           implicitly
         )
-      ) { result: UserAnswers =>
+      ) { result: Option[UserAnswers] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockMemberPaymentsTransformer, times(1)).transformFromEtmp(any(), any(), any(), any(), any())
         verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
-        result mustBe a[UserAnswers]
-        result.data.decryptedValue must not be JsObject.empty
+        result.get mustBe a[UserAnswers]
+        result.get.data.decryptedValue must not be JsObject.empty
       }
     }
 
@@ -286,15 +285,15 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           implicitly,
           implicitly
         )
-      ) { result: UserAnswers =>
+      ) { result: Option[UserAnswers] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any(), any(), any())
         verify(mockSharesTransformer, times(1)).transformFromEtmp(any(), any(), any())
         verify(mockDeclarationTransformer, never).transformFromEtmp(any(), any(), any())
-        result mustBe a[UserAnswers]
-        result.data.decryptedValue must not be JsObject.empty
+        result.get mustBe a[UserAnswers]
+        result.get.data.decryptedValue must not be JsObject.empty
       }
     }
 
@@ -325,15 +324,15 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           implicitly,
           implicitly
         )
-      ) { result: UserAnswers =>
+      ) { result: Option[UserAnswers] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
         verify(mockAssetsTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockLoansTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any(), any(), any())
         verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
         verify(mockDeclarationTransformer, times(1)).transformFromEtmp(any(), any(), any())
-        result mustBe a[UserAnswers]
-        result.data.decryptedValue must not be JsObject.empty
+        result.get mustBe a[UserAnswers]
+        result.get.data.decryptedValue must not be JsObject.empty
       }
     }
   }

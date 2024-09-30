@@ -51,10 +51,10 @@ class ViewOnlyReturnSubmittedControllerSpec extends ControllerBaseSpec with Comm
       .thenReturn(Future.successful(Seq.empty[PsrVersionsResponse]))
     when(
       mockPsrRetrievalService.getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
-    ).thenReturn(Future.successful(userAnswers))
-      .thenReturn(Future.successful(emptyUserAnswers))
-      .thenReturn(Future.successful(userAnswers))
-      .thenReturn(Future.successful(emptyUserAnswers))
+    ).thenReturn(Future.successful(Some(userAnswers)))
+      .thenReturn(Future.successful(None))
+      .thenReturn(Future.successful(Some(userAnswers)))
+      .thenReturn(Future.successful(None))
   }
 
   lazy val onPageLoad: Call = routes.ViewOnlyReturnSubmittedController.onPageLoad(srn, yearString, versionNumber)

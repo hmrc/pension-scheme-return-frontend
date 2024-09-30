@@ -58,7 +58,7 @@ class ViewOnlyReturnSubmittedController @Inject()(
         config.urls.managePensionsSchemes.schemeSummaryDashboard(srn)
       }
       for {
-        retrievedUserAnswers <- psrRetrievalService.getAndTransformStandardPsrDetails(
+        optRetrievedUserAnswers <- psrRetrievalService.getAndTransformStandardPsrDetails(
           None,
           Some(year),
           Some("%03d".format(version)),
@@ -68,7 +68,7 @@ class ViewOnlyReturnSubmittedController @Inject()(
         viewModel = ViewOnlyReturnSubmittedController.viewModel(
           srn,
           request.schemeDetails.schemeName,
-          retrievedUserAnswers,
+          optRetrievedUserAnswers.getOrElse(UserAnswers(request.getUserId + request.srn)),
           psrVersionsResponse,
           version,
           dashboardLink

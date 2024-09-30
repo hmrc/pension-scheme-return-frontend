@@ -72,8 +72,8 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
   override def beforeAll(): Unit =
     when(
       mockPsrRetrievalService.getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
-    ).thenReturn(Future.successful(fullUserAnswers)) // Redirect Test 3 - full return submitted last tax year
-      .thenReturn(Future.successful(skippedUserAnswers)) // Redirect Test 5 - skipped return submitted last tax year
+    ).thenReturn(Future.successful(Some(fullUserAnswers))) // Redirect Test 3 - full return submitted last tax year
+      .thenReturn(Future.successful(Some(skippedUserAnswers))) // Redirect Test 5 - skipped return submitted last tax year
   // Not triggered in any other tests
 
   override def beforeEach(): Unit = {

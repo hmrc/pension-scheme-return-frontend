@@ -75,14 +75,18 @@ trait SchemeDetailNavigationUtils { _: PSRController =>
               if (psrVersionsResponses.nonEmpty) {
                 // If so, then determine if the latest submitted return from last year was a full return
                 val latestVersionNumber = "%03d".format(psrVersionsResponses.map(_.reportVersion).max)
-                val latestReturnFromPreviousTaxYear = psrRetrievalService.getAndTransformStandardPsrDetails(
+                val optLatestReturnFromPreviousTaxYear = psrRetrievalService.getAndTransformStandardPsrDetails(
                   optPeriodStartDate = Some(previousTaxYear),
                   optPsrVersion = Some(latestVersionNumber),
                   fallBackCall = controllers.routes.OverviewController.onPageLoad(srn)
                 )
 
-                latestReturnFromPreviousTaxYear.map { previousUserAnswers =>
-                  Right(previousUserAnswers.get(memberDetails).getOrElse(JsObject.empty).as[JsObject] == JsObject.empty)
+                optLatestReturnFromPreviousTaxYear.map { previousUserAnswers =>
+                  previousUserAnswers match {
+                    case Some(value) =>
+                      Right(value.get(memberDetails).getOrElse(JsObject.empty).as[JsObject] == JsObject.empty)
+                    case None => Right(true)
+                  }
                 }
               } else { // shortcut triggered: no returns of any kind submitted last year
                 Right(true).pure[Future]
