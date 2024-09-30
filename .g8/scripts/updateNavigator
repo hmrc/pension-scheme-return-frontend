@@ -2,9 +2,6 @@
 
 # Uses sed to insert route to supplied navigator file and update navigator spec
 
-# todo
-# - check EOF of routes file and if it doesn't have a newline, create one
-
 set -e
 
 [ -z "$1" ] && echo "missing first param PAGE" && exit 1
@@ -83,7 +80,7 @@ echo "INDEX=$INDEX"
 echo "SECONDARY_INDEX=$SECONDARY_INDEX"
 
 if [ -z "$INDEX" ]; then
-  echo "TODO no index, skipping test"
+  echo "No index, skipping test"
 else
 if [ -z "$SECONDARY_INDEX" ]; then
 sed "\$s/\(}\)/\n  \"$PAGE\" - {\n"\
