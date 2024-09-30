@@ -40,7 +40,6 @@ class PsrRetrievalService @Inject()(
   declarationTransformer: DeclarationTransformer
 ) extends PsrBaseService {
 
-  // todo should return Option.None on 404 instead of empty user answers
   def getAndTransformStandardPsrDetails(
     optFbNumber: Option[String] = None,
     optPeriodStartDate: Option[String] = None,
