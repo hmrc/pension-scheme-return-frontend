@@ -33,6 +33,7 @@ import models.requests.DataRequest
 import views.html.TaskListView
 import models.SchemeId.Srn
 import pages.nonsipp.{CheckReturnDatesPage, CompilationOrSubmissionDatePage, WhichTaxYearPage}
+import play.api.Logging
 import utils.nonsipp.TaskListUtils._
 import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models._
@@ -50,7 +51,8 @@ class TaskListController @Inject()(
   view: TaskListView,
   psrVersionsService: PsrVersionsService
 )(implicit ec: ExecutionContext)
-    extends PSRController {
+    extends PSRController
+    with Logging {
 
   def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     withCompletedBasicDetails(srn) { dates =>
@@ -65,10 +67,12 @@ class TaskListController @Inject()(
         noChangesSincePreviousVersion = if (!hasHistory || request.previousUserAnswers.isEmpty) {
           true
         } else {
-          userAnswersUnchangedAllSections(
+          val bool = userAnswersUnchangedAllSections(
             request.userAnswers,
             request.previousUserAnswers.get
           )
+          logger.info(s"[PSR-1373] userAnswersUnchangedAllSections -> $bool")
+          bool
         }
         viewModel = TaskListController.viewModel(
           srn,
