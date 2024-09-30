@@ -231,10 +231,10 @@ class MemberPaymentsTransformer @Inject()(
           )
       }
     }
-  }.left
-    .map(logger.error(_))
-    .toOption
-    .flatten // todo change return type to accept Failure type (e.g. Either / Try), logging for the time being
+  } match {
+    case Left(error) => throw new RuntimeException(s"error occured: $error")
+    case Right(value) => value
+  }
 
   private def buildMemberDetails(srn: Srn, userAnswers: UserAnswers): Either[String, Map[Max300, MemberDetails]] = {
 
