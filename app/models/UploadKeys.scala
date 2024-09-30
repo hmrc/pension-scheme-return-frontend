@@ -17,9 +17,9 @@
 package models
 
 object UploadKeys {
-  val firstName = "First name"
-  val lastName = "Last name"
-  val dateOfBirth = "Date of birth"
-  val nino = "National Insurance number"
-  val reasonForNoNino = "Reason for no National Insurance number"
+  val firstName = "First name of scheme member (mandatory)"
+  val lastName = "Last name of scheme member (mandatory)"
+  val dateOfBirth = "Member date of birth (mandatory)"
+  val nino = "Member National Insurance number"
+  val reasonForNoNino = "If no National Insurance number for member, give reason"
 }
