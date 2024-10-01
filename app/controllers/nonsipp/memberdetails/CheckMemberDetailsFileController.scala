@@ -63,26 +63,38 @@ class CheckMemberDetailsFileController @Inject()(
   private val form = CheckMemberDetailsFileController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    val uploadStatus = request.userAnswers.get(UploadStatusPage(srn))
+    val uploadStatusOpt = request.userAnswers.get(UploadStatusPage(srn))
 
-    uploadStatus match {
+    uploadStatusOpt match {
       case Some(UploadSubmitted) =>
         val startTime = System.currentTimeMillis
         val uploadKey = UploadKey.fromRequest(srn)
         val preparedForm = request.userAnswers.fillForm(CheckMemberDetailsFilePage(srn), form)
+
         uploadService.getUploadStatus(uploadKey).map {
-          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          case Some(upload: UploadStatus.Success) =>
-            auditUpload(srn, upload, startTime)
-            Ok(view(preparedForm, viewModel(srn, Some(upload.name), mode)))
-          case Some(failure: UploadStatus.Failed) =>
-            auditUpload(srn, failure, startTime)
-            logger.warn("Upload failed")
-            Ok(view(preparedForm, viewModel(srn, Some(""), mode)))
-          case Some(_: UploadStatus.InProgress.type) =>
-            logger.info("Upload In progress, refreshing page")
-            Ok(view(preparedForm, viewModel(srn, None, mode)))
+          case None =>
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+          case Some(uploadStatus) =>
+            uploadStatus match {
+              case success: UploadStatus.Success =>
+                auditUpload(srn, success, startTime)
+                Ok(view(preparedForm, viewModel(srn, Some(success.name), mode)))
+
+              case failed: UploadStatus.Failed =>
+                auditUpload(srn, failed, startTime)
+                Redirect(routes.UploadMemberDetailsController.onPageLoad(srn))
+                  .flashing("error" -> "checkMemberDetailsFile.error.failed")
+
+              case UploadStatus.InProgress =>
+                Ok(view(preparedForm, viewModel(srn, None, mode)))
+
+              case _ =>
+                logger.warn("Unknown upload status error")
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
         }
+
       case _ =>
         logger.warn("Upload is either initiated or never started, redirecting to upload member details")
         Future.successful(Redirect(routes.UploadMemberDetailsController.onPageLoad(srn)))
@@ -97,16 +109,21 @@ class CheckMemberDetailsFileController @Inject()(
       .bindFromRequest()
       .fold(
         formWithErrors =>
-          getUploadedFile(uploadKey)
-            .map(file => BadRequest(view(formWithErrors, viewModel(srn, file.map(_.name), mode)))),
+          getUploadedFile(uploadKey).map {
+            case Some(uploadStatus) =>
+              val fileName = uploadStatus match {
+                case success: UploadStatus.Success => Some(success.name)
+                case _ => None
+              }
+              BadRequest(view(formWithErrors, viewModel(srn, fileName, mode)))
+            case None =>
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          },
         value =>
           getUploadedFile(uploadKey).flatMap {
-            case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            case Some(file) =>
+            case Some(success: UploadStatus.Success) =>
               for {
-                source <- {
-                  uploadService.stream(file.downloadUrl)
-                }
+                source <- uploadService.stream(success.downloadUrl)
                 validated <- {
                   auditDownload(srn, source._1, startTime)
                   uploadValidator.validateCSV(source._2, None)
@@ -118,18 +135,25 @@ class CheckMemberDetailsFileController @Inject()(
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckMemberDetailsFilePage(srn), value))
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(navigator.nextPage(CheckMemberDetailsFilePage(srn), mode, updatedAnswers))
+
+            case Some(failed: UploadStatus.Failed) =>
+              auditUpload(srn, failed, startTime)
+              Future.successful(
+                Redirect(routes.UploadMemberDetailsController.onPageLoad(srn))
+                  .flashing("error" -> "checkMemberDetailsFile.error.failed")
+              )
+
+            case Some(UploadStatus.InProgress) =>
+              Future.successful(Redirect(routes.CheckMemberDetailsFileController.onPageLoad(srn, mode)))
+
+            case None =>
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
           }
       )
   }
-  // todo: handle all Upscan upload states
-  //       None is an error case as the initial state set on the previous page should be InProgress
-  private def getUploadedFile(uploadKey: UploadKey): Future[Option[UploadStatus.Success]] =
+  private def getUploadedFile(uploadKey: UploadKey): Future[Option[UploadStatus]] =
     uploadService
       .getUploadStatus(uploadKey)
-      .map {
-        case Some(upload: UploadStatus.Success) => Some(upload)
-        case _ => None
-      }
 
   private def buildUploadAuditEvent(taxYear: DateRange, uploadStatus: UploadStatus, duration: Long, userName: String)(
     implicit req: DataRequest[_]
@@ -236,20 +260,29 @@ object CheckMemberDetailsFileController {
     "checkMemberDetailsFile.error.required"
   )
 
-  def viewModel(srn: Srn, fileName: Option[String], mode: Mode): FormPageViewModel[YesNoPageViewModel] = {
-    val refresh = if (fileName.isEmpty) Some(1) else None
+  def viewModel(
+    srn: Srn,
+    fileName: Option[String],
+    mode: Mode,
+    doNotRefresh: Boolean = true
+  ): FormPageViewModel[YesNoPageViewModel] = {
+    val refresh = if (fileName.isEmpty && doNotRefresh) Some(1) else None
     FormPageViewModel(
       "checkMemberDetailsFile.title",
       "checkMemberDetailsFile.heading",
       YesNoPageViewModel(
         legend = Some("checkMemberDetailsFile.legend"),
         yes = Some("checkMemberDetailsFile.yes"),
-        no = Some("checkMemberDetailsFile.no")
+        no = Some("checkMemberDetailsFile.no"),
+        showRadios = doNotRefresh
       ),
-      onSubmit = routes.CheckMemberDetailsFileController.onSubmit(srn, mode)
+      onSubmit =
+        if (doNotRefresh) routes.CheckMemberDetailsFileController.onSubmit(srn, mode)
+        else routes.UploadMemberDetailsController.onPageLoad(srn)
     ).refreshPage(refresh)
       .withDescription(
         fileName.map(name => ParagraphMessage(name))
       )
   }
+
 }
