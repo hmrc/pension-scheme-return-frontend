@@ -55,7 +55,7 @@
 
             <p class="govuk-body">
                 @govukButton(
-                     ButtonViewModel(viewmodel.buttonText.toMessage).asLink(viewmodel.onSubmit.url)
+                     ButtonViewModel(viewmodel.buttonText.toMessage).asLink(viewmodel.onSubmit.url).withAttribute("data-prevent-double-click","true")
                 )
             </p>
         }

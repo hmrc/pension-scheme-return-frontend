@@ -71,7 +71,7 @@
     }
 
     @govukButton(
-      ButtonViewModel(renderMessage(viewmodel.buttonText))
+      ButtonViewModel(renderMessage(viewmodel.buttonText)).withAttribute("data-prevent-double-click","true")
     )
   }
 }

@@ -87,7 +87,7 @@
                 if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty)
                     ButtonViewModel(renderMessage(viewmodel.optViewOnlyDetails.get.buttonText))
                 else
-                    ButtonViewModel(renderMessage(viewmodel.buttonText))
+                    ButtonViewModel(renderMessage(viewmodel.buttonText)).withAttribute("data-prevent-double-click","true")
             )
         }
     }
