@@ -72,16 +72,19 @@ class UploadMemberDetailsController @Inject()(
       _ <- uploadService.registerUploadRequest(uploadKey, Reference(initiateResponse.fileReference.reference))
       updatedUserAnswers <- request.userAnswers.set(UploadStatusPage(srn), UploadInitiated).mapK[Future]
       _ <- saveService.save(updatedUserAnswers)
-    } yield Ok(
-      view(
-        viewModel(
-          initiateResponse.postTarget,
-          initiateResponse.formFields,
-          collectErrors(srn, startTime),
-          config.upscanMaxFileSizeMB
+    } yield {
+      val error = collectErrors(srn, startTime)
+      Ok(
+        view(
+          viewModel(
+            initiateResponse.postTarget,
+            initiateResponse.formFields,
+            error,
+            config.upscanMaxFileSizeMB
+          )
         )
       )
-    )
+    }
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
@@ -92,17 +95,24 @@ class UploadMemberDetailsController @Inject()(
   }
 
   private def collectErrors(srn: Srn, startTime: Long)(implicit request: DataRequest[_]): Option[FormError] =
-    request.getQueryString("errorCode").zip(request.getQueryString("errorMessage")).flatMap {
-      case ("EntityTooLarge", error) =>
-        val failure = UploadStatus.Failed(ErrorDetails("EntityTooLarge", error))
-        audit(srn, failure, startTime)
-        Some(FormError("file-input", "uploadMemberDetails.error.size", Seq(config.upscanMaxFileSizeMB)))
-      case ("InvalidArgument", "'file' field not found") =>
-        val failure = UploadStatus.Failed(ErrorDetails("InvalidArgument", "'file' field not found"))
-        audit(srn, failure, startTime)
-        Some(FormError("file-input", "uploadMemberDetails.error.required"))
-      case _ => None
-    }
+    request.flash
+      .get("error")
+      .map { errorKey =>
+        FormError("file-input", errorKey)
+      }
+      .orElse {
+        request.getQueryString("errorCode").zip(request.getQueryString("errorMessage")).flatMap {
+          case ("EntityTooLarge", error) =>
+            val failure = UploadStatus.Failed(ErrorDetails("EntityTooLarge", error))
+            audit(srn, failure, startTime)
+            Some(FormError("file-input", "uploadMemberDetails.error.size", Seq(config.upscanMaxFileSizeMB)))
+          case ("InvalidArgument", "'file' field not found") =>
+            val failure = UploadStatus.Failed(ErrorDetails("InvalidArgument", "'file' field not found"))
+            audit(srn, failure, startTime)
+            Some(FormError("file-input", "uploadMemberDetails.error.required"))
+          case _ => None
+        }
+      }
 
   private def buildAuditEvent(taxYear: DateRange, uploadStatus: UploadStatus, duration: Long, userName: String)(
     implicit req: DataRequest[_]
