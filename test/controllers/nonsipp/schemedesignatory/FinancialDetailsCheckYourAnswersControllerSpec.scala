@@ -18,9 +18,9 @@ package controllers.nonsipp.schemedesignatory
 
 import services.{PsrSubmissionService, SchemeDateService}
 import pages.nonsipp.schemedesignatory.{HowManyMembersPage, ValueOfAssetsPage}
-import config.Refined.Max3
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
+import views.html.CheckYourAnswersView
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage, WhichTaxYearPage}
 import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
 import org.mockito.stubbing.OngoingStubbing
@@ -28,8 +28,6 @@ import models._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import cats.data.NonEmptyList
-import views.html.CheckYourAnswersView
 
 class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
 
@@ -81,7 +79,7 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
           howMuchCashPage = None,
           valueOfAssetsPage = None,
           feesCommissionsWagesSalariesPage = None,
-          Left(dateRange),
+          dateRange,
           defaultSchemeDetails,
           viewOnlyUpdated = false
         )
@@ -125,7 +123,7 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
               howMuchCashPage = None,
               valueOfAssetsPage = None,
               feesCommissionsWagesSalariesPage = None,
-              Left(dateRange),
+              dateRange,
               defaultSchemeDetails,
               viewOnlyUpdated = false,
               optYear = Some(yearString),
@@ -151,7 +149,7 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
               howMuchCashPage = None,
               valueOfAssetsPage = Some(MoneyInPeriod(money, money)),
               feesCommissionsWagesSalariesPage = None,
-              Left(dateRange),
+              dateRange,
               defaultSchemeDetails,
               viewOnlyUpdated = true,
               optYear = Some(yearString),
@@ -178,6 +176,6 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
   }
   private def mockTaxYear(
     taxYear: DateRange
-  ): OngoingStubbing[Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]] =
-    when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(any())).thenReturn(Some(Left(taxYear)))
+  ): OngoingStubbing[Option[DateRange]] =
+    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(Some(taxYear))
 }
