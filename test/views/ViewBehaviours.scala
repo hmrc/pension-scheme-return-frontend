@@ -97,6 +97,16 @@ trait ViewBehaviours {
       }
     }
 
+  def renderButtonWithPreventDoubleClick[A](gen: Gen[A])(view: A => Html): Unit =
+    "render the button attribute" in {
+      forAll(gen) { viewModel =>
+        buttons(view(viewModel))
+          .last()
+          .attribute("data-prevent-double-click")
+          .toString mustBe "data-prevent-double-click=\"true\""
+      }
+    }
+
   def renderForm[A](gen: Gen[A])(view: A => Html, call: A => Call): Unit =
     "has form" in {
       forAll(gen) { viewModel =>

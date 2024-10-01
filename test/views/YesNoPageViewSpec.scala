@@ -44,6 +44,7 @@ class YesNoPageViewSpec extends ViewSpec {
       act.like(renderButtonText(viewModelGen)(view(yesNoForm, _), _.buttonText))
       act.like(renderForm(viewModelGen)(view(yesNoForm, _), _.onSubmit))
       act.like(renderErrors(viewModelGen)(view(invalidForm, _), _ => requiredKey))
+      act.like(renderButtonWithPreventDoubleClick(viewModelGen)(view(yesNoForm, _)))
 
       "have a legend" in {
 
