@@ -29,7 +29,11 @@ import play.api.i18n.MessagesApi
 import models.requests.DataRequest
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
-import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsCYAPage, TotalAmountPensionPaymentsPage}
+import pages.nonsipp.memberpensionpayments.{
+  MemberPensionPaymentsCYAPage,
+  PensionPaymentsJourneyStatus,
+  TotalAmountPensionPaymentsPage
+}
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import play.api.Logger
@@ -114,6 +118,7 @@ class MemberPensionPaymentsCYAController @Inject()(
 
       for {
         updatedAnswers <- request.userAnswers
+          .set(PensionPaymentsJourneyStatus(srn), SectionStatus.InProgress)
           .setWhen(memberPensionPaymentsChanged)(MemberStatus(srn, index), {
             logger.info(s"Pension payments has changed for member $index. Setting MemberStatus to Changed")
             MemberState.Changed
