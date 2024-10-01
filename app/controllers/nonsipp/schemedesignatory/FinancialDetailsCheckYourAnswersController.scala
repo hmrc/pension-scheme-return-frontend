@@ -27,8 +27,6 @@ import controllers.actions._
 import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
 import viewmodels.models.TaskListStatus.Updated
 import models.requests.DataRequest
-import _root_.config.Refined.Max3
-import cats.data.NonEmptyList
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import cats.implicits.toShow
@@ -44,7 +42,7 @@ import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
 class FinancialDetailsCheckYourAnswersController @Inject()(
@@ -78,7 +76,7 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
   def onPageLoadCommon(srn: Srn, mode: Mode, showBackLink: Boolean = true)(
     implicit request: DataRequest[AnyContent]
   ): Result =
-    schemeDateService.taxYearOrAccountingPeriods(srn) match {
+    schemeDateService.schemeDate(srn) match {
       case Some(periods) =>
         val howMuchCashPage = request.userAnswers.get(HowMuchCashPage(srn, mode))
         val valueOfAssetsPage = request.userAnswers.get(ValueOfAssetsPage(srn, mode))
@@ -148,7 +146,7 @@ object FinancialDetailsCheckYourAnswersController {
     howMuchCashPage: Option[MoneyInPeriod],
     valueOfAssetsPage: Option[MoneyInPeriod],
     feesCommissionsWagesSalariesPage: Option[Money],
-    taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
+    schemeDates: DateRange,
     schemeDetails: SchemeDetails,
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
@@ -165,11 +163,10 @@ object FinancialDetailsCheckYourAnswersController {
       page = CheckYourAnswersViewModel(
         sections(
           srn,
-          mode,
           howMuchCashPage,
           valueOfAssetsPage,
           feesCommissionsWagesSalariesPage,
-          taxYearOrAccountingPeriods,
+          schemeDates,
           schemeDetails
         )
       ).withMarginBottom(Margin.Fixed60Bottom),
@@ -218,11 +215,10 @@ object FinancialDetailsCheckYourAnswersController {
 
   private def sections(
     srn: Srn,
-    mode: Mode,
     howMuchCashPage: Option[MoneyInPeriod],
     valueOfAssetsPage: Option[MoneyInPeriod],
     feesCommissionsWagesSalariesPage: Option[Money],
-    taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
+    schemeDates: DateRange,
     schemeDetails: SchemeDetails
   ): List[CheckYourAnswersSection] = List(
     CheckYourAnswersSection(
@@ -233,7 +229,7 @@ object FinancialDetailsCheckYourAnswersController {
             Message(
               "financialDetailsCheckYourAnswersController.totalCashInStartDate",
               schemeDetails.schemeName,
-              taxStartDate(taxYearOrAccountingPeriods).show
+              schemeDates.from.show
             ),
             "£" + howMuchCash.moneyAtStart.displayAs
           ).withChangeAction(
@@ -242,7 +238,7 @@ object FinancialDetailsCheckYourAnswersController {
                 .url + "#taxStartDate",
               hidden = Message(
                 "financialDetailsCheckYourAnswersController.totalCashInStartDate.hidden",
-                taxStartDate(taxYearOrAccountingPeriods).show
+                schemeDates.from.show
               )
             )
             .withOneHalfWidth()
@@ -253,7 +249,7 @@ object FinancialDetailsCheckYourAnswersController {
               Message(
                 "financialDetailsCheckYourAnswersController.totalCashInEndDate",
                 schemeDetails.schemeName,
-                taxEndDate(taxYearOrAccountingPeriods).show
+                schemeDates.to.show
               ),
               "£" + howMuchCash.moneyAtEnd.displayAs
             ).withChangeAction(
@@ -262,7 +258,7 @@ object FinancialDetailsCheckYourAnswersController {
                   .url + "#taxEndDate",
                 hidden = Message(
                   "financialDetailsCheckYourAnswersController.totalCashInEndDate.hidden",
-                  taxEndDate(taxYearOrAccountingPeriods).show
+                  schemeDates.to.show
                 )
               )
               .withOneHalfWidth()
@@ -273,7 +269,7 @@ object FinancialDetailsCheckYourAnswersController {
               Message(
                 "financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate",
                 schemeDetails.schemeName,
-                taxStartDate(taxYearOrAccountingPeriods).show
+                schemeDates.from.show
               ),
               "£" + valueOfAssets.moneyAtStart.displayAs
             ).withChangeAction(
@@ -282,7 +278,7 @@ object FinancialDetailsCheckYourAnswersController {
                   .url + "#taxStartDate",
                 hidden = Message(
                   "financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate.hidden",
-                  taxStartDate(taxYearOrAccountingPeriods).show
+                  schemeDates.from.show
                 )
               )
               .withOneHalfWidth()
@@ -293,7 +289,7 @@ object FinancialDetailsCheckYourAnswersController {
               Message(
                 "financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate",
                 schemeDetails.schemeName,
-                taxEndDate(taxYearOrAccountingPeriods).show
+                schemeDates.to.show
               ),
               "£" + valueOfAssets.moneyAtEnd.displayAs
             ).withChangeAction(
@@ -302,7 +298,7 @@ object FinancialDetailsCheckYourAnswersController {
                   .url + "#taxEndDate",
                 hidden = Message(
                   "financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate.hidden",
-                  taxEndDate(taxYearOrAccountingPeriods).show
+                  schemeDates.to.show
                 )
               )
               .withOneHalfWidth()
@@ -313,7 +309,7 @@ object FinancialDetailsCheckYourAnswersController {
               Message(
                 "financialDetailsCheckYourAnswersController.feeCommissionWagesSalary",
                 schemeDetails.schemeName,
-                taxEndDate(taxYearOrAccountingPeriods).show
+                schemeDates.to.show
               ),
               "£" + feesCommissionsWagesSalaries.displayAs
             ).withChangeAction(
@@ -326,16 +322,4 @@ object FinancialDetailsCheckYourAnswersController {
         )
     )
   )
-
-  private def taxEndDate(taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]]): LocalDate =
-    taxYearOrAccountingPeriods match {
-      case Left(taxYear) => taxYear.to
-      case Right(periods) => periods.toList.maxBy(_._1.to)._1.to
-    }
-
-  private def taxStartDate(taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]]): LocalDate =
-    taxYearOrAccountingPeriods match {
-      case Left(taxYear) => taxYear.from
-      case Right(periods) => periods.toList.maxBy(_._1.from)._1.from
-    }
 }
