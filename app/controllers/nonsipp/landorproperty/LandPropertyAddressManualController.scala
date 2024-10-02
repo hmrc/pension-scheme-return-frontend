@@ -173,14 +173,14 @@ object LandPropertyAddressManualController {
 
   private val field2Errors: InputFormErrors =
     InputFormErrors.input(
-      "landPropertyAddressManual.field2.error.required",
+      "",
       "landPropertyAddressManual.field2.error.invalid",
       "landPropertyAddressManual.field2.error.max"
     )
 
   private val field3Errors: InputFormErrors =
     InputFormErrors.input(
-      "landPropertyAddressManual.field3.error.required",
+      "",
       "landPropertyAddressManual.field3.error.invalid",
       "landPropertyAddressManual.field3.error.max"
     )
@@ -199,13 +199,19 @@ object LandPropertyAddressManualController {
       "landPropertyAddressManual.field5.error.max"
     )
 
+  private val postCodeFormErrors = InputFormErrors.postcode(
+    "landOrPropertyPostcodeLookup.postcode.error.required",
+    "landOrPropertyPostcodeLookup.postcode.error.invalid.characters",
+    "landOrPropertyPostcodeLookup.postcode.error.invalid.format"
+  )
+
   val ukAddressForm: Form[ManualUKAddressAnswers] =
     MultipleQuestionFormProvider(
       Mappings.input(field1Errors),
       Mappings.optionalInput(field2Errors),
       Mappings.optionalInput(field3Errors),
       Mappings.input(field4Errors),
-      Mappings.optionalInput(field5Errors)
+      Mappings.optionalPostcode(postCodeFormErrors)
     )
 
   private val internationalAddressForm: List[SelectInput] => Form[ManualAddressAnswers] =

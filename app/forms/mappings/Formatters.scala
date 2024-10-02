@@ -87,10 +87,10 @@ trait Formatters {
     new Formatter[String] {
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] =
-        Right(data.get(key).getOrElse(""))
+        Right(data.get(key).getOrElse("").trim)
 
       override def unbind(key: String, value: String): Map[String, String] =
-        Map(key -> value)
+        Map(key -> value.trim)
     }
 
   private[mappings] def booleanFormatter(
