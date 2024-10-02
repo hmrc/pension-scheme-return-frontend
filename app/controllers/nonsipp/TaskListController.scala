@@ -26,7 +26,7 @@ import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
 import cats.implicits.toShow
 import controllers.actions._
 import pages.nonsipp.accountingperiod.AccountingPeriods
-import models.backend.responses.ReportStatus
+import models.backend.responses.{PsrVersionsResponse, ReportStatus}
 import viewmodels.models.TaskListStatus._
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
@@ -55,24 +55,26 @@ class TaskListController @Inject()(
     with Logging {
 
   def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    def isSubmitted(psrVersionsResponse: PsrVersionsResponse): Boolean = (
+      psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndInProgress
+        || psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndSuccessfullyProcessed
+    )
+
     withCompletedBasicDetails(srn) { dates =>
       for {
         response <- psrVersionsService.getVersions(request.schemeDetails.pstr, formatDateForApi(dates.from), srn)
-        hasHistory = response
-          .exists(
-            psrVersionsResponse =>
-              psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndInProgress
-                || psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndSuccessfullyProcessed
-          )
+        hasHistory = response.exists(isSubmitted)
         noChangesSincePreviousVersion = if (!hasHistory || request.previousUserAnswers.isEmpty) {
           true
         } else {
-          val bool = userAnswersUnchangedAllSections(
+          userAnswersUnchangedAllSections(
             request.userAnswers,
-            request.previousUserAnswers.get
+            if (isSubmitted(response.head)) {
+              request.pureUserAnswers.get
+            } else {
+              request.previousUserAnswers.get
+            }
           )
-          logger.info(s"[PSR-1373] userAnswersUnchangedAllSections -> $bool")
-          bool
         }
         viewModel = TaskListController.viewModel(
           srn,
