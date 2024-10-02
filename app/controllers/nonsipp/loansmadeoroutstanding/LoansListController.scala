@@ -262,7 +262,7 @@ object LoansListController {
                     ListRow.view(
                       Message("loansList.row", totalLoan.displayAs, recipientName),
                       routes.LoansCYAController.onPageLoadViewOnly(srn, index, year, current, previous).url,
-                      Message("loansList.row.change.hidden", totalLoan.displayAs, recipientName)
+                      Message("loansList.row.view.hidden", totalLoan.displayAs, recipientName)
                     )
                   )
                 case _ => Nil

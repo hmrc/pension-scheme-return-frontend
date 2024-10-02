@@ -256,7 +256,7 @@ object TransferReceivedMemberListController {
                       TableElem.view(
                         controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
                           .onPageLoadViewOnly(srn, nextIndex, year, currentVersion, previousVersion),
-                        Message("transferIn.memberList.remove.hidden.text", memberName.fullName)
+                        memberName.fullName
                       )
                     case _ =>
                       TableElem(

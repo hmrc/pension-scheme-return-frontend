@@ -254,7 +254,7 @@ object SchemeMembersListController {
                     routes.SchemeMemberDetailsAnswersController
                       .onPageLoadViewOnly(srn, index, year, current, previous)
                       .url,
-                    Message("schemeMembersList.change.hidden", memberFullName)
+                    Message("site.view.param", memberFullName)
                   )
                 )
               case _ => Nil
