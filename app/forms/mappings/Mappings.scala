@@ -191,6 +191,19 @@ trait Mappings extends Formatters with Constraints {
       }
       .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
 
+  def validatedOptionalText(
+    regexChecks: List[(Regex, String)],
+    maxLength: Int,
+    maxLengthErrorKey: String,
+    args: Any*
+  ): Mapping[String] =
+    regexChecks
+      .foldLeft(optionalText()) {
+        case (mapping, (regex, key)) =>
+          mapping.verifying(verify[String](key, s => s.trim.isEmpty || s.matches(regex), args: _*))
+      }
+      .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
+
   def validatedText(
     fieldKey: String,
     requiredKey: String,
@@ -243,7 +256,14 @@ trait Mappings extends Formatters with Constraints {
     )
 
   def optionalInput(formErrors: InputFormErrors): Mapping[Option[String]] =
-    optional(input(formErrors))
+    optional(
+      validatedOptionalText(
+        formErrors.regexChecks,
+        formErrors.max._1,
+        formErrors.max._2,
+        formErrors.args: _*
+      )
+    )
 
   def nino(
     requiredKey: String,
@@ -302,6 +322,29 @@ trait Mappings extends Formatters with Constraints {
       .verifying(verify[String](inputFormErrors.max._2, _.length <= inputFormErrors.max._1, inputFormErrors.args: _*))
       .transform[String](_.toUpperCase, _.toUpperCase)
 
+  def nonRequiredPostCode(
+    regexChecks: List[(Regex, String)],
+    maxLength: Int,
+    maxLengthErrorKey: String,
+    args: Any*
+  ): Mapping[String] =
+    regexChecks
+      .foldLeft(optionalText()) {
+        case (mapping, (regex, key)) =>
+          mapping.verifying(verify[String](key, _.toUpperCase.matches(regex), args: _*))
+      }
+      .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args))
+      .transform[String](_.toUpperCase, _.toUpperCase)
+
+  def optionalPostcode(formErrors: InputFormErrors): Mapping[Option[String]] =
+    optional(
+      nonRequiredPostCode(
+        formErrors.regexChecks,
+        formErrors.max._1,
+        formErrors.max._2,
+        formErrors.args: _*
+      )
+    )
 }
 
 object Mappings extends Mappings
