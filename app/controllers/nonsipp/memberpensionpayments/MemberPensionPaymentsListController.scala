@@ -23,7 +23,7 @@ import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.OneTo300
 import controllers.PSRController
-import cats.implicits.{toBifunctorOps, toShow, toTraverseOps}
+import cats.implicits.toShow
 import config.Constants.maxNotRelevant
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
@@ -32,11 +32,7 @@ import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
-import pages.nonsipp.memberpensionpayments.{
-  MemberPensionPaymentsListPage,
-  PensionPaymentsReceivedPage,
-  TotalAmountPensionPaymentsPage
-}
+import pages.nonsipp.memberpensionpayments._
 import controllers.actions._
 import eu.timepit.refined.refineV
 import pages.nonsipp.CompilationOrSubmissionDatePage
@@ -169,7 +165,19 @@ class MemberPensionPaymentsListController @Inject()(
             },
             value =>
               for {
-                updatedUserAnswers <- buildUserAnswerBySelection(srn, value, optionList.flatten.size)
+                updatedUserAnswers <- Future
+                  .fromTry(
+                    request.userAnswers
+                      .set(
+                        PensionPaymentsJourneyStatus(srn),
+                        if (value) {
+                          SectionStatus.Completed
+                        } else {
+                          SectionStatus.InProgress
+                        }
+                      )
+                      .set(MemberPensionPaymentsListPage(srn), value)
+                  )
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (value) {
                   psrSubmissionService.submitPsrDetailsWithUA(
@@ -210,38 +218,6 @@ class MemberPensionPaymentsListController @Inject()(
       val showBackLink = false
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
-
-  private def buildUserAnswerBySelection(srn: Srn, selection: Boolean, memberListSize: Int)(
-    implicit request: DataRequest[_]
-  ): Future[UserAnswers] = {
-    val userAnswerWithMemberContList = request.userAnswers.set(MemberPensionPaymentsListPage(srn), selection)
-
-    if (selection) {
-      val indexes = (1 to memberListSize)
-        .map(i => refineV[OneTo300](i).leftMap(new Exception(_)).toTry)
-        .toList
-        .sequence
-
-      Future.fromTry(
-        indexes.fold(
-          _ => userAnswerWithMemberContList,
-          index =>
-            index.foldLeft(userAnswerWithMemberContList) {
-              case (uaTry, index) =>
-                val optTotalAmountPensionPayments = request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index))
-                for {
-                  ua <- uaTry
-                  ua1 <- ua
-                    .set(TotalAmountPensionPaymentsPage(srn, index), optTotalAmountPensionPayments.getOrElse(Money(0)))
-                } yield ua1
-            }
-        )
-      )
-    } else {
-      Future.fromTry(userAnswerWithMemberContList)
-    }
-  }
-
 }
 
 object MemberPensionPaymentsListController {
