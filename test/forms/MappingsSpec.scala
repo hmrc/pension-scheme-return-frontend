@@ -22,7 +22,7 @@ import forms.mappings.Mappings
 import org.scalatest.OptionValues
 import models.{Crn, Enumerable, Money}
 import play.api.data.{Form, FormError}
-import forms.mappings.errors.MoneyFormErrors
+import forms.mappings.errors.{InputFormErrors, MoneyFormErrors}
 
 object MappingsSpec {
 
@@ -411,6 +411,72 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
     "must not bind an non matching value" in {
       val result = testForm.bind(Map("value" -> "A7654321"))
       result.errors must contain(FormError("value", "error.noMatch"))
+    }
+  }
+
+  "optionalInput" - {
+    val fieldErrors: InputFormErrors =
+      InputFormErrors.input(
+        "required",
+        "invalid",
+        "max"
+      )
+
+    val testForm = Form(
+      "value" -> optionalInput(fieldErrors)
+    )
+
+    "must bind a valid value" in {
+      val result = testForm.bind(Map("value" -> "foobar"))
+      result.get mustEqual Some("foobar")
+    }
+
+    "must bind an empty value" in {
+      val result = testForm.bind(Map("value" -> ""))
+      result.get mustEqual None
+    }
+
+    "must trim space" in {
+      val result = testForm.bind(Map("value" -> " foobar"))
+      result.get mustEqual Some("foobar")
+    }
+
+    "must not bind an invalid value" in {
+      val result = testForm.bind(Map("value" -> "*"))
+      result.errors must contain(FormError("value", "invalid"))
+    }
+  }
+
+  "optionalPostcode" - {
+    val fieldErrors: InputFormErrors =
+      InputFormErrors.postcode(
+        "required",
+        "invalid characters",
+        "invalid format"
+      )
+
+    val testForm = Form(
+      "value" -> optionalInput(fieldErrors)
+    )
+
+    "must bind a valid value" in {
+      val result = testForm.bind(Map("value" -> "AB1 1BA"))
+      result.get mustEqual Some("AB1 1BA")
+    }
+
+    "must bind an empty value" in {
+      val result = testForm.bind(Map("value" -> ""))
+      result.get mustEqual None
+    }
+
+    "must trim space" in {
+      val result = testForm.bind(Map("value" -> " AB1 1BA"))
+      result.get mustEqual Some("AB1 1BA")
+    }
+
+    "must not bind an invalid value" in {
+      val result = testForm.bind(Map("value" -> "*"))
+      result.errors must contain(FormError("value", "invalid format"))
     }
   }
 }
