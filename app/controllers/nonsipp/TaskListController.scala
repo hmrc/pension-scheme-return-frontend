@@ -70,8 +70,10 @@ class TaskListController @Inject()(
           userAnswersUnchangedAllSections(
             request.userAnswers,
             if (isSubmitted(response.head)) {
+              logger.info(s"[PSR-1373] pureUserAnswers used for comparison")
               request.pureUserAnswers.get
             } else {
+              logger.info(s"[PSR-1373] previousUserAnswers used for comparison")
               request.previousUserAnswers.get
             }
           )
@@ -110,7 +112,7 @@ class TaskListController @Inject()(
   }
 }
 
-object TaskListController {
+object TaskListController extends Logging {
 
   def messageKey(prefix: String, suffix: String, status: TaskListStatus): String =
     status match {
@@ -134,7 +136,11 @@ object TaskListController {
     val (numSectionsReadyForSubmission, numSectionsTotal) = evaluateReadyForSubmissionTotalTuple(sectionList)
 
     val allSectionsReadyForSubmission = numSectionsReadyForSubmission == numSectionsTotal
-
+    logger.info(s"[PSR-1373] hasHistory : $hasHistory, noChangesSincePreviousVersion: $noChangesSincePreviousVersion")
+    logger.info(s"[PSR-1373] allSectionsReadyForSubmission : $allSectionsReadyForSubmission")
+    logger.info(
+      s"[PSR-1373] numSectionsReadyForSubmission : $numSectionsReadyForSubmission, numSectionsTotal: $numSectionsTotal "
+    )
     val displayNotSubmittedMessage = (hasHistory, noChangesSincePreviousVersion) match {
       // In Compile mode, if all sections ready for submission, display message
       case (false, _) => allSectionsReadyForSubmission
