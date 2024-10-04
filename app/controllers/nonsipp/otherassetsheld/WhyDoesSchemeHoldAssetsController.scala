@@ -97,6 +97,7 @@ class WhyDoesSchemeHoldAssetsController @Inject()(
             } else {
               // In CheckMode, before saving answers, set PointOfEntry based on the previous answer and new answer
               val previousAnswer = request.userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index))
+              val previousPointOfEntry = request.userAnswers.get(OtherAssetsCYAPointOfEntry(srn, index))
 
               val pointOfEntry = (previousAnswer, answer) match {
                 case (Some(Acquisition), Contribution) => Some(AssetAcquisitionToContributionPointOfEntry)
@@ -105,8 +106,8 @@ class WhyDoesSchemeHoldAssetsController @Inject()(
                 case (Some(Contribution), Transfer) => Some(AssetContributionToTransferPointOfEntry)
                 case (Some(Transfer), Acquisition) => Some(AssetTransferToAcquisitionPointOfEntry)
                 case (Some(Transfer), Contribution) => Some(AssetTransferToContributionPointOfEntry)
-                // If answer is unchanged, use NoPointOfEntry to redirect to CYA
-                case (Some(_), _) => Some(NoPointOfEntry)
+                // If answer is unchanged, use previousPointOfEntry. If this is NoPointOfEntry then redirect to CYA.
+                case (Some(_), _) => previousPointOfEntry
                 case _ => None
               }
 
