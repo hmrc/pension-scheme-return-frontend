@@ -69,7 +69,7 @@ class TaskListController @Inject()(
         } else {
           userAnswersUnchangedAllSections(
             request.userAnswers,
-            if (isSubmitted(response.head)) {
+            if (isSubmitted(response.maxBy(_.reportVersion))) {
               logger.info(s"[PSR-1373] pureUserAnswers used for comparison")
               request.pureUserAnswers.get
             } else {
