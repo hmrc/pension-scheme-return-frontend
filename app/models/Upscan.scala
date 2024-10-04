@@ -88,6 +88,7 @@ object UploadStatus {
   case class Failed(failureDetails: ErrorDetails) extends UploadStatus
 
   case class Success(name: String, mimeType: String, downloadUrl: String, size: Option[Long]) extends UploadStatus
+
 }
 
 object UploadedSuccessfully {

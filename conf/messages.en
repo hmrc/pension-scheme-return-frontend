@@ -1064,6 +1064,7 @@ checkMemberDetailsFile.legend = Is this file correct?
 checkMemberDetailsFile.yes = Yes, add this file to my return
 checkMemberDetailsFile.no = No, I want to select a different file
 checkMemberDetailsFile.error.required = Select yes if you want to add this file to your return
+checkMemberDetailsFile.error.failed = The file upload failed. Please try again.
 
 checkingMemberDetailsFile.title = We are checking your member details file
 checkingMemberDetailsFile.heading = We are checking your member details file
@@ -3710,3 +3711,5 @@ assetDisposal.reportedOtherAssetsDisposalList.view.none.value = No
 removeAssetDisposal.title = Are you sure you want to remove details of the disposal of this asset?
 removeAssetDisposal.heading = Are you sure you want to remove details of the disposal of {0}?
 removeAssetDisposal.error.required = Select yes if you are sure you want to remove this asset disposal
+
+

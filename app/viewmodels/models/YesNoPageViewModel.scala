@@ -27,7 +27,8 @@ case class YesNoPageViewModel(
   hint: Option[Message] = None,
   yes: Option[Message] = None,
   no: Option[Message] = None,
-  details: Option[FurtherDetailsViewModel] = None
+  details: Option[FurtherDetailsViewModel] = None,
+  showRadios: Boolean = true
 ) {
 
   def withHint(message: Message): YesNoPageViewModel =
