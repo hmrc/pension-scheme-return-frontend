@@ -198,7 +198,7 @@ object SchemeMemberDetailsAnswersController {
         booleanToMessage(hasNINO)
       ).withAction(
         SummaryAction("site.change", routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, CheckMode).url)
-          .withVisuallyHiddenContent("memberDetailsCYA.nationalInsuranceNumber.hidden", memberDetails.fullName)
+          .withVisuallyHiddenContent(("memberDetailsCYA.nationalInsuranceNumber.hidden", memberDetails.fullName))
       )
     ) ++
       ninoRow(maybeNino, memberDetails.fullName, srn, index) ++
@@ -216,7 +216,7 @@ object SchemeMemberDetailsAnswersController {
           CheckYourAnswersRowViewModel(Message("memberDetailsNino.heading", memberName), nino.value)
             .withAction(
               SummaryAction("site.change", routes.MemberDetailsNinoController.onPageLoad(srn, index, CheckMode).url)
-                .withVisuallyHiddenContent("memberDetailsCYA.nino.hidden", memberName)
+                .withVisuallyHiddenContent(("memberDetailsCYA.nino.hidden", memberName))
             )
         )
     )
@@ -233,7 +233,7 @@ object SchemeMemberDetailsAnswersController {
           CheckYourAnswersRowViewModel(Message("noNINO.heading", memberName), noNinoReason)
             .withAction(
               SummaryAction("site.change", routes.NoNINOController.onPageLoad(srn, index, CheckMode).url)
-                .withVisuallyHiddenContent("memberDetailsCYA.noNINO.hidden", memberName)
+                .withVisuallyHiddenContent(("memberDetailsCYA.noNINO.hidden", memberName))
             )
         )
     )

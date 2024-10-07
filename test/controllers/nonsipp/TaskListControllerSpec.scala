@@ -24,6 +24,7 @@ import config.Refined.{Max3, Max5000}
 import controllers.ControllerBaseSpec
 import views.html.TaskListView
 import eu.timepit.refined.refineMV
+import models.backend.responses.{PsrVersionsResponse, ReportStatus}
 import models._
 import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.moneyborrowed._
@@ -34,6 +35,7 @@ import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
 import org.mockito.Mockito.when
+import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage, UnregulatedOrConnectedBondsHeldPage}
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
@@ -45,7 +47,9 @@ import pages.nonsipp.common.IdentityTypePage
 
 import scala.concurrent.Future
 
-class TaskListControllerSpec extends ControllerBaseSpec {
+import java.time.LocalDateTime
+
+class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
   val pensionSchemeId: PensionSchemeId = pensionSchemeIdGen.sample.value
   val index1of3: Max3 = refineMV(1)
@@ -72,7 +76,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(HowManyMembersPage.bySrn(srn), schemeMemberNumbers)
       .unsafeSet(WhichTaxYearPage(srn), dateRange)
 
-    lazy val viewModel = TaskListController.viewModel(
+    lazy val defaultViewModel = TaskListController.viewModel(
       srn,
       schemeName,
       dateRange.from,
@@ -86,8 +90,84 @@ class TaskListControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
       val view = injected[TaskListView]
-      view(viewModel, schemeName)
-    }.withName("task list renders OK"))
+      view(defaultViewModel, schemeName)
+    }.withName("task list renders OK when no version response"))
+
+    act.like(
+      renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
+        val view = injected[TaskListView]
+        view(defaultViewModel, schemeName)
+      }.withName("task list renders OK when version response without any submitted")
+        .before(
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any()))
+            .thenReturn(
+              Future.successful(
+                Seq(
+                  PsrVersionsResponse(
+                    startDate = None,
+                    reportFormBundleNumber = commonFbNumber.replace('1', '3'),
+                    reportVersion = commonVersion.toInt + 2,
+                    reportStatus = ReportStatus.ReportStatusCompiled,
+                    compilationOrSubmissionDate = LocalDateTime.parse("2020-04-08T12:00:00.000"),
+                    reportSubmitterDetails = None,
+                    psaDetails = None
+                  )
+                )
+              )
+            )
+        )
+    )
+
+    act.like(
+      renderView(onPageLoad, populatedUserAnswers, optPreviousAnswers = None) { implicit app => implicit request =>
+        val view = injected[TaskListView]
+        view(
+          TaskListController.viewModel(
+            srn,
+            schemeName,
+            dateRange.from,
+            dateRange.to,
+            populatedUserAnswers,
+            pensionSchemeId,
+            hasHistory = true,
+            noChangesSincePreviousVersion = true
+          ),
+          schemeName
+        )
+      }.withName("task list renders OK when version response with any submitted")
+        .before(
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any()))
+            .thenReturn(
+              Future.successful(versionsResponse)
+            )
+        )
+    )
+
+    act.like(
+      renderView(onPageLoad, populatedUserAnswers, optPreviousAnswers = Some(populatedUserAnswers)) {
+        implicit app => implicit request =>
+          val view = injected[TaskListView]
+          view(
+            TaskListController.viewModel(
+              srn,
+              schemeName,
+              dateRange.from,
+              dateRange.to,
+              populatedUserAnswers,
+              pensionSchemeId,
+              hasHistory = true,
+              noChangesSincePreviousVersion = true
+            ),
+            schemeName
+          )
+      }.withName("task list renders OK when version response with any submitted but max version compiled")
+        .before(
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any()))
+            .thenReturn(
+              Future.successful(versionsResponseInProgress)
+            )
+        )
+    )
 
     act.like(
       redirectToPage(

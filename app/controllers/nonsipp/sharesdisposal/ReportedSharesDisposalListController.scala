@@ -36,9 +36,8 @@ import views.html.ListView
 import models.TypeOfShares._
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage
-import models.HowSharesDisposed._
-import play.api.Logging
 import navigation.Navigator
+import models.HowSharesDisposed._
 import utils.DateTimeUtils.localDateTimeShow
 import models._
 import play.api.i18n.MessagesApi
@@ -63,8 +62,7 @@ class ReportedSharesDisposalListController @Inject()(
   psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
-    extends PSRController
-    with Logging {
+    extends PSRController {
 
   val form: Form[Boolean] = ReportedSharesDisposalListController.form(formProvider)
 

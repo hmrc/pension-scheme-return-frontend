@@ -33,7 +33,6 @@ import cats.data.NonEmptyList
 import views.html.CYAWithRemove
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage
-import play.api.Logger
 import navigation.Navigator
 import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models._
@@ -56,8 +55,6 @@ class TotalValueQuotedSharesCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController
     with I18nSupport {
-
-  private val logger = Logger(getClass)
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>

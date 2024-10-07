@@ -33,7 +33,6 @@ import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage
-import play.api.Logging
 import navigation.Navigator
 import controllers.nonsipp.bondsdisposal.ReportBondsDisposalListController._
 import forms.YesNoPageFormProvider
@@ -62,8 +61,7 @@ class ReportBondsDisposalListController @Inject()(
   psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
-    extends PSRController
-    with Logging {
+    extends PSRController {
 
   val form: Form[Boolean] = ReportBondsDisposalListController.form(formProvider)
 

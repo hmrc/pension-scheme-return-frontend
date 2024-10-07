@@ -171,7 +171,7 @@ class DataRetrievalETMPAction(
               Future.successful(UserAnswers(request.getUserId + request.srn))
           }
         } yield {
-          val odr = OptionalDataRequest(
+          OptionalDataRequest(
             request,
             Some(currentReturn),
             pureUa,
@@ -180,18 +180,6 @@ class DataRetrievalETMPAction(
             None,
             previousVersion = None
           )
-          logger.info(s"[PSR-1373] currentReturn : id -> ${currentReturn.id}")
-          logger.info(s"[PSR-1373] currentReturn : lastUpdated -> ${currentReturn.lastUpdated}")
-          logger.info(s"[PSR-1373] currentReturn : data -> ${currentReturn.data.decryptedValue}")
-
-          logger.info(s"[PSR-1373] previousReturn : id -> ${maybePreviousReturn.map(_.id).getOrElse("Not-Found")}")
-          logger.info(
-            s"[PSR-1373] previousReturn : lastUpdated -> ${maybePreviousReturn.map(_.lastUpdated).getOrElse("Not-Found")}"
-          )
-          logger.info(
-            s"[PSR-1373] previousReturn : data -> ${maybePreviousReturn.map(_.data.decryptedValue).getOrElse("Not-Found")}"
-          )
-          odr
         }
       }
     }
