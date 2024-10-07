@@ -57,6 +57,9 @@ class RemoveAssetDisposalController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
+          _ <- request.userAnswers
+            .get(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex))
+            .getOrRedirectToTaskList(srn)
           otherAsset <- request.userAnswers.get(WhatIsOtherAssetPage(srn, assetIndex)).getOrRedirectToTaskList(srn)
         } yield {
           Ok(view(form, viewModel(srn, assetIndex, disposalIndex, otherAsset)))
