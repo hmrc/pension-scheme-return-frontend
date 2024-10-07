@@ -194,13 +194,13 @@ object LandPropertyAddressManualController {
 
   private val field5Errors: InputFormErrors =
     InputFormErrors.input(
-      "landPropertyAddressManual.field5.error.required",
+      "",
       "landPropertyAddressManual.field5.error.invalid",
       "landPropertyAddressManual.field5.error.max"
     )
 
   private val postCodeFormErrors = InputFormErrors.postcode(
-    "landOrPropertyPostcodeLookup.postcode.error.required",
+    "",
     "landOrPropertyPostcodeLookup.postcode.error.invalid.characters",
     "landOrPropertyPostcodeLookup.postcode.error.invalid.format"
   )
