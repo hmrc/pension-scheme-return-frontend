@@ -34,7 +34,6 @@ import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import views.html.ListView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage
-import play.api.Logging
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
 import models._
@@ -59,8 +58,7 @@ class BondsListController @Inject()(
   psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
-    extends PSRController
-    with Logging {
+    extends PSRController {
 
   val form: Form[Boolean] = BondsListController.form(formProvider)
 
