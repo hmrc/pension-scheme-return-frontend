@@ -24,6 +24,8 @@ import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.bondsdisposal.RemoveBondsDisposalController._
 import forms.YesNoPageFormProvider
+import models.HowDisposed
+import pages.nonsipp.bondsdisposal.HowWereBondsDisposedOfPage
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
@@ -41,7 +43,9 @@ class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
-  private val userAnswers = defaultUserAnswers.unsafeSet(NameOfBondsPage(srn, bondIndex), nameOfBonds)
+  private val userAnswers = defaultUserAnswers
+    .unsafeSet(NameOfBondsPage(srn, bondIndex), nameOfBonds)
+    .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex), HowDisposed.Transferred)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)

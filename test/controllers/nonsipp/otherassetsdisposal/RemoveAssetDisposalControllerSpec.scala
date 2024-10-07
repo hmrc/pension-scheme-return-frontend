@@ -17,6 +17,7 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import services.PsrSubmissionService
+import pages.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfPage
 import controllers.nonsipp.otherassetsdisposal.RemoveAssetDisposalController._
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import config.Refined.{Max50, Max5000}
@@ -25,6 +26,7 @@ import play.api.inject.bind
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
+import models.HowDisposed
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
@@ -43,7 +45,9 @@ class RemoveAssetDisposalControllerSpec extends ControllerBaseSpec {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
-  private val userAnswers = defaultUserAnswers.unsafeSet(WhatIsOtherAssetPage(srn, assetIndex), nameOfAsset)
+  private val userAnswers = defaultUserAnswers
+    .unsafeSet(WhatIsOtherAssetPage(srn, assetIndex), nameOfAsset)
+    .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex), HowDisposed.Transferred)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
