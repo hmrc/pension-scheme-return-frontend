@@ -687,6 +687,25 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             )
         )
 
+        act.like(
+          checkmode
+            .navigateToWithIndex(
+              index,
+              WhyDoesSchemeHoldAssetsPage,
+              (srn, _: Max5000, _) =>
+                controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
+                  .onPageLoad(srn, index, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  OtherAssetsCYAPointOfEntry(srn, index),
+                  WhenDidSchemeAcquireAssetsPointOfEntry
+                )
+            )
+            .withName(
+              "go from WhyDoesSchemeHoldAssets to WhenDidSchemeAcquireAssets (when point of entry is WhenDidSchemeAcquireAssetsPointOfEntry)"
+            )
+        )
+
         // If answer is unchanged, use NoPointOfEntry to redirect to CYA
         act.like(
           checkmode

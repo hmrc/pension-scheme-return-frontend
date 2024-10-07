@@ -209,6 +209,9 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
             case Some(AssetTransferToContributionPointOfEntry) =>
               controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
                 .onPageLoad(srn, index, CheckMode)
+            case Some(WhenDidSchemeAcquireAssetsPointOfEntry) =>
+              controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
+                .onPageLoad(srn, index, CheckMode)
             // If answer is unchanged, use NoPointOfEntry to redirect to CYA
             case Some(NoPointOfEntry) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController

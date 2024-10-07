@@ -16,14 +16,15 @@
 
 package controllers.nonsipp.otherassetsheld
 
-import pages.nonsipp.otherassetsheld.WhyDoesSchemeHoldAssetsPage
+import pages.nonsipp.otherassetsheld.{WhenDidSchemeAcquireAssetsPage, WhyDoesSchemeHoldAssetsPage}
 import config.Refined.Max5000
 import views.html.RadioListView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
+import models.IdentitySubject.OtherAssetSeller
 import controllers.nonsipp.otherassetsheld.WhyDoesSchemeHoldAssetsController._
 import controllers.ControllerBaseSpec
-import models.NormalMode
+import models.{CheckMode, NormalMode}
 import models.SchemeHoldAsset.{Acquisition, Contribution, Transfer}
 
 class WhyDoesSchemeHoldAssetsControllerSpec extends ControllerBaseSpec {
@@ -35,6 +36,8 @@ class WhyDoesSchemeHoldAssetsControllerSpec extends ControllerBaseSpec {
     routes.WhyDoesSchemeHoldAssetsController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit =
     routes.WhyDoesSchemeHoldAssetsController.onSubmit(srn, index, NormalMode)
+  private lazy val onSubmitCheckMode =
+    routes.WhyDoesSchemeHoldAssetsController.onSubmit(srn, index, CheckMode)
 
   "WhyDoesSchemeHoldAssetsController" - {
 
@@ -75,6 +78,34 @@ class WhyDoesSchemeHoldAssetsControllerSpec extends ControllerBaseSpec {
 
     "Transfer data is submitted" - {
       act.like(saveAndContinue(onSubmit, defaultUserAnswers, "value" -> Transfer.name))
+    }
+
+    "Acquisition in check mode when changing from contribution" - {
+      "redirects to whenDidSchemeAcquireAssetsPage when no date is previously saved" - {
+        act.like(
+          redirectToPage(
+            onSubmitCheckMode,
+            controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
+              .onPageLoad(srn, index, CheckMode),
+            defaultUserAnswers
+              .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index), Contribution),
+            "value" -> Acquisition.name
+          )
+        )
+      }
+      "redirects to Identity Type page when date is previously saved " - {
+        act.like(
+          redirectToPage(
+            onSubmitCheckMode,
+            controllers.nonsipp.common.routes.IdentityTypeController
+              .onPageLoad(srn, index, CheckMode, OtherAssetSeller),
+            defaultUserAnswers
+              .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index), Contribution)
+              .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, index), localDate),
+            "value" -> Acquisition.name
+          )
+        )
+      }
     }
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

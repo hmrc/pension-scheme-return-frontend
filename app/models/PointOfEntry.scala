@@ -86,6 +86,12 @@ object PointOfEntry {
     val pointOfEntry = "WhoWasAssetAcquiredFromPointOfEntry"
   }
 
+  case object WhenDidSchemeAcquireAssetsPointOfEntry
+      extends WithName("WhenDidSchemeAcquireAssetsPointOfEntry")
+      with PointOfEntry {
+    val pointOfEntry = "WhenDidSchemeAcquireAssetsPointOfEntry"
+  }
+
   implicit val format: Format[PointOfEntry] = new Format[PointOfEntry] {
     override def reads(json: JsValue): JsResult[PointOfEntry] = json match {
       case JsString(NoPointOfEntry.name) => JsSuccess(NoPointOfEntry)
@@ -108,6 +114,7 @@ object PointOfEntry {
       case JsString(AssetTransferToContributionPointOfEntry.name) =>
         JsSuccess(AssetTransferToContributionPointOfEntry)
       case JsString(WhoWasAssetAcquiredFromPointOfEntry.name) => JsSuccess(WhoWasAssetAcquiredFromPointOfEntry)
+      case JsString(WhenDidSchemeAcquireAssetsPointOfEntry.name) => JsSuccess(WhenDidSchemeAcquireAssetsPointOfEntry)
       case unknown => JsError(s"Unknown PointOfEntry value: $unknown")
     }
 
