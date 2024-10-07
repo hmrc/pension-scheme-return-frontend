@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.receivetransfer
 
-import services.{PsrSubmissionService, SaveService}
+import services.SaveService
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -46,8 +46,7 @@ class ReportAnotherTransferInController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView,
-  psrSubmissionService: PsrSubmissionService
+  view: YesNoPageView
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -82,18 +81,8 @@ class ReportAnotherTransferInController @Inject()(
                   .set(ReportAnotherTransferInPage(srn, index, secondaryIndex), value)
               )
               _ <- saveService.save(updatedAnswers)
-              submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
-                srn,
-                updatedAnswers,
-                fallbackCall = controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
-                  .onPageLoad(srn, index, secondaryIndex, mode)
-              )
-            } yield submissionResult.getOrRecoverJourney(
-              _ =>
-                Redirect(
-                  navigator
-                    .nextPage(ReportAnotherTransferInPage(srn, index, secondaryIndex), mode, updatedAnswers)
-                )
+            } yield Redirect(
+              navigator.nextPage(ReportAnotherTransferInPage(srn, index, secondaryIndex), mode, updatedAnswers)
             )
         )
     }
@@ -119,5 +108,4 @@ object ReportAnotherTransferInController {
       ),
       routes.ReportAnotherTransferInController.onSubmit(srn, index, secondaryIndex, mode)
     )
-
 }

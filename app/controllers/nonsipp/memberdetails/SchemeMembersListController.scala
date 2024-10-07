@@ -16,7 +16,6 @@
 
 package controllers.nonsipp.memberdetails
 
-import services.PsrSubmissionService
 import pages.nonsipp.memberdetails.{MembersDetailsCompletedPages, SchemeMembersListPage}
 import viewmodels.implicits._
 import play.api.mvc._
@@ -57,7 +56,6 @@ class SchemeMembersListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
-  psrSubmissionService: PsrSubmissionService,
   formProvider: YesNoPageFormProvider
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -185,19 +183,10 @@ class SchemeMembersListController @Inject()(
             if (lengthOfMembersDetails == maxSchemeMembers && value) {
               Future.successful(Redirect(routes.HowToUploadController.onPageLoad(srn)))
             } else {
-              for {
-                _ <- if (!value) {
-                  psrSubmissionService.submitPsrDetailsWithUA(
-                    srn,
-                    request.userAnswers,
-                    fallbackCall = controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-                      .onPageLoad(srn, page, manualOrUpload)
-                  )
-                } else {
-                  Future.successful(Some(()))
-                }
-              } yield Redirect(
-                navigator.nextPage(SchemeMembersListPage(srn, value, manualOrUpload), mode, request.userAnswers)
+              Future.successful(
+                Redirect(
+                  navigator.nextPage(SchemeMembersListPage(srn, value, manualOrUpload), mode, request.userAnswers)
+                )
               )
             }
           }

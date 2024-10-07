@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.bondsdisposal
 
-import services.{PsrSubmissionService, SaveService}
+import services.SaveService
 import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage}
 import viewmodels.implicits._
 import play.api.mvc._
@@ -58,7 +58,6 @@ class ReportBondsDisposalListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
   formProvider: YesNoPageFormProvider,
-  psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -188,18 +187,9 @@ class ReportBondsDisposalListController @Inject()(
                         .set(BondsDisposalCompleted(srn), SectionCompleted)
                         .mapK[Future]
                       _ <- saveService.save(updatedUserAnswers)
-                      submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
-                        srn,
-                        updatedUserAnswers,
-                        fallbackCall = controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
-                          .onPageLoad(srn, page)
-                      )
-                    } yield submissionResult.getOrRecoverJourney(
-                      _ =>
-                        Redirect(
-                          navigator
-                            .nextPage(ReportBondsDisposalListPage(srn, addAnotherDisposal), mode, request.userAnswers)
-                        )
+                    } yield Redirect(
+                      navigator
+                        .nextPage(ReportBondsDisposalListPage(srn, addAnotherDisposal), mode, request.userAnswers)
                     )
                   }
               )

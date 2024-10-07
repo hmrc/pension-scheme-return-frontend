@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
-import services.{PsrSubmissionService, SaveService}
+import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
@@ -56,7 +56,6 @@ class SurrenderedBenefitsMemberListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
   formProvider: YesNoPageFormProvider,
-  psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -168,23 +167,8 @@ class SurrenderedBenefitsMemberListController @Inject()(
                       .set(SurrenderedBenefitsMemberListPage(srn), finishedAddingSurrenderedBenefits)
                   )
                 _ <- saveService.save(updatedUserAnswers)
-                submissionResult <- if (finishedAddingSurrenderedBenefits) {
-                  psrSubmissionService.submitPsrDetailsWithUA(
-                    srn,
-                    updatedUserAnswers,
-                    fallbackCall =
-                      controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
-                        .onPageLoad(srn, page, mode)
-                  )
-                } else {
-                  Future.successful(Some(()))
-                }
-              } yield submissionResult.getOrRecoverJourney(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(SurrenderedBenefitsMemberListPage(srn), mode, request.userAnswers)
-                  )
+              } yield Redirect(
+                navigator.nextPage(SurrenderedBenefitsMemberListPage(srn), mode, request.userAnswers)
               )
           )
       }

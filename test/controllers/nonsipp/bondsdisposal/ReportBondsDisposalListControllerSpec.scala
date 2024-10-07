@@ -33,8 +33,6 @@ import play.api.inject
 import controllers.nonsipp.bondsdisposal.ReportBondsDisposalListController._
 import forms.YesNoPageFormProvider
 
-import scala.concurrent.Future
-
 class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.ReportBondsDisposalListController.onPageLoad(srn, page)
@@ -89,13 +87,7 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexTwo), HowDisposed.Sold)
     .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexTwo), SectionJourneyStatus.Completed)
 
-  private val mockPsrSubmissionService = mock[PsrSubmissionService]
-
-  override protected def beforeEach(): Unit = {
-    reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(())))
-  }
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     inject.bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -129,7 +121,17 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
       ).withName("Not Started Journey")
     )
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
+
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

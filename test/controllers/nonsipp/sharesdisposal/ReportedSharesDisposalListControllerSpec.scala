@@ -35,8 +35,6 @@ import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 import models.HowSharesDisposed._
 
-import scala.concurrent.Future
-
 class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.ReportedSharesDisposalListController.onPageLoad(srn, page)
@@ -115,12 +113,7 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(FbVersionPage(srn), "002")
     .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
 
-  private val mockPsrSubmissionService = mock[PsrSubmissionService]
-  override protected def beforeEach(): Unit = {
-    reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(())))
-  }
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     inject.bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -152,7 +145,17 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
       ).withName("Not Started Journey")
     )
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
+
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
@@ -282,5 +285,4 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
     )
 
   }
-
 }

@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.shares
 
-import services.{PsrSubmissionService, SaveService}
+import services.SaveService
 import viewmodels.implicits._
 import com.google.inject.Inject
 import utils.ListUtils._
@@ -56,7 +56,6 @@ class SharesListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
   formProvider: YesNoPageFormProvider,
-  psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -163,21 +162,8 @@ class SharesListController @Inject()(
                       .set(SharesListPage(srn), addAnother)
                   )
                 _ <- saveService.save(updatedUserAnswers)
-                submissionResult <- if (!addAnother) {
-                  psrSubmissionService.submitPsrDetailsWithUA(
-                    srn,
-                    updatedUserAnswers,
-                    fallbackCall = controllers.nonsipp.shares.routes.SharesListController.onPageLoad(srn, page, mode)
-                  )
-                } else {
-                  Future.successful(Some(()))
-                }
-              } yield submissionResult.getOrRecoverJourney(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(SharesListPage(srn), mode, updatedUserAnswers)
-                  )
+              } yield Redirect(
+                navigator.nextPage(SharesListPage(srn), mode, updatedUserAnswers)
               )
           )
       }

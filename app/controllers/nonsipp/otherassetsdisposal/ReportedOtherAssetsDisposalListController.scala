@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
-import services.{PsrSubmissionService, SaveService}
+import services.SaveService
 import pages.nonsipp.otherassetsdisposal._
 import viewmodels.implicits._
 import play.api.mvc._
@@ -58,7 +58,6 @@ class ReportedOtherAssetsDisposalListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
   formProvider: YesNoPageFormProvider,
-  psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -155,26 +154,12 @@ class ReportedOtherAssetsDisposalListController @Inject()(
                       .setWhen(!reportAnotherDisposal)(OtherAssetsDisposalCompleted(srn), SectionCompleted)
                       .mapK[Future]
                     _ <- saveService.save(updatedUserAnswers)
-                    submissionResult <- if (!reportAnotherDisposal) {
-                      psrSubmissionService.submitPsrDetailsWithUA(
-                        srn,
-                        updatedUserAnswers,
-                        fallbackCall =
-                          controllers.nonsipp.otherassetsdisposal.routes.ReportedOtherAssetsDisposalListController
-                            .onPageLoad(srn, page)
-                      )
-                    } else {
-                      Future.successful(Some(()))
-                    }
-                  } yield submissionResult.getOrRecoverJourney(
-                    _ =>
-                      Redirect(
-                        navigator.nextPage(
-                          ReportedOtherAssetsDisposalListPage(srn, reportAnotherDisposal),
-                          mode,
-                          request.userAnswers
-                        )
-                      )
+                  } yield Redirect(
+                    navigator.nextPage(
+                      ReportedOtherAssetsDisposalListPage(srn, reportAnotherDisposal),
+                      mode,
+                      request.userAnswers
+                    )
                   )
               )
           }

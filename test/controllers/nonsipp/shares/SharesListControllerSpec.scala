@@ -25,7 +25,6 @@ import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
 import viewmodels.models.SectionCompleted
-import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import viewmodels.models.SectionStatus.Completed
@@ -33,13 +32,11 @@ import controllers.ControllerBaseSpec
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 
-import scala.concurrent.Future
-
 class SharesListControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
   private val page = 1
-  private val mockPsrSubmissionService = mock[PsrSubmissionService]
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   private lazy val onPageLoad =
     controllers.nonsipp.shares.routes.SharesListController.onPageLoad(srn, page, NormalMode)
@@ -96,12 +93,6 @@ class SharesListControllerSpec extends ControllerBaseSpec {
   )
   private val sharesData = List(shareData)
 
-  override protected def beforeEach(): Unit = {
-    reset(mockPsrSubmissionService)
-    when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
-      .thenReturn(Future.successful(Some(())))
-  }
-
   override protected val additionalBindings: List[GuiceableModule] = List(
     inject.bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
@@ -126,8 +117,17 @@ class SharesListControllerSpec extends ControllerBaseSpec {
       }
     )
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
+
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
@@ -243,5 +243,4 @@ class SharesListControllerSpec extends ControllerBaseSpec {
       }.withName("OnPreviousViewOnly renders the view correctly")
     )
   }
-
 }

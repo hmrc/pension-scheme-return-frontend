@@ -98,15 +98,6 @@ class MemberPaymentsTransformer @Inject()(
           )
       }
 
-      val benefitsSurrenderedDetails: UserAnswers => SectionDetails = ua =>
-        SectionDetails(
-          made = ua.get(SurrenderedBenefitsPage(srn)).getOrElse(false),
-          completed = ua.get(SurrenderedBenefitsJourneyStatus(srn)).exists {
-            case SectionStatus.InProgress => false
-            case SectionStatus.Completed => true
-          }
-        )
-
       val psrState: Option[PSRStatus] = userAnswers.get(FbStatus(srn))
 
       /**
@@ -226,7 +217,13 @@ class MemberPaymentsTransformer @Inject()(
               memberContributionMade = userAnswers.get(MemberContributionsPage(srn)),
               lumpSumReceived = userAnswers.get(PensionCommencementLumpSumPage(srn)),
               pensionReceived = pensionAmountReceivedTransformer.transformToEtmp(srn, userAnswers),
-              benefitsSurrenderedDetails = benefitsSurrenderedDetails(userAnswers)
+              benefitsSurrenderedDetails = SectionDetails(
+                made = userAnswers.get(SurrenderedBenefitsPage(srn)).getOrElse(false),
+                completed = userAnswers.get(SurrenderedBenefitsJourneyStatus(srn)).exists {
+                  case SectionStatus.InProgress => false
+                  case SectionStatus.Completed => true
+                }
+              )
             )
           )
       }
