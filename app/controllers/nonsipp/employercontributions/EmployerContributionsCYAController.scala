@@ -393,16 +393,14 @@ object EmployerContributionsCYAController {
             CheckYourAnswersRowViewModel(
               Message("employerContributionsCYA.row.businessType", employerName),
               businessTypeMessageKey(identityType)
-            ).withAction(
-              SummaryAction(
-                "site.change",
-                controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
-                  .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
-                    case ViewOnlyMode => NormalMode
-                    case _ => mode
-                  })
-                  .url
-              ).withVisuallyHiddenContent(Message("employerContributionsCYA.row.businessType.hidden", employerName))
+            ).withChangeAction(
+              controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
+                .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                  case ViewOnlyMode => NormalMode
+                  case _ => CheckMode
+                })
+                .url,
+              hidden = Message("employerContributionsCYA.row.businessType.hidden", employerName)
             ),
             CheckYourAnswersRowViewModel(employerIdOrReasonRowKey, employerIdOrReasonRowValue).withAction(
               SummaryAction("site.change", employerIdRedirectUrl)
@@ -411,18 +409,14 @@ object EmployerContributionsCYAController {
             CheckYourAnswersRowViewModel(
               Message("employerContributionsCYA.row.contribution", employerName, membersName),
               s"£${totalEmployerContribution.displayAs}"
-            ).withAction(
-              SummaryAction(
-                "site.change",
-                controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
-                  .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
-                    case ViewOnlyMode => NormalMode
-                    case _ => mode
-                  })
-                  .url
-              ).withVisuallyHiddenContent(
-                Message("employerContributionsCYA.row.contribution.hidden", employerName, membersName)
-              )
+            ).withChangeAction(
+              controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
+                .onPageLoad(srn, memberIndex, secondaryIndex, mode match {
+                  case ViewOnlyMode => NormalMode
+                  case _ => CheckMode
+                })
+                .url,
+              hidden = Message("employerContributionsCYA.row.contribution.hidden", employerName, membersName)
             )
             // append "any contributions by other employers" row to final section
           ) :?+ Option.when(journeyIndex + 1 == employerCYAs.length)(
