@@ -26,7 +26,11 @@ import navigation.Navigator
 import forms.RadioListFormProvider
 import play.api.i18n.MessagesApi
 import play.api.data.Form
-import pages.nonsipp.otherassetsheld.{OtherAssetsCYAPointOfEntry, WhyDoesSchemeHoldAssetsPage}
+import pages.nonsipp.otherassetsheld.{
+  OtherAssetsCYAPointOfEntry,
+  WhenDidSchemeAcquireAssetsPage,
+  WhyDoesSchemeHoldAssetsPage
+}
 import models.PointOfEntry._
 import controllers.nonsipp.otherassetsheld.WhyDoesSchemeHoldAssetsController._
 import controllers.PSRController
@@ -98,16 +102,19 @@ class WhyDoesSchemeHoldAssetsController @Inject()(
               // In CheckMode, before saving answers, set PointOfEntry based on the previous answer and new answer
               val previousAnswer = request.userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index))
               val previousPointOfEntry = request.userAnswers.get(OtherAssetsCYAPointOfEntry(srn, index))
+              val whenDidSchemeAcquireAssetsPage = request.userAnswers.get(WhenDidSchemeAcquireAssetsPage(srn, index))
 
-              val pointOfEntry = (previousAnswer, answer) match {
-                case (Some(Acquisition), Contribution) => Some(AssetAcquisitionToContributionPointOfEntry)
-                case (Some(Acquisition), Transfer) => Some(AssetAcquisitionToTransferPointOfEntry)
-                case (Some(Contribution), Acquisition) => Some(AssetContributionToAcquisitionPointOfEntry)
-                case (Some(Contribution), Transfer) => Some(AssetContributionToTransferPointOfEntry)
-                case (Some(Transfer), Acquisition) => Some(AssetTransferToAcquisitionPointOfEntry)
-                case (Some(Transfer), Contribution) => Some(AssetTransferToContributionPointOfEntry)
+              val pointOfEntry = (previousAnswer, answer, whenDidSchemeAcquireAssetsPage) match {
+                case (Some(Acquisition), Contribution, Some(_)) => Some(AssetAcquisitionToContributionPointOfEntry)
+                case (Some(Acquisition), Contribution, None) => Some(WhenDidSchemeAcquireAssetsPointOfEntry)
+                case (Some(Acquisition), Transfer, _) => Some(AssetAcquisitionToTransferPointOfEntry)
+                case (Some(Contribution), Acquisition, Some(_)) => Some(AssetContributionToAcquisitionPointOfEntry)
+                case (Some(Contribution), Acquisition, None) => Some(WhenDidSchemeAcquireAssetsPointOfEntry)
+                case (Some(Contribution), Transfer, _) => Some(AssetContributionToTransferPointOfEntry)
+                case (Some(Transfer), Acquisition, _) => Some(AssetTransferToAcquisitionPointOfEntry)
+                case (Some(Transfer), Contribution, _) => Some(AssetTransferToContributionPointOfEntry)
                 // If answer is unchanged, use previousPointOfEntry. If this is NoPointOfEntry then redirect to CYA.
-                case (Some(_), _) => previousPointOfEntry
+                case (Some(_), _, _) => previousPointOfEntry
                 case _ => None
               }
 
