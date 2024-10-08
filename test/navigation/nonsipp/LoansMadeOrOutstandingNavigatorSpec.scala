@@ -292,7 +292,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       act.like(
         normalmode
           .navigateTo(
-            srn => LoansListPage(srn, true),
+            srn => LoansListPage(srn, addLoan = true),
             (srn, _) =>
               controllers.nonsipp.common.routes.IdentityTypeController
                 .onPageLoad(srn, refineMV(2), NormalMode, IdentitySubject.LoanRecipient),
@@ -308,7 +308,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       act.like(
         normalmode
           .navigateTo(
-            srn => LoansListPage(srn, true),
+            srn => LoansListPage(srn, addLoan = true),
             (srn, _) =>
               controllers.nonsipp.common.routes.IdentityTypeController
                 .onPageLoad(srn, refineMV(1), NormalMode, IdentitySubject.LoanRecipient),
@@ -324,7 +324,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       act.like(
         normalmode
           .navigateTo(
-            srn => LoansListPage(srn, true),
+            srn => LoansListPage(srn, addLoan = true),
             (srn, _) =>
               controllers.nonsipp.common.routes.IdentityTypeController
                 .onPageLoad(srn, refineMV(1), NormalMode, IdentitySubject.LoanRecipient),

@@ -36,19 +36,18 @@ class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
   val conditionalYes: ConditionalYesNo[String, Crn] = ConditionalYesNo.yes(crn)
 
   "CompanyRecipientCrnController" - {
-    IdentitySubject.values.foreach {
-      case identitySubject =>
-        lazy val onPageLoad =
-          controllers.nonsipp.common.routes.CompanyRecipientCrnController
-            .onPageLoad(srn, index, NormalMode, identitySubject)
-        lazy val onSubmit =
-          controllers.nonsipp.common.routes.CompanyRecipientCrnController
-            .onSubmit(srn, index, NormalMode, identitySubject)
-        val userAnswersWithData = defaultUserAnswers
-          .unsafeSet(CompanyRecipientNamePage(srn, index), companyName)
-          .unsafeSet(CompanySellerNamePage(srn, index), companyName)
+    IdentitySubject.values.foreach { identitySubject =>
+      lazy val onPageLoad =
+        controllers.nonsipp.common.routes.CompanyRecipientCrnController
+          .onPageLoad(srn, index, NormalMode, identitySubject)
+      lazy val onSubmit =
+        controllers.nonsipp.common.routes.CompanyRecipientCrnController
+          .onSubmit(srn, index, NormalMode, identitySubject)
+      val userAnswersWithData = defaultUserAnswers
+        .unsafeSet(CompanyRecipientNamePage(srn, index), companyName)
+        .unsafeSet(CompanySellerNamePage(srn, index), companyName)
 
-        testCrnController(identitySubject, onPageLoad, onSubmit, userAnswersWithData)
+      testCrnController(identitySubject, onPageLoad, onSubmit, userAnswersWithData)
     }
 
     "Unknown" - {

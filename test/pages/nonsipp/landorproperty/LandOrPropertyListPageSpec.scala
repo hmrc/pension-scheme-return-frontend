@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.landorproperty;
+package pages.nonsipp.landorproperty
 
-import config.Refined.OneTo5000
-import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours;
+import pages.behaviours.PageBehaviours
 
 class LandOrPropertyListPageSpec extends PageBehaviours {
 
-  private val srn = srnGen.sample.value
-
   "LandOrPropertyListPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val srn = srnGen.sample.value
 
     beRetrievable[Boolean](LandOrPropertyListPage(srn, addLandOrProperty = true))
 

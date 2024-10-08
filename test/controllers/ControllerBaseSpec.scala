@@ -216,7 +216,7 @@ trait TestValues {
 
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
-  val defaultExpectedDataPath = None
+  val defaultExpectedDataPath: Option[Nothing] = None
 
   val defaultUserAnswers: UserAnswers =
     UserAnswers(userAnswersId, SensitiveJsObject(Json.obj("non" -> "empty")))

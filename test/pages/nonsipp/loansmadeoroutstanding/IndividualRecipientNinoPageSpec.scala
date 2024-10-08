@@ -27,11 +27,12 @@ class IndividualRecipientNinoPageSpec extends PageBehaviours {
   "IndividualRecipientNinoPage" - {
 
     val index = refineMV[OneTo5000](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnGen.sample.value, index))
+    beRetrievable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnSample, index))
 
-    beSettable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnGen.sample.value, index))
+    beSettable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnSample, index))
 
-    beRemovable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnGen.sample.value, index))
+    beRemovable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnSample, index))
   }
 }

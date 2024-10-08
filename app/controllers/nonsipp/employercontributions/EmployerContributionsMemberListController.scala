@@ -166,9 +166,9 @@ object EmployerContributionsMemberListController {
     srn: Srn,
     mode: Mode,
     memberWithEmployerContributions: List[MemberWithEmployerContributions],
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
+    optYear: Option[String],
+    optCurrentVersion: Option[Int],
+    optPreviousVersion: Option[Int]
   ): List[List[TableElem]] =
     memberWithEmployerContributions.map { memberWithEmployerContributions =>
       val noContributions = memberWithEmployerContributions.contributions.isEmpty

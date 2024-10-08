@@ -26,11 +26,12 @@ class LandOrPropertyDisposalBuyerConnectedPartyPageSpec extends PageBehaviours {
 
     val index = refineMV[Max5000.Refined](1)
     val disposalIndex = refineMV[Max50.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[Boolean](LandOrPropertyDisposalBuyerConnectedPartyPage(srnGen.sample.value, index, disposalIndex))
+    beRetrievable[Boolean](LandOrPropertyDisposalBuyerConnectedPartyPage(srnSample, index, disposalIndex))
 
-    beSettable[Boolean](LandOrPropertyDisposalBuyerConnectedPartyPage(srnGen.sample.value, index, disposalIndex))
+    beSettable[Boolean](LandOrPropertyDisposalBuyerConnectedPartyPage(srnSample, index, disposalIndex))
 
-    beRemovable[Boolean](LandOrPropertyDisposalBuyerConnectedPartyPage(srnGen.sample.value, index, disposalIndex))
+    beRemovable[Boolean](LandOrPropertyDisposalBuyerConnectedPartyPage(srnSample, index, disposalIndex))
   }
 }

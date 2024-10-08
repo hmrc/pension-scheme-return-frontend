@@ -26,11 +26,12 @@ class TotalAmountPensionPaymentsPageSpec extends PageBehaviours {
   "TotalAmountPensionPaymentsPage" - {
 
     val index = refineMV[Max300.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[Money](TotalAmountPensionPaymentsPage(srnGen.sample.value, index))
+    beRetrievable[Money](TotalAmountPensionPaymentsPage(srnSample, index))
 
-    beSettable[Money](TotalAmountPensionPaymentsPage(srnGen.sample.value, index))
+    beSettable[Money](TotalAmountPensionPaymentsPage(srnSample, index))
 
-    beRemovable[Money](TotalAmountPensionPaymentsPage(srnGen.sample.value, index))
+    beRemovable[Money](TotalAmountPensionPaymentsPage(srnSample, index))
   }
 }

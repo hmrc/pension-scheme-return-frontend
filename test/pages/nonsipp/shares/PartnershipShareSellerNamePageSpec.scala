@@ -25,11 +25,12 @@ class PartnershipShareSellerNamePageSpec extends PageBehaviours {
   "PartnershipShareSellerNamePage" - {
 
     val index = refineMV[OneTo5000](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[String](PartnershipShareSellerNamePage(srnGen.sample.value, index))
+    beRetrievable[String](PartnershipShareSellerNamePage(srnSample, index))
 
-    beSettable[String](PartnershipShareSellerNamePage(srnGen.sample.value, index))
+    beSettable[String](PartnershipShareSellerNamePage(srnSample, index))
 
-    beRemovable[String](PartnershipShareSellerNamePage(srnGen.sample.value, index))
+    beRemovable[String](PartnershipShareSellerNamePage(srnSample, index))
   }
 }

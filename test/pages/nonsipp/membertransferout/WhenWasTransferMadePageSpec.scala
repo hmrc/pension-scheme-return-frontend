@@ -18,7 +18,6 @@ package pages.nonsipp.membertransferout
 
 import config.Refined.{Max300, Max5}
 import eu.timepit.refined.refineMV
-import pages.nonsipp.membertransferout.WhenWasTransferMadePage
 import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate
@@ -29,11 +28,12 @@ class WhenWasTransferMadePageSpec extends PageBehaviours {
 
     val index = refineMV[Max300.Refined](1)
     val secondaryIndex = refineMV[Max5.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[LocalDate](WhenWasTransferMadePage(srnGen.sample.value, index, secondaryIndex))
+    beRetrievable[LocalDate](WhenWasTransferMadePage(srnSample, index, secondaryIndex))
 
-    beSettable[LocalDate](WhenWasTransferMadePage(srnGen.sample.value, index, secondaryIndex))
+    beSettable[LocalDate](WhenWasTransferMadePage(srnSample, index, secondaryIndex))
 
-    beRemovable[LocalDate](WhenWasTransferMadePage(srnGen.sample.value, index, secondaryIndex))
+    beRemovable[LocalDate](WhenWasTransferMadePage(srnSample, index, secondaryIndex))
   }
 }

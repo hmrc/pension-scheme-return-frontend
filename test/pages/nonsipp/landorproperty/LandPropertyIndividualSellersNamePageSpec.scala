@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.landorproperty
 
 import config.Refined.OneTo5000
 import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage

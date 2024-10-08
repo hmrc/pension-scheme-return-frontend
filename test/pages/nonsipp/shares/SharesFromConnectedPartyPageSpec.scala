@@ -25,11 +25,12 @@ class SharesFromConnectedPartyPageSpec extends PageBehaviours {
   "SharesFromConnectedPartyPage" - {
 
     val index = refineMV[OneTo5000](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[Boolean](SharesFromConnectedPartyPage(srnGen.sample.value, index))
+    beRetrievable[Boolean](SharesFromConnectedPartyPage(srnSample, index))
 
-    beSettable[Boolean](SharesFromConnectedPartyPage(srnGen.sample.value, index))
+    beSettable[Boolean](SharesFromConnectedPartyPage(srnSample, index))
 
-    beRemovable[Boolean](SharesFromConnectedPartyPage(srnGen.sample.value, index))
+    beRemovable[Boolean](SharesFromConnectedPartyPage(srnSample, index))
   }
 }

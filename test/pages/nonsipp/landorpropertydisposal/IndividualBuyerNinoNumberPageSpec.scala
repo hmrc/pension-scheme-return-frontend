@@ -28,15 +28,16 @@ class IndividualBuyerNinoNumberPageSpec extends PageBehaviours {
 
     val index = refineMV[Max5000.Refined](1)
     val disposalIndex = refineMV[Max50.Refined](1)
+    val srnSample = srnGen.sample.value
 
     beRetrievable[ConditionalYesNo[String, Nino]](
-      IndividualBuyerNinoNumberPage(srnGen.sample.value, index, disposalIndex)
+      IndividualBuyerNinoNumberPage(srnSample, index, disposalIndex)
     )
 
-    beSettable[ConditionalYesNo[String, Nino]](IndividualBuyerNinoNumberPage(srnGen.sample.value, index, disposalIndex))
+    beSettable[ConditionalYesNo[String, Nino]](IndividualBuyerNinoNumberPage(srnSample, index, disposalIndex))
 
     beRemovable[ConditionalYesNo[String, Nino]](
-      IndividualBuyerNinoNumberPage(srnGen.sample.value, index, disposalIndex)
+      IndividualBuyerNinoNumberPage(srnSample, index, disposalIndex)
     )
 
   }

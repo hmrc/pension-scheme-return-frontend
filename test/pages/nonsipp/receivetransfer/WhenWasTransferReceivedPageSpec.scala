@@ -17,7 +17,6 @@
 package pages.nonsipp.receivetransfer
 
 import config.Refined._
-import pages.nonsipp.receivetransfer.WhenWasTransferReceivedPage
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 
@@ -29,11 +28,12 @@ class WhenWasTransferReceivedPageSpec extends PageBehaviours {
 
     val index = refineMV[Max300.Refined](1)
     val secondaryIndex = refineMV[Max5.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[LocalDate](WhenWasTransferReceivedPage(srnGen.sample.value, index, secondaryIndex))
+    beRetrievable[LocalDate](WhenWasTransferReceivedPage(srnSample, index, secondaryIndex))
 
-    beSettable[LocalDate](WhenWasTransferReceivedPage(srnGen.sample.value, index, secondaryIndex))
+    beSettable[LocalDate](WhenWasTransferReceivedPage(srnSample, index, secondaryIndex))
 
-    beRemovable[LocalDate](WhenWasTransferReceivedPage(srnGen.sample.value, index, secondaryIndex))
+    beRemovable[LocalDate](WhenWasTransferReceivedPage(srnSample, index, secondaryIndex))
   }
 }

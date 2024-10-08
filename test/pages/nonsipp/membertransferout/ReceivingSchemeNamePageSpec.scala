@@ -21,7 +21,6 @@ import config.Refined._
 import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
-import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
 import eu.timepit.refined.api.Refined
 import pages.behaviours.PageBehaviours
 
@@ -34,12 +33,13 @@ class ReceivingSchemeNamePageSpec extends PageBehaviours with TestValues {
 
     val index = refineMV[OneTo300](1)
     val transferIndex = refineMV[OneTo5](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[String](ReceivingSchemeNamePage(srnGen.sample.value, index, transferIndex))
+    beRetrievable[String](ReceivingSchemeNamePage(srnSample, index, transferIndex))
 
-    beSettable[String](ReceivingSchemeNamePage(srnGen.sample.value, index, transferIndex))
+    beSettable[String](ReceivingSchemeNamePage(srnSample, index, transferIndex))
 
-    beRemovable[String](ReceivingSchemeNamePage(srnGen.sample.value, index, transferIndex))
+    beRemovable[String](ReceivingSchemeNamePage(srnSample, index, transferIndex))
   }
 
   "cleanup other fields when removed with index-1" in {

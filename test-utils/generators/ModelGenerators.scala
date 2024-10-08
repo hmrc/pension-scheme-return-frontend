@@ -93,6 +93,14 @@ trait ModelGenerators extends BasicGenerators {
       establishers <- Gen.listOf(establisherGen)
     } yield SchemeDetails(name, pstr, status, schemeType, authorisingPsa, establishers)
 
+  val srnGen: Gen[Srn] =
+    Gen
+      .listOfN(10, numChar)
+      .flatMap { xs =>
+        Srn(s"S${xs.mkString}")
+          .fold[Gen[Srn]](Gen.fail)(x => Gen.const(x))
+      }
+
   val minimalSchemeDetailsGen: Gen[MinimalSchemeDetails] =
     for {
       name <- nonEmptyString
@@ -111,14 +119,6 @@ trait ModelGenerators extends BasicGenerators {
   val psaIdGen: Gen[PsaId] = nonEmptyString.map(PsaId)
   val pspIdGen: Gen[PspId] = nonEmptyString.map(PspId)
   val pensionSchemeIdGen: Gen[PensionSchemeId] = Gen.oneOf(psaIdGen, pspIdGen)
-
-  val srnGen: Gen[Srn] =
-    Gen
-      .listOfN(10, numChar)
-      .flatMap { xs =>
-        Srn(s"S${xs.mkString}")
-          .fold[Gen[Srn]](Gen.fail)(x => Gen.const(x))
-      }
 
   val addressGen: Gen[Address] = for {
     addressLine1 <- nonEmptyString

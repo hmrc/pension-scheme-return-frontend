@@ -23,20 +23,22 @@ import pages.behaviours.PageBehaviours
 
 class OtherRecipientDetailsPageSpec extends PageBehaviours {
   private val index = refineMV[OneTo5000](1)
+  private val srnSample = srnGen.sample.value
 
   "OtherRecipientDetailsPage" - {
     IdentitySubject.values.foreach { identitySubject =>
       s"for $identitySubject" - {
+
         beRetrievable[RecipientDetails](
-          OtherRecipientDetailsPage(srnGen.sample.value, index, identitySubject)
+          OtherRecipientDetailsPage(srnSample, index, identitySubject)
         )
 
         beSettable[RecipientDetails](
-          OtherRecipientDetailsPage(srnGen.sample.value, index, identitySubject)
+          OtherRecipientDetailsPage(srnSample, index, identitySubject)
         )
 
         beRemovable[RecipientDetails](
-          OtherRecipientDetailsPage(srnGen.sample.value, index, identitySubject)
+          OtherRecipientDetailsPage(srnSample, index, identitySubject)
         )
       }
     }

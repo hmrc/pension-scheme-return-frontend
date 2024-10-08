@@ -170,6 +170,8 @@ trait BasicGenerators extends EitherValues {
     )
 
   val nonEmptyMessage: Gen[Message] = nonEmptyString.map(Message(_))
+  val relativeUrl: Gen[String] =
+    nonEmptyListOf(nonEmptyString).map(_.toList.mkString("/", "/", "/"))
   val nonEmptyLinkMessage: Gen[LinkMessage] =
     for {
       message <- nonEmptyMessage
@@ -215,9 +217,6 @@ trait BasicGenerators extends EitherValues {
       c <- choose(0, 255)
       d <- choose(0, 255)
     } yield s"$a.$b.$c.$d"
-
-  val relativeUrl: Gen[String] =
-    nonEmptyListOf(nonEmptyString).map(_.toList.mkString("/", "/", "/"))
 
   val httpMethod: Gen[String] = Gen.oneOf("GET", "POST")
   val call: Gen[Call] = {
