@@ -17,7 +17,6 @@
 package pages.nonsipp.memberdetails
 
 import utils.RefinedUtils.RefinedIntOps
-import queries.Removable
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.UserAnswers
@@ -42,9 +41,4 @@ case class DoesMemberHaveNinoPage(srn: Srn, index: Max300) extends QuestionPage[
           List(NoNINOPage(srn, index), MemberDetailsNinoPage(srn, index), MemberDetailsCompletedPage(srn, index))
         )
     }
-}
-
-case class DoesMemberHaveNinoPages(srn: Srn) extends Removable[Map[String, Boolean]] {
-
-  override def path: JsPath = Paths.personalDetails \ "nationalInsuranceNumber"
 }

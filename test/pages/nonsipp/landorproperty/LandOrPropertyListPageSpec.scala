@@ -14,13 +14,26 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.receivetransfer
+package pages.nonsipp.landorproperty;
 
-import models.SchemeId.Srn
-import config.Refined.Max300
-import pages.Page
+import config.Refined.OneTo5000
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours;
 
-case class RemoveTransferInPage(srn: Srn, memberIndex: Max300) extends Page {
+class LandOrPropertyListPageSpec extends PageBehaviours {
 
-  override def toString: String = "RemoveTransferInPage"
+  private val srn = srnGen.sample.value
+
+  "LandOrPropertyListPage" - {
+
+    val index = refineMV[OneTo5000](1)
+
+    beRetrievable[Boolean](LandOrPropertyListPage(srn, addLandOrProperty = true))
+
+    beSettable[Boolean](LandOrPropertyListPage(srn, addLandOrProperty = true))
+
+    beRemovable[Boolean](LandOrPropertyListPage(srn, addLandOrProperty = true))
+
+  }
+
 }

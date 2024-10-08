@@ -28,10 +28,3 @@ case class WhyDidMemberSurrenderBenefitsPage(srn: Srn, index: Max300) extends Qu
 
   override def toString: String = "surrenderReason"
 }
-
-case class WhyDidMemberSurrenderBenefitsPages(srn: Srn) extends QuestionPage[Map[String, String]] {
-
-  override def path: JsPath = Paths.memberPensionSurrender \ toString
-
-  override def toString: String = "surrenderReason"
-}

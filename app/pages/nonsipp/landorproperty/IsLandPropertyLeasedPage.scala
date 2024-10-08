@@ -49,11 +49,3 @@ case class IsLandPropertyLeasedPage(srn: Srn, index: Max5000) extends QuestionPa
     )
 
 }
-
-case class IsLandPropertyLeasedPages(srn: Srn) extends QuestionPage[Map[String, Boolean]] {
-
-  override def path: JsPath = Paths.heldPropertyTransactions \ toString
-
-  override def toString: String = "landOrPropertyLeased"
-
-}

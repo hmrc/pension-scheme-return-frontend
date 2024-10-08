@@ -20,20 +20,12 @@ import utils.RefinedUtils.RefinedIntOps
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import config.Refined.{Max50, Max5000}
-import pages.{IndexedQuestionPage, QuestionPage}
+import pages.QuestionPage
 
 case class CompanyBuyerNamePage(srn: Srn, index: Max5000, disposalIndex: Max50) extends QuestionPage[String] {
 
   override def path: JsPath =
     Paths.salesQuestions \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
-
-  override def toString: String = "nameOfPurchaser"
-}
-
-case class CompanyBuyerNamePages(srn: Srn, index: Max5000) extends IndexedQuestionPage[String] {
-
-  override def path: JsPath =
-    Paths.salesQuestions \ toString \ index.arrayIndex.toString
 
   override def toString: String = "nameOfPurchaser"
 }

@@ -16,8 +16,10 @@
 
 package pages.nonsipp.membersurrenderedbenefits
 
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCompleted._
 import config.Refined.Max300
 import eu.timepit.refined.refineMV
+import models.UserAnswers
 import viewmodels.models.SectionCompleted
 import pages.behaviours.PageBehaviours
 
@@ -35,4 +37,28 @@ class SurrenderedBenefitsCompletedPageSpec extends PageBehaviours {
     beRemovable[SectionCompleted](SurrenderedBenefitsCompletedPage(srn, index))
 
   }
+
+  "SurrenderedBenefitsCompletedPage" - {
+    val index = refineMV[Max300.Refined](1)
+    val srn = srnGen.sample.value
+
+    SurrenderedBenefitsCompletedPage(srn, index).toString mustBe "surrenderedBenefitsSectionCompleted"
+  }
+
+  "SurrenderedBenefitsUserAnswersOps" - {
+
+    "must return a list of indexes for completed sections" in {
+      val srn = srnGen.sample.value
+      val index = refineMV[Max300.Refined](1)
+
+      val userAnswers = UserAnswers(id = "test-id")
+        .set(SurrenderedBenefitsCompletedPage(srn, index), SectionCompleted)
+        .success
+        .value
+
+      val result = userAnswers.surrenderedBenefitsCompleted(srn)
+      result mustEqual List(index)
+    }
+  }
+
 }

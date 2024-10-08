@@ -109,4 +109,5 @@ class HowWasPropertyDisposedOfPageSpec extends PageBehaviours with TestValues {
       result.get(LandOrPropertyDisposalPage(srn)) must not be (empty)
     }
   }
+
 }

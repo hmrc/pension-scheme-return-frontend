@@ -16,12 +16,15 @@
 
 package pages.nonsipp.employercontributions
 
+import pages.nonsipp.employercontributions.EmployerContributionsCompleted.EmployerContributionsUserAnswersOps
 import config.Refined._
 import eu.timepit.refined.refineMV
+import models.UserAnswers
 import viewmodels.models.SectionCompleted
 import pages.behaviours.PageBehaviours
 
 class EmployerContributionsCompletedSpec extends PageBehaviours {
+  val srn = srnGen.sample.value
 
   "EmployerContributionsCYAPage" - {
 
@@ -34,4 +37,23 @@ class EmployerContributionsCompletedSpec extends PageBehaviours {
 
     beRemovable[SectionCompleted.type](EmployerContributionsCompleted(srnGen.sample.value, index, secondaryIndex))
   }
+
+  "EmployerContributionsUserAnswersOps" - {
+
+    val index = refineMV[Max300.Refined](1)
+    val secondaryIndex = refineMV[Max50.Refined](1)
+
+    val userAnswers = UserAnswers(id = "test-id")
+      .set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
+      .success
+      .value
+      .set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
+      .success
+      .value
+
+    val result = userAnswers.employerContributionsCompleted(srn, index)
+    result must contain theSameElementsAs List(secondaryIndex)
+
+  }
+
 }
