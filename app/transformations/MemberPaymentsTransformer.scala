@@ -22,16 +22,16 @@ import pages.nonsipp.memberdetails.MembersDetailsPage._
 import config.Refined.{Max300, Max50}
 import models.SchemeId.Srn
 import pages.nonsipp.memberpensionpayments._
-import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsPage
 import models._
-import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutJourneyStatus}
+import pages.nonsipp.membertransferout.SchemeTransferOutPage
 import models.softdelete.SoftDeletedMember
 import cats.syntax.traverse._
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.membercontributions.{MemberContributionsPage, TotalMemberContributionPage}
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
 import pages.nonsipp.memberpensionpayments.Paths.membersPayments
-import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInJourneyStatus}
+import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
 import models.requests.psr._
 import models.UserAnswers.implicits._
 import pages.nonsipp.{FbStatus, FbVersionPage}
@@ -193,10 +193,7 @@ class MemberPaymentsTransformer @Inject()(
               memberDetails = memberDetailsWithCorrectVersion ++ softDeletedMembers,
               employerContributionsDetails = SectionDetails(
                 made = userAnswers.get(EmployerContributionsPage(srn)).getOrElse(false),
-                completed = userAnswers.get(EmployerContributionsSectionStatus(srn)).exists {
-                  case SectionStatus.InProgress => false
-                  case SectionStatus.Completed => true
-                }
+                completed = false // TODO : CEM to be deleted
               ),
               transfersInMade = userAnswers.get(DidSchemeReceiveTransferPage(srn)),
               transfersOutMade = userAnswers.get(SchemeTransferOutPage(srn)),
@@ -207,10 +204,7 @@ class MemberPaymentsTransformer @Inject()(
               pensionReceived = pensionAmountReceivedTransformer.transformToEtmp(srn, userAnswers),
               benefitsSurrenderedDetails = SectionDetails(
                 made = userAnswers.get(SurrenderedBenefitsPage(srn)).getOrElse(false),
-                completed = userAnswers.get(SurrenderedBenefitsJourneyStatus(srn)).exists {
-                  case SectionStatus.InProgress => false
-                  case SectionStatus.Completed => true
-                }
+                completed = false // TODO : CEM to be deleted
               )
             )
           )
@@ -349,38 +343,13 @@ class MemberPaymentsTransformer @Inject()(
             if (memberPayments.memberDetails.exists(_.employerContributions.nonEmpty)) true
             else memberPayments.employerContributionsDetails.made
           )
-          .set(
-            EmployerContributionsSectionStatus(srn),
-            if (memberPayments.employerContributionsDetails.completed) SectionStatus.Completed
-            else SectionStatus.InProgress
-          )
       }
 
       // Transfers In section-wide user answers
-      ua3_3 <- memberPayments.transfersInMade match {
-        case Some(true) =>
-          ua3_2
-            .set(DidSchemeReceiveTransferPage(srn), true)
-            .set(TransfersInJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
-        case Some(false) =>
-          ua3_2
-            .set(DidSchemeReceiveTransferPage(srn), false)
-            .set(TransfersInJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
-        case None => Try(ua3_2)
-      }
+      ua3_3 <- memberPayments.transfersInMade.fold(Try(ua3_2))(ua3_2.set(DidSchemeReceiveTransferPage(srn), _))
 
       // Transfers Out section-wide user answers
-      ua3_4 <- memberPayments.transfersOutMade match {
-        case Some(true) =>
-          ua3_3
-            .set(SchemeTransferOutPage(srn), true)
-            .set(TransfersOutJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
-        case Some(false) =>
-          ua3_3
-            .set(SchemeTransferOutPage(srn), false)
-            .set(TransfersOutJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
-        case None => Try(ua3_3)
-      }
+      ua3_4 <- memberPayments.transfersOutMade.fold(Try(ua3_3))(ua3_3.set(SchemeTransferOutPage(srn), _))
 
       // new members can be safely hard deleted - don't run when fetching previous user answers as there is no point
       newMembers <- if (!fetchingPreviousVersion) {

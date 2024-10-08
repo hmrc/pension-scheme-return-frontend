@@ -252,14 +252,8 @@ trait SoftDelete { _: PSRController =>
             ua.employerContributionsCompleted(srn, index)
               .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(employerContributionsPages(secondaryIndex)))
               .when(_.get(EmployerContributionsPage(srn)))(
-                ifTrue = _.removeWhen(!EmployerContributionsProgress.exist(srn, _))(
-                  EmployerContributionsSectionStatus(srn),
-                  EmployerContributionsPage(srn)
-                ),
-                ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(
-                  EmployerContributionsSectionStatus(srn),
-                  EmployerContributionsPage(srn)
-                )
+                ifTrue = _.removeWhen(!EmployerContributionsProgress.exist(srn, _))(EmployerContributionsPage(srn)),
+                ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(EmployerContributionsPage(srn))
               )
           }
           .flatMap(
@@ -267,14 +261,8 @@ trait SoftDelete { _: PSRController =>
               ua.transfersInSectionCompleted(srn, index)
                 .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(transfersInPages(secondaryIndex)))
                 .when(_.get(DidSchemeReceiveTransferPage(srn)))(
-                  ifTrue = _.removeWhen(!TransfersInSectionCompleted.exists(srn, _))(
-                    TransfersInJourneyStatus(srn),
-                    DidSchemeReceiveTransferPage(srn)
-                  ),
-                  ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(
-                    TransfersInJourneyStatus(srn),
-                    DidSchemeReceiveTransferPage(srn)
-                  )
+                  ifTrue = _.removeWhen(!TransfersInSectionCompleted.exists(srn, _))(DidSchemeReceiveTransferPage(srn)),
+                  ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(DidSchemeReceiveTransferPage(srn))
                 )
           )
           .flatMap(
@@ -282,27 +270,15 @@ trait SoftDelete { _: PSRController =>
               ua.transfersOutSectionCompleted(srn, index)
                 .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(transfersOutPages(secondaryIndex)))
                 .when(_.get(SchemeTransferOutPage(srn)))(
-                  ifTrue = _.removeWhen(!TransfersOutSectionCompleted.exists(srn, _))(
-                    TransfersOutJourneyStatus(srn),
-                    SchemeTransferOutPage(srn)
-                  ),
-                  ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(
-                    TransfersOutJourneyStatus(srn),
-                    SchemeTransferOutPage(srn)
-                  )
+                  ifTrue = _.removeWhen(!TransfersOutSectionCompleted.exists(srn, _))(SchemeTransferOutPage(srn)),
+                  ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(SchemeTransferOutPage(srn))
                 )
           )
           .flatMap { ua =>
             ua.remove(surrenderedBenefitsPages)
               .when(_.get(SurrenderedBenefitsPage(srn)))(
-                ifTrue = _.removeWhen(_.surrenderedBenefitsCompleted(srn).isEmpty)(
-                  SurrenderedBenefitsJourneyStatus(srn),
-                  SurrenderedBenefitsPage(srn)
-                ),
-                ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(
-                  SurrenderedBenefitsJourneyStatus(srn),
-                  SurrenderedBenefitsPage(srn)
-                )
+                ifTrue = _.removeWhen(_.surrenderedBenefitsCompleted(srn).isEmpty)(SurrenderedBenefitsPage(srn)),
+                ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(SurrenderedBenefitsPage(srn))
               )
           }
           .flatMap { ua =>
@@ -320,13 +296,9 @@ trait SoftDelete { _: PSRController =>
             ua.remove(memberPensionPaymentsPages)
               .when(_.get(PensionPaymentsReceivedPage(srn)))(
                 ifTrue = _.removeWhen(_.map(TotalAmountPensionPaymentsPage.all(srn)).isEmpty)(
-                  PensionPaymentsJourneyStatus(srn),
                   PensionPaymentsReceivedPage(srn)
                 ),
-                ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(
-                  PensionPaymentsJourneyStatus(srn),
-                  PensionPaymentsReceivedPage(srn)
-                )
+                ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(PensionPaymentsReceivedPage(srn))
               )
           }
           .flatMap { ua =>

@@ -19,12 +19,9 @@ package pages.nonsipp.employercontributions
 import utils.RefinedUtils.RefinedIntOps
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import models.{ConditionalYesNo, Crn, UserAnswers}
-import viewmodels.models.SectionStatus
+import models.{ConditionalYesNo, Crn}
 import config.Refined.{Max300, Max50}
 import pages.QuestionPage
-
-import scala.util.Try
 
 case class EmployerCompanyCrnPage(srn: Srn, memberIndex: Max300, index: Max50)
     extends QuestionPage[ConditionalYesNo[String, Crn]] {
@@ -33,21 +30,4 @@ case class EmployerCompanyCrnPage(srn: Srn, memberIndex: Max300, index: Max50)
     Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
 
   override def toString: String = "idNumber"
-
-  override def cleanup(value: Option[ConditionalYesNo[String, Crn]], userAnswers: UserAnswers): Try[UserAnswers] =
-    (value, userAnswers.get(this)) match {
-      case (None, _) => Try(userAnswers) // delete handled by cleanup in EmployerNamePage
-      case (Some(_), None) =>
-        // create
-        userAnswers
-          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-      case (Some(x), Some(y)) if x == y =>
-        // value stays the same
-        Try(userAnswers)
-      case (Some(x), Some(y)) if x != y =>
-        // value updated
-        userAnswers
-          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-      case _ => Try(userAnswers)
-    }
 }

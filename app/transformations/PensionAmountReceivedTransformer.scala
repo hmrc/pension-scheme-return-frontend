@@ -36,10 +36,7 @@ class PensionAmountReceivedTransformer @Inject() extends Transformer {
   // Build section details
   def transformToEtmp(srn: Srn, userAnswers: UserAnswers): SectionDetails = SectionDetails(
     made = userAnswers.get(PensionPaymentsReceivedPage(srn)).getOrElse(false),
-    completed = userAnswers.get(PensionPaymentsJourneyStatus(srn)).exists {
-      case SectionStatus.InProgress => false
-      case SectionStatus.Completed => true
-    }
+    completed = false // TODO : CEM to be deleted
   )
 
   // Save member specific answers
@@ -66,7 +63,6 @@ class PensionAmountReceivedTransformer @Inject() extends Transformer {
 
     status.fold(List.empty[UserAnswers.Compose]) { s =>
       List[UserAnswers.Compose](
-        _.setWhen(pensionReceived.started)(PensionPaymentsJourneyStatus(srn), s),
         _.setWhen(pensionReceived.started)(PensionPaymentsReceivedPage(srn), pensionReceived.made)
       )
     }

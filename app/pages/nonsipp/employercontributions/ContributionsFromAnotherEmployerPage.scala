@@ -19,12 +19,8 @@ package pages.nonsipp.employercontributions
 import utils.RefinedUtils.RefinedIntOps
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import models.UserAnswers
-import viewmodels.models.SectionStatus
 import config.Refined.{Max300, Max50}
 import pages.QuestionPage
-
-import scala.util.Try
 
 case class ContributionsFromAnotherEmployerPage(srn: Srn, index: Max300, secondaryIndex: Max50)
     extends QuestionPage[Boolean] {
@@ -33,22 +29,4 @@ case class ContributionsFromAnotherEmployerPage(srn: Srn, index: Max300, seconda
     Paths.memberEmpContribution \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
   override def toString: String = "contributionsFromAnotherEmployer"
-
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    (value, userAnswers.get(this)) match {
-      case (None, _) => Try(userAnswers) // delete handled by cleanup in EmployerNamePage
-      case (Some(_), None) =>
-        // create
-        userAnswers
-          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-      case (Some(x), Some(y)) if x == y =>
-        // value stays the same
-        Try(userAnswers)
-      case (Some(x), Some(y)) if x != y =>
-        // value updated
-        userAnswers
-          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-      case _ => Try(userAnswers)
-    }
-
 }

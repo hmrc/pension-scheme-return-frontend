@@ -106,7 +106,6 @@ class RemoveSurrenderedBenefitsController @Inject()(
                       .removePages(
                         surrenderBenefitsPages(srn, index)
                       )
-                      .set(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.InProgress)
                       .set(MemberStatus(srn, index), MemberState.Changed)
                   )
                 _ <- saveService.save(updatedAnswers)

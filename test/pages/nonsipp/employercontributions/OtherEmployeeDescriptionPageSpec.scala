@@ -19,8 +19,6 @@ package pages.nonsipp.employercontributions
 import config.Refined._
 import controllers.TestValues
 import eu.timepit.refined.refineMV
-import utils.UserAnswersUtils.UserAnswersOps
-import viewmodels.models.SectionStatus
 import pages.behaviours.PageBehaviours
 
 class OtherEmployeeDescriptionPageSpec extends PageBehaviours with TestValues {
@@ -29,68 +27,12 @@ class OtherEmployeeDescriptionPageSpec extends PageBehaviours with TestValues {
 
     val memberIndex = refineMV[Max300.Refined](1)
     val secondaryIndex = refineMV[Max50.Refined](1)
+    val srn = srnGen.sample.value
 
-    beRetrievable[String](OtherEmployeeDescriptionPage(srnGen.sample.value, memberIndex, secondaryIndex))
+    beRetrievable[String](OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex))
 
-    beSettable[String](OtherEmployeeDescriptionPage(srnGen.sample.value, memberIndex, secondaryIndex))
+    beSettable[String](OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex))
 
-    beRemovable[String](OtherEmployeeDescriptionPage(srnGen.sample.value, memberIndex, secondaryIndex))
-
-    "Dependent values: section status and were employer contributions made are" - {
-
-      "changing when type of business added" in {
-        val userAnswers = defaultUserAnswers
-          .unsafeSet(EmployerContributionsPage(srn), true)
-          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-
-        val result = userAnswers
-          .set(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex), otherRecipientDescription)
-          .success
-          .value
-
-        result.get(EmployerContributionsPage(srn)) must be(Some(true))
-        result.get(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex)) must be(
-          Some(otherRecipientDescription)
-        )
-        result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-      }
-
-      "not changing when value stays the same" in {
-        val userAnswers = defaultUserAnswers
-          .unsafeSet(EmployerContributionsPage(srn), true)
-          .unsafeSet(EmployerNamePage(srn, memberIndex, secondaryIndex), employerName)
-          .unsafeSet(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex), otherRecipientDescription)
-          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-
-        val result = userAnswers
-          .set(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex), otherRecipientDescription)
-          .success
-          .value
-
-        result.get(EmployerContributionsPage(srn)) must be(Some(true))
-        result.get(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex)) must be(
-          Some(otherRecipientDescription)
-        )
-        result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.Completed))
-      }
-
-      "changing when value is different" in {
-        val userAnswers = defaultUserAnswers
-          .unsafeSet(EmployerContributionsPage(srn), true)
-          .unsafeSet(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex), otherRecipientDescription)
-          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-
-        val result =
-          userAnswers
-            .set(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex), otherRecipientDescription + "change")
-            .success
-            .value
-
-        result.get(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex)) must be(
-          Some(otherRecipientDescription + "change")
-        )
-        result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-      }
-    }
+    beRemovable[String](OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex))
   }
 }

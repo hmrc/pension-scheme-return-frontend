@@ -141,7 +141,6 @@ class TransfersInCYAController @Inject()(
 
       for {
         updatedUserAnswers <- request.userAnswers
-          .set(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
           .setWhen(transfersInChanged)(MemberStatus(srn, index), MemberState.Changed)
           .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
