@@ -2125,29 +2125,33 @@ landPropertyDisposalCYA.viewOnly.heading = Disposal of {0}
 
 landOrPropertyDisposalList.title = You have reported {0} land or property disposal
 landOrPropertyDisposalList.title.plural = You have reported {0} land or property disposals
-landOrPropertyDisposalList.view.title = View land or property disposals
 landOrPropertyDisposalList.heading = You have reported {0} land or property disposal
 landOrPropertyDisposalList.heading.plural = You have reported {0} land or property disposals
-landOrPropertyDisposalList.view.heading = {0} land or property disposal
-landOrPropertyDisposalList.view.heading.plural = {0} land or property disposals
-landOrPropertyDisposalList.view.heading.none = Land or property disposals
-landOrPropertyDisposalList.row = Disposal of {0}
-landOrPropertyDisposalList.view.row = {0} disposal of {1}
-landOrPropertyDisposalList.view.row.plural = {0} disposals of {1}
+landOrPropertyDisposalList.row = Disposal of {0} by {1}
 landOrPropertyDisposalList.description = You must tell us about all land or property the scheme disposed of during the period of this return.
 landOrPropertyDisposalList.radios = Do you need to report another land or property disposal?
 landOrPropertyDisposalList.inset = You cannot add another land or property disposal as you have entered the maximum of 50.
 landOrPropertyDisposalList.pagination.label = Showing {0} - {1} of {2} land or property disposals
 landOrPropertyDisposalList.radios.error.required = Select yes if you need to report another land or property disposal
-landOrPropertyDisposalList.row.view.hidden = View details of the disposal of {0}
-landOrPropertyDisposalList.row.change.hidden = Change details of the disposal of {0}
-landOrPropertyDisposalList.row.remove.hidden = Remove details of the disposal of {0}
+landOrPropertyDisposalList.row.change.hidden = Change details of the disposal of {0} by {1}
+landOrPropertyDisposalList.row.remove.hidden = Remove details of the disposal of {0} by {1}
+
+landOrPropertyDisposalList.methodOfDisposal.sold = sale
+landOrPropertyDisposalList.methodOfDisposal.transferred = transfer out
+landOrPropertyDisposalList.methodOfDisposal.other = another method
+
+landOrPropertyDisposalList.view.title = View land or property disposals
+landOrPropertyDisposalList.view.title.plural = View land or property disposals
+landOrPropertyDisposalList.view.heading = {0} land or property disposal
+landOrPropertyDisposalList.view.heading.plural = {0} land or property disposals
+landOrPropertyDisposalList.view.heading.none = Land or property disposals
+landOrPropertyDisposalList.row.view.hidden = View details of the disposal of {0} by {1}
 landOrPropertyDisposalList.view.link = View previous version of land or property disposals (opens in new tab)
 landOrPropertyDisposalList.view.none = Did {0} dispose of any land or property during the period of this return?
 landOrPropertyDisposalList.view.none.value = No
 
 removeLandPropertyDisposal.title = Are you sure you want to remove this land or property disposal?
-removeLandPropertyDisposal.heading = Are you sure you want to remove details of the disposal for {0}?
+removeLandPropertyDisposal.heading = Are you sure you want to remove details of the disposal for {0} by {1}?
 removeLandPropertyDisposal.error.required = Select yes if you are sure you want to remove this land or property disposal
 
 whatYouWillNeedMoneyBorrowed.title = Money borrowed by the scheme
@@ -3489,7 +3493,7 @@ bondsDisposal.reportBondsDisposalList.view.none = Did {0} dispose of any unregul
 bondsDisposal.reportBondsDisposalList.view.none.value = No
 
 bondsDisposal.removeBondsDisposal.title = Are you sure you want to remove details of the disposal of these bonds?
-bondsDisposal.removeBondsDisposal.heading = Are you sure you want to remove details of the disposal of {0}?
+bondsDisposal.removeBondsDisposal.heading = Are you sure you want to remove details of the disposal of {0} by {1}?
 bondsDisposal.removeBondsDisposal.error.required = Select yes if you are sure you want to remove this bond disposal
 
 otherAssetsDisposal.isBuyerConnectedParty.title = Is the buyer a connected party?
@@ -3693,22 +3697,20 @@ assetDisposal.reportedOtherAssetsDisposalList.inset.allOtherAssetsDisposed.parag
 assetDisposal.reportedOtherAssetsDisposalList.pagination.label = Showing {0} - {1} of {2} asset disposals
 assetDisposal.reportedOtherAssetsDisposalList.radios.error.required = Select yes if you need to report another asset disposal
 
+assetDisposal.reportedOtherAssetsDisposalList.methodOfDisposal.sold = sale
+assetDisposal.reportedOtherAssetsDisposalList.methodOfDisposal.transferred = transfer out
+assetDisposal.reportedOtherAssetsDisposalList.methodOfDisposal.other = another method
+
 assetDisposal.reportedOtherAssetsDisposalList.view.title = View other asset disposals
 assetDisposal.reportedOtherAssetsDisposalList.view.title.plural = View other asset disposals
 assetDisposal.reportedOtherAssetsDisposalList.view.heading = {0} other asset disposal
 assetDisposal.reportedOtherAssetsDisposalList.view.heading.plural = {0} other asset disposals
 assetDisposal.reportedOtherAssetsDisposalList.row.view.hidden = View details of the disposal of {0} by {1}
 assetDisposal.reportedOtherAssetsDisposalList.view.link = View previous version of other asset disposals (opens in new tab)
-
-assetDisposal.reportedOtherAssetsDisposalList.methodOfDisposal.sold = sale
-assetDisposal.reportedOtherAssetsDisposalList.methodOfDisposal.transferred = transfer out
-assetDisposal.reportedOtherAssetsDisposalList.methodOfDisposal.other = another method
 assetDisposal.reportedOtherAssetsDisposalList.view.heading.none = Other asset disposals
 assetDisposal.reportedOtherAssetsDisposalList.view.none = Did {0} dispose of any other assets during the period of this return?
 assetDisposal.reportedOtherAssetsDisposalList.view.none.value = No
 
 removeAssetDisposal.title = Are you sure you want to remove details of the disposal of this asset?
-removeAssetDisposal.heading = Are you sure you want to remove details of the disposal of {0}?
+removeAssetDisposal.heading = Are you sure you want to remove details of the disposal of {0} by {1}?
 removeAssetDisposal.error.required = Select yes if you are sure you want to remove this asset disposal
-
-

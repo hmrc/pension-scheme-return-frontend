@@ -19,17 +19,19 @@ package controllers.nonsipp.landorpropertydisposal
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import models.HowDisposed.HowDisposed
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal._
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
-import models.Mode
+import models.{HowDisposed, Mode}
 import play.api.i18n.MessagesApi
 import views.html.YesNoPageView
 import models.SchemeId.Srn
+import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController.LandOrPropertyDisposalData
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import models.requests.DataRequest
@@ -63,14 +65,23 @@ class RemoveLandPropertyDisposalController @Inject()(
           address <- request.userAnswers
             .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex))
             .getOrRedirectToTaskList(srn)
+          methodOfDisposal <- request.userAnswers
+            .get(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
+            .getOrRedirectToTaskList(srn)
         } yield {
           val preparedForm =
             request.userAnswers.fillForm(RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex, disposalIndex), form)
           Ok(
             view(
               preparedForm,
-              RemoveLandPropertyDisposalController
-                .viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode)
+              RemoveLandPropertyDisposalController.viewModel(
+                srn,
+                landOrPropertyIndex,
+                disposalIndex,
+                address.addressLine1,
+                methodOfDisposal,
+                mode
+              )
             )
           )
         }
@@ -85,15 +96,25 @@ class RemoveLandPropertyDisposalController @Inject()(
           errors =>
             request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
               address =>
-                Future.successful(
-                  BadRequest(
-                    view(
-                      errors,
-                      RemoveLandPropertyDisposalController
-                        .viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode)
+                request.userAnswers
+                  .get(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
+                  .getOrRecoverJourney { methodOfDisposal =>
+                    Future.successful(
+                      BadRequest(
+                        view(
+                          errors,
+                          RemoveLandPropertyDisposalController.viewModel(
+                            srn,
+                            landOrPropertyIndex,
+                            disposalIndex,
+                            address.addressLine1,
+                            methodOfDisposal,
+                            mode
+                          )
+                        )
+                      )
                     )
-                  )
-                )
+                  }
             },
           value =>
             if (value) {
@@ -151,16 +172,36 @@ object RemoveLandPropertyDisposalController {
     "removeLandPropertyDisposal.error.required"
   )
 
+  private def buildMessage(landOrPropertyDisposalData: LandOrPropertyDisposalData): Message =
+    landOrPropertyDisposalData match {
+      case LandOrPropertyDisposalData(_, _, addressLine1, typeOfDisposal) =>
+        val disposalType = typeOfDisposal match {
+          case HowDisposed.Sold => "landOrPropertyDisposalList.methodOfDisposal.sold"
+          case HowDisposed.Transferred => "landOrPropertyDisposalList.methodOfDisposal.transferred"
+          case HowDisposed.Other(_) => "landOrPropertyDisposalList.methodOfDisposal.other"
+        }
+        Message("removeLandPropertyDisposal.heading", addressLine1, disposalType)
+    }
+
   def viewModel(
     srn: Srn,
     landOrPropertyIndex: Max5000,
     disposalIndex: Max50,
     addressLine1: String,
+    methodOfDisposal: HowDisposed,
     mode: Mode
-  ): FormPageViewModel[YesNoPageViewModel] =
+  ): FormPageViewModel[YesNoPageViewModel] = {
+    val landOrPropertyDisposalData = LandOrPropertyDisposalData(
+      landOrPropertyIndex,
+      disposalIndex,
+      addressLine1,
+      methodOfDisposal
+    )
+
     YesNoPageViewModel(
       "removeLandPropertyDisposal.title",
-      Message("removeLandPropertyDisposal.heading", addressLine1),
+      buildMessage(landOrPropertyDisposalData),
       routes.RemoveLandPropertyDisposalController.onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
     )
+  }
 }
