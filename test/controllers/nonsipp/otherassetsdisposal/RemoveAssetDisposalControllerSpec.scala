@@ -49,6 +49,9 @@ class RemoveAssetDisposalControllerSpec extends ControllerBaseSpec {
     .unsafeSet(WhatIsOtherAssetPage(srn, assetIndex), nameOfAsset)
     .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex), HowDisposed.Transferred)
 
+  private val userAnswersWithOtherAsset = defaultUserAnswers
+    .unsafeSet(WhatIsOtherAssetPage(srn, assetIndex), nameOfAsset)
+
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
@@ -69,6 +72,14 @@ class RemoveAssetDisposalControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(redirectToPage(onPageLoad, controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
+
+    act.like(
+      redirectToPage(
+        onPageLoad,
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn),
+        userAnswersWithOtherAsset
+      ).withName("whatIsOtherAsset")
+    )
 
     act.like(continueNoSave(onSubmit, userAnswers, "value" -> "false"))
 

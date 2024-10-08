@@ -51,6 +51,9 @@ class RemoveLandPropertyDisposalControllerSpec extends ControllerBaseSpec {
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, index), testAddress)
     .unsafeSet(LandPropertyDisposalCompletedPage(srn, index, disposalIndex), SectionCompleted)
 
+  private val userAnswersAddress = defaultUserAnswers
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, index), testAddress)
+
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
@@ -71,6 +74,11 @@ class RemoveLandPropertyDisposalControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(redirectToPage(onPageLoad, controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
+
+    act.like(
+      redirectToPage(onPageLoad, controllers.nonsipp.routes.TaskListController.onPageLoad(srn), userAnswersAddress)
+        .withName("landOrPropertyChosenAddress")
+    )
 
     act.like(continueNoSave(onSubmit, userAnswers, "value" -> "false"))
 

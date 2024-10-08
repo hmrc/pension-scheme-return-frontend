@@ -47,6 +47,9 @@ class RemoveShareDisposalControllerSpec extends ControllerBaseSpec {
     .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
     .unsafeSet(HowWereSharesDisposedPage(srn, index, disposalIndex), HowSharesDisposed.Transferred)
 
+  private val userAnswersRelatedShares = defaultUserAnswers
+    .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
+
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
@@ -71,6 +74,14 @@ class RemoveShareDisposalControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(redirectToPage(onPageLoad, controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
+
+    act.like(
+      redirectToPage(
+        onPageLoad,
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn),
+        userAnswersRelatedShares
+      ).withName("relatedShares")
+    )
 
     act.like(continueNoSave(onSubmit, userAnswers, "value" -> "false"))
 

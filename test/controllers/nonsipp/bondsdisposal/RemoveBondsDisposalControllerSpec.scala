@@ -47,6 +47,9 @@ class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec {
     .unsafeSet(NameOfBondsPage(srn, bondIndex), nameOfBonds)
     .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex), HowDisposed.Transferred)
 
+  private val userAnswersNameOfBond = defaultUserAnswers
+    .unsafeSet(NameOfBondsPage(srn, bondIndex), nameOfBonds)
+
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
@@ -65,6 +68,11 @@ class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec {
     })
 
     act.like(redirectToPage(onPageLoad, controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
+
+    act.like(
+      redirectToPage(onPageLoad, controllers.nonsipp.routes.TaskListController.onPageLoad(srn), userAnswersNameOfBond)
+        .withName("nameOfBonds")
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
