@@ -34,7 +34,7 @@ import viewmodels.models._
 
 object TaskListUtils {
 
-  def getSectionListWithoutDeclaration(
+  private def getSectionListWithoutDeclaration(
     srn: Srn,
     schemeName: String,
     userAnswers: UserAnswers,
@@ -51,7 +51,7 @@ object TaskListUtils {
       otherAssetsSection(srn, userAnswers)
     )
 
-  def getDeclarationSection(
+  private def getDeclarationSection(
     srn: Srn,
     isPsp: Boolean,
     isLinkActive: Boolean,

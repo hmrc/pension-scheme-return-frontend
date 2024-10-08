@@ -29,11 +29,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.data.Form
 import views.html.YesNoPageView
 import models.SchemeId.Srn
-import pages.nonsipp.memberpensionpayments.{
-  PensionPaymentsJourneyStatus,
-  RemovePensionPaymentsPage,
-  TotalAmountPensionPaymentsPage
-}
+import pages.nonsipp.memberpensionpayments.{RemovePensionPaymentsPage, TotalAmountPensionPaymentsPage}
 import controllers.actions.IdentifyAndRequireData
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
@@ -108,7 +104,6 @@ class RemovePensionPaymentsController @Inject()(
                   .fromTry(
                     request.userAnswers
                       .remove(TotalAmountPensionPaymentsPage(srn, index))
-                      .set(PensionPaymentsJourneyStatus(srn), SectionStatus.InProgress)
                       .set(MemberStatus(srn, index), MemberState.Changed)
                   )
                 _ <- saveService.save(updatedAnswers)

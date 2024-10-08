@@ -21,7 +21,6 @@ import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models.IdentityType
-import viewmodels.models.SectionStatus
 import pages.behaviours.PageBehaviours
 
 class EmployerTypeOfBusinessPageSpec extends PageBehaviours with TestValues {
@@ -34,27 +33,25 @@ class EmployerTypeOfBusinessPageSpec extends PageBehaviours with TestValues {
   "EmployerTypeOfBusinessPage" - {
 
     val index = refineMV[Max50.Refined](1)
+    val srn = srnGen.sample.value
 
-    beRetrievable[IdentityType](EmployerTypeOfBusinessPage(srnGen.sample.value, memberIndex, index))
+    beRetrievable[IdentityType](EmployerTypeOfBusinessPage(srn, memberIndex, index))
 
-    beSettable[IdentityType](EmployerTypeOfBusinessPage(srnGen.sample.value, memberIndex, index))
+    beSettable[IdentityType](EmployerTypeOfBusinessPage(srn, memberIndex, index))
 
-    beRemovable[IdentityType](EmployerTypeOfBusinessPage(srnGen.sample.value, memberIndex, index))
+    beRemovable[IdentityType](EmployerTypeOfBusinessPage(srn, memberIndex, index))
 
     "Dependent values: section status and were employer contributions made are" - {
 
       "changing when type of business added" in {
         val userAnswers = defaultUserAnswers
           .unsafeSet(EmployerContributionsPage(srn), true)
-          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
 
         val result =
           userAnswers.set(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne), typeOfBusiness).success.value
 
         result.get(EmployerContributionsPage(srn)) must be(Some(true))
         result.get(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne)) must be(Some(typeOfBusiness))
-        result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
       }
 
       "not changing when value stays the same" in {
@@ -62,31 +59,23 @@ class EmployerTypeOfBusinessPageSpec extends PageBehaviours with TestValues {
           .unsafeSet(EmployerContributionsPage(srn), true)
           .unsafeSet(EmployerNamePage(srn, memberIndex, indexOne), employerName)
           .unsafeSet(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne), typeOfBusiness)
-          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
         val result =
           userAnswers.set(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne), typeOfBusiness).success.value
 
         result.get(EmployerContributionsPage(srn)) must be(Some(true))
         result.get(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne)) must be(Some(typeOfBusiness))
-        result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.Completed))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(Some(true))
       }
 
       "changing when value is different" in {
         val userAnswers = defaultUserAnswers
           .unsafeSet(EmployerContributionsPage(srn), true)
           .unsafeSet(EmployerNamePage(srn, memberIndex, indexOne), employerName)
-          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
         val result =
           userAnswers.set(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne), otherTypeOfBusiness).success.value
 
         result.get(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne)) must be(Some(otherTypeOfBusiness))
-        result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
       }
     }
   }

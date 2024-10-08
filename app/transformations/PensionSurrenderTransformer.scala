@@ -21,7 +21,7 @@ import config.Refined.Max300
 import models.SchemeId.Srn
 import pages.nonsipp.membersurrenderedbenefits._
 import models.{Money, UserAnswers}
-import viewmodels.models.{SectionCompleted, SectionStatus}
+import viewmodels.models.SectionCompleted
 import models.requests.psr._
 import models.UserAnswers.implicits.UserAnswersTryOps
 
@@ -52,19 +52,5 @@ class PensionSurrenderTransformer @Inject() extends Transformer {
       _.set(SurrenderedBenefitsAmountPage(srn, index), Money(pensionSurrender.totalSurrendered)),
       _.set(WhenDidMemberSurrenderBenefitsPage(srn, index), pensionSurrender.dateOfSurrender),
       _.set(WhyDidMemberSurrenderBenefitsPage(srn, index), pensionSurrender.surrenderReason)
-    )
-
-  // Save section wide answers
-  def transformFromEtmp(
-    srn: Srn,
-    pensionSurrenderDetails: SectionDetails
-  ): List[UserAnswers.Compose] =
-    List[UserAnswers.Compose](
-      _.setWhen(pensionSurrenderDetails.completed)(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.Completed),
-      _.setWhen(pensionSurrenderDetails.started)(
-        SurrenderedBenefitsMemberListPage(srn),
-        pensionSurrenderDetails.completed
-      ),
-      _.setWhen(pensionSurrenderDetails.started)(SurrenderedBenefitsPage(srn), pensionSurrenderDetails.made)
     )
 }

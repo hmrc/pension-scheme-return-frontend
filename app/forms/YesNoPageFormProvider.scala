@@ -23,7 +23,7 @@ import play.api.data.{Form, Mapping}
 
 import javax.inject.Inject
 
-class YesNoPageFormProvider @Inject()() {
+class YesNoPageFormProvider @Inject() {
 
   protected[forms] val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
   protected[forms] val textAreaMaxLength = 160

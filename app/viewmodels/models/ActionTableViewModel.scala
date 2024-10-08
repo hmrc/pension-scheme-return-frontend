@@ -29,7 +29,6 @@ case class TableElem(
 
 object TableElem {
   val empty: TableElem = TableElem(DisplayMessage.Empty)
-  def emptyWithHiddenText(hiddenText: Message): TableElem = TableElem(DisplayMessage.Empty, Some(hiddenText))
   def add(call: Call, hiddenText: Message): TableElem =
     TableElem(Message("site.add"), Some(hiddenText), Some(call.url), Some("site.add"))
   def add(url: String, hiddenText: Message): TableElem =
@@ -46,12 +45,7 @@ case class ActionTableViewModel(
   inset: DisplayMessage,
   head: Option[List[TableElem]],
   rows: List[List[TableElem]],
-  radioText: Message,
-  // whether to render the radio buttons to add another entity to the list or continue
-  showRadios: Boolean = true,
   paginatedViewModel: Option[PaginatedViewModel] = None,
   yesHintText: Option[Message] = None,
-  showInsetWithRadios: Boolean = false,
-  // whether to render the inset text
   showInset: Boolean = false
 )
