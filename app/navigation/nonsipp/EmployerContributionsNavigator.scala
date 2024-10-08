@@ -185,9 +185,9 @@ object EmployerContributionsNavigator extends JourneyNavigator {
           controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
             .onPageLoad(srn, index, getCYAPage(secondaryIndex.value), NormalMode)
 
-        case TotalEmployerContributionPage(srn, index, secondaryIndex) =>
-          controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
-            .onPageLoad(srn, index, secondaryIndex, CheckMode)
+        case TotalEmployerContributionPage(srn, index, _) =>
+          controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+            .onPageLoad(srn, index, page = 1, CheckMode)
 
         case page @ ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex) =>
           if (userAnswers.get(page).contains(true)) {
