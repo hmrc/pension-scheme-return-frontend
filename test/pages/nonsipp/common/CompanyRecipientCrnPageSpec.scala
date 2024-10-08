@@ -16,12 +16,14 @@
 
 package pages.nonsipp.common
 
-import config.Refined.OneTo5000
+import config.RefinedTypes.OneTo5000
 import eu.timepit.refined.refineMV
 import models.{ConditionalYesNo, Crn, IdentitySubject}
 import pages.behaviours.PageBehaviours
 
 class CompanyRecipientCrnPageSpec extends PageBehaviours {
+
+  private val srnSample = srnGen.sample.value
 
   "CompanyRecipientCrnPage" - {
 
@@ -31,15 +33,15 @@ class CompanyRecipientCrnPageSpec extends PageBehaviours {
       s"for $identitySubject" - {
 
         beRetrievable[ConditionalYesNo[String, Crn]](
-          CompanyRecipientCrnPage(srnGen.sample.value, index, identitySubject)
+          CompanyRecipientCrnPage(srnSample, index, identitySubject)
         )
 
         beSettable[ConditionalYesNo[String, Crn]](
-          CompanyRecipientCrnPage(srnGen.sample.value, index, identitySubject)
+          CompanyRecipientCrnPage(srnSample, index, identitySubject)
         )
 
         beRemovable[ConditionalYesNo[String, Crn]](
-          CompanyRecipientCrnPage(srnGen.sample.value, index, identitySubject)
+          CompanyRecipientCrnPage(srnSample, index, identitySubject)
         )
       }
     }

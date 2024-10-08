@@ -19,11 +19,11 @@ package controllers.nonsipp.moneyborrowed
 import services.PsrSubmissionService
 import viewmodels.implicits._
 import play.api.mvc._
-import config.Refined.Max5000
 import cats.implicits.toShow
 import controllers.actions._
 import models.requests.DataRequest
 import controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController._
+import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn

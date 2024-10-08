@@ -20,13 +20,13 @@ import services.SaveService
 import controllers.nonsipp.bondsdisposal.IsBuyerConnectedPartyController._
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
 import play.api.data.Form
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import play.api.i18n.MessagesApi

@@ -20,12 +20,12 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc._
-import config.Refined._
 import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
 import models.requests.DataRequest
 import utils.ListUtils.ListOps
 import models.PensionSchemeType.PensionSchemeType
+import config.RefinedTypes._
 import controllers.PSRController
 import controllers.nonsipp.membertransferout.TransfersOutCYAController._
 import views.html.CheckYourAnswersView

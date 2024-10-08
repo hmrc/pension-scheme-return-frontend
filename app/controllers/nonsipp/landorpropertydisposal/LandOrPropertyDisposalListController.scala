@@ -19,13 +19,13 @@ package controllers.nonsipp.landorpropertydisposal
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import cats.implicits._
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.{
   getCompletedOrUpdatedTaskListStatus,
   getLandOrPropertyDisposalsTaskListStatusWithLink

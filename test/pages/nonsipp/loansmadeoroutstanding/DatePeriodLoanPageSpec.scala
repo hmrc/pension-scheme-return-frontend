@@ -16,7 +16,7 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo5000
+import config.RefinedTypes.OneTo5000
 import eu.timepit.refined.refineMV
 import models.Money
 import pages.behaviours.PageBehaviours

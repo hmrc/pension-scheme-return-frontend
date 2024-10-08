@@ -18,7 +18,6 @@ package controllers.nonsipp.shares
 
 import pages.nonsipp.shares._
 import controllers.nonsipp.shares.SharesFromConnectedPartyController._
-import config.Refined.OneTo5000
 import models.SchemeHoldShare.Acquisition
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
@@ -26,6 +25,7 @@ import forms.YesNoPageFormProvider
 import models._
 import pages.nonsipp.common.IdentityTypePage
 import viewmodels.models.SectionCompleted
+import config.RefinedTypes.OneTo5000
 import viewmodels.models.SectionStatus.Completed
 import controllers.ControllerBaseSpec
 

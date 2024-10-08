@@ -17,10 +17,10 @@
 package pages.nonsipp.shares
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import play.api.libs.json.JsPath
 import models.{TypeOfShares, UserAnswers}
-import config.Refined.Max5000
-import pages.QuestionPage
 import models.TypeOfShares.{SponsoringEmployer, Unquoted}
 import models.SchemeId.Srn
 

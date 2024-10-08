@@ -18,24 +18,24 @@ package controllers.nonsipp.sharesdisposal
 
 import viewmodels.implicits._
 import com.google.inject.Inject
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import config.Constants
+import pages.nonsipp.sharesdisposal._
 import navigation.Navigator
 import forms.RadioListFormProvider
 import play.api.i18n.MessagesApi
 import pages.nonsipp.shares._
 import play.api.mvc._
 import utils.ListUtils._
+import config.RefinedTypes.Max5000.enumerable
 import controllers.nonsipp.sharesdisposal.SharesDisposalListController._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.ListRadiosView
 import models.SchemeId.Srn
 import cats.implicits.{toShow, toTraverseOps}
 import controllers.nonsipp.shares.SharesListController.SharesData
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.refineV
-import config.Refined.Max5000.enumerable
-import pages.nonsipp.sharesdisposal._
 import utils.DateTimeUtils.localDateShow
 import models._
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}

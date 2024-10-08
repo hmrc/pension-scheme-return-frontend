@@ -18,8 +18,6 @@ package controllers.nonsipp.memberpensionpayments
 
 import services.PsrSubmissionService
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.Max300
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.TwoColumnsTripleAction
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
@@ -29,6 +27,8 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
+import config.RefinedTypes.Max300
+import controllers.ControllerBaseSpec
 import pages.nonsipp.memberpensionpayments.{
   MemberPensionPaymentsListPage,
   PensionPaymentsReceivedPage,

@@ -20,14 +20,14 @@ import services.SaveService
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import controllers.PSRController
+import controllers.nonsipp.membertransferout.ReportAnotherTransferOutController._
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
 import play.api.data.Form
-import config.Refined.{Max300, Max5}
-import controllers.nonsipp.membertransferout.ReportAnotherTransferOutController._
+import config.RefinedTypes.{Max300, Max5}
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import pages.nonsipp.membertransferout.{ReportAnotherTransferOutPage, TransfersOutSectionCompleted}

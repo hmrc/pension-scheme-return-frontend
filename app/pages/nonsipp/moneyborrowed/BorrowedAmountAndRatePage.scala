@@ -17,11 +17,11 @@
 package pages.nonsipp.moneyborrowed
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.{Money, Percentage}
-import config.Refined.Max5000
-import pages.QuestionPage
 
 case class BorrowedAmountAndRatePage(srn: Srn, index: Max5000) extends QuestionPage[(Money, Percentage)] {
 

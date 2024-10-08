@@ -18,8 +18,6 @@ package controllers.nonsipp.membertransferout
 
 import services.PsrSubmissionService
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.{Max300, Max5}
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
@@ -32,6 +30,8 @@ import play.api.inject.guice.GuiceableModule
 import controllers.nonsipp.membertransferout.TransferOutMemberListController._
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
+import config.RefinedTypes.{Max300, Max5}
+import controllers.ControllerBaseSpec
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 

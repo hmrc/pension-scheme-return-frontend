@@ -18,8 +18,6 @@ package controllers.nonsipp.shares
 
 import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import models.ConditionalYesNo._
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.shares.SharesCYAController._
 import pages.nonsipp.FbVersionPage
@@ -30,6 +28,8 @@ import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import pages.nonsipp.shares._
 import play.api.mvc.Call
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import models.SchemeHoldShare.Contribution
 import views.html.CheckYourAnswersView

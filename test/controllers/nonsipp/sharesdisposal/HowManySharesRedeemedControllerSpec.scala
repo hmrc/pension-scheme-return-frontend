@@ -17,14 +17,14 @@
 package controllers.nonsipp.sharesdisposal
 
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.IntView
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.HowManySharesRedeemedPage
 import forms.IntFormProvider
 import models.NormalMode
 import controllers.nonsipp.sharesdisposal.HowManySharesRedeemedController._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class HowManySharesRedeemedControllerSpec extends ControllerBaseSpec {
 

@@ -18,11 +18,11 @@ package pages.nonsipp.accountingperiod
 
 import utils.RefinedUtils.RefinedIntOps
 import queries.{Gettable, Removable, Settable}
+import pages.QuestionPage
+import config.RefinedTypes.Max3
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.{DateRange, Mode}
-import config.Refined.Max3
-import pages.QuestionPage
 
 case class AccountingPeriodPage(srn: Srn, index: Max3, mode: Mode) extends QuestionPage[DateRange] {
 

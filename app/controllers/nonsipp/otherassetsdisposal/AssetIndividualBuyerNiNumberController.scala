@@ -20,7 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
-import config.Refined.{Max50, Max5000}
+import config.RefinedTypes.{Max50, Max5000}
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, Mode}

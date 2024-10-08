@@ -18,8 +18,6 @@ package controllers.nonsipp.landorpropertydisposal
 
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import cats.implicits.toShow
 import pages.nonsipp.landorpropertydisposal.WhenWasPropertySoldPage
@@ -30,6 +28,8 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import forms.mappings.errors.DateFormErrors
 import services.{SaveService, SchemeDateService}
 import controllers.nonsipp.landorpropertydisposal.WhenWasPropertySoldController._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.DatePageView
 import models.SchemeId.Srn
 import utils.DateTimeUtils.localDateShow

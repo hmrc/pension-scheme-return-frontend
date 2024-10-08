@@ -18,7 +18,6 @@ package controllers.nonsipp.shares
 
 import services.PsrSubmissionService
 import pages.nonsipp.shares._
-import config.Refined.Max5000
 import views.html.ListView
 import controllers.nonsipp.shares.SharesListController._
 import eu.timepit.refined.refineMV
@@ -27,6 +26,7 @@ import models._
 import viewmodels.models.SectionCompleted
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import config.RefinedTypes.Max5000
 import viewmodels.models.SectionStatus.Completed
 import controllers.ControllerBaseSpec
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}

@@ -19,7 +19,7 @@ package controllers.testonly
 import services.SaveService
 import play.api.mvc.MessagesControllerComponents
 import models.PensionSchemeType.PensionSchemeType
-import config.Refined.{Max300, Max5}
+import config.RefinedTypes.{Max300, Max5}
 import models.SchemeId.Srn
 import pages.nonsipp.receivetransfer._
 import models.{Money, PensionSchemeType}

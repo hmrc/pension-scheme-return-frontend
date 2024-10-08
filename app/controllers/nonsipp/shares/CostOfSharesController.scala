@@ -19,7 +19,7 @@ package controllers.nonsipp.shares
 import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils._
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
 import navigation.Navigator
 import forms.MoneyFormProvider
@@ -29,8 +29,8 @@ import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, CostOfSharesPage}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max5000
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import controllers.nonsipp.shares.CostOfSharesController._

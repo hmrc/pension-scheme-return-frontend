@@ -16,8 +16,6 @@
 
 package controllers.nonsipp.employercontributions
 
-import config.Refined._
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
@@ -29,6 +27,8 @@ import services.PsrSubmissionService
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito.{reset, when, _}
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
 import views.html.CheckYourAnswersView
 

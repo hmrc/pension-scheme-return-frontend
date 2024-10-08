@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.ConditionalYesNoPageView
 import pages.nonsipp.landorpropertydisposal.{PartnershipBuyerNamePage, PartnershipBuyerUtrPage}
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
 import controllers.nonsipp.landorpropertydisposal.PartnershipBuyerUtrController._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class PartnershipBuyerUtrControllerSpec extends ControllerBaseSpec {
 

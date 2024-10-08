@@ -16,8 +16,6 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.viewModel
@@ -25,6 +23,8 @@ import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsPage
 import play.api.data.Form
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class AreRepaymentsInstalmentsControllerSpec extends ControllerBaseSpec {
 

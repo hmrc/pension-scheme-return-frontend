@@ -16,7 +16,7 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import config.Refined._
+import config.RefinedTypes._
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 

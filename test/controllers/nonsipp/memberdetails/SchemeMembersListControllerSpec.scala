@@ -20,8 +20,6 @@ import services.PsrSubmissionService
 import play.api.mvc.Call
 import models.ManualOrUpload.{Manual, Upload}
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.OneTo300
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.ListView
 import eu.timepit.refined._
@@ -33,6 +31,8 @@ import viewmodels.models.{MemberState, SectionCompleted}
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails._
 import org.mockito.Mockito._
+import config.RefinedTypes.OneTo300
+import controllers.ControllerBaseSpec
 
 class SchemeMembersListControllerSpec extends ControllerBaseSpec {
 
@@ -111,7 +111,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
                   Manual,
                   NormalMode,
                   List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
-                  false
+                  viewOnlyUpdated = false
                 )
               )
         )
@@ -172,7 +172,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
                   Upload,
                   NormalMode,
                   List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
-                  false
+                  viewOnlyUpdated = false
                 )
               )
         )

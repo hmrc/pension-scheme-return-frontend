@@ -25,7 +25,7 @@ import models.SchemeId.Srn
 import org.scalatest.exceptions.TestFailedException
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsResultException, Json, JsonValidationError, __}
+import play.api.libs.json.{__, JsResultException, Json, JsonValidationError}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.CommonTestValues
@@ -194,7 +194,12 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
       )
 
       val result = connector
-        .getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get))
+        .getVersionsForYears(
+          commonPstr,
+          Seq(commonStartDate),
+          Srn(commonSrn).get,
+          controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)
+        )
         .futureValue
 
       result mustBe versionsForYearsResponse
@@ -206,7 +211,14 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
         forbidden().withBody(Json.stringify(getVersionsForYears403Json)).withHeader("srn", "S0000000042")
       )
       val err: TestFailedException = intercept[TestFailedException](
-        connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)).futureValue
+        connector
+          .getVersionsForYears(
+            commonPstr,
+            Seq(commonStartDate),
+            Srn(commonSrn).get,
+            controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)
+          )
+          .futureValue
       )
 
       err.cause.get mustBe a[GetPsrException]
@@ -218,7 +230,14 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
         serviceUnavailable().withBody(Json.stringify(getVersions503Json)).withHeader("srn", "S0000000042")
       )
 
-      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)).futureValue
+      val result = connector
+        .getVersionsForYears(
+          commonPstr,
+          Seq(commonStartDate),
+          Srn(commonSrn).get,
+          controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)
+        )
+        .futureValue
 
       result mustBe List()
     }
@@ -229,7 +248,14 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
         notFound().withBody(Json.stringify(getVersionsForYearsNotFoundJson)).withHeader("srn", "S0000000042")
       )
 
-      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)).futureValue
+      val result = connector
+        .getVersionsForYears(
+          commonPstr,
+          Seq(commonStartDate),
+          Srn(commonSrn).get,
+          controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)
+        )
+        .futureValue
 
       result mustBe List()
     }
@@ -241,7 +267,14 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
       )
 
       val err: TestFailedException = intercept[TestFailedException](
-        connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)).futureValue
+        connector
+          .getVersionsForYears(
+            commonPstr,
+            Seq(commonStartDate),
+            Srn(commonSrn).get,
+            controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)
+          )
+          .futureValue
       )
 
       err.cause match {
@@ -262,7 +295,12 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
       )
 
       val result = connector
-        .getVersions(commonPstr, commonStartDate, Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get))
+        .getVersions(
+          commonPstr,
+          commonStartDate,
+          Srn(commonSrn).get,
+          controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)
+        )
         .futureValue
 
       result mustBe versionsResponse
@@ -275,7 +313,14 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
       )
 
       val err: TestFailedException = intercept[TestFailedException](
-        connector.getVersions(commonPstr, commonStartDate, Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)).futureValue
+        connector
+          .getVersions(
+            commonPstr,
+            commonStartDate,
+            Srn(commonSrn).get,
+            controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)
+          )
+          .futureValue
       )
 
       err.cause.get mustBe a[GetPsrException]
@@ -287,11 +332,17 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
         serviceUnavailable().withBody(Json.stringify(getVersions503Json)).withHeader("srn", "S0000000042")
       )
 
-      val result = connector.getVersions(commonPstr, commonStartDate, Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)).futureValue
+      val result = connector
+        .getVersions(
+          commonPstr,
+          commonStartDate,
+          Srn(commonSrn).get,
+          controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)
+        )
+        .futureValue
 
       result mustBe List()
     }
-
 
     "return empty list when getVersions called and data not found" in runningApplication { implicit app =>
       stubGet(
@@ -299,7 +350,14 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
         forbidden().withBody(Json.stringify(getVersionsForYearsNotFoundJson)).withHeader("srn", "S0000000042")
       )
 
-      val result = connector.getVersionsForYears(commonPstr, Seq(commonStartDate), Srn(commonSrn).get, controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)).futureValue
+      val result = connector
+        .getVersionsForYears(
+          commonPstr,
+          Seq(commonStartDate),
+          Srn(commonSrn).get,
+          controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)
+        )
+        .futureValue
 
       result mustBe List()
     }

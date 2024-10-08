@@ -19,7 +19,7 @@ package controllers.nonsipp.landorpropertydisposal
 import services.SaveService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
-import config.Refined.{Max50, Max5000}
+import config.RefinedTypes.{Max50, Max5000}
 import pages.nonsipp.landorpropertydisposal.{IndividualBuyerNinoNumberPage, LandOrPropertyIndividualBuyerNamePage}
 import controllers.actions._
 import forms.YesNoPageFormProvider

@@ -18,7 +18,7 @@ package transformations
 
 import cats.syntax.traverse._
 import com.google.inject.Singleton
-import config.Refined.{Max300, Max5}
+import config.RefinedTypes.{Max300, Max5}
 import models.SchemeId.Srn
 import models.UserAnswers
 import pages.nonsipp.membertransferout._

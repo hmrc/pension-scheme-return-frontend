@@ -18,8 +18,6 @@ package controllers.nonsipp.otherassetsdisposal
 
 import services.PsrSubmissionService
 import pages.nonsipp.otherassetsdisposal._
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.ListView
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController._
@@ -31,6 +29,8 @@ import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, WhatIsOtherAssetPage}
 import models.HowDisposed.{Other, Sold, Transferred}
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 

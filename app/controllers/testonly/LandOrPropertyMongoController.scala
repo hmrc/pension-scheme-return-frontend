@@ -18,7 +18,7 @@ package controllers.testonly
 
 import services.SaveService
 import play.api.mvc.MessagesControllerComponents
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import models._

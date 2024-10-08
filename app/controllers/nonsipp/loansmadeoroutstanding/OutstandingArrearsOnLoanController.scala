@@ -22,7 +22,7 @@ import models.ConditionalYesNo._
 import play.api.mvc._
 import forms.mappings.Mappings
 import controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController._
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import cats.implicits.toShow
 import config.Constants.maxCurrencyValue
 import controllers.actions._

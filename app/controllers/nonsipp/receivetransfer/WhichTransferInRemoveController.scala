@@ -16,24 +16,24 @@
 
 package controllers.nonsipp.receivetransfer
 
+import config.RefinedTypes.Max5._
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
-import config.Refined._
-import controllers.PSRController
 import controllers.nonsipp.receivetransfer.WhichTransferInRemoveController._
+import forms.RadioListFormProvider
 import models.Money
 import play.api.i18n.MessagesApi
 import play.api.data.Form
+import config.RefinedTypes._
+import controllers.PSRController
 import views.html.ListRadiosView
 import models.SchemeId.Srn
 import cats.implicits._
 import pages.nonsipp.receivetransfer.{TotalValueTransferPages, TransferringSchemeNamePages}
 import controllers.actions._
 import eu.timepit.refined.refineV
-import config.Refined.Max5._
-import forms.RadioListFormProvider
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
 

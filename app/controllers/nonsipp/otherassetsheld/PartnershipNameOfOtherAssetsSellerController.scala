@@ -19,7 +19,6 @@ package controllers.nonsipp.otherassetsheld
 import services.SaveService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.PartnershipOtherAssetSellerNamePage
-import config.Refined.Max5000
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -27,6 +26,7 @@ import models.Mode
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import controllers.nonsipp.otherassetsheld.PartnershipNameOfOtherAssetsSellerController._
+import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.TextInputView
 import models.SchemeId.Srn

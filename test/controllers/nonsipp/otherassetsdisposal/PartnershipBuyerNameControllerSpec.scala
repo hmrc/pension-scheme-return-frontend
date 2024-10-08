@@ -17,11 +17,11 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.PartnershipBuyerNamePage
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.TextInputView
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 import models.NormalMode
 import controllers.nonsipp.otherassetsdisposal.PartnershipBuyerNameController._
 

@@ -19,7 +19,7 @@ package controllers.nonsipp.employercontributions
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
-import config.Refined.{Max300, Max50}
+import config.RefinedTypes.{Max300, Max50}
 import controllers.nonsipp.employercontributions.PartnershipEmployerUtrController._
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator

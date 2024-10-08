@@ -20,8 +20,6 @@ import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.nonsipp.landorpropertydisposal.OtherBuyerDetailsController._
 import pages.nonsipp.landorpropertydisposal.OtherBuyerDetailsPage
@@ -31,6 +29,8 @@ import forms.RecipientDetailsFormProvider
 import models.{Mode, RecipientDetails}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.data.Form
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.RecipientDetailsView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

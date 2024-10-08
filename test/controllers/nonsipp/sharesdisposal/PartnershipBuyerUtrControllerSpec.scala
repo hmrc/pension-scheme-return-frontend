@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.sharesdisposal
 
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.ConditionalYesNoPageView
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.{PartnershipBuyerNamePage, PartnershipBuyerUtrPage}
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.sharesdisposal.PartnershipBuyerUtrController._
 import models._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class PartnershipBuyerUtrControllerSpec extends ControllerBaseSpec {
 

@@ -18,8 +18,6 @@ package controllers.nonsipp.memberdetails
 
 import services.PsrSubmissionService
 import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
-import config.Refined.Max300
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import cats.implicits.catsSyntaxOptionId
@@ -30,6 +28,8 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails._
 import org.mockito.Mockito._
+import config.RefinedTypes.Max300
+import controllers.ControllerBaseSpec
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{MemberState, SectionCompleted}
 

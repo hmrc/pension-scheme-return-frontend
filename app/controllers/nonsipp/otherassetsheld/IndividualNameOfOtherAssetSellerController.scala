@@ -20,8 +20,6 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.IndividualNameOfOtherAssetSellerPage
-import config.Refined.Max5000
-import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.otherassetsheld.IndividualNameOfOtherAssetSellerController._
 import navigation.Navigator
@@ -30,6 +28,8 @@ import models.Mode
 import play.api.i18n.MessagesApi
 import viewmodels.models._
 import play.api.data.Form
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.TextInputView
 import models.SchemeId.Srn
 

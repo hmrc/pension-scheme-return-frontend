@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.RecipientDetailsView
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.OtherBuyerDetailsPage
 import eu.timepit.refined.refineMV
 import forms.RecipientDetailsFormProvider
 import models.{NormalMode, RecipientDetails, UserAnswers}
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
 

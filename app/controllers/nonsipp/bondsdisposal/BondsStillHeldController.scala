@@ -21,7 +21,7 @@ import controllers.nonsipp.bondsdisposal.BondsStillHeldController._
 import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants.{maxBonds, minBondsHeld}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -29,8 +29,8 @@ import forms.IntFormProvider
 import models.Mode
 import play.api.data.Form
 import forms.mappings.errors.IntFormErrors
-import config.Refined.{Max50, Max5000}
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.IntView
 import models.SchemeId.Srn
 import play.api.i18n.MessagesApi

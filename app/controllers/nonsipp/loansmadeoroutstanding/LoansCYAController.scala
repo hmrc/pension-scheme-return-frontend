@@ -21,13 +21,13 @@ import viewmodels.implicits._
 import models.ConditionalYesNo._
 import play.api.mvc._
 import utils.ListUtils.ListOps
-import config.Refined.Max5000
-import controllers.PSRController
 import cats.implicits.toShow
 import controllers.actions._
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n._
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage

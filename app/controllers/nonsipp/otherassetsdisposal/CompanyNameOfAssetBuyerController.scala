@@ -20,8 +20,6 @@ import services.SaveService
 import pages.nonsipp.otherassetsdisposal.CompanyNameOfAssetBuyerPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined._
-import controllers.PSRController
 import controllers.nonsipp.otherassetsdisposal.CompanyNameOfAssetBuyerController._
 import controllers.actions._
 import navigation.Navigator
@@ -30,6 +28,8 @@ import models.Mode
 import play.api.i18n.MessagesApi
 import viewmodels.models._
 import play.api.data.Form
+import config.RefinedTypes._
+import controllers.PSRController
 import views.html.TextInputView
 import models.SchemeId.Srn
 

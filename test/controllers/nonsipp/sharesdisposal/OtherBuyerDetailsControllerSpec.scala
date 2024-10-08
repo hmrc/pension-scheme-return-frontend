@@ -17,13 +17,13 @@
 package controllers.nonsipp.sharesdisposal
 
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.RecipientDetailsView
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.OtherBuyerDetailsPage
 import forms.RecipientDetailsFormProvider
 import models.{NormalMode, RecipientDetails, UserAnswers}
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
 

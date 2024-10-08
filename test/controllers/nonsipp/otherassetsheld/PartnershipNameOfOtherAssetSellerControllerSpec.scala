@@ -17,12 +17,12 @@
 package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.PartnershipOtherAssetSellerNamePage
-import config.Refined.Max5000
 import views.html.TextInputView
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import controllers.nonsipp.otherassetsheld.PartnershipNameOfOtherAssetsSellerController._
+import config.RefinedTypes.Max5000
 import controllers.ControllerBaseSpec
 
 class PartnershipNameOfOtherAssetSellerControllerSpec extends ControllerBaseSpec {

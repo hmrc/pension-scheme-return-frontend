@@ -17,11 +17,11 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetPage
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import models.NormalMode
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 import controllers.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetController._
 import forms.MoneyFormProvider
 

@@ -16,13 +16,13 @@
 
 package forms.mappings
 
-import config.Refined.Max3
-import play.api.data.Forms.{of, optional}
 import uk.gov.voa.play.form.Condition
 import models._
 import uk.gov.hmrc.time.TaxYear
 import play.api.data.{FieldMapping, Mapping}
 import forms.mappings.errors._
+import play.api.data.Forms.{of, optional}
+import config.RefinedTypes.Max3
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.domain.Nino
 

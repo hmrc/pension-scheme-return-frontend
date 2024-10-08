@@ -20,8 +20,6 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max300, Max5}
-import controllers.PSRController
 import pages.nonsipp.receivetransfer._
 import controllers.actions._
 import navigation.Navigator
@@ -30,6 +28,8 @@ import controllers.nonsipp.receivetransfer.RemoveTransferInController._
 import models.NormalMode
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.data.Form
+import config.RefinedTypes.{Max300, Max5}
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

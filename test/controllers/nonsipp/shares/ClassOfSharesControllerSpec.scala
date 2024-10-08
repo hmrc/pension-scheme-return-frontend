@@ -18,12 +18,12 @@ package controllers.nonsipp.shares
 
 import controllers.nonsipp.shares.ClassOfSharesController._
 import pages.nonsipp.shares.{ClassOfSharesPage, CompanyNameRelatedSharesPage}
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.TextInputView
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class ClassOfSharesControllerSpec extends ControllerBaseSpec {
 

@@ -17,12 +17,12 @@
 package pages
 
 import pages.nonsipp.memberdetails._
-import config.Refined.Max300
-import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models.NameDOB
 import pages.behaviours.PageBehaviours
+import config.RefinedTypes.Max300
+import controllers.TestValues
 
 class MemberDetailsPageSpec extends PageBehaviours with TestValues {
 

@@ -19,7 +19,7 @@ package controllers.nonsipp.shares
 import services.SaveService
 import viewmodels.implicits._
 import forms.mappings.Mappings
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider

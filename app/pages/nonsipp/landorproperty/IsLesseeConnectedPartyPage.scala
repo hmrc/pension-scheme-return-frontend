@@ -17,23 +17,15 @@
 package pages.nonsipp.landorproperty
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import config.Refined.Max5000
-import pages.QuestionPage
 
 case class IsLesseeConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
   override def path: JsPath =
     Paths.heldPropertyTransactions \ "leaseDetails" \ "connectedPartyStatus" \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "isLesseeConnectedParty"
-}
-
-case class IsLesseeConnectedPartyPages(srn: Srn) extends QuestionPage[Map[String, Boolean]] {
-
-  override def path: JsPath =
-    Paths.heldPropertyTransactions \ "leaseDetails" \ "connectedPartyStatus" \ toString
 
   override def toString: String = "isLesseeConnectedParty"
 }

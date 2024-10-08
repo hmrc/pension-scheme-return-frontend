@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.bondsdisposal
 
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.bondsdisposal.TotalConsiderationSaleBondsController._
 import forms.MoneyFormProvider
 import models.NormalMode
 import pages.nonsipp.bondsdisposal.TotalConsiderationSaleBondsPage
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class TotalConsiderationSaleBondsControllerSpec extends ControllerBaseSpec {
 

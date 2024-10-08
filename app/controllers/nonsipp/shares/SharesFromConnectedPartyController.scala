@@ -19,8 +19,6 @@ package controllers.nonsipp.shares
 import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
-import config.Refined.Max5000
-import controllers.PSRController
 import config.FrontendAppConfig
 import controllers.actions._
 import navigation.Navigator
@@ -30,6 +28,8 @@ import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 import play.api.i18n.MessagesApi
 import pages.nonsipp.shares._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage._

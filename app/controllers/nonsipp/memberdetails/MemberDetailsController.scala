@@ -19,7 +19,7 @@ package controllers.nonsipp.memberdetails
 import services.{SaveService, SchemeDateService}
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max300
+import config.RefinedTypes.Max300
 import config.Constants
 import controllers.actions._
 import navigation.Navigator

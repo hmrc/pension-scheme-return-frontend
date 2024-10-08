@@ -17,10 +17,10 @@
 package pages.nonsipp.shares
 
 import utils.RefinedUtils._
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import config.Refined.Max5000
-import pages.QuestionPage
 
 case class SharesFromConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 

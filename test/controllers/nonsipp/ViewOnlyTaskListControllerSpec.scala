@@ -18,8 +18,6 @@ package controllers.nonsipp
 
 import models.ConditionalYesNo._
 import pages.nonsipp.otherassetsheld._
-import config.Refined._
-import controllers.ControllerBaseSpec
 import models.SchemeHoldShare._
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer._
@@ -45,6 +43,8 @@ import play.api.mvc.Call
 import models.ManualOrUpload._
 import models.PensionSchemeType._
 import models.IdentityType._
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 import views.html.TaskListView
 import models.TypeOfShares._
 import pages.nonsipp.memberpensionpayments._

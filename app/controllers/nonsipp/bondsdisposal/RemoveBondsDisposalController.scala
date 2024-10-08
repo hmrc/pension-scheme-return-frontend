@@ -20,11 +20,11 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.bonds.NameOfBondsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import controllers.nonsipp.bondsdisposal.RemoveBondsDisposalController._

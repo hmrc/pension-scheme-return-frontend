@@ -16,7 +16,7 @@
 
 package pages
 
-import config.Refined.OneTo5000
+import config.RefinedTypes.OneTo5000
 import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours

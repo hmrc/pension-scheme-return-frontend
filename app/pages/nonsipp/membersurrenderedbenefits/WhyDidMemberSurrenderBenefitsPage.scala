@@ -17,21 +17,14 @@
 package pages.nonsipp.membersurrenderedbenefits
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
+import config.RefinedTypes.Max300
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import config.Refined.Max300
-import pages.QuestionPage
 
 case class WhyDidMemberSurrenderBenefitsPage(srn: Srn, index: Max300) extends QuestionPage[String] {
 
   override def path: JsPath = Paths.memberPensionSurrender \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "surrenderReason"
-}
-
-case class WhyDidMemberSurrenderBenefitsPages(srn: Srn) extends QuestionPage[Map[String, String]] {
-
-  override def path: JsPath = Paths.memberPensionSurrender \ toString
 
   override def toString: String = "surrenderReason"
 }

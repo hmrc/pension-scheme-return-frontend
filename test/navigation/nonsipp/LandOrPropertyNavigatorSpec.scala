@@ -17,14 +17,14 @@
 package navigation.nonsipp
 
 import utils.BaseSpec
+import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
+import config.RefinedTypes.{Max5000, OneTo5000}
 import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import models._
 import pages.nonsipp.common._
 import viewmodels.models.SectionCompleted
-import config.Refined.{Max5000, OneTo5000}
-import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
 

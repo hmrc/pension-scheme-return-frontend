@@ -17,13 +17,13 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.TotalAssetValuePage
-import config.Refined._
-import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.shares.TotalAssetValueController._
 import forms.MoneyFormProvider
 import models.NormalMode
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 
 class TotalAssetValueControllerSpec extends ControllerBaseSpec {
 

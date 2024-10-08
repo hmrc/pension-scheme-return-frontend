@@ -20,13 +20,13 @@ import services.SaveService
 import pages.nonsipp.otherassetsdisposal.OtherBuyerDetailsPage
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.RecipientDetailsFormProvider
 import models.{Mode, RecipientDetails}
 import play.api.i18n.{I18nSupport, MessagesApi}
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.RecipientDetailsView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

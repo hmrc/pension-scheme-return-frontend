@@ -19,8 +19,6 @@ package controllers.nonsipp
 import play.api.test.FakeRequest
 import services._
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage}
-import config.Refined.Max3
-import controllers.{ControllerBaseSpec, TestUserAnswers}
 import play.api.inject.bind
 import cats.implicits.toShow
 import eu.timepit.refined.refineMV
@@ -36,6 +34,8 @@ import play.api.test.Helpers.stubMessagesApi
 import org.mockito.Mockito._
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
+import config.RefinedTypes.Max3
+import controllers.{ControllerBaseSpec, TestUserAnswers}
 import cats.data.NonEmptyList
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn

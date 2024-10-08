@@ -18,8 +18,6 @@ package controllers.nonsipp.membercontributions
 
 import services.PsrSubmissionService
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
-import config.Refined.Max300
-import controllers.ControllerBaseSpec
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
@@ -29,6 +27,8 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
+import config.RefinedTypes.Max300
+import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import controllers.nonsipp.membercontributions.MemberContributionsCYAController._
 

@@ -17,8 +17,6 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import services.PsrSubmissionService
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
@@ -28,6 +26,8 @@ import pages.nonsipp.loansmadeoroutstanding._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
 

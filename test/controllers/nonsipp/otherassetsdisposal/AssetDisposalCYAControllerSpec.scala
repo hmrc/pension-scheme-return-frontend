@@ -19,8 +19,6 @@ package controllers.nonsipp.otherassetsdisposal
 import services.PsrSubmissionService
 import pages.nonsipp.otherassetsdisposal._
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
-import config.Refined.{OneTo50, OneTo5000}
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
@@ -28,6 +26,8 @@ import models._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import config.RefinedTypes.{OneTo50, OneTo5000}
+import controllers.ControllerBaseSpec
 import pages.nonsipp.FbVersionPage
 import controllers.nonsipp.otherassetsdisposal.AssetDisposalCYAController._
 

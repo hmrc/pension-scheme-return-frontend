@@ -18,8 +18,6 @@ package controllers.nonsipp.shares
 
 import services.SaveService
 import utils.FormUtils._
-import config.Refined.Max5000
-import controllers.PSRController
 import controllers.nonsipp.shares.CompanyNameRelatedSharesController._
 import controllers.actions._
 import navigation.Navigator
@@ -29,6 +27,8 @@ import play.api.i18n.MessagesApi
 import play.api.data.Form
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, TypeOfSharesHeldPage}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.TextInputView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

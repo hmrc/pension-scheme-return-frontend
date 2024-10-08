@@ -17,14 +17,14 @@
 package controllers.nonsipp.bondsdisposal
 
 import pages.nonsipp.bonds._
-import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import views.html.ListRadiosView
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.bondsdisposal.BondsDisposalListController._
 import forms.RadioListFormProvider
 import models.{NormalMode, SchemeHoldBond}
 import viewmodels.models.SectionCompleted
+import config.RefinedTypes.Max5000
+import controllers.ControllerBaseSpec
 
 class BondsDisposalListControllerSpec extends ControllerBaseSpec {
 

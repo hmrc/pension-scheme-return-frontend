@@ -16,7 +16,7 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, Max5000}
+import config.RefinedTypes.{Max50, Max5000}
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 
@@ -26,11 +26,12 @@ class LandOrPropertyIndividualBuyerNamePageSpec extends PageBehaviours {
 
     val index = refineMV[Max5000.Refined](1)
     val disposalIndex = refineMV[Max50.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[String](LandOrPropertyIndividualBuyerNamePage(srnGen.sample.value, index, disposalIndex))
+    beRetrievable[String](LandOrPropertyIndividualBuyerNamePage(srnSample, index, disposalIndex))
 
-    beSettable[String](LandOrPropertyIndividualBuyerNamePage(srnGen.sample.value, index, disposalIndex))
+    beSettable[String](LandOrPropertyIndividualBuyerNamePage(srnSample, index, disposalIndex))
 
-    beRemovable[String](LandOrPropertyIndividualBuyerNamePage(srnGen.sample.value, index, disposalIndex))
+    beRemovable[String](LandOrPropertyIndividualBuyerNamePage(srnSample, index, disposalIndex))
   }
 }

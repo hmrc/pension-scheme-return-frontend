@@ -18,7 +18,6 @@ package controllers.nonsipp.membercontributions
 
 import services.SaveService
 import play.api.mvc._
-import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
@@ -28,13 +27,14 @@ import _root_.config.Constants
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
-import _root_.config.Refined.{Max300, OneTo300}
 import viewmodels.implicits._
 import pages.nonsipp.membercontributions.{
   MemberContributionsListPage,
   MemberContributionsPage,
   TotalMemberContributionPage
 }
+import _root_.config.RefinedTypes.{Max300, OneTo300}
+import com.google.inject.Inject
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
 import controllers.actions.IdentifyAndRequireData
@@ -234,9 +234,9 @@ object MemberContributionListController {
     srn: Srn,
     mode: Mode,
     memberList: List[(Max300, NameDOB, Option[Money])],
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
+    optYear: Option[String],
+    optCurrentVersion: Option[Int],
+    optPreviousVersion: Option[Int]
   ): List[List[TableElem]] =
     memberList
       .map {

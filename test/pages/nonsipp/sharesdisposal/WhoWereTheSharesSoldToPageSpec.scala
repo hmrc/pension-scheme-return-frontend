@@ -16,12 +16,12 @@
 
 package pages.nonsipp.sharesdisposal
 
-import config.Refined.{Max50, Max5000}
-import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models._
 import pages.behaviours.PageBehaviours
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.TestValues
 
 class WhoWereTheSharesSoldToPageSpec extends PageBehaviours with TestValues {
   private val index = refineMV[Max5000.Refined](1)

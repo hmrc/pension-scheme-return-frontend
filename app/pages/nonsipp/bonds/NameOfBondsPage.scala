@@ -19,11 +19,11 @@ package pages.nonsipp.bonds
 import utils.RefinedUtils.RefinedIntOps
 import utils.PageUtils.removePages
 import queries.Removable
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.UserAnswers
-import config.Refined.Max5000
-import pages.QuestionPage
 
 import scala.util.Try
 

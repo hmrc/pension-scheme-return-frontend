@@ -19,7 +19,7 @@ package navigation.nonsipp
 import utils.BaseSpec
 import models.ConditionalYesNo._
 import models.IdentityType.UKCompany
-import config.Refined.OneTo5000
+import config.RefinedTypes.OneTo5000
 import models.SchemeId.Srn
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}

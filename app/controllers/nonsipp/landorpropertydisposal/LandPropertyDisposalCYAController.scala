@@ -21,13 +21,13 @@ import viewmodels.implicits._
 import play.api.mvc._
 import models.HowDisposed._
 import utils.ListUtils.ListOps
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal._
 import controllers.actions._
 import play.api.i18n._
 import models.requests.DataRequest
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import cats.implicits.toShow

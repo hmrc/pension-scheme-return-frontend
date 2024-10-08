@@ -20,12 +20,12 @@ import services.PsrSubmissionService
 import pages.nonsipp.bonds._
 import viewmodels.implicits._
 import play.api.mvc._
-import config.Refined.Max5000
 import cats.implicits.toShow
 import controllers.actions._
 import play.api.i18n._
 import models.requests.DataRequest
 import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController._
+import config.RefinedTypes.Max5000
 import controllers.PSRController
 import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 import views.html.CheckYourAnswersView

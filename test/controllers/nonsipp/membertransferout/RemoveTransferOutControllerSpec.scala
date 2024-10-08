@@ -17,8 +17,6 @@
 package controllers.nonsipp.membertransferout
 
 import services.PsrSubmissionService
-import config.Refined.{Max300, Max5}
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
@@ -30,6 +28,8 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito.{reset, when}
+import config.RefinedTypes.{Max300, Max5}
+import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 

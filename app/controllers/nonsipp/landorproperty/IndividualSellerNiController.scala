@@ -20,7 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import pages.nonsipp.landorproperty.{IndividualSellerNiPage, LandPropertyIndividualSellersNamePage}
 import controllers.actions._
 import forms.YesNoPageFormProvider

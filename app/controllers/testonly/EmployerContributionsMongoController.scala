@@ -17,7 +17,7 @@
 package controllers.testonly
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max300, Max50}
+import config.RefinedTypes.{Max300, Max50}
 import models.SchemeId.Srn
 import cats.implicits._
 import play.api.libs.json.Json

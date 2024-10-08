@@ -18,8 +18,6 @@ package controllers.nonsipp.shares
 
 import services.{SaveService, SchemeDateService}
 import viewmodels.implicits._
-import config.Refined.Max5000
-import controllers.PSRController
 import config.Constants
 import cats.implicits.toShow
 import controllers.actions._
@@ -29,6 +27,8 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import forms.mappings.errors.DateFormErrors
 import pages.nonsipp.shares.{TypeOfSharesHeldPage, WhenDidSchemeAcquireSharesPage}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.DatePageView
 import controllers.nonsipp.shares.WhenDidSchemeAcquireSharesController._
 import models.SchemeId.Srn

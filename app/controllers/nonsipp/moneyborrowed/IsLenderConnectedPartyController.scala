@@ -21,7 +21,7 @@ import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.nonsipp.moneyborrowed.IsLenderConnectedPartyController.viewModel
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import config.FrontendAppConfig
 import controllers.actions._
 import navigation.Navigator

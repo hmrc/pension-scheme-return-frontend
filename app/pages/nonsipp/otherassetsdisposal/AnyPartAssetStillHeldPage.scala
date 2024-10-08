@@ -17,10 +17,10 @@
 package pages.nonsipp.otherassetsdisposal
 
 import utils.RefinedUtils._
+import pages.QuestionPage
+import config.RefinedTypes.{Max50, Max5000}
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import config.Refined.{Max50, Max5000}
-import pages.QuestionPage
 
 case class AnyPartAssetStillHeldPage(srn: Srn, assetIndex: Max5000, disposalIndex: Max50)
     extends QuestionPage[Boolean] {

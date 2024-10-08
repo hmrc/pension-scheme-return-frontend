@@ -17,13 +17,13 @@
 package navigation.nonsipp
 
 import play.api.mvc.Call
+import pages.Page
+import config.RefinedTypes.Max50
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPages
 import cats.implicits.toTraverseOps
 import pages.nonsipp.landorpropertydisposal._
 import navigation.JourneyNavigator
 import models._
-import config.Refined.Max50
-import pages.Page
 
 object LandOrPropertyDisposalNavigator extends JourneyNavigator {
 

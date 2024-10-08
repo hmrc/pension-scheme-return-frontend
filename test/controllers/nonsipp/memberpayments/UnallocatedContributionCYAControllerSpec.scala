@@ -19,8 +19,6 @@ package controllers.nonsipp.memberpayments
 import services.{PsrSubmissionService, SchemeDateService}
 import play.api.mvc.Call
 import controllers.nonsipp.memberpayments.UnallocatedContributionCYAController._
-import config.Refined.Max3
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import org.mockito.stubbing.OngoingStubbing
@@ -29,6 +27,8 @@ import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import config.RefinedTypes.Max3
+import controllers.ControllerBaseSpec
 import cats.data.NonEmptyList
 import views.html.CYAWithRemove
 

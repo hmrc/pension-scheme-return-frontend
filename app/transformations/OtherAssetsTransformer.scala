@@ -17,8 +17,6 @@
 package transformations
 
 import pages.nonsipp.otherassetsdisposal._
-import config.Refined.{Max5000, OneTo50, OneTo5000}
-import viewmodels.models.SectionStatus.Completed
 import models.SchemeId.Srn
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import eu.timepit.refined.refineV
@@ -30,6 +28,8 @@ import eu.timepit.refined.api.Refined
 import pages.nonsipp.otherassetsheld._
 import models.HowDisposed.{HowDisposed, Other, Sold}
 import com.google.inject.Singleton
+import config.RefinedTypes.{Max5000, OneTo50, OneTo5000}
+import viewmodels.models.SectionStatus.Completed
 import models.requests.psr.{OtherAssetDisposed, OtherAssetTransaction, OtherAssets}
 import models.UserAnswers.implicits.UserAnswersTryOps
 import pages.nonsipp.otherassetsheld.Paths.otherAssets

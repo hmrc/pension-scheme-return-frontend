@@ -18,7 +18,7 @@ package controllers.nonsipp.sharesdisposal
 
 import services.SaveService
 import viewmodels.implicits._
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants.{maxTotalConsiderationAmount, minTotalConsiderationAmount}
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal.{HowManySharesSoldPage, TotalConsiderationSharesSoldPage}
@@ -29,8 +29,8 @@ import play.api.i18n.MessagesApi
 import forms.mappings.errors.MoneyFormErrors
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max50, Max5000}
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.{Empty, Message}

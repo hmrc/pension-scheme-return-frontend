@@ -17,14 +17,14 @@
 package controllers.nonsipp.membersurrenderedbenefits
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import config.Refined.Max300
-import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
 import models.NormalMode
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountController.{form, viewModel}
+import config.RefinedTypes.Max300
+import controllers.ControllerBaseSpec
 
 class SurrenderedBenefitsAmountControllerSpec extends ControllerBaseSpec {
 

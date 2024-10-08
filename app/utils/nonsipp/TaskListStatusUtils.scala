@@ -21,7 +21,7 @@ import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalPage, OtherAssetsDi
 import models.ConditionalYesNo._
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
-import config.Refined.{OneTo300, OneTo5000}
+import config.RefinedTypes.{OneTo300, OneTo5000}
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInSectionCompleted}

@@ -17,14 +17,14 @@
 package navigation.nonsipp
 
 import play.api.mvc.Call
+import pages.Page
+import config.RefinedTypes.Max5000
 import cats.implicits.toTraverseOps
 import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
 import pages.nonsipp.common._
 import pages.nonsipp.otherassetsheld._
 import models.PointOfEntry._
-import config.Refined.Max5000
-import pages.Page
 import models._
 import models.SchemeHoldAsset.{Acquisition, Contribution, Transfer}
 

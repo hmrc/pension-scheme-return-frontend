@@ -18,13 +18,13 @@ package controllers.nonsipp.sharesdisposal
 
 import controllers.nonsipp.sharesdisposal.HowManySharesSoldController._
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.IntView
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.HowManySharesSoldPage
 import forms.IntFormProvider
 import models.NormalMode
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class HowManySharesSoldControllerSpec extends ControllerBaseSpec {
 

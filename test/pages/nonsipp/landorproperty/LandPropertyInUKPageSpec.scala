@@ -16,7 +16,7 @@
 
 package pages.nonsipp.landorproperty
 
-import config.Refined.{OneTo50, OneTo5000}
+import config.RefinedTypes.{OneTo50, OneTo5000}
 import pages.nonsipp.landorpropertydisposal.{HowWasPropertyDisposedOfPage, LandOrPropertyDisposalPage}
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps

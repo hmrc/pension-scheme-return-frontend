@@ -18,8 +18,6 @@ package controllers.nonsipp.common
 
 import services.SaveService
 import viewmodels.implicits._
-import config.Refined.Max5000
-import controllers.nonsipp.common.CompanyRecipientCrnController._
 import pages.nonsipp.landorproperty.CompanySellerNamePage
 import controllers.actions._
 import navigation.Navigator
@@ -33,6 +31,8 @@ import pages.nonsipp.shares.CompanyNameOfSharesSellerPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import pages.nonsipp.otherassetsheld.CompanyNameOfOtherAssetSellerPage
+import config.RefinedTypes.Max5000
+import controllers.nonsipp.common.CompanyRecipientCrnController._
 import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}

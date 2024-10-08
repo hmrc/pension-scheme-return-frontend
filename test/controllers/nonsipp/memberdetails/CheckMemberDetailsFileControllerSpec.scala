@@ -19,8 +19,6 @@ package controllers.nonsipp.memberdetails
 import org.apache.pekko.util.ByteString
 import services._
 import org.apache.pekko.stream.Materializer
-import config.Refined.Max3
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import org.apache.pekko.stream.scaladsl.Source
 import controllers.actions.IdentifyAndRequireData
@@ -34,6 +32,8 @@ import play.api.test.Helpers._
 import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 import org.mockito.Mockito._
 import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
+import config.RefinedTypes.Max3
+import controllers.ControllerBaseSpec
 import cats.data.NonEmptyList
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider

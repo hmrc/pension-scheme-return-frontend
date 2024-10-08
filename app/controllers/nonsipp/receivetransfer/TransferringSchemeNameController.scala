@@ -19,7 +19,6 @@ package controllers.nonsipp.receivetransfer
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max300, Max5}
 import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
 import controllers.actions._
 import navigation.Navigator
@@ -28,6 +27,7 @@ import models.Mode
 import play.api.i18n.MessagesApi
 import viewmodels.models._
 import play.api.data.Form
+import config.RefinedTypes.{Max300, Max5}
 import controllers.PSRController
 import controllers.nonsipp.receivetransfer.TransferringSchemeNameController._
 import views.html.TextInputView

@@ -17,7 +17,6 @@
 package controllers.nonsipp.membertransferout
 
 import services.PsrSubmissionService
-import config.Refined._
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
@@ -29,6 +28,7 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito._
+import config.RefinedTypes._
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.membertransferout.TransfersOutCYAController._
 

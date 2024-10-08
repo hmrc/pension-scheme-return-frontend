@@ -21,13 +21,13 @@ import pages.nonsipp.bonds.WhyDoesSchemeHoldBondsPage
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max5000
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
 import models.{Mode, SchemeHoldBond}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
+import config.RefinedTypes.Max5000
 import controllers.PSRController
 import models.SchemeHoldBond._
 import views.html.RadioListView

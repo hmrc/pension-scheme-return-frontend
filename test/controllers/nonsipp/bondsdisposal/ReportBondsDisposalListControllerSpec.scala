@@ -17,8 +17,6 @@
 package controllers.nonsipp.bondsdisposal
 
 import services.PsrSubmissionService
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.ListView
 import eu.timepit.refined.refineMV
 import models._
@@ -28,6 +26,8 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage}
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 import controllers.nonsipp.bondsdisposal.ReportBondsDisposalListController._

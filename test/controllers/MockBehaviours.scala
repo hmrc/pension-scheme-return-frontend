@@ -20,7 +20,7 @@ import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import org.mockito.verification.VerificationMode
 import org.mockito.Mockito.{verify, when}
 import connectors.{EmailConnector, EmailSent, EmailStatus}
-import config.Refined.Max3
+import config.RefinedTypes.Max3
 import cats.data.NonEmptyList
 import org.mockito.stubbing.OngoingStubbing
 import models.{DateRange, UserAnswers}

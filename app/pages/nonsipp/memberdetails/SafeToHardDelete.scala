@@ -17,11 +17,11 @@
 package pages.nonsipp.memberdetails
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
+import config.RefinedTypes.Max300
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import viewmodels.models.Flag
-import config.Refined.Max300
-import pages.QuestionPage
 
 /**
  * Used to show when a member has been added in the current submission (have never been through an ETMP declaration) and is safe to hard delete

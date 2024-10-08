@@ -19,8 +19,6 @@ package controllers.nonsipp.landorproperty
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc._
-import config.Refined.Max5000
-import controllers.PSRController
 import pages.nonsipp.landorproperty.{AddressLookupResultsPage, LandOrPropertyPostcodeLookupPage}
 import controllers.actions._
 import navigation.Navigator
@@ -30,6 +28,8 @@ import play.api.i18n.MessagesApi
 import forms.mappings.errors.InputFormErrors
 import services.{AddressService, SaveService}
 import controllers.nonsipp.landorproperty.LandOrPropertyPostcodeLookupController.viewModel
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import cats.data.EitherT
 import views.html.PostcodeLookupView
 import models.SchemeId.Srn

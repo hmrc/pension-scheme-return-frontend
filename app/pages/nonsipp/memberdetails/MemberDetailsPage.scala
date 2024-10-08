@@ -19,6 +19,8 @@ package pages.nonsipp.memberdetails
 import utils.RefinedUtils.RefinedIntOps
 import pages.nonsipp.employercontributions.{Paths => _}
 import play.api.mvc.Result
+import pages.{IndexedQuestionPage, QuestionPage}
+import config.RefinedTypes.Max300
 import models.SchemeId.Srn
 import pages.nonsipp.receivetransfer.{Paths => _}
 import play.api.libs.json.JsPath
@@ -26,8 +28,6 @@ import pages.nonsipp.membersurrenderedbenefits.{Paths => _}
 import models.{NameDOB, UserAnswers}
 import pages.nonsipp.membertransferout.{Paths => _}
 import play.api.mvc.Results.Redirect
-import config.Refined.Max300
-import pages.{IndexedQuestionPage, QuestionPage}
 
 case class MemberDetailsPage(srn: Srn, index: Max300) extends QuestionPage[NameDOB] {
 

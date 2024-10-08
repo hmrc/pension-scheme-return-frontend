@@ -21,11 +21,11 @@ import pages.nonsipp.memberdetails._
 import viewmodels.implicits._
 import play.api.mvc._
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.{Max300, OneTo300}
-import controllers.PSRController
 import navigation.Navigator
 import models._
 import play.api.i18n._
+import config.RefinedTypes.{Max300, OneTo300}
+import controllers.PSRController
 import views.html.ContentPageView
 import models.SchemeId.Srn
 import controllers.actions._

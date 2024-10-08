@@ -16,8 +16,8 @@
 
 package pages.nonsipp.memberreceivedpcls
 
-import models.SchemeId.Srn
-import config.Refined.Max300
 import pages.Page
+import config.RefinedTypes.Max300
+import models.SchemeId.Srn
 
 case class PclsCYAPage(srn: Srn, index: Max300) extends Page

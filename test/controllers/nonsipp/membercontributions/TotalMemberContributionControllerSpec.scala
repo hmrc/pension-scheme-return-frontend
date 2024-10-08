@@ -19,13 +19,13 @@ package controllers.nonsipp.membercontributions
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
 import controllers.nonsipp.membercontributions.TotalMemberContributionController._
-import config.Refined._
-import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
 import viewmodels.models.SectionCompleted
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 
 class TotalMemberContributionControllerSpec extends ControllerBaseSpec {
 
