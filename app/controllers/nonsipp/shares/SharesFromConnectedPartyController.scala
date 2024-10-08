@@ -198,8 +198,8 @@ object SharesFromConnectedPartyController {
       )
 
     } else {
-      (schemeHoldShare.name.equals("02"))
-      (schemeHoldShare.name.equals("03"))
+      schemeHoldShare.name.equals("02")
+      schemeHoldShare.name.equals("03")
       YesNoPageViewModel(
         Message("sharesFromConnectedParty.title1"),
         Message("sharesFromConnectedParty.heading1", companyName),

@@ -25,15 +25,15 @@ class IsIndividualRecipientConnectedPartyPageSpec extends PageBehaviours {
   "IsIndividualRecipientConnectedPartyPage" - {
 
     val index = refineMV[OneTo5000](1)
-    val srn = srnGen.sample.value
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[Boolean](IsIndividualRecipientConnectedPartyPage(srnGen.sample.value, index))
+    beRetrievable[Boolean](IsIndividualRecipientConnectedPartyPage(srnSample, index))
 
-    beSettable[Boolean](IsIndividualRecipientConnectedPartyPage(srnGen.sample.value, index))
+    beSettable[Boolean](IsIndividualRecipientConnectedPartyPage(srnSample, index))
 
-    beRemovable[Boolean](IsIndividualRecipientConnectedPartyPage(srnGen.sample.value, index))
+    beRemovable[Boolean](IsIndividualRecipientConnectedPartyPage(srnSample, index))
 
-    IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)).toString mustBe "individualConnectedPartyStatus"
+    IsIndividualRecipientConnectedPartyPage(srnSample, refineMV(1)).toString mustBe "individualConnectedPartyStatus"
 
   }
 }

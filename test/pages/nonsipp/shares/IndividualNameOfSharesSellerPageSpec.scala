@@ -26,12 +26,13 @@ class IndividualNameOfSharesSellerPageSpec extends PageBehaviours with TestValue
   "IndividualNameOfSharesSellerPage" - {
 
     val index = refineMV[OneTo5000](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[String](IndividualNameOfSharesSellerPage(srnGen.sample.value, index))
+    beRetrievable[String](IndividualNameOfSharesSellerPage(srnSample, index))
 
-    beSettable[String](IndividualNameOfSharesSellerPage(srnGen.sample.value, index))
+    beSettable[String](IndividualNameOfSharesSellerPage(srnSample, index))
 
-    beRemovable[String](IndividualNameOfSharesSellerPage(srnGen.sample.value, index))
+    beRemovable[String](IndividualNameOfSharesSellerPage(srnSample, index))
 
   }
 }

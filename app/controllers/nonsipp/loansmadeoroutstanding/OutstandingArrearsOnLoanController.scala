@@ -99,7 +99,7 @@ object OutstandingArrearsOnLoanController {
 
   def form(formProvider: YesNoPageFormProvider, period: DateRange): Form[Either[Unit, Money]] =
     formProvider.conditionalYes[Money](
-      ("outstandingArrearsOnLoan.error.required"),
+      "outstandingArrearsOnLoan.error.required",
       mappingYes = Mappings.money(
         MoneyFormErrors(
           "outstandingArrearsOnLoan.yes.error.required",

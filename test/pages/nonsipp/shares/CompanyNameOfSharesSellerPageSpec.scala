@@ -25,12 +25,13 @@ class CompanyNameOfSharesSellerPageSpec extends PageBehaviours {
   "CompanyNameOfSharesSellerPage" - {
 
     val index = refineMV[Max5000.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[String](CompanyNameOfSharesSellerPage(srnGen.sample.value, index))
+    beRetrievable[String](CompanyNameOfSharesSellerPage(srnSample, index))
 
-    beSettable[String](CompanyNameOfSharesSellerPage(srnGen.sample.value, index))
+    beSettable[String](CompanyNameOfSharesSellerPage(srnSample, index))
 
-    beRemovable[String](CompanyNameOfSharesSellerPage(srnGen.sample.value, index))
+    beRemovable[String](CompanyNameOfSharesSellerPage(srnSample, index))
   }
 
 }

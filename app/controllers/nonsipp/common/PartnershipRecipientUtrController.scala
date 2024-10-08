@@ -91,9 +91,9 @@ class PartnershipRecipientUtrController @Inject()(
 object PartnershipRecipientUtrController {
 
   private def noFormErrors(subjectKey: String) = InputFormErrors.input(
-    s"${subjectKey}.partnershipRecipientUtr.no.conditional.error.required",
-    s"${subjectKey}.partnershipRecipientUtr.no.conditional.error.invalid",
-    s"${subjectKey}.partnershipRecipientUtr.no.conditional.error.length"
+    s"$subjectKey.partnershipRecipientUtr.no.conditional.error.required",
+    s"$subjectKey.partnershipRecipientUtr.no.conditional.error.invalid",
+    s"$subjectKey.partnershipRecipientUtr.no.conditional.error.length"
   )
 
   def form(formProvider: YesNoPageFormProvider, subject: IdentitySubject): Form[Either[String, Utr]] =

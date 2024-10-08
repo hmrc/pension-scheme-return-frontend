@@ -24,20 +24,21 @@ import pages.behaviours.PageBehaviours
 
 class PartnershipRecipientUtrPageSpec extends PageBehaviours {
   val index: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
+  private val srnSample = srnGen.sample.value
 
   "PartnershipRecipientUtrPage" - {
     IdentitySubject.values.foreach { identitySubject =>
       s"for $identitySubject" - {
         beRetrievable[ConditionalYesNo[String, Utr]](
-          PartnershipRecipientUtrPage(srnGen.sample.value, index, identitySubject)
+          PartnershipRecipientUtrPage(srnSample, index, identitySubject)
         )
 
         beSettable[ConditionalYesNo[String, Utr]](
-          PartnershipRecipientUtrPage(srnGen.sample.value, index, identitySubject)
+          PartnershipRecipientUtrPage(srnSample, index, identitySubject)
         )
 
         beRemovable[ConditionalYesNo[String, Utr]](
-          PartnershipRecipientUtrPage(srnGen.sample.value, index, identitySubject)
+          PartnershipRecipientUtrPage(srnSample, index, identitySubject)
         )
       }
     }

@@ -24,11 +24,12 @@ class RemoveLoanPageSpec extends PageBehaviours {
 
   "RemoveLoanPage" - {
     val index = refineMV[OneTo5000](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[Boolean](RemoveLoanPage(srnGen.sample.value, index))
+    beRetrievable[Boolean](RemoveLoanPage(srnSample, index))
 
-    beSettable[Boolean](RemoveLoanPage(srnGen.sample.value, index))
+    beSettable[Boolean](RemoveLoanPage(srnSample, index))
 
-    beRemovable[Boolean](RemoveLoanPage(srnGen.sample.value, index))
+    beRemovable[Boolean](RemoveLoanPage(srnSample, index))
   }
 }

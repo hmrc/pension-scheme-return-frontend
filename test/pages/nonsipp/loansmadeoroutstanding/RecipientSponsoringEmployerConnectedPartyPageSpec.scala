@@ -26,15 +26,15 @@ class RecipientSponsoringEmployerConnectedPartyPageSpec extends PageBehaviours {
   "RecipientSponsoringEmployerConnectedPartyPage" - {
 
     val index = refineMV[OneTo5000](1)
-    val srn = srnGen.sample.value
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value, index))
+    beRetrievable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnSample, index))
 
-    beSettable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value, index))
+    beSettable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnSample, index))
 
-    beRemovable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value, index))
+    beRemovable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnSample, index))
 
-    RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1)).toString mustBe "recipientSponsoringEmployerConnectedParty"
+    RecipientSponsoringEmployerConnectedPartyPage(srnSample, refineMV(1)).toString mustBe "recipientSponsoringEmployerConnectedParty"
 
   }
 }

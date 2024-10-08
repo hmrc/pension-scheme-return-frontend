@@ -27,12 +27,13 @@ class SharesIndividualSellerNINumberPageSpec extends PageBehaviours {
   "SharesIndividualSellerNINumberPage" - {
 
     val index = refineMV[Max5000.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[ConditionalYesNo[String, Nino]](SharesIndividualSellerNINumberPage(srnGen.sample.value, index))
+    beRetrievable[ConditionalYesNo[String, Nino]](SharesIndividualSellerNINumberPage(srnSample, index))
 
-    beSettable[ConditionalYesNo[String, Nino]](SharesIndividualSellerNINumberPage(srnGen.sample.value, index))
+    beSettable[ConditionalYesNo[String, Nino]](SharesIndividualSellerNINumberPage(srnSample, index))
 
-    beRemovable[ConditionalYesNo[String, Nino]](SharesIndividualSellerNINumberPage(srnGen.sample.value, index))
+    beRemovable[ConditionalYesNo[String, Nino]](SharesIndividualSellerNINumberPage(srnSample, index))
 
   }
 

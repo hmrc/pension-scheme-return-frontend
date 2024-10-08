@@ -27,11 +27,12 @@ class WhenDidMemberSurrenderBenefitsPageSpec extends PageBehaviours {
   "WhenDidMemberSurrenderBenefitsPage" - {
 
     val index = refineMV[Max300.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[LocalDate](WhenDidMemberSurrenderBenefitsPage(srnGen.sample.value, index))
+    beRetrievable[LocalDate](WhenDidMemberSurrenderBenefitsPage(srnSample, index))
 
-    beSettable[LocalDate](WhenDidMemberSurrenderBenefitsPage(srnGen.sample.value, index))
+    beSettable[LocalDate](WhenDidMemberSurrenderBenefitsPage(srnSample, index))
 
-    beRemovable[LocalDate](WhenDidMemberSurrenderBenefitsPage(srnGen.sample.value, index))
+    beRemovable[LocalDate](WhenDidMemberSurrenderBenefitsPage(srnSample, index))
   }
 }

@@ -27,12 +27,13 @@ class TotalProceedsSaleLandPropertyPageSpec extends PageBehaviours {
 
     val index = refineMV[Max5000.Refined](1)
     val disposalIndex = refineMV[Max50.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[Money](TotalProceedsSaleLandPropertyPage(srnGen.sample.value, index, disposalIndex))
+    beRetrievable[Money](TotalProceedsSaleLandPropertyPage(srnSample, index, disposalIndex))
 
-    beSettable[Money](TotalProceedsSaleLandPropertyPage(srnGen.sample.value, index, disposalIndex))
+    beSettable[Money](TotalProceedsSaleLandPropertyPage(srnSample, index, disposalIndex))
 
-    beRemovable[Money](TotalProceedsSaleLandPropertyPage(srnGen.sample.value, index, disposalIndex))
+    beRemovable[Money](TotalProceedsSaleLandPropertyPage(srnSample, index, disposalIndex))
 
   }
 

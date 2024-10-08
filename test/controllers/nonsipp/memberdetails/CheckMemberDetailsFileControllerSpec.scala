@@ -18,19 +18,15 @@ package controllers.nonsipp.memberdetails
 
 import org.apache.pekko.util.ByteString
 import services._
-import org.apache.pekko.stream.Materializer
 import config.Refined.Max3
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import org.apache.pekko.stream.scaladsl.Source
-import controllers.actions.IdentifyAndRequireData
-import navigation.Navigator
 import org.mockito.stubbing.OngoingStubbing
 import models.UploadStatus.UploadStatus
 import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import play.api.test.Helpers._
 import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 import org.mockito.Mockito._
 import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
@@ -42,7 +38,6 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import models._
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import java.time.LocalDate
 
@@ -100,30 +95,6 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec with Guice
     taxYear: DateRange
   ): OngoingStubbing[Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]] =
     when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(any())).thenReturn(Some(Left(taxYear)))
-
-  private val mockMessagesApi = stubMessagesApi()
-  private val mockSaveService = mock[SaveService]
-  private val mockNavigator = mock[Navigator]
-  private val mockIdentifyAndRequireData = mock[IdentifyAndRequireData]
-  private val mockFormProvider = mock[YesNoPageFormProvider]
-  private val mockView = mock[YesNoPageView]
-  private val controllerComponents = stubMessagesControllerComponents()
-
-  override implicit val mat: Materializer = app.materializer
-
-  private val controller = new CheckMemberDetailsFileController(
-    messagesApi = mockMessagesApi,
-    saveService = mockSaveService,
-    navigator = mockNavigator,
-    identifyAndRequireData = mockIdentifyAndRequireData,
-    formProvider = mockFormProvider,
-    uploadService = mockUploadService,
-    uploadValidator = mockMemberDetailsUploadValidator,
-    schemeDateService = mockSchemeDateService,
-    auditService = mockAuditService,
-    controllerComponents = controllerComponents,
-    view = mockView
-  )
 
   "CheckMemberDetailsFileController" - {
 

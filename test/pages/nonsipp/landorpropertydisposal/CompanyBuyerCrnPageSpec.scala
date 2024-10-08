@@ -25,23 +25,22 @@ import pages.behaviours.PageBehaviours
 class CompanyBuyerCrnPageSpec extends PageBehaviours {
 
   "CompanyBuyerCrnPage" - {
-    val srn = srnGen.sample.value
+    val srnSample = srnGen.sample.value
     val index: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
     val disposalIndex: Refined[Int, Max50.Refined] = refineMV[Max50.Refined](1)
 
     beRetrievable[ConditionalYesNo[String, Crn]](
-      CompanyBuyerCrnPage(srnGen.sample.value, index, disposalIndex)
+      CompanyBuyerCrnPage(srnSample, index, disposalIndex)
     )
 
     beSettable[ConditionalYesNo[String, Crn]](
-      CompanyBuyerCrnPage(srnGen.sample.value, index, disposalIndex)
+      CompanyBuyerCrnPage(srnSample, index, disposalIndex)
     )
 
     beRemovable[ConditionalYesNo[String, Crn]](
-      CompanyBuyerCrnPage(srnGen.sample.value, index, disposalIndex)
+      CompanyBuyerCrnPage(srnSample, index, disposalIndex)
     )
 
-    CompanyBuyerCrnPage(srn, index, disposalIndex).toString mustBe "idNumber"
+    CompanyBuyerCrnPage(srnSample, index, disposalIndex).toString mustBe "idNumber"
   }
-
 }

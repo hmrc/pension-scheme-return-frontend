@@ -32,7 +32,7 @@ import play.api.libs.json.JsObject
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class RootNavigator @Inject()() extends Navigator {
+class RootNavigator @Inject() extends Navigator {
 
   val journeys: List[JourneyNavigator] =
     List(new JourneyNavigator {

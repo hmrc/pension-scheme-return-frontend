@@ -106,7 +106,7 @@ class RemoveLoanController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(getResult(srn, index, mode, formWithErrors, true)),
+          formWithErrors => Future.successful(getResult(srn, index, mode, formWithErrors, error = true)),
           value =>
             if (value) {
               for {
@@ -144,11 +144,9 @@ object RemoveLoanController {
     loanAmount: String,
     recipientName: String
   ): FormPageViewModel[YesNoPageViewModel] =
-    (
-      YesNoPageViewModel(
-        "removeLoan.title",
-        Message("removeLoan.heading", loanAmount, recipientName),
-        routes.RemoveLoanController.onSubmit(srn, index, mode)
-      )
+    YesNoPageViewModel(
+      "removeLoan.title",
+      Message("removeLoan.heading", loanAmount, recipientName),
+      routes.RemoveLoanController.onSubmit(srn, index, mode)
     )
 }

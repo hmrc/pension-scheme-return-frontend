@@ -27,12 +27,13 @@ class OtherAssetIndividualSellerNINumberPageSpec extends PageBehaviours {
   "OtherAssetIndividualSellerNINumberPage" - {
 
     val index = refineMV[Max5000.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[ConditionalYesNo[String, Nino]](OtherAssetIndividualSellerNINumberPage(srnGen.sample.value, index))
+    beRetrievable[ConditionalYesNo[String, Nino]](OtherAssetIndividualSellerNINumberPage(srnSample, index))
 
-    beSettable[ConditionalYesNo[String, Nino]](OtherAssetIndividualSellerNINumberPage(srnGen.sample.value, index))
+    beSettable[ConditionalYesNo[String, Nino]](OtherAssetIndividualSellerNINumberPage(srnSample, index))
 
-    beRemovable[ConditionalYesNo[String, Nino]](OtherAssetIndividualSellerNINumberPage(srnGen.sample.value, index))
+    beRemovable[ConditionalYesNo[String, Nino]](OtherAssetIndividualSellerNINumberPage(srnSample, index))
 
   }
 

@@ -110,7 +110,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
             )
           )
         }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
-          .withName(s"render correct ${mode} view")
+          .withName(s"render correct $mode view")
       )
 
       act.like(
