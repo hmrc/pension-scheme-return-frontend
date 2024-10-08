@@ -24,26 +24,14 @@ import models.SchemeId.Srn
 import pages.nonsipp.memberpensionpayments._
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
 import models._
-import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransferOutMemberListPage, TransfersOutJourneyStatus}
+import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutJourneyStatus}
 import models.softdelete.SoftDeletedMember
 import cats.syntax.traverse._
 import pages.nonsipp.employercontributions._
-import pages.nonsipp.membercontributions.{
-  MemberContributionsListPage,
-  MemberContributionsPage,
-  TotalMemberContributionPage
-}
-import pages.nonsipp.memberreceivedpcls.{
-  PclsMemberListPage,
-  PensionCommencementLumpSumAmountPage,
-  PensionCommencementLumpSumPage
-}
+import pages.nonsipp.membercontributions.{MemberContributionsPage, TotalMemberContributionPage}
+import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
 import pages.nonsipp.memberpensionpayments.Paths.membersPayments
-import pages.nonsipp.receivetransfer.{
-  DidSchemeReceiveTransferPage,
-  TransferReceivedMemberListPage,
-  TransfersInJourneyStatus
-}
+import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInJourneyStatus}
 import models.requests.psr._
 import models.UserAnswers.implicits._
 import pages.nonsipp.{FbStatus, FbVersionPage}
@@ -366,10 +354,6 @@ class MemberPaymentsTransformer @Inject()(
             if (memberPayments.employerContributionsDetails.completed) SectionStatus.Completed
             else SectionStatus.InProgress
           )
-          .set(
-            EmployerContributionsMemberListPage(srn),
-            memberPayments.employerContributionsDetails.completed
-          )
       }
 
       // Transfers In section-wide user answers
@@ -377,12 +361,10 @@ class MemberPaymentsTransformer @Inject()(
         case Some(true) =>
           ua3_2
             .set(DidSchemeReceiveTransferPage(srn), true)
-            .set(TransferReceivedMemberListPage(srn), true) // temporary E2E workaround
             .set(TransfersInJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
         case Some(false) =>
           ua3_2
             .set(DidSchemeReceiveTransferPage(srn), false)
-            .set(TransferReceivedMemberListPage(srn), true) // temporary E2E workaround
             .set(TransfersInJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
         case None => Try(ua3_2)
       }
@@ -392,38 +374,28 @@ class MemberPaymentsTransformer @Inject()(
         case Some(true) =>
           ua3_3
             .set(SchemeTransferOutPage(srn), true)
-            .set(TransferOutMemberListPage(srn), true) // temporary E2E workaround
             .set(TransfersOutJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
         case Some(false) =>
           ua3_3
             .set(SchemeTransferOutPage(srn), false)
-            .set(TransferOutMemberListPage(srn), true) // temporary E2E workaround
             .set(TransfersOutJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
         case None => Try(ua3_3)
       }
 
-      // temporary E2E workaround
-      memberTotalContributionExists = memberPayments.memberDetails.exists(_.totalContributions.nonEmpty)
-      ua4 <- ua3_4.set(MemberContributionsListPage(srn), memberTotalContributionExists)
-
-      // temporary E2E workaround
-      memberLumpSumReceivedExists = memberPayments.memberDetails.exists(_.memberLumpSumReceived.nonEmpty)
-      ua5 <- ua4.set(PclsMemberListPage(srn), memberLumpSumReceivedExists)
-
       // new members can be safely hard deleted - don't run when fetching previous user answers as there is no point
       newMembers <- if (!fetchingPreviousVersion) {
-        identifyNewMembers(srn, ua5, previousVersionUA)
+        identifyNewMembers(srn, ua3_4, previousVersionUA)
       } else {
         Success(Nil)
       }
 
-      ua5_1 <- newMembers.foldLeft(Try(ua5)) {
+      ua4 <- newMembers.foldLeft(Try(ua3_4)) {
         case (ua, index) =>
           logger.info(s"New member identified at index $index")
           ua.set(SafeToHardDelete(srn, index))
       }
 
-      ua8 <- ua5_1.set(
+      ua5 <- ua4.set(
         SoftDeletedMembers(srn),
         memberPayments.memberDetails
           .filter(_.state == MemberState.Deleted)
@@ -442,7 +414,7 @@ class MemberPaymentsTransformer @Inject()(
               )
           )
       )
-    } yield ua8
+    } yield ua5
 
   /**
    * Checks UserAnswers to see if any members are newly added (have never been through a declaration or have been newly added in this version prior to a declaration)
@@ -491,7 +463,7 @@ class MemberPaymentsTransformer @Inject()(
               new Exception(err)
             }
             .toTry
-            .map { previousMemberDetails =>
+            .map { _ =>
               currentMemberDetails.toList.flatMap {
                 case (index, currentMemberDetail) if currentMemberDetail.state.changed =>
                   logger.info(s"[identifyNewMembers] Member at index $index is changed - NOT safe to hard delete")

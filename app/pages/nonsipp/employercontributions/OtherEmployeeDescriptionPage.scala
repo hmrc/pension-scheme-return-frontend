@@ -40,7 +40,6 @@ case class OtherEmployeeDescriptionPage(srn: Srn, index: Max300, secondaryIndex:
         // create
         userAnswers
           .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
       case (Some(x), Some(y)) if x == y =>
         // value stays the same
         Try(userAnswers)
@@ -48,7 +47,6 @@ case class OtherEmployeeDescriptionPage(srn: Srn, index: Max300, secondaryIndex:
         // value updated
         userAnswers
           .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
       case _ => Try(userAnswers)
     }
 }

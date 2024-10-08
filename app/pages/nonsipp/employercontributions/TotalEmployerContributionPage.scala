@@ -40,7 +40,6 @@ case class TotalEmployerContributionPage(srn: Srn, index: Max300, secondaryIndex
         // create
         userAnswers
           .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
       case (Some(x), Some(y)) if x == y =>
         // update - no changes
         Try(userAnswers)
@@ -48,7 +47,6 @@ case class TotalEmployerContributionPage(srn: Srn, index: Max300, secondaryIndex
         // update
         userAnswers
           .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
       case _ => Try(userAnswers)
     }
 }

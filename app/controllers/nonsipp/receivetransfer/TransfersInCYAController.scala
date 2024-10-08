@@ -143,7 +143,6 @@ class TransfersInCYAController @Inject()(
         updatedUserAnswers <- request.userAnswers
           .set(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
           .setWhen(transfersInChanged)(MemberStatus(srn, index), MemberState.Changed)
-          .remove(TransferReceivedMemberListPage(srn))
           .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(

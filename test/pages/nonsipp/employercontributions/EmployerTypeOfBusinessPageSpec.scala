@@ -54,7 +54,6 @@ class EmployerTypeOfBusinessPageSpec extends PageBehaviours with TestValues {
         result.get(EmployerContributionsPage(srn)) must be(Some(true))
         result.get(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne)) must be(Some(typeOfBusiness))
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
       }
 
       "not changing when value stays the same" in {
@@ -63,7 +62,6 @@ class EmployerTypeOfBusinessPageSpec extends PageBehaviours with TestValues {
           .unsafeSet(EmployerNamePage(srn, memberIndex, indexOne), employerName)
           .unsafeSet(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne), typeOfBusiness)
           .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
         val result =
           userAnswers.set(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne), typeOfBusiness).success.value
@@ -71,7 +69,6 @@ class EmployerTypeOfBusinessPageSpec extends PageBehaviours with TestValues {
         result.get(EmployerContributionsPage(srn)) must be(Some(true))
         result.get(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne)) must be(Some(typeOfBusiness))
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.Completed))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(Some(true))
       }
 
       "changing when value is different" in {
@@ -79,14 +76,12 @@ class EmployerTypeOfBusinessPageSpec extends PageBehaviours with TestValues {
           .unsafeSet(EmployerContributionsPage(srn), true)
           .unsafeSet(EmployerNamePage(srn, memberIndex, indexOne), employerName)
           .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
         val result =
           userAnswers.set(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne), otherTypeOfBusiness).success.value
 
         result.get(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne)) must be(Some(otherTypeOfBusiness))
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
       }
     }
   }

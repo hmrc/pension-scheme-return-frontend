@@ -52,7 +52,6 @@ class TotalEmployerContributionPageSpec extends PageBehaviours with TestValues {
         result.get(EmployerContributionsPage(srn)) must be(Some(true))
         result.get(TotalEmployerContributionPage(srn, memberIndex, secondaryIndex)) must be(Some(money))
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
       }
 
       "not changing when value stays the same" in {
@@ -61,7 +60,6 @@ class TotalEmployerContributionPageSpec extends PageBehaviours with TestValues {
           .unsafeSet(EmployerNamePage(srn, memberIndex, secondaryIndex), employerName)
           .unsafeSet(TotalEmployerContributionPage(srn, memberIndex, secondaryIndex), money)
           .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
         val result = userAnswers
           .set(TotalEmployerContributionPage(srn, memberIndex, secondaryIndex), money)
@@ -71,7 +69,6 @@ class TotalEmployerContributionPageSpec extends PageBehaviours with TestValues {
         result.get(EmployerContributionsPage(srn)) must be(Some(true))
         result.get(TotalEmployerContributionPage(srn, memberIndex, secondaryIndex)) must be(Some(money))
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.Completed))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(Some(true))
       }
 
       "changing when value is different" in {
@@ -80,7 +77,6 @@ class TotalEmployerContributionPageSpec extends PageBehaviours with TestValues {
           .unsafeSet(EmployerContributionsPage(srn), true)
           .unsafeSet(TotalEmployerContributionPage(srn, memberIndex, secondaryIndex), money)
           .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
         val result =
           userAnswers
@@ -92,7 +88,6 @@ class TotalEmployerContributionPageSpec extends PageBehaviours with TestValues {
           Some(otherMoney)
         )
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
       }
     }
   }

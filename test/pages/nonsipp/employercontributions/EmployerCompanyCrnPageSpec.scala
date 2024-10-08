@@ -60,7 +60,6 @@ class EmployerCompanyCrnPageSpec extends PageBehaviours with TestValues {
           Some(ConditionalYesNo.yes[String, Crn](crn))
         )
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
       }
 
       "not changing when value stays the same" in {
@@ -69,7 +68,6 @@ class EmployerCompanyCrnPageSpec extends PageBehaviours with TestValues {
           .unsafeSet(EmployerNamePage(srn, memberIndex, index), employerName)
           .unsafeSet(EmployerCompanyCrnPage(srn, memberIndex, index), ConditionalYesNo.yes[String, Crn](crn))
           .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
         val result = userAnswers
           .set(EmployerCompanyCrnPage(srn, memberIndex, index), ConditionalYesNo.yes[String, Crn](crn))
@@ -81,7 +79,6 @@ class EmployerCompanyCrnPageSpec extends PageBehaviours with TestValues {
           Some(ConditionalYesNo.yes[String, Crn](crn))
         )
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.Completed))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(Some(true))
       }
 
       "changing when value is different" in {
@@ -89,7 +86,6 @@ class EmployerCompanyCrnPageSpec extends PageBehaviours with TestValues {
           .unsafeSet(EmployerContributionsPage(srn), true)
           .unsafeSet(EmployerCompanyCrnPage(srn, memberIndex, index), ConditionalYesNo.yes[String, Crn](crn))
           .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
         val result =
           userAnswers
@@ -101,7 +97,6 @@ class EmployerCompanyCrnPageSpec extends PageBehaviours with TestValues {
           Some(ConditionalYesNo.no[String, Crn](noCrnReason))
         )
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
       }
     }
   }

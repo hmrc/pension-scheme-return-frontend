@@ -35,11 +35,7 @@ import models.softdelete.SoftDeletedMember
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.membercontributions._
 import queries.{Gettable, Removable}
-import pages.nonsipp.memberreceivedpcls.{
-  PclsMemberListPage,
-  PensionCommencementLumpSumAmountPage,
-  PensionCommencementLumpSumPage
-}
+import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCompleted.SurrenderedBenefitsUserAnswersOps
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import cats.syntax.apply._
@@ -313,12 +309,10 @@ trait SoftDelete { _: PSRController =>
             ua.remove(memberCommencementLumpSumPages)
               .when(_.get(PensionCommencementLumpSumPage(srn)))(
                 ifTrue = _.removeWhen(_.map(PensionCommencementLumpSumAmountPage.all(srn)).isEmpty)(
-                  PensionCommencementLumpSumPage(srn),
-                  PclsMemberListPage(srn)
+                  PensionCommencementLumpSumPage(srn)
                 ),
                 ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(
-                  PensionCommencementLumpSumPage(srn),
-                  PclsMemberListPage(srn)
+                  PensionCommencementLumpSumPage(srn)
                 )
               )
           }
@@ -327,12 +321,10 @@ trait SoftDelete { _: PSRController =>
               .when(_.get(PensionPaymentsReceivedPage(srn)))(
                 ifTrue = _.removeWhen(_.map(TotalAmountPensionPaymentsPage.all(srn)).isEmpty)(
                   PensionPaymentsJourneyStatus(srn),
-                  MemberPensionPaymentsListPage(srn),
                   PensionPaymentsReceivedPage(srn)
                 ),
                 ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(
                   PensionPaymentsJourneyStatus(srn),
-                  MemberPensionPaymentsListPage(srn),
                   PensionPaymentsReceivedPage(srn)
                 )
               )
@@ -341,12 +333,10 @@ trait SoftDelete { _: PSRController =>
             ua.remove(memberContributionsPages)
               .when(_.get(MemberContributionsPage(srn)))(
                 ifTrue = _.removeWhen(_.map(AllTotalMemberContributionPages(srn)).isEmpty)(
-                  MemberContributionsPage(srn),
-                  MemberContributionsListPage(srn)
+                  MemberContributionsPage(srn)
                 ),
                 ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(
-                  MemberContributionsPage(srn),
-                  MemberContributionsListPage(srn)
+                  MemberContributionsPage(srn)
                 )
               )
           }

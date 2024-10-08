@@ -67,7 +67,6 @@ class PensionAmountReceivedTransformer @Inject() extends Transformer {
     status.fold(List.empty[UserAnswers.Compose]) { s =>
       List[UserAnswers.Compose](
         _.setWhen(pensionReceived.started)(PensionPaymentsJourneyStatus(srn), s),
-        _.setWhen(pensionReceived.started)(MemberPensionPaymentsListPage(srn), if (s.isCompleted) true else false),
         _.setWhen(pensionReceived.started)(PensionPaymentsReceivedPage(srn), pensionReceived.made)
       )
     }

@@ -41,7 +41,6 @@ case class EmployerTypeOfBusinessPage(srn: Srn, memberIndex: Max300, index: Max5
         // new value / create
         userAnswers
           .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
       case (Some(a), Some(b)) if a == b => Try(userAnswers) // same answer
       case _ =>
         userAnswers
@@ -49,6 +48,5 @@ case class EmployerTypeOfBusinessPage(srn: Srn, memberIndex: Max300, index: Max5
           .remove(PartnershipEmployerUtrPage(srn, memberIndex, index))
           .remove(OtherEmployeeDescriptionPage(srn, memberIndex, index))
           .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-          .remove(EmployerContributionsMemberListPage(srn))
     }
 }

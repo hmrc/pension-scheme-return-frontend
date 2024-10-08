@@ -61,10 +61,6 @@ class PensionSurrenderTransformer @Inject() extends Transformer {
   ): List[UserAnswers.Compose] =
     List[UserAnswers.Compose](
       _.setWhen(pensionSurrenderDetails.completed)(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.Completed),
-      _.setWhen(pensionSurrenderDetails.started)(
-        SurrenderedBenefitsMemberListPage(srn),
-        pensionSurrenderDetails.completed
-      ),
       _.setWhen(pensionSurrenderDetails.started)(SurrenderedBenefitsPage(srn), pensionSurrenderDetails.made)
     )
 }

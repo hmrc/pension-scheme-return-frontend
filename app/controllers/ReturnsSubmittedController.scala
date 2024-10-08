@@ -186,8 +186,6 @@ object ReturnsSubmittedController {
           )
         ),
         rows = data,
-        radioText = Message(""),
-        showRadios = false,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

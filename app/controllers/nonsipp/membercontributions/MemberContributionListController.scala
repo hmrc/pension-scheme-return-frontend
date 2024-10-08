@@ -16,18 +16,17 @@
 
 package controllers.nonsipp.membercontributions
 
-import services.SaveService
 import play.api.mvc._
 import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import controllers.nonsipp.membercontributions.MemberContributionListController._
-import cats.implicits.{toBifunctorOps, toShow, toTraverseOps}
+import cats.implicits.toShow
 import _root_.config.Constants
-import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
+import models.requests.DataRequest
 import _root_.config.Refined.{Max300, OneTo300}
 import viewmodels.implicits._
 import pages.nonsipp.membercontributions.{
@@ -45,10 +44,8 @@ import utils.DateTimeUtils.localDateTimeShow
 import models._
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
-import models.requests.DataRequest
-import play.api.data.Form
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 import java.time.LocalDateTime
 import javax.inject.Named
@@ -58,13 +55,8 @@ class MemberContributionListController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: TwoColumnsTripleAction,
-  saveService: SaveService,
-  formProvider: YesNoPageFormProvider
-)(implicit ec: ExecutionContext)
-    extends PSRController {
-
-  val form: Form[Boolean] = MemberContributionListController.form(formProvider)
+  view: TwoColumnsTripleAction
+) extends PSRController {
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
@@ -90,11 +82,9 @@ class MemberContributionListController @Inject()(
     val optionList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
     if (optionList.flatten.nonEmpty) {
-      val filledForm = userAnswers.get(MemberContributionsListPage(srn)).fold(form)(form.fill)
       val noPageEnabled = !userAnswers.get(MemberContributionsPage(srn)).getOrElse(false)
       Ok(
         view(
-          filledForm,
           viewModel(
             srn,
             page,
@@ -124,54 +114,10 @@ class MemberContributionListController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
-    implicit request =>
-      val userAnswers = request.userAnswers
-      val optionList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
-      if (optionList.flatten.size > Constants.maxSchemeMembers) {
-        Future.successful(
-          Redirect(
-            navigator.nextPage(MemberContributionsListPage(srn), mode, request.userAnswers)
-          )
-        )
-      } else {
-
-        form
-          .bindFromRequest()
-          .fold(
-            errors => {
-              val noPageEnabled = !userAnswers.get(MemberContributionsPage(srn)).getOrElse(false)
-              Future.successful(
-                BadRequest(
-                  view(
-                    errors,
-                    MemberContributionListController
-                      .viewModel(
-                        srn,
-                        page,
-                        mode,
-                        optionList,
-                        userAnswers,
-                        viewOnlyUpdated = false,
-                        None,
-                        None,
-                        None,
-                        noPageEnabled = noPageEnabled
-                      )
-                  )
-                )
-              )
-            },
-            value =>
-              for {
-                updatedUserAnswers <- buildUserAnswerBySelection(srn, value, optionList.flatten.size)
-                _ <- saveService.save(updatedUserAnswers)
-              } yield Redirect(
-                navigator.nextPage(MemberContributionsListPage(srn), mode, request.userAnswers)
-              )
-          )
-      }
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    Redirect(
+      navigator.nextPage(MemberContributionsListPage(srn), mode, request.userAnswers)
+    )
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -192,43 +138,9 @@ class MemberContributionListController @Inject()(
       val showBackLink = false
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
-
-  private def buildUserAnswerBySelection(srn: Srn, selection: Boolean, memberListSize: Int)(
-    implicit request: DataRequest[_]
-  ): Future[UserAnswers] = {
-    val userAnswerWithMemberContList = request.userAnswers.set(MemberContributionsListPage(srn), selection)
-
-    if (selection) {
-      val indexes = (1 to memberListSize)
-        .map(i => refineV[OneTo300](i).leftMap(new Exception(_)).toTry)
-        .toList
-        .sequence
-
-      Future.fromTry(
-        indexes.fold(
-          _ => userAnswerWithMemberContList,
-          index =>
-            index.foldLeft(userAnswerWithMemberContList) {
-              case (uaTry, index) =>
-                val optTotalMemberContribution = request.userAnswers.get(TotalMemberContributionPage(srn, index))
-                for {
-                  ua <- uaTry
-                  ua1 <- ua.set(TotalMemberContributionPage(srn, index), optTotalMemberContribution.getOrElse(Money(0)))
-                } yield ua1
-            }
-        )
-      )
-    } else {
-      Future.fromTry(userAnswerWithMemberContList)
-    }
-  }
 }
 
 object MemberContributionListController {
-  def form(formProvider: YesNoPageFormProvider): Form[Boolean] =
-    formProvider(
-      "ReportContribution.MemberList.radios.error.required"
-    )
 
   private def rows(
     srn: Srn,
@@ -343,26 +255,22 @@ object MemberContributionListController {
       }
     )
 
-    val normalModeMessage =
-      if (mode == NormalMode)
-        Option(
-          ParagraphMessage(
-            "ReportContribution.MemberList.paragraph1"
-          ) ++
-            ParagraphMessage(
-              "ReportContribution.MemberList.paragraph2"
-            )
+    val optDescription = Option.when(mode == NormalMode)(
+      ParagraphMessage(
+        "ReportContribution.MemberList.paragraph1"
+      ) ++
+        ParagraphMessage(
+          "ReportContribution.MemberList.paragraph2"
         )
-      else Option(ParagraphMessage(""))
+    )
 
     FormPageViewModel(
       mode = mode,
       title = Message(title, memberList.flatten.size),
       heading = Message(heading, memberList.flatten.size),
-      description = normalModeMessage,
+      description = optDescription,
       page = ActionTableViewModel(
         inset = "",
-        showInsetWithRadios = true,
         head = Some(
           List(
             TableElem("memberList.memberName"),
@@ -372,7 +280,6 @@ object MemberContributionListController {
           )
         ),
         rows = rows(srn, mode, membersWithContributions, optYear, optCurrentVersion, optPreviousVersion),
-        radioText = Message("ReportContribution.MemberList.radios"),
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

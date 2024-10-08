@@ -16,22 +16,16 @@
 
 package controllers.nonsipp.membertransferout
 
-import services.PsrSubmissionService
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.{Max300, Max5}
 import controllers.ControllerBaseSpec
-import play.api.inject.bind
 import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
-import forms.YesNoPageFormProvider
 import models._
 import pages.nonsipp.membertransferout._
-import org.mockito.ArgumentMatchers.any
-import play.api.inject.guice.GuiceableModule
 import controllers.nonsipp.membertransferout.TransferOutMemberListController._
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
-import org.mockito.Mockito._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 
@@ -54,26 +48,14 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
     submissionNumberTwo,
     submissionNumberOne
   )
-  private lazy val onPreviousViewOnly = routes.TransferOutMemberListController.onPreviousViewOnly(
-    srn,
-    1,
-    yearString,
-    submissionNumberTwo,
-    submissionNumberOne
-  )
+
   private val index = refineMV[Max300.Refined](1)
   private val page = 1
-
-  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   val userAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
     .unsafeSet(SchemeTransferOutPage(srn), true)
-
-  override protected val additionalBindings: List[GuiceableModule] = List(
-    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
-  )
 
   "TransferOutMemberListController" - {
 
@@ -158,7 +140,6 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
       val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
       injected[TwoColumnsTripleAction].apply(
-        form(injected[YesNoPageFormProvider]),
         viewModel(
           srn,
           page,
@@ -172,41 +153,10 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
       )
     })
 
-    act.like(renderPrePopView(onPageLoad, TransferOutMemberListPage(srn), true, userAnswers) {
-      implicit app => implicit request =>
-        val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
-        injected[TwoColumnsTripleAction]
-          .apply(
-            form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(
-              srn,
-              page,
-              NormalMode,
-              memberList,
-              userAnswers,
-              viewOnlyUpdated = false,
-              schemeName = schemeName,
-              noPageEnabled = false
-            )
-          )
-    })
-
-    act.like(
-      redirectNextPage(onSubmit, "value" -> "true")
-        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
-    )
-
-    act.like(
-      redirectNextPage(onSubmit, "value" -> "false")
-        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
-    )
+    act.like(redirectNextPage(onSubmit))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(invalidForm(onSubmit, userAnswers))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     "TransferOutMemberListControllerSpec in view only mode" - {
@@ -224,7 +174,6 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
             val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
             injected[TwoColumnsTripleAction].apply(
-              form(injected[YesNoPageFormProvider]),
               viewModel(
                 srn,
                 page,
@@ -252,7 +201,6 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
             val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
             injected[TwoColumnsTripleAction].apply(
-              form(injected[YesNoPageFormProvider]),
               viewModel(
                 srn,
                 page,
@@ -277,7 +225,6 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
         renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
           implicit app => implicit request =>
             injected[TwoColumnsTripleAction].apply(
-              form(injected[YesNoPageFormProvider]),
               viewModel(
                 srn,
                 page,
@@ -301,10 +248,7 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
           onSubmitViewOnly,
           controllers.nonsipp.routes.ViewOnlyTaskListController
             .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
-        ).after(
-            verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-          )
-          .withName("Submit redirects to view only tasklist")
+        ).withName("Submit redirects to view only tasklist")
       )
 
     }

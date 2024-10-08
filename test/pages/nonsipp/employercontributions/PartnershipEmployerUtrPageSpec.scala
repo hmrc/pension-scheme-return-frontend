@@ -60,7 +60,6 @@ class PartnershipEmployerUtrPageSpec extends PageBehaviours with TestValues {
           Some(ConditionalYesNo.yes[String, Utr](utr))
         )
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
       }
 
       "not changing when value stays the same" in {
@@ -72,7 +71,6 @@ class PartnershipEmployerUtrPageSpec extends PageBehaviours with TestValues {
             ConditionalYesNo.yes[String, Utr](utr)
           )
           .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
         val result = userAnswers
           .set(PartnershipEmployerUtrPage(srn, memberIndex, secondaryIndex), ConditionalYesNo.yes[String, Utr](utr))
@@ -84,7 +82,6 @@ class PartnershipEmployerUtrPageSpec extends PageBehaviours with TestValues {
           Some(ConditionalYesNo.yes[String, Utr](utr))
         )
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.Completed))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(Some(true))
       }
 
       "changing when value is different" in {
@@ -95,7 +92,6 @@ class PartnershipEmployerUtrPageSpec extends PageBehaviours with TestValues {
             ConditionalYesNo.yes[String, Utr](utr)
           )
           .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
         val result =
           userAnswers
@@ -110,7 +106,6 @@ class PartnershipEmployerUtrPageSpec extends PageBehaviours with TestValues {
           Some(ConditionalYesNo.no[String, Utr](noUtrReason))
         )
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
       }
     }
 

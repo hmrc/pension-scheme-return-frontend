@@ -92,7 +92,6 @@ class EmployerNamePageSpec extends PageBehaviours with TestValues {
       result.get(EmployerContributionsPage(srn)) must be(Some(true))
       result.get(EmployerNamePage(srn, memberIndex, indexOne)) must be(Some(employerName))
       result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-      result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
     }
 
     "not changing when value stays the same" in {
@@ -100,14 +99,12 @@ class EmployerNamePageSpec extends PageBehaviours with TestValues {
         .unsafeSet(EmployerContributionsPage(srn), true)
         .unsafeSet(EmployerNamePage(srn, memberIndex, indexOne), employerName)
         .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-        .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
       val result = userAnswers.set(EmployerNamePage(srn, memberIndex, indexOne), employerName).success.value
 
       result.get(EmployerContributionsPage(srn)) must be(Some(true))
       result.get(EmployerNamePage(srn, memberIndex, indexOne)) must be(Some(employerName))
       result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.Completed))
-      result.get(EmployerContributionsMemberListPage(srn)) must be(Some(true))
     }
 
     "changing when value is different" in {
@@ -115,13 +112,11 @@ class EmployerNamePageSpec extends PageBehaviours with TestValues {
         .unsafeSet(EmployerContributionsPage(srn), true)
         .unsafeSet(EmployerNamePage(srn, memberIndex, indexOne), employerName)
         .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-        .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
       val result = userAnswers.set(EmployerNamePage(srn, memberIndex, indexOne), employerName + "changed").success.value
 
       result.get(EmployerNamePage(srn, memberIndex, indexOne)) must be(Some(employerName + "changed"))
       result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-      result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
     }
 
     "changing when employer name is removed" in {
@@ -129,13 +124,11 @@ class EmployerNamePageSpec extends PageBehaviours with TestValues {
         .unsafeSet(EmployerContributionsPage(srn), true)
         .unsafeSet(EmployerNamePage(srn, memberIndex, indexOne), employerName)
         .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-        .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
       val result = userAnswers.remove(EmployerNamePage(srn, memberIndex, indexOne)).success.value
 
       result.get(EmployerNamePage(srn, memberIndex, indexOne)) must be(empty)
       result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-      result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
     }
   }
 

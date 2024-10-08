@@ -41,15 +41,13 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
         // create
         userAnswers
           .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
-      case (Some(x), Some(y)) if (x == y) =>
+      case (Some(x), Some(y)) if x == y =>
         // value not changed
         Try(userAnswers)
-      case (Some(x), Some(y)) if (x != y) =>
+      case (Some(x), Some(y)) if x != y =>
         // value changed
         userAnswers
           .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
       case (None, _) =>
         //deletion
         removePages(userAnswers, pages(srn))
@@ -66,16 +64,8 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
       OtherEmployeeDescriptionPage(srn, memberIndex, index),
       ContributionsFromAnotherEmployerPage(srn, memberIndex, index),
       EmployerContributionsCompleted(srn, memberIndex, index),
-      EmployerContributionsMemberListPage(srn),
       EmployerContributionsProgress(srn, memberIndex, index)
     )
-}
-
-case class EmployerNamePages(srn: Srn, memberIndex: Max300) extends QuestionPage[Map[String, String]] {
-  override def path: JsPath =
-    Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString
-
-  override def toString: String = "orgName"
 }
 
 case class AllEmployerNamePages(srn: Srn) extends QuestionPage[Map[String, Map[String, String]]] {

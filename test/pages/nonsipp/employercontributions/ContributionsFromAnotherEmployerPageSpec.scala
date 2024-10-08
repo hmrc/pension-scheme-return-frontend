@@ -53,7 +53,6 @@ class ContributionsFromAnotherEmployerPageSpec extends PageBehaviours with TestV
         result.get(EmployerContributionsPage(srn)) must be(Some(true))
         result.get(ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex)) must be(Some(false))
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
       }
 
       "not changing when value stays the same" in {
@@ -62,7 +61,6 @@ class ContributionsFromAnotherEmployerPageSpec extends PageBehaviours with TestV
           .unsafeSet(EmployerNamePage(srn, memberIndex, secondaryIndex), employerName)
           .unsafeSet(ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex), false)
           .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
         val result = userAnswers
           .set(ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex), false)
@@ -72,7 +70,6 @@ class ContributionsFromAnotherEmployerPageSpec extends PageBehaviours with TestV
         result.get(EmployerContributionsPage(srn)) must be(Some(true))
         result.get(ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex)) must be(Some(false))
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.Completed))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(Some(true))
       }
 
       "changing when value is different" in {
@@ -80,7 +77,6 @@ class ContributionsFromAnotherEmployerPageSpec extends PageBehaviours with TestV
           .unsafeSet(EmployerContributionsPage(srn), true)
           .unsafeSet(ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex), false)
           .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
         val result =
           userAnswers
@@ -90,7 +86,6 @@ class ContributionsFromAnotherEmployerPageSpec extends PageBehaviours with TestV
 
         result.get(ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex)) must be(Some(true))
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
       }
     }
   }

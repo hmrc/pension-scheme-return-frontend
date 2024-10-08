@@ -16,22 +16,16 @@
 
 package controllers.nonsipp.employercontributions
 
+import pages.nonsipp.employercontributions._
+import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import config.Refined.Max300
 import controllers.ControllerBaseSpec
-import play.api.inject.bind
 import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
+import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
 import models.{NormalMode, ViewOnlyMode}
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.employercontributions._
-import services.PsrSubmissionService
-import play.api.inject.guice.GuiceableModule
-import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
-import org.mockito.Mockito._
-import forms.YesNoPageFormProvider
-import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -52,13 +46,7 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
     submissionNumberTwo,
     submissionNumberOne
   )
-  private lazy val onPreviousViewOnly = routes.EmployerContributionsMemberListController.onPreviousViewOnly(
-    srn,
-    1,
-    yearString,
-    submissionNumberTwo,
-    submissionNumberOne
-  )
+
   private val index = refineMV[Max300.Refined](1)
   private val page = 1
 
@@ -82,12 +70,6 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
         )
       )
     )
-  )
-
-  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
-
-  override protected val additionalBindings: List[GuiceableModule] = List(
-    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
   "EmployerContributionsMemberListController" - {
@@ -161,42 +143,14 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[TwoColumnsTripleAction].apply(
-        form(injected[YesNoPageFormProvider]),
         viewModel(srn, page = 1, NormalMode, employerContributions, viewOnlyUpdated = false, noPageEnabled = false)
       )
     })
 
-    act.like(renderPrePopView(onPageLoad, EmployerContributionsMemberListPage(srn), true, userAnswers) {
-      implicit app => implicit request =>
-        injected[TwoColumnsTripleAction]
-          .apply(
-            form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(
-              srn,
-              page = 1,
-              NormalMode,
-              employerContributions,
-              viewOnlyUpdated = false,
-              noPageEnabled = false
-            )
-          )
-    })
-
-    act.like(
-      redirectNextPage(onSubmit, "value" -> "true")
-        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
-    )
-
-    act.like(
-      redirectNextPage(onSubmit, "value" -> "false")
-        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
-    )
+    act.like(redirectNextPage(onSubmit))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(invalidForm(onSubmit, userAnswers))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 
@@ -213,7 +167,6 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[TwoColumnsTripleAction].apply(
-            form(injected[YesNoPageFormProvider]),
             viewModel(
               srn,
               page,
@@ -237,7 +190,6 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[TwoColumnsTripleAction].apply(
-            form(injected[YesNoPageFormProvider]),
             viewModel(
               srn,
               page,
@@ -272,7 +224,6 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
         optPreviousAnswers = Some(previousUserAnswersNoEmployerContributions)
       ) { implicit app => implicit request =>
         injected[TwoColumnsTripleAction].apply(
-          form(injected[YesNoPageFormProvider]),
           viewModel(
             srn,
             page,
@@ -300,10 +251,7 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
         onSubmitViewOnly,
         controllers.nonsipp.routes.ViewOnlyTaskListController
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
-      ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only tasklist")
+      ).withName("Submit redirects to view only tasklist")
     )
   }
 
