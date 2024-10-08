@@ -208,7 +208,7 @@ class MinimalRequiredSubmissionTransformerSpec
           3,
           4,
           Some(money.value),
-          Some(2 * money.value),
+          None,
           None,
           None,
           Some(3 * money.value)
@@ -237,8 +237,8 @@ class MinimalRequiredSubmissionTransformerSpec
           userAnswers.get(AccountingPeriods(srn)) mustBe Some(
             accountingPeriods.toList.map(period => DateRange(period._1, period._2))
           )
-          userAnswers.get(ValueOfAssetsPage(srn, NormalMode)) mustBe Some(MoneyInPeriod(money, Money(2 * money.value)))
-          userAnswers.get(HowMuchCashPage(srn, NormalMode)) mustBe None
+          userAnswers.get(ValueOfAssetsPage(srn, NormalMode)) mustBe Some(MoneyInPeriod(money, moneyZero))
+          userAnswers.get(HowMuchCashPage(srn, NormalMode)) mustBe Some(MoneyInPeriod(moneyZero, moneyZero))
           userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode)) mustBe Some(Money(3 * money.value))
         }
       )
@@ -265,8 +265,8 @@ class MinimalRequiredSubmissionTransformerSpec
           4,
           None,
           None,
-          Some(money.value),
-          Some(2 * money.value),
+          None,
+          None,
           None
         )
       )
@@ -293,7 +293,7 @@ class MinimalRequiredSubmissionTransformerSpec
           val aps = userAnswers.get(AccountingPeriods(srn))
           aps mustBe Some(accountingPeriods.toList.map(period => DateRange(period._1, period._2)))
           userAnswers.get(ValueOfAssetsPage(srn, NormalMode)) mustBe None
-          userAnswers.get(HowMuchCashPage(srn, NormalMode)) mustBe Some(MoneyInPeriod(money, Money(2 * money.value)))
+          userAnswers.get(HowMuchCashPage(srn, NormalMode)) mustBe None
           userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode)) mustBe None
         }
       )

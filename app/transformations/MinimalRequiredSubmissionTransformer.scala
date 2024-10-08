@@ -144,40 +144,38 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
         }
       }
       ua5 <- {
-        if (minimalRequiredSubmission.schemeDesignatory.totalAssetValueStart.isEmpty ||
-          minimalRequiredSubmission.schemeDesignatory.totalAssetValueEnd.isEmpty) {
+        if (areAllFinancialValuesEmpty(minimalRequiredSubmission.schemeDesignatory)) {
           Try(ua4)
         } else {
           ua4.set(
             ValueOfAssetsPage(srn, NormalMode),
             MoneyInPeriod(
-              Money(minimalRequiredSubmission.schemeDesignatory.totalAssetValueStart.get),
-              Money(minimalRequiredSubmission.schemeDesignatory.totalAssetValueEnd.get)
+              Money(minimalRequiredSubmission.schemeDesignatory.totalAssetValueStart.getOrElse(0)),
+              Money(minimalRequiredSubmission.schemeDesignatory.totalAssetValueEnd.getOrElse(0))
             )
           )
         }
       }
       ua6 <- {
-        if (minimalRequiredSubmission.schemeDesignatory.totalCashStart.isEmpty ||
-          minimalRequiredSubmission.schemeDesignatory.totalCashEnd.isEmpty) {
+        if (areAllFinancialValuesEmpty(minimalRequiredSubmission.schemeDesignatory)) {
           Try(ua5)
         } else {
           ua5.set(
             HowMuchCashPage(srn, NormalMode),
             MoneyInPeriod(
-              Money(minimalRequiredSubmission.schemeDesignatory.totalCashStart.get),
-              Money(minimalRequiredSubmission.schemeDesignatory.totalCashEnd.get)
+              Money(minimalRequiredSubmission.schemeDesignatory.totalCashStart.getOrElse(0)),
+              Money(minimalRequiredSubmission.schemeDesignatory.totalCashEnd.getOrElse(0))
             )
           )
         }
       }
       ua7 <- {
-        if (minimalRequiredSubmission.schemeDesignatory.totalPayments.isEmpty) {
+        if (areAllFinancialValuesEmpty(minimalRequiredSubmission.schemeDesignatory)) {
           Try(ua6)
         } else {
           ua6.set(
             FeesCommissionsWagesSalariesPage(srn, NormalMode),
-            Money(minimalRequiredSubmission.schemeDesignatory.totalPayments.get)
+            Money(minimalRequiredSubmission.schemeDesignatory.totalPayments.getOrElse(0))
           )
         }
       }
@@ -207,4 +205,11 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
     } yield {
       ua13
     }
+
+  private def areAllFinancialValuesEmpty(schemeDesignatory: SchemeDesignatory): Boolean =
+    schemeDesignatory.totalAssetValueStart.isEmpty &&
+      schemeDesignatory.totalAssetValueEnd.isEmpty &&
+      schemeDesignatory.totalCashStart.isEmpty &&
+      schemeDesignatory.totalCashEnd.isEmpty &&
+      schemeDesignatory.totalPayments.isEmpty
 }
