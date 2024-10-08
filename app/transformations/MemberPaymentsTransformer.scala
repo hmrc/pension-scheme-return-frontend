@@ -22,28 +22,16 @@ import pages.nonsipp.memberdetails.MembersDetailsPage._
 import config.Refined.{Max300, Max50}
 import models.SchemeId.Srn
 import pages.nonsipp.memberpensionpayments._
-import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsPage
 import models._
-import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransferOutMemberListPage, TransfersOutJourneyStatus}
+import pages.nonsipp.membertransferout.SchemeTransferOutPage
 import models.softdelete.SoftDeletedMember
 import cats.syntax.traverse._
 import pages.nonsipp.employercontributions._
-import pages.nonsipp.membercontributions.{
-  MemberContributionsListPage,
-  MemberContributionsPage,
-  TotalMemberContributionPage
-}
-import pages.nonsipp.memberreceivedpcls.{
-  PclsMemberListPage,
-  PensionCommencementLumpSumAmountPage,
-  PensionCommencementLumpSumPage
-}
+import pages.nonsipp.membercontributions.{MemberContributionsPage, TotalMemberContributionPage}
+import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
 import pages.nonsipp.memberpensionpayments.Paths.membersPayments
-import pages.nonsipp.receivetransfer.{
-  DidSchemeReceiveTransferPage,
-  TransferReceivedMemberListPage,
-  TransfersInJourneyStatus
-}
+import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
 import models.requests.psr._
 import models.UserAnswers.implicits._
 import pages.nonsipp.{FbStatus, FbVersionPage}
@@ -203,33 +191,21 @@ class MemberPaymentsTransformer @Inject()(
                 userAnswers.get(MemberPaymentsRecordVersionPage(srn)).get
               ),
               memberDetails = memberDetailsWithCorrectVersion ++ softDeletedMembers,
-              employerContributionsDetails = SectionDetails(
-                made = userAnswers.get(EmployerContributionsPage(srn)).getOrElse(false),
-                completed = userAnswers.get(EmployerContributionsSectionStatus(srn)).exists {
-                  case SectionStatus.InProgress => false
-                  case SectionStatus.Completed => true
-                }
-              ),
+              employerContributionMade = userAnswers.get(EmployerContributionsPage(srn)),
               transfersInMade = userAnswers.get(DidSchemeReceiveTransferPage(srn)),
               transfersOutMade = userAnswers.get(SchemeTransferOutPage(srn)),
               unallocatedContribsMade = userAnswers.get(UnallocatedEmployerContributionsPage(srn)),
               unallocatedContribAmount = userAnswers.get(UnallocatedEmployerAmountPage(srn)).map(_.value),
               memberContributionMade = userAnswers.get(MemberContributionsPage(srn)),
               lumpSumReceived = userAnswers.get(PensionCommencementLumpSumPage(srn)),
-              pensionReceived = pensionAmountReceivedTransformer.transformToEtmp(srn, userAnswers),
-              benefitsSurrenderedDetails = SectionDetails(
-                made = userAnswers.get(SurrenderedBenefitsPage(srn)).getOrElse(false),
-                completed = userAnswers.get(SurrenderedBenefitsJourneyStatus(srn)).exists {
-                  case SectionStatus.InProgress => false
-                  case SectionStatus.Completed => true
-                }
-              )
+              pensionReceived = userAnswers.get(PensionPaymentsReceivedPage(srn)),
+              surrenderMade = userAnswers.get(SurrenderedBenefitsPage(srn))
             )
           )
       }
     }
   } match {
-    case Left(error) => throw new RuntimeException(s"error occured: $error")
+    case Left(error) => throw new RuntimeException(s"error occurred: $error")
     case Right(value) => value
   }
 
@@ -335,95 +311,27 @@ class MemberPaymentsTransformer @Inject()(
             pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))
         }
 
-      // Section wide user answers (this includes initial pages, completion pages, section status pages and pages that don't require an index)
-      ua3_1 = ua3.compose(
-        pensionSurrenderTransformer.transformFromEtmp(srn, memberPayments.benefitsSurrenderedDetails) ++
-          pensionAmountReceivedTransformer.transformFromEtmp(
-            srn,
-            memberPayments.pensionReceived
-          )
-      )
-
-      employerContributionsNotStarted = (
-        !memberPayments.employerContributionsDetails.made
-          && memberPayments.memberDetails.forall(_.employerContributions.isEmpty)
-          && !memberPayments.employerContributionsDetails.completed
-      )
-
-      ua3_2 <- if (employerContributionsNotStarted) {
-        ua3_1
-      } else {
-        ua3_1
-          .set(
-            EmployerContributionsPage(srn),
-            // If 1 or more Employer Contributions have been made, then this answer must be set to true / Yes, even if
-            // the value in ETMP is false - this is used as a workaround to indicate the section is In Progress.
-            if (memberPayments.memberDetails.exists(_.employerContributions.nonEmpty)) true
-            else memberPayments.employerContributionsDetails.made
-          )
-          .set(
-            EmployerContributionsSectionStatus(srn),
-            if (memberPayments.employerContributionsDetails.completed) SectionStatus.Completed
-            else SectionStatus.InProgress
-          )
-          .set(
-            EmployerContributionsMemberListPage(srn),
-            memberPayments.employerContributionsDetails.completed
-          )
-      }
-
-      // Transfers In section-wide user answers
-      ua3_3 <- memberPayments.transfersInMade match {
-        case Some(true) =>
-          ua3_2
-            .set(DidSchemeReceiveTransferPage(srn), true)
-            .set(TransferReceivedMemberListPage(srn), true) // temporary E2E workaround
-            .set(TransfersInJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
-        case Some(false) =>
-          ua3_2
-            .set(DidSchemeReceiveTransferPage(srn), false)
-            .set(TransferReceivedMemberListPage(srn), true) // temporary E2E workaround
-            .set(TransfersInJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
-        case None => Try(ua3_2)
-      }
-
-      // Transfers Out section-wide user answers
-      ua3_4 <- memberPayments.transfersOutMade match {
-        case Some(true) =>
-          ua3_3
-            .set(SchemeTransferOutPage(srn), true)
-            .set(TransferOutMemberListPage(srn), true) // temporary E2E workaround
-            .set(TransfersOutJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
-        case Some(false) =>
-          ua3_3
-            .set(SchemeTransferOutPage(srn), false)
-            .set(TransferOutMemberListPage(srn), true) // temporary E2E workaround
-            .set(TransfersOutJourneyStatus(srn), SectionStatus.Completed) // temporary E2E workaround
-        case None => Try(ua3_3)
-      }
-
-      // temporary E2E workaround
-      memberTotalContributionExists = memberPayments.memberDetails.exists(_.totalContributions.nonEmpty)
-      ua4 <- ua3_4.set(MemberContributionsListPage(srn), memberTotalContributionExists)
-
-      // temporary E2E workaround
-      memberLumpSumReceivedExists = memberPayments.memberDetails.exists(_.memberLumpSumReceived.nonEmpty)
-      ua5 <- ua4.set(PclsMemberListPage(srn), memberLumpSumReceivedExists)
+      // Section wide user answers (this includes initial pages that doesn't require an index)
+      ua3_1 <- memberPayments.pensionReceived.fold(Try(ua3))(ua3.set(PensionPaymentsReceivedPage(srn), _))
+      ua3_2 <- memberPayments.employerContributionMade.fold(Try(ua3_1))(ua3_1.set(EmployerContributionsPage(srn), _))
+      ua3_3 <- memberPayments.transfersInMade.fold(Try(ua3_2))(ua3_2.set(DidSchemeReceiveTransferPage(srn), _))
+      ua3_4 <- memberPayments.transfersOutMade.fold(Try(ua3_3))(ua3_3.set(SchemeTransferOutPage(srn), _))
+      ua3_5 <- memberPayments.surrenderMade.fold(Try(ua3_4))(ua3_4.set(SurrenderedBenefitsPage(srn), _))
 
       // new members can be safely hard deleted - don't run when fetching previous user answers as there is no point
       newMembers <- if (!fetchingPreviousVersion) {
-        identifyNewMembers(srn, ua5, previousVersionUA)
+        identifyNewMembers(srn, ua3_5, previousVersionUA)
       } else {
         Success(Nil)
       }
 
-      ua5_1 <- newMembers.foldLeft(Try(ua5)) {
+      ua4 <- newMembers.foldLeft(Try(ua3_5)) {
         case (ua, index) =>
           logger.info(s"New member identified at index $index")
           ua.set(SafeToHardDelete(srn, index))
       }
 
-      ua8 <- ua5_1.set(
+      ua5 <- ua4.set(
         SoftDeletedMembers(srn),
         memberPayments.memberDetails
           .filter(_.state == MemberState.Deleted)
@@ -442,7 +350,7 @@ class MemberPaymentsTransformer @Inject()(
               )
           )
       )
-    } yield ua8
+    } yield ua5
 
   /**
    * Checks UserAnswers to see if any members are newly added (have never been through a declaration or have been newly added in this version prior to a declaration)
@@ -491,7 +399,7 @@ class MemberPaymentsTransformer @Inject()(
               new Exception(err)
             }
             .toTry
-            .map { previousMemberDetails =>
+            .map { _ =>
               currentMemberDetails.toList.flatMap {
                 case (index, currentMemberDetail) if currentMemberDetail.state.changed =>
                   logger.info(s"[identifyNewMembers] Member at index $index is changed - NOT safe to hard delete")

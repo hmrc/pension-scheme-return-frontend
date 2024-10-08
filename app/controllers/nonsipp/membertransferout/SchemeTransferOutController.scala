@@ -28,11 +28,11 @@ import models.Mode
 import play.api.data.Form
 import views.html.YesNoPageView
 import models.SchemeId.Srn
-import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutJourneyStatus}
+import pages.nonsipp.membertransferout.SchemeTransferOutPage
 import play.api.i18n.MessagesApi
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -67,7 +67,6 @@ class SchemeTransferOutController @Inject()(
           for {
             updatedAnswers <- request.userAnswers
               .set(SchemeTransferOutPage(srn), value)
-              .setWhen(!value)(TransfersOutJourneyStatus(srn), SectionStatus.Completed)
               .mapK[Future]
             _ <- saveService.save(updatedAnswers)
             submissionResult <- if (value) {

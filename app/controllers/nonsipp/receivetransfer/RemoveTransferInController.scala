@@ -94,7 +94,6 @@ class RemoveTransferInController @Inject()(
                       .removePages(
                         transferInPages(srn, memberIndex, index)
                       )
-                      .set(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
                       .set(MemberStatus(srn, memberIndex), MemberState.Changed)
                   )
                 _ <- saveService.save(updatedAnswers)

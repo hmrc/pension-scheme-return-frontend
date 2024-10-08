@@ -17,25 +17,15 @@
 package controllers.nonsipp.membercontributions
 
 import play.api.test.FakeRequest
-import services.PsrSubmissionService
-import pages.nonsipp.membercontributions.{
-  MemberContributionsListPage,
-  MemberContributionsPage,
-  TotalMemberContributionPage
-}
+import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
+import pages.nonsipp.membercontributions.{MemberContributionsPage, TotalMemberContributionPage}
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.Max300
 import controllers.ControllerBaseSpec
-import play.api.inject.bind
 import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
-import forms.YesNoPageFormProvider
 import models._
-import org.mockito.ArgumentMatchers.any
-import play.api.inject.guice.GuiceableModule
-import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
-import org.mockito.Mockito._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 
@@ -68,11 +58,6 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[Max300.Refined](1)
   private val page = 1
 
-  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
-
-  override protected val additionalBindings: List[GuiceableModule] = List(
-    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
-  )
   val userAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
@@ -84,7 +69,6 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
       val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
       injected[TwoColumnsTripleAction].apply(
-        MemberContributionListController.form(injected[YesNoPageFormProvider]),
         MemberContributionListController.viewModel(
           srn,
           page = 1,
@@ -97,40 +81,10 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
       )
     })
 
-    act.like(renderPrePopView(onPageLoad, MemberContributionsListPage(srn), true, userAnswers) {
-      implicit app => implicit request =>
-        val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
-        injected[TwoColumnsTripleAction]
-          .apply(
-            MemberContributionListController.form(injected[YesNoPageFormProvider]).fill(true),
-            MemberContributionListController.viewModel(
-              srn,
-              page = 1,
-              NormalMode,
-              memberList,
-              userAnswers,
-              viewOnlyUpdated = false,
-              noPageEnabled = false
-            )
-          )
-    })
-
-    act.like(
-      redirectNextPage(onSubmit, "value" -> "true")
-        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
-    )
-
-    act.like(
-      redirectNextPage(onSubmit, "value" -> "false")
-        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
-    )
+    act.like(redirectNextPage(onSubmit))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(invalidForm(onSubmit, userAnswers))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 
@@ -261,7 +215,6 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
           val memberList: List[Option[NameDOB]] = currentUserAnswers.membersOptionList(srn)
 
           injected[TwoColumnsTripleAction].apply(
-            MemberContributionListController.form(injected[YesNoPageFormProvider]),
             MemberContributionListController.viewModel(
               srn,
               page,
@@ -288,7 +241,6 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
           val memberList: List[Option[NameDOB]] = updatedUserAnswers.membersOptionList(srn)
 
           injected[TwoColumnsTripleAction].apply(
-            MemberContributionListController.form(injected[YesNoPageFormProvider]),
             MemberContributionListController.viewModel(
               srn,
               page,
@@ -312,7 +264,6 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
       renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[TwoColumnsTripleAction].apply(
-            MemberContributionListController.form(injected[YesNoPageFormProvider]),
             MemberContributionListController.viewModel(
               srn,
               page,
@@ -335,10 +286,7 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
         onSubmitViewOnly,
         controllers.nonsipp.routes.ViewOnlyTaskListController
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
-      ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only tasklist")
+      ).withName("Submit redirects to view only tasklist")
     )
 
   }

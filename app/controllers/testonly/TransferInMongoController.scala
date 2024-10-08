@@ -24,7 +24,7 @@ import models.SchemeId.Srn
 import pages.nonsipp.receivetransfer._
 import models.{Money, PensionSchemeType}
 import shapeless._
-import viewmodels.models.{SectionCompleted, SectionStatus}
+import viewmodels.models.SectionCompleted
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 
@@ -49,7 +49,6 @@ class TransferInMongoController @Inject()(
       PageWithValue[LocalDate] ::
       PageWithValue[Boolean] ::
       PageWithValue[SectionCompleted.type] ::
-      PageWithValue[SectionStatus] ::
       HNil
 
   override def pages(srn: Srn, index: Max300, secondaryIndex: Max5): Pages = HList(
@@ -62,8 +61,7 @@ class TransferInMongoController @Inject()(
       PageWithValue(TotalValueTransferPage(srn, index, secondaryIndex), Money(12.34)),
       PageWithValue(WhenWasTransferReceivedPage(srn, index, secondaryIndex), LocalDate.now()),
       PageWithValue(DidTransferIncludeAssetPage(srn, index, secondaryIndex), true),
-      PageWithValue(TransfersInSectionCompleted(srn, index, secondaryIndex), SectionCompleted),
-      PageWithValue(TransfersInJourneyStatus(srn), SectionStatus.Completed)
+      PageWithValue(TransfersInSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
     )
   )
 }
