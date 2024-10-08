@@ -22,5 +22,5 @@ import pages.Page
 
 case class RemoveMemberContributionPage(srn: Srn, index: Max300) extends Page {
 
-  override def toString: String = "removeEmployerContributionsPage"
+  override def toString: String = "RemoveMemberContributionPage"
 }

@@ -29,11 +29,3 @@ case class IsLesseeConnectedPartyPage(srn: Srn, index: Max5000) extends Question
 
   override def toString: String = "isLesseeConnectedParty"
 }
-
-case class IsLesseeConnectedPartyPages(srn: Srn) extends QuestionPage[Map[String, Boolean]] {
-
-  override def path: JsPath =
-    Paths.heldPropertyTransactions \ "leaseDetails" \ "connectedPartyStatus" \ toString
-
-  override def toString: String = "isLesseeConnectedParty"
-}

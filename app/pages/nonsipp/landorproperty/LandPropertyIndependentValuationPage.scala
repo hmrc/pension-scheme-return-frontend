@@ -30,11 +30,3 @@ case class LandPropertyIndependentValuationPage(srn: Srn, index: Max5000) extend
   override def toString: String = "indepValuationSupport"
 
 }
-case class LandPropertyIndependentValuationPages(srn: Srn) extends QuestionPage[Map[String, Boolean]] {
-
-  override def path: JsPath =
-    Paths.heldPropertyTransactions \ toString
-
-  override def toString: String = "indepValuationSupport"
-
-}

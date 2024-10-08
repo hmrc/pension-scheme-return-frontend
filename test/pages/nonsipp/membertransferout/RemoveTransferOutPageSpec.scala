@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.receivetransfer
+package pages.nonsipp.membertransferout;
 
-import models.SchemeId.Srn
 import config.Refined.Max300
-import pages.Page
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours;
 
-case class RemoveTransferInPage(srn: Srn, memberIndex: Max300) extends Page {
+class RemoveTransferOutPageSpec extends PageBehaviours {
 
-  override def toString: String = "RemoveTransferInPage"
+  private val srn = srnGen.sample.value
+
+  "RemoveTransferOutPage" - {
+
+    val index = refineMV[Max300.Refined](1)
+
+    RemoveTransferOutPage(srn, index).toString mustBe "removeTransferOut"
+
+  }
+
 }

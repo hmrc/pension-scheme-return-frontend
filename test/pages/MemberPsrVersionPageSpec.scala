@@ -17,6 +17,7 @@
 package pages
 
 import pages.nonsipp.memberdetails.MemberPsrVersionPage
+import pages.nonsipp.memberreceivedpcls.Paths
 import config.Refined.Max300
 import eu.timepit.refined.refineMV
 import models.SchemeId
@@ -34,5 +35,10 @@ class MemberPsrVersionPageSpec extends PageBehaviours {
     beSettable[String](MemberPsrVersionPage(srn, memberIndex))
 
     beRemovable[String](MemberPsrVersionPage(srn, memberIndex))
+
+    "must return the correct JsPath" in {
+      MemberPsrVersionPage.all(srn).path mustEqual Paths.memberDetails \ "memberPSRVersion"
+    }
   }
+
 }

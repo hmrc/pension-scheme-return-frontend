@@ -71,13 +71,6 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
     )
 }
 
-case class EmployerNamePages(srn: Srn, memberIndex: Max300) extends QuestionPage[Map[String, String]] {
-  override def path: JsPath =
-    Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString
-
-  override def toString: String = "orgName"
-}
-
 case class AllEmployerNamePages(srn: Srn) extends QuestionPage[Map[String, Map[String, String]]] {
   override def path: JsPath =
     Paths.memberEmpContribution \ toString

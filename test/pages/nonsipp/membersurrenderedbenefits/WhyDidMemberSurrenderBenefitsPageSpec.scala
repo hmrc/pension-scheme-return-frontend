@@ -18,17 +18,21 @@ package pages.nonsipp.membersurrenderedbenefits
 
 import config.Refined.OneTo300
 import eu.timepit.refined.refineMV
+import eu.timepit.refined.api.Refined
 import pages.behaviours.PageBehaviours
 
 class WhyDidMemberSurrenderBenefitsPageSpec extends PageBehaviours {
-
+  val srn = srnGen.sample.value
+  val index: Refined[Int, OneTo300] = refineMV[OneTo300](1)
   "WhyDidMemberSurrenderBenefitsPage" - {
-    val index = refineMV[OneTo300](1)
 
     beRetrievable[String](WhyDidMemberSurrenderBenefitsPage(srnGen.sample.value, index))
 
     beSettable[String](WhyDidMemberSurrenderBenefitsPage(srnGen.sample.value, index))
 
     beRemovable[String](WhyDidMemberSurrenderBenefitsPage(srnGen.sample.value, index))
+
+    WhyDidMemberSurrenderBenefitsPage(srn, index).toString mustBe "surrenderReason"
   }
+
 }

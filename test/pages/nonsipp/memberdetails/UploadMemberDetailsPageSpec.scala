@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.receivetransfer
+package pages.nonsipp.memberdetails;
 
-import models.SchemeId.Srn
-import config.Refined.Max300
-import pages.Page
+import pages.behaviours.PageBehaviours;
 
-case class RemoveTransferInPage(srn: Srn, memberIndex: Max300) extends Page {
+class UploadMemberDetailsPageSpec extends PageBehaviours {
 
-  override def toString: String = "RemoveTransferInPage"
+  val srn = srnGen.sample.value
+
+  "UploadMemberDetailsPage" - {
+
+    UploadMemberDetailsPage(srn).toString mustBe "uploadMemberDetailsPage"
+
+  }
+
 }
