@@ -58,6 +58,9 @@ class RemoveBondsDisposalController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
+          _ <- request.userAnswers
+            .get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex))
+            .getOrRedirectToTaskList(srn)
           nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, bondIndex)).getOrRedirectToTaskList(srn)
         } yield {
           val preparedForm =
