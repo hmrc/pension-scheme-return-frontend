@@ -21,7 +21,6 @@ import models.SchemeId.Srn
 import models.UserAnswers.implicits.UserAnswersTryOps
 import play.api.libs.json.JsPath
 import models.{IdentityType, UserAnswers}
-import viewmodels.models.SectionStatus
 import config.Refined.{Max300, Max50}
 import pages.QuestionPage
 
@@ -39,16 +38,12 @@ case class EmployerTypeOfBusinessPage(srn: Srn, memberIndex: Max300, index: Max5
       case (None, _) => Try(userAnswers) // delete handled by cleanup in EmployerNamePage
       case (Some(_), None) =>
         // new value / create
-        userAnswers
-          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
+        Try(userAnswers)
       case (Some(a), Some(b)) if a == b => Try(userAnswers) // same answer
       case _ =>
         userAnswers
           .remove(EmployerCompanyCrnPage(srn, memberIndex, index))
           .remove(PartnershipEmployerUtrPage(srn, memberIndex, index))
           .remove(OtherEmployeeDescriptionPage(srn, memberIndex, index))
-          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-          .remove(EmployerContributionsMemberListPage(srn))
     }
 }

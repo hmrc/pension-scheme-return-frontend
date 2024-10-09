@@ -16,7 +16,6 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
-import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
@@ -24,11 +23,10 @@ import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.OneTo300
 import controllers.PSRController
 import cats.implicits.toShow
-import config.Constants.maxNotRelevant
-import forms.YesNoPageFormProvider
 import pages.nonsipp.membersurrenderedbenefits._
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
+import models.requests.DataRequest
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.TwoColumnsTripleAction
@@ -41,10 +39,8 @@ import utils.DateTimeUtils.localDateTimeShow
 import models._
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
-import models.requests.DataRequest
-import play.api.data.Form
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 import java.time.LocalDateTime
 import javax.inject.Named
@@ -54,13 +50,8 @@ class SurrenderedBenefitsMemberListController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: TwoColumnsTripleAction,
-  formProvider: YesNoPageFormProvider,
-  saveService: SaveService
-)(implicit ec: ExecutionContext)
-    extends PSRController {
-
-  val form: Form[Boolean] = SurrenderedBenefitsMemberListController.form(formProvider)
+  view: TwoColumnsTripleAction
+) extends PSRController {
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
@@ -110,68 +101,17 @@ class SurrenderedBenefitsMemberListController @Inject()(
           noPageEnabled = noPageEnabled,
           showBackLink = showBackLink
         )
-      val filledForm =
-        userAnswers.get(SurrenderedBenefitsMemberListPage(srn)).fold(form)(form.fill)
-      Ok(view(filledForm, viewModel))
+
+      Ok(view(viewModel))
     } else {
       Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
-    implicit request =>
-      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
-
-      if (optionList.flatten.size > Constants.maxSchemeMembers) {
-        Future.successful(
-          Redirect(
-            navigator.nextPage(SurrenderedBenefitsMemberListPage(srn), mode, request.userAnswers)
-          )
-        )
-      } else {
-        val noPageEnabled = !request.userAnswers.get(SurrenderedBenefitsPage(srn)).getOrElse(false)
-        val viewModel =
-          SurrenderedBenefitsMemberListController
-            .viewModel(
-              srn,
-              page,
-              mode,
-              optionList,
-              request.userAnswers,
-              viewOnlyUpdated = false,
-              None,
-              None,
-              None,
-              None,
-              request.schemeDetails.schemeName,
-              noPageEnabled
-            )
-
-        form
-          .bindFromRequest()
-          .fold(
-            errors => Future.successful(BadRequest(view(errors, viewModel))),
-            finishedAddingSurrenderedBenefits =>
-              for {
-                updatedUserAnswers <- Future
-                  .fromTry(
-                    request.userAnswers
-                      .set(
-                        SurrenderedBenefitsJourneyStatus(srn),
-                        if (finishedAddingSurrenderedBenefits) {
-                          SectionStatus.Completed
-                        } else {
-                          SectionStatus.InProgress
-                        }
-                      )
-                      .set(SurrenderedBenefitsMemberListPage(srn), finishedAddingSurrenderedBenefits)
-                  )
-                _ <- saveService.save(updatedUserAnswers)
-              } yield Redirect(
-                navigator.nextPage(SurrenderedBenefitsMemberListPage(srn), mode, request.userAnswers)
-              )
-          )
-      }
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    Redirect(
+      navigator.nextPage(SurrenderedBenefitsMemberListPage(srn), mode, request.userAnswers)
+    )
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -196,10 +136,6 @@ class SurrenderedBenefitsMemberListController @Inject()(
 }
 
 object SurrenderedBenefitsMemberListController {
-  def form(formProvider: YesNoPageFormProvider): Form[Boolean] =
-    formProvider(
-      "surrenderedBenefits.memberList.radios.error.required"
-    )
 
   private def rows(
     srn: Srn,
@@ -334,23 +270,21 @@ object SurrenderedBenefitsMemberListController {
       }
     )
 
-    val normalModeMessage =
-      if (mode == NormalMode)
-        Option(
+    val optDescription =
+      Option.when(mode == NormalMode)(
+        ParagraphMessage(
+          "surrenderedBenefits.memberList.inset1"
+        ) ++
           ParagraphMessage(
-            "surrenderedBenefits.memberList.inset1"
-          ) ++
-            ParagraphMessage(
-              "surrenderedBenefits.memberList.inset2"
-            )
-        )
-      else Option(ParagraphMessage(""))
+            "surrenderedBenefits.memberList.inset2"
+          )
+      )
 
     FormPageViewModel(
       mode = mode,
       title = Message(title, memberListSize),
       heading = Message(heading, memberListSize),
-      description = normalModeMessage,
+      description = optDescription,
       page = ActionTableViewModel(
         inset = "",
         head = Some(
@@ -362,9 +296,6 @@ object SurrenderedBenefitsMemberListController {
           )
         ),
         rows = rows(srn, mode, memberList, userAnswers, optYear, optCurrentVersion, optPreviousVersion),
-        radioText = Message("surrenderedBenefits.memberList.radios"),
-        showRadios = memberList.length < maxNotRelevant,
-        showInsetWithRadios = true,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

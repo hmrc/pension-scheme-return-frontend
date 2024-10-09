@@ -16,37 +16,34 @@
 
 package controllers.nonsipp.employercontributions
 
+import pages.nonsipp.employercontributions._
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
-import cats.implicits.{catsSyntaxApplicativeId, toShow}
+import cats.implicits.toShow
 import _root_.config.Constants
+import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
-import pages.nonsipp.employercontributions._
-import services.SaveService
+import models.requests.DataRequest
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
 import controllers.actions._
 import eu.timepit.refined.refineMV
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
-import forms.YesNoPageFormProvider
-import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
 import utils.DateTimeUtils.localDateTimeShow
 import models._
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models.SectionJourneyStatus.InProgress
 import viewmodels.models._
-import models.requests.DataRequest
-import play.api.data.Form
 import pages.nonsipp.employercontributions.EmployerContributionsProgress.EmployerContributionsUserAnswersOps
 import _root_.config.Refined.{Max300, Max50}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 import java.time.LocalDateTime
 import javax.inject.Named
@@ -56,13 +53,8 @@ class EmployerContributionsMemberListController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  saveService: SaveService,
-  view: TwoColumnsTripleAction,
-  formProvider: YesNoPageFormProvider
-)(implicit ec: ExecutionContext)
-    extends PSRController {
-
-  private val form: Form[Boolean] = EmployerContributionsMemberListController.form(formProvider)
+  view: TwoColumnsTripleAction
+) extends PSRController {
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
@@ -90,11 +82,9 @@ class EmployerContributionsMemberListController @Inject()(
         .zipWithRefinedIndex[Max300.Refined]
         .map { indexes =>
           val employerContributions = buildEmployerContributions(srn, indexes)
-          val filledForm = request.userAnswers.fillForm(EmployerContributionsMemberListPage(srn), form)
           val noPageEnabled = !request.userAnswers.get(EmployerContributionsPage(srn)).getOrElse(false)
           Ok(
             view(
-              filledForm,
               viewModel(
                 srn,
                 page,
@@ -125,68 +115,10 @@ class EmployerContributionsMemberListController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
-    implicit request =>
-      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
-
-      if (optionList.flatten.size > Constants.maxSchemeMembers) {
-        Future.successful(
-          Redirect(
-            navigator.nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
-          )
-        )
-      } else {
-        form
-          .bindFromRequest()
-          .fold(
-            errors => {
-              val noPageEnabled = !request.userAnswers.get(EmployerContributionsPage(srn)).getOrElse(false)
-              optionList
-                .zipWithRefinedIndex[Max300.Refined]
-                .map { indexes =>
-                  val employerContributions = buildEmployerContributions(srn, indexes)
-                  BadRequest(
-                    view(
-                      errors,
-                      EmployerContributionsMemberListController
-                        .viewModel(
-                          srn,
-                          page,
-                          mode,
-                          employerContributions,
-                          viewOnlyUpdated = false,
-                          None,
-                          None,
-                          None,
-                          None,
-                          noPageEnabled
-                        )
-                    )
-                  )
-                }
-                .merge
-                .pure[Future]
-            },
-            value =>
-              for {
-                updatedUserAnswers <- Future.fromTry(
-                  request.userAnswers
-                    .set(
-                      EmployerContributionsSectionStatus(srn),
-                      if (value) {
-                        SectionStatus.Completed
-                      } else {
-                        SectionStatus.InProgress
-                      }
-                    )
-                    .set(EmployerContributionsMemberListPage(srn), value)
-                )
-                _ <- saveService.save(updatedUserAnswers)
-              } yield Redirect(
-                navigator.nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
-              )
-          )
-      }
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    Redirect(
+      navigator.nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
+    )
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -229,10 +161,6 @@ class EmployerContributionsMemberListController @Inject()(
 }
 
 object EmployerContributionsMemberListController {
-  def form(formProvider: YesNoPageFormProvider): Form[Boolean] =
-    formProvider(
-      "employerContributions.MemberList.radios.error.required"
-    )
 
   private def rows(
     srn: Srn,
@@ -373,23 +301,20 @@ object EmployerContributionsMemberListController {
       }
     )
 
-    val normalModeMessage =
-      if (mode == NormalMode)
-        Option(
-          ParagraphMessage(
-            "employerContributions.MemberList.paragraph1"
-          ) ++
-            ParagraphMessage(
-              "employerContributions.MemberList.paragraph2"
-            )
+    val optDescription = Option.when(mode == NormalMode)(
+      ParagraphMessage(
+        "employerContributions.MemberList.paragraph1"
+      ) ++
+        ParagraphMessage(
+          "employerContributions.MemberList.paragraph2"
         )
-      else Option(ParagraphMessage(""))
+    )
 
     FormPageViewModel(
       mode = mode,
       title = Message(title, employerContributions.size),
       heading = Message(heading, employerContributions.size),
-      description = normalModeMessage,
+      description = optDescription,
       page = ActionTableViewModel(
         inset = "",
         head = Some(
@@ -408,8 +333,6 @@ object EmployerContributionsMemberListController {
           optCurrentVersion,
           optPreviousVersion
         ),
-        radioText = Message("employerContributions.MemberList.radios"),
-        showInsetWithRadios = true,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

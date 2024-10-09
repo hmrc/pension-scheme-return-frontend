@@ -16,16 +16,15 @@
 
 package controllers.nonsipp.memberreceivedpcls
 
-import services.SaveService
 import play.api.mvc._
 import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.OneTo300
 import controllers.PSRController
-import cats.implicits.{toBifunctorOps, toShow, toTraverseOps}
-import forms.YesNoPageFormProvider
+import cats.implicits.toShow
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
+import models.requests.DataRequest
 import viewmodels.implicits._
 import pages.nonsipp.memberreceivedpcls._
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
@@ -40,10 +39,8 @@ import utils.DateTimeUtils.localDateTimeShow
 import models._
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
-import models.requests.DataRequest
-import play.api.data.Form
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 import java.time.LocalDateTime
 import javax.inject.Named
@@ -53,13 +50,8 @@ class PclsMemberListController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: TwoColumnsTripleAction,
-  formProvider: YesNoPageFormProvider,
-  saveService: SaveService
-)(implicit ec: ExecutionContext)
-    extends PSRController {
-
-  private val form = PclsMemberListController.form(formProvider)
+  view: TwoColumnsTripleAction
+) extends PSRController {
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
@@ -109,63 +101,17 @@ class PclsMemberListController @Inject()(
           noPageEnabled = noPageEnabled,
           showBackLink = showBackLink
         )
-      val filledForm =
-        request.userAnswers.get(PclsMemberListPage(srn)).fold(form)(form.fill)
-      Ok(view(filledForm, viewModel))
+
+      Ok(view(viewModel))
     } else {
       Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
-    implicit request =>
-      val ua = request.userAnswers
-      val optionList: List[Option[NameDOB]] = ua.membersOptionList(srn)
-
-      if (optionList.flatten.size > Constants.maxSchemeMembers) {
-        Future.successful(
-          Redirect(
-            navigator.nextPage(PclsMemberListPage(srn), mode, ua)
-          )
-        )
-      } else {
-
-        form
-          .bindFromRequest()
-          .fold(
-            errors => {
-              val noPageEnabled = !ua.get(PensionCommencementLumpSumPage(srn)).getOrElse(false)
-              Future.successful(
-                BadRequest(
-                  view(
-                    errors,
-                    PclsMemberListController
-                      .viewModel(
-                        srn,
-                        page,
-                        mode,
-                        optionList,
-                        ua,
-                        viewOnlyUpdated = false,
-                        None,
-                        None,
-                        None,
-                        None,
-                        noPageEnabled
-                      )
-                  )
-                )
-              )
-            },
-            value =>
-              for {
-                updatedUserAnswers <- buildUserAnswerBySelection(srn, value, optionList.flatten.size)
-                _ <- saveService.save(updatedUserAnswers)
-              } yield Redirect(
-                navigator.nextPage(PclsMemberListPage(srn), mode, request.userAnswers)
-              )
-          )
-      }
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    Redirect(
+      navigator.nextPage(PclsMemberListPage(srn), mode, request.userAnswers)
+    )
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -186,47 +132,9 @@ class PclsMemberListController @Inject()(
       val showBackLink = false
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
-
-  private def buildUserAnswerBySelection(srn: Srn, selection: Boolean, memberListSize: Int)(
-    implicit request: DataRequest[_]
-  ): Future[UserAnswers] = {
-    val userAnswerWithPclsMemberList = request.userAnswers.set(PclsMemberListPage(srn), selection)
-
-    if (selection) {
-      val indexes = (1 to memberListSize)
-        .map(i => refineV[OneTo300](i).leftMap(new Exception(_)).toTry)
-        .toList
-        .sequence
-
-      Future.fromTry(
-        indexes.fold(
-          _ => userAnswerWithPclsMemberList,
-          index =>
-            index.foldLeft(userAnswerWithPclsMemberList) {
-              case (uaTry, index) =>
-                val optCommencementLumpSumAmount =
-                  request.userAnswers.get(PensionCommencementLumpSumAmountPage(srn, index))
-                for {
-                  ua <- uaTry
-                  ua1 <- ua.set(
-                    PensionCommencementLumpSumAmountPage(srn, index),
-                    optCommencementLumpSumAmount.getOrElse(PensionCommencementLumpSum(Money(0), Money(0)))
-                  )
-                } yield ua1
-            }
-        )
-      )
-    } else {
-      Future.fromTry(userAnswerWithPclsMemberList)
-    }
-  }
 }
 
 object PclsMemberListController {
-  def form(formProvider: YesNoPageFormProvider): Form[Boolean] =
-    formProvider(
-      "pcls.memberlist.radios.error.required"
-    )
 
   private def rows(
     srn: Srn,
@@ -340,23 +248,21 @@ object PclsMemberListController {
           .exists(nextIndex => userAnswers.get(PensionCommencementLumpSumAmountPage(srn, nextIndex)).isDefined)
     }
 
-    val normalModeMessage =
-      if (mode == NormalMode)
-        Option(
+    val optDescription =
+      Option.when(mode == NormalMode)(
+        ParagraphMessage(
+          "pcls.memberlist.paragraph1"
+        ) ++
           ParagraphMessage(
-            "pcls.memberlist.paragraph1"
-          ) ++
-            ParagraphMessage(
-              "pcls.memberlist.paragraph2"
-            )
-        )
-      else Option(ParagraphMessage(""))
+            "pcls.memberlist.paragraph2"
+          )
+      )
 
     FormPageViewModel(
       mode = mode,
       title = Message(title, memberList.flatten.size),
       heading = Message(heading, memberList.flatten.size),
-      description = normalModeMessage,
+      description = optDescription,
       page = ActionTableViewModel(
         inset = "",
         head = Some(
@@ -368,8 +274,6 @@ object PclsMemberListController {
           )
         ),
         rows = rows(srn, mode, memberList, userAnswers, optYear, optCurrentVersion, optPreviousVersion),
-        radioText = Message("pcls.memberlist.radios"),
-        showInsetWithRadios = true,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

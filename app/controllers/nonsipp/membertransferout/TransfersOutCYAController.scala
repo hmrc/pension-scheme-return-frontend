@@ -134,9 +134,7 @@ class TransfersOutCYAController @Inject()(
 
       for {
         updatedUserAnswers <- request.userAnswers
-          .set(TransfersOutJourneyStatus(srn), SectionStatus.InProgress)
           .setWhen(transfersOutChanged)(MemberStatus(srn, index), MemberState.Changed)
-          .remove(TransferOutMemberListPage(srn))
           .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(

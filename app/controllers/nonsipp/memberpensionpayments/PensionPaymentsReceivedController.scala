@@ -32,7 +32,7 @@ import pages.nonsipp.memberpensionpayments._
 import controllers.actions._
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -67,7 +67,6 @@ class PensionPaymentsReceivedController @Inject()(
           for {
             updatedAnswers <- request.userAnswers
               .set(PensionPaymentsReceivedPage(srn), value)
-              .setWhen(!value)(PensionPaymentsJourneyStatus(srn), SectionStatus.Completed)
               .mapK[Future]
             _ <- saveService.save(updatedAnswers)
             submissionResult <- if (!value) {

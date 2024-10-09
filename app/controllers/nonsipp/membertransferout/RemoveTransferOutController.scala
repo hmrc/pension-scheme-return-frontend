@@ -100,7 +100,6 @@ class RemoveTransferOutController @Inject()(
                   .fromTry(
                     request.userAnswers
                       .removePages(transferOutPages(srn, memberIndex, index))
-                      .set(TransfersOutJourneyStatus(srn), SectionStatus.InProgress)
                       .set(MemberStatus(srn, memberIndex), MemberState.Changed)
                   )
                 _ <- saveService.save(updatedAnswers)

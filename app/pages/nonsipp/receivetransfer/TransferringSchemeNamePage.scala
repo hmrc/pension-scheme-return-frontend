@@ -48,8 +48,7 @@ case class TransferringSchemeNamePage(srn: Srn, memberIndex: Max300, index: Max5
       WhenWasTransferReceivedPage(srn, memberIndex, index),
       DidTransferIncludeAssetPage(srn, memberIndex, index),
       ReportAnotherTransferInPage(srn, memberIndex, index),
-      TransfersInSectionCompleted(srn, memberIndex, index),
-      TransferReceivedMemberListPage(srn)
+      TransfersInSectionCompleted(srn, memberIndex, index)
     )
 }
 

@@ -16,24 +16,14 @@
 
 package controllers.nonsipp.memberpensionpayments
 
-import services.PsrSubmissionService
+import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.Max300
 import controllers.ControllerBaseSpec
-import play.api.inject.bind
 import views.html.TwoColumnsTripleAction
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
-import forms.YesNoPageFormProvider
 import models._
-import org.mockito.ArgumentMatchers.any
-import play.api.inject.guice.GuiceableModule
-import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
-import org.mockito.Mockito._
-import pages.nonsipp.memberpensionpayments.{
-  MemberPensionPaymentsListPage,
-  PensionPaymentsReceivedPage,
-  TotalAmountPensionPaymentsPage
-}
+import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import eu.timepit.refined.refineMV
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
@@ -57,21 +47,10 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
     submissionNumberTwo,
     submissionNumberOne
   )
-  private lazy val onPreviousViewOnly = routes.MemberPensionPaymentsListController.onPreviousViewOnly(
-    srn,
-    1,
-    yearString,
-    submissionNumberTwo,
-    submissionNumberOne
-  )
+
   private val index = refineMV[Max300.Refined](1)
   private val page = 1
 
-  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
-
-  override protected val additionalBindings: List[GuiceableModule] = List(
-    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
-  )
   val userAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
@@ -166,7 +145,6 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
       val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
       injected[TwoColumnsTripleAction].apply(
-        MemberPensionPaymentsListController.form(injected[YesNoPageFormProvider]),
         MemberPensionPaymentsListController.viewModel(
           srn,
           page = 1,
@@ -181,42 +159,10 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
       )
     })
 
-    act.like(renderPrePopView(onPageLoad, MemberPensionPaymentsListPage(srn), true, userAnswers) {
-      implicit app => implicit request =>
-        val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
-        injected[TwoColumnsTripleAction]
-          .apply(
-            MemberPensionPaymentsListController.form(injected[YesNoPageFormProvider]).fill(true),
-            MemberPensionPaymentsListController.viewModel(
-              srn,
-              page = 1,
-              NormalMode,
-              memberList,
-              userAnswers,
-              viewOnlyUpdated = false,
-              schemeName = schemeName,
-              noPageEnabled = false,
-              showBackLink = true
-            )
-          )
-    })
-
-    act.like(
-      redirectNextPage(onSubmit, "value" -> "true")
-        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
-    )
-
-    act.like(
-      redirectNextPage(onSubmit, "value" -> "false")
-        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
-    )
+    act.like(redirectNextPage(onSubmit))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(invalidForm(onSubmit, userAnswers))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 
@@ -236,7 +182,6 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
           val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
           injected[TwoColumnsTripleAction].apply(
-            MemberPensionPaymentsListController.form(injected[YesNoPageFormProvider]),
             MemberPensionPaymentsListController.viewModel(
               srn,
               page,
@@ -265,7 +210,6 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
           val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
 
           injected[TwoColumnsTripleAction].apply(
-            MemberPensionPaymentsListController.form(injected[YesNoPageFormProvider]),
             MemberPensionPaymentsListController.viewModel(
               srn,
               page,
@@ -292,7 +236,6 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
       renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[TwoColumnsTripleAction].apply(
-            MemberPensionPaymentsListController.form(injected[YesNoPageFormProvider]),
             MemberPensionPaymentsListController.viewModel(
               srn,
               page,
@@ -317,10 +260,7 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
         onSubmitViewOnly,
         controllers.nonsipp.routes.ViewOnlyTaskListController
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
-      ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only tasklist")
+      ).withName("Submit redirects to view only tasklist")
     )
   }
 }

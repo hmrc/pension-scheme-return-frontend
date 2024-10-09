@@ -423,15 +423,15 @@ object PsrSubmissionServiceSpec {
     MemberPayments(
       recordVersion = Some("001"),
       memberDetails = List.empty,
-      employerContributionsDetails = SectionDetails(made = true, completed = true),
+      employerContributionMade = Some(true),
       transfersInMade = Some(true),
       transfersOutMade = Some(true),
       unallocatedContribsMade = Some(true),
       unallocatedContribAmount = None,
       memberContributionMade = Some(true),
       lumpSumReceived = Some(true),
-      pensionReceived = SectionDetails(made = true, completed = true),
-      benefitsSurrenderedDetails = SectionDetails(made = true, completed = true)
+      pensionReceived = Some(true),
+      surrenderMade = Some(true)
     )
   )
   val optAssets: Option[Assets] = Some(

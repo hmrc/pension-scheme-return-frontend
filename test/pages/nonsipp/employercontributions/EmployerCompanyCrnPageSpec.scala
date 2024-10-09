@@ -19,9 +19,7 @@ package pages.nonsipp.employercontributions
 import config.Refined.{Max300, Max50}
 import controllers.TestValues
 import eu.timepit.refined.refineMV
-import utils.UserAnswersUtils.UserAnswersOps
 import models.{ConditionalYesNo, Crn}
-import viewmodels.models.SectionStatus
 import pages.behaviours.PageBehaviours
 
 class EmployerCompanyCrnPageSpec extends PageBehaviours with TestValues {
@@ -30,79 +28,12 @@ class EmployerCompanyCrnPageSpec extends PageBehaviours with TestValues {
 
     val memberIndex = refineMV[Max300.Refined](1)
     val index = refineMV[Max50.Refined](1)
+    val srn = srnGen.sample.value
 
-    beRetrievable[ConditionalYesNo[String, Crn]](
-      EmployerCompanyCrnPage(srnGen.sample.value, memberIndex, index)
-    )
+    beRetrievable[ConditionalYesNo[String, Crn]](EmployerCompanyCrnPage(srn, memberIndex, index))
 
-    beSettable[ConditionalYesNo[String, Crn]](
-      EmployerCompanyCrnPage(srnGen.sample.value, memberIndex, index)
-    )
+    beSettable[ConditionalYesNo[String, Crn]](EmployerCompanyCrnPage(srn, memberIndex, index))
 
-    beRemovable[ConditionalYesNo[String, Crn]](
-      EmployerCompanyCrnPage(srnGen.sample.value, memberIndex, index)
-    )
-
-    "Dependent values: section status and were employer contributions made are" - {
-
-      "changing when type of business added" in {
-        val userAnswers = defaultUserAnswers
-          .unsafeSet(EmployerContributionsPage(srn), true)
-          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-
-        val result = userAnswers
-          .set(EmployerCompanyCrnPage(srn, memberIndex, index), ConditionalYesNo.yes[String, Crn](crn))
-          .success
-          .value
-
-        result.get(EmployerContributionsPage(srn)) must be(Some(true))
-        result.get(EmployerCompanyCrnPage(srn, memberIndex, index)) must be(
-          Some(ConditionalYesNo.yes[String, Crn](crn))
-        )
-        result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
-      }
-
-      "not changing when value stays the same" in {
-        val userAnswers = defaultUserAnswers
-          .unsafeSet(EmployerContributionsPage(srn), true)
-          .unsafeSet(EmployerNamePage(srn, memberIndex, index), employerName)
-          .unsafeSet(EmployerCompanyCrnPage(srn, memberIndex, index), ConditionalYesNo.yes[String, Crn](crn))
-          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
-
-        val result = userAnswers
-          .set(EmployerCompanyCrnPage(srn, memberIndex, index), ConditionalYesNo.yes[String, Crn](crn))
-          .success
-          .value
-
-        result.get(EmployerContributionsPage(srn)) must be(Some(true))
-        result.get(EmployerCompanyCrnPage(srn, memberIndex, index)) must be(
-          Some(ConditionalYesNo.yes[String, Crn](crn))
-        )
-        result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.Completed))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(Some(true))
-      }
-
-      "changing when value is different" in {
-        val userAnswers = defaultUserAnswers
-          .unsafeSet(EmployerContributionsPage(srn), true)
-          .unsafeSet(EmployerCompanyCrnPage(srn, memberIndex, index), ConditionalYesNo.yes[String, Crn](crn))
-          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
-
-        val result =
-          userAnswers
-            .set(EmployerCompanyCrnPage(srn, memberIndex, index), ConditionalYesNo.no[String, Crn](noCrnReason))
-            .success
-            .value
-
-        result.get(EmployerCompanyCrnPage(srn, memberIndex, index)) must be(
-          Some(ConditionalYesNo.no[String, Crn](noCrnReason))
-        )
-        result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
-      }
-    }
+    beRemovable[ConditionalYesNo[String, Crn]](EmployerCompanyCrnPage(srn, memberIndex, index))
   }
 }

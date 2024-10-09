@@ -33,7 +33,6 @@ case class SoftDeletedMember(
 )
 
 object SoftDeletedMember {
-  private implicit val formatSectionDetails: Format[SectionDetails] = Json.format[SectionDetails]
   private implicit val formatMemberLumpSumReceived: Format[MemberLumpSumReceived] = Json.format[MemberLumpSumReceived]
   private implicit val formatEmployerContributions: Format[EmployerContributions] = Json.format[EmployerContributions]
   private implicit val formatMemberPersonalDetails: Format[MemberPersonalDetails] = Json.format[MemberPersonalDetails]

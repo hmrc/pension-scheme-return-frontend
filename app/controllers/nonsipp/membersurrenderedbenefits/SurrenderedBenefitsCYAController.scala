@@ -116,10 +116,8 @@ class SurrenderedBenefitsCYAController @Inject()(
 
       for {
         updatedUserAnswers <- request.userAnswers
-          .set(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.InProgress)
           .set(SurrenderedBenefitsCompletedPage(srn, memberIndex), SectionCompleted)
           .setWhen(surrenderedBenefitsChanged)(MemberStatus(srn, memberIndex), MemberState.Changed)
-          .remove(SurrenderedBenefitsMemberListPage(srn))
           .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(

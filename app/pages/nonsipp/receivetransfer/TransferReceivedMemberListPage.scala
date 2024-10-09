@@ -16,13 +16,7 @@
 
 package pages.nonsipp.receivetransfer
 
-import pages.QuestionPage
+import pages.Page
 import models.SchemeId.Srn
-import play.api.libs.json.JsPath
 
-case class TransferReceivedMemberListPage(srn: Srn) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "transferInListPage"
-}
+case class TransferReceivedMemberListPage(srn: Srn) extends Page

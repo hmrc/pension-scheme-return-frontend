@@ -16,13 +16,7 @@
 
 package pages.nonsipp.employercontributions
 
-import pages.QuestionPage
+import pages.Page
 import models.SchemeId.Srn
-import play.api.libs.json.JsPath
 
-case class EmployerContributionsMemberListPage(srn: Srn) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "employerContributionsListPage"
-}
+case class EmployerContributionsMemberListPage(srn: Srn) extends Page

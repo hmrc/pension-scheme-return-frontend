@@ -20,7 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
-import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInJourneyStatus}
+import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
 import controllers.actions._
 import controllers.nonsipp.receivetransfer.DidSchemeReceiveTransferController._
 import navigation.Navigator
@@ -32,7 +32,7 @@ import views.html.YesNoPageView
 import models.SchemeId.Srn
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -72,7 +72,6 @@ class DidSchemeReceiveTransferController @Inject()(
             for {
               updatedAnswers <- request.userAnswers
                 .set(DidSchemeReceiveTransferPage(srn), value)
-                .setWhen(!value)(TransfersInJourneyStatus(srn), SectionStatus.Completed)
                 .mapK[Future]
               _ <- saveService.save(updatedAnswers)
               submissionResult <- if (value) {

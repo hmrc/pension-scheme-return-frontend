@@ -16,13 +16,7 @@
 
 package pages.nonsipp.memberpensionpayments
 
-import pages.QuestionPage
+import pages.Page
 import models.SchemeId.Srn
-import play.api.libs.json.JsPath
 
-case class MemberPensionPaymentsListPage(srn: Srn) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "memberPensionPaymentsListPage"
-}
+case class MemberPensionPaymentsListPage(srn: Srn) extends Page

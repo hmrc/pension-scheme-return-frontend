@@ -16,17 +16,15 @@
 
 package controllers.nonsipp.receivetransfer
 
-import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.{Max300, OneTo300}
 import controllers.PSRController
-import config.Constants.maxNotRelevant
-import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
+import models.requests.DataRequest
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.TwoColumnsTripleAction
@@ -41,10 +39,8 @@ import utils.DateTimeUtils.localDateTimeShow
 import models._
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
-import models.requests.DataRequest
-import play.api.data.Form
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 import java.time.LocalDateTime
 import javax.inject.Named
@@ -54,13 +50,8 @@ class TransferReceivedMemberListController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: TwoColumnsTripleAction,
-  saveService: SaveService,
-  formProvider: YesNoPageFormProvider
-)(implicit ec: ExecutionContext)
-    extends PSRController {
-
-  val form: Form[Boolean] = TransferReceivedMemberListController.form(formProvider)
+  view: TwoColumnsTripleAction
+) extends PSRController {
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
@@ -110,65 +101,16 @@ class TransferReceivedMemberListController @Inject()(
           noPageEnabled = noPageEnabled,
           showBackLink = showBackLink
         )
-      val filledForm =
-        request.userAnswers.get(TransferReceivedMemberListPage(srn)).fold(form)(form.fill)
-      Ok(view(filledForm, viewModel))
+      Ok(view(viewModel))
     } else {
       Redirect(controllers.routes.UnauthorisedController.onPageLoad())
     }
   }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
-    implicit request =>
-      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
-
-      if (optionList.flatten.size > Constants.maxSchemeMembers) {
-        Future.successful(
-          Redirect(
-            navigator.nextPage(TransferReceivedMemberListPage(srn), mode, request.userAnswers)
-          )
-        )
-      } else {
-        val noPageEnabled = !request.userAnswers.get(DidSchemeReceiveTransferPage(srn)).getOrElse(false)
-        val viewModel =
-          TransferReceivedMemberListController
-            .viewModel(
-              srn,
-              page,
-              mode,
-              optionList,
-              request.userAnswers,
-              viewOnlyUpdated = false,
-              None,
-              None,
-              None,
-              None,
-              request.schemeDetails.schemeName,
-              noPageEnabled
-            )
-
-        form
-          .bindFromRequest()
-          .fold(
-            errors => Future.successful(BadRequest(view(errors, viewModel))),
-            finishedAddingTransfers =>
-              for {
-                updatedUserAnswers <- Future
-                  .fromTry(
-                    request.userAnswers
-                      .set(
-                        TransfersInJourneyStatus(srn),
-                        if (finishedAddingTransfers) SectionStatus.Completed
-                        else SectionStatus.InProgress
-                      )
-                      .set(TransferReceivedMemberListPage(srn), finishedAddingTransfers)
-                  )
-                _ <- saveService.save(updatedUserAnswers)
-              } yield Redirect(
-                navigator.nextPage(TransferReceivedMemberListPage(srn), mode, updatedUserAnswers)
-              )
-          )
-      }
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    Redirect(
+      navigator.nextPage(TransferReceivedMemberListPage(srn), mode, request.userAnswers)
+    )
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -187,10 +129,6 @@ class TransferReceivedMemberListController @Inject()(
 }
 
 object TransferReceivedMemberListController {
-  def form(formProvider: YesNoPageFormProvider): Form[Boolean] =
-    formProvider(
-      "transferIn.MemberList.radios.error.required"
-    )
 
   private def rows(
     srn: Srn,
@@ -332,23 +270,21 @@ object TransferReceivedMemberListController {
       }
     )
 
-    val normalModeMessage =
-      if (mode == NormalMode)
-        Option(
+    val optDescription =
+      Option.when(mode == NormalMode)(
+        ParagraphMessage(
+          "transferIn.MemberList.paragraph1"
+        ) ++
           ParagraphMessage(
-            "transferIn.MemberList.paragraph1"
-          ) ++
-            ParagraphMessage(
-              "transferIn.MemberList.paragraph2"
-            )
-        )
-      else Option(ParagraphMessage(""))
+            "transferIn.MemberList.paragraph2"
+          )
+      )
 
     FormPageViewModel(
       mode = mode,
       title = Message(title, memberList.flatten.size),
       heading = Message(heading, memberList.flatten.size),
-      description = normalModeMessage,
+      description = optDescription,
       page = ActionTableViewModel(
         inset = "",
         head = Some(
@@ -360,9 +296,6 @@ object TransferReceivedMemberListController {
           )
         ),
         rows = rows(srn, mode, memberList, userAnswers, optYear, optCurrentVersion, optPreviousVersion),
-        radioText = Message("transferIn.MemberList.radios"),
-        showRadios = memberList.length < maxNotRelevant,
-        showInsetWithRadios = true,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

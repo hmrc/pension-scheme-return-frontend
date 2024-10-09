@@ -20,37 +20,10 @@ import pages.QuestionPage
 import models.SchemeId.Srn
 import pages.nonsipp.employercontributions.Paths.membersPayments
 import play.api.libs.json.JsPath
-import models.UserAnswers
-import viewmodels.models.SectionStatus
-
-import scala.util.Try
 
 case class EmployerContributionsPage(srn: Srn) extends QuestionPage[Boolean] {
 
   override def path: JsPath = membersPayments \ toString
 
   override def toString: String = "employerContributionMade"
-
-  private def setSectionStatus(userAnswers: UserAnswers, newValue: Boolean): Try[UserAnswers] =
-    userAnswers.set(
-      EmployerContributionsSectionStatus(srn),
-      if (newValue) {
-        SectionStatus.InProgress
-      } else {
-        SectionStatus.Completed
-      }
-    )
-
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    (value, userAnswers.get(this)) match {
-      case (None, _) => Try(userAnswers) // delete handled separately
-      case (Some(true), Some(true)) => Try(userAnswers) // no change - do nothing
-      case (Some(false), Some(false)) => Try(userAnswers) // no change - do nothing
-      case (Some(x), Some(_)) =>
-        // new value
-        setSectionStatus(userAnswers, x)
-      case (Some(x), None) =>
-        // new value
-        setSectionStatus(userAnswers, x)
-    }
 }

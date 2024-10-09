@@ -16,17 +16,10 @@
 
 package pages.nonsipp.memberreceivedpcls
 
+import pages.Page
 import models.SchemeId.Srn
-import play.api.libs.json.JsPath
-import pages.QuestionPage
-import pages.nonsipp.memberreceivedpcls.Paths.memberDetails
 
-case class PclsMemberListPage(srn: Srn) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = memberDetails \ toString
-
-  override def toString: String = PclsMemberListPage.key
-}
+case class PclsMemberListPage(srn: Srn) extends Page
 
 object PclsMemberListPage {
   val key = "pclsListPage"
