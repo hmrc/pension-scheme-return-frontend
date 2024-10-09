@@ -19,6 +19,7 @@ package transformations
 import pages.nonsipp.bonds._
 import pages.nonsipp.bonds.Paths.bonds
 import config.Refined.{Max5000, OneTo50, OneTo5000}
+import models.SchemeHoldBond.{Acquisition, Transfer}
 import models.SchemeId.Srn
 import eu.timepit.refined.refineV
 import models.{HowDisposed, Money, UserAnswers}
@@ -28,8 +29,6 @@ import models.requests.DataRequest
 import eu.timepit.refined.api.Refined
 import models.HowDisposed.{Other, Sold}
 import com.google.inject.Singleton
-import viewmodels.models.SectionStatus.Completed
-import models.SchemeHoldBond.{Acquisition, Transfer}
 import models.requests.psr.{BondDisposed, BondTransactions, Bonds}
 import models.UserAnswers.implicits.UserAnswersTryOps
 
@@ -164,7 +163,6 @@ class BondsTransformer @Inject() extends Transformer {
     val bondTransactions = bond.bondTransactions
     val userAnswersOfBondsHeld = userAnswers
       .set(UnregulatedOrConnectedBondsHeldPage(srn), bond.bondsWereAdded)
-      .set(BondsJourneyStatus(srn), Completed)
       .set(BondsListPage(srn), bond.bondTransactions.nonEmpty)
 
     val userAnswersWithRecordVersion =

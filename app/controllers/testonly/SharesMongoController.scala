@@ -21,7 +21,7 @@ import config.Refined.Max5000
 import models.SchemeId.Srn
 import models._
 import shapeless._
-import viewmodels.models.{SectionCompleted, SectionStatus}
+import viewmodels.models.SectionCompleted
 import pages.nonsipp.shares._
 import play.api.mvc.MessagesControllerComponents
 import controllers.actions.IdentifyAndRequireData
@@ -45,7 +45,6 @@ class SharesMongoController @Inject()(
     HList(
       (
         PageWithValue(DidSchemeHoldAnySharesPage(srn), true),
-        PageWithValue(SharesJourneyStatus(srn), SectionStatus.Completed),
         PageWithValue(SharesCompleted(srn, index), SectionCompleted),
         PageWithValue(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted),
         PageWithValue(CompanyNameRelatedSharesPage(srn, index), s"test${index.value} ltd"),
@@ -56,7 +55,6 @@ class SharesMongoController @Inject()(
 
   override type Pages =
     PageWithValue[Boolean] ::
-      PageWithValue[SectionStatus] ::
       PageWithValue[SectionCompleted] ::
       PageWithValue[TypeOfShares] ::
       PageWithValue[String] ::
