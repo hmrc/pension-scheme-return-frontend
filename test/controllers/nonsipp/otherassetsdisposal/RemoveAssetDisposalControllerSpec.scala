@@ -37,6 +37,7 @@ class RemoveAssetDisposalControllerSpec extends ControllerBaseSpec {
 
   private val assetIndex = refineMV[Max5000.Refined](1)
   private val disposalIndex = refineMV[Max50.Refined](1)
+  private val methodOfDisposal = HowDisposed.Sold
 
   private lazy val onPageLoad =
     routes.RemoveAssetDisposalController.onPageLoad(srn, assetIndex, disposalIndex)
@@ -47,7 +48,7 @@ class RemoveAssetDisposalControllerSpec extends ControllerBaseSpec {
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(WhatIsOtherAssetPage(srn, assetIndex), nameOfAsset)
-    .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex), HowDisposed.Transferred)
+    .unsafeSet(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex), methodOfDisposal)
 
   private val userAnswersWithOtherAsset = defaultUserAnswers
     .unsafeSet(WhatIsOtherAssetPage(srn, assetIndex), nameOfAsset)
@@ -65,7 +66,7 @@ class RemoveAssetDisposalControllerSpec extends ControllerBaseSpec {
       val view = injected[YesNoPageView]
       view(
         form(injected[YesNoPageFormProvider]),
-        viewModel(srn, assetIndex, disposalIndex, nameOfAsset)
+        viewModel(srn, assetIndex, disposalIndex, nameOfAsset, methodOfDisposal)
       )
     })
 

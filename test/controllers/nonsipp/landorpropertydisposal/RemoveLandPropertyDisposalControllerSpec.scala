@@ -23,10 +23,10 @@ import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.YesNoPageView
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
-import pages.nonsipp.landorpropertydisposal.LandPropertyDisposalCompletedPage
+import pages.nonsipp.landorpropertydisposal.{HowWasPropertyDisposedOfPage, LandPropertyDisposalCompletedPage}
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.NormalMode
+import models.{HowDisposed, NormalMode}
 import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
@@ -39,6 +39,7 @@ class RemoveLandPropertyDisposalControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[Max5000.Refined](1)
   private val disposalIndex = refineMV[Max50.Refined](1)
   private val testAddress = addressGen.sample.value
+  private val methodOfDisposal = HowDisposed.Other(otherDetails)
 
   private lazy val onPageLoad =
     routes.RemoveLandPropertyDisposalController.onPageLoad(srn, index, disposalIndex, NormalMode)
@@ -49,6 +50,7 @@ class RemoveLandPropertyDisposalControllerSpec extends ControllerBaseSpec {
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, index), testAddress)
+    .unsafeSet(HowWasPropertyDisposedOfPage(srn, index, disposalIndex), methodOfDisposal)
     .unsafeSet(LandPropertyDisposalCompletedPage(srn, index, disposalIndex), SectionCompleted)
 
   private val userAnswersAddress = defaultUserAnswers
@@ -67,7 +69,7 @@ class RemoveLandPropertyDisposalControllerSpec extends ControllerBaseSpec {
       val view = injected[YesNoPageView]
       view(
         form(injected[YesNoPageFormProvider]),
-        viewModel(srn, index, disposalIndex, testAddress.addressLine1, NormalMode)
+        viewModel(srn, index, disposalIndex, testAddress.addressLine1, methodOfDisposal, NormalMode)
       )
     })
 

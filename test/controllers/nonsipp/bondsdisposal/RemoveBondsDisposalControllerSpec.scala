@@ -35,6 +35,7 @@ class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec {
 
   private val bondIndex = refineMV[Max5000.Refined](1)
   private val disposalIndex = refineMV[Max50.Refined](1)
+  private val methodOfDisposal = HowDisposed.Transferred
 
   private lazy val onPageLoad =
     routes.RemoveBondsDisposalController.onPageLoad(srn, bondIndex, disposalIndex)
@@ -45,7 +46,7 @@ class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec {
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(NameOfBondsPage(srn, bondIndex), nameOfBonds)
-    .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex), HowDisposed.Transferred)
+    .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex), methodOfDisposal)
 
   private val userAnswersNameOfBond = defaultUserAnswers
     .unsafeSet(NameOfBondsPage(srn, bondIndex), nameOfBonds)
@@ -63,16 +64,11 @@ class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec {
       val view = injected[YesNoPageView]
       view(
         form(injected[YesNoPageFormProvider]),
-        viewModel(srn, bondIndex, disposalIndex, nameOfBonds)
+        viewModel(srn, bondIndex, disposalIndex, nameOfBonds, methodOfDisposal)
       )
     })
 
     act.like(redirectToPage(onPageLoad, controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
-
-    act.like(
-      redirectToPage(onPageLoad, controllers.nonsipp.routes.TaskListController.onPageLoad(srn), userAnswersNameOfBond)
-        .withName("nameOfBonds")
-    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 

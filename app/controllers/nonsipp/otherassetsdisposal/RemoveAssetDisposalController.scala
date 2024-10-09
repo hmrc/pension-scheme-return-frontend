@@ -19,17 +19,19 @@ package controllers.nonsipp.otherassetsdisposal
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.otherassetsdisposal._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions._
+import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController.OtherAssetsDisposalData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
-import models.NormalMode
+import models.{HowDisposed, NormalMode}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import viewmodels.implicits._
 import controllers.nonsipp.otherassetsdisposal.RemoveAssetDisposalController._
+import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
+import models.HowDisposed.HowDisposed
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
@@ -57,12 +59,14 @@ class RemoveAssetDisposalController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          _ <- request.userAnswers
+          otherAsset <- request.userAnswers
+            .get(WhatIsOtherAssetPage(srn, assetIndex))
+            .getOrRedirectToTaskList(srn)
+          methodOfDisposal <- request.userAnswers
             .get(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex))
             .getOrRedirectToTaskList(srn)
-          otherAsset <- request.userAnswers.get(WhatIsOtherAssetPage(srn, assetIndex)).getOrRedirectToTaskList(srn)
         } yield {
-          Ok(view(form, viewModel(srn, assetIndex, disposalIndex, otherAsset)))
+          Ok(view(form, viewModel(srn, assetIndex, disposalIndex, otherAsset, methodOfDisposal)))
         }
       ).merge
     }
@@ -73,9 +77,22 @@ class RemoveAssetDisposalController @Inject()(
         .bindFromRequest()
         .fold(
           errors =>
-            request.userAnswers.get(WhatIsOtherAssetPage(srn, assetIndex)).getOrRecoverJourney { otherAsset =>
-              Future.successful(BadRequest(view(errors, viewModel(srn, assetIndex, disposalIndex, otherAsset))))
-            },
+            request.userAnswers
+              .get(WhatIsOtherAssetPage(srn, assetIndex))
+              .getOrRecoverJourney { otherAsset =>
+                request.userAnswers
+                  .get(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex))
+                  .getOrRecoverJourney { methodOfDisposal =>
+                    Future.successful(
+                      BadRequest(
+                        view(
+                          errors,
+                          viewModel(srn, assetIndex, disposalIndex, otherAsset, methodOfDisposal)
+                        )
+                      )
+                    )
+                  }
+              },
           removeDisposal =>
             if (removeDisposal) {
               for {
@@ -112,15 +129,35 @@ object RemoveAssetDisposalController {
     "removeAssetDisposal.error.required"
   )
 
+  private def buildMessage(otherAssetsDisposalData: OtherAssetsDisposalData): Message =
+    otherAssetsDisposalData match {
+      case OtherAssetsDisposalData(_, _, otherAsset, typeOfDisposal) =>
+        val disposalType = typeOfDisposal match {
+          case HowDisposed.Sold => "assetDisposal.reportedOtherAssetsDisposalList.methodOfDisposal.sold"
+          case HowDisposed.Transferred => "assetDisposal.reportedOtherAssetsDisposalList.methodOfDisposal.transferred"
+          case HowDisposed.Other(_) => "assetDisposal.reportedOtherAssetsDisposalList.methodOfDisposal.other"
+        }
+        Message("removeAssetDisposal.heading", otherAsset, disposalType)
+    }
+
   def viewModel(
     srn: Srn,
     assetIndex: Max5000,
     disposalIndex: Max50,
-    otherAsset: String
-  ): FormPageViewModel[YesNoPageViewModel] =
-    YesNoPageViewModel(
-      "removeAssetDisposal.title",
-      Message("removeAssetDisposal.heading", otherAsset),
-      routes.RemoveAssetDisposalController.onSubmit(srn, assetIndex, disposalIndex)
+    otherAsset: String,
+    methodOfDisposal: HowDisposed
+  ): FormPageViewModel[YesNoPageViewModel] = {
+    val otherAssetsDisposalData = OtherAssetsDisposalData(
+      assetIndex,
+      disposalIndex,
+      otherAsset,
+      methodOfDisposal
     )
+
+    YesNoPageViewModel(
+      title = "removeAssetDisposal.title",
+      heading = buildMessage(otherAssetsDisposalData),
+      onSubmit = routes.RemoveAssetDisposalController.onSubmit(srn, assetIndex, disposalIndex)
+    )
+  }
 }
