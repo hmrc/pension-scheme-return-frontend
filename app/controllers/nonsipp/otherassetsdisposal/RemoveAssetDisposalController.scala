@@ -155,9 +155,9 @@ object RemoveAssetDisposalController {
     )
 
     YesNoPageViewModel(
-      "removeAssetDisposal.title",
-      buildMessage(otherAssetsDisposalData),
-      routes.RemoveAssetDisposalController.onSubmit(srn, assetIndex, disposalIndex)
+      title = "removeAssetDisposal.title",
+      heading = buildMessage(otherAssetsDisposalData),
+      onSubmit = routes.RemoveAssetDisposalController.onSubmit(srn, assetIndex, disposalIndex)
     )
   }
 }

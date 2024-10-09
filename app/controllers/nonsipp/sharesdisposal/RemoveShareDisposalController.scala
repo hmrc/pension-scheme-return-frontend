@@ -133,8 +133,8 @@ object RemoveShareDisposalController {
     mode: Mode
   ): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
-      "sharesDisposal.removeShareDisposal.title",
-      Message("sharesDisposal.removeShareDisposal.heading", companyName),
-      routes.RemoveShareDisposalController.onSubmit(srn, shareIndex, disposalIndex, mode)
+      title = "sharesDisposal.removeShareDisposal.title",
+      heading = Message("sharesDisposal.removeShareDisposal.heading", companyName),
+      onSubmit = routes.RemoveShareDisposalController.onSubmit(srn, shareIndex, disposalIndex, mode)
     )
 }

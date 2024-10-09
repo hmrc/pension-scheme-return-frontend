@@ -180,7 +180,7 @@ object RemoveBondsDisposalController {
 
     YesNoPageViewModel(
       title = Message("bondsDisposal.removeBondsDisposal.title"),
-      buildMessage(bondsDisposalData),
+      heading = buildMessage(bondsDisposalData),
       onSubmit = routes.RemoveBondsDisposalController.onSubmit(srn, bondIndex, disposalIndex)
     )
   }

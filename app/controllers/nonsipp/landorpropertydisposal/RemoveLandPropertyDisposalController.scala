@@ -199,9 +199,9 @@ object RemoveLandPropertyDisposalController {
     )
 
     YesNoPageViewModel(
-      "removeLandPropertyDisposal.title",
-      buildMessage(landOrPropertyDisposalData),
-      routes.RemoveLandPropertyDisposalController.onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
+      title = "removeLandPropertyDisposal.title",
+      heading = buildMessage(landOrPropertyDisposalData),
+      onSubmit = routes.RemoveLandPropertyDisposalController.onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
     )
   }
 }
