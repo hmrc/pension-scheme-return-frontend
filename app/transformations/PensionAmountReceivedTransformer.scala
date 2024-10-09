@@ -19,11 +19,9 @@ package transformations
 import com.google.inject.Singleton
 import config.Refined.Max300
 import models.SchemeId.Srn
+import models.UserAnswers.implicits.UserAnswersTryOps
 import pages.nonsipp.memberpensionpayments._
 import models.{Money, UserAnswers}
-import viewmodels.models.SectionStatus
-import models.requests.psr.SectionDetails
-import models.UserAnswers.implicits.UserAnswersTryOps
 
 import javax.inject.Inject
 
@@ -32,12 +30,6 @@ class PensionAmountReceivedTransformer @Inject() extends Transformer {
 
   def transformToEtmp(srn: Srn, index: Max300, userAnswers: UserAnswers): Option[Double] =
     userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)).map(_.value)
-
-  // Build section details
-  def transformToEtmp(srn: Srn, userAnswers: UserAnswers): SectionDetails = SectionDetails(
-    made = userAnswers.get(PensionPaymentsReceivedPage(srn)).getOrElse(false),
-    completed = false // TODO : CEM to be deleted
-  )
 
   // Save member specific answers
   def transformFromEtmp(
@@ -48,23 +40,4 @@ class PensionAmountReceivedTransformer @Inject() extends Transformer {
     List[UserAnswers.Compose](
       _.set(TotalAmountPensionPaymentsPage(srn, index), Money(pensionAmountReceived))
     )
-
-  // Save section wide answers
-  def transformFromEtmp(
-    srn: Srn,
-    pensionReceived: SectionDetails
-  ): List[UserAnswers.Compose] = {
-    val status: Option[SectionStatus] = pensionReceived match {
-      case SectionDetails(made @ false, completed @ false) => None // not started
-      case SectionDetails(made @ false, completed @ true) => Some(SectionStatus.Completed)
-      case SectionDetails(made @ true, completed @ false) => Some(SectionStatus.Completed) // temporary E2E workaround
-      case SectionDetails(made @ true, completed @ true) => Some(SectionStatus.Completed)
-    }
-
-    status.fold(List.empty[UserAnswers.Compose]) { s =>
-      List[UserAnswers.Compose](
-        _.setWhen(pensionReceived.started)(PensionPaymentsReceivedPage(srn), pensionReceived.made)
-      )
-    }
-  }
 }

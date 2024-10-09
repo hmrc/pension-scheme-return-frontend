@@ -127,15 +127,15 @@ class MemberPaymentsTransformerSpec
       activeMemberAllSections,
       deletedMemberAllSections
     ),
-    employerContributionsDetails = SectionDetails(made = true, completed = false),
+    employerContributionMade = Some(true),
     transfersInMade = Some(true),
     transfersOutMade = Some(true),
     unallocatedContribsMade = Some(true),
     unallocatedContribAmount = Some(money.value),
     memberContributionMade = Some(true),
     lumpSumReceived = Some(true),
-    benefitsSurrenderedDetails = SectionDetails(made = true, completed = false),
-    pensionReceived = SectionDetails(made = true, completed = false)
+    surrenderMade = Some(true),
+    pensionReceived = Some(true)
   )
 
   private val softDeletedMemberAllSections = SoftDeletedMember(
@@ -262,29 +262,29 @@ class MemberPaymentsTransformerSpec
       activeMemberNoSections,
       deletedMemberNoSections
     ),
-    employerContributionsDetails = SectionDetails(made = false, completed = true),
+    employerContributionMade = Some(false),
     transfersInMade = Some(false),
     transfersOutMade = Some(false),
     unallocatedContribsMade = Some(false),
     unallocatedContribAmount = None,
     memberContributionMade = Some(false),
     lumpSumReceived = Some(false),
-    benefitsSurrenderedDetails = SectionDetails(made = false, completed = true),
-    pensionReceived = SectionDetails(made = false, completed = true)
+    surrenderMade = Some(false),
+    pensionReceived = Some(false)
   )
 
   private val emptyMemberPayments = MemberPayments(
     recordVersion = None,
     memberDetails = Nil,
-    employerContributionsDetails = SectionDetails(made = false, completed = false),
+    employerContributionMade = None,
     transfersInMade = None,
     transfersOutMade = None,
     unallocatedContribsMade = None,
     unallocatedContribAmount = None,
     memberContributionMade = None,
     lumpSumReceived = None,
-    benefitsSurrenderedDetails = SectionDetails(made = false, completed = false),
-    pensionReceived = SectionDetails(made = false, completed = false)
+    surrenderMade = None,
+    pensionReceived = None
   )
 
   private val softDeletedMemberNoSections = SoftDeletedMember(

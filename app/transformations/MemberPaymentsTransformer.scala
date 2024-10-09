@@ -191,21 +191,15 @@ class MemberPaymentsTransformer @Inject()(
                 userAnswers.get(MemberPaymentsRecordVersionPage(srn)).get
               ),
               memberDetails = memberDetailsWithCorrectVersion ++ softDeletedMembers,
-              employerContributionsDetails = SectionDetails(
-                made = userAnswers.get(EmployerContributionsPage(srn)).getOrElse(false),
-                completed = false // TODO : CEM to be deleted
-              ),
+              employerContributionMade = userAnswers.get(EmployerContributionsPage(srn)),
               transfersInMade = userAnswers.get(DidSchemeReceiveTransferPage(srn)),
               transfersOutMade = userAnswers.get(SchemeTransferOutPage(srn)),
               unallocatedContribsMade = userAnswers.get(UnallocatedEmployerContributionsPage(srn)),
               unallocatedContribAmount = userAnswers.get(UnallocatedEmployerAmountPage(srn)).map(_.value),
               memberContributionMade = userAnswers.get(MemberContributionsPage(srn)),
               lumpSumReceived = userAnswers.get(PensionCommencementLumpSumPage(srn)),
-              pensionReceived = pensionAmountReceivedTransformer.transformToEtmp(srn, userAnswers),
-              benefitsSurrenderedDetails = SectionDetails(
-                made = userAnswers.get(SurrenderedBenefitsPage(srn)).getOrElse(false),
-                completed = false // TODO : CEM to be deleted
-              )
+              pensionReceived = userAnswers.get(PensionPaymentsReceivedPage(srn)),
+              surrenderMade = userAnswers.get(SurrenderedBenefitsPage(srn))
             )
           )
       }
@@ -317,48 +311,21 @@ class MemberPaymentsTransformer @Inject()(
             pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))
         }
 
-      // Section wide user answers (this includes initial pages, completion pages, section status pages and pages that don't require an index)
-      ua3_1 = ua3.compose(
-        pensionSurrenderTransformer.transformFromEtmp(srn, memberPayments.benefitsSurrenderedDetails) ++
-          pensionAmountReceivedTransformer.transformFromEtmp(
-            srn,
-            memberPayments.pensionReceived
-          )
-      )
-
-      employerContributionsNotStarted = (
-        !memberPayments.employerContributionsDetails.made
-          && memberPayments.memberDetails.forall(_.employerContributions.isEmpty)
-          && !memberPayments.employerContributionsDetails.completed
-      )
-
-      ua3_2 <- if (employerContributionsNotStarted) {
-        ua3_1
-      } else {
-        ua3_1
-          .set(
-            EmployerContributionsPage(srn),
-            // If 1 or more Employer Contributions have been made, then this answer must be set to true / Yes, even if
-            // the value in ETMP is false - this is used as a workaround to indicate the section is In Progress.
-            if (memberPayments.memberDetails.exists(_.employerContributions.nonEmpty)) true
-            else memberPayments.employerContributionsDetails.made
-          )
-      }
-
-      // Transfers In section-wide user answers
+      // Section wide user answers (this includes initial pages that doesn't require an index)
+      ua3_1 <- memberPayments.pensionReceived.fold(Try(ua3))(ua3.set(PensionPaymentsReceivedPage(srn), _))
+      ua3_2 <- memberPayments.employerContributionMade.fold(Try(ua3_1))(ua3_1.set(EmployerContributionsPage(srn), _))
       ua3_3 <- memberPayments.transfersInMade.fold(Try(ua3_2))(ua3_2.set(DidSchemeReceiveTransferPage(srn), _))
-
-      // Transfers Out section-wide user answers
       ua3_4 <- memberPayments.transfersOutMade.fold(Try(ua3_3))(ua3_3.set(SchemeTransferOutPage(srn), _))
+      ua3_5 <- memberPayments.surrenderMade.fold(Try(ua3_4))(ua3_4.set(SurrenderedBenefitsPage(srn), _))
 
       // new members can be safely hard deleted - don't run when fetching previous user answers as there is no point
       newMembers <- if (!fetchingPreviousVersion) {
-        identifyNewMembers(srn, ua3_4, previousVersionUA)
+        identifyNewMembers(srn, ua3_5, previousVersionUA)
       } else {
         Success(Nil)
       }
 
-      ua4 <- newMembers.foldLeft(Try(ua3_4)) {
+      ua4 <- newMembers.foldLeft(Try(ua3_5)) {
         case (ua, index) =>
           logger.info(s"New member identified at index $index")
           ua.set(SafeToHardDelete(srn, index))
