@@ -22,14 +22,18 @@ import pages.behaviours.PageBehaviours
 
 class IsIndividualRecipientConnectedPartyPageSpec extends PageBehaviours {
 
-  "IsIndividualRecipientConnectedParty" - {
+  "IsIndividualRecipientConnectedPartyPage" - {
 
     val index = refineMV[OneTo5000](1)
+    val srn = srnGen.sample.value
 
     beRetrievable[Boolean](IsIndividualRecipientConnectedPartyPage(srnGen.sample.value, index))
 
     beSettable[Boolean](IsIndividualRecipientConnectedPartyPage(srnGen.sample.value, index))
 
     beRemovable[Boolean](IsIndividualRecipientConnectedPartyPage(srnGen.sample.value, index))
+
+    IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)).toString mustBe "individualConnectedPartyStatus"
+
   }
 }

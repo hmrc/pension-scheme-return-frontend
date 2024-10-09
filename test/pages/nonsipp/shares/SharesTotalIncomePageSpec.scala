@@ -33,5 +33,9 @@ class SharesTotalIncomePageSpec extends PageBehaviours {
     beSettable[Money](SharesTotalIncomePage(srn, index))
 
     beRemovable[Money](SharesTotalIncomePage(srn, index))
+
+    SharesTotalIncomePage(srn, index).toString mustBe "totalDividendsOrReceipts"
+
   }
+
 }

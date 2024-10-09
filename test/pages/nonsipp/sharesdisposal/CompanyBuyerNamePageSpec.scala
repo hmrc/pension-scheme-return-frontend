@@ -32,6 +32,9 @@ class CompanyBuyerNamePageSpec extends PageBehaviours {
     beSettable[String](CompanyBuyerNamePage(srn, index, disposalIndex))
 
     beRemovable[String](CompanyBuyerNamePage(srn, index, disposalIndex))
+
+    CompanyBuyerNamePage(srn, index, disposalIndex).toString mustBe "nameOfPurchaser"
+
   }
 
 }

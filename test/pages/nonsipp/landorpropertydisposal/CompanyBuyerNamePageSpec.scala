@@ -18,19 +18,22 @@ package pages.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
+import eu.timepit.refined.api.Refined
 import pages.behaviours.PageBehaviours
 class CompanyBuyerNamePageSpec extends PageBehaviours {
+  val srn = srnGen.sample.value
+
+  val index: Refined[Int, Max5000.Refined] = refineMV[Max5000.Refined](1)
+  val disposalIndex: Refined[Int, Max50.Refined] = refineMV[Max50.Refined](1)
 
   "CompanyBuyerNamePage" - {
-
-    val index = refineMV[Max5000.Refined](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
 
     beRetrievable[String](CompanyBuyerNamePage(srnGen.sample.value, index, disposalIndex))
 
     beSettable[String](CompanyBuyerNamePage(srnGen.sample.value, index, disposalIndex))
 
     beRemovable[String](CompanyBuyerNamePage(srnGen.sample.value, index, disposalIndex))
-  }
 
+    CompanyBuyerNamePage(srn, index, disposalIndex).toString mustBe "nameOfPurchaser"
+  }
 }
