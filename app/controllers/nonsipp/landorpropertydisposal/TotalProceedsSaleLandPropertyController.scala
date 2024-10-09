@@ -122,15 +122,16 @@ object TotalProceedsSaleLandPropertyController {
   ): FormPageViewModel[SingleQuestion[Money]] =
     FormPageViewModel(
       title = "totalProceedsSaleLandProperty.title",
-      heading = Message("totalProceedsSaleLandProperty.heading", addressLine1),
-      description = Some(
-        ParagraphMessage("totalProceedsSaleLandProperty.paragraph") ++
-          ListMessage(
-            ListType.Bullet,
-            "totalProceedsSaleLandProperty.list1",
-            "totalProceedsSaleLandProperty.list2"
-          )
-      ),
+      heading = Message("totalProceedsSaleLandProperty.heading", addressLine1) ++
+        ParagraphMessage(
+          ParagraphMessage("totalProceedsSaleLandProperty.paragraph") ++
+            ListMessage(
+              ListType.Bullet,
+              "totalProceedsSaleLandProperty.list1",
+              "totalProceedsSaleLandProperty.list2"
+            )
+        ),
+      description = None,
       refresh = None,
       buttonText = Message("site.saveAndContinue"),
       details = None,
