@@ -86,6 +86,7 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
             addressesWithIndexes,
             numberOfDisposals = 1,
             maxPossibleNumberOfDisposals = 50,
+            userAnswers,
             schemeName,
             viewOnlyViewModel = None,
             showBackLink = true
@@ -130,6 +131,7 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
                 addressesWithIndexes,
                 numberOfDisposals = 1,
                 maxPossibleNumberOfDisposals = 50,
+                userAnswers,
                 schemeName,
                 viewOnlyViewModel = Some(viewOnlyViewModel),
                 showBackLink = true
@@ -157,6 +159,7 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
               addressesWithIndexes,
               numberOfDisposals = 1,
               maxPossibleNumberOfDisposals = 50,
+              userAnswers,
               schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
               showBackLink = true
@@ -188,6 +191,7 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
               addressesWithIndexes,
               numberOfDisposals = 1,
               maxPossibleNumberOfDisposals = 50,
+              userAnswers,
               schemeName,
               viewOnlyViewModel = Some(
                 viewOnlyViewModel.copy(

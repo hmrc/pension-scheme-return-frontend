@@ -20,15 +20,17 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.bonds.NameOfBondsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import models.HowDisposed.HowDisposed
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
-import forms.YesNoPageFormProvider
-import models.NormalMode
+import models.{HowDisposed, NormalMode}
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import controllers.nonsipp.bondsdisposal.RemoveBondsDisposalController._
 import navigation.Navigator
+import controllers.nonsipp.bondsdisposal.ReportBondsDisposalListController.BondsDisposalData
+import forms.YesNoPageFormProvider
 import play.api.i18n.MessagesApi
 import pages.nonsipp.bondsdisposal._
 import viewmodels.DisplayMessage.Message
@@ -58,17 +60,19 @@ class RemoveBondsDisposalController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          _ <- request.userAnswers
+          nameOfBonds <- request.userAnswers
+            .get(NameOfBondsPage(srn, bondIndex))
+            .getOrRedirectToTaskList(srn)
+          methodOfDisposal <- request.userAnswers
             .get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex))
             .getOrRedirectToTaskList(srn)
-          nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, bondIndex)).getOrRedirectToTaskList(srn)
         } yield {
           val preparedForm =
             request.userAnswers.fillForm(RemoveBondsDisposalPage(srn, bondIndex, disposalIndex), form)
           Ok(
             view(
               preparedForm,
-              viewModel(srn, bondIndex, disposalIndex, nameOfBonds)
+              viewModel(srn, bondIndex, disposalIndex, nameOfBonds, methodOfDisposal)
             )
           )
         }
@@ -82,14 +86,17 @@ class RemoveBondsDisposalController @Inject()(
         .fold(
           errors =>
             request.userAnswers.get(NameOfBondsPage(srn, bondIndex)).getOrRecoverJourney { nameOfBonds =>
-              Future.successful(
-                BadRequest(
-                  view(
-                    errors,
-                    viewModel(srn, bondIndex, disposalIndex, nameOfBonds)
+              request.userAnswers.get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex)).getOrRecoverJourney {
+                methodOfDisposal =>
+                  Future.successful(
+                    BadRequest(
+                      view(
+                        errors,
+                        viewModel(srn, bondIndex, disposalIndex, nameOfBonds, methodOfDisposal)
+                      )
+                    )
                   )
-                )
-              )
+              }
             },
           value =>
             if (value) {
@@ -146,15 +153,35 @@ object RemoveBondsDisposalController {
     "bondsDisposal.removeBondsDisposal.error.required"
   )
 
+  private def buildMessage(bondsDisposalData: BondsDisposalData): Message =
+    bondsDisposalData match {
+      case BondsDisposalData(_, _, nameOfBonds, methodOfDisposal) =>
+        val disposalType = methodOfDisposal match {
+          case HowDisposed.Sold => "bondsDisposal.reportBondsDisposalList.methodOfDisposal.sold"
+          case HowDisposed.Transferred => "bondsDisposal.reportBondsDisposalList.methodOfDisposal.transferred"
+          case HowDisposed.Other(_) => "bondsDisposal.reportBondsDisposalList.methodOfDisposal.other"
+        }
+        Message("bondsDisposal.removeBondsDisposal.heading", nameOfBonds, disposalType)
+    }
+
   def viewModel(
     srn: Srn,
     bondIndex: Max5000,
     disposalIndex: Max50,
-    nameOfBonds: String
-  ): FormPageViewModel[YesNoPageViewModel] =
+    nameOfBonds: String,
+    methodOfDisposal: HowDisposed
+  ): FormPageViewModel[YesNoPageViewModel] = {
+    val bondsDisposalData = BondsDisposalData(
+      bondIndex,
+      disposalIndex,
+      nameOfBonds,
+      methodOfDisposal
+    )
+
     YesNoPageViewModel(
       title = Message("bondsDisposal.removeBondsDisposal.title"),
-      heading = Message("bondsDisposal.removeBondsDisposal.heading", nameOfBonds),
+      heading = buildMessage(bondsDisposalData),
       onSubmit = routes.RemoveBondsDisposalController.onSubmit(srn, bondIndex, disposalIndex)
     )
+  }
 }

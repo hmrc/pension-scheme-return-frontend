@@ -18,7 +18,6 @@ package controllers.nonsipp.landorpropertydisposal
 
 import viewmodels.implicits._
 import play.api.mvc._
-import com.google.inject.Inject
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import cats.implicits._
@@ -26,6 +25,8 @@ import controllers.actions._
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
+import models.HowDisposed.HowDisposed
+import com.google.inject.Inject
 import utils.nonsipp.TaskListStatusUtils.{
   getCompletedOrUpdatedTaskListStatus,
   getLandOrPropertyDisposalsTaskListStatusWithLink
@@ -157,6 +158,7 @@ class LandOrPropertyDisposalListController @Inject()(
                 indexes,
                 numberOfDisposal,
                 maxPossibleNumberOfDisposals,
+                request.userAnswers,
                 request.schemeDetails.schemeName,
                 viewOnlyViewModel,
                 showBackLink = showBackLink
@@ -197,6 +199,7 @@ class LandOrPropertyDisposalListController @Inject()(
                           indexes,
                           numberOfDisposals,
                           maxPossibleNumberOfDisposals,
+                          request.userAnswers,
                           request.schemeDetails.schemeName,
                           showBackLink = true
                         )
@@ -271,56 +274,69 @@ object LandOrPropertyDisposalListController {
     srn: Srn,
     mode: Mode,
     addressesWithIndexes: List[((Max5000, List[Max50]), Address)],
+    userAnswers: UserAnswers,
     viewOnlyViewModel: Option[ViewOnlyViewModel],
     schemeName: String
   ): List[ListRow] =
-    addressesWithIndexes match {
-      case Nil =>
-        List(
-          ListRow.viewNoLink(
-            Message("landOrPropertyDisposalList.view.none", schemeName),
-            "landOrPropertyDisposalList.view.none.value"
-          )
+    if (addressesWithIndexes.isEmpty) {
+      List(
+        ListRow.viewNoLink(
+          Message("landOrPropertyDisposalList.view.none", schemeName),
+          "landOrPropertyDisposalList.view.none.value"
         )
-      case list =>
-        list.flatMap { a =>
-          (a, viewOnlyViewModel) match {
-            case (((index, disposalIndexes), address), Some(viewOnly)) =>
-              List(
+      )
+    } else {
+      addressesWithIndexes.flatMap {
+        case ((addressIndex, disposalIndexes), address) =>
+          disposalIndexes.map { disposalIndex =>
+            val landOrPropertyDisposalData = LandOrPropertyDisposalData(
+              addressIndex,
+              disposalIndex,
+              address.addressLine1,
+              userAnswers.get(HowWasPropertyDisposedOfPage(srn, addressIndex, disposalIndex)).get
+            )
+
+            (mode, viewOnlyViewModel) match {
+              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
                 ListRow.view(
-                  Message(
-                    if (disposalIndexes.size > 1) "landOrPropertyDisposalList.view.row.plural"
-                    else "landOrPropertyDisposalList.view.row",
-                    disposalIndexes.size,
-                    address.addressLine1
-                  ),
+                  buildMessage("landOrPropertyDisposalList.row", landOrPropertyDisposalData),
                   routes.LandPropertyDisposalCYAController
-                    .onPageLoadViewOnly(
-                      srn,
-                      index,
-                      disposalIndexes.head,
-                      viewOnly.year,
-                      viewOnly.currentVersion,
-                      viewOnly.previousVersion
-                    )
+                    .onPageLoadViewOnly(srn, addressIndex, disposalIndex, year, currentVersion, previousVersion)
                     .url,
-                  Message("landOrPropertyDisposalList.row.view.hidden", address.addressLine1)
+                  buildMessage("landOrPropertyDisposalList.row.view.hidden", landOrPropertyDisposalData)
                 )
-              )
-            case (((index, disposalIndexes), address), None) =>
-              disposalIndexes.map { x =>
+              case (_, _) =>
                 ListRow(
-                  Message("landOrPropertyDisposalList.row", address.addressLine1),
+                  buildMessage("landOrPropertyDisposalList.row", landOrPropertyDisposalData),
                   changeUrl = routes.LandPropertyDisposalCYAController
-                    .onPageLoad(srn, index, x, mode)
+                    .onPageLoad(srn, addressIndex, disposalIndex, CheckMode)
                     .url,
-                  changeHiddenText = Message("landOrPropertyDisposalList.row.change.hidden", address.addressLine1),
-                  removeUrl = routes.RemoveLandPropertyDisposalController.onPageLoad(srn, index, x, NormalMode).url,
-                  removeHiddenText = Message("landOrPropertyDisposalList.row.remove.hidden", address.addressLine1)
+                  changeHiddenText = buildMessage(
+                    "landOrPropertyDisposalList.row.change.hidden",
+                    landOrPropertyDisposalData
+                  ),
+                  removeUrl = routes.RemoveLandPropertyDisposalController
+                    .onPageLoad(srn, addressIndex, disposalIndex, NormalMode)
+                    .url,
+                  removeHiddenText = buildMessage(
+                    "landOrPropertyDisposalList.row.remove.hidden",
+                    landOrPropertyDisposalData
+                  )
                 )
-              }
+            }
           }
+      }
+    }
+
+  private def buildMessage(messageString: String, landOrPropertyDisposalData: LandOrPropertyDisposalData): Message =
+    landOrPropertyDisposalData match {
+      case LandOrPropertyDisposalData(_, _, addressLine1, typeOfDisposal) =>
+        val disposalType = typeOfDisposal match {
+          case HowDisposed.Sold => "landOrPropertyDisposalList.methodOfDisposal.sold"
+          case HowDisposed.Transferred => "landOrPropertyDisposalList.methodOfDisposal.transferred"
+          case HowDisposed.Other(_) => "landOrPropertyDisposalList.methodOfDisposal.other"
         }
+        Message(messageString, addressLine1, disposalType)
     }
 
   def viewModel(
@@ -330,6 +346,7 @@ object LandOrPropertyDisposalListController {
     addressesWithIndexes: List[((Max5000, List[Max50]), Address)],
     numberOfDisposals: Int,
     maxPossibleNumberOfDisposals: Int,
+    userAnswers: UserAnswers,
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean
@@ -371,7 +388,7 @@ object LandOrPropertyDisposalListController {
       ),
       page = ListViewModel(
         inset = "landOrPropertyDisposalList.inset",
-        rows(srn, mode, addressesWithIndexes, viewOnlyViewModel, schemeName),
+        rows(srn, mode, addressesWithIndexes, userAnswers, viewOnlyViewModel, schemeName),
         Message("landOrPropertyDisposalList.radios"),
         showRadios = !mode.isViewOnlyMode && numberOfDisposals < maxPossibleNumberOfDisposals,
         paginatedViewModel = Some(
@@ -424,4 +441,11 @@ object LandOrPropertyDisposalListController {
       showBackLink = showBackLink
     )
   }
+
+  case class LandOrPropertyDisposalData(
+    addressIndex: Max5000,
+    disposalIndex: Max50,
+    addressLine1: String,
+    disposalMethod: HowDisposed
+  )
 }
