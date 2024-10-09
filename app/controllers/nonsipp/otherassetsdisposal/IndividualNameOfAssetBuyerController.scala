@@ -20,7 +20,7 @@ import services.SaveService
 import pages.nonsipp.otherassetsdisposal.IndividualNameOfAssetBuyerPage
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max50, Max5000}
+import config.RefinedTypes.{Max50, Max5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider

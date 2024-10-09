@@ -19,14 +19,14 @@ package controllers.nonsipp.landorproperty
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max5000
-import controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController._
 import pages.nonsipp.landorproperty.{IsLesseeConnectedPartyPage, LandOrPropertyLeaseDetailsPage}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
 import play.api.data.Form
+import config.RefinedTypes.Max5000
+import controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController._
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}

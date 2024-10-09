@@ -20,8 +20,6 @@ import services.SaveService
 import controllers.nonsipp.common.OtherRecipientDetailsController.viewModel
 import viewmodels.implicits._
 import utils.FormUtils._
-import config.Refined.Max5000
-import controllers.PSRController
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.actions._
 import navigation.Navigator
@@ -32,6 +30,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.data.Form
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.RecipientDetailsView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

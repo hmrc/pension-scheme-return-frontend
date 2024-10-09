@@ -16,8 +16,6 @@
 
 package controllers.nonsipp.landorproperty
 
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.PostcodeLookupView
 import eu.timepit.refined.refineMV
@@ -28,6 +26,8 @@ import services.AddressService
 import controllers.nonsipp.landorproperty.LandOrPropertyPostcodeLookupController._
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 

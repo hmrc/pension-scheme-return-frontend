@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import utils.BaseSpec
-import config.Refined.{Max300, Max5}
+import config.RefinedTypes.{Max300, Max5}
 import models.SchemeId.Srn
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}

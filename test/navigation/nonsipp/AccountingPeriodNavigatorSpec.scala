@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import utils.BaseSpec
-import config.Refined.OneToThree
+import config.RefinedTypes.OneToThree
 import generators.IndexGen
 import controllers.nonsipp.schemedesignatory
 import controllers.nonsipp.accountingperiod.routes

@@ -20,13 +20,13 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max300, Max5}
-import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import play.api.data.Form
+import config.RefinedTypes.{Max300, Max5}
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import pages.nonsipp.membertransferout._

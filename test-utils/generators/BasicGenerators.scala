@@ -17,7 +17,7 @@
 package generators
 
 import play.api.mvc.Call
-import config.Refined.{Max300, OneTo300}
+import config.RefinedTypes.{Max300, OneTo300}
 import cats.data.NonEmptyList
 import org.scalacheck.Gen._
 import eu.timepit.refined._

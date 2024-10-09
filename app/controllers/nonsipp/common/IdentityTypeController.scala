@@ -20,7 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import models.IdentityType._
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.actions._
 import navigation.Navigator

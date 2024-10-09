@@ -17,13 +17,13 @@
 package navigation.nonsipp
 
 import play.api.mvc.Call
+import pages.Page
+import config.RefinedTypes.Max5000
 import cats.implicits.toTraverseOps
 import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
 import models.{NormalMode, UserAnswers}
 import pages.nonsipp.moneyborrowed._
-import config.Refined.Max5000
-import pages.Page
 
 object MoneyBorrowedNavigator extends JourneyNavigator {
 

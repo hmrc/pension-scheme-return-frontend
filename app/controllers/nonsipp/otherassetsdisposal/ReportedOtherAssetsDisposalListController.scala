@@ -29,7 +29,7 @@ import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListCo
 import _root_.config.Constants.{maxDisposalPerOtherAsset, maxOtherAssetsTransactions}
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
-import _root_.config.Refined.{Max50, Max5000}
+import _root_.config.RefinedTypes.{Max50, Max5000}
 import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, WhatIsOtherAssetPage}
 import models.HowDisposed._
 import com.google.inject.Inject

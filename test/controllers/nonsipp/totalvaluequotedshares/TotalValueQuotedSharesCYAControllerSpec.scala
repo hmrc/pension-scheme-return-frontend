@@ -17,8 +17,6 @@
 package controllers.nonsipp.totalvaluequotedshares
 
 import services.{PsrSubmissionService, SchemeDateService}
-import config.Refined.Max3
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesCYAController._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage, WhichTaxYearPage}
@@ -28,6 +26,8 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, TotalValueQuotedSharesPage}
 import org.mockito.Mockito._
+import config.RefinedTypes.Max3
+import controllers.ControllerBaseSpec
 import cats.data.NonEmptyList
 import views.html.CYAWithRemove
 

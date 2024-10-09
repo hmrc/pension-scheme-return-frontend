@@ -16,8 +16,6 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.YesNoPageView
 import pages.nonsipp.landorpropertydisposal.DisposalIndependentValuationPage
 import eu.timepit.refined.refineMV
@@ -25,6 +23,8 @@ import controllers.nonsipp.landorpropertydisposal.DisposalIndependentValuationCo
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import play.api.data.FormError
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class DisposalIndependentValuationControllerSpec extends ControllerBaseSpec {
 

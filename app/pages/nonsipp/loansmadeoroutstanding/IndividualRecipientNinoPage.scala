@@ -17,10 +17,10 @@
 package pages.nonsipp.loansmadeoroutstanding
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import models.ConditionalYesNo
-import config.Refined.Max5000
-import pages.QuestionPage
 import uk.gov.hmrc.domain.Nino
 import play.api.libs.json.JsPath
 

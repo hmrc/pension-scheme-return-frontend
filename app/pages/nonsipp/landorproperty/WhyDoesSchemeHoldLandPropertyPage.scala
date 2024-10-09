@@ -19,10 +19,10 @@ package pages.nonsipp.landorproperty
 import utils.RefinedUtils.RefinedIntOps
 import utils.PageUtils._
 import queries.Removable
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import models.{IdentitySubject, SchemeHoldLandProperty, UserAnswers}
-import config.Refined.Max5000
-import pages.QuestionPage
 import pages.nonsipp.common
 import play.api.libs.json.JsPath
 

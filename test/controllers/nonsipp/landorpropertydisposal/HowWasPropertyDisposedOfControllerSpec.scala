@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorpropertydisposal.HowWasPropertyDisposedOfController._
 import views.html.RadioListView
 import pages.nonsipp.landorpropertydisposal.HowWasPropertyDisposedOfPage
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{HowDisposed, NormalMode}
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class HowWasPropertyDisposedOfControllerSpec extends ControllerBaseSpec {
 

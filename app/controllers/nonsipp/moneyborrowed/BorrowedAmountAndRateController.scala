@@ -19,6 +19,8 @@ package controllers.nonsipp.moneyborrowed
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import viewmodels.models.MultipleQuestionsViewModel.DoubleDifferentQuestion
+import config.RefinedTypes.Max5000
 import config.Constants.{borrowMaxPercentage, borrowMinPercentage, maxCurrencyValue}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -28,8 +30,6 @@ import play.api.data.Form
 import forms.mappings.errors.{MoneyFormErrors, PercentageFormErrors}
 import forms.mappings.Mappings
 import com.google.inject.Inject
-import config.Refined.Max5000
-import viewmodels.models.MultipleQuestionsViewModel.DoubleDifferentQuestion
 import views.html.MultipleQuestionView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}

@@ -20,13 +20,13 @@ import services.SaveService
 import pages.nonsipp.memberdetails.{MemberDetailsPage, NoNINOPage}
 import viewmodels.implicits._
 import play.api.mvc._
-import config.Refined.Max300
-import controllers.nonsipp.memberdetails.NoNINOController._
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
 import models.{Mode, NameDOB}
 import viewmodels.models.{FormPageViewModel, TextAreaViewModel}
+import controllers.nonsipp.memberdetails.NoNINOController._
+import config.RefinedTypes.Max300
 import views.html.TextAreaView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}

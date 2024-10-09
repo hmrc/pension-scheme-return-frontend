@@ -17,7 +17,7 @@
 package transformations
 
 import com.google.inject.Singleton
-import config.Refined.OneTo5000
+import config.RefinedTypes.OneTo5000
 import eu.timepit.refined.refineV
 import models.{Money, Percentage, UserAnswers}
 import pages.nonsipp.moneyborrowed._

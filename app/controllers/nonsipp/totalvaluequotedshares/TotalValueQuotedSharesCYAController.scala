@@ -20,8 +20,6 @@ import services.{PsrSubmissionService, SchemeDateService}
 import pages.nonsipp.totalvaluequotedshares._
 import viewmodels.implicits._
 import play.api.mvc._
-import config.Refined.Max3
-import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesCYAController._
 import cats.implicits.toShow
@@ -29,6 +27,8 @@ import controllers.actions._
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n._
 import models.requests.DataRequest
+import config.RefinedTypes.Max3
+import controllers.PSRController
 import cats.data.NonEmptyList
 import views.html.CYAWithRemove
 import models.SchemeId.Srn

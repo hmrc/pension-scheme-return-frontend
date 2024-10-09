@@ -19,13 +19,13 @@ package pages.nonsipp.shares
 import utils.RefinedUtils.RefinedIntOps
 import utils.PageUtils.removePages
 import queries.Removable
+import pages.QuestionPage
+import config.RefinedTypes.{Max5000, OneTo50}
 import models.SchemeId.Srn
 import eu.timepit.refined.refineV
 import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, HowWereSharesDisposedPagesForShare}
 import play.api.libs.json.JsPath
 import models.UserAnswers
-import config.Refined.{Max5000, OneTo50}
-import pages.QuestionPage
 
 import scala.util.Try
 

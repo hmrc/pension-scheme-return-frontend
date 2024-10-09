@@ -16,8 +16,6 @@
 
 package controllers.nonsipp.accountingperiod
 
-import config.Refined.OneToThree
-import controllers.ControllerBaseSpec
 import views.html.ListView
 import config.Constants.maxAccountingPeriods
 import eu.timepit.refined.refineV
@@ -26,6 +24,8 @@ import org.scalacheck.Gen
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
+import config.RefinedTypes.OneToThree
+import controllers.ControllerBaseSpec
 
 class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
 

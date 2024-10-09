@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.moneyborrowed
 
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.MultipleQuestionView
 import controllers.nonsipp.moneyborrowed.{routes, BorrowedAmountAndRateController}
 import eu.timepit.refined.refineMV
 import models.NormalMode
 import pages.nonsipp.moneyborrowed.BorrowedAmountAndRatePage
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class BorrowedAmountAndRateControllerSpec extends ControllerBaseSpec {
 

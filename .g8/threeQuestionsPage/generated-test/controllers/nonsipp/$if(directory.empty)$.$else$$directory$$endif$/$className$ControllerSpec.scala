@@ -12,7 +12,7 @@ import forms.MoneyFormProvider
 import views.html.MultipleQuestionView
 import $className;format="cap"$Controller._
 $if(!index.empty)$
-import config.Refined.$index$
+import config.RefinedTypes.$index$
 import eu.timepit.refined.refineMV
 $endif$
 

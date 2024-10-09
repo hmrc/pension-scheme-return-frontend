@@ -17,8 +17,6 @@
 package controllers.nonsipp.bondsdisposal
 
 import play.api.mvc._
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -27,6 +25,8 @@ import cats.{Id, Monad}
 import forms.mappings.errors.DateFormErrors
 import services.{SaveService, SchemeDateService}
 import controllers.nonsipp.bondsdisposal.WhenWereBondsSoldController._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.DatePageView
 import models.SchemeId.Srn
 import utils.DateTimeUtils.localDateShow

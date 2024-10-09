@@ -17,10 +17,10 @@
 package pages.nonsipp.bonds
 
 import utils.RefinedUtils._
+import pages.QuestionPage
+import config.RefinedTypes._
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import config.Refined._
-import pages.QuestionPage
 
 case class AreBondsUnregulatedPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
   override def path: JsPath =

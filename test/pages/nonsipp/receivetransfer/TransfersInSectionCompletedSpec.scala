@@ -16,7 +16,7 @@
 
 package pages.nonsipp.receivetransfer
 
-import config.Refined._
+import config.RefinedTypes._
 import eu.timepit.refined.refineMV
 import viewmodels.models.SectionCompleted
 import pages.behaviours.PageBehaviours
@@ -27,11 +27,12 @@ class TransfersInSectionCompletedSpec extends PageBehaviours {
 
     val index = refineMV[Max300.Refined](1)
     val secondaryIndex = refineMV[Max5.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[SectionCompleted.type](TransfersInSectionCompleted(srnGen.sample.value, index, secondaryIndex))
+    beRetrievable[SectionCompleted.type](TransfersInSectionCompleted(srnSample, index, secondaryIndex))
 
-    beSettable[SectionCompleted.type](TransfersInSectionCompleted(srnGen.sample.value, index, secondaryIndex))
+    beSettable[SectionCompleted.type](TransfersInSectionCompleted(srnSample, index, secondaryIndex))
 
-    beRemovable[SectionCompleted.type](TransfersInSectionCompleted(srnGen.sample.value, index, secondaryIndex))
+    beRemovable[SectionCompleted.type](TransfersInSectionCompleted(srnSample, index, secondaryIndex))
   }
 }

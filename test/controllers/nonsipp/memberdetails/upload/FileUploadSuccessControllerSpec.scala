@@ -17,8 +17,6 @@
 package controllers.nonsipp.memberdetails.upload
 
 import play.api.test.FakeRequest
-import config.Refined.OneTo300
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import uk.gov.hmrc.domain.Nino
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
@@ -33,6 +31,8 @@ import pages.nonsipp.memberdetails._
 import org.mockito.Mockito.{reset, verify, when}
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
 import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
+import config.RefinedTypes.OneTo300
+import controllers.ControllerBaseSpec
 import views.html.ContentPageView
 import models.SchemeId.Srn
 import cats.implicits.catsSyntaxOptionId

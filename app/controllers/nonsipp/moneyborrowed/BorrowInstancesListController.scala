@@ -19,13 +19,13 @@ package controllers.nonsipp.moneyborrowed
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
-import config.Refined.{Max5000, OneTo5000}
-import controllers.PSRController
 import cats.implicits._
 import config.Constants.maxBorrows
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import eu.timepit.refined.api.Refined
+import config.RefinedTypes.{Max5000, OneTo5000}
+import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.{getBorrowingTaskListStatusAndLink, getCompletedOrUpdatedTaskListStatus}
 import config.Constants
 import views.html.ListView

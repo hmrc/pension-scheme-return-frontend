@@ -19,7 +19,7 @@ package controllers.nonsipp.accountingperiod
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
-import config.Refined.OneToThree
+import config.RefinedTypes.OneToThree
 import cats.implicits.toShow
 import config.Constants.maxAccountingPeriods
 import pages.nonsipp.accountingperiod.{AccountingPeriodListPage, AccountingPeriods}

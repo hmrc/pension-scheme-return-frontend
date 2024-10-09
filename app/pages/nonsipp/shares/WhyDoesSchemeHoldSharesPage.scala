@@ -19,11 +19,11 @@ package pages.nonsipp.shares
 import utils.RefinedUtils.RefinedIntOps
 import utils.PageUtils.removePages
 import queries.Removable
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import models.SchemeHoldShare._
 import models.SchemeId.Srn
 import models.{IdentitySubject, SchemeHoldShare, UserAnswers}
-import config.Refined.Max5000
-import pages.QuestionPage
 import pages.nonsipp.common
 import play.api.libs.json.JsPath
 

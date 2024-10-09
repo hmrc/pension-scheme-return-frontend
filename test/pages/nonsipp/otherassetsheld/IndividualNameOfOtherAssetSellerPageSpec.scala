@@ -16,10 +16,10 @@
 
 package pages.nonsipp.otherassetsheld
 
-import config.Refined.OneTo5000
-import controllers.TestValues
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
+import config.RefinedTypes.OneTo5000
+import controllers.TestValues
 
 class IndividualNameOfOtherAssetSellerPageSpec extends PageBehaviours with TestValues {
 

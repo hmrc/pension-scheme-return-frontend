@@ -19,8 +19,6 @@ package transformations
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.shares._
 import com.google.inject.Singleton
-import config.Refined.{Max5000, OneTo50, OneTo5000}
-import viewmodels.models.SectionStatus.Completed
 import models.SchemeHoldShare.{Acquisition, Transfer}
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import eu.timepit.refined.refineV
@@ -32,6 +30,8 @@ import models.IdentitySubject.SharesSeller
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import models.requests.DataRequest
 import eu.timepit.refined.api.Refined
+import config.RefinedTypes.{Max5000, OneTo50, OneTo5000}
+import viewmodels.models.SectionStatus.Completed
 import models.TypeOfShares.{SponsoringEmployer, Unquoted}
 import models.SchemeId.Srn
 import models.requests.psr._

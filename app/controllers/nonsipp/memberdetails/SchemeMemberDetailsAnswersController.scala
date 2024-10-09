@@ -21,14 +21,14 @@ import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
 import pages.nonsipp.memberdetails._
 import play.api.mvc._
 import com.google.inject.Inject
-import config.Refined.Max300
-import controllers.PSRController
 import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
 import viewmodels.implicits._
 import utils.MessageUtils.booleanToMessage
+import config.RefinedTypes.Max300
+import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage

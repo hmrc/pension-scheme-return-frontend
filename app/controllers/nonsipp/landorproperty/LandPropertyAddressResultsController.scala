@@ -19,14 +19,14 @@ package controllers.nonsipp.landorproperty
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined._
-import controllers.PSRController
 import pages.nonsipp.landorproperty.{AddressLookupResultsPage, LandOrPropertyChosenAddressPage}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
 import models.{Address, Mode}
 import play.api.data.Form
+import config.RefinedTypes._
+import controllers.PSRController
 import views.html.RadioListView
 import models.SchemeId.Srn
 import play.api.i18n.MessagesApi

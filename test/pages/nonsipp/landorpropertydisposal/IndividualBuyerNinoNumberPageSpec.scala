@@ -16,7 +16,7 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, Max5000}
+import config.RefinedTypes.{Max50, Max5000}
 import eu.timepit.refined.refineMV
 import uk.gov.hmrc.domain.Nino
 import models.ConditionalYesNo
@@ -28,15 +28,16 @@ class IndividualBuyerNinoNumberPageSpec extends PageBehaviours {
 
     val index = refineMV[Max5000.Refined](1)
     val disposalIndex = refineMV[Max50.Refined](1)
+    val srnSample = srnGen.sample.value
 
     beRetrievable[ConditionalYesNo[String, Nino]](
-      IndividualBuyerNinoNumberPage(srnGen.sample.value, index, disposalIndex)
+      IndividualBuyerNinoNumberPage(srnSample, index, disposalIndex)
     )
 
-    beSettable[ConditionalYesNo[String, Nino]](IndividualBuyerNinoNumberPage(srnGen.sample.value, index, disposalIndex))
+    beSettable[ConditionalYesNo[String, Nino]](IndividualBuyerNinoNumberPage(srnSample, index, disposalIndex))
 
     beRemovable[ConditionalYesNo[String, Nino]](
-      IndividualBuyerNinoNumberPage(srnGen.sample.value, index, disposalIndex)
+      IndividualBuyerNinoNumberPage(srnSample, index, disposalIndex)
     )
 
   }

@@ -17,13 +17,13 @@
 package views
 
 import play.api.test.FakeRequest
-import play.twirl.api.Html
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import views.html.ListRadiosView
-import config.Refined.Max5000._
 import org.scalacheck.Gen
 import forms.RadioListFormProvider
 import models.Pagination
+import play.twirl.api.Html
+import config.RefinedTypes.Max5000._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, ListRadiosViewModel, PaginatedViewModel}
 

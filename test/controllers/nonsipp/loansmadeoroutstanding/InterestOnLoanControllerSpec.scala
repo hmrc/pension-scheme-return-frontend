@@ -16,12 +16,12 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.MultipleQuestionView
 import eu.timepit.refined.refineMV
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.InterestOnLoanPage
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class InterestOnLoanControllerSpec extends ControllerBaseSpec {
 

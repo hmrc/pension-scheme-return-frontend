@@ -18,13 +18,13 @@ package navigation.nonsipp
 
 import pages.nonsipp.otherassetsdisposal._
 import play.api.mvc.Call
+import pages.Page
+import config.RefinedTypes.Max50
 import cats.implicits.{catsSyntaxEitherId, toBifunctorOps, toTraverseOps}
 import eu.timepit.refined.refineV
 import navigation.JourneyNavigator
 import models._
 import viewmodels.models.SectionJourneyStatus
-import config.Refined.Max50
-import pages.Page
 
 object OtherAssetsDisposalNavigator extends JourneyNavigator {
 

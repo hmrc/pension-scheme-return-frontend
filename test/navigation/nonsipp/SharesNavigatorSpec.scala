@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import utils.BaseSpec
-import config.Refined.{Max5000, OneTo5000}
+import config.RefinedTypes.{Max5000, OneTo5000}
 import models.SchemeId.Srn
 import eu.timepit.refined.refineMV
 import models._

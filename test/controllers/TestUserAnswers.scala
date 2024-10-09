@@ -18,13 +18,13 @@ package controllers
 
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, SchemeDesignatoryRecordVersionPage}
 import pages.nonsipp.memberdetails._
-import config.Refined.{Max3, Max300}
-import viewmodels.models.MemberState.New
 import eu.timepit.refined.refineMV
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriodRecordVersionPage}
 import models.{DateRange, NormalMode, UserAnswers}
 import pages.nonsipp.declaration.PensionSchemeDeclarationPage
 import viewmodels.models.{DeclarationViewModel, SectionCompleted, Submitted}
+import config.RefinedTypes.{Max3, Max300}
+import viewmodels.models.MemberState.New
 import pages.nonsipp._
 import org.scalatest.OptionValues
 

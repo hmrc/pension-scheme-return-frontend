@@ -17,9 +17,9 @@
 package pages.nonsipp.memberdetails
 
 import utils.RefinedUtils.RefinedIntOps
-import models.SchemeId.Srn
-import config.Refined.Max300
 import pages.{IndexedQuestionPage, QuestionPage}
+import config.RefinedTypes.Max300
+import models.SchemeId.Srn
 import uk.gov.hmrc.domain.Nino
 import play.api.libs.json.JsPath
 

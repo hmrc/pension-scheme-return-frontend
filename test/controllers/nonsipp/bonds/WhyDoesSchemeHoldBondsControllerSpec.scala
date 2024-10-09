@@ -17,12 +17,12 @@
 package controllers.nonsipp.bonds
 
 import pages.nonsipp.bonds.WhyDoesSchemeHoldBondsPage
-import config.Refined.Max5000
 import views.html.RadioListView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.NormalMode
 import controllers.nonsipp.bonds.WhyDoesSchemeHoldBondsController._
+import config.RefinedTypes.Max5000
 import controllers.ControllerBaseSpec
 import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 

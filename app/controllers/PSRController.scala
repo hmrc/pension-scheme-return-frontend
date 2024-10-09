@@ -20,7 +20,7 @@ import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import play.api.mvc.Result
 import org.slf4j.LoggerFactory
-import config.Refined._
+import config.RefinedTypes._
 import play.api.libs.json.{Reads, Writes}
 import models.backend.responses.{IndividualDetails, PsrVersionsResponse}
 import pages.nonsipp.membersurrenderedbenefits.{

@@ -23,13 +23,13 @@ import pages.nonsipp.employercontributions.{
 }
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import controllers.nonsipp.employercontributions.WhichEmployerContributionRemoveController._
-import config.Refined.Max50
-import controllers.ControllerBaseSpec
 import views.html.ListRadiosView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{Money, NameDOB}
 import viewmodels.models.SectionJourneyStatus
+import config.RefinedTypes.Max50
+import controllers.ControllerBaseSpec
 
 class WhichEmployerContributionRemoveControllerSpec extends ControllerBaseSpec {
 

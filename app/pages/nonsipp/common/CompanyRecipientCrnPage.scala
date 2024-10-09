@@ -17,11 +17,11 @@
 package pages.nonsipp.common
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.{ConditionalYesNo, Crn, IdentitySubject}
-import config.Refined.Max5000
-import pages.QuestionPage
 
 case class CompanyRecipientCrnPage(srn: Srn, index: Max5000, identitySubject: IdentitySubject)
     extends QuestionPage[ConditionalYesNo[String, Crn]] {

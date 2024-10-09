@@ -18,14 +18,14 @@ package controllers.nonsipp.landorpropertydisposal
 
 import services.SaveService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import pages.nonsipp.landorpropertydisposal.PartnershipBuyerNamePage
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
 import play.api.i18n.MessagesApi
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.TextInputView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

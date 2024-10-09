@@ -20,7 +20,6 @@ import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max5000
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -33,6 +32,7 @@ import pages.nonsipp.otherassetsheld.{
 }
 import models.PointOfEntry._
 import controllers.nonsipp.otherassetsheld.WhyDoesSchemeHoldAssetsController._
+import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.RadioListView
 import models.SchemeId.Srn

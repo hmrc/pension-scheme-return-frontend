@@ -20,7 +20,7 @@ import services.PsrSubmissionService
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
-import controllers.PSRController
+import models.SchemeHoldLandProperty.{Acquisition, Transfer}
 import pages.nonsipp.landorproperty._
 import cats.implicits.toShow
 import controllers.actions._
@@ -28,8 +28,8 @@ import controllers.nonsipp.landorproperty.LandOrPropertyCYAController._
 import pages.nonsipp.common._
 import play.api.i18n._
 import models.requests.DataRequest
-import config.Refined.Max5000
-import models.SchemeHoldLandProperty.{Acquisition, Transfer}
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage

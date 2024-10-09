@@ -18,13 +18,13 @@ package controllers.nonsipp.moneyborrowed
 
 import play.api.mvc.Call
 import controllers.nonsipp.moneyborrowed.IsLenderConnectedPartyController._
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NormalMode, UserAnswers}
 import pages.nonsipp.moneyborrowed.{IsLenderConnectedPartyPage, LenderNamePage}
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class IsLenderConnectedPartyControllerSpec extends ControllerBaseSpec {
 

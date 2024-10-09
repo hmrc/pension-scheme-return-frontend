@@ -18,7 +18,7 @@ package forms.mappings
 
 import play.api.data.format.Formatter
 import cats.data.Validated._
-import config.Refined.Max3
+import config.RefinedTypes.Max3
 import play.api.Logger
 import cats.syntax.all._
 import uk.gov.hmrc.time.TaxYear

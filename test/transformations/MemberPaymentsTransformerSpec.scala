@@ -18,7 +18,6 @@ package transformations
 
 import org.scalatest.matchers.must.Matchers
 import com.softwaremill.diffx.scalatest.DiffShouldMatcher
-import config.Refined.{Max300, Max5, Max50}
 import models.requests.psr._
 import utils.UserAnswersUtils.UserAnswersOps
 import pages.nonsipp.membersurrenderedbenefits._
@@ -30,6 +29,7 @@ import pages.nonsipp.memberdetails._
 import org.scalatest.freespec.AnyFreeSpec
 import pages.nonsipp.membercontributions._
 import pages.nonsipp.memberreceivedpcls._
+import config.RefinedTypes.{Max300, Max5, Max50}
 import viewmodels.models.MemberState.Deleted
 import controllers.TestValues
 import cats.implicits.catsSyntaxEitherId

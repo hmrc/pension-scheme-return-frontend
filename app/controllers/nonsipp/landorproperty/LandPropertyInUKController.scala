@@ -20,7 +20,7 @@ import services.SaveService
 import controllers.nonsipp.landorproperty.LandPropertyInUKController._
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import pages.nonsipp.landorproperty.LandPropertyInUKPage
 import controllers.actions._
 import navigation.Navigator

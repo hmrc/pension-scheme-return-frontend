@@ -19,14 +19,14 @@ package controllers.nonsipp.loansmadeoroutstanding
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max5000
-import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import models._
 import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n.MessagesApi
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import forms.YesNoPageFormProvider

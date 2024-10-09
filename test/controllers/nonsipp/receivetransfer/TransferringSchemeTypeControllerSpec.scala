@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.receivetransfer
 
-import config.Refined.{Max300, Max5}
-import controllers.ControllerBaseSpec
 import views.html.RadioListView
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.receivetransfer.TransferringSchemeTypeController._
 import forms.RadioListFormProvider
 import models.NormalMode
+import config.RefinedTypes.{Max300, Max5}
+import controllers.ControllerBaseSpec
 
 class TransferringSchemeTypeControllerSpec extends ControllerBaseSpec {
 

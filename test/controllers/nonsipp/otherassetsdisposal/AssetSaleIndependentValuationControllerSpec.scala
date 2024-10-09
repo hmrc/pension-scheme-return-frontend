@@ -18,12 +18,12 @@ package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.AssetSaleIndependentValuationPage
 import controllers.nonsipp.otherassetsdisposal.AssetSaleIndependentValuationController._
-import config.Refined._
-import controllers.ControllerBaseSpec
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 
 class AssetSaleIndependentValuationControllerSpec extends ControllerBaseSpec {
 

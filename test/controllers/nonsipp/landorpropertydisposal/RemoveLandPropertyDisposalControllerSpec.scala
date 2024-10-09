@@ -18,8 +18,6 @@ package controllers.nonsipp.landorpropertydisposal
 
 import services.PsrSubmissionService
 import controllers.nonsipp.landorpropertydisposal.RemoveLandPropertyDisposalController._
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.YesNoPageView
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
@@ -31,6 +29,8 @@ import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{when, _}
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 

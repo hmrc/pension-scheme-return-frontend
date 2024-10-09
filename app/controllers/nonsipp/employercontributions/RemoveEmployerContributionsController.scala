@@ -19,7 +19,7 @@ package controllers.nonsipp.employercontributions
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import controllers.PSRController
+import controllers.nonsipp.employercontributions.RemoveEmployerContributionsController._
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -28,8 +28,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.data.Form
 import pages.nonsipp.employercontributions._
 import services.{PsrSubmissionService, SaveService}
-import config.Refined.{Max300, Max50}
-import controllers.nonsipp.employercontributions.RemoveEmployerContributionsController._
+import config.RefinedTypes.{Max300, Max50}
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

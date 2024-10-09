@@ -20,12 +20,12 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails._
 import viewmodels.implicits._
 import play.api.mvc._
-import config.Refined.Max300
-import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import models._
 import play.api.i18n.MessagesApi
+import config.RefinedTypes.Max300
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import utils.nonsipp.SoftDelete

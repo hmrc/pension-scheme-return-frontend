@@ -17,10 +17,10 @@
 package pages.nonsipp.membersurrenderedbenefits
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
+import config.RefinedTypes.Max300
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import config.Refined.Max300
-import pages.QuestionPage
 
 import java.time.LocalDate
 

@@ -19,8 +19,6 @@ package controllers.nonsipp.shares
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import utils.ListUtils.ListOps
-import config.Refined.Max5000
-import controllers.PSRController
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
 import cats.implicits.toShow
 import controllers.actions._
@@ -30,6 +28,8 @@ import play.api.i18n._
 import models.requests.DataRequest
 import pages.nonsipp.shares._
 import play.api.mvc._
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
 import models.SchemeId.Srn

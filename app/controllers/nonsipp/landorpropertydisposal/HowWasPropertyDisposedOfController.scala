@@ -18,8 +18,6 @@ package controllers.nonsipp.landorpropertydisposal
 
 import services.SaveService
 import viewmodels.implicits._
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import controllers.nonsipp.landorpropertydisposal.HowWasPropertyDisposedOfController._
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.HowWasPropertyDisposedOfPage
@@ -34,6 +32,8 @@ import models.GenericFormMapper.ConditionalRadioMapper
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import models.HowDisposed._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.RadioListView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

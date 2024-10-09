@@ -16,7 +16,7 @@
 
 package pages.nonsipp.otherassetsheld
 
-import config.Refined._
+import config.RefinedTypes._
 import eu.timepit.refined.refineMV
 import models.Money
 import pages.behaviours.PageBehaviours

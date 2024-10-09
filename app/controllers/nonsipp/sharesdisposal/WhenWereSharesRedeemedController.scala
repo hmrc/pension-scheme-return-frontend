@@ -18,8 +18,6 @@ package controllers.nonsipp.sharesdisposal
 
 import services.{SaveService, SchemeDateService}
 import viewmodels.implicits._
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.sharesdisposal.WhenWereSharesRedeemedController._
@@ -31,6 +29,8 @@ import play.api.data.Form
 import forms.mappings.errors.DateFormErrors
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.DatePageView
 import models.SchemeId.Srn
 import utils.DateTimeUtils.localDateShow

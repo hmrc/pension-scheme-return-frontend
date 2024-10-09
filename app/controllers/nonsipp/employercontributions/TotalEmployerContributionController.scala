@@ -18,7 +18,7 @@ package controllers.nonsipp.employercontributions
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
 import cats.implicits.catsSyntaxApplicativeId
 import controllers.actions._
@@ -32,8 +32,8 @@ import pages.nonsipp.employercontributions.{EmployerNamePage, TotalEmployerContr
 import services.SaveService
 import viewmodels.implicits._
 import controllers.nonsipp.employercontributions.TotalEmployerContributionController._
-import config.Refined._
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import config.RefinedTypes._
+import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import utils.FunctionKUtils._

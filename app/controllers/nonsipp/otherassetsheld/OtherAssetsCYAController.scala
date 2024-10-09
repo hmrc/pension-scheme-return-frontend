@@ -21,14 +21,14 @@ import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
-import config.Refined.Max5000
-import controllers.PSRController
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.common._
 import models.requests.DataRequest
 import pages.nonsipp.otherassetsheld._
 import models.PointOfEntry.NoPointOfEntry
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage

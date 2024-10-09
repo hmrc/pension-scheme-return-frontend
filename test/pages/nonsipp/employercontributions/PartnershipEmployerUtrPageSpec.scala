@@ -16,13 +16,13 @@
 
 package pages.nonsipp.employercontributions
 
-import config.Refined.{Max300, Max50}
-import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models.{ConditionalYesNo, Utr}
 import viewmodels.models.SectionStatus
 import pages.behaviours.PageBehaviours
+import config.RefinedTypes.{Max300, Max50}
+import controllers.TestValues
 
 class PartnershipEmployerUtrPageSpec extends PageBehaviours with TestValues {
 

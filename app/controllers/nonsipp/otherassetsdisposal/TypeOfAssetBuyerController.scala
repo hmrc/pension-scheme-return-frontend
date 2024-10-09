@@ -21,13 +21,13 @@ import pages.nonsipp.otherassetsdisposal.TypeOfAssetBuyerPage
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import models.IdentityType._
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
 import models.{IdentityType, Mode}
 import play.api.data.Form
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.RadioListView
 import models.SchemeId.Srn
 import play.api.i18n.MessagesApi

@@ -20,8 +20,6 @@ import services.PsrSubmissionService
 import pages.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfPage
 import controllers.nonsipp.otherassetsdisposal.RemoveAssetDisposalController._
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
@@ -30,6 +28,8 @@ import models.HowDisposed
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 

@@ -20,8 +20,6 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.otherassetsdisposal._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -30,6 +28,8 @@ import play.api.i18n.MessagesApi
 import play.api.data.Form
 import viewmodels.implicits._
 import controllers.nonsipp.otherassetsdisposal.RemoveAssetDisposalController._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

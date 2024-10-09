@@ -18,7 +18,7 @@ package controllers.nonsipp.common
 
 import services.SaveService
 import viewmodels.implicits._
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -91,9 +91,9 @@ class PartnershipRecipientUtrController @Inject()(
 object PartnershipRecipientUtrController {
 
   private def noFormErrors(subjectKey: String) = InputFormErrors.input(
-    s"${subjectKey}.partnershipRecipientUtr.no.conditional.error.required",
-    s"${subjectKey}.partnershipRecipientUtr.no.conditional.error.invalid",
-    s"${subjectKey}.partnershipRecipientUtr.no.conditional.error.length"
+    s"$subjectKey.partnershipRecipientUtr.no.conditional.error.required",
+    s"$subjectKey.partnershipRecipientUtr.no.conditional.error.invalid",
+    s"$subjectKey.partnershipRecipientUtr.no.conditional.error.length"
   )
 
   def form(formProvider: YesNoPageFormProvider, subject: IdentitySubject): Form[Either[String, Utr]] =

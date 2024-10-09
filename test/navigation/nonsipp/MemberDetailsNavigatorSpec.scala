@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import models.ManualOrUpload.{Manual, Upload}
-import controllers.nonsipp.memberdetails.routes
+import pages.{CheckingMemberDetailsFilePage, FileUploadErrorSummaryPage, FileUploadTooManyErrorsPage}
 import models.SchemeId.Srn
 import generators.IndexGen
 import eu.timepit.refined.refineMV
@@ -27,8 +27,8 @@ import models._
 import eu.timepit.refined.api.Refined
 import utils.BaseSpec
 import pages.nonsipp.memberdetails._
-import config.Refined.OneTo300
-import pages.{CheckingMemberDetailsFilePage, FileUploadErrorSummaryPage, FileUploadTooManyErrorsPage}
+import config.RefinedTypes.OneTo300
+import controllers.nonsipp.memberdetails.routes
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
 

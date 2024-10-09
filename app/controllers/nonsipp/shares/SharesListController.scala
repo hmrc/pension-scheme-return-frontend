@@ -20,8 +20,6 @@ import services.SaveService
 import viewmodels.implicits._
 import com.google.inject.Inject
 import utils.ListUtils._
-import config.Refined.Max5000
-import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import _root_.config.Constants
 import controllers.actions.IdentifyAndRequireData
@@ -29,6 +27,8 @@ import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import pages.nonsipp.shares._
 import play.api.mvc._
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.ListView
 import models.SchemeId.Srn
 import cats.implicits.{catsSyntaxApplicativeId, toShow, toTraverseOps}

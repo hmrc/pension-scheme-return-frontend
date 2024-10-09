@@ -16,7 +16,7 @@
 
 package pages.nonsipp.common
 
-import config.Refined.OneTo5000
+import config.RefinedTypes.OneTo5000
 import pages.nonsipp.landorproperty.LandPropertyInUKPage
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps

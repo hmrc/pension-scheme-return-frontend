@@ -17,8 +17,6 @@
 package controllers.nonsipp.receivetransfer
 
 import services.PsrSubmissionService
-import config.Refined._
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import pages.nonsipp.receivetransfer._
@@ -29,6 +27,8 @@ import viewmodels.models.SectionCompleted
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito._
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 import controllers.nonsipp.receivetransfer.TransfersInCYAController._
 import org.mockito.ArgumentMatchers.any
 

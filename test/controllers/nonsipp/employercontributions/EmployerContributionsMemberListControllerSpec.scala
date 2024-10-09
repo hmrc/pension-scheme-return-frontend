@@ -16,8 +16,6 @@
 
 package controllers.nonsipp.employercontributions
 
-import config.Refined.Max300
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
@@ -30,6 +28,8 @@ import services.PsrSubmissionService
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
+import config.RefinedTypes.Max300
+import controllers.ControllerBaseSpec
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
 import viewmodels.DisplayMessage.Message

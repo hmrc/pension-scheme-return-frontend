@@ -25,16 +25,16 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.mvc._
 import com.google.inject.Inject
 import utils.ListUtils.ListOps
-import controllers.PSRController
 import cats.implicits._
 import controllers.actions._
+import config.RefinedTypes.Max50._
 import forms.RadioListFormProvider
 import models.{Money, NormalMode}
 import play.api.i18n.MessagesApi
 import viewmodels.implicits._
 import controllers.nonsipp.employercontributions.WhichEmployerContributionRemoveController._
-import config.Refined._
-import config.Refined.Max50._
+import config.RefinedTypes._
+import controllers.PSRController
 import views.html.ListRadiosView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

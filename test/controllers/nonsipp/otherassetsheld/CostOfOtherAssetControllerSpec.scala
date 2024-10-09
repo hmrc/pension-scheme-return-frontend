@@ -17,13 +17,13 @@
 package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.CostOfOtherAssetPage
-import config.Refined._
-import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
 import controllers.nonsipp.otherassetsheld.CostOfOtherAssetController._
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 
 class CostOfOtherAssetControllerSpec extends ControllerBaseSpec {
 

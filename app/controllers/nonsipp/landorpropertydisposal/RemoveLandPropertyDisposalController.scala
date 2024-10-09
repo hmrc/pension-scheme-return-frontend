@@ -19,8 +19,6 @@ package controllers.nonsipp.landorpropertydisposal
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal._
 import controllers.actions._
@@ -28,6 +26,8 @@ import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
 import play.api.i18n.MessagesApi
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

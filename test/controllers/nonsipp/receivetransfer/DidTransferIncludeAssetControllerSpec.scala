@@ -17,12 +17,12 @@
 package controllers.nonsipp.receivetransfer
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import config.Refined._
-import controllers.ControllerBaseSpec
 import views.html.YesNoPageView
 import pages.nonsipp.receivetransfer.{DidTransferIncludeAssetPage, TransferringSchemeNamePage}
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.receivetransfer.DidTransferIncludeAssetController._
 

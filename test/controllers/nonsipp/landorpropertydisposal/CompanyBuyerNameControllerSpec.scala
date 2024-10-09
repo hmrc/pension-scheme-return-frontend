@@ -17,13 +17,13 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import controllers.nonsipp.landorpropertydisposal.CompanyBuyerNameController.{form, viewModel}
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.TextInputView
 import pages.nonsipp.landorpropertydisposal.CompanyBuyerNamePage
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class CompanyBuyerNameControllerSpec extends ControllerBaseSpec {
 

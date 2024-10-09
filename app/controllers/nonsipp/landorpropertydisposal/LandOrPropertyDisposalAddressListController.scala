@@ -16,19 +16,19 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import _root_.config.RefinedTypes.Max5000.enumerable
 import viewmodels.implicits._
 import play.api.mvc._
-import com.google.inject.Inject
 import utils.ListUtils.ListOps
 import controllers.PSRController
 import cats.implicits._
-import _root_.config.Refined.Max5000.enumerable
 import _root_.config.Constants.maxLandOrPropertyDisposals
 import navigation.Navigator
 import forms.RadioListFormProvider
 import models._
 import play.api.i18n.MessagesApi
-import _root_.config.Refined.{Max50, Max5000}
+import _root_.config.RefinedTypes.{Max50, Max5000}
+import com.google.inject.Inject
 import views.html.ListRadiosView
 import models.SchemeId.Srn
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._

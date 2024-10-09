@@ -19,14 +19,14 @@ package controllers.nonsipp.landorproperty
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
-import config.Refined.Max5000
-import controllers.PSRController
 import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPropertyListPage}
 import cats.implicits.toShow
 import config.Constants.maxLandOrProperties
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.{getCompletedOrUpdatedTaskListStatus, getLandOrPropertyTaskListStatusAndLink}
 import config.Constants
 import views.html.ListView

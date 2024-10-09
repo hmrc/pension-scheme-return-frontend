@@ -18,7 +18,7 @@ package controllers.nonsipp.shares
 
 import services.SaveService
 import viewmodels.implicits._
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
 import controllers.nonsipp.shares.SharesTotalIncomeController._
 import controllers.actions._
@@ -30,8 +30,8 @@ import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompleted, SharesTotalIncomePage}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max5000
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.{Empty, Message}

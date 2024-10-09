@@ -16,7 +16,7 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, OneTo5000}
+import config.RefinedTypes.{Max50, OneTo5000}
 import eu.timepit.refined.refineMV
 import models.{ConditionalYesNo, Crn}
 import pages.behaviours.PageBehaviours
@@ -27,17 +27,18 @@ class CompanyBuyerCrnPageSpec extends PageBehaviours {
 
     val index = refineMV[OneTo5000](1)
     val disposalIndex = refineMV[Max50.Refined](1)
+    val srnSample = srnGen.sample.value
 
     beRetrievable[ConditionalYesNo[String, Crn]](
-      CompanyBuyerCrnPage(srnGen.sample.value, index, disposalIndex)
+      CompanyBuyerCrnPage(srnSample, index, disposalIndex)
     )
 
     beSettable[ConditionalYesNo[String, Crn]](
-      CompanyBuyerCrnPage(srnGen.sample.value, index, disposalIndex)
+      CompanyBuyerCrnPage(srnSample, index, disposalIndex)
     )
 
     beRemovable[ConditionalYesNo[String, Crn]](
-      CompanyBuyerCrnPage(srnGen.sample.value, index, disposalIndex)
+      CompanyBuyerCrnPage(srnSample, index, disposalIndex)
     )
   }
 }

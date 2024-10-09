@@ -17,8 +17,6 @@
 package controllers.nonsipp.moneyborrowed
 
 import services.PsrSubmissionService
-import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import views.html.ListView
 import forms.YesNoPageFormProvider
 import models._
@@ -26,6 +24,8 @@ import pages.nonsipp.moneyborrowed._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import config.RefinedTypes.Max5000
+import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.moneyborrowed.BorrowInstancesListController._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}

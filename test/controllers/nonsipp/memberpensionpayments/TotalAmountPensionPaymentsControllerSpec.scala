@@ -18,8 +18,6 @@ package controllers.nonsipp.memberpensionpayments
 
 import controllers.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsController._
 import services.PsrSubmissionService
-import config.Refined._
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.MoneyView
 import forms.MoneyFormProvider
@@ -29,6 +27,8 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito.{reset, when}
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
 import eu.timepit.refined.refineMV
 

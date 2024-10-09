@@ -19,8 +19,6 @@ package controllers.nonsipp.otherassetsheld
 import controllers.nonsipp.otherassetsheld.OtherAssetsCYAController._
 import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import pages.nonsipp.otherassetsheld._
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
@@ -29,6 +27,8 @@ import pages.nonsipp.common.IdentityTypePage
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 import pages.nonsipp.FbVersionPage
 import uk.gov.hmrc.domain.Nino
 

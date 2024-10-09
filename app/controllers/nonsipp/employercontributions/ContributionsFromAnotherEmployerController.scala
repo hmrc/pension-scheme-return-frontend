@@ -19,8 +19,6 @@ package controllers.nonsipp.employercontributions
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max300, Max50}
-import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -28,6 +26,8 @@ import play.api.i18n.MessagesApi
 import play.api.data.Form
 import pages.nonsipp.employercontributions.ContributionsFromAnotherEmployerPage
 import services.SaveService
+import config.RefinedTypes.{Max300, Max50}
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import models.Mode

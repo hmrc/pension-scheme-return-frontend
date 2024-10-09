@@ -21,13 +21,13 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.OneTo300
-import controllers.PSRController
 import cats.implicits.toShow
 import config.Constants.maxNotRelevant
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
+import config.RefinedTypes.OneTo300
+import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.TwoColumnsTripleAction
@@ -216,9 +216,9 @@ object MemberPensionPaymentsListController {
     mode: Mode,
     memberList: List[Option[NameDOB]],
     userAnswers: UserAnswers,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
+    optYear: Option[String],
+    optCurrentVersion: Option[Int],
+    optPreviousVersion: Option[Int]
   ): List[List[TableElem]] =
     memberList.zipWithIndex
       .map {

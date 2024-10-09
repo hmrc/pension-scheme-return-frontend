@@ -17,24 +17,16 @@
 package pages.nonsipp.loansmadeoroutstanding
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.SponsoringOrConnectedParty
-import config.Refined.Max5000
-import pages.QuestionPage
 
 case class RecipientSponsoringEmployerConnectedPartyPage(srn: Srn, index: Max5000)
     extends QuestionPage[SponsoringOrConnectedParty] {
 
   override def path: JsPath = Paths.loanTransactions \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "recipientSponsoringEmployerConnectedParty"
-}
-
-case class RecipientSponsoringEmployerConnectedPartyPages(srn: Srn)
-    extends QuestionPage[Map[String, SponsoringOrConnectedParty]] {
-
-  override def path: JsPath = Paths.loanTransactions \ toString
 
   override def toString: String = "recipientSponsoringEmployerConnectedParty"
 }

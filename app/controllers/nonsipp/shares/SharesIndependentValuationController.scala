@@ -18,8 +18,6 @@ package controllers.nonsipp.shares
 
 import services.SaveService
 import viewmodels.implicits._
-import config.Refined._
-import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.shares.SharesIndependentValuationController._
 import navigation.Navigator
@@ -29,6 +27,8 @@ import play.api.i18n.MessagesApi
 import play.api.data.Form
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesIndependentValuationPage}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.RefinedTypes._
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

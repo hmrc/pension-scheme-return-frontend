@@ -21,14 +21,14 @@ import pages.nonsipp.otherassetsdisposal._
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import cats.implicits.toShow
 import controllers.actions._
 import play.api.i18n._
 import models.requests.DataRequest
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import models.HowDisposed._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage

@@ -19,12 +19,12 @@ package controllers.nonsipp.employercontributions
 import pages.nonsipp.employercontributions.{EmployerNamePage, TotalEmployerContributionPage}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import controllers.nonsipp.employercontributions.TotalEmployerContributionController._
-import config.Refined._
-import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 
 class TotalEmployerContributionControllerSpec extends ControllerBaseSpec {
 

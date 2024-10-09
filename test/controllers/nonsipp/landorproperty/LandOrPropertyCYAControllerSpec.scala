@@ -18,7 +18,7 @@ package controllers.nonsipp.landorproperty
 
 import services.PsrSubmissionService
 import models.ConditionalYesNo._
-import controllers.ControllerBaseSpec
+import models.SchemeHoldLandProperty.Transfer
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import pages.nonsipp.landorproperty._
@@ -28,8 +28,8 @@ import models._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import config.Refined.OneTo5000
-import models.SchemeHoldLandProperty.Transfer
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
 

@@ -20,8 +20,6 @@ import controllers.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldControl
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.{HowWasPropertyDisposedOfPage, LandOrPropertyStillHeldPage}
 import controllers.actions._
@@ -30,6 +28,8 @@ import forms.YesNoPageFormProvider
 import models.{HowDisposed, Mode}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

@@ -20,8 +20,6 @@ import services.SaveService
 import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController._
 import viewmodels.implicits._
 import com.google.inject.Inject
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import cats.implicits._
 import config.Constants.{maxDisposalsPerShare, maxSharesTransactions}
 import controllers.actions.IdentifyAndRequireData
@@ -30,6 +28,8 @@ import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompleted, TypeOfSharesHeldPage}
 import play.api.mvc._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.ListView

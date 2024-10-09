@@ -16,7 +16,7 @@
 
 package pages.nonsipp.sharesdisposal
 
-import config.Refined.{Max50, OneTo5000}
+import config.RefinedTypes.{Max50, OneTo5000}
 import eu.timepit.refined.refineMV
 import models.RecipientDetails
 import pages.behaviours.PageBehaviours

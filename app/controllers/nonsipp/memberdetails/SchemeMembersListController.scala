@@ -21,12 +21,12 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.Max300
-import controllers.PSRController
 import cats.implicits.{catsSyntaxApplicativeId, toShow}
 import config.Constants.maxSchemeMembers
 import forms.YesNoPageFormProvider
 import play.api.i18n.MessagesApi
+import config.RefinedTypes.Max300
+import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.ListView

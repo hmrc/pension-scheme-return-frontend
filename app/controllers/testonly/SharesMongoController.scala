@@ -17,7 +17,7 @@
 package controllers.testonly
 
 import services.SaveService
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import models._
 import shapeless._

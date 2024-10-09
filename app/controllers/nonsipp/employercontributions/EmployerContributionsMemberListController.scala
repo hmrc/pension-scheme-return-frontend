@@ -18,7 +18,6 @@ package controllers.nonsipp.employercontributions
 
 import viewmodels.implicits._
 import play.api.mvc._
-import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
@@ -26,8 +25,11 @@ import cats.implicits.{catsSyntaxApplicativeId, toShow}
 import _root_.config.Constants
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
+import pages.nonsipp.employercontributions.EmployerContributionsProgress.EmployerContributionsUserAnswersOps
 import pages.nonsipp.employercontributions._
 import services.SaveService
+import _root_.config.RefinedTypes.{Max300, Max50}
+import com.google.inject.Inject
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
 import controllers.actions._
@@ -43,8 +45,6 @@ import viewmodels.models.SectionJourneyStatus.InProgress
 import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
-import pages.nonsipp.employercontributions.EmployerContributionsProgress.EmployerContributionsUserAnswersOps
-import _root_.config.Refined.{Max300, Max50}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -238,9 +238,9 @@ object EmployerContributionsMemberListController {
     srn: Srn,
     mode: Mode,
     memberWithEmployerContributions: List[MemberWithEmployerContributions],
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
+    optYear: Option[String],
+    optCurrentVersion: Option[Int],
+    optPreviousVersion: Option[Int]
   ): List[List[TableElem]] =
     memberWithEmployerContributions.map { memberWithEmployerContributions =>
       val noContributions = memberWithEmployerContributions.contributions.isEmpty

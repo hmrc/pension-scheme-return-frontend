@@ -19,16 +19,16 @@ package controllers.nonsipp.otherassetsdisposal
 import pages.nonsipp.otherassetsdisposal._
 import viewmodels.implicits._
 import play.api.mvc._
-import utils.ListUtils._
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import config.Constants
-import config.Refined.Max5000.enumerable
 import navigation.Navigator
 import forms.RadioListFormProvider
 import models.{Mode, Pagination, UserAnswers}
 import pages.nonsipp.otherassetsheld._
 import com.google.inject.Inject
+import utils.ListUtils._
+import config.RefinedTypes.Max5000.enumerable
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.ListRadiosView
 import models.SchemeId.Srn
 import cats.implicits.toTraverseOps

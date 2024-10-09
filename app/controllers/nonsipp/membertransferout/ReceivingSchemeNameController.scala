@@ -19,14 +19,14 @@ package controllers.nonsipp.membertransferout
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max300, Max5}
-import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
 import viewmodels.models.{FormPageViewModel, TextInputViewModel}
 import play.api.data.Form
+import config.RefinedTypes.{Max300, Max5}
+import controllers.PSRController
 import views.html.TextInputViewWidth40
 import models.SchemeId.Srn
 import pages.nonsipp.membertransferout.ReceivingSchemeNamePage

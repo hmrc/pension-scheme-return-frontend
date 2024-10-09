@@ -16,10 +16,10 @@
 
 package pages.nonsipp
 
+import pages.QuestionPage
+import config.RefinedTypes.{Max300, Max5}
 import models.SchemeId.Srn
 import play.api.libs.json.{__, JsPath}
-import config.Refined.{Max300, Max5}
-import pages.QuestionPage
 
 package object receivetransfer {
 

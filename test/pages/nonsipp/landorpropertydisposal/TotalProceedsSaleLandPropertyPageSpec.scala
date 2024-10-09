@@ -16,7 +16,7 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, Max5000}
+import config.RefinedTypes.{Max50, Max5000}
 import eu.timepit.refined.refineMV
 import models.Money
 import pages.behaviours.PageBehaviours
@@ -27,12 +27,13 @@ class TotalProceedsSaleLandPropertyPageSpec extends PageBehaviours {
 
     val index = refineMV[Max5000.Refined](1)
     val disposalIndex = refineMV[Max50.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[Money](TotalProceedsSaleLandPropertyPage(srnGen.sample.value, index, disposalIndex))
+    beRetrievable[Money](TotalProceedsSaleLandPropertyPage(srnSample, index, disposalIndex))
 
-    beSettable[Money](TotalProceedsSaleLandPropertyPage(srnGen.sample.value, index, disposalIndex))
+    beSettable[Money](TotalProceedsSaleLandPropertyPage(srnSample, index, disposalIndex))
 
-    beRemovable[Money](TotalProceedsSaleLandPropertyPage(srnGen.sample.value, index, disposalIndex))
+    beRemovable[Money](TotalProceedsSaleLandPropertyPage(srnSample, index, disposalIndex))
 
   }
 

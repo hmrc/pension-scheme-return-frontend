@@ -31,7 +31,7 @@ import controllers.nonsipp.$directory$.$className;format="cap"$Controller._
 $endif$
 
 $if(!index.empty)$
-import config.Refined._
+import config.RefinedTypes._
 $endif$
 
 import controllers.actions._

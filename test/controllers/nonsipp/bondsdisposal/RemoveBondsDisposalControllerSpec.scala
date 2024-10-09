@@ -17,8 +17,6 @@
 package controllers.nonsipp.bondsdisposal
 
 import services.PsrSubmissionService
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
@@ -30,6 +28,8 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.NameOfBondsPage
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec {
 

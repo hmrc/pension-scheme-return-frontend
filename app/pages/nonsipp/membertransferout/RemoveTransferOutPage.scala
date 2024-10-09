@@ -16,9 +16,9 @@
 
 package pages.nonsipp.membertransferout
 
-import models.SchemeId.Srn
-import config.Refined.Max300
 import pages.Page
+import config.RefinedTypes.Max300
+import models.SchemeId.Srn
 
 case class RemoveTransferOutPage(srn: Srn, memberIndex: Max300) extends Page {
 

@@ -17,8 +17,6 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import services.SchemeDateService
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.MultipleQuestionView
 import eu.timepit.refined.refineMV
@@ -28,6 +26,8 @@ import pages.nonsipp.loansmadeoroutstanding.AmountOfTheLoanPage
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{reset, when}
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
 

@@ -18,7 +18,7 @@ package controllers.testonly
 
 import services.SaveService
 import play.api.mvc.MessagesControllerComponents
-import config.Refined.{Max50, Max5000}
+import config.RefinedTypes.{Max50, Max5000}
 import models.SchemeId.Srn
 import pages.nonsipp.sharesdisposal._
 import models.HowSharesDisposed._

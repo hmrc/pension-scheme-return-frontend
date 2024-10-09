@@ -19,8 +19,6 @@ package controllers.nonsipp.receivetransfer
 import services.{SaveService, SchemeDateService}
 import viewmodels.implicits._
 import play.api.mvc._
-import config.Refined._
-import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import forms.DatePageFormProvider
@@ -29,6 +27,8 @@ import play.api.i18n.{Messages, MessagesApi}
 import forms.mappings.errors.DateFormErrors
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController._
+import config.RefinedTypes._
+import controllers.PSRController
 import views.html.DatePageView
 import models.SchemeId.Srn
 import cats.implicits.toShow
