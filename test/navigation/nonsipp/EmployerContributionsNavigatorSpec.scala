@@ -22,7 +22,7 @@ import config.Refined.{Max300, Max50}
 import models.SchemeId.Srn
 import eu.timepit.refined.{refineMV, refineV}
 import navigation.{Navigator, NavigatorBehaviours}
-import models.{IdentityType, NormalMode, UserAnswers}
+import models._
 import viewmodels.models.SectionJourneyStatus
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
@@ -218,7 +218,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           TotalEmployerContributionPage,
-          (srn, index: Max300, secondaryIndex: Max50, _) =>
+          (srn, index: Max300, _: Max50, _) =>
             controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )

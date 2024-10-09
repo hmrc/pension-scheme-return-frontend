@@ -98,7 +98,7 @@ class TotalEmployerContributionController @Inject()(
             for {
               updatedAnswers <- request.userAnswers
                 .set(TotalEmployerContributionPage(srn, index, secondaryIndex), value)
-                .mapK
+                .mapK[Future]
               nextPage = navigator
                 .nextPage(TotalEmployerContributionPage(srn, index, secondaryIndex), mode, updatedAnswers)
               updatedProgressAnswers <- saveProgress(
