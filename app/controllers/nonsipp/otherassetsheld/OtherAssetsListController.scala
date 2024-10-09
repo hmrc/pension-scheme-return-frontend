@@ -159,15 +159,7 @@ class OtherAssetsListController @Inject()(
             },
             addAnother =>
               for {
-                updatedUserAnswers <- Future
-                  .fromTry(
-                    request.userAnswers
-                      .set(
-                        OtherAssetsJourneyStatus(srn),
-                        if (!addAnother) SectionStatus.Completed else SectionStatus.InProgress
-                      )
-                      .set(OtherAssetsListPage(srn), addAnother)
-                  )
+                updatedUserAnswers <- Future.fromTry(request.userAnswers.set(OtherAssetsListPage(srn), addAnother))
                 _ <- saveService.save(updatedUserAnswers)
               } yield Redirect(
                 navigator.nextPage(OtherAssetsListPage(srn), mode, updatedUserAnswers)

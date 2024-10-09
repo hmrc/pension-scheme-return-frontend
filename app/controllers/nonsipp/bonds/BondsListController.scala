@@ -158,15 +158,7 @@ class BondsListController @Inject()(
             },
             addAnother =>
               for {
-                updatedUserAnswers <- Future
-                  .fromTry(
-                    request.userAnswers
-                      .set(
-                        BondsJourneyStatus(srn),
-                        if (!addAnother) SectionStatus.Completed else SectionStatus.InProgress
-                      )
-                      .set(BondsListPage(srn), addAnother)
-                  )
+                updatedUserAnswers <- Future.fromTry(request.userAnswers.set(BondsListPage(srn), addAnother))
                 _ <- saveService.save(updatedUserAnswers)
               } yield Redirect(
                 navigator.nextPage(BondsListPage(srn), mode, updatedUserAnswers)

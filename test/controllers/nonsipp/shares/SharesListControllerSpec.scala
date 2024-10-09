@@ -19,6 +19,7 @@ package controllers.nonsipp.shares
 import services.PsrSubmissionService
 import pages.nonsipp.shares._
 import config.Refined.Max5000
+import controllers.ControllerBaseSpec
 import views.html.ListView
 import controllers.nonsipp.shares.SharesListController._
 import eu.timepit.refined.refineMV
@@ -27,8 +28,6 @@ import models._
 import viewmodels.models.SectionCompleted
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
-import viewmodels.models.SectionStatus.Completed
-import controllers.ControllerBaseSpec
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 
@@ -44,13 +43,6 @@ class SharesListControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit =
     controllers.nonsipp.shares.routes.SharesListController.onSubmit(srn, page, NormalMode)
 
-  private lazy val onSubmitViewOnly =
-    controllers.nonsipp.shares.routes.SharesListController.onSubmitViewOnly(
-      srn,
-      yearString,
-      submissionNumberTwo,
-      submissionNumberOne
-    )
   private lazy val onPageLoadViewOnly =
     controllers.nonsipp.shares.routes.SharesListController.onPageLoadViewOnly(
       srn,
@@ -71,7 +63,6 @@ class SharesListControllerSpec extends ControllerBaseSpec {
   private val userAnswers =
     defaultUserAnswers
       .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
-      .unsafeSet(SharesJourneyStatus(srn), Completed)
       .unsafeSet(SharesCompleted(srn, index), SectionCompleted)
       .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
       .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)

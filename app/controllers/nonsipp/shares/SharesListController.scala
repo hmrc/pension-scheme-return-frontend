@@ -153,14 +153,7 @@ class SharesListController @Inject()(
             addAnother =>
               for {
                 updatedUserAnswers <- Future
-                  .fromTry(
-                    request.userAnswers
-                      .set(
-                        SharesJourneyStatus(srn),
-                        if (!addAnother) SectionStatus.Completed else SectionStatus.InProgress
-                      )
-                      .set(SharesListPage(srn), addAnother)
-                  )
+                  .fromTry(request.userAnswers.set(SharesListPage(srn), addAnother))
                 _ <- saveService.save(updatedUserAnswers)
               } yield Redirect(
                 navigator.nextPage(SharesListPage(srn), mode, updatedUserAnswers)

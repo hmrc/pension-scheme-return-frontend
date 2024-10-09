@@ -19,6 +19,7 @@ package controllers.nonsipp.shares
 import pages.nonsipp.shares._
 import controllers.nonsipp.shares.SharesFromConnectedPartyController._
 import config.Refined.OneTo5000
+import controllers.ControllerBaseSpec
 import models.SchemeHoldShare.Acquisition
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
@@ -26,8 +27,6 @@ import forms.YesNoPageFormProvider
 import models._
 import pages.nonsipp.common.IdentityTypePage
 import viewmodels.models.SectionCompleted
-import viewmodels.models.SectionStatus.Completed
-import controllers.ControllerBaseSpec
 
 class SharesFromConnectedPartyControllerSpec extends ControllerBaseSpec {
 
@@ -39,7 +38,6 @@ class SharesFromConnectedPartyControllerSpec extends ControllerBaseSpec {
 
   "SharesFromConnectedPartyControllerSpec" - {
     val acquisitionUserAnswers = defaultUserAnswers
-      .unsafeSet(SharesJourneyStatus(srn), Completed)
       .unsafeSet(SharesCompleted(srn, index), SectionCompleted)
       .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
       .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition)
@@ -61,7 +59,6 @@ class SharesFromConnectedPartyControllerSpec extends ControllerBaseSpec {
       renderView(
         onPageLoad,
         defaultUserAnswers
-          .unsafeSet(SharesJourneyStatus(srn), Completed)
           .unsafeSet(SharesCompleted(srn, index), SectionCompleted)
           .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
           .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty)
