@@ -242,6 +242,8 @@ accountingPeriod.before.error.firstStartDate =  First start date of the return m
 accountingPeriod.before.error.startAfter = Start date must be the same as or after {0}
 accountingPeriod.before.error.endBefore = End date must be before {0}
 accountingPeriod.before.error.endAfter = End date must be after {0}
+accountingPeriod.startDate.hint = For example, 27 3 2024
+accountingPeriod.endDate.hint = For example, 27 6 2024
 
 accountingPeriods.title = You have added 1 accounting period
 accountingPeriods.title.plural = You have added {0} accounting periods
@@ -1485,6 +1487,7 @@ amountOfTheLoan.amountOutstanding.error.tooLarge = Total amount of the loan outs
 interestOnLoan.loanInterestRate.title = Interest on the loan
 interestOnLoan.loanInterestRate.heading = Interest on the loan
 interestOnLoan.loanInterestAmount.label = Total interest payable for term of loan, in pounds and pence
+interestOnLoan.loanInterestAmount.hint = Provide the total interest payable as calculated on the date the loan was made.
 interestOnLoan.loanInterestAmount.error.required = Enter the total interest payable for term of loan, in pounds and pence
 interestOnLoan.loanInterestAmount.error.nonNumeric = Total interest payable for term of loan must be an amount of money, like 123 or 123.45
 interestOnLoan.loanInterestAmount.error.max = Total amount of the loan must be 999999999.99 or less

@@ -38,8 +38,9 @@
       @govukErrorSummary(ErrorSummaryViewModel(form))
     }
 
-
       <h1 class="govuk-heading-l govuk-!-margin-bottom-3">@renderMessage(viewmodel.heading)</h1>
+
+      @viewmodel.description.map(renderMessage)
 
       @viewmodel.details.map { detail =>
         @govukDetails(

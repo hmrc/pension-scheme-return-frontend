@@ -232,11 +232,15 @@ trait ViewModelGenerators extends BasicGenerators {
   implicit val dateRangeViewModelGen: Gen[DateRangeViewModel] =
     for {
       startDateLabel <- nonEmptyMessage
+      startDateHint <- nonEmptyMessage
       endDateLabel <- nonEmptyMessage
+      endDateHint <- nonEmptyMessage
     } yield {
       DateRangeViewModel(
         startDateLabel,
-        endDateLabel
+        startDateHint,
+        endDateLabel,
+        endDateHint
       )
     }
 
