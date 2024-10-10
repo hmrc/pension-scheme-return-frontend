@@ -159,6 +159,8 @@ object AccountingPeriodController {
   def viewModel(srn: Srn, index: Max3, mode: Mode): FormPageViewModel[DateRangeViewModel] = DateRangeViewModel(
     "accountingPeriod.title",
     "accountingPeriod.heading",
+    "accountingPeriod.startDate.hint",
+    "accountingPeriod.endDate.hint",
     Some(ParagraphMessage("accountingPeriod.description")),
     routes.AccountingPeriodController.onSubmit(srn, index, mode)
   )
