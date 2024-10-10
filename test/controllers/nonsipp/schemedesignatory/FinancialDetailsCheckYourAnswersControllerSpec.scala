@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.schemedesignatory
 
+import play.api.test.FakeRequest
 import services.{PsrSubmissionService, SchemeDateService}
 import pages.nonsipp.schemedesignatory.{HowManyMembersPage, ValueOfAssetsPage}
 import controllers.ControllerBaseSpec
@@ -112,6 +113,29 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
     val previousUserAnswers = currentUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+
+    "must return OK and render the correct view without back link" in {
+
+      mockTaxYear(dateRange)
+
+      val application =
+        applicationBuilder(userAnswers = Some(currentUserAnswers), previousUserAnswers = Some(previousUserAnswers))
+          .build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, onPreviousViewOnly.url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) must include("Financial details")
+        contentAsString(result) must include("Submitted on")
+
+        (contentAsString(result) must not).include("govuk-back-link")
+      }
+    }
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {

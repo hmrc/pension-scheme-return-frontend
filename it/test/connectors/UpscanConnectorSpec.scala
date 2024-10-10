@@ -21,10 +21,11 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import models.{PreparedUpload, Reference, UploadForm, UpscanFileReference, UpscanInitiateResponse}
 import play.api.Application
+import play.api.http.Status
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 class UpscanConnectorSpec extends BaseConnectorSpec {
   implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -55,6 +56,28 @@ class UpscanConnectorSpec extends BaseConnectorSpec {
         result mustBe expectedResponse
       }
     }
+
+
+    "return an error if the file size is larger than 1MB" in runningApplication { implicit app =>
+      val errorResponseJson = Json.obj(
+        "code" -> "EntityTooLarge",
+        "message" -> "The uploaded file is too large. The maximum file size is 1MB."
+      )
+
+      UpscanHelper.stubPost(
+        aResponse()
+          .withStatus(Status.REQUEST_ENTITY_TOO_LARGE)
+          .withBody(errorResponseJson.toString())
+      )
+
+      val exception = intercept[UpstreamErrorResponse] {
+        connector.initiate(callBackUrl, successRedirectUrl, failureRedirectUrl).futureValue
+      }
+
+      exception.statusCode mustBe Status.REQUEST_ENTITY_TOO_LARGE
+      exception.message must include("The uploaded file is too large. The maximum file size is 1MB.")
+    }
+
   }
 
   object UpscanHelper {
