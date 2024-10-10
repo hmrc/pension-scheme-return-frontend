@@ -23,7 +23,6 @@ import play.api.mvc._
 import com.google.inject.Inject
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
-import cats.implicits.toShow
 import controllers.actions._
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import models.backend.responses.{PsrVersionsResponse, ReportStatus}
@@ -32,6 +31,8 @@ import play.api.i18n.MessagesApi
 import models.requests.DataRequest
 import views.html.TaskListView
 import models.SchemeId.Srn
+import cats.implicits.toShow
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import pages.nonsipp.{CheckReturnDatesPage, CompilationOrSubmissionDatePage, WhichTaxYearPage}
 import utils.nonsipp.TaskListUtils._
 import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
@@ -104,7 +105,15 @@ class TaskListController @Inject()(
       dates <- request.userAnswers.get(WhichTaxYearPage(srn))
     } yield dates
 
-    basicDetails.fold(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))(f)
+    basicDetails.fold(
+      Future.successful(
+        Redirect(
+          controllers.routes.JourneyRecoveryController.onPageLoad(
+            Some(RedirectUrl(controllers.routes.OverviewController.onPageLoad(srn).url))
+          )
+        )
+      )
+    )(f)
   }
 }
 
