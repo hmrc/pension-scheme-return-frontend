@@ -17,6 +17,7 @@
 package pages.nonsipp.shares
 
 import utils.RefinedUtils.RefinedIntOps
+import queries.Removable
 import play.api.libs.json.JsPath
 import models.{TypeOfShares, UserAnswers}
 import config.Refined.Max5000
@@ -38,11 +39,20 @@ case class TypeOfSharesHeldPage(srn: Srn, index: Max5000) extends QuestionPage[T
       // if unchanged, do nothing
       case (Some(a), Some(b)) if a == b => Try(userAnswers)
       // if changed from Unquoted to any other type of shares, remove connected party
-      case (Some(Unquoted), Some(_)) => userAnswers.remove(SharesFromConnectedPartyPage(srn, index))
+      case (Some(Unquoted), Some(_)) =>
+        userAnswers.remove(commonPages(srn, index) :+ SharesFromConnectedPartyPage(srn, index))
       // if changed from SponsoringEmployer to any other type of shares, remove total asset value
-      case (Some(SponsoringEmployer), Some(_)) => userAnswers.remove(TotalAssetValuePage(srn, index))
+      case (Some(SponsoringEmployer), Some(_)) =>
+        userAnswers.remove(commonPages(srn, index) :+ TotalAssetValuePage(srn, index))
       case _ => Try(userAnswers)
     }
+
+  private def commonPages(srn: Srn, index: Max5000): List[Removable[_]] = List(
+    WhyDoesSchemeHoldSharesPage(srn, index),
+    WhenDidSchemeAcquireSharesPage(srn, index),
+    CompanyNameRelatedSharesPage(srn, index),
+    SharesCompanyCrnPage(srn, index)
+  )
 }
 
 case class TypeOfSharesHeldPages(srn: Srn) extends QuestionPage[Map[String, TypeOfShares]] {

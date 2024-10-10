@@ -108,6 +108,9 @@ final case class UserAnswers(
   def remove(pages: List[Removable[_]]): Try[UserAnswers] =
     pages.foldLeft(Try(this))((ua, page) => ua.flatMap(_.removeOnly(page)))
 
+  def remove(pages: Removable[_]*): Try[UserAnswers] =
+    pages.foldLeft(Try(this))((ua, page) => ua.flatMap(_.removeOnly(page)))
+
   def setWhen[A](bool: Boolean)(page: Settable[A], value: => A)(implicit writes: Writes[A]): Try[UserAnswers] =
     if (bool) setOnly(page, value) else Try(this)
 

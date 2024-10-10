@@ -35,7 +35,7 @@ import models.HowSharesDisposed.HowSharesDisposed
 import models.requests.{AllowedAccessRequest, IdentifierRequest}
 import models.cache.PensionSchemeUser.{Administrator, Practitioner}
 
-import java.time.{LocalDate, LocalDateTime, ZoneOffset}
+import java.time.{LocalDate, LocalDateTime, LocalTime, ZoneOffset}
 
 trait ModelGenerators extends BasicGenerators {
 
@@ -201,6 +201,14 @@ trait ModelGenerators extends BasicGenerators {
       )
       nanos <- Gen.chooseNum(LocalDateTime.MIN.getNano, LocalDateTime.MAX.getNano)
     } yield LocalDateTime.ofEpochSecond(seconds, nanos, ZoneOffset.UTC)
+
+  val localDateGen: Gen[LocalDate] =
+    for {
+      day <- Gen.chooseNum(
+        LocalDate.MIN.toEpochDay,
+        LocalDate.MAX.toEpochDay
+      )
+    } yield LocalDate.ofEpochDay(day)
 
   val manualOrUploadGen: Gen[ManualOrUpload] = Gen.oneOf(ManualOrUpload.values)
 

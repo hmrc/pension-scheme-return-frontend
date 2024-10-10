@@ -30,6 +30,7 @@ class WhyDoesSchemeHoldBondsPageSpec extends PageBehaviours {
 
     val index = refineMV[OneTo5000](1)
     val srn = srnGen.sample.value
+    val money = moneyGen.sample.value
 
     beRetrievable[SchemeHoldBond](WhyDoesSchemeHoldBondsPage(srn, index))
 
@@ -44,17 +45,20 @@ class WhyDoesSchemeHoldBondsPageSpec extends PageBehaviours {
         UserAnswers("id")
           .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, index), SchemeHoldBond.Acquisition)
           .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, index), localDate)
+          .unsafeSet(CostOfBondsPage(srn, index), money)
 
       s"remove dependant values when current answer is different than the existing answer" in {
         val result =
           WhyDoesSchemeHoldBondsPage(srn, index).cleanup(Some(SchemeHoldBond.Transfer), userAnswers).toOption.value
         result.get(WhenDidSchemeAcquireBondsPage(srn, index)) mustBe None
+        result.get(CostOfBondsPage(srn, index)) mustBe None
       }
 
       s"retain dependant values when current answer is the same as the existing answer" in {
         val result =
           WhyDoesSchemeHoldBondsPage(srn, index).cleanup(Some(SchemeHoldBond.Acquisition), userAnswers).toOption.value
         result.get(WhenDidSchemeAcquireBondsPage(srn, index)) must not be None
+        result.get(CostOfBondsPage(srn, index)) must not be None
       }
     }
   }

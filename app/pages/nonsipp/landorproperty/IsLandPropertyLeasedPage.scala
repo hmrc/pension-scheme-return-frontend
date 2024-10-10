@@ -45,7 +45,8 @@ case class IsLandPropertyLeasedPage(srn: Srn, index: Max5000) extends QuestionPa
   private def pages(srn: Srn): List[Removable[_]] =
     List(
       LandOrPropertyLeaseDetailsPage(srn, index),
-      IsLesseeConnectedPartyPage(srn, index)
+      IsLesseeConnectedPartyPage(srn, index),
+      LandOrPropertyTotalIncomePage(srn, index)
     )
 
 }
