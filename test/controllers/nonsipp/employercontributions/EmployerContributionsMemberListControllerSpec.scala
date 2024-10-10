@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.employercontributions
 
+import play.api.test.FakeRequest
 import config.Refined.Max300
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
@@ -209,6 +210,34 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
 
+    "must return OK and render the correct view without back link" in {
+
+      val currentUserAnswers = userAnswers
+        .unsafeSet(FbVersionPage(srn), "002")
+        .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
+      val previousUserAnswers = userAnswers
+        .unsafeSet(FbVersionPage(srn), "001")
+        .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+
+      val application =
+        applicationBuilder(userAnswers = Some(currentUserAnswers), previousUserAnswers = Some(previousUserAnswers))
+          .build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, onPreviousViewOnly.url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) must include("Submitted on")
+
+        (contentAsString(result) must not).include("govuk-back-link")
+      }
+    }
+
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
@@ -306,5 +335,4 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
         .withName("Submit redirects to view only tasklist")
     )
   }
-
 }
