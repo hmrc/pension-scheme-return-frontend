@@ -90,7 +90,6 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
               valueOfAssetsPage,
               feesCommissionsWagesSalariesPage,
               periods,
-              request.schemeDetails,
               viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
                 getFinancialDetailsCompletedOrUpdated(request.userAnswers, request.previousUserAnswers.get) == Updated
               } else {
@@ -147,7 +146,6 @@ object FinancialDetailsCheckYourAnswersController {
     valueOfAssetsPage: Option[MoneyInPeriod],
     feesCommissionsWagesSalariesPage: Option[Money],
     schemeDates: DateRange,
-    schemeDetails: SchemeDetails,
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
@@ -166,8 +164,7 @@ object FinancialDetailsCheckYourAnswersController {
           howMuchCashPage,
           valueOfAssetsPage,
           feesCommissionsWagesSalariesPage,
-          schemeDates,
-          schemeDetails
+          schemeDates
         )
       ).withMarginBottom(Margin.Fixed60Bottom),
       refresh = None,
@@ -218,8 +215,7 @@ object FinancialDetailsCheckYourAnswersController {
     howMuchCashPage: Option[MoneyInPeriod],
     valueOfAssetsPage: Option[MoneyInPeriod],
     feesCommissionsWagesSalariesPage: Option[Money],
-    schemeDates: DateRange,
-    schemeDetails: SchemeDetails
+    schemeDates: DateRange
   ): List[CheckYourAnswersSection] = List(
     CheckYourAnswersSection(
       None,
@@ -228,7 +224,6 @@ object FinancialDetailsCheckYourAnswersController {
           CheckYourAnswersRowViewModel(
             Message(
               "financialDetailsCheckYourAnswersController.totalCashInStartDate",
-              schemeDetails.schemeName,
               schemeDates.from.show
             ),
             "£" + howMuchCash.moneyAtStart.displayAs
@@ -248,7 +243,6 @@ object FinancialDetailsCheckYourAnswersController {
             CheckYourAnswersRowViewModel(
               Message(
                 "financialDetailsCheckYourAnswersController.totalCashInEndDate",
-                schemeDetails.schemeName,
                 schemeDates.to.show
               ),
               "£" + howMuchCash.moneyAtEnd.displayAs
@@ -268,7 +262,6 @@ object FinancialDetailsCheckYourAnswersController {
             CheckYourAnswersRowViewModel(
               Message(
                 "financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate",
-                schemeDetails.schemeName,
                 schemeDates.from.show
               ),
               "£" + valueOfAssets.moneyAtStart.displayAs
@@ -288,7 +281,6 @@ object FinancialDetailsCheckYourAnswersController {
             CheckYourAnswersRowViewModel(
               Message(
                 "financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate",
-                schemeDetails.schemeName,
                 schemeDates.to.show
               ),
               "£" + valueOfAssets.moneyAtEnd.displayAs
@@ -307,9 +299,7 @@ object FinancialDetailsCheckYourAnswersController {
           feesCommissionsWagesSalaries =>
             CheckYourAnswersRowViewModel(
               Message(
-                "financialDetailsCheckYourAnswersController.feeCommissionWagesSalary",
-                schemeDetails.schemeName,
-                schemeDates.to.show
+                "financialDetailsCheckYourAnswersController.feeCommissionWagesSalary"
               ),
               "£" + feesCommissionsWagesSalaries.displayAs
             ).withChangeAction(

@@ -135,7 +135,10 @@ object InterestOnLoanController {
       Message("interestOnLoan.loanInterestRate.heading", schemeName),
       page = TripleQuestion(
         form,
-        QuestionField.currency(Message("interestOnLoan.loanInterestAmount.label")),
+        QuestionField.currency(
+          Message("interestOnLoan.loanInterestAmount.label"),
+          Option(Message("interestOnLoan.loanInterestAmount.hint"))
+        ),
         QuestionField.percentage(
           Message("interestOnLoan.loanInterestRate.label"),
           Option(Message("interestOnLoan.loanInterestRate.hint"))

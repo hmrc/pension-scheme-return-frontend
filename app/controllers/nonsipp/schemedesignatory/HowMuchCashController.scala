@@ -139,8 +139,8 @@ object HowMuchCashController {
       Message("howMuchCash.heading", schemeName),
       page = DoubleQuestion(
         form,
-        QuestionField.input(Message("howMuchCash.start.label", period.from.show)),
-        QuestionField.input(Message("howMuchCash.end.label", period.to.show))
+        QuestionField.currency(Message("howMuchCash.start.label", period.from.show)),
+        QuestionField.currency(Message("howMuchCash.end.label", period.to.show))
       ),
       routes.HowMuchCashController.onSubmit(srn, mode)
     ).withDescription(ParagraphMessage("howMuchCash.paragraph"))
