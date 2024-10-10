@@ -46,6 +46,7 @@ class IsLandPropertyLeasedPageSpec extends PageBehaviours {
         UserAnswers("id")
           .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, index), (leaseName, money, localDate))
           .unsafeSet(IsLesseeConnectedPartyPage(srn, index), true)
+          .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
 
       s"remove dependant values when current answer is Some(false) and existing answer is true" in {
         val answer = userAnswers.unsafeSet(IsLandPropertyLeasedPage(srn, index), true)
@@ -54,6 +55,7 @@ class IsLandPropertyLeasedPageSpec extends PageBehaviours {
 
         result.get(LandOrPropertyLeaseDetailsPage(srn, index)) mustBe None
         result.get(IsLesseeConnectedPartyPage(srn, index)) mustBe None
+        result.get(LandOrPropertyTotalIncomePage(srn, index)) mustBe None
       }
 
       s"retain dependant values when current answer is Some(true) and existing answer is true" in {
@@ -63,6 +65,7 @@ class IsLandPropertyLeasedPageSpec extends PageBehaviours {
 
         result.get(LandOrPropertyLeaseDetailsPage(srn, index)) must not be None
         result.get(IsLesseeConnectedPartyPage(srn, index)) must not be None
+        result.get(LandOrPropertyTotalIncomePage(srn, index)) must not be None
       }
 
       s"retain dependant values when current answer is Some(true) and existing answer is None" in {
@@ -71,6 +74,7 @@ class IsLandPropertyLeasedPageSpec extends PageBehaviours {
 
         result.get(LandOrPropertyLeaseDetailsPage(srn, index)) must not be None
         result.get(IsLesseeConnectedPartyPage(srn, index)) must not be None
+        result.get(LandOrPropertyTotalIncomePage(srn, index)) must not be None
       }
 
       List(Some(true), Some(false)).foreach { currentAnswer =>
@@ -82,6 +86,7 @@ class IsLandPropertyLeasedPageSpec extends PageBehaviours {
 
           result.get(LandOrPropertyLeaseDetailsPage(srn, index)) must not be None
           result.get(IsLesseeConnectedPartyPage(srn, index)) must not be None
+          result.get(LandOrPropertyTotalIncomePage(srn, index)) must not be None
         }
       }
 
@@ -94,6 +99,7 @@ class IsLandPropertyLeasedPageSpec extends PageBehaviours {
 
           result.get(LandOrPropertyLeaseDetailsPage(srn, index)) mustBe None
           result.get(IsLesseeConnectedPartyPage(srn, index)) mustBe None
+          result.get(LandOrPropertyTotalIncomePage(srn, index)) mustBe None
         }
       }
     }

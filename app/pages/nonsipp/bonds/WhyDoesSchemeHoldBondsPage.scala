@@ -47,6 +47,7 @@ case class WhyDoesSchemeHoldBondsPage(srn: Srn, index: Max5000) extends Question
   private def dependantPages(srn: Srn): List[Removable[_]] =
     List(
       WhenDidSchemeAcquireBondsPage(srn, index),
-      BondsFromConnectedPartyPage(srn, index)
+      BondsFromConnectedPartyPage(srn, index),
+      CostOfBondsPage(srn, index)
     )
 }
