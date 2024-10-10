@@ -202,6 +202,14 @@ trait ModelGenerators extends BasicGenerators {
       nanos <- Gen.chooseNum(LocalDateTime.MIN.getNano, LocalDateTime.MAX.getNano)
     } yield LocalDateTime.ofEpochSecond(seconds, nanos, ZoneOffset.UTC)
 
+  val localDateGen: Gen[LocalDate] =
+    for {
+      day <- Gen.chooseNum(
+        LocalDate.MIN.toEpochDay,
+        LocalDate.MAX.toEpochDay
+      )
+    } yield LocalDate.ofEpochDay(day)
+
   val manualOrUploadGen: Gen[ManualOrUpload] = Gen.oneOf(ManualOrUpload.values)
 
   implicit val moneyGen: Gen[Money] = for {

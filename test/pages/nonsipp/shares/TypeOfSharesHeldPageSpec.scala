@@ -18,7 +18,8 @@ package pages.nonsipp.shares
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models.TypeOfShares
+import utils.UserAnswersUtils.UserAnswersOps
+import models.{SchemeHoldShare, TypeOfShares, UserAnswers}
 import pages.behaviours.PageBehaviours
 
 class TypeOfSharesHeldPageSpec extends PageBehaviours {
@@ -26,12 +27,26 @@ class TypeOfSharesHeldPageSpec extends PageBehaviours {
   "DidSchemeHoldAnySharesPage" - {
 
     val srn = srnGen.sample.value
+    val localDate = localDateGen.sample.value
     val index = refineMV[OneTo5000](1)
 
     beRetrievable[TypeOfShares](TypeOfSharesHeldPage(srn, index))
-
     beSettable[TypeOfShares](TypeOfSharesHeldPage(srn, index))
-
     beRemovable[TypeOfShares](TypeOfSharesHeldPage(srn, index))
+
+    "cleanup" - {
+      val userAnswers =
+        UserAnswers("id")
+          .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer)
+          .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition)
+          .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index), localDate)
+
+      "do not remove check return dates value when TypeOfSharesHeldPage remains the same" in {
+        val updatedAnswers =
+          userAnswers.set(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer).toOption.value
+        updatedAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)) mustBe Some(SchemeHoldShare.Acquisition)
+        updatedAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)) mustBe Some(localDate)
+      }
+    }
   }
 }
