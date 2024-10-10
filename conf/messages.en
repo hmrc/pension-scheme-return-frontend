@@ -1487,6 +1487,7 @@ amountOfTheLoan.amountOutstanding.error.tooLarge = Total amount of the loan outs
 interestOnLoan.loanInterestRate.title = Interest on the loan
 interestOnLoan.loanInterestRate.heading = Interest on the loan
 interestOnLoan.loanInterestAmount.label = Total interest payable for term of loan, in pounds and pence
+interestOnLoan.loanInterestAmount.hint = Provide the total interest payable as calculated on the date the loan was made.
 interestOnLoan.loanInterestAmount.error.required = Enter the total interest payable for term of loan, in pounds and pence
 interestOnLoan.loanInterestAmount.error.nonNumeric = Total interest payable for term of loan must be an amount of money, like 123 or 123.45
 interestOnLoan.loanInterestAmount.error.max = Total amount of the loan must be 999999999.99 or less
