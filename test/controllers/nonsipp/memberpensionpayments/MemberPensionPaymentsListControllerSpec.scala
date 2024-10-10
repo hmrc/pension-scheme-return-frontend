@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.memberpensionpayments
 
+import play.api.test.FakeRequest
 import services.PsrSubmissionService
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import config.Refined.Max300
@@ -322,5 +323,23 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
         )
         .withName("Submit redirects to view only tasklist")
     )
+
+    "must return OK and render the correct view without back link" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(currentUserAnswers), previousUserAnswers = Some(previousUserAnswers))
+          .build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, onPreviousViewOnly.url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) must include("Submitted on")
+        (contentAsString(result) must not).include("govuk-back-link")
+      }
+    }
   }
 }

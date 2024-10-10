@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.memberpayments
 
+import play.api.test.FakeRequest
 import services.{PsrSubmissionService, SchemeDateService}
 import play.api.mvc.Call
 import controllers.nonsipp.memberpayments.UnallocatedContributionCYAController._
@@ -128,6 +129,37 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
       .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
+
+    "must return OK and render the correct view without back link" in {
+
+      val currentUserAnswers = defaultUserAnswers
+        .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
+        .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+        .unsafeSet(FbVersionPage(srn), "002")
+
+      val previousUserAnswers = defaultUserAnswers
+        .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
+        .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+        .unsafeSet(FbVersionPage(srn), "001")
+
+      val application =
+        applicationBuilder(userAnswers = Some(currentUserAnswers), previousUserAnswers = Some(previousUserAnswers))
+          .build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, onPreviousViewOnly.url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) must include("Unallocated employer contributions")
+        contentAsString(result) must include("Submitted on")
+
+        (contentAsString(result) must not).include("govuk-back-link")
+      }
+    }
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {

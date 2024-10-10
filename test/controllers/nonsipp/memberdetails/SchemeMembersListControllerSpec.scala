@@ -16,7 +16,9 @@
 
 package controllers.nonsipp.memberdetails
 
+import play.api.test.FakeRequest
 import services.PsrSubmissionService
+import pages.nonsipp.membercontributions.MemberContributionsPage
 import play.api.mvc.Call
 import models.ManualOrUpload.{Manual, Upload}
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
@@ -27,7 +29,7 @@ import views.html.ListView
 import eu.timepit.refined._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
-import models.{NormalMode, ViewOnlyMode}
+import models.{NormalMode, UserAnswers, ViewOnlyMode}
 import controllers.nonsipp.memberdetails.SchemeMembersListController._
 import viewmodels.models.{MemberState, SectionCompleted}
 import play.api.inject.guice.GuiceableModule
@@ -80,6 +82,11 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
+
+  val userAnswers: UserAnswers = defaultUserAnswers
+    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(MemberContributionsPage(srn), true)
 
   "SchemeMembersListController" - {
     "incomplete members must be filtered" in {
@@ -286,6 +293,34 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
             .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
         ).withName("Submit redirects to view only tasklist")
       )
+
+      "must return OK and render the correct view without back link" in {
+
+        val currentUserAnswers = userAnswers
+          .unsafeSet(FbVersionPage(srn), "002")
+          .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
+        val previousUserAnswers = userAnswers
+          .unsafeSet(FbVersionPage(srn), "001")
+          .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+
+        val application =
+          applicationBuilder(userAnswers = Some(currentUserAnswers), previousUserAnswers = Some(previousUserAnswers))
+            .build()
+
+        running(application) {
+
+          val request = FakeRequest(GET, onPreviousViewOnly.url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+
+          contentAsString(result) must include("Submitted on")
+
+          (contentAsString(result) must not).include("govuk-back-link")
+        }
+      }
 
     }
   }
