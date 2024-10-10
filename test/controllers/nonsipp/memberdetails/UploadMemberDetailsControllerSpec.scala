@@ -94,7 +94,7 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
 
   "UploadMemberDetailsController" - {
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[UploadView].apply(viewModel(postTarget, formFields, None, "50MB"))
+      injected[UploadView].apply(viewModel(postTarget, formFields, None, "1MB"))
     }.before(mockInitiateUpscan()))
 
     act.like(
@@ -103,8 +103,8 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
           viewModel(
             postTarget,
             formFields,
-            Some(FormError("file-input", "uploadMemberDetails.error.size", Seq("50MB"))),
-            "50MB"
+            Some(FormError("file-input", "uploadMemberDetails.error.size", Seq("1MB"))),
+            "1MB"
           )
         )
       }.before({
@@ -121,7 +121,7 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
     act.like(
       renderView(onPageLoad("InvalidArgument", "'file' field not found")) { implicit app => implicit request =>
         injected[UploadView].apply(
-          viewModel(postTarget, formFields, Some(FormError("file-input", "uploadMemberDetails.error.required")), "50MB")
+          viewModel(postTarget, formFields, Some(FormError("file-input", "uploadMemberDetails.error.required")), "1MB")
         )
       }.updateName(_ + " with error InvalidArgument")
         .before({
