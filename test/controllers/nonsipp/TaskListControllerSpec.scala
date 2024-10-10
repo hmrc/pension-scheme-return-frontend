@@ -44,9 +44,9 @@ import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import play.api.inject
 import viewmodels.models.TaskListStatus.TaskListStatus
 import pages.nonsipp.common.IdentityTypePage
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 import scala.concurrent.Future
-
 import java.time.LocalDateTime
 
 class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
@@ -172,7 +172,8 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
     act.like(
       redirectToPage(
         onPageLoad,
-        controllers.routes.JourneyRecoveryController.onPageLoad(),
+        controllers.routes.JourneyRecoveryController
+          .onPageLoad(Some(RedirectUrl(controllers.routes.OverviewController.onPageLoad(srn).url))),
         defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
       )
     )
