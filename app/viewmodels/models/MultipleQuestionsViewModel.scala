@@ -18,7 +18,7 @@ package viewmodels.models
 
 import models.SelectInput
 import viewmodels.InputWidth
-import viewmodels.DisplayMessage.InlineMessage
+import viewmodels.DisplayMessage.{InlineMessage, Message}
 import play.api.data.Form
 
 sealed trait MultipleQuestionsViewModel[A] {
@@ -123,6 +123,8 @@ case class QuestionField(
   fieldType: FieldType
 ) {
   def withWidth(width: InputWidth): QuestionField = copy(width = Some(width))
+
+  def withHint(message: Message): QuestionField = copy(hint = Some(message))
 }
 
 object QuestionField {
