@@ -61,26 +61,24 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
     submissionNumberTwo,
     submissionNumberOne
   )
-  private lazy val onPreviousViewOnly = routes.BasicDetailsCheckYourAnswersController.onPreviousViewOnly(
-    srn,
-    yearString,
-    submissionNumberTwo,
-    submissionNumberOne
-  )
 
-  // This handles the latest return from the previous tax year
   override def beforeAll(): Unit =
     when(
       mockPsrRetrievalService.getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
-    ).thenReturn(Future.successful(fullUserAnswers)) // Redirect Test 3 - full return submitted last tax year
-      .thenReturn(Future.successful(skippedUserAnswers)) // Redirect Test 5 - skipped return submitted last tax year
-  // Not triggered in any other tests
+    ).thenReturn(Future.successful(fullUserAnswers))
+      .thenReturn(Future.successful(skippedUserAnswers))
 
   override def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
     reset(mockSchemeDateService)
     reset(mockPsrVersionsService)
   }
+  private lazy val onPreviousViewOnly = routes.BasicDetailsCheckYourAnswersController.onPreviousViewOnly(
+    srn,
+    yearString,
+    submissionNumberTwo,
+    submissionNumberOne
+  )
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
@@ -479,6 +477,39 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec with
       .unsafeSet(FbVersionPage(srn), "001")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
       .unsafeSet(ActiveBankAccountPage(srn), true)
+
+    "must return OK and render the correct view without back link" in {
+
+      val currentUserAnswers = defaultUserAnswers
+        .unsafeSet(WhichTaxYearPage(srn), dateRange)
+        .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersUnderThreshold)
+        .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+        .unsafeSet(FbVersionPage(srn), "002")
+        .unsafeSet(ActiveBankAccountPage(srn), true)
+      val previousUserAnswers = currentUserAnswers
+        .unsafeSet(FbVersionPage(srn), "001")
+        .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+        .unsafeSet(ActiveBankAccountPage(srn), true)
+
+      mockTaxYear(dateRange)
+
+      val application = applicationBuilder(
+        userAnswers = Some(currentUserAnswers),
+        previousUserAnswers = Some(previousUserAnswers)
+      ).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, onPreviousViewOnly.url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) must include("Submitted on")
+        (contentAsString(result) must not).include("govuk-back-link")
+      }
+    }
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {

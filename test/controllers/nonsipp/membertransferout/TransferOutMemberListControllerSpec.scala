@@ -32,6 +32,7 @@ import play.api.inject.guice.GuiceableModule
 import controllers.nonsipp.membertransferout.TransferOutMemberListController._
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
+import play.api.test.FakeRequest
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 
@@ -217,6 +218,25 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
       val previousUserAnswers = userAnswers
         .unsafeSet(FbVersionPage(srn), "001")
         .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+
+      "must return OK and render the correct view without back link" in {
+
+        val application =
+          applicationBuilder(userAnswers = Some(currentUserAnswers), previousUserAnswers = Some(previousUserAnswers))
+            .build()
+
+        running(application) {
+
+          val request = FakeRequest(GET, onPreviousViewOnly.url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+
+          contentAsString(result) must include("Submitted on")
+          (contentAsString(result) must not).include("govuk-back-link")
+        }
+      }
 
       act.like(
         renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
