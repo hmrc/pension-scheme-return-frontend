@@ -19,9 +19,7 @@ package pages.nonsipp.employercontributions
 import config.Refined._
 import controllers.TestValues
 import eu.timepit.refined.refineMV
-import utils.UserAnswersUtils.UserAnswersOps
 import models.Money
-import viewmodels.models.SectionStatus
 import pages.behaviours.PageBehaviours
 
 class TotalEmployerContributionPageSpec extends PageBehaviours with TestValues {
@@ -30,70 +28,12 @@ class TotalEmployerContributionPageSpec extends PageBehaviours with TestValues {
 
     val memberIndex = refineMV[Max300.Refined](1)
     val secondaryIndex = refineMV[Max50.Refined](1)
+    val srn = srnGen.sample.value
 
-    beRetrievable[Money](TotalEmployerContributionPage(srnGen.sample.value, memberIndex, secondaryIndex))
+    beRetrievable[Money](TotalEmployerContributionPage(srn, memberIndex, secondaryIndex))
 
-    beSettable[Money](TotalEmployerContributionPage(srnGen.sample.value, memberIndex, secondaryIndex))
+    beSettable[Money](TotalEmployerContributionPage(srn, memberIndex, secondaryIndex))
 
-    beRemovable[Money](TotalEmployerContributionPage(srnGen.sample.value, memberIndex, secondaryIndex))
-
-    "Dependent values: section status and were employer contributions made are" - {
-
-      "changing when type of business added" in {
-        val userAnswers = defaultUserAnswers
-          .unsafeSet(EmployerContributionsPage(srn), true)
-          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-
-        val result = userAnswers
-          .set(TotalEmployerContributionPage(srn, memberIndex, secondaryIndex), money)
-          .success
-          .value
-
-        result.get(EmployerContributionsPage(srn)) must be(Some(true))
-        result.get(TotalEmployerContributionPage(srn, memberIndex, secondaryIndex)) must be(Some(money))
-        result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
-      }
-
-      "not changing when value stays the same" in {
-        val userAnswers = defaultUserAnswers
-          .unsafeSet(EmployerContributionsPage(srn), true)
-          .unsafeSet(EmployerNamePage(srn, memberIndex, secondaryIndex), employerName)
-          .unsafeSet(TotalEmployerContributionPage(srn, memberIndex, secondaryIndex), money)
-          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
-
-        val result = userAnswers
-          .set(TotalEmployerContributionPage(srn, memberIndex, secondaryIndex), money)
-          .success
-          .value
-
-        result.get(EmployerContributionsPage(srn)) must be(Some(true))
-        result.get(TotalEmployerContributionPage(srn, memberIndex, secondaryIndex)) must be(Some(money))
-        result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.Completed))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(Some(true))
-      }
-
-      "changing when value is different" in {
-        val otherMoney: Money = Money(money.value + 1)
-        val userAnswers = defaultUserAnswers
-          .unsafeSet(EmployerContributionsPage(srn), true)
-          .unsafeSet(TotalEmployerContributionPage(srn, memberIndex, secondaryIndex), money)
-          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
-
-        val result =
-          userAnswers
-            .set(TotalEmployerContributionPage(srn, memberIndex, secondaryIndex), otherMoney)
-            .success
-            .value
-
-        result.get(TotalEmployerContributionPage(srn, memberIndex, secondaryIndex)) must be(
-          Some(otherMoney)
-        )
-        result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
-        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
-      }
-    }
+    beRemovable[Money](TotalEmployerContributionPage(srn, memberIndex, secondaryIndex))
   }
 }

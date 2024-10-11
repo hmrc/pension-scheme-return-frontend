@@ -22,7 +22,6 @@ import queries.Removable
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.UserAnswers
-import viewmodels.models.SectionStatus
 import config.Refined.{Max300, Max50}
 import pages.QuestionPage
 
@@ -37,23 +36,9 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
 
   override def cleanup(value: Option[String], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
-      case (Some(_), None) =>
-        // create
-        userAnswers
-          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
-      case (Some(x), Some(y)) if (x == y) =>
-        // value not changed
-        Try(userAnswers)
-      case (Some(x), Some(y)) if (x != y) =>
-        // value changed
-        userAnswers
-          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
       case (None, _) =>
         //deletion
         removePages(userAnswers, pages(srn))
-          .flatMap(_.set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress))
       case _ => Try(userAnswers)
     }
 
@@ -66,7 +51,6 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
       OtherEmployeeDescriptionPage(srn, memberIndex, index),
       ContributionsFromAnotherEmployerPage(srn, memberIndex, index),
       EmployerContributionsCompleted(srn, memberIndex, index),
-      EmployerContributionsMemberListPage(srn),
       EmployerContributionsProgress(srn, memberIndex, index)
     )
 }

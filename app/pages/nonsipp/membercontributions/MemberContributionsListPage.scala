@@ -16,13 +16,7 @@
 
 package pages.nonsipp.membercontributions
 
-import pages.QuestionPage
+import pages.Page
 import models.SchemeId.Srn
-import play.api.libs.json.JsPath
 
-case class MemberContributionsListPage(srn: Srn) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = Paths.membersPayments \ toString
-
-  override def toString: String = "memberContributionsListPage"
-}
+case class MemberContributionsListPage(srn: Srn) extends Page

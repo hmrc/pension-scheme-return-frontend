@@ -127,15 +127,15 @@ class MemberPaymentsTransformerSpec
       activeMemberAllSections,
       deletedMemberAllSections
     ),
-    employerContributionsDetails = SectionDetails(made = true, completed = true),
+    employerContributionMade = Some(true),
     transfersInMade = Some(true),
     transfersOutMade = Some(true),
     unallocatedContribsMade = Some(true),
     unallocatedContribAmount = Some(money.value),
     memberContributionMade = Some(true),
     lumpSumReceived = Some(true),
-    benefitsSurrenderedDetails = SectionDetails(made = true, completed = true),
-    pensionReceived = SectionDetails(made = true, completed = true)
+    surrenderMade = Some(true),
+    pensionReceived = Some(true)
   )
 
   private val softDeletedMemberAllSections = SoftDeletedMember(
@@ -196,44 +196,34 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(EmployerTypeOfBusinessPage(srn, index, employerContribsIndex), IdentityType.UKCompany)
     .unsafeSet(EmployerCompanyCrnPage(srn, index, employerContribsIndex), ConditionalYesNo(crn.asRight[String]))
     .unsafeSet(TotalEmployerContributionPage(srn, index, employerContribsIndex), money)
-    .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
     .unsafeSet(EmployerContributionsCompleted(srn, index, employerContribsIndex), SectionCompleted)
-    .unsafeSet(EmployerContributionsMemberListPage(srn), true)
     .unsafeSet(EmployerContributionsProgress(srn, index, employerContribsIndex), SectionJourneyStatus.Completed)
     // unallocated employer contributions
     .unsafeSet(UnallocatedEmployerContributionsPage(srn), true)
     .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
     // member contributions
     .unsafeSet(MemberContributionsPage(srn), true)
-    .unsafeSet(MemberContributionsListPage(srn), true)
     .unsafeSet(TotalMemberContributionPage(srn, index), money)
     // transfers in
     .unsafeSet(TransfersInSectionCompleted(srn, index, transfersInIndex), SectionCompleted)
-    .unsafeSet(TransfersInJourneyStatus(srn), SectionStatus.Completed)
     .unsafeSet(TransferringSchemeNamePage(srn, index, transfersInIndex), schemeName)
     .unsafeSet(WhenWasTransferReceivedPage(srn, index, transfersInIndex), localDate)
     .unsafeSet(TotalValueTransferPage(srn, index, transfersInIndex), money)
     .unsafeSet(DidTransferIncludeAssetPage(srn, index, transfersInIndex), true)
     .unsafeSet(TransferringSchemeTypePage(srn, index, transfersInIndex), PensionSchemeType.RegisteredPS("123"))
     .unsafeSet(DidSchemeReceiveTransferPage(srn), true)
-    .unsafeSet(TransferReceivedMemberListPage(srn), true)
     .unsafeSet(ReportAnotherTransferInPage(srn, index, transfersInIndex), false)
     // pcls
     .unsafeSet(PensionCommencementLumpSumPage(srn), true)
-    .unsafeSet(PclsMemberListPage(srn), true)
     .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index), PensionCommencementLumpSum(money, money))
     // transfers out
     .unsafeSet(SchemeTransferOutPage(srn), true)
-    .unsafeSet(TransferOutMemberListPage(srn), true)
-    .unsafeSet(TransfersOutJourneyStatus(srn), SectionStatus.Completed)
     .unsafeSet(TransfersOutSectionCompleted(srn, index, transfersOutIndex), SectionCompleted)
     .unsafeSet(ReceivingSchemeNamePage(srn, index, transfersOutIndex), schemeName)
     .unsafeSet(WhenWasTransferMadePage(srn, index, transfersOutIndex), localDate)
     .unsafeSet(ReceivingSchemeTypePage(srn, index, transfersOutIndex), PensionSchemeType.RegisteredPS("456"))
     // pension surrender
     .unsafeSet(SurrenderedBenefitsCompletedPage(srn, index), SectionCompleted)
-    .unsafeSet(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.Completed)
-    .unsafeSet(SurrenderedBenefitsMemberListPage(srn), true)
     .unsafeSet(SurrenderedBenefitsPage(srn), true)
     .unsafeSet(SurrenderedBenefitsAmountPage(srn, index), Money(12.34))
     .unsafeSet(WhenDidMemberSurrenderBenefitsPage(srn, index), LocalDate.of(2022, 12, 12))
@@ -241,8 +231,6 @@ class MemberPaymentsTransformerSpec
     // pension payments
     .unsafeSet(PensionPaymentsReceivedPage(srn), true)
     .unsafeSet(TotalAmountPensionPaymentsPage(srn, index), Money(12.34))
-    .unsafeSet(PensionPaymentsJourneyStatus(srn), SectionStatus.Completed)
-    .unsafeSet(MemberPensionPaymentsListPage(srn), true)
     // soft deleted
     .unsafeSet(SoftDeletedMembers(srn), List(softDeletedMemberAllSections))
 
@@ -274,29 +262,29 @@ class MemberPaymentsTransformerSpec
       activeMemberNoSections,
       deletedMemberNoSections
     ),
-    employerContributionsDetails = SectionDetails(made = false, completed = true),
+    employerContributionMade = Some(false),
     transfersInMade = Some(false),
     transfersOutMade = Some(false),
     unallocatedContribsMade = Some(false),
     unallocatedContribAmount = None,
     memberContributionMade = Some(false),
     lumpSumReceived = Some(false),
-    benefitsSurrenderedDetails = SectionDetails(made = false, completed = true),
-    pensionReceived = SectionDetails(made = false, completed = true)
+    surrenderMade = Some(false),
+    pensionReceived = Some(false)
   )
 
   private val emptyMemberPayments = MemberPayments(
     recordVersion = None,
     memberDetails = Nil,
-    employerContributionsDetails = SectionDetails(made = false, completed = false),
+    employerContributionMade = None,
     transfersInMade = None,
     transfersOutMade = None,
     unallocatedContribsMade = None,
     unallocatedContribAmount = None,
     memberContributionMade = None,
     lumpSumReceived = None,
-    benefitsSurrenderedDetails = SectionDetails(made = false, completed = false),
-    pensionReceived = SectionDetails(made = false, completed = false)
+    surrenderMade = None,
+    pensionReceived = None
   )
 
   private val softDeletedMemberNoSections = SoftDeletedMember(
@@ -327,32 +315,20 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(MemberStatus(srn, index), MemberState.New)
     // employer contributions
     .unsafeSet(EmployerContributionsPage(srn), false)
-    .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-    .unsafeSet(EmployerContributionsMemberListPage(srn), true)
     // unallocated employer contributions
     .unsafeSet(UnallocatedEmployerContributionsPage(srn), false)
     // member contributions
     .unsafeSet(MemberContributionsPage(srn), false)
-    .unsafeSet(MemberContributionsListPage(srn), false)
     // transfers in
-    .unsafeSet(TransfersInJourneyStatus(srn), SectionStatus.Completed)
     .unsafeSet(DidSchemeReceiveTransferPage(srn), false)
-    .unsafeSet(TransferReceivedMemberListPage(srn), true)
     // pcls
     .unsafeSet(PensionCommencementLumpSumPage(srn), false)
-    .unsafeSet(PclsMemberListPage(srn), false)
     // transfers out
     .unsafeSet(SchemeTransferOutPage(srn), false)
-    .unsafeSet(TransferOutMemberListPage(srn), true)
-    .unsafeSet(TransfersOutJourneyStatus(srn), SectionStatus.Completed)
     // pension surrender
-    .unsafeSet(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.Completed)
     .unsafeSet(SurrenderedBenefitsPage(srn), false)
-    .unsafeSet(SurrenderedBenefitsMemberListPage(srn), true)
     // pension payments
     .unsafeSet(PensionPaymentsReceivedPage(srn), false)
-    .unsafeSet(PensionPaymentsJourneyStatus(srn), SectionStatus.Completed)
-    .unsafeSet(MemberPensionPaymentsListPage(srn), true)
     // soft deleted
     .unsafeSet(SoftDeletedMembers(srn), List(softDeletedMemberNoSections))
 
@@ -378,7 +354,7 @@ class MemberPaymentsTransformerSpec
       val userAnswers1 = userAnswersAllSections.remove(MemberStatus(srn, index)).get
       val result =
         intercept[RuntimeException](memberPaymentsTransformer.transformToEtmp(srn, userAnswers1, emptyUserAnswers))
-      result.getMessage shouldMatchTo ("error occured: MemberStatus not found for member 1")
+      result.getMessage shouldMatchTo "error occurred: MemberStatus not found for member 1"
     }
 
     "should return member payments with memberPsrVersion when initial UA contains completion status semantics but initial UA and current UA are same" in {
@@ -417,7 +393,7 @@ class MemberPaymentsTransformerSpec
         .unsafeSet(MemberDetailsNinoPage(srn, index), ninoWithSpaces)
 
       val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswersWithNinoSpaces, userAnswersAllSections)
-      result.get.memberDetails(0).personalDetails.nino.value shouldMatchTo ninoWithSpaces.value.replace(" ", "")
+      result.get.memberDetails.head.personalDetails.nino.value shouldMatchTo ninoWithSpaces.value.replace(" ", "")
     }
 
     "Member state" - {

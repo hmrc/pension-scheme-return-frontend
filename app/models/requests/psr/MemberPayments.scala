@@ -23,25 +23,18 @@ import viewmodels.models.MemberState
 
 import java.time.LocalDate
 
-case class SectionDetails(
-  made: Boolean,
-  completed: Boolean
-) {
-  val started: Boolean = !(!made && !completed)
-}
-
 case class MemberPayments(
   recordVersion: Option[String],
   memberDetails: List[MemberDetails],
-  employerContributionsDetails: SectionDetails,
+  employerContributionMade: Option[Boolean],
   transfersInMade: Option[Boolean],
   transfersOutMade: Option[Boolean],
   unallocatedContribsMade: Option[Boolean],
   unallocatedContribAmount: Option[Double],
   memberContributionMade: Option[Boolean],
   lumpSumReceived: Option[Boolean],
-  pensionReceived: SectionDetails,
-  benefitsSurrenderedDetails: SectionDetails
+  pensionReceived: Option[Boolean],
+  surrenderMade: Option[Boolean]
 )
 
 case class MemberDetails(
@@ -139,7 +132,6 @@ object MemberPersonalDetails {
 }
 
 object MemberPayments {
-  private implicit val formatSectionDetails: Format[SectionDetails] = Json.format[SectionDetails]
   private implicit val formatMemberLumpSumReceived: Format[MemberLumpSumReceived] = Json.format[MemberLumpSumReceived]
   private implicit val formatEmployerContributions: Format[EmployerContributions] = Json.format[EmployerContributions]
   private implicit val formatMemberPersonalDetails: Format[MemberPersonalDetails] = Json.format[MemberPersonalDetails]
