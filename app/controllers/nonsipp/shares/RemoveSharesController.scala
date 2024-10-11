@@ -33,7 +33,7 @@ import pages.nonsipp
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -84,13 +84,7 @@ class RemoveSharesController @Inject()(
               val isLast = request.userAnswers.map(CompanyNameRelatedSharesPages(srn)).size == 1
               for {
                 updatedAnswers <- Future
-                  .fromTry(
-                    request.userAnswers
-                      .remove(
-                        nonsipp.shares.sharesPages(srn, index, isLast)
-                      )
-                      .set(SharesJourneyStatus(srn), SectionStatus.InProgress)
-                  )
+                  .fromTry(request.userAnswers.remove(nonsipp.shares.sharesPages(srn, index, isLast)))
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                   srn,

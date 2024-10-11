@@ -23,7 +23,7 @@ import config.Refined.Max5000
 import models.SchemeId.Srn
 import models.{Money, SchemeHoldAsset}
 import shapeless._
-import viewmodels.models.{SectionCompleted, SectionStatus}
+import viewmodels.models.SectionCompleted
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 
@@ -46,7 +46,6 @@ class OtherAssetsMongoController @Inject()(
       (
         PageWithValue(OtherAssetsHeldPage(srn), true),
         PageWithValue(OtherAssetsCompleted(srn, index), SectionCompleted),
-        PageWithValue(OtherAssetsJourneyStatus(srn), SectionStatus.Completed),
         PageWithValue(OtherAssetsListPage(srn), false),
         PageWithValue(IncomeFromAssetPage(srn, index), Money(34.56)),
         PageWithValue(IndependentValuationPage(srn, index), false),
@@ -62,7 +61,6 @@ class OtherAssetsMongoController @Inject()(
   override type Pages =
     PageWithValue[Boolean] ::
       PageWithValue[SectionCompleted] ::
-      PageWithValue[SectionStatus] ::
       PageWithValue[Boolean] ::
       PageWithValue[Money] ::
       PageWithValue[Boolean] ::

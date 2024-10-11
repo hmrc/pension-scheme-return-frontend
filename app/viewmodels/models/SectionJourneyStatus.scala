@@ -21,41 +21,9 @@ import play.api.mvc.Call
 import play.api.libs.json._
 
 /**
- * Defines the completion state of a section on the PSR task list page
- *
- * `NotStarted` is not defined as this value will be saved in UserAnswers;
- * The absence of a `SectionStatus` value will indicate `Not Started`
- */
-sealed trait SectionStatus {
-  val name: String
-  val isCompleted: Boolean
-}
-
-object SectionStatus {
-  case object InProgress extends WithName("InProgress") with SectionStatus {
-    val isCompleted: Boolean = false
-  }
-
-  case object Completed extends WithName("Completed") with SectionStatus {
-    val isCompleted: Boolean = true
-  }
-
-  implicit val format: Format[SectionStatus] = new Format[SectionStatus] {
-    override def reads(json: JsValue): JsResult[SectionStatus] = json match {
-      case JsString(SectionStatus.InProgress.name) => JsSuccess(SectionStatus.InProgress)
-      case JsString(SectionStatus.Completed.name) => JsSuccess(SectionStatus.Completed)
-      case unknown => JsError(s"Unknown SectionStatus value $unknown")
-    }
-
-    override def writes(o: SectionStatus): JsValue = JsString(o.name)
-  }
-}
-
-/**
  * Defines the completion state of a journey within a section
  */
 sealed trait SectionJourneyStatus extends Product with Serializable {
-  val name: String
   val inProgress: Boolean
   val completed: Boolean
 }
