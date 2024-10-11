@@ -62,7 +62,7 @@ import pages.nonsipp.membertransferout._
 import pages.nonsipp.moneyborrowed._
 import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsStillHeldPage, HowWereBondsDisposedOfPage}
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
-import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
+import viewmodels.models.{MemberState, SectionCompleted}
 
 class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
@@ -545,7 +545,6 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when DidSchemeHoldAnyShares is true and status is Recorded - first incomplete" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
-          .unsafeSet(SharesJourneyStatus(srn), SectionStatus.InProgress)
           // first share:
           .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), TypeOfShares.Unquoted)
           // second share:
@@ -559,7 +558,6 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when DidSchemeHoldAnyShares is true and status is Recorded - second incomplete" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
-          .unsafeSet(SharesJourneyStatus(srn), SectionStatus.InProgress)
           // first share:
           .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), TypeOfShares.Unquoted)
           .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
