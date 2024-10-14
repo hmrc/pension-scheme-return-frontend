@@ -589,7 +589,7 @@ shares.classOfShares.error.length = The class of the shares held in this company
 
 shares.costOfShares.title = What was the total cost of the shares in this company, in pounds and pence?
 shares.costOfShares.heading = What was the total cost of the shares in {0}, in pounds and pence?
-shares.costOfShares.hint = Include all costs related to the transaction. If the shares were contributed or transferred in, provide the total value.
+shares.costOfShares.hint = Include all costs related to the transaction. If the shares were not acquired or subscribed for, provide the total value.
 shares.costOfShares.error.required = Enter the total cost of the shares, in pounds and pence
 shares.costOfShares.error.invalid = Total cost of the shares must be an amount of money, like 123 or 123.45
 shares.costOfShares.error.tooSmall = Total cost of the shares must be 0.01 or more
@@ -2954,7 +2954,7 @@ sharesCYA.section1.Transfer = Transfer
 sharesCYA.section2.heading =  Details of the transaction
 sharesCYA.section2.whenDidSchemeAcquire = Date {0} acquired these {1}
 sharesCYA.section2.whenDidSchemeAcquire.hidden = date {0} acquired these {1}
-sharesCYA.section2.companyNameRelatedShares = Company name of these shares
+sharesCYA.section2.companyNameRelatedShares = What is the company name of these shares
 sharesCYA.section2.companyNameRelatedShares.hidden = company name of these shares
 sharesCYA.section2.companySharesCrn = {0}’s Company Registration Number (CRN)
 sharesCYA.section2.companySharesCrn.hidden = {0}’s Company Registration Number
