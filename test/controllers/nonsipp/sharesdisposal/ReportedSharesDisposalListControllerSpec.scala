@@ -121,6 +121,15 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
 
   "ReportedSharesDisposalListController" - {
 
+    val incompleteUserAnswers = defaultUserAnswers
+      .unsafeSet(TypeOfSharesHeldPage(srn, shareIndexOne), sharesTypeOne)
+      .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndexOne), companyName)
+      .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexOne, disposalIndexOne), howSharesDisposedOne)
+      .unsafeSet(SharesCompleted(srn, shareIndexOne), SectionCompleted)
+      .unsafeSet(SharesDisposalProgress(srn, shareIndexOne, disposalIndexOne), SectionJourneyStatus.Completed)
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
     act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
       injected[ListView].apply(
         form(new YesNoPageFormProvider()),
@@ -132,7 +141,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
           completedUserAnswers,
           schemeName,
           viewOnlyViewModel = None,
-          showBackLink = true
+          showBackLink = true,
+          isMaxLimitReached = true
         )
       )
     }.withName("Completed Journey"))
@@ -146,13 +156,13 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectNextPage(onSubmit, "value" -> "true")
+      redirectNextPage(onSubmit, incompleteUserAnswers, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
     )
 
     act.like(
-      redirectNextPage(onSubmit, "value" -> "false")
+      redirectNextPage(onSubmit, incompleteUserAnswers, "value" -> "false")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
     )
@@ -194,7 +204,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
                 completedUserAnswers,
                 schemeName,
                 viewOnlyViewModel = Some(viewOnlyViewModel),
-                showBackLink = true
+                showBackLink = true,
+                isMaxLimitReached = true
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -217,7 +228,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
                 updatedUserAnswers,
                 schemeName,
                 viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-                showBackLink = true
+                showBackLink = true,
+                isMaxLimitReached = true
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -239,7 +251,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
             noDisposalsUserAnswers,
             schemeName,
             viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-            showBackLink = true
+            showBackLink = true,
+            isMaxLimitReached = true
           )
         )
       }.withName("OnPageLoadViewOnly renders ok with no disposals")
@@ -278,7 +291,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
                 previousVersion = (submissionNumberOne - 1).max(0)
               )
             ),
-            showBackLink = false
+            showBackLink = false,
+            isMaxLimitReached = true
           )
         )
       }.withName("OnPreviousViewOnly renders the view correctly")

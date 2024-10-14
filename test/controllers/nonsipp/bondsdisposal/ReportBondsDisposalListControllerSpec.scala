@@ -95,6 +95,15 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
 
   "ReportBondsDisposalListController" - {
 
+    val completedUserAnswers = defaultUserAnswers
+      .unsafeSet(NameOfBondsPage(srn, bondIndexOne), "Bond Name")
+      .unsafeSet(BondsCompleted(srn, bondIndexOne), SectionCompleted)
+      .unsafeSet(BondsDisposalPage(srn), true)
+      .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexOne), HowDisposed.Sold)
+      .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexOne), SectionJourneyStatus.Completed)
+      .unsafeSet(HowWereBondsDisposedOfPage(srn, bondIndexOne, disposalIndexTwo), HowDisposed.Sold)
+      .unsafeSet(BondsDisposalProgress(srn, bondIndexOne, disposalIndexTwo), SectionJourneyStatus.Completed)
+
     act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
       injected[ListView].apply(
         form(new YesNoPageFormProvider()),
@@ -108,7 +117,8 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
           completedUserAnswers,
           schemeName,
           viewOnlyViewModel = None,
-          showBackLink = true
+          showBackLink = true,
+          isMaxLimitReached = false
         )
       )
     }.withName("Completed Journey"))
@@ -122,13 +132,13 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectNextPage(onSubmit, "value" -> "true")
+      redirectNextPage(onSubmit, completedUserAnswers, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
     )
 
     act.like(
-      redirectNextPage(onSubmit, "value" -> "false")
+      redirectNextPage(onSubmit, completedUserAnswers, "value" -> "false")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
     )
@@ -172,7 +182,8 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
               completedUserAnswers,
               schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel),
-              showBackLink = true
+              showBackLink = true,
+              isMaxLimitReached = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
@@ -196,7 +207,8 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
               updatedUserAnswers,
               schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-              showBackLink = true
+              showBackLink = true,
+              isMaxLimitReached = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -233,7 +245,8 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
                   previousVersion = submissionNumberZero
                 )
               ),
-              showBackLink = false
+              showBackLink = false,
+              isMaxLimitReached = true
             )
           )
       }.withName("OnPreviousViewOnly renders view with parameters for the previous submission")

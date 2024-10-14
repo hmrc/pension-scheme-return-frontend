@@ -21,7 +21,7 @@ import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController._
 import viewmodels.implicits._
 import com.google.inject.Inject
 import cats.implicits._
-import config.Constants.{maxDisposalsPerShare, maxSharesTransactions}
+import config.Constants.maxDisposalsPerShare
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal._
 import forms.YesNoPageFormProvider
@@ -107,6 +107,11 @@ class ReportedSharesDisposalListController @Inject()(
     implicit request: DataRequest[AnyContent]
   ): Result =
     getCompletedDisposals(srn).map { completedDisposals =>
+      val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+      val numberOfSharesItems = request.userAnswers.map(SharesCompleted.all(srn)).size
+      val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
+      val isMaxLimitReached = numberOfDisposals >= maxDisposalsPerShare || numberOfDisposals >= maxPossibleNumberOfDisposals
+
       if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
         Ok(
           view(
@@ -119,7 +124,8 @@ class ReportedSharesDisposalListController @Inject()(
               request.userAnswers,
               request.schemeDetails.schemeName,
               viewOnlyViewModel,
-              showBackLink = showBackLink
+              showBackLink = showBackLink,
+              isMaxLimitReached = isMaxLimitReached
             )
           )
         )
@@ -135,11 +141,15 @@ class ReportedSharesDisposalListController @Inject()(
           val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
           val numberOfSharesItems = request.userAnswers.map(SharesCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
+          val isMaxLimitReached = numberOfDisposals >= maxDisposalsPerShare || numberOfDisposals >= maxPossibleNumberOfDisposals
 
-          if (numberOfDisposals == maxPossibleNumberOfDisposals) {
-            Redirect(
-              navigator.nextPage(ReportedSharesDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
-            ).pure[Future]
+          if (isMaxLimitReached) {
+            for {
+              updatedUserAnswers <- request.userAnswers
+                .set(SharesDisposalCompleted(srn), SectionCompleted)
+                .mapK[Future]
+              _ <- saveService.save(updatedUserAnswers)
+            } yield Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
           } else {
             form
               .bindFromRequest()
@@ -155,7 +165,8 @@ class ReportedSharesDisposalListController @Inject()(
                         disposals,
                         request.userAnswers,
                         request.schemeDetails.schemeName,
-                        showBackLink = true
+                        showBackLink = true,
+                        isMaxLimitReached = true
                       )
                     )
                   ).pure[Future],
@@ -330,7 +341,8 @@ object ReportedSharesDisposalListController {
     userAnswers: UserAnswers,
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
-    showBackLink: Boolean
+    showBackLink: Boolean,
+    isMaxLimitReached: Boolean
   ): FormPageViewModel[ListViewModel] = {
 
     val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
@@ -383,7 +395,7 @@ object ReportedSharesDisposalListController {
     )
 
     val conditionalInsetText: DisplayMessage = {
-      if (numberOfDisposals >= maxSharesTransactions) {
+      if (numberOfDisposals >= maxDisposalsPerShare) {
         Message("sharesDisposal.reportedSharesDisposalList.inset.maximumReached")
       } else if (numberOfDisposals >= maxPossibleNumberOfDisposals) {
         ParagraphMessage("sharesDisposal.reportedSharesDisposalList.inset.allSharesDisposed.paragraph1") ++
@@ -398,7 +410,7 @@ object ReportedSharesDisposalListController {
       title = title,
       heading = heading,
       description = Option.when(
-        !((numberOfDisposals >= maxSharesTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals))
+        !((numberOfDisposals >= maxDisposalsPerShare) | (numberOfDisposals >= maxPossibleNumberOfDisposals))
       )(
         ParagraphMessage("sharesDisposal.reportedSharesDisposalList.description")
       ),
@@ -407,7 +419,7 @@ object ReportedSharesDisposalListController {
         rows(srn, mode, disposals, userAnswers, viewOnlyViewModel, schemeName),
         Message("sharesDisposal.reportedSharesDisposalList.radios"),
         showRadios =
-          !((numberOfDisposals >= maxSharesTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
+          !((numberOfDisposals >= maxDisposalsPerShare) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

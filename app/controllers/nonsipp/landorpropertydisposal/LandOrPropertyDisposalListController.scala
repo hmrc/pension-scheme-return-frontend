@@ -177,7 +177,10 @@ class LandOrPropertyDisposalListController @Inject()(
       val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
       val numberOfAddresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
       val maxPossibleNumberOfDisposals = maxLandOrPropertyDisposals * numberOfAddresses
-      if (numberOfDisposals == maxPossibleNumberOfDisposals) {
+
+      if (numberOfDisposals >= maxLandOrPropertyDisposals) {
+        Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
+      } else if (numberOfDisposals == maxPossibleNumberOfDisposals) {
         Redirect(
           navigator.nextPage(LandOrPropertyDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
         )
@@ -380,17 +383,19 @@ object LandOrPropertyDisposalListController {
       }
     )
 
+    val hasReachedMax = numberOfDisposals >= Constants.maxLandOrPropertyDisposals
+
     FormPageViewModel(
       title = title,
       heading = heading,
-      description = Option.when(numberOfDisposals < maxPossibleNumberOfDisposals)(
+      description = Option.when(!hasReachedMax)(
         ParagraphMessage("landOrPropertyDisposalList.description")
       ),
       page = ListViewModel(
         inset = "landOrPropertyDisposalList.inset",
         rows(srn, mode, addressesWithIndexes, userAnswers, viewOnlyViewModel, schemeName),
         Message("landOrPropertyDisposalList.radios"),
-        showRadios = !mode.isViewOnlyMode && numberOfDisposals < maxPossibleNumberOfDisposals,
+        showRadios = !mode.isViewOnlyMode && !hasReachedMax,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

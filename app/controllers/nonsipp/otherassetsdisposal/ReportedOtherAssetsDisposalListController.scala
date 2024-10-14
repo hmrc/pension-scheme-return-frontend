@@ -26,7 +26,7 @@ import cats.implicits._
 import _root_.config.Constants
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController._
-import _root_.config.Constants.{maxDisposalPerOtherAsset, maxOtherAssetsTransactions}
+import _root_.config.Constants.maxDisposalPerOtherAsset
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import _root_.config.RefinedTypes.{Max50, Max5000}
@@ -106,6 +106,11 @@ class ReportedOtherAssetsDisposalListController @Inject()(
     implicit request: DataRequest[AnyContent]
   ): Result =
     getCompletedDisposals(srn).map { completedDisposals =>
+      val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+      val numberOfOtherAssetsItems = request.userAnswers.map(OtherAssetsCompleted.all(srn)).size
+      val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
+      val isMaxLimitReached = numberOfDisposals >= maxDisposalPerOtherAsset || numberOfDisposals >= maxPossibleNumberOfDisposals
+
       if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
         Ok(
           view(
@@ -118,7 +123,8 @@ class ReportedOtherAssetsDisposalListController @Inject()(
               request.userAnswers,
               request.schemeDetails.schemeName,
               viewOnlyViewModel,
-              showBackLink = showBackLink
+              showBackLink = showBackLink,
+              isMaxLimitReached = isMaxLimitReached
             )
           )
         )
@@ -134,19 +140,34 @@ class ReportedOtherAssetsDisposalListController @Inject()(
           val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
           val numberOfOtherAssetsItems = request.userAnswers.map(OtherAssetsCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
+          val isMaxLimitReached = numberOfDisposals >= maxDisposalPerOtherAsset || numberOfDisposals >= maxPossibleNumberOfDisposals
 
-          if (numberOfDisposals == maxPossibleNumberOfDisposals) {
-            Redirect(
-              navigator
-                .nextPage(ReportedOtherAssetsDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
-            ).pure[Future]
+          if (isMaxLimitReached) {
+            for {
+              updatedUserAnswers <- request.userAnswers
+                .set(OtherAssetsDisposalCompleted(srn), SectionCompleted)
+                .mapK[Future]
+              _ <- saveService.save(updatedUserAnswers)
+            } yield Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
           } else {
             form
               .bindFromRequest()
               .fold(
                 errors =>
                   BadRequest(
-                    view(errors, viewModel(srn, mode, page, disposals, request.userAnswers, "", showBackLink = true))
+                    view(
+                      errors,
+                      viewModel(
+                        srn,
+                        mode,
+                        page,
+                        disposals,
+                        request.userAnswers,
+                        request.schemeDetails.schemeName,
+                        showBackLink = true,
+                        isMaxLimitReached = isMaxLimitReached
+                      )
+                    )
                   ).pure[Future],
                 reportAnotherDisposal =>
                   for {
@@ -317,7 +338,8 @@ object ReportedOtherAssetsDisposalListController {
     userAnswers: UserAnswers,
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
-    showBackLink: Boolean
+    showBackLink: Boolean,
+    isMaxLimitReached: Boolean
   ): FormPageViewModel[ListViewModel] = {
 
     val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
@@ -371,7 +393,7 @@ object ReportedOtherAssetsDisposalListController {
     )
 
     val conditionalInsetText: DisplayMessage = {
-      if (numberOfDisposals >= maxOtherAssetsTransactions) {
+      if (numberOfDisposals >= maxDisposalPerOtherAsset) {
         Message("assetDisposal.reportedOtherAssetsDisposalList.inset.maximumReached")
       } else if (numberOfDisposals >= maxPossibleNumberOfDisposals) {
         ParagraphMessage("assetDisposal.reportedOtherAssetsDisposalList.inset.allOtherAssetsDisposed.paragraph1") ++
@@ -386,7 +408,7 @@ object ReportedOtherAssetsDisposalListController {
       title = title,
       heading = heading,
       description = Option.when(
-        !((numberOfDisposals >= maxOtherAssetsTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals))
+        !isMaxLimitReached
       )(
         ParagraphMessage("assetDisposal.reportedOtherAssetsDisposalList.description")
       ),
@@ -394,8 +416,7 @@ object ReportedOtherAssetsDisposalListController {
         inset = conditionalInsetText,
         rows(srn, mode, disposals, userAnswers, viewOnlyViewModel, schemeName),
         Message("assetDisposal.reportedOtherAssetsDisposalList.radios"),
-        showRadios =
-          !((numberOfDisposals >= maxOtherAssetsTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
+        showRadios = !isMaxLimitReached,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
@@ -409,9 +430,12 @@ object ReportedOtherAssetsDisposalListController {
         )
       ),
       refresh = None,
-      buttonText = "site.saveAndContinue",
-      details = None,
-      onSubmit = routes.ReportedOtherAssetsDisposalListController.onSubmit(srn, page, mode),
+      buttonText = if (isMaxLimitReached) "site.saveAndContinue" else "site.return.to.tasklist",
+      onSubmit = if (isMaxLimitReached) {
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+      } else {
+        routes.ReportedOtherAssetsDisposalListController.onSubmit(srn, page, mode)
+      },
       optViewOnlyDetails = viewOnlyViewModel.map { viewOnly =>
         ViewOnlyDetailsViewModel(
           updated = viewOnly.viewOnlyUpdated,

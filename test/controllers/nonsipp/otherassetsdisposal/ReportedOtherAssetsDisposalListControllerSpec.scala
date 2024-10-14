@@ -114,6 +114,22 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
 
   "ReportedOtherAssetsDisposalListController" - {
 
+    val completedUserAnswers = defaultUserAnswers
+      .unsafeSet(WhatIsOtherAssetPage(srn, otherAssetIndexOne), nameOfAsset)
+      .unsafeSet(HowWasAssetDisposedOfPage(srn, otherAssetIndexOne, disposalIndexOne), howOtherAssetsDisposedOne)
+      .unsafeSet(HowWasAssetDisposedOfPage(srn, otherAssetIndexOne, disposalIndexTwo), howOtherAssetsDisposedTwo)
+      .unsafeSet(OtherAssetsCompleted(srn, otherAssetIndexOne), SectionCompleted)
+      .unsafeSet(OtherAssetsDisposalProgress(srn, otherAssetIndexOne, disposalIndexOne), SectionJourneyStatus.Completed)
+      .unsafeSet(OtherAssetsDisposalProgress(srn, otherAssetIndexOne, disposalIndexTwo), SectionJourneyStatus.Completed)
+      .unsafeSet(WhatIsOtherAssetPage(srn, otherAssetIndexTwo), nameOfAsset)
+      .unsafeSet(HowWasAssetDisposedOfPage(srn, otherAssetIndexTwo, disposalIndexOne), howOtherAssetsDisposedTwo)
+      .unsafeSet(HowWasAssetDisposedOfPage(srn, otherAssetIndexTwo, disposalIndexTwo), howOtherAssetsDisposedThree)
+      .unsafeSet(OtherAssetsCompleted(srn, otherAssetIndexTwo), SectionCompleted)
+      .unsafeSet(OtherAssetsDisposalProgress(srn, otherAssetIndexTwo, disposalIndexOne), SectionJourneyStatus.Completed)
+      .unsafeSet(OtherAssetsDisposalProgress(srn, otherAssetIndexTwo, disposalIndexTwo), SectionJourneyStatus.Completed)
+      .unsafeSet(FbVersionPage(srn), "002")
+      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
     act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
       injected[ListView].apply(
         form(new YesNoPageFormProvider()),
@@ -125,7 +141,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
           completedUserAnswers,
           schemeName,
           viewOnlyViewModel = None,
-          showBackLink = true
+          showBackLink = true,
+          isMaxLimitReached = false
         )
       )
     }.withName("Completed Journey"))
@@ -139,13 +156,13 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectNextPage(onSubmit, "value" -> "true")
+      redirectNextPage(onSubmit, completedUserAnswers, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
     )
 
     act.like(
-      redirectNextPage(onSubmit, "value" -> "false")
+      redirectNextPage(onSubmit, completedUserAnswers, "value" -> "false")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
     )
@@ -187,7 +204,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
               completedUserAnswers,
               schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel),
-              showBackLink = true
+              showBackLink = true,
+              isMaxLimitReached = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
@@ -209,7 +227,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
               updatedUserAnswers,
               schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-              showBackLink = true
+              showBackLink = true,
+              isMaxLimitReached = true
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -231,7 +250,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
             noDisposalsUserAnswers,
             schemeName,
             viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-            showBackLink = true
+            showBackLink = true,
+            isMaxLimitReached = true
           )
         )
       }.withName("OnPageLoadViewOnly renders ok with no disposals")
@@ -269,7 +289,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
                 previousVersion = submissionNumberZero
               )
             ),
-            showBackLink = false
+            showBackLink = false,
+            isMaxLimitReached = true
           )
         )
       }.withName(

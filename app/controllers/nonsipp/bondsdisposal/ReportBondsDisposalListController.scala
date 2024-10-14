@@ -21,7 +21,7 @@ import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage}
 import viewmodels.implicits._
 import play.api.mvc._
 import cats.implicits._
-import config.Constants.{maxBondsTransactions, maxDisposalPerBond}
+import config.Constants.maxDisposalPerBond
 import controllers.actions.IdentifyAndRequireData
 import viewmodels.models.TaskListStatus.Updated
 import models.HowDisposed.HowDisposed
@@ -95,7 +95,6 @@ class ReportBondsDisposalListController @Inject()(
     )
     onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel), showBackLink)
   }
-
   def onPageLoadCommon(
     srn: Srn,
     page: Int,
@@ -109,32 +108,32 @@ class ReportBondsDisposalListController @Inject()(
       val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
       val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
       val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
-      getBondsDisposalsWithIndexes(srn, completedDisposals)
-        .map(
-          bondsDisposalsWithIndexes =>
-            if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
-              Ok(
-                view(
-                  form,
-                  viewModel(
-                    srn,
-                    mode,
-                    page,
-                    bondsDisposalsWithIndexes,
-                    numberOfDisposals,
-                    maxPossibleNumberOfDisposals,
-                    request.userAnswers,
-                    request.schemeDetails.schemeName,
-                    viewOnlyViewModel,
-                    showBackLink = showBackLink
-                  )
-                )
+      val isMaxLimitReached = numberOfDisposals >= maxDisposalPerBond || numberOfDisposals >= maxPossibleNumberOfDisposals
+
+      getBondsDisposalsWithIndexes(srn, completedDisposals).map { bondsDisposalsWithIndexes =>
+        if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
+          Ok(
+            view(
+              form,
+              viewModel(
+                srn,
+                mode,
+                page,
+                bondsDisposalsWithIndexes,
+                numberOfDisposals,
+                maxPossibleNumberOfDisposals,
+                request.userAnswers,
+                request.schemeDetails.schemeName,
+                viewOnlyViewModel,
+                showBackLink = showBackLink,
+                isMaxLimitReached = isMaxLimitReached
               )
-            } else {
-              Redirect(routes.BondsDisposalController.onPageLoad(srn, NormalMode))
-            }
-        )
-        .merge
+            )
+          )
+        } else {
+          Redirect(routes.BondsDisposalController.onPageLoad(srn, NormalMode))
+        }
+      }.merge
     }.merge
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
@@ -144,35 +143,40 @@ class ReportBondsDisposalListController @Inject()(
           val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
           val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
-          if (numberOfDisposals == maxPossibleNumberOfDisposals) {
-            Redirect(
-              navigator.nextPage(ReportBondsDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
-            ).pure[Future]
+          val isMaxLimitReached = numberOfDisposals >= maxDisposalPerBond || numberOfDisposals >= maxPossibleNumberOfDisposals
+
+          if (isMaxLimitReached) {
+            for {
+              updatedUserAnswers <- request.userAnswers
+                .set(BondsDisposalCompleted(srn), SectionCompleted)
+                .mapK[Future]
+              _ <- saveService.save(updatedUserAnswers)
+            } yield Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
           } else {
             form
               .bindFromRequest()
               .fold(
                 errors =>
                   getBondsDisposalsWithIndexes(srn, completedDisposals)
-                    .map(
-                      indexes =>
-                        BadRequest(
-                          view(
-                            errors,
-                            viewModel(
-                              srn,
-                              mode,
-                              page,
-                              indexes,
-                              numberOfDisposals,
-                              maxPossibleNumberOfDisposals,
-                              request.userAnswers,
-                              request.schemeDetails.schemeName,
-                              showBackLink = true
-                            )
+                    .map { indexes =>
+                      BadRequest(
+                        view(
+                          errors,
+                          viewModel(
+                            srn,
+                            mode,
+                            page,
+                            indexes,
+                            numberOfDisposals,
+                            maxPossibleNumberOfDisposals,
+                            request.userAnswers,
+                            request.schemeDetails.schemeName,
+                            showBackLink = true,
+                            isMaxLimitReached = isMaxLimitReached
                           )
                         )
-                    )
+                      )
+                    }
                     .merge
                     .pure[Future],
                 addAnotherDisposal =>
@@ -355,7 +359,8 @@ object ReportBondsDisposalListController {
     userAnswers: UserAnswers,
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
-    showBackLink: Boolean
+    showBackLink: Boolean,
+    isMaxLimitReached: Boolean
   ): FormPageViewModel[ListViewModel] = {
 
     val (title, heading) = ((mode, numberOfDisposals) match {
@@ -401,7 +406,7 @@ object ReportBondsDisposalListController {
     )
 
     val conditionalInsetText: DisplayMessage = {
-      if (numberOfDisposals >= maxBondsTransactions) {
+      if (isMaxLimitReached) {
         Message("bondsDisposal.reportBondsDisposalList.inset.maximumReached")
       } else if (numberOfDisposals >= maxPossibleNumberOfDisposals) {
         ParagraphMessage("bondsDisposal.reportBondsDisposalList.inset.allBondsDisposed.paragraph1") ++
@@ -415,17 +420,14 @@ object ReportBondsDisposalListController {
       mode = mode,
       title = title,
       heading = heading,
-      description = Option.when(
-        !((numberOfDisposals >= maxBondsTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals))
-      )(
+      description = Option.when(!isMaxLimitReached)(
         ParagraphMessage("bondsDisposal.reportBondsDisposalList.description")
       ),
       page = ListViewModel(
         inset = conditionalInsetText,
         rows(srn, mode, bondsDisposalsWithIndexes, userAnswers, viewOnlyViewModel, schemeName),
         Message("bondsDisposal.reportBondsDisposalList.radios"),
-        showRadios =
-          !((numberOfDisposals >= maxBondsTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
+        showRadios = !isMaxLimitReached,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
@@ -439,9 +441,13 @@ object ReportBondsDisposalListController {
         )
       ),
       refresh = None,
-      buttonText = "site.saveAndContinue",
+      buttonText = if (isMaxLimitReached) "site.saveAndContinue" else "site.saveAndContinue",
       details = None,
-      onSubmit = routes.ReportBondsDisposalListController.onSubmit(srn, page, mode),
+      onSubmit = if (isMaxLimitReached) {
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+      } else {
+        routes.ReportBondsDisposalListController.onSubmit(srn, page, mode)
+      },
       optViewOnlyDetails = viewOnlyViewModel.map { viewOnly =>
         ViewOnlyDetailsViewModel(
           updated = viewOnly.viewOnlyUpdated,
