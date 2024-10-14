@@ -123,20 +123,23 @@ object TotalProceedsSaleLandPropertyController {
     FormPageViewModel(
       title = "totalProceedsSaleLandProperty.title",
       heading = Message("totalProceedsSaleLandProperty.heading", addressLine1),
-      description = Some(
-        ParagraphMessage("totalProceedsSaleLandProperty.paragraph") ++
-          ListMessage(
-            ListType.Bullet,
-            "totalProceedsSaleLandProperty.list1",
-            "totalProceedsSaleLandProperty.list2"
-          )
-      ),
+      description = None,
       refresh = None,
       buttonText = Message("site.saveAndContinue"),
       details = None,
       page = SingleQuestion(
         form,
-        QuestionField.input(Empty)
+        QuestionField.input(
+          Empty,
+          Some(
+            ParagraphMessage("totalProceedsSaleLandProperty.paragraph") ++
+              ListMessage(
+                ListType.Bullet,
+                "totalProceedsSaleLandProperty.list1",
+                "totalProceedsSaleLandProperty.list2"
+              )
+          )
+        )
       ),
       onSubmit = routes.TotalProceedsSaleLandPropertyController.onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
     )
