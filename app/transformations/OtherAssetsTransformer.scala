@@ -18,7 +18,6 @@ package transformations
 
 import pages.nonsipp.otherassetsdisposal._
 import config.Refined.{Max5000, OneTo50, OneTo5000}
-import viewmodels.models.SectionStatus.Completed
 import models.SchemeId.Srn
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import eu.timepit.refined.refineV
@@ -429,7 +428,6 @@ class OtherAssetsTransformer @Inject() extends Transformer {
     val otherAssetTransactions = otherAssets.otherAssetTransactions
     val userAnswersOfOtherAssetsHeld = userAnswers
       .set(OtherAssetsHeldPage(srn), otherAssets.otherAssetsWereHeld)
-      .set(OtherAssetsJourneyStatus(srn), Completed)
       .set(OtherAssetsListPage(srn), otherAssets.otherAssetTransactions.nonEmpty)
     val userAnswersWithRecordVersion =
       otherAssets.recordVersion.fold(userAnswersOfOtherAssetsHeld)(
