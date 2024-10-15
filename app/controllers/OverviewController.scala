@@ -94,7 +94,6 @@ class OverviewController @Inject()(
               .find(x => LocalDate.parse(x.startDate) == yearFrom)
               .flatMap(_.data.sortBy(_.reportVersion).lastOption)
               .map(_.reportFormBundleNumber)
-              .getOrElse("")
 
             val (status, url, label) = if (compiled) {
               (
@@ -257,19 +256,22 @@ class OverviewController @Inject()(
     srn: Srn,
     taxYear: String,
     version: String,
-    fbNumber: String,
+    fbNumber: Option[String],
     reportType: String
   ): Action[AnyContent] =
     identifyAndRequireData(srn, taxYear, version).async { implicit request =>
       reportType match {
         case PsrReportType.Sipp.name =>
           val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippContinueJourney}"
-          Future.successful(
-            Redirect(sippUrl)
+          Future.successful {
+            val result = Redirect(sippUrl)
               .addingToSession(Constants.TAX_YEAR -> taxYear)
               .addingToSession(Constants.VERSION -> version)
-              .addingToSession(Constants.FB_NUMBER -> fbNumber)
-          )
+
+            fbNumber
+              .map(fb => result.addingToSession(Constants.FB_NUMBER -> fb))
+              .getOrElse(result)
+          }
         case _ =>
           Future.successful(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
       }
