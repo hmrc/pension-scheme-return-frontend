@@ -22,7 +22,7 @@ package pages.nonsipp.$directory$
 $endif$
 
 $if(!index.empty)$
-import config.Refined._
+import config.RefinedTypes._
 import utils.RefinedUtils._
 $endif$
 

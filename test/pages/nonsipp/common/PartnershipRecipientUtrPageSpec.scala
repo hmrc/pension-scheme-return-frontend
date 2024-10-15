@@ -16,7 +16,7 @@
 
 package pages.nonsipp.common
 
-import config.Refined.OneTo5000
+import config.RefinedTypes.OneTo5000
 import eu.timepit.refined.refineMV
 import models.{ConditionalYesNo, IdentitySubject, Utr}
 import eu.timepit.refined.api.Refined

@@ -17,13 +17,13 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import models.IdentityType._
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.RadioListView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.NormalMode
 import controllers.nonsipp.landorpropertydisposal.WhoPurchasedLandOrPropertyController._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class WhoPurchasedLandOrPropertyControllerSpec extends ControllerBaseSpec {
 

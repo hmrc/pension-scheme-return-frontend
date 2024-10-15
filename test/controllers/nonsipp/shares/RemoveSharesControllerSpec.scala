@@ -18,8 +18,6 @@ package controllers.nonsipp.shares
 
 import services.PsrSubmissionService
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
@@ -29,6 +27,8 @@ import controllers.nonsipp.shares.RemoveSharesController._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{reset, when}
+import config.RefinedTypes.Max5000
+import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 

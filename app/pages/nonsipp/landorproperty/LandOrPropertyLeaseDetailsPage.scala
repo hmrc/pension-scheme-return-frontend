@@ -17,11 +17,11 @@
 package pages.nonsipp.landorproperty
 
 import utils.RefinedUtils._
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models._
-import config.Refined.Max5000
-import pages.QuestionPage
 
 import java.time.LocalDate
 

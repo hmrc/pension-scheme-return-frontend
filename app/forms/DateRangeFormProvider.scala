@@ -16,14 +16,14 @@
 
 package forms
 
-import config.Refined.Max3
-import play.api.data.Forms.mapping
 import models.DateRange
 import uk.gov.hmrc.time.TaxYear
 import play.api.data.Form
 import forms.mappings.errors.DateFormErrors
 import forms.mappings.Mappings
 import com.google.inject.Inject
+import play.api.data.Forms.mapping
+import config.RefinedTypes.Max3
 
 class DateRangeFormProvider @Inject()() extends Mappings {
 

@@ -19,7 +19,7 @@ package controllers.nonsipp.landorproperty
 import services.SaveService
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 import controllers.actions._
 import navigation.Navigator

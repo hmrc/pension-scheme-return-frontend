@@ -16,6 +16,8 @@
 
 package transformations
 
+import models.SchemeHoldLandProperty.{Acquisition, Transfer}
+import config.RefinedTypes.{Max5000, OneTo50, OneTo5000}
 import pages.nonsipp.landorproperty._
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import eu.timepit.refined.refineV
@@ -28,8 +30,6 @@ import models.requests.DataRequest
 import eu.timepit.refined.api.Refined
 import models.HowDisposed.{HowDisposed, Other, Sold}
 import com.google.inject.Singleton
-import config.Refined.{Max5000, OneTo50, OneTo5000}
-import models.SchemeHoldLandProperty.{Acquisition, Transfer}
 import pages.nonsipp.landorproperty.Paths.landOrProperty
 import models.SchemeId.Srn
 import models.requests.psr._

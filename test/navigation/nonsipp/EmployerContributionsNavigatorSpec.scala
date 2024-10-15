@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import pages.nonsipp.employercontributions._
 import utils.BaseSpec
-import config.Refined.{Max300, Max50}
+import config.RefinedTypes.{Max300, Max50}
 import models.SchemeId.Srn
 import eu.timepit.refined.{refineMV, refineV}
 import navigation.{Navigator, NavigatorBehaviours}

@@ -19,7 +19,7 @@ package controllers.nonsipp.memberreceivedpcls
 import services.SaveService
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import com.google.inject.Inject
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel.DoubleQuestion
 import config.Constants.{maxPCLSAmount, minPosMoneyValue}
 import controllers.actions._
 import navigation.Navigator
@@ -31,8 +31,8 @@ import viewmodels.implicits._
 import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
 import controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max300
-import viewmodels.models.MultipleQuestionsViewModel.DoubleQuestion
+import config.RefinedTypes.Max300
+import controllers.PSRController
 import views.html.MultipleQuestionView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}

@@ -20,7 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import forms.mappings.Mappings
 import models.PensionSchemeType._
-import config.Refined.{Max300, Max5}
+import config.RefinedTypes.{Max300, Max5}
 import pages.nonsipp.receivetransfer.TransferringSchemeTypePage
 import config.Constants.{inputRegexPSTR, inputRegexQROPS, maxNotRelevant}
 import controllers.actions.IdentifyAndRequireData

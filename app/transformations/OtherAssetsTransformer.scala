@@ -17,7 +17,7 @@
 package transformations
 
 import pages.nonsipp.otherassetsdisposal._
-import config.Refined.{Max5000, OneTo50, OneTo5000}
+import config.RefinedTypes.{Max5000, OneTo50, OneTo5000}
 import models.SchemeId.Srn
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import eu.timepit.refined.refineV

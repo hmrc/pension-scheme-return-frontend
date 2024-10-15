@@ -16,7 +16,7 @@
 
 package pages.nonsipp.membersurrenderedbenefits
 
-import config.Refined.Max300
+import config.RefinedTypes.Max300
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 

@@ -17,11 +17,11 @@
 package pages.nonsipp.sharesdisposal
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
+import config.RefinedTypes.{Max50, Max5000}
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.Money
-import config.Refined.{Max50, Max5000}
-import pages.QuestionPage
 
 case class TotalConsiderationSharesRedeemedPage(srn: Srn, shareIndex: Max5000, disposalIndex: Max50)
     extends QuestionPage[Money] {

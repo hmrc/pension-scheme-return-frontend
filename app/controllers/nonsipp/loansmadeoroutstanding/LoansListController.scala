@@ -18,7 +18,6 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import viewmodels.implicits._
 import play.api.mvc._
-import com.google.inject.Inject
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.{getCompletedOrUpdatedTaskListStatus, getLoansTaskListStatusAndLink}
 import cats.implicits._
@@ -28,7 +27,8 @@ import forms.YesNoPageFormProvider
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n.MessagesApi
 import eu.timepit.refined.api.Refined
-import _root_.config.Refined.{Max5000, OneTo5000}
+import _root_.config.RefinedTypes.{Max5000, OneTo5000}
+import com.google.inject.Inject
 import views.html.ListView
 import models.SchemeId.Srn
 import controllers.nonsipp.loansmadeoroutstanding.LoansListController._

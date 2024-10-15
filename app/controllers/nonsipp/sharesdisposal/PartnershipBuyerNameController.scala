@@ -19,7 +19,7 @@ package controllers.nonsipp.sharesdisposal
 import services.SaveService
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max50, Max5000}
+import config.RefinedTypes.{Max50, Max5000}
 import controllers.actions._
 import pages.nonsipp.sharesdisposal.PartnershipBuyerNamePage
 import navigation.Navigator

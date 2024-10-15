@@ -20,7 +20,7 @@ import services.SaveService
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants.{maxSurrenderedBenefitAmount, minPosMoneyValue}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -30,8 +30,8 @@ import models.{Mode, Money}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
-import config.Refined.Max300
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import config.RefinedTypes.Max300
+import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountController._

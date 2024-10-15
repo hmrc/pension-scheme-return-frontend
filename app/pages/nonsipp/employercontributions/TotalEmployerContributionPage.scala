@@ -17,11 +17,11 @@
 package pages.nonsipp.employercontributions
 
 import utils.RefinedUtils._
+import pages.QuestionPage
+import config.RefinedTypes._
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.Money
-import config.Refined._
-import pages.QuestionPage
 
 case class TotalEmployerContributionPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends QuestionPage[Money] {
 

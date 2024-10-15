@@ -18,7 +18,7 @@ package controllers.nonsipp.landorproperty
 
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
 import pages.nonsipp.landorproperty._
 import controllers.actions._
@@ -30,8 +30,8 @@ import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
 import services.SaveService
 import controllers.nonsipp.landorproperty.LandOrPropertyTotalIncomeController._
-import config.Refined.Max5000
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.{Empty, Message}

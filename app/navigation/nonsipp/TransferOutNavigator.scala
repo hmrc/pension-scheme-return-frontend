@@ -17,13 +17,13 @@
 package navigation.nonsipp
 
 import play.api.mvc.Call
+import pages.Page
+import config.RefinedTypes.{Max300, Max5}
 import models.SchemeId.Srn
 import cats.implicits.toTraverseOps
 import navigation.JourneyNavigator
 import models.{NormalMode, UserAnswers}
 import pages.nonsipp.membertransferout._
-import config.Refined.{Max300, Max5}
-import pages.Page
 
 object TransferOutNavigator extends JourneyNavigator {
 

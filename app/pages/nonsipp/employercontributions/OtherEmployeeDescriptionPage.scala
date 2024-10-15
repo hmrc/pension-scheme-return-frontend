@@ -17,10 +17,10 @@
 package pages.nonsipp.employercontributions
 
 import utils.RefinedUtils._
+import pages.QuestionPage
+import config.RefinedTypes._
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
-import config.Refined._
-import pages.QuestionPage
 
 case class OtherEmployeeDescriptionPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends QuestionPage[String] {
 

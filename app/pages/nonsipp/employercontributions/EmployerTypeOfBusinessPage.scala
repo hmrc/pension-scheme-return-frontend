@@ -17,12 +17,12 @@
 package pages.nonsipp.employercontributions
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
+import config.RefinedTypes.{Max300, Max50}
 import models.SchemeId.Srn
 import models.UserAnswers.implicits.UserAnswersTryOps
 import play.api.libs.json.JsPath
 import models.{IdentityType, UserAnswers}
-import config.Refined.{Max300, Max50}
-import pages.QuestionPage
 
 import scala.util.Try
 

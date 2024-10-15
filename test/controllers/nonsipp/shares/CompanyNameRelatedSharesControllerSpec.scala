@@ -17,12 +17,12 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, TypeOfSharesHeldPage}
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.shares.CompanyNameRelatedSharesController._
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.{NormalMode, TypeOfShares}
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 import views.html.TextInputView
 import models.TypeOfShares.ConnectedParty
 

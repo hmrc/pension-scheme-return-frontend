@@ -21,8 +21,6 @@ import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import models.PointOfEntry.{NoPointOfEntry, WhoWereTheSharesSoldToPointOfEntry}
 import models.IdentityType._
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.sharesdisposal.WhoWereTheSharesSoldToController._
 import pages.nonsipp.sharesdisposal.{SharesDisposalCYAPointOfEntry, WhoWereTheSharesSoldToPage}
@@ -33,6 +31,8 @@ import play.api.i18n.MessagesApi
 import play.api.data.Form
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.RadioListView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

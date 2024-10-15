@@ -18,12 +18,12 @@ package navigation.nonsipp
 
 import play.api.mvc.Call
 import models.PointOfEntry.{HowWereBondsDisposedPointOfEntry, NoPointOfEntry}
+import pages.Page
+import config.RefinedTypes.Max50
 import cats.implicits.toTraverseOps
 import navigation.JourneyNavigator
 import models._
 import pages.nonsipp.bondsdisposal._
-import config.Refined.Max50
-import pages.Page
 
 object BondsDisposalNavigator extends JourneyNavigator {
 

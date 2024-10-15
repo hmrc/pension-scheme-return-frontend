@@ -21,12 +21,12 @@ import utils.PageUtils._
 import queries.Removable
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import models.{IdentitySubject, IdentityType, UserAnswers}
 import pages.nonsipp.loansmadeoroutstanding._
-import config.Refined.Max5000
-import pages.QuestionPage
 import pages.nonsipp.loansmadeoroutstanding
 import play.api.libs.json.JsPath
 

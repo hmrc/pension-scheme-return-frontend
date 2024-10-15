@@ -16,7 +16,7 @@
 
 package pages.nonsipp.otherassetsheld
 
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import eu.timepit.refined.refineMV
 import uk.gov.hmrc.domain.Nino
 import models.ConditionalYesNo

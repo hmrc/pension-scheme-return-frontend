@@ -17,7 +17,7 @@
 package services
 
 import com.google.inject.ImplementedBy
-import config.Refined.{Max3, OneToThree}
+import config.RefinedTypes.{Max3, OneToThree}
 import eu.timepit.refined.refineV
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import models.DateRange

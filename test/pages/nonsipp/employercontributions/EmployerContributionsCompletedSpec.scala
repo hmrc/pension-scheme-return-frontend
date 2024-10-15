@@ -17,7 +17,7 @@
 package pages.nonsipp.employercontributions
 
 import pages.nonsipp.employercontributions.EmployerContributionsCompleted.EmployerContributionsUserAnswersOps
-import config.Refined._
+import config.RefinedTypes._
 import eu.timepit.refined.refineMV
 import models.{SchemeId, UserAnswers}
 import viewmodels.models.SectionCompleted

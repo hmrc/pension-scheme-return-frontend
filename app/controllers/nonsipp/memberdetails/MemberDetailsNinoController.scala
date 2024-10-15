@@ -22,7 +22,7 @@ import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsNinoPage
 import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max300
+import config.RefinedTypes.Max300
 import controllers.actions._
 import forms.TextFormProvider
 import models.{Mode, NameDOB}

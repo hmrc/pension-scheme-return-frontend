@@ -22,7 +22,7 @@ import utils.Country
 import viewmodels.implicits._
 import play.api.mvc._
 import forms.mappings.Mappings
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel.{QuintupleQuestion, SextupleQuestion}
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.actions._
 import navigation.Navigator
@@ -30,8 +30,8 @@ import forms.MultipleQuestionFormProvider
 import models._
 import viewmodels.models._
 import forms.mappings.errors.InputFormErrors
-import config.Refined._
-import viewmodels.models.MultipleQuestionsViewModel.{QuintupleQuestion, SextupleQuestion}
+import config.RefinedTypes._
+import controllers.PSRController
 import views.html.MultipleQuestionView
 import models.SchemeId.Srn
 import play.api.i18n.MessagesApi

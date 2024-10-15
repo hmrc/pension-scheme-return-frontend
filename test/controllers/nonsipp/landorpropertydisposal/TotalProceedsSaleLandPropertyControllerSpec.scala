@@ -17,14 +17,14 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import controllers.nonsipp.landorpropertydisposal.TotalProceedsSaleLandPropertyController._
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.TotalProceedsSaleLandPropertyPage
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class TotalProceedsSaleLandPropertyControllerSpec extends ControllerBaseSpec {
 

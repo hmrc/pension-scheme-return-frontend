@@ -17,8 +17,6 @@
 package controllers.nonsipp.membersurrenderedbenefits
 
 import services.SchemeDateService
-import config.Refined.Max300
-import controllers.ControllerBaseSpec
 import views.html.DatePageView
 import eu.timepit.refined.refineMV
 import play.api.inject
@@ -29,6 +27,8 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito.{reset, when}
+import config.RefinedTypes.Max300
+import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 

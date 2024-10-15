@@ -18,13 +18,13 @@ package controllers.nonsipp.otherassetsheld
 
 import controllers.nonsipp.otherassetsheld.OtherAssetSellerConnectedPartyController._
 import pages.nonsipp.otherassetsheld.{IndividualNameOfOtherAssetSellerPage, OtherAssetSellerConnectedPartyPage}
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
 import pages.nonsipp.common.IdentityTypePage
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class OtherAssetSellerConnectedPartyControllerSpec extends ControllerBaseSpec {
 

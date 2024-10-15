@@ -17,12 +17,12 @@
 package controllers.nonsipp.employercontributions
 
 import pages.nonsipp.employercontributions.{EmployerCompanyCrnPage, EmployerNamePage}
-import config.Refined.{Max300, Max50}
-import controllers.ControllerBaseSpec
 import views.html.ConditionalYesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
+import config.RefinedTypes.{Max300, Max50}
+import controllers.ControllerBaseSpec
 
 class EmployerCompanyCrnControllerSpec extends ControllerBaseSpec {
 

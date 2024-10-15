@@ -21,8 +21,6 @@ import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import models.IdentityType.{Other, UKCompany, UKPartnership}
-import config.Refined.{Max300, Max50}
-import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -31,6 +29,8 @@ import play.api.i18n.MessagesApi
 import play.api.data.Form
 import pages.nonsipp.employercontributions.{EmployerNamePage, EmployerTypeOfBusinessPage}
 import services.SaveService
+import config.RefinedTypes.{Max300, Max50}
+import controllers.PSRController
 import views.html.RadioListView
 import models.SchemeId.Srn
 import utils.FunctionKUtils._

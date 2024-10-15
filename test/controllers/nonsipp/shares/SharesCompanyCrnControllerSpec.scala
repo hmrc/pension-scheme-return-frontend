@@ -18,12 +18,12 @@ package controllers.nonsipp.shares
 
 import controllers.nonsipp.shares.SharesCompanyCrnController._
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompanyCrnPage}
-import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import views.html.ConditionalYesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
+import config.RefinedTypes.Max5000
+import controllers.ControllerBaseSpec
 
 class SharesCompanyCrnControllerSpec extends ControllerBaseSpec {
 

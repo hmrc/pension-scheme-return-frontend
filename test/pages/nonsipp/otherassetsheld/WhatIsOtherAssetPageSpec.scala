@@ -16,12 +16,12 @@
 
 package pages.nonsipp.otherassetsheld
 
-import config.Refined.Max5000
-import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models.UserAnswers
 import pages.behaviours.PageBehaviours
+import config.RefinedTypes.Max5000
+import controllers.TestValues
 
 class WhatIsOtherAssetPageSpec extends PageBehaviours with TestValues {
 

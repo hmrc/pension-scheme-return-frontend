@@ -19,7 +19,7 @@ package controllers
 import play.api.test._
 import services.SaveService
 import queries.{Removable, Settable}
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import play.api.inject.bind
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.actions._

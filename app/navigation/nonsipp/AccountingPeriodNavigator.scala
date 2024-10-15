@@ -17,14 +17,14 @@
 package navigation.nonsipp
 
 import play.api.mvc.Call
-import controllers.nonsipp
+import pages.Page
 import controllers.nonsipp.accountingperiod.routes
 import eu.timepit.refined.refineV
 import pages.nonsipp.accountingperiod._
 import navigation.JourneyNavigator
 import models.{NormalMode, UserAnswers}
-import config.Refined.OneToThree
-import pages.Page
+import config.RefinedTypes.OneToThree
+import controllers.nonsipp
 
 object AccountingPeriodNavigator extends JourneyNavigator {
 

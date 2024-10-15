@@ -18,12 +18,12 @@ package pages.nonsipp.employercontributions
 
 import utils.RefinedUtils.RefinedIntOps
 import utils.ListUtils.ListTupOps
+import pages.{IndexedQuestionPage, QuestionPage}
+import config.RefinedTypes.{Max300, Max50}
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.UserAnswers
 import viewmodels.models.SectionJourneyStatus
-import config.Refined.{Max300, Max50}
-import pages.{IndexedQuestionPage, QuestionPage}
 
 case class EmployerContributionsProgress(srn: Srn, memberIndex: Max300, secondaryIndex: Max50)
     extends QuestionPage[SectionJourneyStatus] {

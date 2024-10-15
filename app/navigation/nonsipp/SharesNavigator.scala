@@ -16,6 +16,8 @@
 
 package navigation.nonsipp
 
+import pages.Page
+import config.RefinedTypes.Max5000
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
 import cats.implicits.toTraverseOps
 import eu.timepit.refined.refineMV
@@ -25,8 +27,6 @@ import pages.nonsipp.common._
 import models.IdentitySubject.SharesSeller
 import pages.nonsipp.shares._
 import play.api.mvc.Call
-import config.Refined.Max5000
-import pages.Page
 import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
 import models.SchemeId.Srn
 

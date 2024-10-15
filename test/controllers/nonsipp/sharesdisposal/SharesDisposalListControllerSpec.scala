@@ -18,14 +18,14 @@ package controllers.nonsipp.sharesdisposal
 
 import pages.nonsipp.shares._
 import controllers.nonsipp.sharesdisposal.SharesDisposalListController._
-import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import views.html.ListRadiosView
 import controllers.nonsipp.shares.SharesListController.SharesData
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{SchemeHoldShare, TypeOfShares}
 import viewmodels.models.SectionCompleted
+import config.RefinedTypes.Max5000
+import controllers.ControllerBaseSpec
 
 class SharesDisposalListControllerSpec extends ControllerBaseSpec {
 

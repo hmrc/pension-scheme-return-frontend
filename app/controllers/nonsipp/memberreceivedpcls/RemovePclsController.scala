@@ -19,8 +19,6 @@ package controllers.nonsipp.memberreceivedpcls
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max300
-import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -29,6 +27,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.data.Form
 import viewmodels.implicits._
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, RemovePclsPage}
+import config.RefinedTypes.Max300
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

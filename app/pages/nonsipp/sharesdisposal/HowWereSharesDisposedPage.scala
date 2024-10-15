@@ -19,10 +19,10 @@ package pages.nonsipp.sharesdisposal
 import utils.RefinedUtils.RefinedIntOps
 import utils.PageUtils.removePages
 import queries.Removable
+import pages.QuestionPage
+import config.RefinedTypes.{Max50, Max5000}
 import models.SchemeId.Srn
 import models.{HowSharesDisposed, UserAnswers}
-import config.Refined.{Max50, Max5000}
-import pages.QuestionPage
 import play.api.libs.json.JsPath
 import models.HowSharesDisposed.HowSharesDisposed
 

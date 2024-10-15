@@ -19,8 +19,6 @@ package controllers.nonsipp.sharesdisposal
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined._
-import controllers.PSRController
 import controllers.actions._
 import pages.nonsipp.sharesdisposal.CompanyBuyerNamePage
 import navigation.Navigator
@@ -28,6 +26,8 @@ import forms.TextFormProvider
 import models.Mode
 import play.api.i18n.MessagesApi
 import viewmodels.models._
+import config.RefinedTypes._
+import controllers.PSRController
 import views.html.TextInputView
 import models.SchemeId.Srn
 import controllers.nonsipp.sharesdisposal.CompanyNameOfSharesBuyerController._

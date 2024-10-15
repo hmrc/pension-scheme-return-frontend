@@ -20,8 +20,6 @@ import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
-import config.Refined._
-import controllers.PSRController
 import config.Constants
 import cats.implicits.{catsSyntaxApplicativeId, toTraverseOps}
 import controllers.actions._
@@ -30,6 +28,8 @@ import play.api.i18n.MessagesApi
 import models.requests.DataRequest
 import pages.nonsipp.employercontributions._
 import services.{PsrSubmissionService, SaveService}
+import config.RefinedTypes._
+import controllers.PSRController
 import cats.data.EitherT
 import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
 import views.html.CheckYourAnswersView

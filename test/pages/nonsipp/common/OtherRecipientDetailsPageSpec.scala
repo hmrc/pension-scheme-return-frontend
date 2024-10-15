@@ -16,7 +16,7 @@
 
 package pages.nonsipp.common
 
-import config.Refined.OneTo5000
+import config.RefinedTypes.OneTo5000
 import eu.timepit.refined.refineMV
 import models.{IdentitySubject, RecipientDetails}
 import pages.behaviours.PageBehaviours

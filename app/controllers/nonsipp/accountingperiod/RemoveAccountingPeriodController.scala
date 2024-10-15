@@ -19,8 +19,6 @@ package controllers.nonsipp.accountingperiod
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
-import config.Refined.Max3
-import controllers.PSRController
 import controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController._
 import cats.implicits.toShow
 import controllers.actions._
@@ -28,6 +26,8 @@ import pages.nonsipp.accountingperiod.{AccountingPeriodPage, RemoveAccountingPer
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import play.api.i18n.{I18nSupport, MessagesApi}
+import config.RefinedTypes.Max3
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import utils.DateTimeUtils.localDateShow

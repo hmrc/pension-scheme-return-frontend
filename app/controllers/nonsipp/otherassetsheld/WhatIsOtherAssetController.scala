@@ -20,7 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import controllers.nonsipp.otherassetsheld.WhatIsOtherAssetController._
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator

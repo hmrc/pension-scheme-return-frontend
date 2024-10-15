@@ -19,7 +19,7 @@ package transformations
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.shares._
 import com.google.inject.Singleton
-import config.Refined.{Max5000, OneTo50, OneTo5000}
+import config.RefinedTypes.{Max5000, OneTo50, OneTo5000}
 import models.SchemeHoldShare.{Acquisition, Transfer}
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import eu.timepit.refined.refineV

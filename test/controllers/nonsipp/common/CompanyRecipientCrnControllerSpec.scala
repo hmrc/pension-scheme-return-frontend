@@ -17,7 +17,6 @@
 package controllers.nonsipp.common
 
 import play.api.mvc.Call
-import config.Refined.OneTo5000
 import views.html.ConditionalYesNoPageView
 import pages.nonsipp.landorproperty.CompanySellerNamePage
 import eu.timepit.refined.refineMV
@@ -25,6 +24,7 @@ import forms.YesNoPageFormProvider
 import models._
 import pages.nonsipp.common.CompanyRecipientCrnPage
 import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
+import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.common.CompanyRecipientCrnController._
 
