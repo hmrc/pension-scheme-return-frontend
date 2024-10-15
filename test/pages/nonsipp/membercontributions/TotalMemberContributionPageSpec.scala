@@ -26,11 +26,12 @@ class TotalMemberContributionPageSpec extends PageBehaviours {
   "TotalMemberContributionPage" - {
 
     val index = refineMV[Max300.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[Money](TotalMemberContributionPage(srnGen.sample.value, index))
+    beRetrievable[Money](TotalMemberContributionPage(srnSample, index))
 
-    beSettable[Money](TotalMemberContributionPage(srnGen.sample.value, index))
+    beSettable[Money](TotalMemberContributionPage(srnSample, index))
 
-    beRemovable[Money](TotalMemberContributionPage(srnGen.sample.value, index))
+    beRemovable[Money](TotalMemberContributionPage(srnSample, index))
   }
 }

@@ -25,11 +25,12 @@ class PartnershipOtherAssetSellerNamePageSpec extends PageBehaviours {
   "PartnershipOtherAssetSellerNamePage" - {
 
     val index = refineMV[OneTo5000](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[String](PartnershipOtherAssetSellerNamePage(srnGen.sample.value, index))
+    beRetrievable[String](PartnershipOtherAssetSellerNamePage(srnSample, index))
 
-    beSettable[String](PartnershipOtherAssetSellerNamePage(srnGen.sample.value, index))
+    beSettable[String](PartnershipOtherAssetSellerNamePage(srnSample, index))
 
-    beRemovable[String](PartnershipOtherAssetSellerNamePage(srnGen.sample.value, index))
+    beRemovable[String](PartnershipOtherAssetSellerNamePage(srnSample, index))
   }
 }

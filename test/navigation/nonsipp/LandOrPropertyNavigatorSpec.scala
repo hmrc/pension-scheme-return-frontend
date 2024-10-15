@@ -186,7 +186,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             Gen.const(recipientDetails),
             controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onPageLoad
           )
-          .withName(s"go from ${page} page to recipient connected party page")
+          .withName(s"go from $page page to recipient connected party page")
       )
     }
 

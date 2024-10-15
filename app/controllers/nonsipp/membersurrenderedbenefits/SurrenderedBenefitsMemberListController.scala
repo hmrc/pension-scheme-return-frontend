@@ -142,9 +142,9 @@ object SurrenderedBenefitsMemberListController {
     mode: Mode,
     memberList: List[Option[NameDOB]],
     userAnswers: UserAnswers,
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
+    optYear: Option[String],
+    optCurrentVersion: Option[Int],
+    optPreviousVersion: Option[Int]
   ): List[List[TableElem]] =
     memberList.zipWithIndex
       .map {

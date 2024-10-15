@@ -333,7 +333,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
             srn,
             ViewOnlyMode,
             memberDetails,
-            false,
+            hasNINO = false,
             None,
             Some("test reason"),
             viewOnlyUpdated = false,

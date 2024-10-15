@@ -84,7 +84,7 @@ class HowWasAssetDisposedOfPageSpec extends PageBehaviours with TestValues {
 
       result.get(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexOne)) must be(empty)
       result.get(OtherAssetsDisposalProgress(srn, assetIndexOne, indexOne)) must be(empty)
-      result.get(OtherAssetsDisposalPage(srn)) must not be (empty)
+      result.get(OtherAssetsDisposalPage(srn)) must not be empty
     }
 
     "cleanup other fields when removing a disposal but there are disposals for other assets" in {
@@ -104,7 +104,7 @@ class HowWasAssetDisposedOfPageSpec extends PageBehaviours with TestValues {
 
       result.get(AnyPartAssetStillHeldPage(srn, assetIndexOne, indexOne)) must be(empty)
       result.get(OtherAssetsDisposalProgress(srn, assetIndexOne, indexOne)) must be(empty)
-      result.get(OtherAssetsDisposalPage(srn)) must not be (empty)
+      result.get(OtherAssetsDisposalPage(srn)) must not be empty
     }
   }
 }

@@ -26,12 +26,13 @@ class DisposalIndependentValuationPageSpec extends PageBehaviours {
 
     val index = refineMV[Max5000.Refined](1)
     val disposalIndex = refineMV[Max50.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[Boolean](DisposalIndependentValuationPage(srnGen.sample.value, index, disposalIndex))
+    beRetrievable[Boolean](DisposalIndependentValuationPage(srnSample, index, disposalIndex))
 
-    beSettable[Boolean](DisposalIndependentValuationPage(srnGen.sample.value, index, disposalIndex))
+    beSettable[Boolean](DisposalIndependentValuationPage(srnSample, index, disposalIndex))
 
-    beRemovable[Boolean](DisposalIndependentValuationPage(srnGen.sample.value, index, disposalIndex))
+    beRemovable[Boolean](DisposalIndependentValuationPage(srnSample, index, disposalIndex))
   }
 
 }

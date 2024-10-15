@@ -32,11 +32,12 @@ class SurrenderedBenefitsAmountPageSpec extends PageBehaviours with TestValues {
 
     val index = refineMV[Max300.Refined](1)
 
-    beRetrievable[Money](SurrenderedBenefitsAmountPage(srnGen.sample.value, index))
+    val srnSample = srnGen.sample.value
+    beRetrievable[Money](SurrenderedBenefitsAmountPage(srnSample, index))
 
-    beSettable[Money](SurrenderedBenefitsAmountPage(srnGen.sample.value, index))
+    beSettable[Money](SurrenderedBenefitsAmountPage(srnSample, index))
 
-    beRemovable[Money](SurrenderedBenefitsAmountPage(srnGen.sample.value, index))
+    beRemovable[Money](SurrenderedBenefitsAmountPage(srnSample, index))
 
   }
 

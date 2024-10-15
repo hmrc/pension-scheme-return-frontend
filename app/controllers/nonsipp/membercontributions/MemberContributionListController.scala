@@ -146,9 +146,9 @@ object MemberContributionListController {
     srn: Srn,
     mode: Mode,
     memberList: List[(Max300, NameDOB, Option[Money])],
-    optYear: Option[String] = None,
-    optCurrentVersion: Option[Int] = None,
-    optPreviousVersion: Option[Int] = None
+    optYear: Option[String],
+    optCurrentVersion: Option[Int],
+    optPreviousVersion: Option[Int]
   ): List[List[TableElem]] =
     memberList
       .map {

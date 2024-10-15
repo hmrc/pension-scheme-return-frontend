@@ -63,7 +63,7 @@ class AccountingPeriodController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private def form(usedAccountingPeriods: List[DateRange] = List(), taxYear: TaxYear = TaxYear.current, index: Max3) =
+  private def form(usedAccountingPeriods: List[DateRange] = List(), taxYear: TaxYear, index: Max3): Form[DateRange] =
     AccountingPeriodController.form(formProvider, taxYear, usedAccountingPeriods, config.allowedStartDateRange, index)
 
   private val viewModel = AccountingPeriodController.viewModel _
@@ -100,7 +100,7 @@ class AccountingPeriodController @Inject()(
       }
     }
 
-  def duplicateAccountingPeriods(srn: Srn, index: Max3)(implicit request: DataRequest[_]): List[DateRange] =
+  private def duplicateAccountingPeriods(srn: Srn, index: Max3)(implicit request: DataRequest[_]): List[DateRange] =
     request.userAnswers.list(AccountingPeriods(srn)).removeAt(index.arrayIndex)
 
   private def getWhichTaxYear(

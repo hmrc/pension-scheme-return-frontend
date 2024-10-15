@@ -21,19 +21,19 @@ import eu.timepit.refined.refineMV
 import eu.timepit.refined.api.Refined
 import pages.behaviours.PageBehaviours
 class CompanyBuyerNamePageSpec extends PageBehaviours {
-  val srn = srnGen.sample.value
-
-  val index: Refined[Int, Max5000.Refined] = refineMV[Max5000.Refined](1)
-  val disposalIndex: Refined[Int, Max50.Refined] = refineMV[Max50.Refined](1)
 
   "CompanyBuyerNamePage" - {
 
-    beRetrievable[String](CompanyBuyerNamePage(srnGen.sample.value, index, disposalIndex))
+    val index: Refined[Int, Max5000.Refined] = refineMV[Max5000.Refined](1)
+    val disposalIndex: Refined[Int, Max50.Refined] = refineMV[Max50.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beSettable[String](CompanyBuyerNamePage(srnGen.sample.value, index, disposalIndex))
+    beRetrievable[String](CompanyBuyerNamePage(srnSample, index, disposalIndex))
 
-    beRemovable[String](CompanyBuyerNamePage(srnGen.sample.value, index, disposalIndex))
+    beSettable[String](CompanyBuyerNamePage(srnSample, index, disposalIndex))
 
-    CompanyBuyerNamePage(srn, index, disposalIndex).toString mustBe "nameOfPurchaser"
+    beRemovable[String](CompanyBuyerNamePage(srnSample, index, disposalIndex))
+
+    CompanyBuyerNamePage(srnSample, index, disposalIndex).toString mustBe "nameOfPurchaser"
   }
 }

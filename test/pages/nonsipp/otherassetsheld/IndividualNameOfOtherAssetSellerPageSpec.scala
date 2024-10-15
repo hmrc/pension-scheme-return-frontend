@@ -26,12 +26,13 @@ class IndividualNameOfOtherAssetSellerPageSpec extends PageBehaviours with TestV
   "IndividualNameOfOtherAssetSellerPage" - {
 
     val index = refineMV[OneTo5000](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[String](IndividualNameOfOtherAssetSellerPage(srnGen.sample.value, index))
+    beRetrievable[String](IndividualNameOfOtherAssetSellerPage(srnSample, index))
 
-    beSettable[String](IndividualNameOfOtherAssetSellerPage(srnGen.sample.value, index))
+    beSettable[String](IndividualNameOfOtherAssetSellerPage(srnSample, index))
 
-    beRemovable[String](IndividualNameOfOtherAssetSellerPage(srnGen.sample.value, index))
+    beRemovable[String](IndividualNameOfOtherAssetSellerPage(srnSample, index))
 
   }
 }

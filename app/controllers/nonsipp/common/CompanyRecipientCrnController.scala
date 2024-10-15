@@ -89,9 +89,9 @@ class CompanyRecipientCrnController @Inject()(
 object CompanyRecipientCrnController {
 
   private def inputFormErrors(subjectKey: String) = InputFormErrors.textArea(
-    s"${subjectKey}.companyRecipientCrn.no.conditional.error.required",
-    s"${subjectKey}.companyRecipientCrn.no.conditional.error.invalid",
-    s"${subjectKey}.companyRecipientCrn.no.conditional.error.length"
+    s"$subjectKey.companyRecipientCrn.no.conditional.error.required",
+    s"$subjectKey.companyRecipientCrn.no.conditional.error.invalid",
+    s"$subjectKey.companyRecipientCrn.no.conditional.error.length"
   )
 
   def form(formProvider: YesNoPageFormProvider, subject: IdentitySubject): Form[Either[String, Crn]] =

@@ -25,11 +25,12 @@ class RemovePclsPageSpec extends PageBehaviours {
   "RemovePclsPage" - {
 
     val index = refineMV[OneTo300](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[Boolean](RemovePclsPage(srnGen.sample.value, index))
+    beRetrievable[Boolean](RemovePclsPage(srnSample, index))
 
-    beSettable[Boolean](RemovePclsPage(srnGen.sample.value, index))
+    beSettable[Boolean](RemovePclsPage(srnSample, index))
 
-    beRemovable[Boolean](RemovePclsPage(srnGen.sample.value, index))
+    beRemovable[Boolean](RemovePclsPage(srnSample, index))
   }
 }

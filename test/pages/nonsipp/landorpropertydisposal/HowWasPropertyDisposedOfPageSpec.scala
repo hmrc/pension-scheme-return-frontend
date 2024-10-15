@@ -35,12 +35,13 @@ class HowWasPropertyDisposedOfPageSpec extends PageBehaviours with TestValues {
 
     val index = refineMV[Max5000.Refined](1)
     val disposalIndex = refineMV[Max50.Refined](1)
+    val srnSample = srnGen.sample.value
 
-    beRetrievable[HowDisposed](HowWasPropertyDisposedOfPage(srnGen.sample.value, index, disposalIndex))
+    beRetrievable[HowDisposed](HowWasPropertyDisposedOfPage(srnSample, index, disposalIndex))
 
-    beSettable[HowDisposed](HowWasPropertyDisposedOfPage(srnGen.sample.value, index, disposalIndex))
+    beSettable[HowDisposed](HowWasPropertyDisposedOfPage(srnSample, index, disposalIndex))
 
-    beRemovable[HowDisposed](HowWasPropertyDisposedOfPage(srnGen.sample.value, index, disposalIndex))
+    beRemovable[HowDisposed](HowWasPropertyDisposedOfPage(srnSample, index, disposalIndex))
 
     "cleanup other fields when removing the last disposal of all properties" in {
       val userAnswers = defaultUserAnswers
@@ -86,7 +87,7 @@ class HowWasPropertyDisposedOfPageSpec extends PageBehaviours with TestValues {
 
       result.get(LandOrPropertyStillHeldPage(srn, landOrPropertyIndexOne, indexOne)) must be(empty)
       result.get(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndexOne, indexOne)) must be(empty)
-      result.get(LandOrPropertyDisposalPage(srn)) must not be (empty)
+      result.get(LandOrPropertyDisposalPage(srn)) must not be empty
     }
 
     "cleanup other fields when removing a disposal but there are disposals for other properties" in {
@@ -106,7 +107,7 @@ class HowWasPropertyDisposedOfPageSpec extends PageBehaviours with TestValues {
 
       result.get(LandOrPropertyStillHeldPage(srn, landOrPropertyIndexOne, indexOne)) must be(empty)
       result.get(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndexOne, indexOne)) must be(empty)
-      result.get(LandOrPropertyDisposalPage(srn)) must not be (empty)
+      result.get(LandOrPropertyDisposalPage(srn)) must not be empty
     }
   }
 

@@ -19,23 +19,24 @@ package pages.nonsipp.employercontributions
 import pages.nonsipp.employercontributions.EmployerContributionsCompleted.EmployerContributionsUserAnswersOps
 import config.Refined._
 import eu.timepit.refined.refineMV
-import models.UserAnswers
+import models.{SchemeId, UserAnswers}
 import viewmodels.models.SectionCompleted
 import pages.behaviours.PageBehaviours
 
 class EmployerContributionsCompletedSpec extends PageBehaviours {
-  val srn = srnGen.sample.value
+
+  val srnSample: SchemeId.Srn = srnGen.sample.value
 
   "EmployerContributionsCYAPage" - {
 
     val index = refineMV[Max300.Refined](1)
     val secondaryIndex = refineMV[Max50.Refined](1)
 
-    beRetrievable[SectionCompleted.type](EmployerContributionsCompleted(srnGen.sample.value, index, secondaryIndex))
+    beRetrievable[SectionCompleted.type](EmployerContributionsCompleted(srnSample, index, secondaryIndex))
 
-    beSettable[SectionCompleted.type](EmployerContributionsCompleted(srnGen.sample.value, index, secondaryIndex))
+    beSettable[SectionCompleted.type](EmployerContributionsCompleted(srnSample, index, secondaryIndex))
 
-    beRemovable[SectionCompleted.type](EmployerContributionsCompleted(srnGen.sample.value, index, secondaryIndex))
+    beRemovable[SectionCompleted.type](EmployerContributionsCompleted(srnSample, index, secondaryIndex))
   }
 
   "EmployerContributionsUserAnswersOps" - {
@@ -44,14 +45,14 @@ class EmployerContributionsCompletedSpec extends PageBehaviours {
     val secondaryIndex = refineMV[Max50.Refined](1)
 
     val userAnswers = UserAnswers(id = "test-id")
-      .set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
+      .set(EmployerContributionsCompleted(srnSample, index, secondaryIndex), SectionCompleted)
       .success
       .value
-      .set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
+      .set(EmployerContributionsCompleted(srnSample, index, secondaryIndex), SectionCompleted)
       .success
       .value
 
-    val result = userAnswers.employerContributionsCompleted(srn, index)
+    val result = userAnswers.employerContributionsCompleted(srnSample, index)
     result must contain theSameElementsAs List(secondaryIndex)
 
   }
