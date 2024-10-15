@@ -19,7 +19,6 @@ package controllers.nonsipp.employercontributions
 import pages.nonsipp.employercontributions._
 import viewmodels.implicits._
 import play.api.mvc._
-import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
@@ -29,6 +28,9 @@ import controllers.nonsipp.employercontributions.EmployerContributionsMemberList
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
+import pages.nonsipp.employercontributions.EmployerContributionsProgress.EmployerContributionsUserAnswersOps
+import _root_.config.RefinedTypes.{Max300, Max50}
+import com.google.inject.Inject
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
 import controllers.actions._
@@ -40,8 +42,6 @@ import models._
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models.SectionJourneyStatus.InProgress
 import viewmodels.models._
-import pages.nonsipp.employercontributions.EmployerContributionsProgress.EmployerContributionsUserAnswersOps
-import _root_.config.Refined.{Max300, Max50}
 
 import scala.concurrent.Future
 

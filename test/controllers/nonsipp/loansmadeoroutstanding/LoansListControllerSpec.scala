@@ -19,8 +19,6 @@ package controllers.nonsipp.loansmadeoroutstanding
 import services.PsrSubmissionService
 import org.mockito.Mockito._
 import models.ConditionalYesNo._
-import config.Refined.{Max5000, OneTo5000}
-import controllers.ControllerBaseSpec
 import views.html.ListView
 import forms.YesNoPageFormProvider
 import models._
@@ -28,6 +26,8 @@ import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, Partners
 import pages.nonsipp.loansmadeoroutstanding._
 import eu.timepit.refined.api.Refined
 import org.mockito.ArgumentMatchers.any
+import config.RefinedTypes.{Max5000, OneTo5000}
+import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
 import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}

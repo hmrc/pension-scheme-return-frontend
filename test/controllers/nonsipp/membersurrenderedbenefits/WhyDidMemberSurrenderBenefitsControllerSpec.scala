@@ -17,12 +17,12 @@
 package controllers.nonsipp.membersurrenderedbenefits
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import config.Refined.OneTo300
-import controllers.ControllerBaseSpec
 import views.html.TextAreaView
 import forms.TextFormProvider
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, WhyDidMemberSurrenderBenefitsPage}
 import models.{NormalMode, UserAnswers}
+import config.RefinedTypes.OneTo300
+import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.membersurrenderedbenefits.WhyDidMemberSurrenderBenefitsController._
 

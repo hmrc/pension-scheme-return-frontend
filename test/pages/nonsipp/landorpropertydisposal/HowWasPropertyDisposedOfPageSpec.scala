@@ -17,13 +17,13 @@
 package pages.nonsipp.landorpropertydisposal
 
 import models.HowDisposed.HowDisposed
-import config.Refined.{Max50, Max5000}
-import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models.{HowDisposed, IdentityType}
 import viewmodels.models.SectionCompleted
 import pages.behaviours.PageBehaviours
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.TestValues
 
 class HowWasPropertyDisposedOfPageSpec extends PageBehaviours with TestValues {
   private val landOrPropertyIndexOne = refineMV[Max5000.Refined](1)

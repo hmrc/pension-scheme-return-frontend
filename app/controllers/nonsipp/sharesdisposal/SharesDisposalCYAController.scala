@@ -21,8 +21,6 @@ import viewmodels.implicits._
 import models.PointOfEntry.NoPointOfEntry
 import utils.ListUtils.ListOps
 import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import models.SchemeHoldShare.Transfer
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
@@ -30,6 +28,8 @@ import pages.nonsipp.sharesdisposal._
 import models.requests.DataRequest
 import pages.nonsipp.shares._
 import play.api.mvc._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage

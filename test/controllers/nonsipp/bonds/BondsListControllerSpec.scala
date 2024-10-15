@@ -17,8 +17,6 @@
 package controllers.nonsipp.bonds
 
 import services.PsrSubmissionService
-import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.bonds.BondsListController._
 import views.html.ListView
 import eu.timepit.refined.refineMV
@@ -29,6 +27,8 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds._
+import config.RefinedTypes.Max5000
+import controllers.ControllerBaseSpec
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 

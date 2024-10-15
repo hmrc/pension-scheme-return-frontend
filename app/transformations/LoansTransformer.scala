@@ -18,7 +18,7 @@ package transformations
 
 import com.google.inject.Singleton
 import models.IdentityType.reads
-import config.Refined.OneTo5000
+import config.RefinedTypes.OneTo5000
 import models.SchemeId.Srn
 import cats.implicits.{catsSyntaxTuple2Semigroupal, catsSyntaxTuple3Semigroupal}
 import models.requests.psr._

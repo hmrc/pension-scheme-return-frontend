@@ -20,8 +20,6 @@ import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max5000
-import controllers.PSRController
 import config.FrontendAppConfig
 import pages.nonsipp.landorproperty._
 import controllers.actions._
@@ -30,6 +28,8 @@ import forms.YesNoPageFormProvider
 import models.{IdentitySubject, IdentityType, Mode}
 import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 import play.api.i18n.MessagesApi
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage._

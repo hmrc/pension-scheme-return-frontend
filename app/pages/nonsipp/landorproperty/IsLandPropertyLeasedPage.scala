@@ -19,11 +19,11 @@ package pages.nonsipp.landorproperty
 import utils.RefinedUtils.RefinedIntOps
 import utils.PageUtils._
 import queries.Removable
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.UserAnswers
-import config.Refined.Max5000
-import pages.QuestionPage
 
 import scala.util.Try
 case class IsLandPropertyLeasedPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {

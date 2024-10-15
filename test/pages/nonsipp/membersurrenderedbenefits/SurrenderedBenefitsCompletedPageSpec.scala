@@ -17,7 +17,7 @@
 package pages.nonsipp.membersurrenderedbenefits
 
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCompleted._
-import config.Refined.Max300
+import config.RefinedTypes.Max300
 import eu.timepit.refined.refineMV
 import models.UserAnswers
 import viewmodels.models.SectionCompleted

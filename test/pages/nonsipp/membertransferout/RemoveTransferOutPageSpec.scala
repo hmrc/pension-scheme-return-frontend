@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.membertransferout;
+package pages.nonsipp.membertransferout
 
-import config.Refined.Max300
+import config.RefinedTypes.Max300
 import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours;
+import pages.behaviours.PageBehaviours
 
 class RemoveTransferOutPageSpec extends PageBehaviours {
 

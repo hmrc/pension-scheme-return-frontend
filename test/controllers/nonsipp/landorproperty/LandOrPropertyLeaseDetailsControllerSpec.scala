@@ -18,8 +18,6 @@ package controllers.nonsipp.landorproperty
 
 import services.SchemeDateService
 import controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController._
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.MultipleQuestionView
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyLeaseDetailsPage}
@@ -27,6 +25,8 @@ import eu.timepit.refined.refineMV
 import models.{DateRange, NormalMode}
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.reset
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class LandOrPropertyLeaseDetailsControllerSpec extends ControllerBaseSpec {
 

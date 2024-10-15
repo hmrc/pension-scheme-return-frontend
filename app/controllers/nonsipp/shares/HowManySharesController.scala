@@ -18,7 +18,7 @@ package controllers.nonsipp.shares
 
 import services.SaveService
 import utils.FormUtils._
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import controllers.actions._
 import navigation.Navigator
 import forms.IntFormProvider
@@ -27,8 +27,8 @@ import play.api.data.Form
 import forms.mappings.errors.IntFormErrors
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, HowManySharesPage}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max5000
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.IntView
 import models.SchemeId.Srn
 import controllers.nonsipp.shares.HowManySharesController._

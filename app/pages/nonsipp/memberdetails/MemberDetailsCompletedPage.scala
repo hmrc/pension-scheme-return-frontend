@@ -17,11 +17,11 @@
 package pages.nonsipp.memberdetails
 
 import utils.RefinedUtils._
+import pages.{IndexedQuestionPage, QuestionPage}
+import config.RefinedTypes._
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import viewmodels.models.SectionCompleted
-import config.Refined._
-import pages.{IndexedQuestionPage, QuestionPage}
 
 case class MemberDetailsCompletedPage(srn: Srn, index: Max300) extends QuestionPage[SectionCompleted] {
 

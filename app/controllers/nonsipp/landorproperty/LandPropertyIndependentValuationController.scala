@@ -19,8 +19,6 @@ package controllers.nonsipp.landorproperty
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max5000
-import controllers.PSRController
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandPropertyIndependentValuationPage}
 import controllers.actions._
 import navigation.Navigator
@@ -29,6 +27,8 @@ import models.Mode
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import controllers.nonsipp.landorproperty.LandPropertyIndependentValuationController._
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

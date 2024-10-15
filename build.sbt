@@ -28,7 +28,7 @@ lazy val root = Project(appName, file("."))
       "models.SchemeId._",
       "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl",
       "config.Binders._",
-      "config.Refined._",
+      "config.RefinedTypes._",
       "eu.timepit.refined.refineMV",
       "eu.timepit.refined.auto._"
     ),

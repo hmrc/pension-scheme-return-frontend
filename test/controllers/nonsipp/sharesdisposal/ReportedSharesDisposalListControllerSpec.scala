@@ -18,8 +18,6 @@ package controllers.nonsipp.sharesdisposal
 
 import services.PsrSubmissionService
 import pages.nonsipp.shares._
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, IndependentValuationPage, SharesDisposalProgress}
 import forms.YesNoPageFormProvider
@@ -29,6 +27,8 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController._
 import play.api.inject.guice.GuiceableModule
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 import views.html.ListView
 import models.TypeOfShares._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}

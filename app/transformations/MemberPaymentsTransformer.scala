@@ -19,8 +19,7 @@ package transformations
 import pages.nonsipp.memberdetails._
 import com.google.inject.Singleton
 import pages.nonsipp.memberdetails.MembersDetailsPage._
-import config.Refined.{Max300, Max50}
-import models.SchemeId.Srn
+import config.RefinedTypes.{Max300, Max50}
 import pages.nonsipp.memberpensionpayments._
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsPage
 import models._
@@ -30,6 +29,8 @@ import cats.syntax.traverse._
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.membercontributions.{MemberContributionsPage, TotalMemberContributionPage}
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
+import config.RefinedTypes.Max300.Refined
+import models.SchemeId.Srn
 import pages.nonsipp.memberpensionpayments.Paths.membersPayments
 import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
 import models.requests.psr._
@@ -38,7 +39,6 @@ import pages.nonsipp.{FbStatus, FbVersionPage}
 import play.api.Logger
 import uk.gov.hmrc.domain.Nino
 import pages.nonsipp.memberpayments._
-import config.Refined.Max300.Refined
 import viewmodels.models._
 
 import scala.util.{Success, Try}

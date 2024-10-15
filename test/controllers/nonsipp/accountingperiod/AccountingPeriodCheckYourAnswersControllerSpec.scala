@@ -17,13 +17,13 @@
 package controllers.nonsipp.accountingperiod
 
 import play.api.mvc.Call
-import config.Refined.OneToThree
-import controllers.ControllerBaseSpec
 import views.html.CheckYourAnswersView
 import cats.implicits.toShow
 import eu.timepit.refined._
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
+import config.RefinedTypes.OneToThree
+import controllers.ControllerBaseSpec
 import utils.DateTimeUtils.localDateShow
 import models.{NormalMode, UserAnswers}
 import viewmodels.DisplayMessage.Message

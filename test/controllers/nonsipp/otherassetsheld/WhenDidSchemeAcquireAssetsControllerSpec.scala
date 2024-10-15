@@ -17,8 +17,6 @@
 package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.WhenDidSchemeAcquireAssetsPage
-import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.DatePageView
 import eu.timepit.refined.refineMV
@@ -28,6 +26,8 @@ import services.SchemeDateService
 import controllers.nonsipp.otherassetsheld.WhenDidSchemeAcquireAssetsController._
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.reset
+import config.RefinedTypes.Max5000
+import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 

@@ -17,13 +17,13 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.IndividualNameOfSharesSellerPage
-import config.Refined._
-import controllers.ControllerBaseSpec
 import views.html.TextInputView
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import controllers.nonsipp.shares.IndividualNameOfSharesSellerController._
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 
 class IndividualNameOfSharesSellerControllerSpec extends ControllerBaseSpec {
 

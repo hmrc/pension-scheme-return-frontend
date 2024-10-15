@@ -18,13 +18,13 @@ package controllers.nonsipp.sharesdisposal
 
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import models.IdentityType._
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.RadioListView
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.sharesdisposal.WhoWereTheSharesSoldToController._
 import forms.RadioListFormProvider
 import models.NormalMode
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class WhoWereTheSharesSoldToControllerSpec extends ControllerBaseSpec {
 

@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.common
 
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.RecipientDetailsView
 import eu.timepit.refined.refineMV
 import forms.RecipientDetailsFormProvider
 import models.{IdentitySubject, NormalMode, RecipientDetails}
 import pages.nonsipp.common.OtherRecipientDetailsPage
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class OtherRecipientDetailsControllerSpec extends ControllerBaseSpec {
 

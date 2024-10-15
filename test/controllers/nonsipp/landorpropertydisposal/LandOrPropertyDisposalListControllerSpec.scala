@@ -16,8 +16,6 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.ListView
 import pages.nonsipp.landorpropertydisposal.{
   HowWasPropertyDisposedOfPage,
@@ -29,6 +27,8 @@ import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models._
 import viewmodels.models.SectionCompleted
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController._
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyCompleted}
 

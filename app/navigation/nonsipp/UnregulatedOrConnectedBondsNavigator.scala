@@ -18,13 +18,13 @@ package navigation.nonsipp
 
 import pages.nonsipp.bonds._
 import play.api.mvc.Call
-import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
+import pages.Page
 import cats.implicits.toTraverseOps
 import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
 import models.{CheckMode, NormalMode, UserAnswers}
-import config.Refined.Max5000
-import pages.Page
+import config.RefinedTypes.Max5000
+import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 
 object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
 

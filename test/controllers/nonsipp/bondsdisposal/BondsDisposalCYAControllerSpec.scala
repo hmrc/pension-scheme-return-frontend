@@ -18,8 +18,6 @@ package controllers.nonsipp.bondsdisposal
 
 import services.PsrSubmissionService
 import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
-import config.Refined.{OneTo50, OneTo5000}
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
@@ -30,6 +28,8 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
+import config.RefinedTypes.{OneTo50, OneTo5000}
+import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 

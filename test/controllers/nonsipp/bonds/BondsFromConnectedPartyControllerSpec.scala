@@ -17,11 +17,11 @@
 package controllers.nonsipp.bonds
 
 import pages.nonsipp.bonds.BondsFromConnectedPartyPage
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 import models.NormalMode
 import controllers.nonsipp.bonds.BondsFromConnectedPartyController._
 

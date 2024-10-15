@@ -17,11 +17,11 @@
 package pages.nonsipp.membercontributions
 
 import utils.RefinedUtils._
+import pages.{IndexedQuestionPage, QuestionPage}
+import config.RefinedTypes.Max300
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.Money
-import config.Refined.Max300
-import pages.{IndexedQuestionPage, QuestionPage}
 
 case class TotalMemberContributionPage(srn: Srn, index: Max300) extends QuestionPage[Money] {
 

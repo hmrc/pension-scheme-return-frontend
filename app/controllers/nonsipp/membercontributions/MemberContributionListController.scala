@@ -17,7 +17,6 @@
 package controllers.nonsipp.membercontributions
 
 import play.api.mvc._
-import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
@@ -27,13 +26,14 @@ import _root_.config.Constants
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
-import _root_.config.Refined.{Max300, OneTo300}
 import viewmodels.implicits._
 import pages.nonsipp.membercontributions.{
   MemberContributionsListPage,
   MemberContributionsPage,
   TotalMemberContributionPage
 }
+import _root_.config.RefinedTypes.{Max300, OneTo300}
+import com.google.inject.Inject
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
 import controllers.actions.IdentifyAndRequireData

@@ -19,13 +19,13 @@ package controllers.nonsipp.moneyborrowed
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max5000
-import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
 import play.api.data.Form
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.TextAreaView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}

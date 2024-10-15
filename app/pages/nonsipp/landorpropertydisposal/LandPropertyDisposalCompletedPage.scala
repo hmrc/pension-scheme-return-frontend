@@ -17,11 +17,11 @@
 package pages.nonsipp.landorpropertydisposal
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.{IndexedQuestionPage, QuestionPage}
+import config.RefinedTypes.{Max50, Max5000}
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import viewmodels.models.SectionCompleted
-import config.Refined.{Max50, Max5000}
-import pages.{IndexedQuestionPage, QuestionPage}
 case class LandPropertyDisposalCompletedPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
     extends QuestionPage[SectionCompleted.type] {
   override def path: JsPath =

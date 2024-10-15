@@ -17,11 +17,11 @@
 package pages.nonsipp.memberdetails
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.{IndexedQuestionPage, QuestionPage}
+import config.RefinedTypes.Max300
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import pages.nonsipp.memberdetails.Paths.memberDetails
-import config.Refined.Max300
-import pages.{IndexedQuestionPage, QuestionPage}
 
 case class MemberPsrVersionPage(srn: Srn, index: Max300) extends QuestionPage[String] {
 

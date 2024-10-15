@@ -20,8 +20,6 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
 import forms.mappings.Mappings
-import config.Refined.Max5000
-import controllers.PSRController
 import controllers.nonsipp.landorproperty.LandRegistryTitleNumberController._
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandRegistryTitleNumberPage}
 import controllers.actions._
@@ -31,6 +29,8 @@ import models._
 import play.api.i18n._
 import play.api.data.Form
 import forms.mappings.errors._
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

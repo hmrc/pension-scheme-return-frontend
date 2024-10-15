@@ -19,8 +19,6 @@ package controllers.nonsipp.sharesdisposal
 import services.PsrSubmissionService
 import pages.nonsipp.shares._
 import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
-import config.Refined.{OneTo50, OneTo5000}
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
@@ -29,6 +27,8 @@ import models._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import config.RefinedTypes.{OneTo50, OneTo5000}
+import controllers.ControllerBaseSpec
 import pages.nonsipp.FbVersionPage
 import uk.gov.hmrc.domain.Nino
 

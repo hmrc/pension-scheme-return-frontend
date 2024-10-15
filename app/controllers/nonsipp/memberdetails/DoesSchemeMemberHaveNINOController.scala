@@ -22,7 +22,7 @@ import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage}
 import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc._
-import config.Refined.Max300
+import config.RefinedTypes.Max300
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider

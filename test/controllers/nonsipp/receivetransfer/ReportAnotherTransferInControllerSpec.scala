@@ -17,7 +17,7 @@
 package controllers.nonsipp.receivetransfer
 
 import services.PsrSubmissionService
-import controllers.ControllerBaseSpec
+import controllers.nonsipp.receivetransfer.ReportAnotherTransferInController.{form, viewModel}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import pages.nonsipp.receivetransfer.ReportAnotherTransferInPage
@@ -28,8 +28,8 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito.{reset, when}
-import controllers.nonsipp.receivetransfer.ReportAnotherTransferInController.{form, viewModel}
-import config.Refined.{Max300, Max5}
+import config.RefinedTypes.{Max300, Max5}
+import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 

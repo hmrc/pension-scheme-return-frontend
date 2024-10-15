@@ -19,8 +19,6 @@ package controllers.nonsipp.landorproperty
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max5000
-import controllers.PSRController
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, WhyDoesSchemeHoldLandPropertyPage}
 import controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController._
 import controllers.actions._
@@ -29,6 +27,8 @@ import forms.RadioListFormProvider
 import models.{Mode, SchemeHoldLandProperty}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.RadioListView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

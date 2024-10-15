@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.membertransferout
 
-import config.Refined.{Max300, Max5}
-import controllers.ControllerBaseSpec
 import views.html.RadioListView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.NormalMode
 import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
+import config.RefinedTypes.{Max300, Max5}
+import controllers.ControllerBaseSpec
 
 class ReceivingSchemeTypeControllerSpec extends ControllerBaseSpec {
 

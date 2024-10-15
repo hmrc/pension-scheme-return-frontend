@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.receivetransfer;
+package pages.nonsipp.receivetransfer
 
-import config.Refined.Max300
+import config.RefinedTypes.Max300
 import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours;
+import pages.behaviours.PageBehaviours
 
 class RemoveTransferInPageSpec extends PageBehaviours {
   private val srn = srnGen.sample.value

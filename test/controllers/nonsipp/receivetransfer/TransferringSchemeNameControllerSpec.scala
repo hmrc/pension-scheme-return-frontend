@@ -16,12 +16,12 @@
 
 package controllers.nonsipp.receivetransfer
 
-import config.Refined._
 import views.html.TextInputView
 import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
+import config.RefinedTypes._
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.receivetransfer.TransferringSchemeNameController._
 

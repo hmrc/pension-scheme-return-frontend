@@ -19,11 +19,11 @@ package controllers.nonsipp.memberpensionpayments
 import play.api.test.FakeRequest
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.Max300
-import controllers.ControllerBaseSpec
 import views.html.TwoColumnsTripleAction
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import models._
+import config.RefinedTypes.Max300
+import controllers.ControllerBaseSpec
 import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import eu.timepit.refined.refineMV
 import viewmodels.DisplayMessage.Message

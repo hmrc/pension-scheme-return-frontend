@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import utils.BaseSpec
-import config.Refined.{Max50, Max5000}
+import config.RefinedTypes.{Max50, Max5000}
 import pages.nonsipp.landorpropertydisposal._
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}

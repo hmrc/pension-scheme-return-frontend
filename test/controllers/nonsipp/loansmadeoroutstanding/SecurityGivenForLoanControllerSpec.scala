@@ -17,14 +17,14 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import models.ConditionalYesNo._
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.ConditionalYesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode, Security}
 import pages.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanPage
 import controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController._
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class SecurityGivenForLoanControllerSpec extends ControllerBaseSpec {
 

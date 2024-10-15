@@ -18,7 +18,7 @@ package controllers.testonly
 
 import pages.nonsipp.memberdetails._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max300, OneTo300}
+import config.RefinedTypes.{Max300, OneTo300}
 import models.SchemeId.Srn
 import cats.implicits._
 import repositories.SessionRepository

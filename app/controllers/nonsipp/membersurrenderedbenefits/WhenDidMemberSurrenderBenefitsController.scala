@@ -20,8 +20,6 @@ import services.{SaveService, SchemeDateService}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc._
-import config.Refined.Max300
-import controllers.PSRController
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -29,6 +27,8 @@ import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, W
 import cats.{Id, Monad}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import forms.mappings.errors.DateFormErrors
+import config.RefinedTypes.Max300
+import controllers.PSRController
 import views.html.DatePageView
 import models.SchemeId.Srn
 import controllers.nonsipp.membersurrenderedbenefits.WhenDidMemberSurrenderBenefitsController._

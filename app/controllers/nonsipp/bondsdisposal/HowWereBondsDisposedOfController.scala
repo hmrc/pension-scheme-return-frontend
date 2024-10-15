@@ -19,8 +19,6 @@ package controllers.nonsipp.bondsdisposal
 import controllers.nonsipp.bondsdisposal.HowWereBondsDisposedOfController._
 import services.SaveService
 import viewmodels.implicits._
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -32,6 +30,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import models.PointOfEntry.{HowWereBondsDisposedPointOfEntry, NoPointOfEntry}
 import models.HowDisposed._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.RadioListView
 import models.SchemeId.Srn
 import play.api.i18n.MessagesApi

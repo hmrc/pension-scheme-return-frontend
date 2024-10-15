@@ -18,8 +18,6 @@ package controllers.nonsipp.employercontributions
 
 import viewmodels.implicits._
 import play.api.mvc._
-import config.Refined._
-import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -29,6 +27,8 @@ import play.api.data.Form
 import controllers.nonsipp.employercontributions.OtherEmployeeDescriptionController._
 import pages.nonsipp.employercontributions.{EmployerNamePage, OtherEmployeeDescriptionPage}
 import services.SaveService
+import config.RefinedTypes._
+import controllers.PSRController
 import views.html.TextAreaView
 import models.SchemeId.Srn
 import utils.FunctionKUtils._

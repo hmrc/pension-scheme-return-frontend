@@ -9,7 +9,7 @@ import models.SchemeId.Srn
 import models._
 import pages.QuestionPage
 $if(!index.empty)$
-import config.Refined.$index$
+import config.RefinedTypes.$index$
 import utils.RefinedUtils._
 import eu.timepit.refined.refineMV
 $endif$

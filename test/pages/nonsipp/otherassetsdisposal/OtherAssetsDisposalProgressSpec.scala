@@ -16,7 +16,7 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import config.Refined.{Max50, Max5000}
+import config.RefinedTypes.{Max50, Max5000}
 import eu.timepit.refined.refineMV
 import viewmodels.models.SectionJourneyStatus
 import pages.behaviours.PageBehaviours

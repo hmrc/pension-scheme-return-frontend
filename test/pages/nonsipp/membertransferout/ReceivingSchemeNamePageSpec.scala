@@ -17,12 +17,12 @@
 package pages.nonsipp.membertransferout
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import config.Refined._
-import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import eu.timepit.refined.api.Refined
 import pages.behaviours.PageBehaviours
+import config.RefinedTypes._
+import controllers.TestValues
 
 class ReceivingSchemeNamePageSpec extends PageBehaviours with TestValues {
 

@@ -16,21 +16,21 @@
 
 package controllers.nonsipp.membertransferout
 
+import config.RefinedTypes.Max5.enumerable
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
-import config.Refined.{Max300, Max5, OneTo5}
-import controllers.PSRController
 import cats.implicits._
+import forms.RadioListFormProvider
 import utils.DateTimeUtils.localDateShow
 import play.api.data.Form
+import config.RefinedTypes.{Max300, Max5, OneTo5}
+import controllers.PSRController
 import views.html.ListRadiosView
 import models.SchemeId.Srn
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.refineV
-import config.Refined.Max5.enumerable
-import forms.RadioListFormProvider
 import pages.nonsipp.membertransferout.{ReceivingSchemeNamePages, WhenWasTransferMadePages}
 import play.api.i18n.MessagesApi
 import controllers.nonsipp.membertransferout.WhichTransferOutRemoveController._

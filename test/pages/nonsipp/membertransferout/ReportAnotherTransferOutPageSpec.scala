@@ -16,7 +16,7 @@
 
 package pages.nonsipp.membertransferout
 
-import config.Refined.{Max300, Max5}
+import config.RefinedTypes.{Max300, Max5}
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 

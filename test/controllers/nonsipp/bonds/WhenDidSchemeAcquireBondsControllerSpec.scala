@@ -17,8 +17,6 @@
 package controllers.nonsipp.bonds
 
 import services.SchemeDateService
-import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.DatePageView
 import eu.timepit.refined.refineMV
@@ -28,6 +26,8 @@ import controllers.nonsipp.bonds.WhenDidSchemeAcquireBondsController._
 import org.mockito.Mockito.reset
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.WhenDidSchemeAcquireBondsPage
+import config.RefinedTypes.Max5000
+import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 

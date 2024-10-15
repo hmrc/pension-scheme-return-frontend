@@ -17,11 +17,11 @@
 package pages.nonsipp.memberdetails
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
+import config.RefinedTypes.Max300
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import viewmodels.models.MemberState
-import config.Refined.Max300
-import pages.QuestionPage
 
 /**
  * Used to show the state of a member in ETMP

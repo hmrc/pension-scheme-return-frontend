@@ -20,7 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider

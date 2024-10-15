@@ -28,7 +28,7 @@ import pages.nonsipp.$directory$.$className$Page
 $endif$
 
 $if(!index.empty)$
-import config.Refined._
+import config.RefinedTypes._
 $endif$
 
 $if(!requiredPage.empty)$

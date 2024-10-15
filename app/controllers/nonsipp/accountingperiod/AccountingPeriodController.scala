@@ -23,7 +23,7 @@ import utils.FormUtils._
 import play.api.mvc._
 import com.google.inject.Inject
 import utils.ListUtils.ListOps
-import config.Refined.Max3
+import config.RefinedTypes.Max3
 import config.FrontendAppConfig
 import controllers.actions._
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriods}

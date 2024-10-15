@@ -18,8 +18,6 @@ package controllers.nonsipp.memberdetails
 
 import org.apache.pekko.util.ByteString
 import services._
-import config.Refined.Max3
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import org.apache.pekko.stream.scaladsl.Source
 import org.mockito.stubbing.OngoingStubbing
@@ -30,6 +28,8 @@ import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 import org.mockito.Mockito._
 import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
+import config.RefinedTypes.Max3
+import controllers.ControllerBaseSpec
 import cats.data.NonEmptyList
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider

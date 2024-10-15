@@ -19,8 +19,6 @@ package controllers.nonsipp.otherassetsdisposal
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.otherassetsdisposal._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController.OtherAssetsDisposalData
 import navigation.Navigator
@@ -32,6 +30,8 @@ import viewmodels.implicits._
 import controllers.nonsipp.otherassetsdisposal.RemoveAssetDisposalController._
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import models.HowDisposed.HowDisposed
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

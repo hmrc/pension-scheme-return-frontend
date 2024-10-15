@@ -16,12 +16,12 @@
 
 package controllers.nonsipp.sharesdisposal
 
-import config.Refined.{Max50, Max5000}
 import views.html.TextInputView
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.PartnershipBuyerNamePage
 import forms.TextFormProvider
 import models.NormalMode
+import config.RefinedTypes.{Max50, Max5000}
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.sharesdisposal.PartnershipBuyerNameController._
 
