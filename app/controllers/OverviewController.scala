@@ -178,7 +178,7 @@ class OverviewController @Inject()(
                             srn,
                             formatDateForApi(yearFrom),
                             "%03d".format(last.reportVersion),
-                            last.reportFormBundleNumber,
+                            Some(last.reportFormBundleNumber),
                             reportType
                           )
                           .url
