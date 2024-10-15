@@ -48,7 +48,8 @@ trait ControllerBehaviours {
     call: => Call,
     userAnswers: UserAnswers = defaultUserAnswers,
     pureUserAnswers: UserAnswers = defaultUserAnswers,
-    optPreviousAnswers: Option[UserAnswers] = None
+    optPreviousAnswers: Option[UserAnswers] = None,
+    isPsa: Boolean = true
   )(
     view: Application => Request[_] => Html
   ): BehaviourTest =
@@ -56,7 +57,8 @@ trait ControllerBehaviours {
       val appBuilder = applicationBuilder(
         userAnswers = Some(userAnswers),
         pureUserAnswers = Some(pureUserAnswers),
-        previousUserAnswers = optPreviousAnswers
+        previousUserAnswers = optPreviousAnswers,
+        isPsa = isPsa
       )
       render(appBuilder, call)(view)
     }
