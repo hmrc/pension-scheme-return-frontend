@@ -16,12 +16,12 @@
 
 package controllers.nonsipp.landorproperty
 
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.IsLandPropertyLeasedController._
 import pages.nonsipp.landorproperty.{IsLandPropertyLeasedPage, LandOrPropertyChosenAddressPage}
 

@@ -18,7 +18,7 @@ package controllers.nonsipp.membercontributions
 
 import services.SaveService
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
 import controllers.actions._
 import navigation.Navigator
@@ -31,8 +31,8 @@ import viewmodels.implicits._
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
 import controllers.nonsipp.membercontributions.TotalMemberContributionController._
 import play.api.mvc._
-import config.Refined.Max300
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import config.RefinedTypes.Max300
+import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.{Empty, Message}

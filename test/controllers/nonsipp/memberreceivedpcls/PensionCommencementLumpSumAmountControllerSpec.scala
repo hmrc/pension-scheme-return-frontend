@@ -19,8 +19,6 @@ package controllers.nonsipp.memberreceivedpcls
 import utils.RefinedUtils.RefinedIntOps
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
-import config.Refined.Max300
-import controllers.ControllerBaseSpec
 import views.html.MultipleQuestionView
 import eu.timepit.refined.refineMV
 import utils.Transform.TransformOps
@@ -28,6 +26,8 @@ import play.api.libs.json.JsPath
 import forms.MoneyFormProvider
 import models.{Money, NormalMode}
 import models.PensionCommencementLumpSum._
+import config.RefinedTypes.Max300
+import controllers.ControllerBaseSpec
 
 class PensionCommencementLumpSumAmountControllerSpec extends ControllerBaseSpec {
 

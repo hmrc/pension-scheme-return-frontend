@@ -17,11 +17,11 @@
 package pages.nonsipp.bondsdisposal
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.{IndexedQuestionPage, QuestionPage}
+import config.RefinedTypes.{Max50, Max5000}
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import viewmodels.models.SectionJourneyStatus
-import config.Refined.{Max50, Max5000}
-import pages.{IndexedQuestionPage, QuestionPage}
 
 case class BondsDisposalProgress(srn: Srn, bondIndex: Max5000, disposalIndex: Max50)
     extends QuestionPage[SectionJourneyStatus] {

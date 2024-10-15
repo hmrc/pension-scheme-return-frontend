@@ -18,8 +18,6 @@ package controllers.nonsipp.sharesdisposal
 
 import services.SaveService
 import viewmodels.implicits._
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, SharesDisposalCYAPointOfEntry}
 import forms.RadioListFormProvider
@@ -33,6 +31,8 @@ import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import models.PointOfEntry.{HowWereSharesDisposedPointOfEntry, NoPointOfEntry}
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.RadioListView
 import models.SchemeId.Srn
 import navigation.Navigator

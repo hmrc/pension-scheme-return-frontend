@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import forms.mappings.Mappings
 import forms.mappings.errors._
 $if(!index.empty)$
-import config.Refined.$index$
+import config.RefinedTypes.$index$
 $endif$
 
 class $className;format="cap"$Controller @Inject()(

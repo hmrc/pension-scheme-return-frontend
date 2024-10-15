@@ -18,13 +18,13 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import play.api.mvc.Call
 import controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController._
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NormalMode, UserAnswers}
 import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IsIndividualRecipientConnectedPartyPage}
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class IsIndividualRecipientConnectedPartyControllerSpec extends ControllerBaseSpec {
 

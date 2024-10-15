@@ -17,7 +17,6 @@
 package controllers.nonsipp.moneyborrowed
 
 import services.PsrSubmissionService
-import config.Refined.OneTo5000
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
@@ -28,6 +27,7 @@ import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController._
+import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
 
 class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {

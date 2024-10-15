@@ -16,12 +16,12 @@
 
 package controllers.nonsipp.landorproperty
 
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.TextInputView
 import pages.nonsipp.landorproperty.PartnershipSellerNamePage
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.PartnershipSellerNameController.{form, viewModel}
 import models.NormalMode
 class PartnershipSellerNameControllerSpec extends ControllerBaseSpec {

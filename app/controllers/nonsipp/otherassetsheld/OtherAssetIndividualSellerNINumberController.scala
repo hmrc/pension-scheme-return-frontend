@@ -19,7 +19,7 @@ package controllers.nonsipp.otherassetsheld
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, Mode}

@@ -17,14 +17,14 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController._
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.ConditionalYesNoPageView
 import eu.timepit.refined.refineMV
 import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode, UserAnswers}
 import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IndividualRecipientNinoPage}
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class IndividualRecipientNinoControllerSpec extends ControllerBaseSpec {
 

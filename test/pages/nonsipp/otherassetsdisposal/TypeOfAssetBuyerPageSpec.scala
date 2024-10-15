@@ -16,12 +16,12 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import config.Refined.{Max50, Max5000}
-import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models.{ConditionalYesNo, Crn, IdentityType}
 import pages.behaviours.PageBehaviours
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.TestValues
 
 class TypeOfAssetBuyerPageSpec extends PageBehaviours with TestValues {
   private val index = refineMV[Max5000.Refined](1)

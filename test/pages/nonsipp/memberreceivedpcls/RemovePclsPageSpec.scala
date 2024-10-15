@@ -16,7 +16,7 @@
 
 package pages.nonsipp.memberreceivedpcls
 
-import config.Refined.OneTo300
+import config.RefinedTypes.OneTo300
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 

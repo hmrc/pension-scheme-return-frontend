@@ -17,8 +17,6 @@
 package controllers.nonsipp.receivetransfer
 
 import services.SchemeDateService
-import config.Refined._
-import controllers.ControllerBaseSpec
 import views.html.DatePageView
 import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, WhenWasTransferReceivedPage}
 import eu.timepit.refined.refineMV
@@ -30,6 +28,8 @@ import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.mockito.Mockito.{reset, when}
 import controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController._
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 

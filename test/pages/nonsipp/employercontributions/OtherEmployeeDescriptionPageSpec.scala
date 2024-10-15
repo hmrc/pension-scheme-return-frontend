@@ -16,10 +16,10 @@
 
 package pages.nonsipp.employercontributions
 
-import config.Refined._
-import controllers.TestValues
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
+import config.RefinedTypes._
+import controllers.TestValues
 
 class OtherEmployeeDescriptionPageSpec extends PageBehaviours with TestValues {
 

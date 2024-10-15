@@ -16,7 +16,7 @@
 
 package transformations
 
-import config.Refined._
+import config.RefinedTypes._
 import cats.implicits.{toBifunctorOps, toTraverseOps}
 import eu.timepit.refined.refineV
 import eu.timepit.refined.api.{Refined, Validate}

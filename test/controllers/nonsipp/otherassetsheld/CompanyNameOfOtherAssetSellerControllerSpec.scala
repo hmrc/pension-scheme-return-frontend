@@ -17,13 +17,13 @@
 package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.CompanyNameOfOtherAssetSellerPage
-import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import views.html.TextInputView
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import controllers.nonsipp.otherassetsheld.CompanyNameOfOtherAssetSellerController.{form, viewModel}
+import config.RefinedTypes.Max5000
+import controllers.ControllerBaseSpec
 
 class CompanyNameOfOtherAssetSellerControllerSpec extends ControllerBaseSpec {
 

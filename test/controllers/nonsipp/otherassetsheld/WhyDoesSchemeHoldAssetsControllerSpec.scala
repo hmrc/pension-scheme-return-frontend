@@ -17,12 +17,12 @@
 package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.{WhenDidSchemeAcquireAssetsPage, WhyDoesSchemeHoldAssetsPage}
-import config.Refined.Max5000
 import views.html.RadioListView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.IdentitySubject.OtherAssetSeller
 import controllers.nonsipp.otherassetsheld.WhyDoesSchemeHoldAssetsController._
+import config.RefinedTypes.Max5000
 import controllers.ControllerBaseSpec
 import models.{CheckMode, NormalMode}
 import models.SchemeHoldAsset.{Acquisition, Contribution, Transfer}

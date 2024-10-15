@@ -16,7 +16,7 @@
 
 package pages.nonsipp.shares
 
-import config.Refined.OneTo5000
+import config.RefinedTypes.OneTo5000
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import pages.nonsipp.common

@@ -18,6 +18,7 @@ package controllers.nonsipp
 
 import services._
 import play.api.mvc._
+import _root_.config.RefinedTypes.Max3
 import utils.ListUtils.ListOps
 import controllers.{nonsipp, PSRController}
 import utils.nonsipp.TaskListStatusUtils.getBasicDetailsCompletedOrUpdated
@@ -28,7 +29,6 @@ import _root_.config.Constants._
 import utils.nonsipp.SchemeDetailNavigationUtils
 import viewmodels.models.TaskListStatus.Updated
 import models.requests.DataRequest
-import _root_.config.Refined.Max3
 import models.audit.PSRStartAuditEvent
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
 import viewmodels.implicits._

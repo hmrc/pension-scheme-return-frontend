@@ -19,14 +19,14 @@ package controllers.nonsipp.memberreceivedpcls
 import play.api.mvc._
 import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.OneTo300
-import controllers.PSRController
 import cats.implicits.toShow
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
 import viewmodels.implicits._
 import pages.nonsipp.memberreceivedpcls._
+import config.RefinedTypes.OneTo300
+import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.TwoColumnsTripleAction

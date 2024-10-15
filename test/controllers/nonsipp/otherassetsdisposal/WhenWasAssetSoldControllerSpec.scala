@@ -18,8 +18,6 @@ package controllers.nonsipp.otherassetsdisposal
 
 import services.SchemeDateService
 import pages.nonsipp.otherassetsdisposal.WhenWasAssetSoldPage
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.DatePageView
 import eu.timepit.refined.refineMV
 import play.api.inject
@@ -28,6 +26,8 @@ import models.{DateRange, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{reset, when}
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 import java.time.LocalDate
 

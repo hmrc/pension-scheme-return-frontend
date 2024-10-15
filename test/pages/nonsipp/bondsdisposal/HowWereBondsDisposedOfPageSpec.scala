@@ -16,14 +16,14 @@
 
 package pages.nonsipp.bondsdisposal
 
-import config.Refined.{Max50, Max5000}
-import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import viewmodels.models.SectionJourneyStatus.Completed
 import pages.behaviours.PageBehaviours
 import models.PointOfEntry._
 import models.HowDisposed._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.TestValues
 
 class HowWereBondsDisposedOfPageSpec extends PageBehaviours with TestValues {
 

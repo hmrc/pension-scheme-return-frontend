@@ -20,8 +20,6 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.MemberStatus
 import play.api.mvc._
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.Max300
-import controllers.PSRController
 import controllers.nonsipp.membercontributions.MemberContributionsCYAController._
 import controllers.actions.IdentifyAndRequireData
 import models._
@@ -29,6 +27,8 @@ import play.api.i18n.MessagesApi
 import models.requests.DataRequest
 import viewmodels.implicits._
 import pages.nonsipp.membercontributions.{MemberContributionsCYAPage, TotalMemberContributionPage}
+import config.RefinedTypes.Max300
+import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage

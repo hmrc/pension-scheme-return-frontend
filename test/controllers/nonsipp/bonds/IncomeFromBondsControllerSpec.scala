@@ -17,13 +17,13 @@
 package controllers.nonsipp.bonds
 
 import pages.nonsipp.bonds.IncomeFromBondsPage
-import config.Refined._
-import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.bonds.IncomeFromBondsController._
 import forms.MoneyFormProvider
 import models.NormalMode
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 
 class IncomeFromBondsControllerSpec extends ControllerBaseSpec {
 

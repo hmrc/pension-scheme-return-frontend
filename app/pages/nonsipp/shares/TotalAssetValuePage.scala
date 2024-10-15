@@ -17,11 +17,11 @@
 package pages.nonsipp.shares
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.Money
-import config.Refined.Max5000
-import pages.QuestionPage
 
 case class TotalAssetValuePage(srn: Srn, index: Max5000) extends QuestionPage[Money] {
 

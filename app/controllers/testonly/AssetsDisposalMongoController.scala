@@ -20,7 +20,7 @@ import services.SaveService
 import pages.nonsipp.otherassetsdisposal._
 import play.api.mvc.MessagesControllerComponents
 import models.HowDisposed.HowDisposed
-import config.Refined.{Max50, Max5000}
+import config.RefinedTypes.{Max50, Max5000}
 import models.SchemeId.Srn
 import models._
 import shapeless._

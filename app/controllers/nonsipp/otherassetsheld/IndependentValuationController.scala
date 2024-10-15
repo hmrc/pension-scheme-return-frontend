@@ -20,14 +20,14 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.IndependentValuationPage
-import config.Refined._
-import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
 import play.api.i18n.MessagesApi
 import play.api.data.Form
+import config.RefinedTypes._
+import controllers.PSRController
 import controllers.nonsipp.otherassetsheld.IndependentValuationController._
 import views.html.YesNoPageView
 import models.SchemeId.Srn

@@ -19,8 +19,6 @@ package controllers.nonsipp.memberreceivedpcls
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc._
-import config.Refined._
-import controllers.PSRController
 import controllers.nonsipp.memberreceivedpcls.PclsCYAController._
 import controllers.actions._
 import models._
@@ -28,6 +26,8 @@ import play.api.i18n.MessagesApi
 import models.requests.DataRequest
 import viewmodels.implicits._
 import pages.nonsipp.memberreceivedpcls.{PclsCYAPage, PensionCommencementLumpSumAmountPage}
+import config.RefinedTypes._
+import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage

@@ -18,8 +18,6 @@ package controllers.nonsipp.sharesdisposal
 
 import services.SchemeDateService
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.DatePageView
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.WhenWereSharesSoldPage
@@ -28,6 +26,8 @@ import forms.DatePageFormProvider
 import models.NormalMode
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.reset
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class WhenWereSharesSoldControllerSpec extends ControllerBaseSpec {
 

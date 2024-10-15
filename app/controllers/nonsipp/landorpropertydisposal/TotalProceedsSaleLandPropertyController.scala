@@ -20,7 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.nonsipp.landorpropertydisposal.TotalProceedsSaleLandPropertyController._
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.TotalProceedsSaleLandPropertyPage
@@ -31,8 +31,8 @@ import models.{Mode, Money}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
-import config.Refined.{Max50, Max5000}
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage._

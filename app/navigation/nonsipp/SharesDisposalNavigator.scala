@@ -18,14 +18,14 @@ package navigation.nonsipp
 
 import play.api.mvc.Call
 import models.PointOfEntry._
+import pages.Page
+import config.RefinedTypes.Max50
 import cats.implicits.{catsSyntaxEitherId, toBifunctorOps, toTraverseOps}
 import eu.timepit.refined.refineV
 import pages.nonsipp.sharesdisposal._
 import navigation.JourneyNavigator
 import models._
 import viewmodels.models.SectionJourneyStatus
-import config.Refined.Max50
-import pages.Page
 
 object SharesDisposalNavigator extends JourneyNavigator {
 

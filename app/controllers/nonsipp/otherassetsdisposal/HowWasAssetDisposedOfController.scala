@@ -19,8 +19,6 @@ package controllers.nonsipp.otherassetsdisposal
 import services.SaveService
 import pages.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfPage
 import viewmodels.implicits._
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -32,6 +30,8 @@ import models.GenericFormMapper.ConditionalRadioMapper
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import models.HowDisposed._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.RadioListView
 import controllers.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfController._
 import models.SchemeId.Srn

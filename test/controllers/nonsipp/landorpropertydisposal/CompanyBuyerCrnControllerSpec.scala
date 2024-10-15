@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorpropertydisposal.CompanyBuyerCrnController._
 import views.html.ConditionalYesNoPageView
 import pages.nonsipp.landorpropertydisposal.{CompanyBuyerCrnPage, CompanyBuyerNamePage}
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class CompanyBuyerCrnControllerSpec extends ControllerBaseSpec {
 

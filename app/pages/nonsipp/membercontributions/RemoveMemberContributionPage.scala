@@ -16,9 +16,9 @@
 
 package pages.nonsipp.membercontributions
 
-import models.SchemeId.Srn
-import config.Refined.Max300
 import pages.Page
+import config.RefinedTypes.Max300
+import models.SchemeId.Srn
 
 case class RemoveMemberContributionPage(srn: Srn, index: Max300) extends Page {
 

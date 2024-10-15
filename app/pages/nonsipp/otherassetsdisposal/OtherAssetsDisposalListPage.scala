@@ -16,8 +16,8 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import models.SchemeId.Srn
-import config.Refined.Max5000
 import pages.Page
+import config.RefinedTypes.Max5000
+import models.SchemeId.Srn
 
 case class OtherAssetsDisposalListPage(srn: Srn, assetIndex: Max5000) extends Page

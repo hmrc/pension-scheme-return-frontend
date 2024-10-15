@@ -19,8 +19,6 @@ package controllers.nonsipp.shares
 import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
-import config.Refined.Max5000
-import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -29,6 +27,8 @@ import play.api.i18n.MessagesApi
 import play.api.data.Form
 import pages.nonsipp.shares.{TypeOfSharesHeldPage, WhyDoesSchemeHoldSharesPage}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import models.SchemeHoldShare._
 import controllers.nonsipp.shares.WhyDoesSchemeHoldSharesController._
 import views.html.RadioListView

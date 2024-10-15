@@ -18,12 +18,12 @@ package controllers.nonsipp.employercontributions
 
 import pages.nonsipp.employercontributions.EmployerNamePage
 import controllers.nonsipp.employercontributions.EmployerNameController._
-import config.Refined._
-import controllers.ControllerBaseSpec
 import views.html.TextInputView
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 
 class EmployerNameControllerSpec extends ControllerBaseSpec {
 

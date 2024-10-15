@@ -17,14 +17,14 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.{IndividualNameOfSharesSellerPage, SharesIndividualSellerNINumberPage}
-import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import views.html.ConditionalYesNoPageView
 import eu.timepit.refined.refineMV
 import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode, UserAnswers}
 import controllers.nonsipp.shares.SharesIndividualSellerNINumberController._
+import config.RefinedTypes.Max5000
+import controllers.ControllerBaseSpec
 
 class SharesIndividualSellerNINumberControllerSpec extends ControllerBaseSpec {
 

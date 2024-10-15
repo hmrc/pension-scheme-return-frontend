@@ -17,7 +17,7 @@
 package controllers.nonsipp
 
 import play.api.mvc.Call
-import config.Refined.{Max50, Max5000}
+import config.RefinedTypes.{Max50, Max5000}
 import models.SchemeId.Srn
 import pages.nonsipp.sharesdisposal.SharesDisposalProgress
 import models.UserAnswers

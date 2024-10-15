@@ -20,12 +20,12 @@ import pages.nonsipp.memberdetails._
 import play.api.mvc.Call
 import models.ManualOrUpload.{Manual, Upload}
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import controllers.nonsipp.memberdetails.routes
+import pages._
 import eu.timepit.refined.refineV
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
 import models._
-import config.Refined.{Max300, OneTo300}
-import pages._
+import config.RefinedTypes.{Max300, OneTo300}
+import controllers.nonsipp.memberdetails.routes
 import pages.nonsipp.BasicDetailsCheckYourAnswersPage
 import navigation.JourneyNavigator
 

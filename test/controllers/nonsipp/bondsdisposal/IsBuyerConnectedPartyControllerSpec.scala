@@ -17,13 +17,13 @@
 package controllers.nonsipp.bondsdisposal
 
 import controllers.nonsipp.bondsdisposal.IsBuyerConnectedPartyController._
-import config.Refined._
-import controllers.ControllerBaseSpec
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.bondsdisposal.{BuyerNamePage, IsBuyerConnectedPartyPage}
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 
 class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
 

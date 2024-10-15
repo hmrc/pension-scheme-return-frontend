@@ -18,8 +18,6 @@ package controllers.nonsipp.membersurrenderedbenefits
 
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.Max300
-import controllers.ControllerBaseSpec
 import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
@@ -27,6 +25,8 @@ import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, S
 import models._
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListController._
 import play.api.test.FakeRequest
+import config.RefinedTypes.Max300
+import controllers.ControllerBaseSpec
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 

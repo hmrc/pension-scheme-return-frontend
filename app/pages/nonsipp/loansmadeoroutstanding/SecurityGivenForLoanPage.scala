@@ -18,11 +18,11 @@ package pages.nonsipp.loansmadeoroutstanding
 
 import utils.RefinedUtils.RefinedIntOps
 import models.ConditionalYesNo.ConditionalYes
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.Security
-import config.Refined.Max5000
-import pages.QuestionPage
 
 case class SecurityGivenForLoanPage(srn: Srn, index: Max5000) extends QuestionPage[ConditionalYes[Security]] {
 

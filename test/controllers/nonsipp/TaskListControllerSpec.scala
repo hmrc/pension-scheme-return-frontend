@@ -20,8 +20,6 @@ import services.PsrVersionsService
 import models.ConditionalYesNo._
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
 import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, OtherAssetsHeldPage, WhatIsOtherAssetPage}
-import config.Refined.{Max3, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.TaskListView
 import eu.timepit.refined.refineMV
 import models.backend.responses.{PsrVersionsResponse, ReportStatus}
@@ -38,6 +36,8 @@ import org.mockito.Mockito.when
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage, UnregulatedOrConnectedBondsHeldPage}
+import config.RefinedTypes.{Max3, Max5000}
+import controllers.ControllerBaseSpec
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import pages.nonsipp.sharesdisposal._
 import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}

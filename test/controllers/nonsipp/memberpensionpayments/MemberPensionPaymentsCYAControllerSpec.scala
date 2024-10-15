@@ -18,8 +18,6 @@ package controllers.nonsipp.memberpensionpayments
 
 import services.PsrSubmissionService
 import controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController._
-import config.Refined.Max300
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import pages.nonsipp.FbVersionPage
@@ -28,6 +26,8 @@ import viewmodels.models.SectionCompleted
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import org.mockito.Mockito._
+import config.RefinedTypes.Max300
+import controllers.ControllerBaseSpec
 import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
 import eu.timepit.refined.refineMV
 

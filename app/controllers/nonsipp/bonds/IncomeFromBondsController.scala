@@ -21,7 +21,7 @@ import pages.nonsipp.bonds.{BondsCompleted, IncomeFromBondsPage}
 import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
 import controllers.actions._
 import controllers.nonsipp.bonds.IncomeFromBondsController._
@@ -31,8 +31,8 @@ import models.{Mode, Money}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
-import config.Refined.Max5000
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.{Empty, Message}

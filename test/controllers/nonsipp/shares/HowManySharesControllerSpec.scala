@@ -17,13 +17,13 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, HowManySharesPage}
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.IntView
 import controllers.nonsipp.shares.HowManySharesController._
 import eu.timepit.refined.refineMV
 import forms.IntFormProvider
 import models.NormalMode
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class HowManySharesControllerSpec extends ControllerBaseSpec {
 

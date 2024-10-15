@@ -17,12 +17,12 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.{TypeOfSharesHeldPage, WhyDoesSchemeHoldSharesPage}
-import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import views.html.RadioListView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{NormalMode, TypeOfShares}
+import config.RefinedTypes.Max5000
+import controllers.ControllerBaseSpec
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
 import controllers.nonsipp.shares.WhyDoesSchemeHoldSharesController._
 
