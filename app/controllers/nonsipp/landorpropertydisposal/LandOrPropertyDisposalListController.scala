@@ -35,8 +35,8 @@ import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController._
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPropertyChosenAddressPage}
-import config.Constants.maxLandOrPropertyDisposals
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
+import config.Constants.{maxLandOrProperties, maxLandOrPropertyDisposals}
 import pages.nonsipp.landorpropertydisposal._
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import play.api.Logging
@@ -63,6 +63,8 @@ class LandOrPropertyDisposalListController @Inject()(
     with Logging {
 
   val form: Form[Boolean] = LandOrPropertyDisposalListController.form(formProvider)
+
+  private val maxTotalLandOrPropertyDisposals: Int = maxLandOrProperties * maxLandOrPropertyDisposals
 
   def onPageLoadViewOnly(
     srn: Srn,
@@ -143,25 +145,27 @@ class LandOrPropertyDisposalListController @Inject()(
     logger.info(s"Land or property disposal status is $status")
 
     getCompletedDisposals(srn).map { completedDisposals =>
+      val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+      val hasReachedMax = numberOfDisposals >= maxTotalLandOrPropertyDisposals
+
       if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
-        val numberOfDisposal = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-        val numberOfAddresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
-        val maxPossibleNumberOfDisposals = maxLandOrPropertyDisposals * numberOfAddresses
+
         getAddressesWithIndexes(srn, completedDisposals).map { indexes =>
           Ok(
             view(
-              form,
+              form = form,
               viewModel(
                 srn,
                 mode,
                 page,
                 indexes,
-                numberOfDisposal,
-                maxPossibleNumberOfDisposals,
+                numberOfDisposals,
+                maxTotalLandOrPropertyDisposals,
                 request.userAnswers,
                 request.schemeDetails.schemeName,
                 viewOnlyViewModel,
-                showBackLink = showBackLink
+                showBackLink = showBackLink,
+                hasReachedMax = hasReachedMax
               )
             )
           )
@@ -175,15 +179,10 @@ class LandOrPropertyDisposalListController @Inject()(
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     getCompletedDisposals(srn).map { completedDisposals =>
       val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-      val numberOfAddresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
-      val maxPossibleNumberOfDisposals = maxLandOrPropertyDisposals * numberOfAddresses
+      val hasReachedMax = numberOfDisposals >= maxTotalLandOrPropertyDisposals
 
-      if (numberOfDisposals >= maxLandOrPropertyDisposals) {
+      if (hasReachedMax) {
         Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
-      } else if (numberOfDisposals == maxPossibleNumberOfDisposals) {
-        Redirect(
-          navigator.nextPage(LandOrPropertyDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
-        )
       } else {
         form
           .bindFromRequest()
@@ -201,10 +200,11 @@ class LandOrPropertyDisposalListController @Inject()(
                           page,
                           indexes,
                           numberOfDisposals,
-                          maxPossibleNumberOfDisposals,
+                          maxTotalLandOrPropertyDisposals,
                           request.userAnswers,
                           request.schemeDetails.schemeName,
-                          showBackLink = true
+                          showBackLink = true,
+                          hasReachedMax = false
                         )
                       )
                     )
@@ -264,7 +264,6 @@ class LandOrPropertyDisposalListController @Inject()(
       .sortBy { case (index, _) => index.value }
       .map { case (_, listRow) => listRow }
       .sequence
-
 }
 
 object LandOrPropertyDisposalListController {
@@ -348,11 +347,12 @@ object LandOrPropertyDisposalListController {
     page: Int,
     addressesWithIndexes: List[((Max5000, List[Max50]), Address)],
     numberOfDisposals: Int,
-    maxPossibleNumberOfDisposals: Int,
+    maxTotalLandOrPropertyDisposals: Int,
     userAnswers: UserAnswers,
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
-    showBackLink: Boolean
+    showBackLink: Boolean,
+    hasReachedMax: Boolean
   ): FormPageViewModel[ListViewModel] = {
 
     val (title, heading) = ((mode, numberOfDisposals) match {
@@ -383,19 +383,19 @@ object LandOrPropertyDisposalListController {
       }
     )
 
-    val hasReachedMax = numberOfDisposals >= Constants.maxLandOrPropertyDisposals
+    val hasReachedMaxFlag = numberOfDisposals >= maxTotalLandOrPropertyDisposals
 
     FormPageViewModel(
       title = title,
       heading = heading,
-      description = Option.when(!hasReachedMax)(
+      description = Option.when(!hasReachedMaxFlag)(
         ParagraphMessage("landOrPropertyDisposalList.description")
       ),
       page = ListViewModel(
-        inset = "landOrPropertyDisposalList.inset",
+        inset = if (hasReachedMaxFlag) "landOrPropertyDisposalList.inset" else "landOrPropertyDisposalList.inset",
         rows(srn, mode, addressesWithIndexes, userAnswers, viewOnlyViewModel, schemeName),
         Message("landOrPropertyDisposalList.radios"),
-        showRadios = !mode.isViewOnlyMode && !hasReachedMax,
+        showRadios = !mode.isViewOnlyMode && !hasReachedMaxFlag,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

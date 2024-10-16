@@ -85,16 +85,17 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
             page = 1,
             addressesWithIndexes,
             numberOfDisposals = 1,
-            maxPossibleNumberOfDisposals = 50,
+            maxTotalLandOrPropertyDisposals = 250000,
             userAnswers,
             schemeName,
             viewOnlyViewModel = None,
-            showBackLink = true
+            showBackLink = true,
+            hasReachedMax = true
           )
         )
     })
 
-    act.like(redirectNextPage(onSubmit, "value" -> "1"))
+    act.like(redirectNextPage(onSubmit, "value" -> "true"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
@@ -130,11 +131,12 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
                 page = 1,
                 addressesWithIndexes,
                 numberOfDisposals = 1,
-                maxPossibleNumberOfDisposals = 50,
+                maxTotalLandOrPropertyDisposals = 250000,
                 userAnswers,
                 schemeName,
                 viewOnlyViewModel = Some(viewOnlyViewModel),
-                showBackLink = true
+                showBackLink = true,
+                hasReachedMax = true
               )
             )
         }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
@@ -158,11 +160,12 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
               page = 1,
               addressesWithIndexes,
               numberOfDisposals = 1,
-              maxPossibleNumberOfDisposals = 50,
+              maxTotalLandOrPropertyDisposals = 250000,
               userAnswers,
               schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-              showBackLink = true
+              showBackLink = true,
+              hasReachedMax = true
             )
           )
         }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated true")
@@ -190,7 +193,7 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
               page = 1,
               addressesWithIndexes,
               numberOfDisposals = 1,
-              maxPossibleNumberOfDisposals = 50,
+              maxTotalLandOrPropertyDisposals = 250000,
               userAnswers,
               schemeName,
               viewOnlyViewModel = Some(
@@ -200,7 +203,8 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
                   previousVersion = (submissionNumberOne - 1).max(0)
                 )
               ),
-              showBackLink = false
+              showBackLink = false,
+              hasReachedMax = true
             )
           )
         }.withName("OnPreviousViewOnly renders the view correctly")

@@ -46,16 +46,16 @@ object Constants {
 
   val maxAccountingPeriods = 3
   val maxLandOrProperties = 5000
-  val maxLandOrPropertyDisposals = 250000
+  val maxLandOrPropertyDisposals = 50
 
   val schemeMembersPageSize = 25
   val maxSchemeMembers = 300
   val maxSharesTransactions = 5000
-  val maxDisposalsPerShare = 250000
+  val maxDisposalsPerShare = 50
   val maxBondsTransactions = 5000
-  val maxDisposalPerBond = 250000
+  val maxDisposalPerBond = 50
   val maxOtherAssetsTransactions = 5000
-  val maxDisposalPerOtherAsset = 250000
+  val maxDisposalPerOtherAsset = 50
 
   val pageSize = 25
 
