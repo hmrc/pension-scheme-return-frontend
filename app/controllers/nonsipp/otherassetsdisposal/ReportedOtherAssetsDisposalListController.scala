@@ -20,19 +20,19 @@ import services.SaveService
 import pages.nonsipp.otherassetsdisposal._
 import viewmodels.implicits._
 import play.api.mvc._
-import controllers.PSRController
-import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import cats.implicits._
-import _root_.config.Constants
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController._
-import _root_.config.Constants.maxDisposalPerOtherAsset
+import _root_.config.Constants.{maxDisposalPerOtherAsset, maxOtherAssetsTransactions}
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
-import _root_.config.RefinedTypes.{Max50, Max5000}
-import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, WhatIsOtherAssetPage}
+import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import models.HowDisposed._
 import com.google.inject.Inject
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
+import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage
@@ -61,6 +61,8 @@ class ReportedOtherAssetsDisposalListController @Inject()(
   saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
+
+  val maxTotalDisposals: Int = maxDisposalPerOtherAsset * maxOtherAssetsTransactions
 
   val form: Form[Boolean] = ReportedOtherAssetsDisposalListController.form(formProvider)
 
@@ -107,9 +109,7 @@ class ReportedOtherAssetsDisposalListController @Inject()(
   ): Result =
     getCompletedDisposals(srn).map { completedDisposals =>
       val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-      val numberOfOtherAssetsItems = request.userAnswers.map(OtherAssetsCompleted.all(srn)).size
-      val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
-      val isMaxLimitReached = numberOfDisposals >= maxDisposalPerOtherAsset || numberOfDisposals >= maxPossibleNumberOfDisposals
+      val isMaxLimitReached = numberOfDisposals >= maxTotalDisposals
 
       if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
         Ok(
@@ -120,6 +120,8 @@ class ReportedOtherAssetsDisposalListController @Inject()(
               mode,
               page,
               completedDisposals,
+              numberOfDisposals,
+              maxTotalDisposals,
               request.userAnswers,
               request.schemeDetails.schemeName,
               viewOnlyViewModel,
@@ -138,9 +140,7 @@ class ReportedOtherAssetsDisposalListController @Inject()(
       getCompletedDisposals(srn)
         .map { disposals =>
           val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-          val numberOfOtherAssetsItems = request.userAnswers.map(OtherAssetsCompleted.all(srn)).size
-          val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
-          val isMaxLimitReached = numberOfDisposals >= maxDisposalPerOtherAsset || numberOfDisposals >= maxPossibleNumberOfDisposals
+          val isMaxLimitReached = numberOfDisposals >= maxTotalDisposals
 
           if (isMaxLimitReached) {
             for {
@@ -162,6 +162,8 @@ class ReportedOtherAssetsDisposalListController @Inject()(
                         mode,
                         page,
                         disposals,
+                        numberOfDisposals,
+                        maxTotalDisposals,
                         request.userAnswers,
                         request.schemeDetails.schemeName,
                         showBackLink = true,
@@ -247,6 +249,11 @@ class ReportedOtherAssetsDisposalListController @Inject()(
           } yield (otherAssetsIndex, disposalIndexes)
       }
       .map(_.toMap)
+
+  private def getBondsDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(
+    implicit request: DataRequest[_]
+  ): Either[Result, List[(Max5000, List[Max50])]] =
+    disposals.toList.sortBy(_._1.value).asRight
 }
 
 object ReportedOtherAssetsDisposalListController {
@@ -335,16 +342,14 @@ object ReportedOtherAssetsDisposalListController {
     mode: Mode,
     page: Int,
     disposals: Map[Max5000, List[Max50]],
+    numberOfDisposals: Int,
+    maxTotalDisposals: Int,
     userAnswers: UserAnswers,
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean,
     isMaxLimitReached: Boolean
   ): FormPageViewModel[ListViewModel] = {
-
-    val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-    val numberOfOtherAssetsItems = userAnswers.map(OtherAssetsCompleted.all(srn)).size
-    val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
 
     val (title, heading) = ((mode, numberOfDisposals) match {
 
@@ -382,7 +387,7 @@ object ReportedOtherAssetsDisposalListController {
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.reportedOtherAssetsDisposalListSize,
-      numberOfDisposals,
+      totalSize = numberOfDisposals,
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.ReportedOtherAssetsDisposalListController
@@ -393,11 +398,8 @@ object ReportedOtherAssetsDisposalListController {
     )
 
     val conditionalInsetText: DisplayMessage = {
-      if (numberOfDisposals >= maxDisposalPerOtherAsset) {
+      if (isMaxLimitReached) {
         Message("assetDisposal.reportedOtherAssetsDisposalList.inset.maximumReached")
-      } else if (numberOfDisposals >= maxPossibleNumberOfDisposals) {
-        ParagraphMessage("assetDisposal.reportedOtherAssetsDisposalList.inset.allOtherAssetsDisposed.paragraph1") ++
-          ParagraphMessage("assetDisposal.reportedOtherAssetsDisposalList.inset.allOtherAssetsDisposed.paragraph2")
       } else {
         Message("")
       }
@@ -430,7 +432,7 @@ object ReportedOtherAssetsDisposalListController {
         )
       ),
       refresh = None,
-      buttonText = if (isMaxLimitReached) "site.saveAndContinue" else "site.return.to.tasklist",
+      buttonText = "site.saveAndContinue",
       onSubmit = if (isMaxLimitReached) {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       } else {

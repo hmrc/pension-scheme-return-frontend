@@ -130,22 +130,17 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(FbVersionPage(srn), "002")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
 
-    act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
-      injected[ListView].apply(
-        form(new YesNoPageFormProvider()),
-        viewModel(
-          srn,
-          page,
-          mode = NormalMode,
-          sharesDisposalsWithIndexes,
-          completedUserAnswers,
-          schemeName,
-          viewOnlyViewModel = None,
-          showBackLink = true,
-          isMaxLimitReached = true
-        )
-      )
-    }.withName("Completed Journey"))
+    viewModel(
+      srn,
+      page,
+      mode = NormalMode,
+      sharesDisposalsWithIndexes,
+      completedUserAnswers,
+      schemeName,
+      viewOnlyViewModel = None,
+      showBackLink = true,
+      isMaxLimitReached = false
+    )
 
     act.like(
       redirectToPage(

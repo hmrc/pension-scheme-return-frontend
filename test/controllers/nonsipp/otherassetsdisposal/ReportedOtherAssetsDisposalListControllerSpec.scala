@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsdisposal
 import services.PsrSubmissionService
 import pages.nonsipp.otherassetsdisposal._
 import views.html.ListView
+import config.Constants.{maxDisposalPerOtherAsset, maxOtherAssetsTransactions}
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController._
 import forms.YesNoPageFormProvider
@@ -112,6 +113,7 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
     inject.bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
+  val maxTotalDisposals: Int = maxDisposalPerOtherAsset * maxOtherAssetsTransactions
   "ReportedOtherAssetsDisposalListController" - {
 
     val completedUserAnswers = defaultUserAnswers
@@ -138,8 +140,10 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
           NormalMode,
           page,
           otherAssetsDisposalsWithIndexes,
-          completedUserAnswers,
-          schemeName,
+          numberOfDisposals = otherAssetsDisposalsWithIndexes.values.map(_.size).sum,
+          maxTotalDisposals = maxTotalDisposals,
+          userAnswers = completedUserAnswers,
+          schemeName = schemeName, // Pass the defined schemeName
           viewOnlyViewModel = None,
           showBackLink = true,
           isMaxLimitReached = false
@@ -201,8 +205,10 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               page,
               otherAssetsDisposalsWithIndexes,
-              completedUserAnswers,
-              schemeName,
+              numberOfDisposals = otherAssetsDisposalsWithIndexes.values.map(_.size).sum,
+              maxTotalDisposals = maxTotalDisposals,
+              userAnswers = completedUserAnswers,
+              schemeName = schemeName, // Pass the defined schemeName
               viewOnlyViewModel = Some(viewOnlyViewModel),
               showBackLink = true,
               isMaxLimitReached = true
@@ -224,8 +230,10 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               page,
               otherAssetsDisposalsWithIndexes,
-              updatedUserAnswers,
-              schemeName,
+              numberOfDisposals = otherAssetsDisposalsWithIndexes.values.map(_.size).sum,
+              maxTotalDisposals = maxTotalDisposals,
+              userAnswers = updatedUserAnswers,
+              schemeName = schemeName, // Pass the defined schemeName
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
               showBackLink = true,
               isMaxLimitReached = true
@@ -246,9 +254,11 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
             srn,
             mode = ViewOnlyMode,
             page,
-            Map(),
-            noDisposalsUserAnswers,
-            schemeName,
+            disposals = Map.empty,
+            numberOfDisposals = 0,
+            maxTotalDisposals = maxTotalDisposals,
+            userAnswers = noDisposalsUserAnswers,
+            schemeName = schemeName,
             viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
             showBackLink = true,
             isMaxLimitReached = true
@@ -256,7 +266,6 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
         )
       }.withName("OnPageLoadViewOnly renders ok with no disposals")
     )
-
     act.like(
       redirectToPage(
         onSubmitViewOnly,
@@ -281,8 +290,10 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
             mode = ViewOnlyMode,
             page,
             otherAssetsDisposalsWithIndexes,
-            completedUserAnswers,
-            schemeName,
+            numberOfDisposals = otherAssetsDisposalsWithIndexes.values.map(_.size).sum,
+            maxTotalDisposals = maxTotalDisposals,
+            userAnswers = completedUserAnswers,
+            schemeName = schemeName, // Pass the defined schemeName
             viewOnlyViewModel = Some(
               viewOnlyViewModel.copy(
                 currentVersion = submissionNumberOne,

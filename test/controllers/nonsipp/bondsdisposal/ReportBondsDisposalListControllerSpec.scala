@@ -73,7 +73,7 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
 
   private val disposalIndexes = List(disposalIndexOne, disposalIndexTwo)
   private val bondsDisposalsWithIndexes =
-    List(((bondIndexOne, disposalIndexes), SectionCompleted))
+    List((bondIndexOne, List(disposalIndexOne, disposalIndexTwo)))
 
   private val completedUserAnswers = defaultUserAnswers
   // Bonds data 1
@@ -112,10 +112,10 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
           NormalMode,
           page,
           bondsDisposalsWithIndexes,
-          numberOfDisposals,
-          maxPossibleNumberOfDisposals,
-          completedUserAnswers,
-          schemeName,
+          numberOfDisposals = numberOfDisposals,
+          maxTotalDisposals = maxPossibleNumberOfDisposals,
+          userAnswers = completedUserAnswers,
+          schemeName = schemeName,
           viewOnlyViewModel = None,
           showBackLink = true,
           isMaxLimitReached = false

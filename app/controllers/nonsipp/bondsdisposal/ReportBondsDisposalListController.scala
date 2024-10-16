@@ -17,11 +17,11 @@
 package controllers.nonsipp.bondsdisposal
 
 import services.SaveService
-import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage}
+import pages.nonsipp.bonds.NameOfBondsPage
 import viewmodels.implicits._
 import play.api.mvc._
 import cats.implicits._
-import config.Constants.maxDisposalPerBond
+import config.Constants.{maxBondsTransactions, maxDisposalPerBond}
 import controllers.actions.IdentifyAndRequireData
 import viewmodels.models.TaskListStatus.Updated
 import models.HowDisposed.HowDisposed
@@ -62,6 +62,8 @@ class ReportBondsDisposalListController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
+  val maxTotalDisposals: Int = maxDisposalPerBond * maxBondsTransactions
+
   val form: Form[Boolean] = ReportBondsDisposalListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
@@ -95,6 +97,7 @@ class ReportBondsDisposalListController @Inject()(
     )
     onPageLoadCommon(srn, page, mode, Some(viewOnlyViewModel), showBackLink)
   }
+
   def onPageLoadCommon(
     srn: Srn,
     page: Int,
@@ -106,9 +109,7 @@ class ReportBondsDisposalListController @Inject()(
   ): Result =
     getCompletedDisposals(srn).map { completedDisposals =>
       val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-      val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
-      val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
-      val isMaxLimitReached = numberOfDisposals >= maxDisposalPerBond || numberOfDisposals >= maxPossibleNumberOfDisposals
+      val isMaxLimitReached = numberOfDisposals >= maxTotalDisposals
 
       getBondsDisposalsWithIndexes(srn, completedDisposals).map { bondsDisposalsWithIndexes =>
         if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
@@ -121,7 +122,7 @@ class ReportBondsDisposalListController @Inject()(
                 page,
                 bondsDisposalsWithIndexes,
                 numberOfDisposals,
-                maxPossibleNumberOfDisposals,
+                maxTotalDisposals,
                 request.userAnswers,
                 request.schemeDetails.schemeName,
                 viewOnlyViewModel,
@@ -139,11 +140,9 @@ class ReportBondsDisposalListController @Inject()(
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       getCompletedDisposals(srn)
-        .traverse { completedDisposals =>
-          val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-          val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
-          val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
-          val isMaxLimitReached = numberOfDisposals >= maxDisposalPerBond || numberOfDisposals >= maxPossibleNumberOfDisposals
+        .map { disposals =>
+          val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+          val isMaxLimitReached = numberOfDisposals >= maxTotalDisposals
 
           if (isMaxLimitReached) {
             for {
@@ -157,7 +156,7 @@ class ReportBondsDisposalListController @Inject()(
               .bindFromRequest()
               .fold(
                 errors =>
-                  getBondsDisposalsWithIndexes(srn, completedDisposals)
+                  getBondsDisposalsWithIndexes(srn, disposals)
                     .map { indexes =>
                       BadRequest(
                         view(
@@ -168,7 +167,7 @@ class ReportBondsDisposalListController @Inject()(
                             page,
                             indexes,
                             numberOfDisposals,
-                            maxPossibleNumberOfDisposals,
+                            maxTotalDisposals,
                             request.userAnswers,
                             request.schemeDetails.schemeName,
                             showBackLink = true,
@@ -199,7 +198,8 @@ class ReportBondsDisposalListController @Inject()(
               )
           }
         }
-        .map(_.merge)
+        .leftMap(_.pure[Future])
+        .merge
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -215,26 +215,29 @@ class ReportBondsDisposalListController @Inject()(
     year: String,
     current: Int,
     previous: Int
-  ): Action[AnyContent] = identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) {
-    implicit request =>
-      val showBackLink = false
-      val viewOnlyViewModel = ViewOnlyViewModel(
-        viewOnlyUpdated = request.previousUserAnswers match {
-          case Some(previousUserAnswers) =>
-            getCompletedOrUpdatedTaskListStatus(
-              request.userAnswers,
-              previousUserAnswers,
-              pages.nonsipp.bondsdisposal.Paths.bondsDisposed
-            ) == Updated
-          case _ => false
-        },
-        year = year,
-        currentVersion = (current - 1).max(0),
-        previousVersion = (previous - 1).max(0),
-        compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
-      )
-      onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
-  }
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)).async {
+      implicit request =>
+        Future.successful {
+          val showBackLink = false
+          val viewOnlyViewModel = ViewOnlyViewModel(
+            viewOnlyUpdated = request.previousUserAnswers match {
+              case Some(previousUserAnswers) =>
+                getCompletedOrUpdatedTaskListStatus(
+                  request.userAnswers,
+                  previousUserAnswers,
+                  pages.nonsipp.bondsdisposal.Paths.bondsDisposed
+                ) == Updated
+              case _ => false
+            },
+            year = year,
+            currentVersion = (current - 1).max(0),
+            previousVersion = (previous - 1).max(0),
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          )
+          onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
+        }
+    }
 
   private def getCompletedDisposals(
     srn: Srn
@@ -259,19 +262,8 @@ class ReportBondsDisposalListController @Inject()(
 
   private def getBondsDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(
     implicit request: DataRequest[_]
-  ): Either[Result, List[((Max5000, List[Max50]), SectionCompleted)]] =
-    disposals
-      .map {
-        case indexes @ (index, _) =>
-          index -> request.userAnswers
-            .get(BondsCompleted(srn, index))
-            .getOrRecoverJourney
-            .map(bondsDisposal => (indexes, bondsDisposal))
-      }
-      .toList
-      .sortBy { case (index, _) => index.value }
-      .map { case (_, listRow) => listRow }
-      .sequence
+  ): Either[Result, List[(Max5000, List[Max50])]] =
+    disposals.toList.sortBy(_._1.value).asRight
 }
 
 object ReportBondsDisposalListController {
@@ -283,7 +275,7 @@ object ReportBondsDisposalListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    bondsDisposalsWithIndexes: List[((Max5000, List[Max50]), SectionCompleted)],
+    bondsDisposalsWithIndexes: List[(Max5000, List[Max50])],
     userAnswers: UserAnswers,
     viewOnlyViewModel: Option[ViewOnlyViewModel],
     schemeName: String
@@ -297,7 +289,7 @@ object ReportBondsDisposalListController {
       )
     } else {
       bondsDisposalsWithIndexes.flatMap {
-        case ((bondIndex, disposalIndexes), bondsDisposal) =>
+        case (bondIndex, disposalIndexes) =>
           disposalIndexes.map { disposalIndex =>
             val bondsDisposalData = BondsDisposalData(
               bondIndex,
@@ -353,9 +345,9 @@ object ReportBondsDisposalListController {
     srn: Srn,
     mode: Mode,
     page: Int,
-    bondsDisposalsWithIndexes: List[((Max5000, List[Max50]), SectionCompleted)],
+    bondsDisposalsWithIndexes: List[(Max5000, List[Max50])],
     numberOfDisposals: Int,
-    maxPossibleNumberOfDisposals: Int,
+    maxTotalDisposals: Int,
     userAnswers: UserAnswers,
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
@@ -364,28 +356,21 @@ object ReportBondsDisposalListController {
   ): FormPageViewModel[ListViewModel] = {
 
     val (title, heading) = ((mode, numberOfDisposals) match {
-      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals == 0 =>
+      case (ViewOnlyMode, 0) =>
         ("bondsDisposal.reportBondsDisposalList.view.title", "bondsDisposal.reportBondsDisposalList.view.heading.none")
-
-      case (ViewOnlyMode, _) if numberOfDisposals > 1 =>
+      case (ViewOnlyMode, 1) =>
+        ("bondsDisposal.reportBondsDisposalList.view.title", "bondsDisposal.reportBondsDisposalList.view.heading")
+      case (ViewOnlyMode, _) =>
         (
           "bondsDisposal.reportBondsDisposalList.view.title.plural",
           "bondsDisposal.reportBondsDisposalList.view.heading.plural"
         )
-      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals > 1 =>
-        (
-          "bondsDisposal.reportBondsDisposalList.view.title",
-          "bondsDisposal.reportBondsDisposalList.view.heading"
-        )
-      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals > 1 =>
+      case (_, 1) =>
+        ("bondsDisposal.reportBondsDisposalList.title", "bondsDisposal.reportBondsDisposalList.heading")
+      case (_, _) =>
         (
           "bondsDisposal.reportBondsDisposalList.title.plural",
           "bondsDisposal.reportBondsDisposalList.heading.plural"
-        )
-      case _ =>
-        (
-          "bondsDisposal.reportBondsDisposalList.title",
-          "bondsDisposal.reportBondsDisposalList.heading"
         )
     }) match {
       case (title, heading) =>
@@ -394,8 +379,8 @@ object ReportBondsDisposalListController {
 
     val pagination = Pagination(
       currentPage = page,
-      pageSize = Constants.reportedSharesDisposalListSize,
-      numberOfDisposals,
+      pageSize = Constants.reportedOtherAssetsDisposalListSize,
+      totalSize = numberOfDisposals,
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.ReportBondsDisposalListController
@@ -408,9 +393,6 @@ object ReportBondsDisposalListController {
     val conditionalInsetText: DisplayMessage = {
       if (isMaxLimitReached) {
         Message("bondsDisposal.reportBondsDisposalList.inset.maximumReached")
-      } else if (numberOfDisposals >= maxPossibleNumberOfDisposals) {
-        ParagraphMessage("bondsDisposal.reportBondsDisposalList.inset.allBondsDisposed.paragraph1") ++
-          ParagraphMessage("bondsDisposal.reportBondsDisposalList.inset.allBondsDisposed.paragraph2")
       } else {
         Message("")
       }
@@ -420,7 +402,9 @@ object ReportBondsDisposalListController {
       mode = mode,
       title = title,
       heading = heading,
-      description = Option.when(!isMaxLimitReached)(
+      description = Option.when(
+        !isMaxLimitReached
+      )(
         ParagraphMessage("bondsDisposal.reportBondsDisposalList.description")
       ),
       page = ListViewModel(
@@ -441,8 +425,7 @@ object ReportBondsDisposalListController {
         )
       ),
       refresh = None,
-      buttonText = if (isMaxLimitReached) "site.saveAndContinue" else "site.saveAndContinue",
-      details = None,
+      buttonText = "site.saveAndContinue",
       onSubmit = if (isMaxLimitReached) {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       } else {

@@ -20,8 +20,9 @@ import services.SaveService
 import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController._
 import viewmodels.implicits._
 import com.google.inject.Inject
+import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import cats.implicits._
-import config.Constants.maxDisposalsPerShare
+import config.Constants.{maxDisposalsPerShare, maxSharesTransactions, reportedSharesDisposalListSize}
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal._
 import forms.YesNoPageFormProvider
@@ -30,8 +31,6 @@ import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompleted, Type
 import play.api.mvc._
 import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
-import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
-import config.Constants
 import views.html.ListView
 import models.TypeOfShares._
 import models.SchemeId.Srn
@@ -63,6 +62,7 @@ class ReportedSharesDisposalListController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
+  val maxTotalDisposals: Int = maxSharesTransactions * maxDisposalsPerShare
   val form: Form[Boolean] = ReportedSharesDisposalListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
@@ -109,8 +109,7 @@ class ReportedSharesDisposalListController @Inject()(
     getCompletedDisposals(srn).map { completedDisposals =>
       val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
       val numberOfSharesItems = request.userAnswers.map(SharesCompleted.all(srn)).size
-      val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
-      val isMaxLimitReached = numberOfDisposals >= maxDisposalsPerShare || numberOfDisposals >= maxPossibleNumberOfDisposals
+      val isMaxLimitReached = numberOfDisposals >= maxTotalDisposals
 
       if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
         Ok(
@@ -140,8 +139,7 @@ class ReportedSharesDisposalListController @Inject()(
         .map { disposals =>
           val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
           val numberOfSharesItems = request.userAnswers.map(SharesCompleted.all(srn)).size
-          val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
-          val isMaxLimitReached = numberOfDisposals >= maxDisposalsPerShare || numberOfDisposals >= maxPossibleNumberOfDisposals
+          val isMaxLimitReached = numberOfDisposals >= maxTotalDisposals
 
           if (isMaxLimitReached) {
             for {
@@ -166,7 +164,7 @@ class ReportedSharesDisposalListController @Inject()(
                         request.userAnswers,
                         request.schemeDetails.schemeName,
                         showBackLink = true,
-                        isMaxLimitReached = true
+                        isMaxLimitReached = false
                       )
                     )
                   ).pure[Future],
@@ -347,7 +345,6 @@ object ReportedSharesDisposalListController {
 
     val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
     val numberOfSharesItems = userAnswers.map(SharesCompleted.all(srn)).size
-    val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
 
     val (title, heading) = ((mode, numberOfDisposals) match {
       case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals == 0 =>
@@ -356,20 +353,15 @@ object ReportedSharesDisposalListController {
           "sharesDisposal.reportedSharesDisposalList.view.heading.none"
         )
 
-      case (ViewOnlyMode, _) if numberOfDisposals > 1 =>
+      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals > 1 =>
         (
           "sharesDisposal.reportedSharesDisposalList.view.title.plural",
           "sharesDisposal.reportedSharesDisposalList.view.heading.plural"
         )
-      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals > 1 =>
+      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals == 1 =>
         (
           "sharesDisposal.reportedSharesDisposalList.view.title",
           "sharesDisposal.reportedSharesDisposalList.view.heading"
-        )
-      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals > 1 =>
-        (
-          "sharesDisposal.reportedSharesDisposalList.title.plural",
-          "sharesDisposal.reportedSharesDisposalList.heading.plural"
         )
       case _ =>
         (
@@ -383,8 +375,8 @@ object ReportedSharesDisposalListController {
 
     val pagination = Pagination(
       currentPage = page,
-      pageSize = Constants.reportedSharesDisposalListSize,
-      numberOfDisposals,
+      pageSize = reportedSharesDisposalListSize,
+      totalSize = numberOfDisposals,
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.ReportedSharesDisposalListController
@@ -394,32 +386,27 @@ object ReportedSharesDisposalListController {
       }
     )
 
-    val conditionalInsetText: DisplayMessage = {
-      if (numberOfDisposals >= maxDisposalsPerShare) {
-        Message("sharesDisposal.reportedSharesDisposalList.inset.maximumReached")
-      } else if (numberOfDisposals >= maxPossibleNumberOfDisposals) {
-        ParagraphMessage("sharesDisposal.reportedSharesDisposalList.inset.allSharesDisposed.paragraph1") ++
-          ParagraphMessage("sharesDisposal.reportedSharesDisposalList.inset.allSharesDisposed.paragraph2")
-      } else {
-        Message("")
-      }
+    val hasReachedMaxFlag = isMaxLimitReached
+
+    val insetMessage: DisplayMessage = if (hasReachedMaxFlag) {
+
+      Message("sharesDisposal.reportedSharesDisposalList.inset.maximumReached")
+    } else {
+      Message("sharesDisposal.reportedSharesDisposalList.inset.maximumReached")
     }
 
     FormPageViewModel(
       mode = mode,
       title = title,
       heading = heading,
-      description = Option.when(
-        !((numberOfDisposals >= maxDisposalsPerShare) | (numberOfDisposals >= maxPossibleNumberOfDisposals))
-      )(
+      description = Option.when(!hasReachedMaxFlag)(
         ParagraphMessage("sharesDisposal.reportedSharesDisposalList.description")
       ),
       page = ListViewModel(
-        inset = conditionalInsetText,
+        inset = insetMessage,
         rows(srn, mode, disposals, userAnswers, viewOnlyViewModel, schemeName),
         Message("sharesDisposal.reportedSharesDisposalList.radios"),
-        showRadios =
-          !((numberOfDisposals >= maxDisposalsPerShare) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
+        showRadios = !hasReachedMaxFlag && !mode.isViewOnlyMode,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
