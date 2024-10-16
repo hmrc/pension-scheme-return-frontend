@@ -157,7 +157,7 @@ object LandOrPropertyLeaseDetailsController {
   ): FormPageViewModel[TripleQuestion[String, Money, LocalDate]] = FormPageViewModel(
     title = "landOrPropertyLeaseDetails.title",
     heading = Message("landOrPropertyLeaseDetails.heading", addressLine1),
-    description = Some("landOrPropertyLeaseDetails.paragraph"),
+    description = None,
     page = TripleQuestion(
       form,
       QuestionField
