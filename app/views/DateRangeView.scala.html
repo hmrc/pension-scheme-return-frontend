@@ -42,6 +42,7 @@
         legend = LegendViewModel(viewmodel.page.startDateLabel.toMessage)
       )
       .withId("dates.startDate")
+      .withHint(HintViewModel(renderMessage(viewmodel.page.startDateHint)))
     )
 
     @govukDateInput(
@@ -50,6 +51,7 @@
         legend = LegendViewModel(viewmodel.page.endDateLabel.toMessage)
       )
       .withId("dates.endDate")
+      .withHint(HintViewModel(renderMessage(viewmodel.page.endDateHint)))
     )
 
     @govukButton(

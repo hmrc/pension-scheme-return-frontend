@@ -50,7 +50,7 @@ class ValueOfAssetsControllerSpec extends ControllerBaseSpec {
   "ValueOfAssetsController" - {
 
     val form = ValueOfAssetsController.form(new MoneyFormProvider(), schemeDatePeriod)
-    lazy val viewModel = ValueOfAssetsController.viewModel(srn, NormalMode, schemeName, schemeDatePeriod, _)
+    lazy val viewModel = ValueOfAssetsController.viewModel(srn, NormalMode, schemeDatePeriod, _)
 
     val moneyInPeriodData = MoneyInPeriod(moneyNegative, moneyNegative)
 

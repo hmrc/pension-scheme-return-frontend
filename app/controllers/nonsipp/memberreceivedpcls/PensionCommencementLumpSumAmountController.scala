@@ -35,8 +35,8 @@ import config.RefinedTypes.Max300
 import controllers.PSRController
 import views.html.MultipleQuestionView
 import models.SchemeId.Srn
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, QuestionField}
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, QuestionField}
 import models.PensionCommencementLumpSum._
 import play.api.data.Form
 
@@ -131,14 +131,10 @@ object PensionCommencementLumpSumAmountController {
       page = DoubleQuestion(
         form,
         QuestionField.currency(Message("pensionCommencementLumpSumAmount.received", fullName)),
-        QuestionField.currency(Message("pensionCommencementLumpSumAmount.relevant", fullName))
+        QuestionField
+          .currency(Message("pensionCommencementLumpSumAmount.relevant", fullName))
+          .withHint("pensionCommencementLumpSumAmount.relevant.hint")
       ),
-      Option(
-        FurtherDetailsViewModel(
-          Message("pensionCommencementLumpSumAmount.details.title"),
-          ParagraphMessage("pensionCommencementLumpSumAmount.details")
-        )
-      ),
-      routes.PensionCommencementLumpSumAmountController.onSubmit(srn, index, mode)
+      onSubmit = routes.PensionCommencementLumpSumAmountController.onSubmit(srn, index, mode)
     )
 }

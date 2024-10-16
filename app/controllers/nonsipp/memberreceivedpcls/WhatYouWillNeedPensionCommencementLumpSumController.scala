@@ -62,12 +62,10 @@ object WhatYouWillNeedPensionCommencementLumpSumController {
     ).withButtonText(Message("site.continue"))
       .withDescription(
         ParagraphMessage("WhatYouWillNeed.PensionCommencementLumpSum.paragraph1") ++
-          ParagraphMessage("WhatYouWillNeed.PensionCommencementLumpSum.paragraph2") ++
           ListMessage(
             ListType.Bullet,
-            "WhatYouWillNeed.PensionCommencementLumpSum.totalAmount",
-            "WhatYouWillNeed.PensionCommencementLumpSum.relevantPension"
-          ) ++
-          ParagraphMessage("WhatYouWillNeed.PensionCommencementLumpSum.paragraph3")
+            "WhatYouWillNeed.PensionCommencementLumpSum.bullet1",
+            "WhatYouWillNeed.PensionCommencementLumpSum.bullet2"
+          )
       )
 }

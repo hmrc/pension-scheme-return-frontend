@@ -35,7 +35,7 @@ import utils.DateTimeUtils.localDateShow
 import models._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.DisplayMessage._
 import viewmodels.models.{FormPageViewModel, QuestionField}
 import models.requests.DataRequest
 import play.api.data.Form
@@ -63,7 +63,6 @@ class ValueOfAssetsController @Inject()(
       val viewModel = ValueOfAssetsController.viewModel(
         srn,
         mode,
-        request.schemeDetails.schemeName,
         period,
         form
       )
@@ -81,7 +80,7 @@ class ValueOfAssetsController @Inject()(
         .fold(
           formWithErrors => {
             val viewModel =
-              ValueOfAssetsController.viewModel(srn, mode, request.schemeDetails.schemeName, period, form)
+              ValueOfAssetsController.viewModel(srn, mode, period, form)
 
             Future.successful(BadRequest(view(formWithErrors, viewModel)))
           },
@@ -132,18 +131,25 @@ object ValueOfAssetsController {
   def viewModel(
     srn: Srn,
     mode: Mode,
-    schemeName: String,
     period: DateRange,
     form: Form[(Money, Money)]
   ): FormPageViewModel[DoubleQuestion[Money]] =
     FormPageViewModel(
-      "valueOfAssets.title",
-      Message("valueOfAssets.heading", schemeName),
+      title = "valueOfAssets.title",
+      heading = "valueOfAssets.heading",
       page = DoubleQuestion(
         form,
-        QuestionField.input(Message("valueOfAssets.start.label", period.from.show)),
-        QuestionField.input(Message("valueOfAssets.end.label", period.to.show))
+        QuestionField.currency(Message("valueOfAssets.start.label", period.from.show)),
+        QuestionField.currency(Message("valueOfAssets.end.label", period.to.show))
       ),
-      routes.ValueOfAssetsController.onSubmit(srn, mode)
-    ).withDescription(ParagraphMessage("valueOfAssets.description"))
+      onSubmit = routes.ValueOfAssetsController.onSubmit(srn, mode)
+    ).withDescription(
+      ParagraphMessage("valueOfAssets.paragraph") ++
+        ListMessage(
+          ListType.Bullet,
+          "valueOfAssets.bullet1",
+          "valueOfAssets.bullet2",
+          "valueOfAssets.bullet3"
+        )
+    )
 }
