@@ -392,7 +392,7 @@ object LandOrPropertyDisposalListController {
         ParagraphMessage("landOrPropertyDisposalList.description")
       ),
       page = ListViewModel(
-        inset = if (hasReachedMaxFlag) "landOrPropertyDisposalList.inset" else "landOrPropertyDisposalList.inset",
+        inset = "landOrPropertyDisposalList.inset",
         rows(srn, mode, addressesWithIndexes, userAnswers, viewOnlyViewModel, schemeName),
         Message("landOrPropertyDisposalList.radios"),
         showRadios = !mode.isViewOnlyMode && !hasReachedMaxFlag,
