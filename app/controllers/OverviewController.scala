@@ -202,7 +202,12 @@ class OverviewController @Inject()(
                       ActionItem(
                         content = messages("site.viewOrChange"),
                         href = controllers.routes.OverviewController
-                          .onSelectViewAndChange(srn, last.reportFormBundleNumber, reportType)
+                          .onSelectViewAndChange(
+                            srn,
+                            last.reportFormBundleNumber,
+                            formatDateForApi(yearFrom),
+                            reportType
+                          )
                           .url
                       )
                     )
@@ -277,12 +282,21 @@ class OverviewController @Inject()(
       }
     }
 
-  def onSelectViewAndChange(srn: Srn, fbNumber: String, reportType: String): Action[AnyContent] =
+  def onSelectViewAndChange(
+    srn: Srn,
+    fbNumber: String,
+    taxYear: String,
+    reportType: String
+  ): Action[AnyContent] =
     identifyAndRequireData(srn, fbNumber).async { implicit request =>
       reportType match {
         case PsrReportType.Sipp.name =>
           val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippViewAndChange}"
-          Future.successful(Redirect(sippUrl).addingToSession(Constants.FB_NUMBER -> fbNumber))
+          Future.successful(
+            Redirect(sippUrl)
+              .addingToSession(Constants.FB_NUMBER -> fbNumber)
+              .addingToSession(Constants.TAX_YEAR -> taxYear)
+          )
         case _ =>
           val byPassedJourney =
             Redirect(controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode))
