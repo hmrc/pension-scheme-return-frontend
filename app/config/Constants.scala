@@ -50,8 +50,8 @@ object Constants {
 
   val schemeMembersPageSize = 25
   val maxSchemeMembers = 300
-  val maxSharesTransactions = 1
-  val maxDisposalsPerShare = 8
+  val maxSharesTransactions = 5000
+  val maxDisposalsPerShare = 50
   val maxBondsTransactions = 5000
   val maxDisposalPerBond = 50
   val maxOtherAssetsTransactions = 5000
