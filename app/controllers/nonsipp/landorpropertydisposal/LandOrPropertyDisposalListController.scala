@@ -177,10 +177,11 @@ class LandOrPropertyDisposalListController @Inject()(
       val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
       val numberOfAddresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
       val maxPossibleNumberOfDisposals = maxLandOrPropertyDisposals * numberOfAddresses
-      if (numberOfDisposals == maxPossibleNumberOfDisposals) {
-        Redirect(
-          navigator.nextPage(LandOrPropertyDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
-        )
+
+      val showRadios = !mode.isViewOnlyMode && numberOfDisposals < maxPossibleNumberOfDisposals
+
+      if (!showRadios) {
+        Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
       } else {
         form
           .bindFromRequest()

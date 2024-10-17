@@ -136,7 +136,7 @@ class ReportedSharesDisposalListController @Inject()(
           val numberOfSharesItems = request.userAnswers.map(SharesCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
 
-          if (numberOfDisposals == maxPossibleNumberOfDisposals) {
+          if (numberOfDisposals >= maxSharesTransactions * maxDisposalsPerShare) {
             Redirect(
               navigator.nextPage(ReportedSharesDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
             ).pure[Future]
@@ -155,6 +155,7 @@ class ReportedSharesDisposalListController @Inject()(
                         disposals,
                         request.userAnswers,
                         request.schemeDetails.schemeName,
+                        viewOnlyViewModel = None,
                         showBackLink = true
                       )
                     )
@@ -169,7 +170,7 @@ class ReportedSharesDisposalListController @Inject()(
                     navigator.nextPage(
                       ReportedSharesDisposalListPage(srn, reportAnotherDisposal),
                       mode,
-                      request.userAnswers
+                      updatedUserAnswers
                     )
                   )
               )
