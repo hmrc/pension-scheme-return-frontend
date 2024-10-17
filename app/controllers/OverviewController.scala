@@ -66,7 +66,8 @@ class OverviewController @Inject()(
 
   private def outstandingData(
     srn: Srn,
-    overview: Option[Seq[OverviewResponse]]
+    overview: Option[Seq[OverviewResponse]],
+    versionsForYears: Seq[PsrVersionsForYearsResponse]
   )(implicit messages: Messages): Seq[OverviewSummary] =
     overview.fold(Seq[OverviewSummary]())(
       values =>
@@ -89,11 +90,22 @@ class OverviewController @Inject()(
             val yearFrom = overviewResponse.periodStartDate
             val yearTo = overviewResponse.periodEndDate
             val compiled = overviewResponse.compiledVersionAvailable.getOrElse(YesNo.No) == YesNo.Yes
+            val fbNumber = versionsForYears
+              .find(x => LocalDate.parse(x.startDate) == yearFrom)
+              .flatMap(_.data.sortBy(_.reportVersion).lastOption)
+              .map(_.reportFormBundleNumber)
+
             val (status, url, label) = if (compiled) {
               (
                 ReportStatus.ReportStatusCompiled,
                 controllers.routes.OverviewController
-                  .onSelectContinue(srn, formatDateForApi(yearFrom), "001", overviewResponse.psrReportType.get.name)
+                  .onSelectContinue(
+                    srn,
+                    formatDateForApi(yearFrom),
+                    "001",
+                    fbNumber,
+                    overviewResponse.psrReportType.get.name
+                  )
                   .url,
                 messages("site.continue")
               )
@@ -166,6 +178,7 @@ class OverviewController @Inject()(
                             srn,
                             formatDateForApi(yearFrom),
                             "%03d".format(last.reportVersion),
+                            Some(last.reportFormBundleNumber),
                             reportType
                           )
                           .url
@@ -189,7 +202,12 @@ class OverviewController @Inject()(
                       ActionItem(
                         content = messages("site.viewOrChange"),
                         href = controllers.routes.OverviewController
-                          .onSelectViewAndChange(srn, last.reportFormBundleNumber, reportType)
+                          .onSelectViewAndChange(
+                            srn,
+                            last.reportFormBundleNumber,
+                            formatDateForApi(yearFrom),
+                            reportType
+                          )
                           .url
                       )
                     )
@@ -209,7 +227,7 @@ class OverviewController @Inject()(
         overviewResponse <- psrOverviewService.getOverview(request.schemeDetails.pstr, fromDate, toDate, srn)
         versionsForYearsResponse <- psrVersionsService
           .getVersionsForYears(request.schemeDetails.pstr, allDates.drop(1).map(dates => dates._2.from.toString), srn)
-        outstanding = outstandingData(srn, overviewResponse)
+        outstanding = outstandingData(srn, overviewResponse, versionsForYearsResponse)
         previous = previousData(srn, versionsForYearsResponse, overviewResponse, outstanding)
       } yield Ok(view(outstanding, previous, request.schemeDetails.schemeName))
         .addingToSession((Constants.SRN, srn.value))
@@ -239,27 +257,46 @@ class OverviewController @Inject()(
       }
     }
 
-  def onSelectContinue(srn: Srn, taxYear: String, version: String, reportType: String): Action[AnyContent] =
+  def onSelectContinue(
+    srn: Srn,
+    taxYear: String,
+    version: String,
+    fbNumber: Option[String],
+    reportType: String
+  ): Action[AnyContent] =
     identifyAndRequireData(srn, taxYear, version).async { implicit request =>
       reportType match {
         case PsrReportType.Sipp.name =>
           val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippContinueJourney}"
-          Future.successful(
-            Redirect(sippUrl)
+          Future.successful {
+            val result = Redirect(sippUrl)
               .addingToSession(Constants.TAX_YEAR -> taxYear)
               .addingToSession(Constants.VERSION -> version)
-          )
+
+            fbNumber
+              .map(fb => result.addingToSession(Constants.FB_NUMBER -> fb))
+              .getOrElse(result)
+          }
         case _ =>
           Future.successful(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
       }
     }
 
-  def onSelectViewAndChange(srn: Srn, fbNumber: String, reportType: String): Action[AnyContent] =
+  def onSelectViewAndChange(
+    srn: Srn,
+    fbNumber: String,
+    taxYear: String,
+    reportType: String
+  ): Action[AnyContent] =
     identifyAndRequireData(srn, fbNumber).async { implicit request =>
       reportType match {
         case PsrReportType.Sipp.name =>
           val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippViewAndChange}"
-          Future.successful(Redirect(sippUrl).addingToSession(Constants.FB_NUMBER -> fbNumber))
+          Future.successful(
+            Redirect(sippUrl)
+              .addingToSession(Constants.FB_NUMBER -> fbNumber)
+              .addingToSession(Constants.TAX_YEAR -> taxYear)
+          )
         case _ =>
           val byPassedJourney =
             Redirect(controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode))
