@@ -87,7 +87,7 @@ class PspDeclarationControllerSpec
     lazy val emailAuditEventCaptor: ArgumentCaptor[PSRSubmissionEmailAuditEvent] =
       ArgumentCaptor.forClass(classOf[PSRSubmissionEmailAuditEvent])
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, isPsa = false) { implicit app => implicit request =>
       injected[PsaIdInputView]
         .apply(form(injected[TextFormProvider], Some(psaId.value)), viewModel)
     })
