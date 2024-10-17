@@ -94,7 +94,7 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
         )
     })
 
-    act.like(redirectNextPage(onSubmit, "value" -> "1"))
+    act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "true"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

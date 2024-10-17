@@ -144,7 +144,7 @@ class ReportBondsDisposalListController @Inject()(
           val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
           val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
-          if (numberOfDisposals == maxPossibleNumberOfDisposals) {
+          if (numberOfDisposals >= maxBondsTransactions * maxDisposalPerBond) {
             Redirect(
               navigator.nextPage(ReportBondsDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
             ).pure[Future]
@@ -401,7 +401,7 @@ object ReportBondsDisposalListController {
     )
 
     val conditionalInsetText: DisplayMessage = {
-      if (numberOfDisposals >= maxBondsTransactions) {
+      if (numberOfDisposals >= maxBondsTransactions * maxDisposalPerBond) {
         Message("bondsDisposal.reportBondsDisposalList.inset.maximumReached")
       } else if (numberOfDisposals >= maxPossibleNumberOfDisposals) {
         ParagraphMessage("bondsDisposal.reportBondsDisposalList.inset.allBondsDisposed.paragraph1") ++

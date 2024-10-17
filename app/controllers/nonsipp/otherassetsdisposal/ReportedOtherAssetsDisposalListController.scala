@@ -135,7 +135,7 @@ class ReportedOtherAssetsDisposalListController @Inject()(
           val numberOfOtherAssetsItems = request.userAnswers.map(OtherAssetsCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
 
-          if (numberOfDisposals == maxPossibleNumberOfDisposals) {
+          if (numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset) {
             Redirect(
               navigator
                 .nextPage(ReportedOtherAssetsDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
@@ -146,7 +146,19 @@ class ReportedOtherAssetsDisposalListController @Inject()(
               .fold(
                 errors =>
                   BadRequest(
-                    view(errors, viewModel(srn, mode, page, disposals, request.userAnswers, "", showBackLink = true))
+                    view(
+                      errors,
+                      viewModel(
+                        srn,
+                        mode,
+                        page,
+                        disposals,
+                        request.userAnswers,
+                        request.schemeDetails.schemeName,
+                        viewOnlyViewModel = None,
+                        showBackLink = true
+                      )
+                    )
                   ).pure[Future],
                 reportAnotherDisposal =>
                   for {
@@ -158,7 +170,7 @@ class ReportedOtherAssetsDisposalListController @Inject()(
                     navigator.nextPage(
                       ReportedOtherAssetsDisposalListPage(srn, reportAnotherDisposal),
                       mode,
-                      request.userAnswers
+                      updatedUserAnswers
                     )
                   )
               )
