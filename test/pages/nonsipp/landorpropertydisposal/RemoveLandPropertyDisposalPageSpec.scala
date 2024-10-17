@@ -16,7 +16,7 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import config.Refined.{OneTo50, OneTo5000}
+import config.RefinedTypes.{OneTo50, OneTo5000}
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 

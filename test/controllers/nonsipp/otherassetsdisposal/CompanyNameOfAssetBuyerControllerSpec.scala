@@ -17,13 +17,13 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.CompanyNameOfAssetBuyerPage
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.TextInputView
 import controllers.nonsipp.otherassetsdisposal.CompanyNameOfAssetBuyerController._
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class CompanyNameOfAssetBuyerControllerSpec extends ControllerBaseSpec {
 

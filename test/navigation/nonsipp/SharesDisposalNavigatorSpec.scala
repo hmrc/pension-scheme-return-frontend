@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import utils.BaseSpec
-import config.Refined.{Max50, Max5000}
+import config.RefinedTypes.{Max50, Max5000}
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal._
 import models._

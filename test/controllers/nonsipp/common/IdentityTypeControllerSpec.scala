@@ -19,14 +19,14 @@ package controllers.nonsipp.common
 import play.api.test.FakeRequest
 import play.api.mvc.AnyContentAsEmpty
 import models.IdentityType._
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.RadioListView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{IdentitySubject, NormalMode}
 import controllers.nonsipp.common.IdentityTypeController._
 import models.requests.AllowedAccessRequest
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class IdentityTypeControllerSpec extends ControllerBaseSpec {
 

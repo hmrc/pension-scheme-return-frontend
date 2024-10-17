@@ -17,11 +17,11 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, CostOfSharesPage}
-import config.Refined._
-import controllers.ControllerBaseSpec
 import views.html.MoneyView
 import forms.MoneyFormProvider
 import models.NormalMode
+import config.RefinedTypes._
+import controllers.ControllerBaseSpec
 import controllers.nonsipp.shares.CostOfSharesController._
 import eu.timepit.refined.refineMV
 

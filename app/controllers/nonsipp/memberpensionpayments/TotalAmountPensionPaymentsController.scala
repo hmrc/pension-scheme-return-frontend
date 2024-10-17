@@ -21,7 +21,7 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
 import navigation.Navigator
 import forms.MoneyFormProvider
@@ -29,8 +29,8 @@ import models.{Mode, Money, NameDOB}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
-import config.Refined.Max300
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import config.RefinedTypes.Max300
+import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage

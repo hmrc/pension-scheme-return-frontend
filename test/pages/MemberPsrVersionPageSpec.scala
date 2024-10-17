@@ -18,7 +18,7 @@ package pages
 
 import pages.nonsipp.memberdetails.MemberPsrVersionPage
 import pages.nonsipp.memberreceivedpcls.Paths
-import config.Refined.Max300
+import config.RefinedTypes.Max300
 import eu.timepit.refined.refineMV
 import models.SchemeId
 import pages.behaviours.PageBehaviours

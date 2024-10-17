@@ -17,13 +17,13 @@
 package pages.nonsipp.otherassetsdisposal
 
 import models.HowDisposed._
-import config.Refined.{Max50, Max5000}
-import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models.{HowDisposed, IdentityType}
 import viewmodels.models.SectionJourneyStatus
 import pages.behaviours.PageBehaviours
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.TestValues
 
 class HowWasAssetDisposedOfPageSpec extends PageBehaviours with TestValues {
 

@@ -16,12 +16,12 @@
 
 package pages.nonsipp.employercontributions
 
-import config.Refined.{Max300, Max50}
-import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models.IdentityType
 import pages.behaviours.PageBehaviours
+import config.RefinedTypes.{Max300, Max50}
+import controllers.TestValues
 
 class EmployerTypeOfBusinessPageSpec extends PageBehaviours with TestValues {
 

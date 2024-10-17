@@ -16,7 +16,7 @@
 
 package pages.nonsipp.receivetransfer
 
-import config.Refined._
+import config.RefinedTypes._
 import eu.timepit.refined.refineMV
 import viewmodels.models.SectionCompleted
 import pages.behaviours.PageBehaviours

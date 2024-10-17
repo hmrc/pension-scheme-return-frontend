@@ -20,11 +20,11 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.{Max300, OneTo300}
-import controllers.PSRController
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
+import config.RefinedTypes.{Max300, OneTo300}
+import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.TwoColumnsTripleAction

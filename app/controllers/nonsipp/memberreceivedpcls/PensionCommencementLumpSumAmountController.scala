@@ -19,7 +19,7 @@ package controllers.nonsipp.memberreceivedpcls
 import services.SaveService
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import com.google.inject.Inject
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel.DoubleQuestion
 import config.Constants.{maxPCLSAmount, minPosMoneyValue}
 import controllers.actions._
 import navigation.Navigator
@@ -31,12 +31,12 @@ import viewmodels.implicits._
 import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
 import controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined.Max300
-import viewmodels.models.MultipleQuestionsViewModel.DoubleQuestion
+import config.RefinedTypes.Max300
+import controllers.PSRController
 import views.html.MultipleQuestionView
 import models.SchemeId.Srn
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, QuestionField}
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, QuestionField}
 import models.PensionCommencementLumpSum._
 import play.api.data.Form
 
@@ -131,14 +131,10 @@ object PensionCommencementLumpSumAmountController {
       page = DoubleQuestion(
         form,
         QuestionField.currency(Message("pensionCommencementLumpSumAmount.received", fullName)),
-        QuestionField.currency(Message("pensionCommencementLumpSumAmount.relevant", fullName))
+        QuestionField
+          .currency(Message("pensionCommencementLumpSumAmount.relevant", fullName))
+          .withHint("pensionCommencementLumpSumAmount.relevant.hint")
       ),
-      Option(
-        FurtherDetailsViewModel(
-          Message("pensionCommencementLumpSumAmount.details.title"),
-          ParagraphMessage("pensionCommencementLumpSumAmount.details")
-        )
-      ),
-      routes.PensionCommencementLumpSumAmountController.onSubmit(srn, index, mode)
+      onSubmit = routes.PensionCommencementLumpSumAmountController.onSubmit(srn, index, mode)
     )
 }

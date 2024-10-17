@@ -17,7 +17,7 @@
 package transformations
 
 import com.google.inject.Singleton
-import config.Refined.Max300
+import config.RefinedTypes.Max300
 import models.SchemeId.Srn
 import models.UserAnswers.implicits.UserAnswersTryOps
 import pages.nonsipp.memberpensionpayments._

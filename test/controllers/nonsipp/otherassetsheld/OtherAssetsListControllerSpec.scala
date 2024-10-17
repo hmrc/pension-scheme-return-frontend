@@ -18,8 +18,6 @@ package controllers.nonsipp.otherassetsheld
 
 import services.PsrSubmissionService
 import pages.nonsipp.otherassetsheld._
-import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import views.html.ListView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
@@ -29,6 +27,8 @@ import viewmodels.models.SectionCompleted
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import config.RefinedTypes.Max5000
+import controllers.ControllerBaseSpec
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 

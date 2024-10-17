@@ -20,7 +20,7 @@ import services.SaveService
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import controllers.PSRController
+import controllers.nonsipp.receivetransfer.ReportAnotherTransferInController._
 import pages.nonsipp.receivetransfer.ReportAnotherTransferInPage
 import controllers.actions._
 import navigation.Navigator
@@ -28,8 +28,8 @@ import forms.YesNoPageFormProvider
 import models.Mode
 import play.api.i18n.MessagesApi
 import play.api.data.Form
-import controllers.nonsipp.receivetransfer.ReportAnotherTransferInController._
-import config.Refined.{Max300, Max5}
+import config.RefinedTypes.{Max300, Max5}
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

@@ -18,7 +18,7 @@ package controllers.nonsipp
 
 import pages.nonsipp.employercontributions.EmployerContributionsProgress
 import play.api.mvc.Call
-import config.Refined.{Max300, Max50}
+import config.RefinedTypes.{Max300, Max50}
 import models.SchemeId.Srn
 import models.UserAnswers
 import utils.FunctionKUtils._

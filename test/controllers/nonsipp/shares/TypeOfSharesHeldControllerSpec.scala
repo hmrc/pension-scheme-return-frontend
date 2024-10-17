@@ -17,11 +17,11 @@
 package controllers.nonsipp.shares
 
 import controllers.nonsipp.shares.TypeOfSharesHeldController._
-import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.NormalMode
+import config.RefinedTypes.Max5000
+import controllers.ControllerBaseSpec
 import views.html.RadioListView
 import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
 

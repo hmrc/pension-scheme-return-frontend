@@ -19,14 +19,14 @@ package controllers.nonsipp.employercontributions
 import play.api.test.FakeRequest
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
-import config.Refined.Max300
-import controllers.ControllerBaseSpec
 import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
 import models.{NormalMode, ViewOnlyMode}
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import config.RefinedTypes.Max300
+import controllers.ControllerBaseSpec
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 

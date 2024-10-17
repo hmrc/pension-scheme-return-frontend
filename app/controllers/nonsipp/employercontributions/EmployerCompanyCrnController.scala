@@ -19,8 +19,6 @@ package controllers.nonsipp.employercontributions
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
-import config.Refined.{Max300, Max50}
-import controllers.PSRController
 import cats.implicits.catsSyntaxApplicativeId
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.employercontributions.EmployerCompanyCrnController._
@@ -32,6 +30,8 @@ import play.api.data.Form
 import forms.mappings.errors.InputFormErrors
 import pages.nonsipp.employercontributions.{EmployerCompanyCrnPage, EmployerNamePage}
 import services.SaveService
+import config.RefinedTypes.{Max300, Max50}
+import controllers.PSRController
 import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
 import utils.FunctionKUtils._

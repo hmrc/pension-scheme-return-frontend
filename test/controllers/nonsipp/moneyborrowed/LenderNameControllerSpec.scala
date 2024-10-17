@@ -16,12 +16,12 @@
 
 package controllers.nonsipp.moneyborrowed
 
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
 import views.html.TextInputView
 import forms.TextFormProvider
 import models.NormalMode
 import pages.nonsipp.moneyborrowed.LenderNamePage
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 import controllers.nonsipp.moneyborrowed.LenderNameController._
 import eu.timepit.refined.refineMV
 

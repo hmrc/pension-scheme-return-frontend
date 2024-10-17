@@ -17,8 +17,6 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import services.PsrSubmissionService
-import config.Refined.{OneTo50, OneTo5000}
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
@@ -30,6 +28,8 @@ import models._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import config.RefinedTypes.{OneTo50, OneTo5000}
+import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 

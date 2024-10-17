@@ -17,13 +17,13 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldController._
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.YesNoPageView
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldPage
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class LandOrPropertyStillHeldControllerSpec extends ControllerBaseSpec {
 

@@ -19,8 +19,6 @@ package utils.nonsipp
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
-import config.Refined._
-import controllers.TestValues
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer._
 import pages.nonsipp.landorpropertydisposal.{
@@ -46,6 +44,8 @@ import models.ConditionalYesNo._
 import models.ManualOrUpload.Manual
 import models.PensionSchemeType.RegisteredPS
 import models.IdentityType.{Individual, UKCompany, UKPartnership}
+import config.RefinedTypes._
+import controllers.TestValues
 import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
 import models.SchemeHoldShare.Acquisition
 import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}

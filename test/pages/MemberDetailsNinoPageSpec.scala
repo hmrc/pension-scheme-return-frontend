@@ -17,7 +17,7 @@
 package pages
 
 import pages.nonsipp.memberdetails.MemberDetailsNinoPage
-import config.Refined.Max300
+import config.RefinedTypes.Max300
 import eu.timepit.refined.refineMV
 import uk.gov.hmrc.domain.Nino
 import pages.behaviours.PageBehaviours

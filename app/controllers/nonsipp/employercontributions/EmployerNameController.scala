@@ -19,8 +19,6 @@ package controllers.nonsipp.employercontributions
 import viewmodels.implicits._
 import controllers.nonsipp.employercontributions.EmployerNameController._
 import play.api.mvc._
-import config.Refined.{Max300, Max50}
-import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -29,6 +27,8 @@ import play.api.i18n.MessagesApi
 import play.api.data.Form
 import pages.nonsipp.employercontributions.EmployerNamePage
 import services.SaveService
+import config.RefinedTypes.{Max300, Max50}
+import controllers.PSRController
 import views.html.TextInputView
 import models.SchemeId.Srn
 import utils.FunctionKUtils._

@@ -19,7 +19,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 import services.SaveService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, Mode}

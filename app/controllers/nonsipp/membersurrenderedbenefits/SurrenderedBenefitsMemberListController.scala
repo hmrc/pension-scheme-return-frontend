@@ -20,13 +20,13 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.OneTo300
-import controllers.PSRController
 import cats.implicits.toShow
 import pages.nonsipp.membersurrenderedbenefits._
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
+import config.RefinedTypes.OneTo300
+import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.TwoColumnsTripleAction

@@ -17,11 +17,11 @@
 package pages.nonsipp.landorpropertydisposal
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
+import config.RefinedTypes.{Max50, Max5000}
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.{ConditionalYesNo, Utr}
-import config.Refined.{Max50, Max5000}
-import pages.QuestionPage
 
 case class PartnershipBuyerUtrPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
     extends QuestionPage[ConditionalYesNo[String, Utr]] {

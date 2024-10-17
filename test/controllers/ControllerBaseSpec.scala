@@ -19,7 +19,7 @@ package controllers
 import play.api.test._
 import services.SaveService
 import queries.{Removable, Settable}
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import play.api.inject.bind
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.actions._
@@ -72,16 +72,23 @@ trait ControllerBaseSpec
   protected def applicationBuilder(
     userAnswers: Option[UserAnswers] = Some(emptyUserAnswers),
     schemeDetails: SchemeDetails = defaultSchemeDetails,
+    isPsa: Boolean = true,
     minimalDetails: MinimalDetails = defaultMinimalDetails,
     pureUserAnswers: Option[UserAnswers] = Some(emptyUserAnswers),
     previousUserAnswers: Option[UserAnswers] = Some(emptyUserAnswers),
     saveService: Option[SaveService] = None
-  ): GuiceApplicationBuilder =
+  ): GuiceApplicationBuilder = {
+    val identifierActionBind = if (isPsa) {
+      bind[IdentifierAction].to[FakePsaIdentifierAction]
+    } else {
+      bind[IdentifierAction].to[FakePspIdentifierAction]
+    }
+
     new GuiceApplicationBuilder()
       .overrides(
         List[GuiceableModule](
           bind[DataRequiredAction].to[DataRequiredActionImpl],
-          bind[IdentifierAction].to[FakeIdentifierAction],
+          identifierActionBind,
           bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails, minimalDetails)),
           bind[DataRetrievalAction]
             .toInstance(new FakeDataRetrievalAction(userAnswers, pureUserAnswers, previousUserAnswers)),
@@ -94,6 +101,7 @@ trait ControllerBaseSpec
           ++ additionalBindings: _*
       )
       .configure("play.filters.csp.nonce.enabled" -> false)
+  }
 
   protected val additionalBindings: List[GuiceableModule] = List()
 

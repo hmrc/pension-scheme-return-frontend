@@ -19,7 +19,7 @@ package controllers.nonsipp.landorproperty
 import services.PsrSubmissionService
 import org.mockito.Mockito.{never, _}
 import models.ConditionalYesNo._
-import controllers.ControllerBaseSpec
+import controllers.nonsipp.landorproperty.LandOrPropertyListController._
 import views.html.ListView
 import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
@@ -29,8 +29,8 @@ import models._
 import viewmodels.models.SectionCompleted
 import eu.timepit.refined.api.Refined
 import org.mockito.ArgumentMatchers.any
-import controllers.nonsipp.landorproperty.LandOrPropertyListController._
-import config.Refined.OneTo5000
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
 

@@ -17,14 +17,14 @@
 package pages.nonsipp.otherassetsheld
 
 import models.PointOfEntry._
-import config.Refined.OneTo5000
-import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import uk.gov.hmrc.domain.Nino
 import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 import viewmodels.models.SectionCompleted
 import pages.behaviours.PageBehaviours
+import config.RefinedTypes.OneTo5000
+import controllers.TestValues
 import models._
 import models.SchemeHoldAsset._
 

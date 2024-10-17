@@ -20,8 +20,6 @@ import pages.nonsipp.schemedesignatory._
 import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
-import config.Refined._
-import controllers.TestValues
 import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
@@ -33,6 +31,8 @@ import pages.nonsipp.moneyborrowed._
 import pages.nonsipp.bonds._
 import pages.nonsipp.memberdetails._
 import org.scalatest.freespec.AnyFreeSpec
+import config.RefinedTypes._
+import controllers.TestValues
 
 class MemberCountUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 

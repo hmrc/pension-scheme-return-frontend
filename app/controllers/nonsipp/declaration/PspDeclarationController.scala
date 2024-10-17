@@ -69,38 +69,43 @@ class PspDeclarationController @Inject()(
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      request.session
-        .get(SUBMISSION_VIEWED_FLAG)
-        .fold {
-          def form: Form[String] = PspDeclarationController.form(formProvider, request.schemeDetails.authorisingPSAID)
-          isJourneyBypassed(srn).map(
-            eitherJourneyNavigationResultOrRecovery =>
-              eitherJourneyNavigationResultOrRecovery.fold(
-                _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()),
-                isBypassed =>
-                  Ok(
-                    view(
-                      form.fromUserAnswers(PspDeclarationPage(srn)),
-                      PspDeclarationController
-                        .viewModel(
-                          srn,
-                          isBypassed && hasMemberNumbersChangedToOver99(
-                            request.userAnswers,
+      if (!request.pensionSchemeId.isPSP) {
+        Future.successful(Redirect(controllers.routes.UnauthorisedController.onPageLoad()))
+      } else {
+        request.session
+          .get(SUBMISSION_VIEWED_FLAG)
+          .fold {
+            def form: Form[String] = PspDeclarationController.form(formProvider, request.schemeDetails.authorisingPSAID)
+
+            isJourneyBypassed(srn).map(
+              eitherJourneyNavigationResultOrRecovery =>
+                eitherJourneyNavigationResultOrRecovery.fold(
+                  _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()),
+                  isBypassed =>
+                    Ok(
+                      view(
+                        form.fromUserAnswers(PspDeclarationPage(srn)),
+                        PspDeclarationController
+                          .viewModel(
                             srn,
-                            request.pensionSchemeId
+                            isBypassed && hasMemberNumbersChangedToOver99(
+                              request.userAnswers,
+                              srn,
+                              request.pensionSchemeId
+                            )
                           )
-                        )
+                      )
                     )
-                  )
+                )
+            )
+          }(
+            _ =>
+              Future.successful(
+                Redirect(controllers.routes.OverviewController.onPageLoad(srn))
+                  .removingFromSession(SUBMISSION_VIEWED_FLAG)
               )
           )
-        }(
-          _ =>
-            Future.successful(
-              Redirect(controllers.routes.OverviewController.onPageLoad(srn))
-                .removingFromSession(SUBMISSION_VIEWED_FLAG)
-            )
-        )
+      }
     }
 
   def onSubmit(srn: Srn): Action[AnyContent] =

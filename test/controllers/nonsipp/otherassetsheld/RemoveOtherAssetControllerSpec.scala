@@ -19,8 +19,6 @@ package controllers.nonsipp.otherassetsheld
 import services.PsrSubmissionService
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import controllers.nonsipp.otherassetsheld.RemoveOtherAssetController._
-import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
@@ -29,6 +27,8 @@ import models.NormalMode
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
+import config.RefinedTypes.Max5000
+import controllers.ControllerBaseSpec
 
 class RemoveOtherAssetControllerSpec extends ControllerBaseSpec {
 

@@ -19,12 +19,12 @@ package pages.nonsipp.otherassetsheld
 import utils.RefinedUtils.RefinedIntOps
 import utils.PageUtils.removePages
 import queries.Removable
+import pages.QuestionPage
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.{IdentitySubject, SchemeHoldAsset, UserAnswers}
 import pages.nonsipp.common.IdentityTypePage
-import config.Refined.Max5000
-import pages.QuestionPage
 
 import scala.util.Try
 

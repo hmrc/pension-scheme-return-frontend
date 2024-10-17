@@ -18,7 +18,7 @@ package generators
 
 import play.api.mvc.Request
 import models.HowDisposed.HowDisposed
-import config.Refined.OneTo5000
+import config.RefinedTypes.OneTo5000
 import models.SchemeId.{Pstr, Srn}
 import models.PensionSchemeId.{PsaId, PspId}
 import models.{ConditionalYesNo, _}

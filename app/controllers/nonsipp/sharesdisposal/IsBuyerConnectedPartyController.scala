@@ -19,8 +19,6 @@ package controllers.nonsipp.sharesdisposal
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal._
 import navigation.Navigator
@@ -28,6 +26,8 @@ import forms.YesNoPageFormProvider
 import models.{IdentityType, Mode}
 import play.api.i18n.MessagesApi
 import controllers.nonsipp.sharesdisposal.IsBuyerConnectedPartyController._
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

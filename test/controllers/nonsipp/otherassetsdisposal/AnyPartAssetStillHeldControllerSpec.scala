@@ -18,12 +18,12 @@ package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.AnyPartAssetStillHeldPage
 import controllers.nonsipp.otherassetsdisposal.AnyPartAssetStillHeldController._
-import config.Refined.{Max50, Max5000}
-import controllers.ControllerBaseSpec
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.ControllerBaseSpec
 
 class AnyPartAssetStillHeldControllerSpec extends ControllerBaseSpec {
 

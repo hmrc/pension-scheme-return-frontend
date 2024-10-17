@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import utils.BaseSpec
-import config.Refined.Max300
+import config.RefinedTypes.Max300
 import eu.timepit.refined.refineMV
 import org.scalacheck.Gen
 import navigation.{Navigator, NavigatorBehaviours}

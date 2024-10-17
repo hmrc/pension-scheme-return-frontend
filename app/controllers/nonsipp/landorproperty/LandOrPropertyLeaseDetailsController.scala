@@ -21,7 +21,7 @@ import controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController._
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
-import controllers.PSRController
+import viewmodels.models.MultipleQuestionsViewModel._
 import config.Constants
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyLeaseDetailsPage}
 import cats.implicits._
@@ -31,8 +31,8 @@ import forms.MultipleQuestionFormProvider
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.data.Form
 import forms.mappings.errors._
-import config.Refined.Max5000
-import viewmodels.models.MultipleQuestionsViewModel._
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.MultipleQuestionView
 import models.SchemeId.Srn
 import utils.DateTimeUtils.localDateShow
@@ -157,7 +157,7 @@ object LandOrPropertyLeaseDetailsController {
   ): FormPageViewModel[TripleQuestion[String, Money, LocalDate]] = FormPageViewModel(
     title = "landOrPropertyLeaseDetails.title",
     heading = Message("landOrPropertyLeaseDetails.heading", addressLine1),
-    description = Some("landOrPropertyLeaseDetails.paragraph"),
+    description = None,
     page = TripleQuestion(
       form,
       QuestionField

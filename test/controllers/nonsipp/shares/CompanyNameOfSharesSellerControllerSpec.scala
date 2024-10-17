@@ -17,11 +17,11 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.CompanyNameOfSharesSellerPage
-import config.Refined.Max5000
-import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
+import config.RefinedTypes.Max5000
+import controllers.ControllerBaseSpec
 import views.html.TextInputView
 import controllers.nonsipp.shares.CompanyNameOfSharesSellerController.{form, viewModel}
 

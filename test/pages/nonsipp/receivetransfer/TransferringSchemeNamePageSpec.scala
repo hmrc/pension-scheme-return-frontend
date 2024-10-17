@@ -17,13 +17,13 @@
 package pages.nonsipp.receivetransfer
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import config.Refined.{Max300, Max5}
-import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import viewmodels.models.SectionCompleted
 import eu.timepit.refined.api.Refined
 import pages.behaviours.PageBehaviours
+import config.RefinedTypes.{Max300, Max5}
+import controllers.TestValues
 
 class TransferringSchemeNamePageSpec extends PageBehaviours with TestValues {
 

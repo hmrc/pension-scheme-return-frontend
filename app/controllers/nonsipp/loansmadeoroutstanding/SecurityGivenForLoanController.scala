@@ -21,7 +21,7 @@ import viewmodels.implicits._
 import models.ConditionalYesNo._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
-import config.Refined.Max5000
+import config.RefinedTypes.Max5000
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider

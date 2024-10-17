@@ -21,8 +21,6 @@ import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import models.IdentityType._
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.WhoPurchasedLandOrPropertyPage
 import controllers.actions._
@@ -31,6 +29,8 @@ import forms.RadioListFormProvider
 import models.{IdentityType, Mode, NormalMode}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.RadioListView
 import models.SchemeId.Srn
 import controllers.nonsipp.landorpropertydisposal.WhoPurchasedLandOrPropertyController._

@@ -20,13 +20,13 @@ import services.SaveService
 import pages.nonsipp.bonds.AreBondsUnregulatedPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import config.Refined._
-import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
 import play.api.data.Form
+import config.RefinedTypes._
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import play.api.i18n.MessagesApi

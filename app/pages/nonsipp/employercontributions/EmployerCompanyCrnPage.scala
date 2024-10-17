@@ -17,11 +17,11 @@
 package pages.nonsipp.employercontributions
 
 import utils.RefinedUtils.RefinedIntOps
+import pages.QuestionPage
+import config.RefinedTypes.{Max300, Max50}
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import models.{ConditionalYesNo, Crn}
-import config.Refined.{Max300, Max50}
-import pages.QuestionPage
 
 case class EmployerCompanyCrnPage(srn: Srn, memberIndex: Max300, index: Max50)
     extends QuestionPage[ConditionalYesNo[String, Crn]] {

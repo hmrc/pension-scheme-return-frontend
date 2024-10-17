@@ -18,14 +18,14 @@ package navigation.nonsipp
 
 import models.ConditionalYesNo._
 import play.api.mvc.Call
+import pages.Page
+import config.RefinedTypes.Max5000
 import cats.implicits.toTraverseOps
 import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
 import models._
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
-import config.Refined.Max5000
-import pages.Page
 
 object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
 

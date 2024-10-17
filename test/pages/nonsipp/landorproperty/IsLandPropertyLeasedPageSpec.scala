@@ -16,7 +16,7 @@
 
 package pages.nonsipp.landorproperty
 
-import config.Refined.OneTo5000
+import config.RefinedTypes.OneTo5000
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models.{Money, UserAnswers}

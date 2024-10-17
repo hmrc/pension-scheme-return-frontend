@@ -20,13 +20,13 @@ import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.{RemoveOtherAssetPage, WhatIsOtherAssetPage}
-import config.Refined.Max5000
-import controllers.PSRController
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
 import play.api.i18n.MessagesApi
+import config.RefinedTypes.Max5000
+import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message

@@ -20,13 +20,13 @@ import play.api.test.FakeRequest
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import config.Refined.Max300
-import controllers.ControllerBaseSpec
 import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.memberreceivedpcls.PclsMemberListController._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import models._
+import config.RefinedTypes.Max300
+import controllers.ControllerBaseSpec
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 

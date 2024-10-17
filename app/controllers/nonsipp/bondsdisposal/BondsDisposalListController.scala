@@ -20,17 +20,17 @@ import pages.nonsipp.bonds._
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
-import utils.ListUtils._
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
 import config.Constants
 import cats.implicits.toTraverseOps
 import config.Constants.maxDisposalPerBond
-import config.Refined.Max5000.enumerable
 import controllers.nonsipp.bondsdisposal.BondsDisposalListController._
 import navigation.Navigator
 import forms.RadioListFormProvider
 import models._
+import utils.ListUtils._
+import config.RefinedTypes.Max5000.enumerable
+import config.RefinedTypes.{Max50, Max5000}
+import controllers.PSRController
 import views.html.ListRadiosView
 import models.SchemeId.Srn
 import controllers.actions.IdentifyAndRequireData

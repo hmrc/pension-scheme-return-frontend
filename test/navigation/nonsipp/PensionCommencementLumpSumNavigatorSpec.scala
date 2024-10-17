@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import utils.BaseSpec
 import pages.nonsipp.memberreceivedpcls._
-import config.Refined.{Max300, OneTo300}
+import config.RefinedTypes.{Max300, OneTo300}
 import eu.timepit.refined.refineMV
 import org.scalacheck.Gen
 import navigation.{Navigator, NavigatorBehaviours}

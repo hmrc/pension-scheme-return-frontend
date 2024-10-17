@@ -18,8 +18,6 @@ package utils.nonsipp
 
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.membertransferout.TransfersOutSectionCompleted.TransfersOutSectionCompletedUserAnswersOps
-import config.Refined.{Max300, Max5, Max50}
-import controllers.PSRController
 import models.SchemeId.Srn
 import pages.nonsipp.receivetransfer._
 import models.requests.psr._
@@ -39,6 +37,8 @@ import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, P
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCompleted.SurrenderedBenefitsUserAnswersOps
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import cats.syntax.apply._
+import config.RefinedTypes.{Max300, Max5, Max50}
+import controllers.PSRController
 import cats.syntax.option._
 import pages.nonsipp.membertransferout._
 
