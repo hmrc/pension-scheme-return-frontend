@@ -42,6 +42,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
   protected val logger: Logger = Logger(classOf[PSRConnector])
   private def getStandardUrl(pstr: String) = s"$baseUrl/pension-scheme-return/psr/standard/$pstr"
   private def submitStandardUrl = s"$baseUrl/pension-scheme-return/psr/standard"
+  private def submitPrePopulatedUrl = s"$baseUrl/pension-scheme-return/psr/pre-populated"
   private def overviewUrl(pstr: String) = s"$baseUrl/pension-scheme-return/psr/overview/$pstr"
   private def versionsForYearsUrl(pstr: String, startDates: Seq[String]) =
     s"$baseUrl/pension-scheme-return/psr/versions/years/$pstr?startDates=${startDates.mkString("&startDates=")}"
@@ -55,7 +56,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
     srn: Srn
   )(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] =
     http
-      .post(url"$submitStandardUrl")
+      .post(if (srn.value == "S2400000018") url"$submitPrePopulatedUrl" else url"$submitStandardUrl") //just to test pre-population without the pages
       .withBody(Json.toJson(psrSubmission))
       .transform(buildHeaders(_, userName, schemeName, srn))
       .execute[HttpResponse]

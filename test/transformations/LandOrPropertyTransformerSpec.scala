@@ -67,7 +67,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
       result mustBe Some(
         LandOrProperty(
           recordVersion = None,
-          landOrPropertyHeld = false,
+          optLandOrPropertyHeld = Some(false),
           disposeAnyLandOrProperty = false,
           landOrPropertyTransactions = Seq.empty
         )
@@ -89,7 +89,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
       result mustBe Some(
         LandOrProperty(
           recordVersion = Some("001"),
-          landOrPropertyHeld = true,
+          optLandOrPropertyHeld = Some(true),
           disposeAnyLandOrProperty = false,
           landOrPropertyTransactions = Seq.empty
         )
@@ -554,7 +554,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
   def buildLandOrProperty(name: String, propertyAcquiredFrom: PropertyAcquiredFrom): LandOrProperty =
     LandOrProperty(
       recordVersion = Some("001"),
-      landOrPropertyHeld = true,
+      optLandOrPropertyHeld = Some(true),
       disposeAnyLandOrProperty = true,
       landOrPropertyTransactions = Seq(
         LandOrPropertyTransactions(
@@ -572,7 +572,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
             optConnectedPartyStatus = Some(true),
             totalCostOfLandOrProperty = money.value,
             optIndepValuationSupport = Some(false),
-            isLandOrPropertyResidential = true,
+            optIsLandOrPropertyResidential = Some(true),
             optLeaseDetails = Some(
               LeaseDetails(
                 lesseeName = "lesseeName",
