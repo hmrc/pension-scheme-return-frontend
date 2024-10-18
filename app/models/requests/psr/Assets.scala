@@ -30,8 +30,8 @@ case class Assets(
 
 case class LandOrProperty(
   recordVersion: Option[String],
-  landOrPropertyHeld: Boolean,
-  disposeAnyLandOrProperty: Boolean,
+  optLandOrPropertyHeld: Option[Boolean],
+  optDisposeAnyLandOrProperty: Option[Boolean],
   landOrPropertyTransactions: Seq[LandOrPropertyTransactions]
 )
 
@@ -56,10 +56,10 @@ case class HeldPropertyTransaction(
   optConnectedPartyStatus: Option[Boolean],
   totalCostOfLandOrProperty: Double,
   optIndepValuationSupport: Option[Boolean],
-  isLandOrPropertyResidential: Boolean,
+  optIsLandOrPropertyResidential: Option[Boolean],
   optLeaseDetails: Option[LeaseDetails],
-  landOrPropertyLeased: Boolean,
-  totalIncomeOrReceipts: Double
+  optLandOrPropertyLeased: Option[Boolean],
+  optTotalIncomeOrReceipts: Option[Double]
 )
 
 case class DisposedPropertyTransaction(
@@ -75,10 +75,10 @@ case class DisposedPropertyTransaction(
 )
 
 case class LeaseDetails(
-  lesseeName: String,
-  leaseGrantDate: LocalDate,
-  annualLeaseAmount: Double,
-  connectedPartyStatus: Boolean
+  optLesseeName: Option[String],
+  optLeaseGrantDate: Option[LocalDate],
+  optAnnualLeaseAmount: Option[Double],
+  optConnectedPartyStatus: Option[Boolean]
 )
 
 case class Borrowing(recordVersion: Option[String], moneyWasBorrowed: Boolean, moneyBorrowed: Seq[MoneyBorrowed])

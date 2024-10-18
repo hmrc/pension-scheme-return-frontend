@@ -377,8 +377,8 @@ object PsrRetrievalServiceSpec {
     optLandOrProperty = Some(
       LandOrProperty(
         Some("001"),
-        landOrPropertyHeld = true,
-        disposeAnyLandOrProperty = true,
+        optLandOrPropertyHeld = Some(true),
+        optDisposeAnyLandOrProperty = Some(true),
         landOrPropertyTransactions = Seq.empty
       )
     ),

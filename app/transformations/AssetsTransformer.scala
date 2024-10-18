@@ -18,7 +18,7 @@ package transformations
 
 import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import models.SchemeId.Srn
-import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
+import pages.nonsipp.landorproperty.{LandOrPropertyHeldPage, LandPropertyInUKPages}
 import models.requests.psr._
 import models._
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
@@ -42,14 +42,18 @@ class AssetsTransformer @Inject()(
     implicit request: DataRequest[_]
   ): Option[Assets] = {
     val optLandOrPropertyHeld = request.userAnswers.get(LandOrPropertyHeldPage(srn))
+    val optLandOrPropertyHeldOrList = Option.when(
+      optLandOrPropertyHeld.nonEmpty || request.userAnswers.map(LandPropertyInUKPages(srn)).toList.nonEmpty
+    )(true)
     val optMoneyWasBorrowed = request.userAnswers.get(MoneyBorrowedPage(srn))
     val optUnregulatedOrConnectedBondsHeld = request.userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
     val optOtherAssetsHeld = request.userAnswers.get(OtherAssetsHeldPage(srn))
 
     Option.when(
-      List(optLandOrPropertyHeld, optMoneyWasBorrowed, optUnregulatedOrConnectedBondsHeld, optOtherAssetsHeld).exists(
-        _.isDefined
-      )
+      List(optLandOrPropertyHeldOrList, optMoneyWasBorrowed, optUnregulatedOrConnectedBondsHeld, optOtherAssetsHeld)
+        .exists(
+          _.isDefined
+        )
     )(
       Assets(
         optLandOrProperty = landOrPropertyTransformer.transformToEtmp(srn, optLandOrPropertyHeld, initialUA),
