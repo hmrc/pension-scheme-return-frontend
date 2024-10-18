@@ -144,7 +144,7 @@ class ReportBondsDisposalListController @Inject()(
           val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
           val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
-          if (numberOfDisposals == maxPossibleNumberOfDisposals) {
+          if (numberOfDisposals >= maxBondsTransactions * maxDisposalPerBond || numberOfDisposals >= maxPossibleNumberOfDisposals) {
             Redirect(
               navigator.nextPage(ReportBondsDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
             ).pure[Future]
@@ -401,7 +401,7 @@ object ReportBondsDisposalListController {
     )
 
     val conditionalInsetText: DisplayMessage = {
-      if (numberOfDisposals >= maxBondsTransactions) {
+      if (numberOfDisposals >= maxBondsTransactions * maxDisposalPerBond) {
         Message("bondsDisposal.reportBondsDisposalList.inset.maximumReached")
       } else if (numberOfDisposals >= maxPossibleNumberOfDisposals) {
         ParagraphMessage("bondsDisposal.reportBondsDisposalList.inset.allBondsDisposed.paragraph1") ++
@@ -416,7 +416,7 @@ object ReportBondsDisposalListController {
       title = title,
       heading = heading,
       description = Option.when(
-        !((numberOfDisposals >= maxBondsTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals))
+        !((numberOfDisposals >= maxBondsTransactions * maxDisposalPerBond) | (numberOfDisposals >= maxPossibleNumberOfDisposals))
       )(
         ParagraphMessage("bondsDisposal.reportBondsDisposalList.description")
       ),
@@ -425,7 +425,7 @@ object ReportBondsDisposalListController {
         rows(srn, mode, bondsDisposalsWithIndexes, userAnswers, viewOnlyViewModel, schemeName),
         Message("bondsDisposal.reportBondsDisposalList.radios"),
         showRadios =
-          !((numberOfDisposals >= maxBondsTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
+          !((numberOfDisposals >= maxBondsTransactions * maxDisposalPerBond) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
