@@ -145,9 +145,13 @@ class LandOrPropertyDisposalListController @Inject()(
 
     getCompletedDisposals(srn).map { completedDisposals =>
       if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
-        val numberOfDisposal = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+        val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
         val numberOfAddresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
         val maxPossibleNumberOfDisposals = maxLandOrPropertyDisposals * numberOfAddresses
+
+        val maximumDisposalsReached = numberOfDisposals >= maxLandOrProperties * maxLandOrPropertyDisposals ||
+          numberOfDisposals >= maxPossibleNumberOfDisposals
+
         getAddressesWithIndexes(srn, completedDisposals).map { indexes =>
           Ok(
             view(
@@ -157,13 +161,13 @@ class LandOrPropertyDisposalListController @Inject()(
                 mode,
                 page,
                 indexes,
-                numberOfDisposal,
+                numberOfDisposals,
                 maxPossibleNumberOfDisposals,
                 request.userAnswers,
                 request.schemeDetails.schemeName,
                 viewOnlyViewModel,
                 showBackLink = showBackLink,
-                maximumDisposalsReached = true
+                maximumDisposalsReached = maximumDisposalsReached
               )
             )
           )
