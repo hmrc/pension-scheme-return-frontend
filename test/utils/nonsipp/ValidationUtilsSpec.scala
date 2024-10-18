@@ -17,51 +17,82 @@
 package utils.nonsipp
 
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
-import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import models.IdentityType.UKCompany
+import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
-import utils.UserAnswersUtils.UserAnswersOps
-import models.{NormalMode, UserAnswers}
+import models._
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
+import models.IdentitySubject.LandOrPropertySeller
 import config.RefinedTypes._
-import controllers.TestValues
+import controllers.ControllerBaseSpec
 import utils.nonsipp.ValidationUtils._
 import pages.nonsipp.CheckReturnDatesPage
 import org.scalatest.OptionValues
 
-class ValidationUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
+class ValidationUtilsSpec extends ControllerBaseSpec with Matchers with OptionValues {
 
   // Set test values
   private val name: String = "name"
   private val reason: String = "reason"
   private val index1of3: Max3 = refineMV(1)
-  private val index1of5: Max5 = refineMV(1)
-  private val index1of50: Max50 = refineMV(1)
-  private val index1of300: Max300 = refineMV(1)
   private val index1of5000: Max5000 = refineMV(1)
+  private val index2of5000: Max5000 = refineMV(2)
+  private val index3of5000: Max5000 = refineMV(3)
 
-  "TODO validateAllSections" - {
+  // (S6) Land or Property
+  private val validLandOrPropertyAnswers = defaultUserAnswers
+    .unsafeSet(LandOrPropertyHeldPage(srn), true)
+    .unsafeSet(LandPropertyInUKPage(srn, index1of5000), true)
+    .unsafeSet(LandOrPropertyPostcodeLookupPage(srn, index1of5000), postcodeLookup)
+    .unsafeSet(AddressLookupResultsPage(srn, index1of5000), List(address, address, address))
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, index1of5000), address)
+    .unsafeSet(LandRegistryTitleNumberPage(srn, index1of5000), ConditionalYesNo.no[String, String](reason))
+    .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index1of5000), SchemeHoldLandProperty.Acquisition)
+    .unsafeSet(LandOrPropertyWhenDidSchemeAcquirePage(srn, index1of5000), localDate)
+    .unsafeSet(IdentityTypePage(srn, index1of5000, LandOrPropertySeller), UKCompany)
+    .unsafeSet(CompanySellerNamePage(srn, index1of5000), name)
+    .unsafeSet(CompanyRecipientCrnPage(srn, index1of5000, LandOrPropertySeller), ConditionalYesNo.yes[String, Crn](crn))
+    .unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, index1of5000), false)
+    .unsafeSet(LandOrPropertyTotalCostPage(srn, index1of5000), money)
+    .unsafeSet(LandPropertyIndependentValuationPage(srn, index1of5000), false)
+    .unsafeSet(IsLandOrPropertyResidentialPage(srn, index1of5000), false)
+    .unsafeSet(IsLandPropertyLeasedPage(srn, index1of5000), true)
+    .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, index1of5000), (leaseName, money, localDate))
+    .unsafeSet(IsLesseeConnectedPartyPage(srn, index1of5000), false)
+    .unsafeSet(LandOrPropertyTotalIncomePage(srn, index1of5000), money)
 
-    "must be true when no necessary answers are missing" in {
-      val userAnswers = defaultUserAnswers
+  "answersMissingAllSections" - { //todo
+
+    "must be false when no necessary answers are missing" in {
+//      val userAnswers = defaultUserAnswers
+//      // (S1) Basic Details
+//        .unsafeSet(CheckReturnDatesPage(srn), true)
+//        .unsafeSet(ActiveBankAccountPage(srn), true)
+//        .unsafeSet(HowManyMembersPage(srn, psaId), schemeMemberNumbers)
+//        // (S?) Land or Property
+//        .unsafeSet(LandOrPropertyHeldPage(srn), true)
+//        .unsafeSet(LandPropertyInUKPage(srn, index1of5000), true)
+//        .unsafeSet(LandOrPropertyChosenAddressPage(srn, index1of5000), address)
+
+      val userAnswers = validLandOrPropertyAnswers
         .unsafeSet(CheckReturnDatesPage(srn), true)
-        //.unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), dateRange)
         .unsafeSet(ActiveBankAccountPage(srn), true)
-        //.unsafeSet(WhyNoBankAccountPage(srn), reason)
         .unsafeSet(HowManyMembersPage(srn, psaId), schemeMemberNumbers)
 
-      validateAllSections(userAnswers, srn) mustBe true
+      answersMissingAllSections(userAnswers, srn) mustBe false
     }
 
-    "must be false when some necessary answers are missing" in {
+    "must be true when some necessary answers are missing" in {
       val userAnswers = defaultUserAnswers
 
-      validateAllSections(userAnswers, srn) mustBe false
+      answersMissingAllSections(userAnswers, srn) mustBe true
     }
   }
 
-  "validateBasicDetailsSection" - {
-    "must be true for valid path A" in {
+  "answersMissingBasicDetailsSection" - {
+    "must be false for valid path A" in {
       val userAnswers: UserAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), true)
         //.unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), dateRange)
@@ -69,12 +100,12 @@ class ValidationUtilsSpec extends AnyFreeSpec with Matchers with OptionValues wi
         //.unsafeSet(WhyNoBankAccountPage(srn), reason)
         .unsafeSet(HowManyMembersPage(srn, psaId), schemeMemberNumbers)
 
-      val result: Boolean = validateBasicDetailsSection(userAnswers, srn)
+      val result: Boolean = answersMissingBasicDetailsSection(userAnswers, srn)
 
-      result mustBe true
+      result mustBe false
     }
 
-    "must be true for valid path B" in {
+    "must be false for valid path B" in {
       val userAnswers: UserAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), true)
         //.unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), dateRange)
@@ -82,12 +113,12 @@ class ValidationUtilsSpec extends AnyFreeSpec with Matchers with OptionValues wi
         .unsafeSet(WhyNoBankAccountPage(srn), reason)
         .unsafeSet(HowManyMembersPage(srn, psaId), schemeMemberNumbers)
 
-      val result: Boolean = validateBasicDetailsSection(userAnswers, srn)
+      val result: Boolean = answersMissingBasicDetailsSection(userAnswers, srn)
 
-      result mustBe true
+      result mustBe false
     }
 
-    "must be true for valid path C" in {
+    "must be false for valid path C" in {
       val userAnswers: UserAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), false)
         .unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), dateRange)
@@ -95,12 +126,12 @@ class ValidationUtilsSpec extends AnyFreeSpec with Matchers with OptionValues wi
         //.unsafeSet(WhyNoBankAccountPage(srn), reason)
         .unsafeSet(HowManyMembersPage(srn, psaId), schemeMemberNumbers)
 
-      val result: Boolean = validateBasicDetailsSection(userAnswers, srn)
+      val result: Boolean = answersMissingBasicDetailsSection(userAnswers, srn)
 
-      result mustBe true
+      result mustBe false
     }
 
-    "must be true for valid path D" in {
+    "must be false for valid path D" in {
       val userAnswers: UserAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), false)
         .unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), dateRange)
@@ -108,20 +139,20 @@ class ValidationUtilsSpec extends AnyFreeSpec with Matchers with OptionValues wi
         .unsafeSet(WhyNoBankAccountPage(srn), reason)
         .unsafeSet(HowManyMembersPage(srn, psaId), schemeMemberNumbers)
 
-      val result: Boolean = validateBasicDetailsSection(userAnswers, srn)
-
-      result mustBe true
-    }
-
-    "must be false for invalid path - no answers" in {
-      val userAnswersA: UserAnswers = defaultUserAnswers
-
-      val result: Boolean = validateBasicDetailsSection(userAnswersA, srn)
+      val result: Boolean = answersMissingBasicDetailsSection(userAnswers, srn)
 
       result mustBe false
     }
 
-    "must be false for invalid path - single necessary answer missing" in {
+    "must be true for invalid path - no answers" in {
+      val userAnswersA: UserAnswers = defaultUserAnswers
+
+      val result: Boolean = answersMissingBasicDetailsSection(userAnswersA, srn)
+
+      result mustBe true
+    }
+
+    "must be true for invalid path - single necessary answer missing" in {
       val userAnswersA: UserAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), false)
         //.unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), dateRange)
@@ -129,12 +160,12 @@ class ValidationUtilsSpec extends AnyFreeSpec with Matchers with OptionValues wi
         .unsafeSet(WhyNoBankAccountPage(srn), reason)
         .unsafeSet(HowManyMembersPage(srn, psaId), schemeMemberNumbers)
 
-      val result: Boolean = validateBasicDetailsSection(userAnswersA, srn)
+      val result: Boolean = answersMissingBasicDetailsSection(userAnswersA, srn)
 
-      result mustBe false
+      result mustBe true
     }
 
-    "must be false for invalid path - multiple necessary answers missing" in {
+    "must be true for invalid path - multiple necessary answers missing" in {
       val userAnswersA: UserAnswers = defaultUserAnswers
       //.unsafeSet(CheckReturnDatesPage(srn), false)
         .unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), dateRange)
@@ -142,12 +173,12 @@ class ValidationUtilsSpec extends AnyFreeSpec with Matchers with OptionValues wi
         //.unsafeSet(WhyNoBankAccountPage(srn), reason)
         .unsafeSet(HowManyMembersPage(srn, psaId), schemeMemberNumbers)
 
-      val result: Boolean = validateBasicDetailsSection(userAnswersA, srn)
+      val result: Boolean = answersMissingBasicDetailsSection(userAnswersA, srn)
 
-      result mustBe false
+      result mustBe true
     }
 
-    "must be false for invalid path - no necessary answers missing but invalid combination" in {
+    "must be true for invalid path - no necessary answers missing but invalid combination" in {
       val userAnswersA: UserAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), true)
         .unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), dateRange)
@@ -155,27 +186,71 @@ class ValidationUtilsSpec extends AnyFreeSpec with Matchers with OptionValues wi
         .unsafeSet(WhyNoBankAccountPage(srn), reason)
         .unsafeSet(HowManyMembersPage(srn, psaId), schemeMemberNumbers)
 
-      val result: Boolean = validateBasicDetailsSection(userAnswersA, srn)
+      val result: Boolean = answersMissingBasicDetailsSection(userAnswersA, srn)
 
-      result mustBe false
+      result mustBe true
     }
   }
 
-  "TODO validateLandOrPropertySection" - {
-    val userAnswers = defaultUserAnswers
+  "answersMissingLandOrPropertySection" - { //todo
 
-    validateLandOrPropertySection(userAnswers, srn) mustBe true
+    "must be false when LandOrPropertyHeldPage is Some(true) and no necessary answers are missing" in {
+//      val userAnswers = defaultUserAnswers
+//        .unsafeSet(LandOrPropertyHeldPage(srn), true)
+//        .unsafeSet(LandPropertyInUKPage(srn, index1of5000), true)
+//        .unsafeSet(LandOrPropertyChosenAddressPage(srn, index1of5000), address)
+////        .unsafeSet(LandPropertyInUKPage(srn, index2of5000), false)
+////        .unsafeSet(LandOrPropertyChosenAddressPage(srn, index2of5000), address)
+//        .unsafeSet(LandPropertyInUKPage(srn, index3of5000), false)
+//        .unsafeSet(LandOrPropertyChosenAddressPage(srn, index3of5000), address)
+
+      val userAnswers = validLandOrPropertyAnswers
+
+      answersMissingLandOrPropertySection(userAnswers, srn) mustBe false
+    }
+
+    "must be true when LandOrPropertyHeldPage is Some(true) and some necessary answers are missing" in {
+//      val userAnswers = defaultUserAnswers
+//        .unsafeSet(LandOrPropertyHeldPage(srn), true)
+//        .unsafeSet(LandPropertyInUKPage(srn, index1of5000), true)
+//        .unsafeSet(LandOrPropertyChosenAddressPage(srn, index1of5000), address)
+//        .unsafeSet(LandPropertyInUKPage(srn, index2of5000), false)
+////        .unsafeSet(LandOrPropertyChosenAddressPage(srn, index2of5000), address)
+//        .unsafeSet(LandPropertyInUKPage(srn, index3of5000), false)
+//        .unsafeSet(LandOrPropertyChosenAddressPage(srn, index3of5000), address)
+
+      val userAnswers = validLandOrPropertyAnswers
+        .unsafeRemove(IdentityTypePage(srn, index1of5000, LandOrPropertySeller))
+
+      answersMissingLandOrPropertySection(userAnswers, srn) mustBe true
+    }
+
+    "must be false when LandOrPropertyHeldPage is Some(false)" in {
+      val userAnswers = defaultUserAnswers.unsafeSet(LandOrPropertyHeldPage(srn), false)
+
+      answersMissingLandOrPropertySection(userAnswers, srn) mustBe false
+    }
+
+    "must be false when LandOrPropertyHeldPage is None" in {
+      val userAnswers = defaultUserAnswers
+
+      answersMissingLandOrPropertySection(userAnswers, srn) mustBe false
+    }
   }
 
-  "TODO validateLandOrPropertyJourney" - {
-    val userAnswers = defaultUserAnswers
+  "answersMissingLandOrPropertyJourney" - { //todo
 
-    validateLandOrPropertyJourney(userAnswers, srn, index1of5000) mustBe true
-  }
+    "must be false when no necessary answers are missing" in {
+      val userAnswers = validLandOrPropertyAnswers
 
-  "TODO validateLandOrPropertyDisposalJourney" - {
-    val userAnswers = defaultUserAnswers
+      answersMissingLandOrPropertyJourney(userAnswers, srn, index1of5000) mustBe false
+    }
 
-    validateLandOrPropertyDisposalJourney(userAnswers, srn, index1of5000, index1of50) mustBe true
+    "must be true when some necessary answers are missing" in {
+      val userAnswers = validLandOrPropertyAnswers
+        .unsafeRemove(IdentityTypePage(srn, index1of5000, LandOrPropertySeller))
+
+      answersMissingLandOrPropertyJourney(userAnswers, srn, index1of5000) mustBe true
+    }
   }
 }
