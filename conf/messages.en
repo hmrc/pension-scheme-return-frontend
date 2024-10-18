@@ -2137,6 +2137,10 @@ landOrPropertyDisposalList.radios.error.required = Select yes if you need to rep
 landOrPropertyDisposalList.row.change.hidden = Change details of the disposal of {0} by {1}
 landOrPropertyDisposalList.row.remove.hidden = Remove a disposal of {0} by {1} from the list
 
+landOrPropertyDisposal.landOrPropertyDisposalList.inset.allLandOrPropertyDisposed.paragraph1 = You have reported disposal of all the land and properties that you told us about.
+landOrPropertyDisposal.landOrPropertyDisposalList.inset.allLandOrPropertyDisposed.paragraph2 = If you need to add another land or property, go back to the ‘Change land or property’ section of this return.
+
+
 landOrPropertyDisposalList.methodOfDisposal.sold = sale
 landOrPropertyDisposalList.methodOfDisposal.transferred = transfer out
 landOrPropertyDisposalList.methodOfDisposal.other = another method

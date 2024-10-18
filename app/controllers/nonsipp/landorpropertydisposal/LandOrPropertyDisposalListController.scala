@@ -391,8 +391,13 @@ object LandOrPropertyDisposalListController {
     )
 
     val conditionalInsetText: DisplayMessage = {
-      if (maximumDisposalsReached) {
+      if (numberOfDisposals >= maxLandOrProperties * maxLandOrPropertyDisposals) {
         Message("landOrPropertyDisposalList.inset")
+      } else if (numberOfDisposals >= maxPossibleNumberOfDisposals) {
+        ParagraphMessage("landOrPropertyDisposal.landOrPropertyDisposalList.inset.allLandOrPropertyDisposed.paragraph1") ++
+          ParagraphMessage(
+            "landOrPropertyDisposal.landOrPropertyDisposalList.inset.allLandOrPropertyDisposed.paragraph2"
+          )
       } else {
         Message("")
       }
