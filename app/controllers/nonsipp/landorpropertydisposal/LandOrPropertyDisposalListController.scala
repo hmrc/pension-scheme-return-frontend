@@ -22,7 +22,6 @@ import cats.implicits._
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
-import play.api.i18n.MessagesApi
 import models.HowDisposed.HowDisposed
 import com.google.inject.Inject
 import config.RefinedTypes.{Max50, Max5000}
@@ -36,13 +35,15 @@ import views.html.ListView
 import models.SchemeId.Srn
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController._
 import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPropertyChosenAddressPage}
-import config.Constants.maxLandOrPropertyDisposals
+import config.Constants.{maxLandOrProperties, maxLandOrPropertyDisposals}
 import pages.nonsipp.landorpropertydisposal._
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import play.api.Logging
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
 import models.{ViewOnlyViewModel, _}
+import play.api.i18n.MessagesApi
+import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
@@ -161,7 +162,8 @@ class LandOrPropertyDisposalListController @Inject()(
                 request.userAnswers,
                 request.schemeDetails.schemeName,
                 viewOnlyViewModel,
-                showBackLink = showBackLink
+                showBackLink = showBackLink,
+                maximumDisposalsReached = true
               )
             )
           )
@@ -178,9 +180,10 @@ class LandOrPropertyDisposalListController @Inject()(
       val numberOfAddresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
       val maxPossibleNumberOfDisposals = maxLandOrPropertyDisposals * numberOfAddresses
 
-      val showRadios = !mode.isViewOnlyMode && numberOfDisposals < maxPossibleNumberOfDisposals
+      val maximumDisposalsReached = numberOfDisposals >= maxLandOrProperties * maxLandOrPropertyDisposals ||
+        numberOfDisposals >= maxPossibleNumberOfDisposals
 
-      if (!showRadios) {
+      if (maximumDisposalsReached) {
         Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
       } else {
         form
@@ -202,7 +205,8 @@ class LandOrPropertyDisposalListController @Inject()(
                           maxPossibleNumberOfDisposals,
                           request.userAnswers,
                           request.schemeDetails.schemeName,
-                          showBackLink = true
+                          showBackLink = true,
+                          maximumDisposalsReached = maximumDisposalsReached
                         )
                       )
                     )
@@ -350,7 +354,8 @@ object LandOrPropertyDisposalListController {
     userAnswers: UserAnswers,
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
-    showBackLink: Boolean
+    showBackLink: Boolean,
+    maximumDisposalsReached: Boolean
   ): FormPageViewModel[ListViewModel] = {
 
     val (title, heading) = ((mode, numberOfDisposals) match {
@@ -381,17 +386,27 @@ object LandOrPropertyDisposalListController {
       }
     )
 
+    val conditionalInsetText: DisplayMessage = {
+      if (maximumDisposalsReached) {
+        Message("landOrPropertyDisposalList.inset")
+      } else {
+        Message("")
+      }
+    }
+
+    val showRadios = !maximumDisposalsReached && !mode.isViewOnlyMode && numberOfDisposals < maxPossibleNumberOfDisposals
+
     FormPageViewModel(
       title = title,
       heading = heading,
-      description = Option.when(numberOfDisposals < maxPossibleNumberOfDisposals)(
+      description = Option.when(numberOfDisposals < maxPossibleNumberOfDisposals && !maximumDisposalsReached)(
         ParagraphMessage("landOrPropertyDisposalList.description")
       ),
       page = ListViewModel(
-        inset = "landOrPropertyDisposalList.inset",
+        inset = conditionalInsetText,
         rows(srn, mode, addressesWithIndexes, userAnswers, viewOnlyViewModel, schemeName),
         Message("landOrPropertyDisposalList.radios"),
-        showRadios = !mode.isViewOnlyMode && numberOfDisposals < maxPossibleNumberOfDisposals,
+        showRadios = showRadios,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
