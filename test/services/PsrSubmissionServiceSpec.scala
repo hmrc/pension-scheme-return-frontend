@@ -35,7 +35,7 @@ import utils.BaseSpec
 import play.api.test.Helpers.stubMessagesApi
 import org.mockito.Mockito._
 import models.requests.psr._
-import config.Constants.{PSP, UNCHANGED_SESSION_PREFIX}
+import config.Constants.{PREPOPULATION_FLAG, PSP, UNCHANGED_SESSION_PREFIX}
 import pages.nonsipp.CheckReturnDatesPage
 import play.api.libs.json.{JsArray, JsValue}
 import repositories.SessionRepository
@@ -65,8 +65,15 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     when(mockAuditService.sendEvent(any)(any(), any())).thenReturn(Future.successful(AuditResult.Success))
   }
 
-  val allowedAccessRequest
-    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+      .withSession((PREPOPULATION_FLAG, "false"))
+  ).sample.value
+  val allowedAccessRequestPrePopulation: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+      .withSession((PREPOPULATION_FLAG, "true"))
+  ).sample.value
+
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -241,10 +248,55 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       }
     }
 
+    s"submitPrePopulatedDetails request successfully" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(CheckReturnDatesPage(srn), false)
+      val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
+
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any(), any())(any()))
+        .thenReturn(Some(minimalRequiredSubmission))
+      when(mockLoansTransformer.transformToEtmp(any(), any())(any())).thenReturn(optLoans)
+      when(mockMemberPaymentsTransformerTransformer.transformToEtmp(any(), any(), any(), any()))
+        .thenReturn(optMemberPayments)
+      when(mockAssetsTransformer.transformToEtmp(any(), any())(any())).thenReturn(optAssets)
+      when(mockSharesTransformer.transformToEtmp(any(), any())(any())).thenReturn(optShares)
+      when(mockConnector.submitPrePopulatedPsr(any(), any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(Right(())))
+      when(mockSessionRepository.get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
+        .thenReturn(Future.successful(Some(emptyUserAnswers)))
+
+      whenReady(
+        service.submitPsrDetails(srn, fallbackCall = fallbackCall)(implicitly, implicitly, request)
+      ) { result: Option[Unit] =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1))
+          .transformToEtmp(any(), any(), ArgumentMatchers.eq(false))(any())
+        verify(mockLoansTransformer, times(1)).transformToEtmp(any(), any())(any())
+        verify(mockMemberPaymentsTransformerTransformer, times(1)).transformToEtmp(any(), any(), any(), any())
+        verify(mockAssetsTransformer, times(1)).transformToEtmp(any(), any())(any())
+        verify(mockSharesTransformer, times(1)).transformToEtmp(any(), any())(any())
+        verify(mockDeclarationTransformer, never).transformToEtmp(any())
+        verify(mockConnector, times(1)).submitPrePopulatedPsr(psrSubmissionCaptor.capture(), any(), any(), any())(
+          any(),
+          any()
+        )
+        verify(mockAuditService, times(1)).sendExtendedEvent(psrCompileAuditEventCaptor.capture())(any(), any())
+        verify(mockSessionRepository, times(1)).get(UNCHANGED_SESSION_PREFIX + request.userAnswers.id)
+
+        psrSubmissionCaptor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+        psrSubmissionCaptor.getValue.checkReturnDates mustBe false
+        psrSubmissionCaptor.getValue.loans mustBe optLoans
+        psrSubmissionCaptor.getValue.assets mustBe optAssets
+        psrSubmissionCaptor.getValue.shares mustBe optShares
+        psrSubmissionCaptor.getValue.psrDeclaration mustBe None
+        psrCompileAuditEventCaptor.getValue.taskList must not be JsArray(Array.empty[JsValue])
+        result mustBe Some(())
+      }
+    }
+
     s"submitPsrDetails request successfully with PsrDeclaration when isSubmitted is true and (initial UA current UA) are same" in {
       val userAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), false)
-      val request = DataRequest(allowedAccessRequest, userAnswers)
+      val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
 
       when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any(), any())(any()))
         .thenReturn(Some(minimalRequiredSubmission))
@@ -289,7 +341,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     "should submit PsrDetails request when initial UA and current UA are same but isSubmitted true" in {
       val userAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), false)
-      val request = DataRequest(allowedAccessRequest, userAnswers)
+      val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
 
       when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any(), any())(any()))
         .thenReturn(Some(minimalRequiredSubmission))
@@ -337,7 +389,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         .unsafeSet(HowMuchCashPage(srn, NormalMode), moneyInPeriod)
         .unsafeSet(ValueOfAssetsPage(srn, NormalMode), moneyInPeriod)
         .unsafeSet(FeesCommissionsWagesSalariesPage(srn, NormalMode), money)
-      val request = DataRequest(allowedAccessRequest, userAnswers)
+      val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
 
       when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any(), any(), any())(any()))
         .thenReturn(

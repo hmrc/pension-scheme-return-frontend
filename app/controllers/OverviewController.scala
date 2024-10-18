@@ -315,7 +315,6 @@ class OverviewController @Inject()(
                 Constants.PREPOPULATION_FLAG -> String.valueOf(lastSubmittedPsrFbInPreviousYears.isDefined)
               )
           )
-          Future.successful(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
       }
     }
 

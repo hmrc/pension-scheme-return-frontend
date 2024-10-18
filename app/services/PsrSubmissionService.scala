@@ -28,8 +28,9 @@ import models.requests.DataRequest
 import handlers.PostPsrException
 import models.SchemeId.Srn
 import models.requests.psr._
-import config.Constants.{PSA, PSP, UNCHANGED_SESSION_PREFIX}
+import config.Constants._
 import pages.nonsipp.CheckReturnDatesPage
+import play.api.Logging
 import utils.nonsipp.TaskListUtils.getSectionList
 import play.api.libs.json.Json
 import repositories.SessionRepository
@@ -53,7 +54,8 @@ class PsrSubmissionService @Inject()(
   declarationTransformer: DeclarationTransformer,
   sessionRepository: SessionRepository
 ) extends PsrBaseService
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def submitPsrDetailsWithUA(
     srn: Srn,
@@ -96,13 +98,7 @@ class PsrSubmissionService @Inject()(
                       shares = sharesTransformer.transformToEtmp(srn, initialUA),
                       psrDeclaration = Option.when(isSubmitted)(declarationTransformer.transformToEtmp)
                     )
-                    psrConnector
-                      .submitPsrDetails(
-                        submissionRequest,
-                        schemeAdministratorOrPractitionerName,
-                        request.schemeDetails.schemeName,
-                        srn
-                      )
+                    callSubmission(srn, submissionRequest, isSubmitted)
                       .flatMap {
                         case Left(message: String) =>
                           throw PostPsrException(message, fallbackCall.url)
@@ -119,6 +115,31 @@ class PsrSubmissionService @Inject()(
         ).sequence
       )
   }
+
+  private def callSubmission(
+    srn: Srn,
+    submissionRequest: PsrSubmission,
+    isSubmitted: Boolean
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Either[String, Unit]] =
+    if (isPrePopulation(implicitly) && !isSubmitted) {
+      logger.info("Submit pre-populated PSR is called")
+      psrConnector
+        .submitPrePopulatedPsr(
+          submissionRequest,
+          schemeAdministratorOrPractitionerName,
+          request.schemeDetails.schemeName,
+          srn
+        )
+    } else {
+      logger.info("Submit PSR details is called")
+      psrConnector
+        .submitPsrDetails(
+          submissionRequest,
+          schemeAdministratorOrPractitionerName,
+          request.schemeDetails.schemeName,
+          srn
+        )
+    }
 
   def submitPsrDetailsBypassed(
     srn: Srn,
@@ -208,4 +229,8 @@ class PsrSubmissionService @Inject()(
       )
     }
   }
+
+  private def isPrePopulation(implicit request: DataRequest[_]): Boolean =
+    request.session.get(PREPOPULATION_FLAG).fold(false)(_.toBoolean)
+
 }
