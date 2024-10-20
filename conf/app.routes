@@ -453,7 +453,7 @@ POST        /:srn/change-remove-unallocated-employer-contributions              
 
 GET         /:srn/overview                                                                                     controllers.OverviewController.onPageLoad(srn: Srn)
 GET         /:srn/select-view-and-change                                                                       controllers.OverviewController.onSelectViewAndChange(srn: Srn, fbNumber: String, taxYear: String, reportType: String)
-GET         /:srn/select-start                                                                                 controllers.OverviewController.onSelectStart(srn: Srn, taxYear: String, version: String, reportType: String)
+GET         /:srn/select-start                                                                                 controllers.OverviewController.onSelectStart(srn: Srn, taxYear: String, version: String, reportType: String, lastSubmittedPsrFbInPreviousYears: Option[String])
 GET         /:srn/select-continue                                                                              controllers.OverviewController.onSelectContinue(srn: Srn, taxYear: String, version: String, fbNumber: Option[String], reportType: String)
 GET         /:srn/view-change/submitted-returns/:page                                                          controllers.ReturnsSubmittedController.onPageLoad(srn: Srn, page: Int)
 GET         /:srn/view-change/select-submitted-returns                                                         controllers.ReturnsSubmittedController.onSelect(srn: Srn, fbNumber: String)

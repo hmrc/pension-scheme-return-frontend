@@ -18,7 +18,7 @@ package repositories
 
 import uk.gov.hmrc.mongo.MongoComponent
 import org.mongodb.scala.model._
-import config.Constants.{PREVIOUS_SUBMITTED_PREFIX, UNCHANGED_SESSION_PREFIX}
+import config.Constants.{PREPOP_PREFIX, PREVIOUS_SUBMITTED_PREFIX, UNCHANGED_SESSION_PREFIX}
 import org.mongodb.scala.bson.conversions.Bson
 import play.api.libs.json.Format
 import models.UserAnswers
@@ -60,7 +60,7 @@ class SessionRepository @Inject()(
   private def byId(id: String): Bson = Filters.equal("_id", id)
 
   private def bySessionIds(id: String): Bson = {
-    val filters = List(id, UNCHANGED_SESSION_PREFIX + id, PREVIOUS_SUBMITTED_PREFIX + id).map(byId)
+    val filters = List(id, UNCHANGED_SESSION_PREFIX + id, PREVIOUS_SUBMITTED_PREFIX + id, PREPOP_PREFIX + id).map(byId)
     Filters.or(filters: _*)
   }
 

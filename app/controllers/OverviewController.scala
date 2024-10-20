@@ -26,6 +26,7 @@ import controllers.actions._
 import pages.nonsipp.WhichTaxYearPage
 import uk.gov.hmrc.time.TaxYear
 import viewmodels.DisplayMessage.Message
+import controllers.OverviewController.isSubmitted
 import views.html.OverviewView
 import models.SchemeId.Srn
 import config.Constants.UNCHANGED_SESSION_PREFIX
@@ -37,6 +38,7 @@ import models._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import viewmodels.OverviewSummary
 
+import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
@@ -47,8 +49,8 @@ class OverviewController @Inject()(
   config: FrontendAppConfig,
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
-  getData: DataRetrievalAction,
   createData: DataCreationAction,
+  prePopData: PrePopDataAction,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   psrOverviewService: PsrOverviewService,
@@ -90,12 +92,12 @@ class OverviewController @Inject()(
             val yearFrom = overviewResponse.periodStartDate
             val yearTo = overviewResponse.periodEndDate
             val compiled = overviewResponse.compiledVersionAvailable.getOrElse(YesNo.No) == YesNo.Yes
-            val fbNumber = versionsForYears
-              .find(x => LocalDate.parse(x.startDate) == yearFrom)
-              .flatMap(_.data.sortBy(_.reportVersion).lastOption)
-              .map(_.reportFormBundleNumber)
 
             val (status, url, label) = if (compiled) {
+              val fbNumber = versionsForYears
+                .find(x => LocalDate.parse(x.startDate) == yearFrom)
+                .flatMap(_.data.sortBy(_.reportVersion).lastOption)
+                .map(_.reportFormBundleNumber)
               (
                 ReportStatus.ReportStatusCompiled,
                 controllers.routes.OverviewController
@@ -110,10 +112,28 @@ class OverviewController @Inject()(
                 messages("site.continue")
               )
             } else {
+              val lastSubmittedPsrFbInPreviousYears =
+                versionsForYears
+                  .filter(x => LocalDate.parse(x.startDate) < yearFrom)
+                  .sortBy(x => LocalDate.parse(x.startDate))(Ordering[LocalDate].reverse)
+                  .find(response => response.data.exists(isSubmitted))
+                  .flatMap { response =>
+                    response.data
+                      .filter(isSubmitted)
+                      .sortBy(_.reportVersion)(Ordering[Int].reverse)
+                      .headOption
+                      .map(_.reportFormBundleNumber)
+                  }
               (
                 ReportStatus.NotStarted,
                 controllers.routes.OverviewController
-                  .onSelectStart(srn, formatDateForApi(yearFrom), "001", overviewResponse.psrReportType.get.name)
+                  .onSelectStart(
+                    srn,
+                    formatDateForApi(yearFrom),
+                    "001",
+                    overviewResponse.psrReportType.get.name,
+                    lastSubmittedPsrFbInPreviousYears
+                  )
                   .url,
                 messages("site.start")
               )
@@ -220,7 +240,7 @@ class OverviewController @Inject()(
     }
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).async { implicit request =>
+    identify.andThen(allowAccess(srn)).async { implicit request =>
       val toDate = formatDateForApi(allDates.head._2.from)
       val fromDate = formatDateForApi(allDates.last._2.from)
       for {
@@ -233,29 +253,43 @@ class OverviewController @Inject()(
         .addingToSession((Constants.SRN, srn.value))
     }
 
-  def onSelectStart(srn: Srn, taxYear: String, version: String, reportType: String): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData).async { implicit request =>
-      reportType match {
-        case PsrReportType.Sipp.name =>
-          val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippStartJourney}"
-          Future.successful(
-            Redirect(sippUrl)
-              .addingToSession(Constants.TAX_YEAR -> taxYear)
-              .addingToSession(Constants.VERSION -> version)
-          )
-        case _ =>
-          val yearFrom = LocalDate.parse(taxYear)
-          val yearTo = yearFrom.plusYears(1).minusDays(1)
-          val dateRange = DateRange(yearFrom, yearTo)
-          for {
-            userAnswers <- Future.fromTry(request.userAnswers.set(WhichTaxYearPage(srn), dateRange))
-            _ <- saveService.save(userAnswers.copy(id = UNCHANGED_SESSION_PREFIX + userAnswers.id))
-            _ <- saveService.save(userAnswers)
-          } yield {
-            Redirect(controllers.routes.WhatYouWillNeedController.onPageLoad(srn, "", taxYear, version))
-          }
+  def onSelectStart(
+    srn: Srn,
+    taxYear: String,
+    version: String,
+    reportType: String,
+    lastSubmittedPsrFbInPreviousYears: Option[String]
+  ): Action[AnyContent] =
+    identify
+      .andThen(allowAccess(srn))
+      .andThen(createData)
+      .andThen(
+        prePopData(
+          Option.when(reportType == PsrReportType.Standard.name)(lastSubmittedPsrFbInPreviousYears).flatten
+        )
+      )
+      .async { implicit request =>
+        reportType match {
+          case PsrReportType.Sipp.name =>
+            val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippStartJourney}"
+            Future.successful(
+              Redirect(sippUrl)
+                .addingToSession(Constants.TAX_YEAR -> taxYear)
+                .addingToSession(Constants.VERSION -> version)
+            )
+          case _ =>
+            val yearFrom = LocalDate.parse(taxYear)
+            val yearTo = yearFrom.plusYears(1).minusDays(1)
+            val dateRange = DateRange(yearFrom, yearTo)
+            for {
+              userAnswers <- Future.fromTry(request.userAnswers.set(WhichTaxYearPage(srn), dateRange))
+              _ <- saveService.save(userAnswers.copy(id = UNCHANGED_SESSION_PREFIX + userAnswers.id))
+              _ <- saveService.save(userAnswers)
+            } yield {
+              Redirect(controllers.routes.WhatYouWillNeedController.onPageLoad(srn, "", taxYear, version))
+            }
+        }
       }
-    }
 
   def onSelectContinue(
     srn: Srn,
@@ -316,4 +350,9 @@ object OverviewController {
 
     Enumerable(taxYearRanges: _*).toList
   }
+
+  def isSubmitted(psrVersionsResponse: PsrVersionsResponse): Boolean = (
+    psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndInProgress
+      || psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndSuccessfullyProcessed
+  )
 }

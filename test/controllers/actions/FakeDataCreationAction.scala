@@ -17,14 +17,14 @@
 package controllers.actions
 
 import models.UserAnswers
-import models.requests.{DataRequest, OptionalDataRequest}
+import models.requests.{AllowedAccessRequest, DataRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class FakeDataCreationAction(dataToReturn: UserAnswers) extends DataCreationAction {
 
-  override protected def transform[A](request: OptionalDataRequest[A]): Future[DataRequest[A]] =
-    Future(DataRequest(request.request, dataToReturn))
+  override protected def transform[A](request: AllowedAccessRequest[A]): Future[DataRequest[A]] =
+    Future(DataRequest(request, dataToReturn))
 
   override protected implicit val executionContext: ExecutionContext =
     scala.concurrent.ExecutionContext.Implicits.global
