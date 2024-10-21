@@ -58,7 +58,10 @@
                         section.rows.map { row =>
                             SummaryListRowViewModel(
                                 key = if(row.oneHalfWidth) KeyViewModel(row.key.toMessage).withOneHalfWidth() else KeyViewModel(row.key.toMessage),
-                                value = row.value.fold(ValueViewModel.empty)(value => ValueViewModel(renderMessage(value))),
+                                value = row.value match {
+                                    case CheckYourAnswerValue.Answer(msg) => renderMessage(msg)
+                                    case CheckYourAnswerValue.AnswerLink(msg, link) => HtmlFormat.raw(s"<p class='govuk-body'><a href=$link class='govuk-link'>${renderMessage(msg)}</a></p>")
+                                },
                                 actions = if (viewmodel.mode == ViewOnlyMode) Seq() else {
                                     row.actions.map { a =>
                                         ActionItemViewModel(Text(a.content.toMessage), a.href).withVisuallyHiddenText(a.visuallyHiddenContent.toMessage)

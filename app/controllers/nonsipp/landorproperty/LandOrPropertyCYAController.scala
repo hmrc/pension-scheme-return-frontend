@@ -723,32 +723,20 @@ object LandOrPropertyCYAController {
       CheckYourAnswersSection(
         Some(Heading2.medium(("landOrPropertyCYA.section4.heading", address))),
         List(
-          CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section4.residential", address)
-//            if (landOrPropertyResidential) "site.yes" else "site.no"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, mode).url
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyResidential.hidden")
+          CheckYourAnswersRowViewModel.link(
+            Message("landOrPropertyCYA.section4.residential", address),
+            "Enter if any part is residential",
+            routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, mode).url
           ),
-          CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section4.propertyLease", address)
-//            if (landOrPropertyLease) "site.yes" else "site.no"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.IsLandPropertyLeasedController.onPageLoad(srn, index, mode).url
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyLease.hidden")
+          CheckYourAnswersRowViewModel.link(
+            Message("landOrPropertyCYA.section4.propertyLease", address),
+            "some page",
+            controllers.routes.UnauthorisedController.onPageLoad().url
           ),
-          CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section4.propertyTotalIncome", address)
-//            s"£${landOrPropertyTotalIncome.displayAs}"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.LandOrPropertyTotalIncomeController.onPageLoad(srn, index, mode).url + "#landOrPropertyTotalIncome"
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyTotalIncome.hidden")
+          CheckYourAnswersRowViewModel.link(
+            Message("landOrPropertyCYA.section4.propertyTotalIncome", address),
+            "some page",
+            controllers.routes.UnauthorisedController.onPageLoad().url
           )
         )
       )

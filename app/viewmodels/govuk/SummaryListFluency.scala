@@ -16,7 +16,7 @@
 
 package viewmodels.govuk
 
-import play.twirl.api.Html
+import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.Aliases.Empty
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
@@ -83,6 +83,17 @@ trait SummaryListFluency {
       SummaryListRow(
         key = Key(Text(key)),
         value = Value(Text(value)),
+        actions = Some(Actions(items = actions))
+      )
+
+    def apply(
+      key: Key,
+      value: HtmlFormat.Appendable,
+      actions: Seq[ActionItem]
+    ): SummaryListRow =
+      SummaryListRow(
+        key = key,
+        value = Value(HtmlContent(value)),
         actions = Some(Actions(items = actions))
       )
   }
