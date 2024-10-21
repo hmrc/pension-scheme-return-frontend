@@ -47,7 +47,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
   def transformToEtmp(srn: Srn, optLandOrPropertyHeld: Option[Boolean], initialUA: UserAnswers)(
     implicit request: DataRequest[_]
   ): Option[LandOrProperty] =
-    Option.when(request.userAnswers.map(LandPropertyInUKPages(srn)).toList.nonEmpty) {
+    Option.when(optLandOrPropertyHeld.nonEmpty || request.userAnswers.map(LandPropertyInUKPages(srn)).toList.nonEmpty) {
       val disposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn)).getOrElse(false)
       LandOrProperty(
         recordVersion = Option.when(request.userAnswers.get(landOrProperty) == initialUA.get(landOrProperty))(
