@@ -18,7 +18,7 @@ package controllers.actions
 
 import services.PsrRetrievalService
 import play.api.mvc.ActionTransformer
-import config.Constants.PREPOP_PREFIX
+import config.Constants.PREPOPULATION_PREFIX
 import models.UserAnswers
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class PrePopDataAction @Inject()(sessionRepository: SessionRepository, psrRetrievalService: PsrRetrievalService)(
+class PrePopulationDataAction @Inject()(sessionRepository: SessionRepository, psrRetrievalService: PsrRetrievalService)(
   implicit val ec: ExecutionContext
 ) {
 
@@ -44,7 +44,7 @@ class PrePopDataAction @Inject()(sessionRepository: SessionRepository, psrRetrie
               HeaderCarrierConverter.fromRequestAndSession(existingDataRequest, existingDataRequest.session)
             val allowedAccessRequest = existingDataRequest.request
             for {
-              prePopReturn <- psrRetrievalService.getAndTransformStandardPsrDetails(
+              prePopulationReturn <- psrRetrievalService.getAndTransformStandardPsrDetails(
                 optFbNumber = Some(lastSubmittedPsrFbInPreviousYears),
                 fallBackCall = controllers.routes.OverviewController.onPageLoad(existingDataRequest.srn)
               )(
@@ -52,13 +52,15 @@ class PrePopDataAction @Inject()(sessionRepository: SessionRepository, psrRetrie
                 ec = implicitly,
                 request = DataRequest[A](allowedAccessRequest, emptyUserAnswers(allowedAccessRequest))
               )
-              cleanedPrePopUa = cleanUpPrePop(prePopReturn)
-              _ <- sessionRepository.set(cleanedPrePopUa.copy(id = PREPOP_PREFIX + prePopReturn.id))
+              cleanedPrePopulationUa = cleanUpPrePopulationUA(prePopulationReturn)
+              _ <- sessionRepository.set(
+                cleanedPrePopulationUa.copy(id = PREPOPULATION_PREFIX + prePopulationReturn.id)
+              )
             } yield {
               DataRequest(
                 allowedAccessRequest,
                 existingDataRequest.userAnswers,
-                prePopUserAnswers = Some(cleanedPrePopUa)
+                prePopulationUserAnswers = Some(cleanedPrePopulationUa)
               )
             }
 
@@ -72,5 +74,5 @@ class PrePopDataAction @Inject()(sessionRepository: SessionRepository, psrRetrie
   private def emptyUserAnswers(request: AllowedAccessRequest[_]): UserAnswers =
     UserAnswers(request.getUserId + request.srn)
 
-  private def cleanUpPrePop(userAnswers: UserAnswers): UserAnswers = userAnswers
+  private def cleanUpPrePopulationUA(userAnswers: UserAnswers): UserAnswers = userAnswers
 }

@@ -22,7 +22,7 @@ object Constants {
 
   val UNCHANGED_SESSION_PREFIX = "pure_"
   val PREVIOUS_SUBMITTED_PREFIX = "previous_"
-  val PREPOP_PREFIX = "prepop_"
+  val PREPOPULATION_PREFIX = "prepopulation_"
 
   val psaEnrolmentKey = "HMRC-PODS-ORG"
   val pspEnrolmentKey = "HMRC-PODSPP-ORG"

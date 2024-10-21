@@ -69,7 +69,7 @@ class DataRetrievalETMPAction(
           userAnswers = Some(currentReturn),
           pureUa,
           previousUserAnswers = None,
-          prePopUserAnswers = None,
+          prePopulationUserAnswers = None,
           Some(year),
           Some(current),
           previousVersion = Some(0) // this function is only ever called when the current version is 1 so this is safe
@@ -116,7 +116,7 @@ class DataRetrievalETMPAction(
           Some(currentReturn),
           pureUa,
           previousUa,
-          prePopUserAnswers = None,
+          prePopulationUserAnswers = None,
           Some(year),
           Some(current),
           Some(previous)

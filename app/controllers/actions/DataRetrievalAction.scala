@@ -37,9 +37,15 @@ class DataRetrievalActionImpl @Inject()(
       ua <- sessionRepository.get(userAnswersKey)
       pureUa <- sessionRepository.get(UNCHANGED_SESSION_PREFIX + userAnswersKey)
       maybePreviousUa <- sessionRepository.get(PREVIOUS_SUBMITTED_PREFIX + userAnswersKey)
-      maybePrepUa <- sessionRepository.get(PREPOP_PREFIX + userAnswersKey)
+      maybePrepUa <- sessionRepository.get(PREPOPULATION_PREFIX + userAnswersKey)
     } yield {
-      OptionalDataRequest(request, ua, pureUa, previousUserAnswers = maybePreviousUa, prePopUserAnswers = maybePrepUa)
+      OptionalDataRequest(
+        request,
+        ua,
+        pureUa,
+        previousUserAnswers = maybePreviousUa,
+        prePopulationUserAnswers = maybePrepUa
+      )
     }
   }
 }

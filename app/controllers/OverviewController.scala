@@ -50,7 +50,7 @@ class OverviewController @Inject()(
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
   createData: DataCreationAction,
-  prePopData: PrePopDataAction,
+  prePopulatedData: PrePopulationDataAction,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   psrOverviewService: PsrOverviewService,
@@ -264,7 +264,7 @@ class OverviewController @Inject()(
       .andThen(allowAccess(srn))
       .andThen(createData)
       .andThen(
-        prePopData(
+        prePopulatedData(
           Option.when(reportType == PsrReportType.Standard.name)(lastSubmittedPsrFbInPreviousYears).flatten
         )
       )
