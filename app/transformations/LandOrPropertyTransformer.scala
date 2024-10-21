@@ -47,17 +47,17 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
   def transformToEtmp(srn: Srn, optLandOrPropertyHeld: Option[Boolean], initialUA: UserAnswers)(
     implicit request: DataRequest[_]
   ): Option[LandOrProperty] =
-    optLandOrPropertyHeld.map(landOrPropertyHeld => {
+    Option.when(optLandOrPropertyHeld.nonEmpty || request.userAnswers.map(LandPropertyInUKPages(srn)).toList.nonEmpty) {
       val disposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn)).getOrElse(false)
       LandOrProperty(
         recordVersion = Option.when(request.userAnswers.get(landOrProperty) == initialUA.get(landOrProperty))(
           request.userAnswers.get(LandOrPropertyRecordVersionPage(srn)).get
         ),
-        landOrPropertyHeld = landOrPropertyHeld,
+        optLandOrPropertyHeld = optLandOrPropertyHeld,
         disposeAnyLandOrProperty = disposeAnyLandOrProperty,
         landOrPropertyTransactions = transformLandOrPropertyTransactionsToEtmp(srn, disposeAnyLandOrProperty)
       )
-    })
+    }
 
   private def transformLandOrPropertyTransactionsToEtmp(srn: Srn, disposeAnyLandOrProperty: Boolean)(
     implicit request: DataRequest[_]
@@ -77,7 +77,6 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
               methodOfHolding <- request.userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, index))
 
               totalCostOfLandOrProperty <- request.userAnswers.get(LandOrPropertyTotalCostPage(srn, index))
-              isLandOrPropertyResidential <- request.userAnswers.get(IsLandOrPropertyResidentialPage(srn, index))
               landOrPropertyLeased <- request.userAnswers.get(IsLandPropertyLeasedPage(srn, index))
               totalIncomeOrReceipts <- request.userAnswers.get(LandOrPropertyTotalIncomePage(srn, index))
             } yield {
@@ -100,7 +99,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
                   optConnectedPartyStatus = optAcquisitionRelatedDetails.map(_._2),
                   totalCostOfLandOrProperty = totalCostOfLandOrProperty.value,
                   optIndepValuationSupport = optNoneTransferRelatedDetails.map(_._1),
-                  isLandOrPropertyResidential = isLandOrPropertyResidential,
+                  optIsLandOrPropertyResidential = request.userAnswers.get(IsLandOrPropertyResidentialPage(srn, index)),
                   optLeaseDetails = buildOptLandOrPropertyLeasedDetails(landOrPropertyLeased, srn, index),
                   landOrPropertyLeased = landOrPropertyLeased,
                   totalIncomeOrReceipts = totalIncomeOrReceipts.value
@@ -114,8 +113,10 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, landOrProperty: LandOrProperty): Try[UserAnswers] = {
     val landOrPropertyTransactions = landOrProperty.landOrPropertyTransactions
-    val userAnswersOfLandOrPropertyHeld =
-      userAnswers.set(LandOrPropertyHeldPage(srn), landOrProperty.landOrPropertyHeld)
+    val userAnswersOfLandOrPropertyHeld = landOrProperty.optLandOrPropertyHeld match {
+      case Some(value) => userAnswers.set(LandOrPropertyHeldPage(srn), value)
+      case None => Try(userAnswers)
+    }
     val userAnswersWithRecordVersion =
       landOrProperty.recordVersion.fold(userAnswersOfLandOrPropertyHeld)(
         userAnswersOfLandOrPropertyHeld.set(LandOrPropertyRecordVersionPage(srn), _)
@@ -136,7 +137,9 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
           val totalCostOfLandOrProperty = LandOrPropertyTotalCostPage(srn, index) -> Money(
             heldPropertyTransaction.totalCostOfLandOrProperty
           )
-          val isLandOrPropertyResidential = IsLandOrPropertyResidentialPage(srn, index) -> heldPropertyTransaction.isLandOrPropertyResidential
+          val optIsLandOrPropertyResidential = heldPropertyTransaction.optIsLandOrPropertyResidential.map(
+            isResidential => IsLandOrPropertyResidentialPage(srn, index) -> isResidential
+          )
           val landOrPropertyLeased = IsLandPropertyLeasedPage(srn, index) -> heldPropertyTransaction.landOrPropertyLeased
           val totalIncomeOrReceipts = LandOrPropertyTotalIncomePage(srn, index) -> Money(
             heldPropertyTransaction.totalIncomeOrReceipts
@@ -233,7 +236,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
             ua3 <- ua2.set(landRegistryTitleNumber._1, landRegistryTitleNumber._2)
             ua4 <- ua3.set(methodOfHolding._1, methodOfHolding._2)
             ua5 <- ua4.set(totalCostOfLandOrProperty._1, totalCostOfLandOrProperty._2)
-            ua6 <- ua5.set(isLandOrPropertyResidential._1, isLandOrPropertyResidential._2)
+            ua6 <- optIsLandOrPropertyResidential.map(t => ua5.set(t._1, t._2)).getOrElse(Try(ua5))
             ua7 <- ua6.set(landOrPropertyLeased._1, landOrPropertyLeased._2)
             ua8 <- ua7
               .set(totalIncomeOrReceipts._1, totalIncomeOrReceipts._2)
