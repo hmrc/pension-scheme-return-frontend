@@ -105,10 +105,8 @@ object ValidationUtils {
     srn: Srn,
     sectionIndex: Max5000
   ): Boolean = {
-    val temp = (
+    val initialAnswers = (
       userAnswers.get(LandPropertyInUKPage(srn, sectionIndex)),
-      userAnswers.get(LandOrPropertyPostcodeLookupPage(srn, sectionIndex)),
-      userAnswers.get(AddressLookupResultsPage(srn, sectionIndex)),
       userAnswers.get(LandOrPropertyChosenAddressPage(srn, sectionIndex)),
       userAnswers.get(LandRegistryTitleNumberPage(srn, sectionIndex)),
       userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, sectionIndex)),
@@ -120,22 +118,22 @@ object ValidationUtils {
       userAnswers.get(IsLandOrPropertyResidentialPage(srn, sectionIndex))
     ) match {
       // Acquisition
-      case (Some(_), _, _, Some(_), Some(_), Some(Acquisition), Some(_), Some(_), Some(_), Some(_), Some(_)) =>
+      case (Some(_), Some(_), Some(_), Some(Acquisition), Some(_), Some(_), Some(_), Some(_), Some(_)) =>
         userAnswers.get(IdentityTypePage(srn, sectionIndex, LandOrPropertySeller)) match {
           case None => true
           case Some(identityType) =>
             answersMissingIdentityQuestions(userAnswers, srn, sectionIndex, identityType, LandOrPropertySeller)
         }
       // Contribution
-      case (Some(_), _, _, Some(_), Some(_), Some(Contribution), Some(_), Some(_), Some(_), Some(_), None) =>
+      case (Some(_), Some(_), Some(_), Some(Contribution), Some(_), None, Some(_), Some(_), Some(_)) =>
         false
       // Transfer
-      case (Some(_), _, _, Some(_), Some(_), Some(Transfer), None, Some(_), None, Some(_), None) =>
+      case (Some(_), Some(_), Some(_), Some(Transfer), None, None, Some(_), None, Some(_)) =>
         false
-      case (_, _, _, _, _, _, _, _, _, _, _) =>
+      case (_, _, _, _, _, _, _, _, _) =>
         true
     }
-    temp || (
+    initialAnswers || (
       (
         userAnswers.get(IsLandPropertyLeasedPage(srn, sectionIndex)),
         userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, sectionIndex)),
