@@ -46,6 +46,7 @@ class AssetsTransformer @Inject()(
     val optUnregulatedOrConnectedBondsHeld = request.userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
     val optOtherAssetsHeld = request.userAnswers.get(OtherAssetsHeldPage(srn))
 
+    //TODO change this condition
     Option.when(
       List(optLandOrPropertyHeld, optMoneyWasBorrowed, optUnregulatedOrConnectedBondsHeld, optOtherAssetsHeld).exists(
         _.isDefined
