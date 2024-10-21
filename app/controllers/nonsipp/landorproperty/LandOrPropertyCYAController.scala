@@ -724,8 +724,8 @@ object LandOrPropertyCYAController {
         Some(Heading2.medium(("landOrPropertyCYA.section4.heading", address))),
         List(
           CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section4.residential", address),
-            if (landOrPropertyResidential) "site.yes" else "site.no"
+            Message("landOrPropertyCYA.section4.residential", address)
+//            if (landOrPropertyResidential) "site.yes" else "site.no"
           ).withAction(
             SummaryAction(
               "site.change",
@@ -733,8 +733,8 @@ object LandOrPropertyCYAController {
             ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyResidential.hidden")
           ),
           CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section4.propertyLease", address),
-            if (landOrPropertyLease) "site.yes" else "site.no"
+            Message("landOrPropertyCYA.section4.propertyLease", address)
+//            if (landOrPropertyLease) "site.yes" else "site.no"
           ).withAction(
             SummaryAction(
               "site.change",
@@ -742,8 +742,8 @@ object LandOrPropertyCYAController {
             ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyLease.hidden")
           ),
           CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section4.propertyTotalIncome", address),
-            s"£${landOrPropertyTotalIncome.displayAs}"
+            Message("landOrPropertyCYA.section4.propertyTotalIncome", address)
+//            s"£${landOrPropertyTotalIncome.displayAs}"
           ).withAction(
             SummaryAction(
               "site.change",

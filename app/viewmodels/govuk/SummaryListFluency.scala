@@ -18,6 +18,7 @@ package viewmodels.govuk
 
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent, Text}
+import uk.gov.hmrc.govukfrontend.views.Aliases.Empty
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 import viewmodels.Margin
 
@@ -158,6 +159,9 @@ trait SummaryListFluency {
 
     def apply(content: String): Value =
       Value(content = Text(content))
+
+    val empty: Value =
+      Value(content = Empty)
   }
 
   implicit class FluentValue(value: Value) {

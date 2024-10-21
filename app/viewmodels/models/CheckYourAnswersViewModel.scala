@@ -53,7 +53,7 @@ object CheckYourAnswersViewModel {
 
 case class CheckYourAnswersRowViewModel(
   key: Message,
-  value: DisplayMessage,
+  value: Option[DisplayMessage],
   actions: Seq[SummaryAction],
   oneHalfWidth: Boolean = false
 ) {
@@ -87,6 +87,12 @@ object CheckYourAnswersRowViewModel {
   ): CheckYourAnswersRowViewModel =
     apply(Message(key), Message(value))
 
+  def link(
+    key: Message,
+    link: String
+  ): CheckYourAnswersRowViewModel =
+    CheckYourAnswersRowViewModel(key, None, Seq())
+
   def apply(
     key: Message,
     value: String
@@ -97,7 +103,7 @@ object CheckYourAnswersRowViewModel {
     key: Message,
     value: DisplayMessage
   ): CheckYourAnswersRowViewModel =
-    CheckYourAnswersRowViewModel(key, value, Seq())
+    CheckYourAnswersRowViewModel(key, Some(value), Seq())
 }
 
 case class SummaryAction(content: Message, href: String, visuallyHiddenContent: Message) {

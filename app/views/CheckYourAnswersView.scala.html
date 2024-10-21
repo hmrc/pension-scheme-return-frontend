@@ -58,7 +58,7 @@
                         section.rows.map { row =>
                             SummaryListRowViewModel(
                                 key = if(row.oneHalfWidth) KeyViewModel(row.key.toMessage).withOneHalfWidth() else KeyViewModel(row.key.toMessage),
-                                value = ValueViewModel(renderMessage(row.value)),
+                                value = row.value.fold(ValueViewModel.empty)(value => ValueViewModel(renderMessage(value))),
                                 actions = if (viewmodel.mode == ViewOnlyMode) Seq() else {
                                     row.actions.map { a =>
                                         ActionItemViewModel(Text(a.content.toMessage), a.href).withVisuallyHiddenText(a.visuallyHiddenContent.toMessage)
