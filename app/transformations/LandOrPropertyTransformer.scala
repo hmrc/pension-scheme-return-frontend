@@ -46,9 +46,9 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
 
   def transformToEtmp(srn: Srn, optLandOrPropertyHeld: Option[Boolean], initialUA: UserAnswers)(
     implicit request: DataRequest[_]
-  ): Option[LandOrProperty] = {
-    val disposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn)).getOrElse(false)
-    Some( //TODO keep None if there are land or property details
+  ): Option[LandOrProperty] =
+    Option.when(request.userAnswers.map(LandPropertyInUKPages(srn)).toList.nonEmpty) {
+      val disposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn)).getOrElse(false)
       LandOrProperty(
         recordVersion = Option.when(request.userAnswers.get(landOrProperty) == initialUA.get(landOrProperty))(
           request.userAnswers.get(LandOrPropertyRecordVersionPage(srn)).get
@@ -57,8 +57,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
         disposeAnyLandOrProperty = disposeAnyLandOrProperty,
         landOrPropertyTransactions = transformLandOrPropertyTransactionsToEtmp(srn, disposeAnyLandOrProperty)
       )
-    )
-  }
+    }
 
   private def transformLandOrPropertyTransactionsToEtmp(srn: Srn, disposeAnyLandOrProperty: Boolean)(
     implicit request: DataRequest[_]
@@ -114,8 +113,10 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, landOrProperty: LandOrProperty): Try[UserAnswers] = {
     val landOrPropertyTransactions = landOrProperty.landOrPropertyTransactions
-    val userAnswersOfLandOrPropertyHeld =
-      userAnswers.set(LandOrPropertyHeldPage(srn), landOrProperty.optLandOrPropertyHeld.getOrElse(false))
+    val userAnswersOfLandOrPropertyHeld = landOrProperty.optLandOrPropertyHeld match {
+      case Some(value) => userAnswers.set(LandOrPropertyHeldPage(srn), value)
+      case None => Try(userAnswers)
+    }
     val userAnswersWithRecordVersion =
       landOrProperty.recordVersion.fold(userAnswersOfLandOrPropertyHeld)(
         userAnswersOfLandOrPropertyHeld.set(LandOrPropertyRecordVersionPage(srn), _)
