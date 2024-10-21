@@ -1859,7 +1859,7 @@ landOrPropertyDisposal.heading = Did {0} dispose of any land or property during 
 landOrPropertyDisposal.error.required = Select yes if the scheme disposed of any land or property during the period of this return
 
 landOrPropertyList.title = You have added {0} land or property
-landOrPropertyList.title.plural = You have added {0} land or properties
+landOrPropertyList.title.plural = Total of {0} land or properties
 landOrPropertyList.heading = You have added {0} land or property
 landOrPropertyList.heading.plural = You have added {0} land or properties
 landOrPropertyList.paragraph = You must tell us about all land or property the scheme held at any point during the period of this return.

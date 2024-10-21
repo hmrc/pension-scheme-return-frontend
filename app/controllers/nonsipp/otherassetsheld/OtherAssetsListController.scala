@@ -323,7 +323,7 @@ object OtherAssetsListController {
       description = Some(ParagraphMessage("otherAssets.list.description")),
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows = rows(srn, mode, data, viewOnlyViewModel, schemeName),
+        sections = List(Section(rows(srn, mode, data, viewOnlyViewModel, schemeName))),
         radioText = Message("otherAssets.list.radios"),
         showRadios = data.size < Constants.maxOtherAssetsTransactions,
         showInsetWithRadios = !(data.length < Constants.maxOtherAssetsTransactions),

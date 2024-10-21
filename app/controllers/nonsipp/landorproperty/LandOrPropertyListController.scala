@@ -102,21 +102,37 @@ class LandOrPropertyListController @Inject()(
     val userAnswers = request.userAnswers
     val (status, incompleteLandOrPropertyUrl) = getLandOrPropertyTaskListStatusAndLink(userAnswers, srn)
 
+    val addresses = (1 to 5).map { index =>
+      (index.toString, Address("a", s"$index test street", None, None, "", None, "", "", LookupAddress))
+    }.toMap
+
+    val prePopAddresses = (1 to 5).map { index =>
+      (index.toString, Address("a", s"$index$index test street", None, None, "", None, "", "", LookupAddress))
+    }.toMap
+
+    // Would new validation util get rolled into TaskListStatus util?
     if (status == TaskListStatus.NotStarted) {
       Redirect(routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode))
     } else if (status == TaskListStatus.InProgress) {
       Redirect(incompleteLandOrPropertyUrl)
     } else {
-      val addresses = userAnswers.map(LandOrPropertyAddressLookupPages(srn))
+
+      // Dependant on Christo's work
+
+      // Get all indexes for a section that have atleast completed the first page
+      // Check for completed / incompleted using Christo's validation util
+      // partition into 2 sections
+
       val viewModel =
         LandOrPropertyListController.viewModel(
           srn,
           page,
           mode,
           addresses,
-          request.schemeDetails.schemeName,
+          prePopAddresses,
+          schemeName = request.schemeDetails.schemeName,
           viewOnlyViewModel,
-          showBackLink = showBackLink
+          showBackLink
         )
       Ok(view(form, viewModel))
     }
@@ -129,7 +145,7 @@ class LandOrPropertyListController @Inject()(
       Redirect(navigator.nextPage(LandOrPropertyListPage(srn, addLandOrProperty = false), mode, request.userAnswers))
     } else {
       val viewModel =
-        LandOrPropertyListController.viewModel(srn, page, mode, addresses, "", showBackLink = true)
+        LandOrPropertyListController.viewModel(srn, page, mode, addresses, addresses, "", showBackLink = true)
 
       form
         .bindFromRequest()
@@ -240,6 +256,7 @@ object LandOrPropertyListController {
     page: Int,
     mode: Mode,
     addresses: Map[String, Address],
+    prePopulatedAddresses: Map[String, Address],
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean
@@ -286,7 +303,24 @@ object LandOrPropertyListController {
       description = paragraph,
       page = ListViewModel(
         inset = "landOrPropertyList.inset",
-        rows(srn, mode, addresses, viewOnlyViewModel, schemeName),
+        List(
+          Section.heading("Updated in this return", rows(srn, mode, addresses, viewOnlyViewModel, schemeName)),
+          Section.heading(
+            "Check details added in a previous return",
+            List(
+              ListRow.check(
+                "123 Test Street",
+                controllers.routes.UnauthorisedController.onPageLoad().url,
+                Message("landOrPropertyList.row.change.hiddenText", "sd")
+              ),
+              ListRow.check(
+                "24a Burlington Avenue",
+                controllers.routes.UnauthorisedController.onPageLoad().url,
+                Message("landOrPropertyList.row.change.hiddenText", "sd")
+              )
+            )
+          )
+        ),
         Message("landOrPropertyList.radios"),
         showRadios = addresses.size < Constants.maxLandOrProperties,
         paginatedViewModel = Some(

@@ -422,7 +422,7 @@ object ReportBondsDisposalListController {
       ),
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows(srn, mode, bondsDisposalsWithIndexes, userAnswers, viewOnlyViewModel, schemeName),
+        sections = List(Section(rows(srn, mode, bondsDisposalsWithIndexes, userAnswers, viewOnlyViewModel, schemeName))),
         Message("bondsDisposal.reportBondsDisposalList.radios"),
         showRadios =
           !((numberOfDisposals >= maxBondsTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),

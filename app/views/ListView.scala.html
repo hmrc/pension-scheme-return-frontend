@@ -26,7 +26,7 @@
 )
 @(form: Form[Boolean], viewmodel: FormPageViewModel[ListViewModel])(implicit request: Request[_], messages: Messages)
 
-    @layout(pageTitle = title(form, if(viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.title.toMessage else viewmodel.title.toMessage),showBackLink = viewmodel.showBackLink) {
+    @layout(pageTitle = title(form, if(viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.title.toMessage else viewmodel.title.toMessage), showBackLink = viewmodel.showBackLink) {
 
         @formHelper(action = if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.onSubmit else viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
 
@@ -55,35 +55,45 @@
                 <h1 class="govuk-heading-l">@renderMessage(viewmodel.optViewOnlyDetails.get.heading)</h1>
             }
 
-            @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.rows)(paginatedViewModel =>
-                viewmodel.page.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
-            ) { rows =>
-                @hmrcListWithActions(ListWithActionsViewModel(
-                    rows.map(value =>
-                        ListWithActionsItemViewModel(
-                            renderMessage(value.text),
-                            value.change.map(change => ListWithActionsActionViewModel(messages("site.change"), change.url)
-                            .withVisuallyHiddenText(change.hiddenText.toMessage)).toList ++
-                                    value.remove.map(remove => ListWithActionsActionViewModel(messages("site.remove"), remove.url)
-                                    .withVisuallyHiddenText(remove.hiddenText.toMessage)).toList ++
-                                    value.view.map {
-                                        case ListRowLink(url, hiddenText) => ListWithActionsActionViewModel(messages("site.view"), url)
-                                        .withVisuallyHiddenText(hiddenText.toMessage)
-                                        case ListRowNoLink(text) => ListWithActionsActionViewModel.noLink(renderMessage(text))
-                                    }.toList
+            @viewmodel.page.sections.map { section =>
 
+                @defining(viewmodel.page.paginatedViewModel.fold(section.rows)(paginatedViewModel =>
+                    section.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
+                ) { rows =>
+
+                    @section.label.map { label =>
+                        <h2 class="govuk-heading-m">@renderMessage(label)</h2>
+                    }
+
+                    @hmrcListWithActions(ListWithActionsViewModel(
+                        rows.map(value =>
+                            ListWithActionsItemViewModel(
+                                renderMessage(value.text),
+                                value.change.map(change => ListWithActionsActionViewModel(messages("site.change"), change.url)
+                                .withVisuallyHiddenText(change.hiddenText.toMessage)).toList ++
+                                        value.remove.map(remove => ListWithActionsActionViewModel(messages("site.remove"), remove.url)
+                                        .withVisuallyHiddenText(remove.hiddenText.toMessage)).toList ++
+                                        value.check.map(check => ListWithActionsActionViewModel(messages("Check"), check.url)
+                                        .withVisuallyHiddenText(check.hiddenText.toMessage)).toList ++
+                                        value.view.map {
+                                            case ListRowLink(url, hiddenText) => ListWithActionsActionViewModel(messages("site.view"), url)
+                                            .withVisuallyHiddenText(hiddenText.toMessage)
+                                            case ListRowNoLink(text) => ListWithActionsActionViewModel.noLink(renderMessage(text))
+                                        }.toList
+
+                            )
                         )
-                    )
-                ))
-            }
-
-            @viewmodel.page.paginatedViewModel.map { paginatedViewModel =>
-                @if(paginatedViewModel.pagination.totalPages > 1) {
-                    <p id="pagination-label" class="govuk-body">@{
-                        renderMessage(paginatedViewModel.label)
-                    }</p>
+                    ))
                 }
-                @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
+
+                @viewmodel.page.paginatedViewModel.map { paginatedViewModel =>
+                    @if(paginatedViewModel.pagination.totalPages > 1) {
+                        <p id="pagination-label" class="govuk-body">@{
+                            renderMessage(paginatedViewModel.label)
+                        }</p>
+                    }
+                    @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
+                }
             }
 
             @if(!viewmodel.mode.isViewOnlyMode) {
