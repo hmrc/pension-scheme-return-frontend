@@ -135,8 +135,7 @@ class ReportedSharesDisposalListController @Inject()(
           val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
           val numberOfSharesItems = request.userAnswers.map(SharesCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
-
-          if (numberOfDisposals == maxPossibleNumberOfDisposals) {
+          if (numberOfDisposals >= maxSharesTransactions * maxDisposalsPerShare || numberOfDisposals >= maxPossibleNumberOfDisposals) {
             Redirect(
               navigator.nextPage(ReportedSharesDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
             ).pure[Future]
@@ -155,6 +154,7 @@ class ReportedSharesDisposalListController @Inject()(
                         disposals,
                         request.userAnswers,
                         request.schemeDetails.schemeName,
+                        viewOnlyViewModel = None,
                         showBackLink = true
                       )
                     )
@@ -169,7 +169,7 @@ class ReportedSharesDisposalListController @Inject()(
                     navigator.nextPage(
                       ReportedSharesDisposalListPage(srn, reportAnotherDisposal),
                       mode,
-                      request.userAnswers
+                      updatedUserAnswers
                     )
                   )
               )
@@ -383,7 +383,7 @@ object ReportedSharesDisposalListController {
     )
 
     val conditionalInsetText: DisplayMessage = {
-      if (numberOfDisposals >= maxSharesTransactions) {
+      if (numberOfDisposals >= maxSharesTransactions * maxDisposalsPerShare) {
         Message("sharesDisposal.reportedSharesDisposalList.inset.maximumReached")
       } else if (numberOfDisposals >= maxPossibleNumberOfDisposals) {
         ParagraphMessage("sharesDisposal.reportedSharesDisposalList.inset.allSharesDisposed.paragraph1") ++
@@ -398,7 +398,7 @@ object ReportedSharesDisposalListController {
       title = title,
       heading = heading,
       description = Option.when(
-        !((numberOfDisposals >= maxSharesTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals))
+        !((numberOfDisposals >= maxSharesTransactions * maxDisposalsPerShare) | (numberOfDisposals >= maxPossibleNumberOfDisposals))
       )(
         ParagraphMessage("sharesDisposal.reportedSharesDisposalList.description")
       ),
@@ -407,7 +407,7 @@ object ReportedSharesDisposalListController {
         rows(srn, mode, disposals, userAnswers, viewOnlyViewModel, schemeName),
         Message("sharesDisposal.reportedSharesDisposalList.radios"),
         showRadios =
-          !((numberOfDisposals >= maxSharesTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
+          !((numberOfDisposals >= maxSharesTransactions * maxDisposalsPerShare) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

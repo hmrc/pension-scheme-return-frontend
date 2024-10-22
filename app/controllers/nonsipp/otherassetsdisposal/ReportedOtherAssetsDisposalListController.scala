@@ -135,7 +135,7 @@ class ReportedOtherAssetsDisposalListController @Inject()(
           val numberOfOtherAssetsItems = request.userAnswers.map(OtherAssetsCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
 
-          if (numberOfDisposals == maxPossibleNumberOfDisposals) {
+          if (numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset || (numberOfDisposals >= maxPossibleNumberOfDisposals)) {
             Redirect(
               navigator
                 .nextPage(ReportedOtherAssetsDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
@@ -146,7 +146,19 @@ class ReportedOtherAssetsDisposalListController @Inject()(
               .fold(
                 errors =>
                   BadRequest(
-                    view(errors, viewModel(srn, mode, page, disposals, request.userAnswers, "", showBackLink = true))
+                    view(
+                      errors,
+                      viewModel(
+                        srn,
+                        mode,
+                        page,
+                        disposals,
+                        request.userAnswers,
+                        request.schemeDetails.schemeName,
+                        viewOnlyViewModel = None,
+                        showBackLink = true
+                      )
+                    )
                   ).pure[Future],
                 reportAnotherDisposal =>
                   for {
@@ -158,7 +170,7 @@ class ReportedOtherAssetsDisposalListController @Inject()(
                     navigator.nextPage(
                       ReportedOtherAssetsDisposalListPage(srn, reportAnotherDisposal),
                       mode,
-                      request.userAnswers
+                      updatedUserAnswers
                     )
                   )
               )
@@ -371,7 +383,7 @@ object ReportedOtherAssetsDisposalListController {
     )
 
     val conditionalInsetText: DisplayMessage = {
-      if (numberOfDisposals >= maxOtherAssetsTransactions) {
+      if (numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset) {
         Message("assetDisposal.reportedOtherAssetsDisposalList.inset.maximumReached")
       } else if (numberOfDisposals >= maxPossibleNumberOfDisposals) {
         ParagraphMessage("assetDisposal.reportedOtherAssetsDisposalList.inset.allOtherAssetsDisposed.paragraph1") ++
@@ -386,7 +398,7 @@ object ReportedOtherAssetsDisposalListController {
       title = title,
       heading = heading,
       description = Option.when(
-        !((numberOfDisposals >= maxOtherAssetsTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals))
+        !((numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset) | (numberOfDisposals >= maxPossibleNumberOfDisposals))
       )(
         ParagraphMessage("assetDisposal.reportedOtherAssetsDisposalList.description")
       ),
@@ -395,7 +407,7 @@ object ReportedOtherAssetsDisposalListController {
         rows(srn, mode, disposals, userAnswers, viewOnlyViewModel, schemeName),
         Message("assetDisposal.reportedOtherAssetsDisposalList.radios"),
         showRadios =
-          !((numberOfDisposals >= maxOtherAssetsTransactions) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
+          !((numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
