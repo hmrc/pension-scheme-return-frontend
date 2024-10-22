@@ -94,6 +94,10 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(FbVersionPage(srn), "002")
     .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
 
+  private val checkUserAnswers = completedUserAnswers.unsafeRemove(LandOrPropertyCompleted(srn, indexOne))
+
+  private val inProgressUserAnswers = defaultUserAnswers.unsafeSet(LandOrPropertyHeldPage(srn), true)
+
   private lazy val onPageLoad = routes.LandOrPropertyListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.LandOrPropertyListController.onSubmit(srn, page = 1, NormalMode)
   private lazy val onLandOrPropertyHeldPageLoad = routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode)
@@ -155,12 +159,26 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
       )
     }.withName("Completed PrePop Journey"))
 
+    act.like(renderView(onPageLoad, checkUserAnswers) { implicit app => implicit request =>
+      injected[ListView].apply(
+        form(new YesNoPageFormProvider()),
+        viewModel(
+          srn,
+          1,
+          NormalMode,
+          addresses,
+          schemeName,
+          showBackLink = true
+        )
+      )
+    }.withName("Check Journey"))
+
     act.like(
       redirectToPage(
         onPageLoad,
         controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode),
-        completedUserAnswers.remove(LandOrPropertyCompleted(srn, indexOne)).get
-      ).withName("Incomplete Journey")
+        inProgressUserAnswers
+      ).withName("In Progress Journey")
     )
 
     act.like(
