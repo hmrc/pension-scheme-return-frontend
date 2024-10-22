@@ -388,7 +388,7 @@ object LandOrPropertyDisposalListController {
       ),
       page = ListViewModel(
         inset = "landOrPropertyDisposalList.inset",
-        rows(srn, mode, addressesWithIndexes, userAnswers, viewOnlyViewModel, schemeName),
+        sections = List(Section(rows(srn, mode, addressesWithIndexes, userAnswers, viewOnlyViewModel, schemeName))),
         Message("landOrPropertyDisposalList.radios"),
         showRadios = !mode.isViewOnlyMode && numberOfDisposals < maxPossibleNumberOfDisposals,
         paginatedViewModel = Some(

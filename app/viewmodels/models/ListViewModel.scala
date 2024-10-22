@@ -19,11 +19,14 @@ package viewmodels.models
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.Message
 
+import scala.collection.immutable.List
+
 case class ListRow(
   text: DisplayMessage,
   change: Option[ListRowLink],
   remove: Option[ListRowLink],
-  view: Option[ViewOnlyLink]
+  view: Option[ViewOnlyLink],
+  check: Option[ListRowLink]
 )
 
 sealed trait ViewOnlyLink
@@ -42,7 +45,8 @@ object ListRow {
     text,
     change = Some(ListRowLink(changeUrl, changeHiddenText)),
     remove = Some(ListRowLink(removeUrl, removeHiddenText)),
-    view = None
+    view = None,
+    check = None
   )
 
   def view(text: DisplayMessage, url: String, hiddenText: Message): ListRow =
@@ -50,7 +54,17 @@ object ListRow {
       text,
       change = None,
       remove = None,
-      view = Some(ListRowLink(url, hiddenText))
+      view = Some(ListRowLink(url, hiddenText)),
+      check = None
+    )
+
+  def check(text: DisplayMessage, url: String, hiddenText: Message): ListRow =
+    ListRow(
+      text,
+      change = None,
+      remove = None,
+      view = None,
+      check = Some(ListRowLink(url, hiddenText))
     )
 
   def viewNoLink(text: DisplayMessage, value: DisplayMessage): ListRow =
@@ -58,13 +72,14 @@ object ListRow {
       text,
       change = None,
       remove = None,
-      view = Some(ListRowNoLink(value))
+      view = Some(ListRowNoLink(value)),
+      check = None
     )
 }
 
 case class ListViewModel(
   inset: DisplayMessage,
-  rows: List[ListRow],
+  sections: List[Section],
   radioText: Message,
   // whether to render the radio buttons to add another entity to the list or continue
   showRadios: Boolean = true,
@@ -72,3 +87,13 @@ case class ListViewModel(
   yesHintText: Option[Message] = None,
   showInsetWithRadios: Boolean = false
 )
+
+case class Section(label: Option[DisplayMessage], rows: List[ListRow])
+
+object Section {
+  def apply(rows: List[ListRow]): Section =
+    Section(label = None, rows)
+
+  def heading(label: DisplayMessage, rows: List[ListRow]): Section =
+    Section(Some(label), rows)
+}

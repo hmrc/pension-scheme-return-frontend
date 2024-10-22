@@ -330,7 +330,7 @@ object SharesListController {
       description = Some(ParagraphMessage("sharesList.description")),
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows = rows(srn, mode, data, viewOnlyViewModel, schemeName),
+        sections = List(Section(rows(srn, mode, data, viewOnlyViewModel, schemeName))),
         radioText = Message("sharesList.radios"),
         showRadios = data.size < Constants.maxSharesTransactions,
         showInsetWithRadios = !(data.length < Constants.maxSharesTransactions),
