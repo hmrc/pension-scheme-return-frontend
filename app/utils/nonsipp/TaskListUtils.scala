@@ -553,8 +553,9 @@ object TaskListUtils {
     val numSectionsUnableToStart = items.count(_.status == UnableToStart)
     val numSectionsNotStarted = items.count(_.status == NotStarted)
     val numSectionsInProgress = items.count(_.status == InProgress)
+    val numSectionsCheck = items.count(_.status == Check)
     val numSectionsReadyForSubmission =
-      numSectionsTotal - (numSectionsUnableToStart + numSectionsNotStarted + numSectionsInProgress)
+      numSectionsTotal - (numSectionsUnableToStart + numSectionsNotStarted + numSectionsInProgress + numSectionsCheck)
 
     (numSectionsReadyForSubmission, numSectionsTotal)
   }

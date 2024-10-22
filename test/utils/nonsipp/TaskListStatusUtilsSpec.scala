@@ -372,16 +372,6 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, firstQuestionPageUrl)
       }
-
-      "when landOrPropertyHeldPage true and only first page is present" in {
-        val customUserAnswers = defaultUserAnswers
-          .unsafeSet(LandOrPropertyHeldPage(srn), true)
-          .unsafeSet(LandPropertyInUKPages(srn), Map("0" -> true))
-
-        val result =
-          TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
-        result mustBe (InProgress, secondQuestionPageUrl(index1of5000))
-      }
     }
 
     "should be Recorded" - {
@@ -394,6 +384,15 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       }
 
       "when landOrPropertyHeldPage true and equal number of first pages and last pages are present" in {
+        val customUserAnswers = currentUA
+
+        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (Recorded(1, "landOrProperties"), listPageUrl)
+      }
+    }
+
+    "should be Check" - {
+      "when landOrPropertyHeldPage true and only first page is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LandOrPropertyHeldPage(srn), true)
           .unsafeSet(LandPropertyInUKPage(srn, refineMV(1)), true)
@@ -403,7 +402,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
         val result =
           TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
-        result mustBe (Recorded(2, "landOrProperties"), listPageUrl)
+        result mustBe (Check, listPageUrl)
       }
 
       "when landOrPropertyHeldPage true and more first pages than last pages is present - index 2 is missing" in {
@@ -415,20 +414,28 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
         val result =
           TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
-        result mustBe (Recorded(1, "landOrProperties"), listPageUrl)
+        result mustBe (Check, listPageUrl)
       }
 
       "when landOrPropertyHeldPage true and more first pages than last pages is present - index 1 is missing" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LandOrPropertyHeldPage(srn), true)
-          .unsafeSet(LandPropertyInUKPage(srn, refineMV(1)), true)
+          .unsafeSet(LandPropertyInUKPage(srn, index1of5000), true)
           // missing here
-          .unsafeSet(LandPropertyInUKPage(srn, refineMV(2)), true)
+          .unsafeSet(LandPropertyInUKPage(srn, index2of5000), true)
+          .unsafeSet(LandOrPropertyChosenAddressPage(srn, index2of5000), address)
+          .unsafeSet(LandRegistryTitleNumberPage(srn, index2of5000), ConditionalYesNo.no[String, String](reason))
+          .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index2of5000), SchemeHoldLandProperty.Transfer)
+          .unsafeSet(LandOrPropertyTotalCostPage(srn, index2of5000), money)
+          .unsafeSet(IsLandOrPropertyResidentialPage(srn, index2of5000), false)
+          .unsafeSet(IsLandPropertyLeasedPage(srn, index2of5000), false)
+          .unsafeSet(LandOrPropertyTotalIncomePage(srn, index2of5000), money)
           .unsafeSet(LandOrPropertyCompleted(srn, index2of5000), SectionCompleted)
+          .unsafeSet(LandPropertyIndependentValuationPage(srn, index2of5000), false)
 
         val result =
           TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
-        result mustBe (Recorded(1, "landOrProperties"), listPageUrl)
+        result mustBe (Check, listPageUrl)
       }
     }
   }
