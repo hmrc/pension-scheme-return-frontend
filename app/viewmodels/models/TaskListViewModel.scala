@@ -89,6 +89,8 @@ object TaskListStatus {
 
   case object Updated extends TaskListStatus("tasklist.updated")
 
+  case object Check extends TaskListStatus("tasklist.check")
+
   case object Recorded extends TaskListStatus("tasklist.recorded")
 
   case class Recorded(numRecorded: Int, itemKey: String)
