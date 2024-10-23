@@ -41,6 +41,7 @@ object Constants {
   val TAX_YEAR = "taxYear"
   val VERSION = "version"
   val FB_NUMBER = "fbNumber"
+  val PREPOPULATION_FLAG = "prePopulationFlag"
 
   val delimitedPSA = "DELIMITED_PSAID"
   val detailsNotFound = "no match found"

@@ -39,6 +39,9 @@ GET         /:srn/what-you-will-need/:taxYear/:version                          
 GET         /:srn/what-you-will-need                                                                           controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String = "2022-04-06", version: String = "001")
 GET         /:srn/what-you-will-need-next-page                                                                 controllers.WhatYouWillNeedController.onSubmit(srn: Srn, taxYear: String, fbNumber: String,  version: String)
 
+GET         /:srn/check-update-information/:taxYear/:version                                                   controllers.CheckAndUpdateTheInformationController.onPageLoad(srn: Srn, taxYear: String, version: String)
+GET         /:srn/check-update-information-next-page                                                           controllers.CheckAndUpdateTheInformationController.onSubmit(srn: Srn, taxYear: String, version: String)
+
 GET         /:srn/which-tax-year                                                                               controllers.nonsipp.WhichTaxYearController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/which-tax-year                                                                               controllers.nonsipp.WhichTaxYearController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
@@ -454,7 +457,7 @@ POST        /:srn/change-remove-unallocated-employer-contributions              
 GET         /:srn/overview                                                                                     controllers.OverviewController.onPageLoad(srn: Srn)
 GET         /:srn/select-view-and-change                                                                       controllers.OverviewController.onSelectViewAndChange(srn: Srn, fbNumber: String, taxYear: String, reportType: String)
 GET         /:srn/select-start                                                                                 controllers.OverviewController.onSelectStart(srn: Srn, taxYear: String, version: String, reportType: String, lastSubmittedPsrFbInPreviousYears: Option[String])
-GET         /:srn/select-continue                                                                              controllers.OverviewController.onSelectContinue(srn: Srn, taxYear: String, version: String, fbNumber: Option[String], reportType: String)
+GET         /:srn/select-continue                                                                              controllers.OverviewController.onSelectContinue(srn: Srn, taxYear: String, version: String, fbNumber: Option[String], reportType: String, lastSubmittedPsrFbInPreviousYears: Option[String])
 GET         /:srn/view-change/submitted-returns/:page                                                          controllers.ReturnsSubmittedController.onPageLoad(srn: Srn, page: Int)
 GET         /:srn/view-change/select-submitted-returns                                                         controllers.ReturnsSubmittedController.onSelect(srn: Srn, fbNumber: String)
 GET         /:srn/view-change/select-submitted-returns-to-view/:year/:current/:previous                        controllers.ReturnsSubmittedController.onSelectToView(srn: Srn, year: String, current: Int, previous: Int)
