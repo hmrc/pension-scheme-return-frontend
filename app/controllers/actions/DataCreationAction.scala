@@ -19,7 +19,7 @@ package controllers.actions
 import play.api.mvc.ActionTransformer
 import repositories.SessionRepository
 import models.UserAnswers
-import models.requests.{DataRequest, OptionalDataRequest}
+import models.requests.{AllowedAccessRequest, DataRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -30,11 +30,11 @@ class DataCreationActionImpl @Inject()(sessionRepository: SessionRepository)(
   implicit val executionContext: ExecutionContext
 ) extends DataCreationAction {
 
-  override protected def transform[A](request: OptionalDataRequest[A]): Future[DataRequest[A]] = {
+  override protected def transform[A](request: AllowedAccessRequest[A]): Future[DataRequest[A]] = {
     val userAnswersKey = request.getUserId + request.srn
     val userAnswers = UserAnswers(userAnswersKey)
-    sessionRepository.set(userAnswers).map(_ => DataRequest(request.request, userAnswers))
+    sessionRepository.set(userAnswers).map(_ => DataRequest(request, userAnswers))
   }
 }
 
-trait DataCreationAction extends ActionTransformer[OptionalDataRequest, DataRequest]
+trait DataCreationAction extends ActionTransformer[AllowedAccessRequest, DataRequest]

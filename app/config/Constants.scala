@@ -22,6 +22,7 @@ object Constants {
 
   val UNCHANGED_SESSION_PREFIX = "pure_"
   val PREVIOUS_SUBMITTED_PREFIX = "previous_"
+  val PREPOPULATION_PREFIX = "prepopulation_"
 
   val psaEnrolmentKey = "HMRC-PODS-ORG"
   val pspEnrolmentKey = "HMRC-PODSPP-ORG"
@@ -40,6 +41,7 @@ object Constants {
   val TAX_YEAR = "taxYear"
   val VERSION = "version"
   val FB_NUMBER = "fbNumber"
+  val PREPOPULATION_FLAG = "prePopulationFlag"
 
   val delimitedPSA = "DELIMITED_PSAID"
   val detailsNotFound = "no match found"

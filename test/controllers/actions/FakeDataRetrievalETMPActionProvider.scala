@@ -30,7 +30,8 @@ import javax.inject.Inject
 class FakeDataRetrievalETMPActionProvider @Inject()(
   userAnswers: Option[UserAnswers],
   pureUserAnswers: Option[UserAnswers],
-  previousUserAnswers: Option[UserAnswers]
+  previousUserAnswers: Option[UserAnswers],
+  prePopulationUserAnswers: Option[UserAnswers]
 ) extends DataRetrievalETMPActionProvider
     with Generators
     with OptionValues {
@@ -65,6 +66,7 @@ class FakeDataRetrievalETMPActionProvider @Inject()(
             userAnswers,
             pureUserAnswers,
             previousUserAnswers,
+            prePopulationUserAnswers,
             Some(year),
             Some(current),
             if (current - 1 <= 0) None else Some(current - 1)
@@ -87,6 +89,7 @@ class FakeDataRetrievalETMPActionProvider @Inject()(
             userAnswers,
             pureUserAnswers,
             if (previous == 0) None else previousUserAnswers,
+            prePopulationUserAnswers,
             Some(year),
             Some(current),
             Some(previous)

@@ -76,6 +76,7 @@ trait ControllerBaseSpec
     minimalDetails: MinimalDetails = defaultMinimalDetails,
     pureUserAnswers: Option[UserAnswers] = Some(emptyUserAnswers),
     previousUserAnswers: Option[UserAnswers] = Some(emptyUserAnswers),
+    prePopUserAnswers: Option[UserAnswers] = Some(emptyUserAnswers),
     saveService: Option[SaveService] = None
   ): GuiceApplicationBuilder = {
     val identifierActionBind = if (isPsa) {
@@ -94,7 +95,12 @@ trait ControllerBaseSpec
             .toInstance(new FakeDataRetrievalAction(userAnswers, pureUserAnswers, previousUserAnswers)),
           bind[DataRetrievalETMPActionProvider]
             .toInstance(
-              new FakeDataRetrievalETMPActionProvider(userAnswers, pureUserAnswers, previousUserAnswers)
+              new FakeDataRetrievalETMPActionProvider(
+                userAnswers,
+                pureUserAnswers,
+                previousUserAnswers,
+                prePopUserAnswers
+              )
             ),
           bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers)))
         ) ++ saveService.fold[List[GuiceableModule]](Nil)(service => List(bind[SaveService].toInstance(service)))

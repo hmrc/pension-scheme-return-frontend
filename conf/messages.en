@@ -144,6 +144,13 @@ upload.acceptedFileType = Accepted file type: {0}
 upload.maxFileSize = Maximum file size: {0}
 upload.uploadAFile = Upload a file
 
+checkAndUpdateTheInformation.title = Check and update the information you provided
+checkAndUpdateTheInformation.heading = Check and update the information you provided
+checkAndUpdateTheInformation.paragraph1 = Some of the information that you provided from the previous return period has been included for you to check or update.
+checkAndUpdateTheInformation.paragraph2 = You must check that the information is correct, or make any required changes before submitting this period's return.
+checkAndUpdateTheInformation.paragraph3 = You do not have to complete the whole return at once. You can save your answers and come back to them later.
+checkAndUpdateTheInformation.legend = Saving your answers
+
 whatYouWillNeed.title = What you will need
 whatYouWillNeed.heading = What you will need
 whatYouWillNeed.paragraph = To start a pension scheme return, you will need to tell us:

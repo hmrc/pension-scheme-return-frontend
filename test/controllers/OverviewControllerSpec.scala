@@ -38,10 +38,12 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
   lazy val onPageLoad: String = routes.OverviewController.onPageLoad(srn).url
   lazy val onSelectStart: String =
-    routes.OverviewController.onSelectStart(srn, commonStartDate, commonVersion, PsrReportType.Standard.name).url
+    routes.OverviewController
+      .onSelectStart(srn, commonStartDate, commonVersion, PsrReportType.Standard.name, None)
+      .url
   lazy val onSelectContinue: String =
     routes.OverviewController
-      .onSelectContinue(srn, commonStartDate, commonVersion, Some(commonFbNumber), PsrReportType.Standard.name)
+      .onSelectContinue(srn, commonStartDate, commonVersion, Some(commonFbNumber), PsrReportType.Standard.name, None)
       .url
   lazy val onSelectViewAndChange: String =
     routes.OverviewController
