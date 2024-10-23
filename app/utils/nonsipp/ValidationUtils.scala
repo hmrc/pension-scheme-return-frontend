@@ -138,11 +138,12 @@ object ValidationUtils {
         userAnswers.get(IsLandPropertyLeasedPage(srn, sectionIndex)),
         userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, sectionIndex)),
         userAnswers.get(IsLesseeConnectedPartyPage(srn, sectionIndex)),
-        userAnswers.get(LandOrPropertyTotalIncomePage(srn, sectionIndex))
+        userAnswers.get(LandOrPropertyTotalIncomePage(srn, sectionIndex)),
+        userAnswers.get(LandOrPropertyCompleted(srn, sectionIndex))
       ) match {
-        case (Some(true), Some(_), Some(_), Some(_)) => false
-        case (Some(false), None, None, Some(_)) => false
-        case (_, _, _, _) => true
+        case (Some(true), Some(_), Some(_), Some(_), Some(_)) => false
+        case (Some(false), None, None, Some(_), Some(_)) => false
+        case (_, _, _, _, _) => true
       }
     )
   }

@@ -25,6 +25,7 @@ import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import models._
 import pages.nonsipp.common._
 import models.IdentitySubject.LandOrPropertySeller
+import viewmodels.models.SectionCompleted
 import config.RefinedTypes._
 import controllers.ControllerBaseSpec
 import utils.nonsipp.ValidationUtils._
@@ -53,19 +54,20 @@ class ValidationUtilsSpec extends ControllerBaseSpec with Matchers with OptionVa
     .unsafeSet(LandPropertyInUKPage(srn, index1of5000), true)
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, index1of5000), address)
     .unsafeSet(LandRegistryTitleNumberPage(srn, index1of5000), ConditionalYesNo.no[String, String](reason))
-//    .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index1of5000), SchemeHoldLandProperty.Acquisition) // Branch X--
-//    .unsafeSet(LandOrPropertyWhenDidSchemeAcquirePage(srn, index1of5000), localDate)
-//    .unsafeSet(IdentityTypePage(srn, index1of5000, LandOrPropertySeller), UKCompany) // Branch -X-
-//    .unsafeSet(CompanySellerNamePage(srn, index1of5000), name)
-//    .unsafeSet(CompanyRecipientCrnPage(srn, index1of5000, LandOrPropertySeller), ConditionalYesNo.yes[String, Crn](crn))
-//    .unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, index1of5000), false)
+    //.unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index1of5000), SchemeHoldLandProperty.Acquisition) // X--
+    //.unsafeSet(LandOrPropertyWhenDidSchemeAcquirePage(srn, index1of5000), localDate)
+    //.unsafeSet(IdentityTypePage(srn, index1of5000, LandOrPropertySeller), UKCompany) // -X-
+    //.unsafeSet(CompanySellerNamePage(srn, index1of5000), name)
+    //.unsafeSet(CompanyRecipientCrnPage(srn, index1of5000, LandOrPropertySeller), conditionalYesCrn)
+    //.unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, index1of5000), false)
     .unsafeSet(LandOrPropertyTotalCostPage(srn, index1of5000), money)
-//    .unsafeSet(LandPropertyIndependentValuationPage(srn, index1of5000), false)
+    //.unsafeSet(LandPropertyIndependentValuationPage(srn, index1of5000), false)
     .unsafeSet(IsLandOrPropertyResidentialPage(srn, index1of5000), false)
-//    .unsafeSet(IsLandPropertyLeasedPage(srn, index1of5000), true) // Branch --X
-//    .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, index1of5000), (leaseName, money, localDate))
-//    .unsafeSet(IsLesseeConnectedPartyPage(srn, index1of5000), false)
+    //.unsafeSet(IsLandPropertyLeasedPage(srn, index1of5000), true) // --X
+    //.unsafeSet(LandOrPropertyLeaseDetailsPage(srn, index1of5000), (leaseName, money, localDate))
+    //.unsafeSet(IsLesseeConnectedPartyPage(srn, index1of5000), false)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, index1of5000), money)
+    .unsafeSet(LandOrPropertyCompleted(srn, index1of5000), SectionCompleted)
 
   // AAA = Acquisition, Individual, Leased
   private val landOrPropertyAnswersAAA = baseLandOrPropertyAnswers
