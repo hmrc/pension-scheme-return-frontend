@@ -81,6 +81,7 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
           valueOfAssetsPage = None,
           feesCommissionsWagesSalariesPage = None,
           dateRange,
+          defaultSchemeDetails,
           viewOnlyUpdated = false
         )
       )
@@ -147,6 +148,7 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
               valueOfAssetsPage = None,
               feesCommissionsWagesSalariesPage = None,
               dateRange,
+              defaultSchemeDetails,
               viewOnlyUpdated = false,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
@@ -172,6 +174,7 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
               valueOfAssetsPage = Some(MoneyInPeriod(money, money)),
               feesCommissionsWagesSalariesPage = None,
               dateRange,
+              defaultSchemeDetails,
               viewOnlyUpdated = true,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),

@@ -90,6 +90,7 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
               valueOfAssetsPage,
               feesCommissionsWagesSalariesPage,
               periods,
+              request.schemeDetails,
               viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
                 getFinancialDetailsCompletedOrUpdated(request.userAnswers, request.previousUserAnswers.get) == Updated
               } else {
@@ -146,6 +147,7 @@ object FinancialDetailsCheckYourAnswersController {
     valueOfAssetsPage: Option[MoneyInPeriod],
     feesCommissionsWagesSalariesPage: Option[Money],
     schemeDates: DateRange,
+    schemeDetails: SchemeDetails,
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
@@ -164,7 +166,8 @@ object FinancialDetailsCheckYourAnswersController {
           howMuchCashPage,
           valueOfAssetsPage,
           feesCommissionsWagesSalariesPage,
-          schemeDates
+          schemeDates,
+          schemeDetails
         )
       ).withMarginBottom(Margin.Fixed60Bottom),
       refresh = None,
@@ -215,7 +218,8 @@ object FinancialDetailsCheckYourAnswersController {
     howMuchCashPage: Option[MoneyInPeriod],
     valueOfAssetsPage: Option[MoneyInPeriod],
     feesCommissionsWagesSalariesPage: Option[Money],
-    schemeDates: DateRange
+    schemeDates: DateRange,
+    schemeDetails: SchemeDetails
   ): List[CheckYourAnswersSection] = List(
     CheckYourAnswersSection(
       None,
@@ -233,6 +237,7 @@ object FinancialDetailsCheckYourAnswersController {
                 .url + "#taxStartDate",
               hidden = Message(
                 "financialDetailsCheckYourAnswersController.totalCashInStartDate.hidden",
+                schemeDetails.schemeName,
                 schemeDates.from.show
               )
             )
@@ -252,6 +257,7 @@ object FinancialDetailsCheckYourAnswersController {
                   .url + "#taxEndDate",
                 hidden = Message(
                   "financialDetailsCheckYourAnswersController.totalCashInEndDate.hidden",
+                  schemeDetails.schemeName,
                   schemeDates.to.show
                 )
               )
