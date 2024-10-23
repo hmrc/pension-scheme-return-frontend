@@ -27,7 +27,6 @@ import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInSectionCompleted}
 import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
 import pages.nonsipp.sharesdisposal._
-import play.api.libs.json.{JsObject, JsPath}
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsCompleted, SurrenderedBenefitsPage}
 import models._
 import pages.nonsipp.loansmadeoroutstanding._
@@ -39,6 +38,8 @@ import pages.nonsipp.accountingperiod.Paths.accountingPeriodDetails
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
 import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import eu.timepit.refined.refineV
+import utils.nonsipp.ValidationUtils.answersMissingLandOrPropertySection
+import play.api.libs.json.{JsObject, JsPath}
 import viewmodels.models.TaskListStatus._
 import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import pages.nonsipp.common.IdentityTypes
@@ -453,11 +454,14 @@ object TaskListStatusUtils {
           .url
     )
 
-    (wereLandOrProperties, numRecorded) match {
-      case (None, _) => (NotStarted, firstQuestionPageUrl)
-      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
-      case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
-      case (Some(true), _) => (Recorded(numRecorded, "landOrProperties"), listPageUrl)
+    val ifNeedsChecking = answersMissingLandOrPropertySection(userAnswers, srn)
+
+    (wereLandOrProperties, numRecorded, ifNeedsChecking) match {
+      case (_, _, true) => (Check, listPageUrl) // TODO: navigate to new list page
+      case (None, _, false) => (NotStarted, firstQuestionPageUrl)
+      case (Some(false), _, false) => (Recorded(0, ""), firstQuestionPageUrl)
+      case (Some(true), 0, false) => (InProgress, inProgressCalculatedUrl)
+      case (Some(true), _, false) => (Recorded(numRecorded, "landOrProperties"), listPageUrl)
     }
   }
 

@@ -80,6 +80,7 @@ tasklist.updated = Updated
 tasklist.recorded = Recorded
 tasklist.noneRecorded = None recorded
 tasklist.numItems = {0} {1}
+tasklist.check = Check
 
 members.singular = member
 members.plural = members
