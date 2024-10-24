@@ -94,7 +94,7 @@ class MemberPaymentsTransformer @Inject()(
        * - stay CHANGED
        * - else change to NEW as the member has not been part of a declaration yet
        */
-      val memberDetailsWithCorrectState = currentMemberDetails.map {
+      val memberDetailsWithCorrectState: Map[Max300, MemberDetails] = currentMemberDetails.map {
         _ -> psrState -> maybePreviousMemberDetails match {
           // new member created and changed while in interim Submitted state
           case (((index, currentMemberDetail), Some(Submitted)), None)
@@ -135,7 +135,7 @@ class MemberPaymentsTransformer @Inject()(
         }
       }
 
-      val normalise = (memberDetails: MemberDetails) => {
+      val normalise: MemberDetails => MemberDetails = (memberDetails: MemberDetails) => {
         memberDetails.copy(
           memberLumpSumReceived = if (memberDetails.memberLumpSumReceived.exists(_.isZero)) {
             None
