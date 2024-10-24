@@ -26,6 +26,7 @@ import pages.nonsipp.receivetransfer.TransfersInSectionCompleted.TransfersInSect
 import play.api.libs.json.Reads
 import pages.nonsipp.membersurrenderedbenefits._
 import models.{IdentityType, UserAnswers}
+import pages.nonsipp.membertransferout._
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
 import models.requests.DataRequest
 import pages.nonsipp.employercontributions.EmployerContributionsProgress.EmployerContributionsUserAnswersOps
@@ -39,10 +40,8 @@ import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import cats.syntax.apply._
 import config.RefinedTypes.{Max300, Max5, Max50}
 import controllers.PSRController
-import cats.syntax.option._
-import pages.nonsipp.membertransferout._
 
-import scala.util.{Failure, Try}
+import scala.util.{Failure, Success, Try}
 
 trait SoftDelete { _: PSRController =>
 
@@ -70,13 +69,19 @@ trait SoftDelete { _: PSRController =>
     val ua = userAnswers
     def get[A: Reads](f: (Srn, Max300) => Gettable[A]): Option[A] = ua.get(f(srn, index))
 
-    val memberDetails: Option[MemberPersonalDetails] = (
+    val memberDetails: Try[MemberPersonalDetails] = (
       get(MemberDetailsPage),
-      get(NoNINOPage).some,
-      get(MemberDetailsNinoPage).map(_.value).some
-    ).mapN(
-      (nameDob, noNino, nino) => MemberPersonalDetails(nameDob.firstName, nameDob.lastName, nino, noNino, nameDob.dob)
-    )
+      get(NoNINOPage),
+      get(MemberDetailsNinoPage).map(_.value)
+    ) match {
+      case (None, _, _) => Failure(new Exception("Missing member details when trying to soft delete member"))
+      case (_, None, None) =>
+        Failure(new Exception("Missing both NINO or no NINO reason when trying to soft delete member"))
+      case (_, Some(_), Some(_)) =>
+        Failure(new Exception("Both NINO and no NINO reason present when trying to soft delete member"))
+      case (Some(nameDob), noNino, nino) =>
+        Success(MemberPersonalDetails(nameDob.firstName, nameDob.lastName, nino, noNino, nameDob.dob))
+    }
 
     val memberDetailsPages: List[Removable[_]] = List(
       MemberDetailsPage(srn, index),
@@ -213,7 +218,7 @@ trait SoftDelete { _: PSRController =>
         )
     )
 
-    val memberToDelete = memberDetails.map(
+    val memberToDelete: Try[SoftDeletedMember] = memberDetails.map(
       SoftDeletedMember(
         memberPSRVersion = None, // do not set member PSR version when soft deleting
         _,
@@ -227,18 +232,7 @@ trait SoftDelete { _: PSRController =>
       )
     )
 
-    memberToDelete.fold[Try[UserAnswers]](
-      Failure[UserAnswers](
-        new Exception(
-          "Failure when building soft deleted member. Checks:" +
-            s"memberDetails empty = ${memberDetails.isEmpty}\n" +
-            s"employer contributions completed = ${userAnswers.employerContributionsCompleted(srn, index).size}\n" +
-            s"employerContributions size = ${employerContributions.size}\n" +
-            s"transfersIn empty = ${transfersIn.size}\n" +
-            s"transfersOut size = ${transfersOut.size}\n"
-        )
-      )
-    )(
+    memberToDelete.flatMap(
       member =>
         userAnswers
           .setWhen(userAnswers.get(SafeToHardDelete(srn, index)).isEmpty)(
