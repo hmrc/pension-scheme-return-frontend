@@ -141,7 +141,7 @@ class LandOrPropertyCYAController @Inject()(
           ).flatten.headOption
         )
 
-        landOrPropertyResidential <- requiredPage(IsLandOrPropertyResidentialPage(srn, index))
+        landOrPropertyResidential = request.userAnswers.get(IsLandOrPropertyResidentialPage(srn, index))
         landOrPropertyLease <- requiredPage(IsLandPropertyLeasedPage(srn, index))
         landOrPropertyTotalIncome <- requiredPage(LandOrPropertyTotalIncomePage(srn, index))
 
@@ -232,7 +232,7 @@ object LandOrPropertyCYAController {
     recipientDetails: Option[String],
     recipientReasonNoDetails: Option[String],
     landOrPropertySellerConnectedParty: Option[Boolean],
-    landOrPropertyResidential: Boolean,
+    landOrPropertyResidential: Option[Boolean],
     landOrPropertyLease: Boolean,
     landOrPropertyTotalIncome: Money,
     addressLookUpPage: Address,
@@ -326,7 +326,7 @@ object LandOrPropertyCYAController {
     landOrPropertySellerConnectedParty: Option[Boolean],
     landPropertyIndependentValuation: Option[Boolean],
     leaseDetails: Option[(String, Money, LocalDate, Boolean)],
-    landOrPropertyResidential: Boolean,
+    landOrPropertyResidential: Option[Boolean],
     landOrPropertyLease: Boolean,
     landOrPropertyTotalIncome: Money,
     addressLookUpPage: Address,
@@ -713,7 +713,7 @@ object LandOrPropertyCYAController {
   private def leaseDetailsAndIncome(
     srn: Srn,
     index: Max5000,
-    landOrPropertyResidential: Boolean,
+    landOrPropertyResidential: Option[Boolean],
     landOrPropertyLease: Boolean,
     landOrPropertyTotalIncome: Money,
     address: String,
@@ -723,22 +723,23 @@ object LandOrPropertyCYAController {
       CheckYourAnswersSection(
         Some(Heading2.medium(("landOrPropertyCYA.section4.heading", address))),
         List(
-          if (landOrPropertyResidential.booleanValue()) {
-            CheckYourAnswersRowViewModel(
-              Message("landOrPropertyCYA.section4.residential", address),
-              if (landOrPropertyResidential) "site.yes" else "site.no"
-            ).withAction(
-              SummaryAction(
-                "site.change",
+          landOrPropertyResidential match {
+            case Some(value) =>
+              CheckYourAnswersRowViewModel(
+                Message("landOrPropertyCYA.section4.residential", address),
+                if (value) "site.yes" else "site.no"
+              ).withAction(
+                SummaryAction(
+                  "site.change",
+                  routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, mode).url
+                ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyResidential.hidden")
+              )
+            case None =>
+              CheckYourAnswersRowViewModel.link(
+                Message("landOrPropertyCYA.section4.residential", address),
+                "Enter if any part is residential",
                 routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, mode).url
-              ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyResidential.hidden")
-            )
-          } else {
-            CheckYourAnswersRowViewModel.link(
-              Message("landOrPropertyCYA.section4.residential", address),
-              "Enter if any part is residential",
-              routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, mode).url
-            )
+              )
           },
           if (landOrPropertyLease) {
             CheckYourAnswersRowViewModel(
