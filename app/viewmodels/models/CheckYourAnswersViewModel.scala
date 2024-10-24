@@ -17,6 +17,7 @@
 package viewmodels.models
 
 import play.api.mvc.Call
+import viewmodels.models.CheckYourAnswerValue.{Answer, AnswerLink}
 import viewmodels.{DisplayMessage, Margin}
 import viewmodels.DisplayMessage.Message
 
@@ -51,9 +52,16 @@ object CheckYourAnswersViewModel {
     CheckYourAnswersViewModel(List(CheckYourAnswersSection(None, rows)))
 }
 
+sealed trait CheckYourAnswerValue
+
+object CheckYourAnswerValue {
+  case class AnswerLink(text: DisplayMessage, url: String) extends CheckYourAnswerValue
+
+  case class Answer(text: DisplayMessage) extends CheckYourAnswerValue
+}
 case class CheckYourAnswersRowViewModel(
   key: Message,
-  value: DisplayMessage,
+  value: CheckYourAnswerValue,
   actions: Seq[SummaryAction],
   oneHalfWidth: Boolean = false
 ) {
@@ -87,6 +95,13 @@ object CheckYourAnswersRowViewModel {
   ): CheckYourAnswersRowViewModel =
     apply(Message(key), Message(value))
 
+  def link(
+    key: Message,
+    value: DisplayMessage,
+    link: String
+  ): CheckYourAnswersRowViewModel =
+    CheckYourAnswersRowViewModel(key, AnswerLink(value, link), Seq())
+
   def apply(
     key: Message,
     value: String
@@ -97,7 +112,7 @@ object CheckYourAnswersRowViewModel {
     key: Message,
     value: DisplayMessage
   ): CheckYourAnswersRowViewModel =
-    CheckYourAnswersRowViewModel(key, value, Seq())
+    CheckYourAnswersRowViewModel(key, Answer(value), Seq())
 }
 
 case class SummaryAction(content: Message, href: String, visuallyHiddenContent: Message) {
