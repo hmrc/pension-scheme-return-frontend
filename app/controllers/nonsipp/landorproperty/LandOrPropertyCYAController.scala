@@ -723,21 +723,59 @@ object LandOrPropertyCYAController {
       CheckYourAnswersSection(
         Some(Heading2.medium(("landOrPropertyCYA.section4.heading", address))),
         List(
-          CheckYourAnswersRowViewModel.link(
-            Message("landOrPropertyCYA.section4.residential", address),
-            "Enter if any part is residential",
-            routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, mode).url
-          ),
-          CheckYourAnswersRowViewModel.link(
-            Message("landOrPropertyCYA.section4.propertyLease", address),
-            "Enter if it is leased",
-            routes.IsLandPropertyLeasedController.onPageLoad(srn, index, mode).url
-          ),
-          CheckYourAnswersRowViewModel.link(
-            Message("landOrPropertyCYA.section4.propertyTotalIncome", address),
-            "Enter total income in period of return",
-            routes.LandOrPropertyTotalIncomeController.onPageLoad(srn, index, mode).url + "#landOrPropertyTotalIncome"
-          )
+          if (landOrPropertyResidential.booleanValue()) {
+            CheckYourAnswersRowViewModel(
+              Message("landOrPropertyCYA.section4.residential", address),
+              if (landOrPropertyResidential) "site.yes" else "site.no"
+            ).withAction(
+              SummaryAction(
+                "site.change",
+                routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, mode).url
+              ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyResidential.hidden")
+            )
+          } else {
+            CheckYourAnswersRowViewModel.link(
+              Message("landOrPropertyCYA.section4.residential", address),
+              "Enter if any part is residential",
+              routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, mode).url
+            )
+          },
+          if (landOrPropertyLease) {
+            CheckYourAnswersRowViewModel(
+              Message("landOrPropertyCYA.section4.propertyLease", address),
+              if (landOrPropertyLease) "site.yes" else "site.no"
+            ).withAction(
+              SummaryAction(
+                "site.change",
+                routes.IsLandPropertyLeasedController.onPageLoad(srn, index, mode).url
+              ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyLease.hidden")
+            )
+          } else {
+            CheckYourAnswersRowViewModel.link(
+              Message("landOrPropertyCYA.section4.propertyLease", address),
+              "Enter if it is leased",
+              routes.IsLandPropertyLeasedController.onPageLoad(srn, index, mode).url
+            )
+          },
+          if (landOrPropertyTotalIncome.displayAs.isBlank) {
+            CheckYourAnswersRowViewModel(
+              Message("landOrPropertyCYA.section4.propertyTotalIncome", address),
+              s"£${landOrPropertyTotalIncome.displayAs}"
+            ).withAction(
+              SummaryAction(
+                "site.change",
+                routes.LandOrPropertyTotalIncomeController
+                  .onPageLoad(srn, index, mode)
+                  .url + "#landOrPropertyTotalIncome"
+              ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyTotalIncome.hidden")
+            )
+          } else {
+            CheckYourAnswersRowViewModel.link(
+              Message("landOrPropertyCYA.section4.propertyTotalIncome", address),
+              "Enter total income in period of return",
+              routes.LandOrPropertyTotalIncomeController.onPageLoad(srn, index, mode).url + "#landOrPropertyTotalIncome"
+            )
+          }
         )
       )
     )
