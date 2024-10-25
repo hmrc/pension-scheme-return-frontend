@@ -163,9 +163,9 @@ object LandOrPropertyLeaseDetailsController {
       QuestionField
         .input("landOrPropertyLeaseDetails.field1.label", Some("landOrPropertyLeaseDetails.field1.label.hint")),
       QuestionField
-        .money("landOrPropertyLeaseDetails.field2.label", Some("landOrPropertyLeaseDetails.field2.label.hint")),
+        .currency("landOrPropertyLeaseDetails.field2.label", Some("landOrPropertyLeaseDetails.field2.label.hint")),
       QuestionField
-        .localDate("landOrPropertyLeaseDetails.field3.label", Some("landOrPropertyLeaseDetails.field3.label.hint"))
+        .date("landOrPropertyLeaseDetails.field3.label", Some("landOrPropertyLeaseDetails.field3.label.hint"))
     ),
     refresh = None,
     buttonText = "site.saveAndContinue",

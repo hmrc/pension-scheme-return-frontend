@@ -17,7 +17,7 @@
 package controllers.nonsipp.schemedesignatory
 
 import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
-import views.html.MoneyView
+import views.html.MoneyViewWithDescription
 import forms.MoneyFormProvider
 import models.{Money, NormalMode}
 import play.api.data.Form
@@ -38,12 +38,12 @@ class FeesCommissionsWagesSalariesControllerSpec extends ControllerBaseSpec {
   "FeesCommissionsWagesSalariesController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[MoneyView].apply(moneyForm, viewModel(srn, schemeName, moneyForm, NormalMode))
+      injected[MoneyViewWithDescription].apply(moneyForm, viewModel(srn, moneyForm, NormalMode))
     })
 
     act.like(renderPrePopView(onPageLoad, FeesCommissionsWagesSalariesPage(srn, NormalMode), validMoney) {
       implicit app => implicit request =>
-        injected[MoneyView].apply(moneyForm.fill(validMoney), viewModel(srn, schemeName, moneyForm, NormalMode))
+        injected[MoneyViewWithDescription].apply(moneyForm.fill(validMoney), viewModel(srn, moneyForm, NormalMode))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
