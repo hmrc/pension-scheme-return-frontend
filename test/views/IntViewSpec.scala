@@ -17,6 +17,7 @@
 package views
 
 import play.api.test.FakeRequest
+import play.api.mvc.AnyContentAsEmpty
 import forms.mappings.Mappings
 import play.api.data.Forms.mapping
 import views.html.IntView
@@ -46,16 +47,16 @@ class IntViewSpec extends ViewSpec with Mappings {
     val tripleIntViewModel = formPageViewModelGen(tripleQuestionGen(tripleIntForm))
     val viewModelGen = Gen.oneOf(singleIntViewModel, tripleIntViewModel, invalidViewModel)
 
-    implicit val request = FakeRequest()
+    implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
     "IntView" - {
 
       act.like(renderTitle(viewModelGen)(view(intForm, _), _.title.key))
       act.like(renderHeading(viewModelGen)(view(intForm, _), _.heading))
       act.like(renderInputWithLabel(singleIntViewModel)("value", view(intForm, _), _.heading))
-//      act.like(renderInputWithLabel(tripleIntViewModel)("value.1", view(tripleIntForm, _), _.page.fields.head.label))
-//      act.like(renderInputWithLabel(tripleIntViewModel)("value.2", view(tripleIntForm, _), _.page.fields(1).label))
-//      act.like(renderInputWithLabel(tripleIntViewModel)("value.3", view(tripleIntForm, _), _.page.fields(2).label))
+      act.like(renderInputWithLabel(tripleIntViewModel)("value.1", view(intForm, _), _.page.fields.head.label))
+      act.like(renderInputWithLabel(tripleIntViewModel)("value.2", view(intForm, _), _.page.fields(1).label))
+      act.like(renderInputWithLabel(tripleIntViewModel)("value.3", view(intForm, _), _.page.fields(2).label))
       act.like(renderErrors(invalidViewModel)(view(invalidForm, _), _ => "int.error.required"))
       act.like(renderForm(viewModelGen)(view(intForm, _), _.onSubmit))
       act.like(renderButtonText(viewModelGen)(view(intForm, _), _.buttonText))
