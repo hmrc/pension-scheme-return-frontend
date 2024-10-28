@@ -19,7 +19,7 @@ package controllers
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import play.api.mvc.Result
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 import config.RefinedTypes._
 import play.api.libs.json.{Reads, Writes}
 import models.backend.responses.{IndividualDetails, PsrVersionsResponse}
@@ -150,6 +150,15 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
       case None => Left(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
     }
   }
+
+  implicit class EitherOps[A](maybe: Either[String, A]) {
+    def getOrRecoverJourney(implicit logger: Logger): Either[Result, A] =
+      maybe.leftMap { errMsg =>
+        logger.warn(errMsg)
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+  }
+
   implicit class FutureOps[A](f: Future[A]) {
     def liftF(implicit ec: ExecutionContext): EitherT[Future, Result, A] = EitherT.liftF(f)
   }

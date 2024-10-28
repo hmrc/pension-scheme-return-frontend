@@ -66,7 +66,7 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
   "MemberContributionListController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
+      val memberList: List[(Max300, NameDOB)] = userAnswers.completedMembersDetails(srn).value
 
       injected[TwoColumnsTripleAction].apply(
         MemberContributionListController.viewModel(
@@ -132,7 +132,7 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
         .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
         .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), Money(0))
 
-      val memberList: List[Option[NameDOB]] = userAnswersWithNoContributions.membersOptionList(srn)
+      val memberList = userAnswersWithNoContributions.completedMembersDetails(srn).value
 
       val result = MemberContributionListController.viewModel(
         srn,
@@ -157,7 +157,7 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
         .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
         .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), Money(1))
 
-      val memberList: List[Option[NameDOB]] = userAnswersWithOneContribution.membersOptionList(srn)
+      val memberList = userAnswersWithOneContribution.completedMembersDetails(srn).value
 
       val result = MemberContributionListController.viewModel(
         srn,
@@ -186,7 +186,8 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
         .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails2)
         .unsafeSet(TotalMemberContributionPage(srn, refineMV(2)), Money(20))
 
-      val memberList: List[Option[NameDOB]] = List(Some(memberDetails1), Some(memberDetails2))
+      val memberList =
+        List((refineMV[Max300.Refined](1), memberDetails1), (refineMV[Max300.Refined](2), memberDetails2))
 
       val result = MemberContributionListController.viewModel(
         srn,
@@ -212,7 +213,7 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
-          val memberList: List[Option[NameDOB]] = currentUserAnswers.membersOptionList(srn)
+          val memberList = currentUserAnswers.completedMembersDetails(srn).value
 
           injected[TwoColumnsTripleAction].apply(
             MemberContributionListController.viewModel(
@@ -238,7 +239,7 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
-          val memberList: List[Option[NameDOB]] = updatedUserAnswers.membersOptionList(srn)
+          val memberList = updatedUserAnswers.completedMembersDetails(srn).value
 
           injected[TwoColumnsTripleAction].apply(
             MemberContributionListController.viewModel(

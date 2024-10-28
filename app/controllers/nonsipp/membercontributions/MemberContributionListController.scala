@@ -17,12 +17,14 @@
 package controllers.nonsipp.membercontributions
 
 import play.api.mvc._
+import com.google.inject.Inject
+import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
-import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import controllers.nonsipp.membercontributions.MemberContributionListController._
 import cats.implicits.toShow
 import _root_.config.Constants
+import controllers.actions.IdentifyAndRequireData
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
@@ -32,12 +34,10 @@ import pages.nonsipp.membercontributions.{
   MemberContributionsPage,
   TotalMemberContributionPage
 }
-import _root_.config.RefinedTypes.{Max300, OneTo300}
-import com.google.inject.Inject
+import config.RefinedTypes.Max300
+import controllers.PSRController
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
-import controllers.actions.IdentifyAndRequireData
-import eu.timepit.refined.refineV
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
@@ -58,6 +58,8 @@ class MemberContributionListController @Inject()(
   view: TwoColumnsTripleAction
 ) extends PSRController {
 
+  private val logger = LoggerFactory.getLogger(this.getClass.getSimpleName)
+
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       onPageLoadCommon(srn, page, mode, showBackLink = true)
@@ -77,42 +79,43 @@ class MemberContributionListController @Inject()(
 
   private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(
     implicit request: DataRequest[AnyContent]
-  ): Result = {
-    val userAnswers = request.userAnswers
-    val optionList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
-    if (optionList.flatten.nonEmpty) {
-      val noPageEnabled = !userAnswers.get(MemberContributionsPage(srn)).getOrElse(false)
-      Ok(
-        view(
-          viewModel(
-            srn,
-            page,
-            mode,
-            optionList,
-            userAnswers,
-            viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-              getCompletedOrUpdatedTaskListStatus(
-                userAnswers,
-                request.previousUserAnswers.get,
-                pages.nonsipp.membercontributions.Paths.memberDetails \ "totalMemberContribution"
-              ) == Updated
-            } else {
-              false
-            },
-            optYear = request.year,
-            optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = userAnswers.get(CompilationOrSubmissionDatePage(srn)),
-            noPageEnabled = noPageEnabled,
-            showBackLink = showBackLink
+  ): Result =
+    request.userAnswers.completedMembersDetails(srn) match {
+      case Left(err) =>
+        logger.warn(s"Error when fetching completed member details - $err")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      case Right(Nil) =>
+        logger.warn(s"No completed member details for srn $srn")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      case Right(completedMemberDetails) =>
+        val noPageEnabled = !request.userAnswers.get(MemberContributionsPage(srn)).getOrElse(false)
+        Ok(
+          view(
+            viewModel(
+              srn,
+              page,
+              mode,
+              completedMemberDetails,
+              request.userAnswers,
+              viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+                getCompletedOrUpdatedTaskListStatus(
+                  request.userAnswers,
+                  request.previousUserAnswers.get,
+                  pages.nonsipp.membercontributions.Paths.memberDetails \ "totalMemberContribution"
+                ) == Updated
+              } else {
+                false
+              },
+              optYear = request.year,
+              optCurrentVersion = request.currentVersion,
+              optPreviousVersion = request.previousVersion,
+              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+              noPageEnabled = noPageEnabled,
+              showBackLink = showBackLink
+            )
           )
         )
-      )
-    } else {
-      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
-  }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     Redirect(
@@ -205,7 +208,7 @@ object MemberContributionListController {
     srn: Srn,
     page: Int,
     mode: Mode,
-    memberList: List[Option[NameDOB]],
+    memberList: List[(Max300, NameDOB)],
     userAnswers: UserAnswers,
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
@@ -217,21 +220,16 @@ object MemberContributionListController {
   ): FormPageViewModel[ActionTableViewModel] = {
 
     val (title, heading) =
-      if (memberList.flatten.size == 1) {
+      if (memberList.size == 1) {
         ("ReportContribution.MemberList.title", "ReportContribution.MemberList.heading")
       } else {
         ("ReportContribution.MemberList.title.plural", "ReportContribution.MemberList.heading.plural")
       }
 
-    val membersWithContributions: List[(Max300, NameDOB, Option[Money])] = memberList.zipWithIndex
-      .flatMap {
-        case (Some(memberName), index) =>
-          refineV[OneTo300](index + 1) match {
-            case Right(index) =>
-              List((index, memberName, userAnswers.get(TotalMemberContributionPage(srn, index))))
-            case Left(_) => List.empty
-
-          }
+    val membersWithContributions: List[(Max300, NameDOB, Option[Money])] = memberList
+      .map {
+        case (index, memberName) =>
+          (index, memberName, userAnswers.get(TotalMemberContributionPage(srn, index)))
       }
 
     val sumMemberContributions = membersWithContributions.count {
@@ -240,11 +238,11 @@ object MemberContributionListController {
 
     // in view-only mode or with direct url edit page value can be higher than needed
     val currentPage =
-      if ((page - 1) * Constants.memberContributionsMemberListSize >= memberList.flatten.size) 1 else page
+      if ((page - 1) * Constants.memberContributionsMemberListSize >= memberList.size) 1 else page
     val pagination = Pagination(
       currentPage = currentPage,
       pageSize = Constants.memberContributionsMemberListSize,
-      memberList.flatten.size,
+      memberList.size,
       call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
         case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
           controllers.nonsipp.membercontributions.routes.MemberContributionListController
@@ -266,8 +264,8 @@ object MemberContributionListController {
 
     FormPageViewModel(
       mode = mode,
-      title = Message(title, memberList.flatten.size),
-      heading = Message(heading, memberList.flatten.size),
+      title = Message(title, memberList.size),
+      heading = Message(heading, memberList.size),
       description = optDescription,
       page = ActionTableViewModel(
         inset = "",

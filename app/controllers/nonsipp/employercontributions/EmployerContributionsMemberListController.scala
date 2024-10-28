@@ -19,6 +19,7 @@ package controllers.nonsipp.employercontributions
 import pages.nonsipp.employercontributions._
 import viewmodels.implicits._
 import play.api.mvc._
+import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
@@ -56,6 +57,8 @@ class EmployerContributionsMemberListController @Inject()(
   view: TwoColumnsTripleAction
 ) extends PSRController {
 
+  private val logger = LoggerFactory.getLogger(this.getClass.getSimpleName)
+
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       onPageLoadCommon(srn, page, mode)
@@ -75,45 +78,42 @@ class EmployerContributionsMemberListController @Inject()(
 
   private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean = true)(
     implicit request: DataRequest[AnyContent]
-  ): Result = {
-    val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
-    if (optionList.flatten.nonEmpty) {
-      optionList
-        .zipWithRefinedIndex[Max300.Refined]
-        .map { indexes =>
-          val employerContributions = buildEmployerContributions(srn, indexes)
-          val noPageEnabled = !request.userAnswers.get(EmployerContributionsPage(srn)).getOrElse(false)
-          Ok(
-            view(
-              viewModel(
-                srn,
-                page,
-                mode,
-                employerContributions,
-                viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-                  getCompletedOrUpdatedTaskListStatus(
-                    request.userAnswers,
-                    request.previousUserAnswers.get,
-                    pages.nonsipp.employercontributions.Paths.memberEmpContribution
-                  ) == Updated
-                } else {
-                  false
-                },
-                optYear = request.year,
-                optCurrentVersion = request.currentVersion,
-                optPreviousVersion = request.previousVersion,
-                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
-                noPageEnabled,
-                showBackLink = showBackLink
-              )
+  ): Result =
+    request.userAnswers.completedMembersDetails(srn) match {
+      case Left(err) =>
+        logger.warn(s"Error when fetching completed member details - $err")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      case Right(Nil) =>
+        logger.warn(s"No completed member details for srn $srn")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      case Right(completedMemberDetails) =>
+        val noPageEnabled = !request.userAnswers.get(EmployerContributionsPage(srn)).getOrElse(false)
+        Ok(
+          view(
+            viewModel(
+              srn,
+              page,
+              mode,
+              employerContributions = buildEmployerContributions(srn, completedMemberDetails),
+              viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+                getCompletedOrUpdatedTaskListStatus(
+                  request.userAnswers,
+                  request.previousUserAnswers.get,
+                  pages.nonsipp.employercontributions.Paths.memberEmpContribution
+                ) == Updated
+              } else {
+                false
+              },
+              optYear = request.year,
+              optCurrentVersion = request.currentVersion,
+              optPreviousVersion = request.previousVersion,
+              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+              noPageEnabled,
+              showBackLink = showBackLink
             )
           )
-        }
-        .merge
-    } else {
-      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        )
     }
-  }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     Redirect(
@@ -140,23 +140,20 @@ class EmployerContributionsMemberListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
-  private def buildEmployerContributions(srn: Srn, indexes: List[(Max300, Option[NameDOB])])(
+  private def buildEmployerContributions(srn: Srn, indexes: List[(Max300, NameDOB)])(
     implicit request: DataRequest[_]
-  ): List[MemberWithEmployerContributions] = indexes.flatMap {
-    case (index, Some(nameDOB)) =>
-      Some(
-        MemberWithEmployerContributions(
-          memberIndex = index,
-          employerFullName = nameDOB.fullName,
-          contributions = request.userAnswers
-            .employerContributionsProgress(srn, index)
-            .map {
-              case (secondaryIndex, status) =>
-                EmployerContributions(secondaryIndex, status)
-            }
-        )
+  ): List[MemberWithEmployerContributions] = indexes.map {
+    case (index, nameDOB) =>
+      MemberWithEmployerContributions(
+        memberIndex = index,
+        employerFullName = nameDOB.fullName,
+        contributions = request.userAnswers
+          .employerContributionsProgress(srn, index)
+          .map {
+            case (secondaryIndex, status) =>
+              EmployerContributions(secondaryIndex, status)
+          }
       )
-    case _ => None
   }
 }
 
@@ -186,7 +183,7 @@ object EmployerContributionsMemberListController {
             TableElem.add(
               memberWithEmployerContributions.contributions.find(_.status.inProgress) match {
                 case Some(EmployerContributions(_, InProgress(url))) => url
-                case None =>
+                case _ =>
                   controllers.nonsipp.employercontributions.routes.EmployerNameController
                     .onSubmit(srn, memberWithEmployerContributions.memberIndex, refineMV(1), mode)
                     .url

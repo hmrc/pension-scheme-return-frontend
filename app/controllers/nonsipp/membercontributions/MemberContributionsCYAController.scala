@@ -17,9 +17,9 @@
 package controllers.nonsipp.membercontributions
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.memberdetails.MemberStatus
+import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc._
-import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
+import org.slf4j.LoggerFactory
 import controllers.nonsipp.membercontributions.MemberContributionsCYAController._
 import controllers.actions.IdentifyAndRequireData
 import models._
@@ -53,6 +53,8 @@ class MemberContributionsCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
+  private val logger = LoggerFactory.getLogger(this.getClass.getSimpleName)
+
   def onPageLoad(
     srn: Srn,
     index: Max300,
@@ -75,35 +77,30 @@ class MemberContributionsCYAController @Inject()(
     }
 
   def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
-    (
-      for {
-        contribution <- request.userAnswers.get(TotalMemberContributionPage(srn, index))
-        optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
-
-      } yield optionList(index.value - 1)
-        .map(_.fullName)
-        .getOrRecoverJourney
-        .map(
-          memberName =>
-            Ok(
-              view(
-                viewModel(
-                  srn,
-                  memberName,
-                  index,
-                  contribution,
-                  mode,
-                  viewOnlyUpdated = false, // flag is not displayed on this tier
-                  optYear = request.year,
-                  optCurrentVersion = request.currentVersion,
-                  optPreviousVersion = request.previousVersion,
-                  compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
-                )
+    request.userAnswers.get(MemberDetailsPage(srn, index)) match {
+      case None =>
+        logger.warn(s"Member details for member index $index not found")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      case Some(memberDetails) =>
+        request.userAnswers.get(TotalMemberContributionPage(srn, index)).getOrRecoverJourney { contribution =>
+          Ok(
+            view(
+              viewModel(
+                srn,
+                memberDetails.fullName,
+                index,
+                contribution,
+                mode,
+                viewOnlyUpdated = false, // flag is not displayed on this tier
+                optYear = request.year,
+                optCurrentVersion = request.currentVersion,
+                optPreviousVersion = request.previousVersion,
+                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
               )
             )
-        )
-        .merge
-    ).get
+          )
+        }
+    }
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
