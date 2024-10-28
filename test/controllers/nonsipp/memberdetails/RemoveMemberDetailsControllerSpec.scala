@@ -25,7 +25,7 @@ import models.{NameDOB, NormalMode}
 import controllers.nonsipp.memberdetails.RemoveMemberDetailsController.{form, viewModel}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsPage, NoNINOPage}
 import org.mockito.Mockito.{reset, when}
 import controllers.nonsipp.memberdetails.routes
 import controllers.ControllerBaseSpec
@@ -43,7 +43,9 @@ class RemoveMemberDetailsControllerSpec extends ControllerBaseSpec {
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(NoNINOPage(srn, refineMV(1)), "reason")
     .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
+    .unsafeSet(NoNINOPage(srn, refineMV(2)), "reason")
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
