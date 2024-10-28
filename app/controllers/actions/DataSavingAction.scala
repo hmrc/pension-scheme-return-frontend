@@ -18,7 +18,7 @@ package controllers.actions
 
 import play.api.mvc.ActionTransformer
 import com.google.inject.ImplementedBy
-import config.Constants.{PREPOPULATION_PREFIX, PREVIOUS_SUBMITTED_PREFIX, UNCHANGED_SESSION_PREFIX}
+import config.Constants.{PREVIOUS_SUBMITTED_PREFIX, UNCHANGED_SESSION_PREFIX}
 import repositories.SessionRepository
 import models.requests.DataRequest
 
@@ -39,10 +39,6 @@ class DataSavingActionImpl @Inject()(sessionRepository: SessionRepository)(
       _ <- request.previousUserAnswers.fold(Future.unit)(
         previousUserAnswers =>
           sessionRepository.set(previousUserAnswers.copy(id = PREVIOUS_SUBMITTED_PREFIX + userAnswersKey))
-      )
-      _ <- request.prePopulationUserAnswers.fold(Future.unit)(
-        prePopulationUserAnswers =>
-          sessionRepository.set(prePopulationUserAnswers.copy(id = PREPOPULATION_PREFIX + userAnswersKey))
       )
     } yield request
   }

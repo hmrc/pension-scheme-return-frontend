@@ -31,7 +31,6 @@ case class OptionalDataRequest[A](
   userAnswers: Option[UserAnswers],
   pureUserAnswers: Option[UserAnswers] = None,
   previousUserAnswers: Option[UserAnswers] = None,
-  prePopulationUserAnswers: Option[UserAnswers] = None,
   year: Option[String] = None,
   currentVersion: Option[Int] = None,
   previousVersion: Option[Int] = None
@@ -51,7 +50,6 @@ case class DataRequest[A](
   userAnswers: UserAnswers,
   pureUserAnswers: Option[UserAnswers] = None,
   previousUserAnswers: Option[UserAnswers] = None,
-  prePopulationUserAnswers: Option[UserAnswers] = None,
   year: Option[String] = None,
   currentVersion: Option[Int] = None,
   previousVersion: Option[Int] = None

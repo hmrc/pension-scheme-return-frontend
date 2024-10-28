@@ -40,7 +40,6 @@ class DataRequiredActionImpl @Inject()(implicit val executionContext: ExecutionC
               userAnswers = data,
               pureUserAnswers = request.pureUserAnswers,
               previousUserAnswers = request.previousUserAnswers,
-              prePopulationUserAnswers = request.prePopulationUserAnswers,
               year = request.year,
               currentVersion = request.currentVersion,
               previousVersion = request.previousVersion

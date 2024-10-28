@@ -170,18 +170,18 @@ class LoansTransformer @Inject() extends Transformer {
                         optRecipientSponsoringEmployer,
                         LoanPeriod(datePeriodLoanDetails._1, datePeriodLoanDetails._2.value, datePeriodLoanDetails._3),
                         LoanAmountDetails(
-                          loanAmount.value,
-                          capRepaymentCY.value,
-                          amountOutstanding.value
+                          loanAmount.value, // ???? Why not to delete
+                          capRepaymentCY.value, //delete
+                          amountOutstanding.value //delete
                         ),
                         equalInstallments,
                         LoanInterestDetails(
-                          loanInterestAmount.value,
-                          loanInterestRate.value,
-                          intReceivedCY.value
+                          loanInterestAmount.value, // ???? Why not to delete
+                          loanInterestRate.value, // ???? Why not to delete
+                          intReceivedCY.value //delete
                         ),
                         optSecurity.map(_.security),
-                        optOutstandingArrearsOnLoan.map(_.value)
+                        optOutstandingArrearsOnLoan.map(_.value) // delete
                       )
                     }
                 }
