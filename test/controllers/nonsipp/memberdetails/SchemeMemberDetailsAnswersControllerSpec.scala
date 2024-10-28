@@ -218,7 +218,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
         act.like(
           saveAndContinue(
-            call = onSubmit(CheckMode),
+            call = onSubmit(NormalMode),
             userAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.Changed),
             pureUserAnswers = userAnswersWithNino.unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.New).some,
             expectations = (ua: UserAnswers) =>

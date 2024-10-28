@@ -110,7 +110,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      lazy val memberDetailsChanged: Boolean = (for {
+      val memberDetailsChanged: Boolean = (for {
         initial <- request.pureUserAnswers
         initialMemberPayments <- initial.buildMemberDetails(srn, index)
         currentMemberPayments <- request.userAnswers.buildMemberDetails(srn, index)
@@ -135,6 +135,10 @@ class SchemeMemberDetailsAnswersController @Inject()(
           )
           // If member is already CHANGED, do not override with NEW if user goes back to CYA page on check mode
           .setWhen(justAdded)(MemberStatus(srn, index), MemberState.New)
+          .setWhen(mode.isCheckMode && request.userAnswers.get(MemberDetailsCompletedPage(srn, index)).isEmpty)(
+            MemberStatus(srn, index),
+            MemberState.New
+          )
           .setWhen(justAdded)(SafeToHardDelete(srn, index), Flag)
           .set(MemberDetailsCompletedPage(srn, index), SectionCompleted)
           .mapK[Future]
