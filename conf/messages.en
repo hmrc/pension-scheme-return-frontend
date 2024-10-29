@@ -826,6 +826,7 @@ sharesDisposal.cya.nino = National Insurance number
 sharesDisposal.cya.crn = Company Registration Number (CRN)
 sharesDisposal.cya.utr = Unique Taxpayer Reference (UTR)
 sharesDisposal.cya.details = details
+sharesDisposal.cya.inset.maximumReached = You cannot report another disposal of these shares as you have reached the maximum of disposing it 50 times. If you need to remove a disposal, you can do this on the next page.
 
 sharesDisposal.viewOnly.title = View details of the disposal of shares in this company
 sharesDisposal.viewOnly.heading = Disposal of shares in {0}
@@ -2133,6 +2134,8 @@ landPropertyDisposalCYA.change.heading = Change details for the disposal of {0}
 
 landPropertyDisposalCYA.viewOnly.title = View details for land or property disposal
 landPropertyDisposalCYA.viewOnly.heading = Disposal of {0}
+
+landPropertyDisposalCYA.inset.maximumReached = You cannot report another disposal of this land and property as you have reached the maximum of disposing it 50 times. If you need to remove a disposal, you can do this on the next page.
 
 landOrPropertyDisposalList.title = You have reported {0} land or property disposal
 landOrPropertyDisposalList.title.plural = You have reported {0} land or property disposals
@@ -3460,6 +3463,7 @@ bondsDisposalCYA.change.heading = Change details of bond disposal
 
 bondsDisposalCYA.viewOnly.title = View details of bond disposals
 bondsDisposalCYA.viewOnly.heading = Disposal of {0}
+bondsDisposalCYA.inset.maximumReached = You cannot report another disposal of these bonds as you have reached the maximum of disposing it 50 times. If you need to remove a disposal, you can do this on the next page.
 
 bondsDisposal.reportBondsDisposalList.title = You have reported {0} bond disposal
 bondsDisposal.reportBondsDisposalList.title.plural = You have reported {0} bond disposals
@@ -3673,6 +3677,7 @@ assetDisposalCYA.identityType.pageContent = An individual
 assetDisposalCYA.identityType.pageContent1 = A UK company
 assetDisposalCYA.identityType.pageContent2 = A UK partnership
 assetDisposalCYA.identityType.pageContent3 = Other
+assetDisposalCYA.inset.maximumReached = You cannot report another disposal of this asset as you have reached the maximum of disposing it 50 times. If you need to remove a disposal, you can do this on the next page.
 
 assetDisposalCYA.change.title = Change details of asset disposal
 assetDisposalCYA.change.heading = Change details of asset disposal
