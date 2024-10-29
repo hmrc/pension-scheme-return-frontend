@@ -23,6 +23,7 @@ import utils.ListUtils.ListOps
 import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
 import models.SchemeHoldShare.Transfer
 import cats.implicits.toShow
+import config.Constants.maxDisposalsPerShare
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal._
 import models.requests.DataRequest
@@ -60,7 +61,7 @@ class SharesDisposalCYAController @Inject()(
     extends PSRController {
 
   def onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
+    identifyAndRequireData(srn).async { implicit request =>
       // Clear any PointOfEntry
       saveService
         .save(
@@ -81,148 +82,159 @@ class SharesDisposalCYAController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] =
-    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    identifyAndRequireData(srn, mode, year, current, previous).async { implicit request =>
       onPageLoadCommon(srn, shareIndex, disposalIndex, mode)
     }
 
   def onPageLoadCommon(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode)(
     implicit request: DataRequest[AnyContent]
-  ): Result =
+  ): Future[Result] =
     (
       for {
+        updatedUserAnswers <- request.userAnswers
+          .set(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.Completed)
+          .toOption
+          .getOrRecoverJourneyT
         // Row 1 (Shares data)
-        sharesType <- request.userAnswers
+        sharesType <- updatedUserAnswers
           .get(TypeOfSharesHeldPage(srn, shareIndex))
-          .getOrRecoverJourney
-        companyName <- request.userAnswers
+          .getOrRecoverJourneyT
+        companyName <- updatedUserAnswers
           .get(CompanyNameRelatedSharesPage(srn, shareIndex))
-          .getOrRecoverJourney
-        acquisitionType <- request.userAnswers
+          .getOrRecoverJourneyT
+        acquisitionType <- updatedUserAnswers
           .get(WhyDoesSchemeHoldSharesPage(srn, shareIndex))
-          .getOrRecoverJourney
+          .getOrRecoverJourneyT
 
         acquisitionDate = Option.when(acquisitionType != Transfer)(
-          request.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, shareIndex)).get
+          updatedUserAnswers.get(WhenDidSchemeAcquireSharesPage(srn, shareIndex)).get
         )
-
         // Row 2 onwards (Shares Disposal data)
-        howSharesDisposed <- request.userAnswers
+        howSharesDisposed <- updatedUserAnswers
           .get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex))
-          .getOrRecoverJourney
-
+          .getOrRecoverJourneyT
         // <Rows conditional on Sold>
         dateSharesSold = Option.when(howSharesDisposed == Sold)(
-          request.userAnswers.get(WhenWereSharesSoldPage(srn, shareIndex, disposalIndex)).get
+          updatedUserAnswers.get(WhenWereSharesSoldPage(srn, shareIndex, disposalIndex)).get
         )
         numberSharesSold = Option.when(howSharesDisposed == Sold)(
-          request.userAnswers.get(HowManySharesSoldPage(srn, shareIndex, disposalIndex)).get
+          updatedUserAnswers.get(HowManySharesSoldPage(srn, shareIndex, disposalIndex)).get
         )
         considerationSharesSold = Option.when(howSharesDisposed == Sold)(
-          request.userAnswers.get(TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex)).get
+          updatedUserAnswers.get(TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex)).get
         )
         buyerIdentity = Option.when(howSharesDisposed == Sold)(
-          request.userAnswers.get(WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex)).get
+          updatedUserAnswers.get(WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex)).get
         )
         buyerName = Option.when(howSharesDisposed == Sold)(
           List(
-            request.userAnswers.get(SharesIndividualBuyerNamePage(srn, shareIndex, disposalIndex)),
-            request.userAnswers.get(CompanyBuyerNamePage(srn, shareIndex, disposalIndex)),
-            request.userAnswers.get(PartnershipBuyerNamePage(srn, shareIndex, disposalIndex)),
-            request.userAnswers
+            updatedUserAnswers.get(SharesIndividualBuyerNamePage(srn, shareIndex, disposalIndex)),
+            updatedUserAnswers.get(CompanyBuyerNamePage(srn, shareIndex, disposalIndex)),
+            updatedUserAnswers.get(PartnershipBuyerNamePage(srn, shareIndex, disposalIndex)),
+            updatedUserAnswers
               .get(OtherBuyerDetailsPage(srn, shareIndex, disposalIndex))
               .map(_.name)
           ).flatten.head
         )
         buyerDetails = Option.when(howSharesDisposed == Sold)(
           List(
-            request.userAnswers
+            updatedUserAnswers
               .get(IndividualBuyerNinoNumberPage(srn, shareIndex, disposalIndex))
               .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
+            updatedUserAnswers
               .get(CompanyBuyerCrnPage(srn, shareIndex, disposalIndex))
               .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
+            updatedUserAnswers
               .get(PartnershipBuyerUtrPage(srn, shareIndex, disposalIndex))
               .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
+            updatedUserAnswers
               .get(OtherBuyerDetailsPage(srn, shareIndex, disposalIndex))
               .map(_.description)
           ).flatten.headOption
         )
         buyerReasonNoDetails = Option.when(howSharesDisposed == Sold)(
           List(
-            request.userAnswers
+            updatedUserAnswers
               .get(IndividualBuyerNinoNumberPage(srn, shareIndex, disposalIndex))
               .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
+            updatedUserAnswers
               .get(CompanyBuyerCrnPage(srn, shareIndex, disposalIndex))
               .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
+            updatedUserAnswers
               .get(PartnershipBuyerUtrPage(srn, shareIndex, disposalIndex))
               .flatMap(_.value.swap.toOption.map(_.value))
           ).flatten.headOption
         )
         isBuyerConnectedParty = Option.when(howSharesDisposed == Sold)(
-          request.userAnswers.get(IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex)).get
+          updatedUserAnswers.get(IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex)).get
         )
         isIndependentValuation = Option.when(howSharesDisposed == Sold)(
-          request.userAnswers.get(IndependentValuationPage(srn, shareIndex, disposalIndex)).get
+          updatedUserAnswers.get(IndependentValuationPage(srn, shareIndex, disposalIndex)).get
         )
-
         // <Rows conditional on Redeemed>
         dateSharesRedeemed = Option.when(howSharesDisposed == Redeemed)(
-          request.userAnswers.get(WhenWereSharesRedeemedPage(srn, shareIndex, disposalIndex)).get
+          updatedUserAnswers.get(WhenWereSharesRedeemedPage(srn, shareIndex, disposalIndex)).get
         )
         numberSharesRedeemed = Option.when(howSharesDisposed == Redeemed)(
-          request.userAnswers.get(HowManySharesRedeemedPage(srn, shareIndex, disposalIndex)).get
+          updatedUserAnswers.get(HowManySharesRedeemedPage(srn, shareIndex, disposalIndex)).get
         )
         considerationSharesRedeemed = Option.when(howSharesDisposed == Redeemed)(
-          request.userAnswers.get(TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex)).get
+          updatedUserAnswers.get(TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex)).get
         )
 
-        // Last row
-        sharesStillHeld <- request.userAnswers
+        sharesStillHeld <- updatedUserAnswers
           .get(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex))
-          .getOrRecoverJourney
+          .getOrRecoverJourneyT
 
         schemeName = request.schemeDetails.schemeName
 
-      } yield Ok(
-        view(
-          viewModel(
-            ViewModelParameters(
-              srn,
-              shareIndex,
-              disposalIndex,
-              sharesType,
-              companyName,
-              acquisitionType,
-              acquisitionDate,
-              howSharesDisposed,
-              dateSharesSold,
-              numberSharesSold,
-              considerationSharesSold,
-              buyerIdentity,
-              buyerName,
-              buyerDetails.flatten,
-              buyerReasonNoDetails.flatten,
-              isBuyerConnectedParty,
-              isIndependentValuation,
-              dateSharesRedeemed,
-              numberSharesRedeemed,
-              considerationSharesRedeemed,
-              sharesStillHeld,
-              schemeName,
-              mode
-            ),
-            viewOnlyUpdated = false, // flag is not displayed on this tier
-            optYear = request.year,
-            optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+        disposalAmount = updatedUserAnswers
+          .map(SharesDisposalProgress.all(srn, shareIndex))
+          .count { case (_, progress) => progress.completed }
+
+        _ <- saveService.save(updatedUserAnswers).liftF
+
+      } yield {
+        val isMaximumReached = disposalAmount >= maxDisposalsPerShare
+
+        Ok(
+          view(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                shareIndex,
+                disposalIndex,
+                sharesType,
+                companyName,
+                acquisitionType,
+                acquisitionDate,
+                howSharesDisposed,
+                dateSharesSold,
+                numberSharesSold,
+                considerationSharesSold,
+                buyerIdentity,
+                buyerName,
+                buyerDetails.flatten,
+                buyerReasonNoDetails.flatten,
+                isBuyerConnectedParty,
+                isIndependentValuation,
+                dateSharesRedeemed,
+                numberSharesRedeemed,
+                considerationSharesRedeemed,
+                sharesStillHeld,
+                schemeName,
+                mode
+              ),
+              viewOnlyUpdated = false,
+              optYear = request.year,
+              optCurrentVersion = request.currentVersion,
+              optPreviousVersion = request.previousVersion,
+              compilationOrSubmissionDate = updatedUserAnswers.get(CompilationOrSubmissionDatePage(srn)),
+              isMaximumReached = isMaximumReached
+            )
           )
         )
-      )
+      }
     ).merge
 
   def onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
@@ -291,7 +303,8 @@ object SharesDisposalCYAController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    compilationOrSubmissionDate: Option[LocalDateTime] = None,
+    isMaximumReached: Boolean
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = parameters.mode,
@@ -310,7 +323,8 @@ object SharesDisposalCYAController {
         .singleSection(
           rows(parameters)
         )
-        .withMarginBottom(Margin.Fixed60Bottom),
+        .withMarginBottom(Margin.Fixed60Bottom)
+        .withInset(Option.when(isMaximumReached)(Message("sharesDisposal.cya.inset.maximumReached"))),
       refresh = None,
       buttonText =
         parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
@@ -327,7 +341,6 @@ object SharesDisposalCYAController {
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
-                // view-only continue button always navigates back to the first list page if paginating
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onSubmitViewOnly(parameters.srn, 1, year, currentVersion, previousVersion)
               case _ =>

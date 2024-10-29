@@ -22,8 +22,8 @@ import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
 import cats.implicits.toShow
+import config.Constants.maxDisposalPerOtherAsset
 import controllers.actions._
-import play.api.i18n._
 import models.requests.DataRequest
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import models.HowDisposed._
@@ -36,6 +36,8 @@ import controllers.nonsipp.otherassetsdisposal.AssetDisposalCYAController._
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
+import play.api.i18n._
+import viewmodels.Margin
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
@@ -62,7 +64,7 @@ class AssetDisposalCYAController @Inject()(
     disposalIndex: Max50,
     mode: Mode
   ): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
+    identifyAndRequireData(srn).async { implicit request =>
       onPageLoadCommon(srn, index, disposalIndex, mode)
     }
 
@@ -75,45 +77,56 @@ class AssetDisposalCYAController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] =
-    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    identifyAndRequireData(srn, mode, year, current, previous).async { implicit request =>
       onPageLoadCommon(srn, index, disposalIndex, mode)
     }
 
   def onPageLoadCommon(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode)(
     implicit request: DataRequest[AnyContent]
-  ): Result =
+  ): Future[Result] =
     (
       for {
-        howWasAssetDisposed <- requiredPage(HowWasAssetDisposedOfPage(srn, index, disposalIndex))
-        whatIsOtherAsset <- requiredPage(WhatIsOtherAssetPage(srn, index))
-        anyPartAssetStillHeld <- requiredPage(AnyPartAssetStillHeldPage(srn, index, disposalIndex))
+        updatedUserAnswers <- request.userAnswers
+          .set(OtherAssetsDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
+          .toOption
+          .getOrRecoverJourneyT
+
+        howWasAssetDisposed <- updatedUserAnswers
+          .get(HowWasAssetDisposedOfPage(srn, index, disposalIndex))
+          .getOrRecoverJourneyT
+        whatIsOtherAsset <- updatedUserAnswers
+          .get(WhatIsOtherAssetPage(srn, index))
+          .getOrRecoverJourneyT
+        anyPartAssetStillHeld <- updatedUserAnswers
+          .get(AnyPartAssetStillHeldPage(srn, index, disposalIndex))
+          .getOrRecoverJourneyT
 
         totalConsiderationSale = Option.when(howWasAssetDisposed == Sold)(
-          request.userAnswers.get(TotalConsiderationSaleAssetPage(srn, index, disposalIndex)).get
+          updatedUserAnswers.get(TotalConsiderationSaleAssetPage(srn, index, disposalIndex)).get
         )
         independentValuation = Option.when(howWasAssetDisposed == Sold)(
-          request.userAnswers.get(AssetSaleIndependentValuationPage(srn, index, disposalIndex)).get
+          updatedUserAnswers.get(AssetSaleIndependentValuationPage(srn, index, disposalIndex)).get
         )
         assetDisposedType = Option.when(howWasAssetDisposed == Sold)(
-          request.userAnswers
+          updatedUserAnswers
             .get(TypeOfAssetBuyerPage(srn: Srn, index, disposalIndex))
             .get
         )
 
         whenWasAssetSold = Option.when(howWasAssetDisposed == Sold)(
-          request.userAnswers.get(WhenWasAssetSoldPage(srn, index, disposalIndex)).get
+          updatedUserAnswers.get(WhenWasAssetSoldPage(srn, index, disposalIndex)).get
         )
 
         assetDisposalBuyerConnectedParty = Option.when(howWasAssetDisposed == Sold)(
-          request.userAnswers.get(IsBuyerConnectedPartyPage(srn, index, disposalIndex)).get
+          updatedUserAnswers.get(IsBuyerConnectedPartyPage(srn, index, disposalIndex)).get
         )
 
         recipientName = Option.when(howWasAssetDisposed == Sold)(
           List(
-            request.userAnswers.get(IndividualNameOfAssetBuyerPage(srn, index, disposalIndex)),
-            request.userAnswers.get(CompanyNameOfAssetBuyerPage(srn, index, disposalIndex)),
-            request.userAnswers.get(PartnershipBuyerNamePage(srn, index, disposalIndex)),
-            request.userAnswers
+            updatedUserAnswers.get(IndividualNameOfAssetBuyerPage(srn, index, disposalIndex)),
+            updatedUserAnswers.get(CompanyNameOfAssetBuyerPage(srn, index, disposalIndex)),
+            updatedUserAnswers.get(PartnershipBuyerNamePage(srn, index, disposalIndex)),
+            updatedUserAnswers
               .get(OtherBuyerDetailsPage(srn, index, disposalIndex))
               .map(_.name)
           ).flatten.head
@@ -121,16 +134,16 @@ class AssetDisposalCYAController @Inject()(
 
         recipientDetails = Option.when(howWasAssetDisposed == Sold)(
           List(
-            request.userAnswers
+            updatedUserAnswers
               .get(AssetIndividualBuyerNiNumberPage(srn, index, disposalIndex))
               .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
+            updatedUserAnswers
               .get(AssetCompanyBuyerCrnPage(srn, index, disposalIndex))
               .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
+            updatedUserAnswers
               .get(PartnershipBuyerUtrPage(srn, index, disposalIndex))
               .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
+            updatedUserAnswers
               .get(OtherBuyerDetailsPage(srn, index, disposalIndex))
               .map(_.description)
           ).flatten.headOption
@@ -138,18 +151,24 @@ class AssetDisposalCYAController @Inject()(
 
         recipientReasonNoDetails = Option.when(howWasAssetDisposed == Sold)(
           List(
-            request.userAnswers
+            updatedUserAnswers
               .get(AssetIndividualBuyerNiNumberPage(srn, index, disposalIndex))
               .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
+            updatedUserAnswers
               .get(AssetCompanyBuyerCrnPage(srn, index, disposalIndex))
               .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
+            updatedUserAnswers
               .get(PartnershipBuyerUtrPage(srn, index, disposalIndex))
               .flatMap(_.value.swap.toOption.map(_.value))
           ).flatten.headOption
         )
         schemeName = request.schemeDetails.schemeName
+
+        disposalAmount = updatedUserAnswers
+          .map(OtherAssetsDisposalProgress.all(srn, index))
+          .count { case (_, progress) => progress.completed }
+
+        isMaximumReached = disposalAmount >= maxDisposalPerOtherAsset
 
       } yield Ok(
         view(
@@ -176,7 +195,8 @@ class AssetDisposalCYAController @Inject()(
             optYear = request.year,
             optCurrentVersion = request.currentVersion,
             optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+            compilationOrSubmissionDate = updatedUserAnswers.get(CompilationOrSubmissionDatePage(srn)),
+            isMaximumReached = isMaximumReached
           )
         )
       )
@@ -240,7 +260,8 @@ object AssetDisposalCYAController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    compilationOrSubmissionDate: Option[LocalDateTime] = None,
+    isMaximumReached: Boolean
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = parameters.mode,
@@ -255,25 +276,28 @@ object AssetDisposalCYAController {
         viewOnly = Message("assetDisposalCYA.viewOnly.heading", parameters.whatIsOtherAsset)
       ),
       description = Some(ParagraphMessage("assetDisposalCYA.paragraph")),
-      page = CheckYourAnswersViewModel.singleSection(
-        rows(
-          parameters.srn,
-          parameters.index,
-          parameters.disposalIndex,
-          parameters.schemeName,
-          parameters.howWasAssetDisposed,
-          parameters.whenWasAssetSold,
-          parameters.whatIsOtherAsset,
-          parameters.assetDisposedType,
-          parameters.recipientReasonNoDetails,
-          parameters.assetDisposalBuyerConnectedParty,
-          parameters.totalConsiderationSale,
-          parameters.independentValuation,
-          parameters.anyPartAssetStillHeld,
-          parameters.recipientName,
-          parameters.recipientDetails
+      page = CheckYourAnswersViewModel
+        .singleSection(
+          rows(
+            parameters.srn,
+            parameters.index,
+            parameters.disposalIndex,
+            parameters.schemeName,
+            parameters.howWasAssetDisposed,
+            parameters.whenWasAssetSold,
+            parameters.whatIsOtherAsset,
+            parameters.assetDisposedType,
+            parameters.recipientReasonNoDetails,
+            parameters.assetDisposalBuyerConnectedParty,
+            parameters.totalConsiderationSale,
+            parameters.independentValuation,
+            parameters.anyPartAssetStillHeld,
+            parameters.recipientName,
+            parameters.recipientDetails
+          )
         )
-      ),
+        .withMarginBottom(Margin.Fixed60Bottom)
+        .withInset(Option.when(isMaximumReached)(Message("assetDisposalCYA.inset.maximumReached"))),
       refresh = None,
       buttonText =
         parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
