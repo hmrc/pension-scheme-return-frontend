@@ -54,7 +54,7 @@
       @{
           viewmodel.page.fields.zipWithIndex.map {
             case (field @ QuestionField(_, _, width, _, FieldType.Input), index) => input(index, width, field)
-            case (field @ QuestionField(_, _, _,_, FieldType.Currency), index) => currency(index, field)
+            case (field @ QuestionField(_, _, _, _, FieldType.Currency), index) => currency(index, field)
             case (field @ QuestionField(_, _, _, _, FieldType.Percentage), index) => percentage(index, field)
             case (field @ QuestionField(_, _, _, _, FieldType.Date), index) => date(index, field)
             case (field @ QuestionField(_, _, _, _, FieldType.Select), index) => select(index, field)

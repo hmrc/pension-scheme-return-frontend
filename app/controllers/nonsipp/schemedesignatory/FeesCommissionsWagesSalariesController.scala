@@ -29,11 +29,11 @@ import forms.MoneyFormProvider
 import models._
 import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
-import views.html.MoneyView
+import views.html.MoneyViewWithDescription
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.{Empty, Message}
+import viewmodels.DisplayMessage._
 import viewmodels.models.{FormPageViewModel, QuestionField}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,7 +47,7 @@ class FeesCommissionsWagesSalariesController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: MoneyFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: MoneyView
+  view: MoneyViewWithDescription
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -56,7 +56,7 @@ class FeesCommissionsWagesSalariesController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val preparedForm = request.userAnswers.fillForm(FeesCommissionsWagesSalariesPage(srn, mode), form)
-    Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, form, mode)))
+    Ok(view(preparedForm, viewModel(srn, form, mode)))
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
@@ -68,7 +68,7 @@ class FeesCommissionsWagesSalariesController @Inject()(
             BadRequest(
               view(
                 formWithErrors,
-                viewModel(srn, request.schemeDetails.schemeName, form, mode)
+                viewModel(srn, form, mode)
               )
             )
           ),
@@ -98,14 +98,34 @@ object FeesCommissionsWagesSalariesController {
     )
   )
 
-  def viewModel(srn: Srn, schemeName: String, form: Form[Money], mode: Mode): FormPageViewModel[SingleQuestion[Money]] =
+  def viewModel(
+    srn: Srn,
+    form: Form[Money],
+    mode: Mode
+  ): FormPageViewModel[SingleQuestion[Money]] =
     FormPageViewModel(
-      "feesCommissionsWagesSalaries.title",
-      Message("feesCommissionsWagesSalaries.heading", schemeName),
-      SingleQuestion(
+      title = "feesCommissionsWagesSalaries.title",
+      heading = "feesCommissionsWagesSalaries.heading",
+      page = SingleQuestion(
         form,
-        QuestionField.input(Empty, Some("feesCommissionsWagesSalaries.hint"))
+        QuestionField.currency("feesCommissionsWagesSalaries.label", Some("feesCommissionsWagesSalaries.hint"))
       ),
-      routes.FeesCommissionsWagesSalariesController.onSubmit(srn, mode)
+      onSubmit = routes.FeesCommissionsWagesSalariesController.onSubmit(srn, mode)
+    ).withDescription(
+      ParagraphMessage("feesCommissionsWagesSalaries.paragraph1") ++
+        ParagraphMessage("feesCommissionsWagesSalaries.paragraph2") ++
+        ListMessage(
+          ListType.Bullet,
+          "feesCommissionsWagesSalaries.bullet1",
+          "feesCommissionsWagesSalaries.bullet2"
+        ) ++
+        ParagraphMessage("feesCommissionsWagesSalaries.paragraph3") ++
+        ListMessage(
+          ListType.Bullet,
+          "feesCommissionsWagesSalaries.bullet3",
+          "feesCommissionsWagesSalaries.bullet4"
+        ) ++
+        ParagraphMessage("feesCommissionsWagesSalaries.paragraph4") ++
+        ParagraphMessage("feesCommissionsWagesSalaries.paragraph5")
     )
 }

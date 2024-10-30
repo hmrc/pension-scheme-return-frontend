@@ -20,16 +20,16 @@ import play.api.test.FakeRequest
 import play.api.mvc.AnyContentAsEmpty
 import forms.mappings.Mappings
 import play.api.data.Forms.mapping
-import views.html.MoneyView
+import views.html.MoneyViewWithDescription
 import org.scalacheck.Gen
 import play.api.data
 import models.Money
 import forms.mappings.errors.MoneyFormErrors
 
-class MoneyViewSpec extends ViewSpec with Mappings {
+class MoneyViewWithDescriptionSpec extends ViewSpec with Mappings {
 
   runningApplication { implicit app =>
-    val view = injected[MoneyView]
+    val view = injected[MoneyViewWithDescription]
 
     val moneyMapping = money(MoneyFormErrors.default(requiredKey = "money.error.required"))
     val moneyForm: data.Form[Money] = data.Form("value" -> moneyMapping)
@@ -51,14 +51,11 @@ class MoneyViewSpec extends ViewSpec with Mappings {
 
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
-    "MoneyView" - {
+    "MoneyViewWithDescription" - {
 
       act.like(renderTitle(viewModelGen)(view(moneyForm, _), _.title.key))
       act.like(renderHeading(viewModelGen)(view(moneyForm, _), _.heading))
-      act.like(renderInputWithLabel(singleMoneyQuestion)("value", view(moneyForm, _), _.heading))
-      act.like(renderInputWithLabel(tripleMoneyQuestion)("value.1", view(moneyForm, _), _.page.fields.head.label))
-      act.like(renderInputWithLabel(tripleMoneyQuestion)("value.2", view(moneyForm, _), _.page.fields(1).label))
-      act.like(renderInputWithLabel(tripleMoneyQuestion)("value.3", view(moneyForm, _), _.page.fields(2).label))
+      act.like(renderInputWithLabel(singleMoneyQuestion)("value", view(moneyForm, _), _.page.firstField.label))
       act.like(renderErrors(invalidSingleMoneyQuestion)(view(invalidMoneyForm, _), _ => "money.error.required"))
       act.like(renderForm(viewModelGen)(view(moneyForm, _), _.onSubmit))
       act.like(renderButtonText(viewModelGen)(view(moneyForm, _), _.buttonText))

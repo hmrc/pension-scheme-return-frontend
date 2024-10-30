@@ -34,39 +34,20 @@
       @govukErrorSummary(ErrorSummaryViewModel(form))
     }
 
-    @if(viewmodel.page.fields.length > 1) {
       <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
-
-      @viewmodel.description.map(renderMessage)
-
-      @viewmodel.page.fields.zipWithIndex.map { case (field, index) =>
-        @govukInput(
-          InputViewModel(
-            field = form(s"value.${index + 1}"),
-            label = LabelViewModel(renderMessage(field.label))
-          )
-          .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
-          .asNumeric()
-          .withWidth(Fixed10)
-          .withPrefix(PrefixOrSuffix(content = Text("£")))
-        )
-      }
-
-    } else {
 
       @viewmodel.description.map(renderMessage)
 
       @govukInput(
         InputViewModel(
           field = form("value"),
-          label = LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading()
+          label = LabelViewModel(renderMessage(viewmodel.page.firstField.label)).withCssClass("govuk-label govuk-label--m")
         )
         .withHint(viewmodel.page.firstField.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
         .asNumeric()
         .withWidth(Fixed10)
         .withPrefix(PrefixOrSuffix(content = Text("£")))
       )
-    }
 
     @govukButton(
       ButtonViewModel(renderMessage(viewmodel.buttonText))
