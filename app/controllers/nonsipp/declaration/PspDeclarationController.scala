@@ -141,7 +141,7 @@ class PspDeclarationController @Inject()(
                   _ <- if (bypassed && hasNumberOfMembersChangedToOver99) {
                     psrSubmissionService.submitPsrDetailsBypassed(
                       srn = srn,
-                      fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
+                      fallbackCall = controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
                     )
                   } else {
                     psrSubmissionService.submitPsrDetails(
