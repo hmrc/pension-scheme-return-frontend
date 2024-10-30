@@ -84,37 +84,41 @@ class BondsDisposalCYAController @Inject()(
   ): Result =
     (
       for {
-        bondsName <- request.userAnswers
+        updatedUserAnswers <- request.userAnswers
+          .set(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.Completed)
+          .toOption
+          .getOrRecoverJourney
+        bondsName <- updatedUserAnswers
           .get(NameOfBondsPage(srn, bondIndex))
           .getOrRecoverJourney
-        acquisitionType <- request.userAnswers
+        acquisitionType <- updatedUserAnswers
           .get(WhyDoesSchemeHoldBondsPage(srn, bondIndex))
           .getOrRecoverJourney
-        costOfBonds <- request.userAnswers
+        costOfBonds <- updatedUserAnswers
           .get(CostOfBondsPage(srn, bondIndex))
           .getOrRecoverJourney
 
-        howBondsDisposed <- request.userAnswers
+        howBondsDisposed <- updatedUserAnswers
           .get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex))
           .getOrRecoverJourney
 
         dateBondsSold = Option.when(howBondsDisposed == Sold)(
-          request.userAnswers.get(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex)).get
+          updatedUserAnswers.get(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex)).get
         )
 
         considerationBondsSold = Option.when(howBondsDisposed == Sold)(
-          request.userAnswers.get(TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex)).get
+          updatedUserAnswers.get(TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex)).get
         )
         buyerName = Option.when(howBondsDisposed == Sold)(
-          request.userAnswers.get(BuyerNamePage(srn, bondIndex, disposalIndex)).get
+          updatedUserAnswers.get(BuyerNamePage(srn, bondIndex, disposalIndex)).get
         )
         isBuyerConnectedParty = Option.when(howBondsDisposed == Sold)(
-          request.userAnswers.get(IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex)).get
+          updatedUserAnswers.get(IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex)).get
         )
 
-        bondsStillHeld <- request.userAnswers
-          .get(BondsStillHeldPage(srn, bondIndex, disposalIndex))
-          .getOrRecoverJourney
+        disposalAmount = updatedUserAnswers
+          .map(BondsDisposalProgress.all(srn, bondIndex))
+          .count { case (_, progress) => progress.completed }
 
         schemeName = request.schemeDetails.schemeName
 
@@ -133,7 +137,7 @@ class BondsDisposalCYAController @Inject()(
               considerationBondsSold,
               buyerName,
               isBuyerConnectedParty,
-              bondsStillHeld,
+              disposalAmount,
               schemeName,
               mode
             ),
@@ -150,13 +154,10 @@ class BondsDisposalCYAController @Inject()(
   def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
-        updatedUserAnswers <- Future.fromTry(
-          request.userAnswers.set(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.Completed)
-        )
-        _ <- saveService.save(updatedUserAnswers)
+        _ <- saveService.save(request.userAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
           srn,
-          updatedUserAnswers,
+          request.userAnswers,
           fallbackCall = controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
             .onPageLoad(srn, bondIndex, disposalIndex, mode)
         )
