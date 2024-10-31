@@ -20,7 +20,7 @@ import play.api.test.FakeRequest
 import play.api.mvc.AnyContentAsEmpty
 import repositories.SessionRepository
 import models.UserAnswers
-import models.requests.{AllowedAccessRequest, DataRequest, OptionalDataRequest}
+import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.ArgumentMatchers.any
 import utils.BaseSpec
 import org.mockito.Mockito.{times, verify, when}
@@ -30,7 +30,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class DataCreationActionSpec extends BaseSpec {
 
-  class Harness(request: OptionalDataRequest[AnyContentAsEmpty.type], sessionRepository: SessionRepository)(
+  class Harness(request: AllowedAccessRequest[AnyContentAsEmpty.type], sessionRepository: SessionRepository)(
     implicit ec: ExecutionContext
   ) extends DataCreationActionImpl(sessionRepository)(ec) {
     def callTransform(): Future[DataRequest[AnyContentAsEmpty.type]] =
@@ -42,30 +42,13 @@ class DataCreationActionSpec extends BaseSpec {
 
   "Data Creation Action" - {
 
-    "overwrites user answers in the repository" - {
-      "when there is data in the cache" in {
-        val sessionRepository = mock[SessionRepository]
-        when(sessionRepository.set(any())).thenReturn(Future.successful(()))
-
-        val optionalDataRequest = OptionalDataRequest(request, Some(userAnswers))
-        val action = new Harness(optionalDataRequest, sessionRepository)
-
-        val result = action.callTransform().futureValue
-
-        result.request mustBe request
-        result.userAnswers.id mustBe request.getUserId + request.srn
-        verify(sessionRepository, times(1)).set(any())
-      }
-    }
-
     "add user answers to repository" - {
       "when there is no data in the cache" in {
 
         val sessionRepository = mock[SessionRepository]
         when(sessionRepository.set(any())).thenReturn(Future.successful(()))
 
-        val optionalDataRequest = OptionalDataRequest(request, None)
-        val action = new Harness(optionalDataRequest, sessionRepository)
+        val action = new Harness(request, sessionRepository)
 
         val result = action.callTransform().futureValue
 

@@ -31,15 +31,17 @@ class DataSavingActionImpl @Inject()(sessionRepository: SessionRepository)(
   implicit val executionContext: ExecutionContext
 ) extends DataSavingAction {
 
-  override protected def transform[A](request: DataRequest[A]): Future[DataRequest[A]] =
+  override protected def transform[A](request: DataRequest[A]): Future[DataRequest[A]] = {
+    val userAnswersKey = request.getUserId + request.srn
     for {
       _ <- sessionRepository.set(request.userAnswers)
-      _ <- sessionRepository.set(request.userAnswers.copy(id = UNCHANGED_SESSION_PREFIX + request.userAnswers.id))
+      _ <- sessionRepository.set(request.userAnswers.copy(id = UNCHANGED_SESSION_PREFIX + userAnswersKey))
       _ <- request.previousUserAnswers.fold(Future.unit)(
         previousUserAnswers =>
-          sessionRepository.set(previousUserAnswers.copy(id = PREVIOUS_SUBMITTED_PREFIX + previousUserAnswers.id))
+          sessionRepository.set(previousUserAnswers.copy(id = PREVIOUS_SUBMITTED_PREFIX + userAnswersKey))
       )
     } yield request
+  }
 }
 
 @ImplementedBy(classOf[DataSavingActionImpl])

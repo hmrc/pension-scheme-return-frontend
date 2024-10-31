@@ -17,7 +17,7 @@
 package controllers
 
 import play.api.test.FakeRequest
-import services.{PsrOverviewService, PsrRetrievalService, PsrVersionsService}
+import services._
 import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import play.api.inject.bind
 import views.html.OverviewView
@@ -28,7 +28,7 @@ import models.CheckMode
 import viewmodels.OverviewSummary
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberdetails.DoesMemberHaveNinoPage
-import org.mockito.Mockito.{reset, when}
+import org.mockito.Mockito._
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
 
@@ -37,11 +37,19 @@ import scala.concurrent.Future
 class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
   lazy val onPageLoad: String = routes.OverviewController.onPageLoad(srn).url
-  lazy val onSelectStart: String =
-    routes.OverviewController.onSelectStart(srn, commonStartDate, commonVersion, PsrReportType.Standard.name).url
+  def onSelectStart(lastSubmittedPsrFbInPreviousYears: Option[String]): String =
+    routes.OverviewController
+      .onSelectStart(
+        srn,
+        commonStartDate,
+        commonVersion,
+        PsrReportType.Standard.name,
+        lastSubmittedPsrFbInPreviousYears
+      )
+      .url
   lazy val onSelectContinue: String =
     routes.OverviewController
-      .onSelectContinue(srn, commonStartDate, commonVersion, Some(commonFbNumber), PsrReportType.Standard.name)
+      .onSelectContinue(srn, commonStartDate, commonVersion, Some(commonFbNumber), PsrReportType.Standard.name, None)
       .url
   lazy val onSelectViewAndChange: String =
     routes.OverviewController
@@ -51,17 +59,20 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
   private implicit val mockPsrRetrievalService: PsrRetrievalService = mock[PsrRetrievalService]
   private implicit val mockPsrOverviewService: PsrOverviewService = mock[PsrOverviewService]
   private implicit val mockPsrVersionsService: PsrVersionsService = mock[PsrVersionsService]
+  private implicit val mockPrePopulationService: PrePopulationService = mock[PrePopulationService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrRetrievalService].toInstance(mockPsrRetrievalService),
     bind[PsrOverviewService].toInstance(mockPsrOverviewService),
-    bind[PsrVersionsService].toInstance(mockPsrVersionsService)
+    bind[PsrVersionsService].toInstance(mockPsrVersionsService),
+    bind[PrePopulationService].toInstance(mockPrePopulationService)
   )
 
-  override protected def beforeAll(): Unit = {
+  override protected def beforeEach(): Unit = {
     reset(mockPsrRetrievalService)
     reset(mockPsrOverviewService)
     reset(mockPsrVersionsService)
+    reset(mockPrePopulationService)
   }
 
   "OverviewController" - {
@@ -88,6 +99,9 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual expectedView.toString
+        verify(mockPsrOverviewService, times(1)).getOverview(any(), any(), any(), any())(any(), any())
+        verify(mockPsrVersionsService, times(1)).getVersionsForYears(any(), any(), any())(any(), any())
+        verify(mockPrePopulationService, never).findLastSubmittedPsrFbInPreviousYears(any(), any())
     }
 
     "onPageLoads returns OK and expected content - when submitted responses returned" in runningApplication {
@@ -97,6 +111,9 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
         )
         when(mockPsrVersionsService.getVersionsForYears(any(), any(), any())(any(), any())).thenReturn(
           Future.successful(versionsForYearsResponse)
+        )
+        when(mockPrePopulationService.findLastSubmittedPsrFbInPreviousYears(any(), any())).thenReturn(
+          None
         )
         val request = FakeRequest(GET, onPageLoad)
 
@@ -111,6 +128,9 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
         (content must not).include(
           "<caption class=\"govuk-table__caption govuk-table__caption--m\">Submitted with changes in progress</caption>"
         )
+        verify(mockPsrOverviewService, times(1)).getOverview(any(), any(), any(), any())(any(), any())
+        verify(mockPsrVersionsService, times(1)).getVersionsForYears(any(), any(), any())(any(), any())
+        verify(mockPrePopulationService, times(1)).findLastSubmittedPsrFbInPreviousYears(any(), any())
     }
 
     "onPageLoads returns OK and expected content - when in progress responses returned" in runningApplication {
@@ -120,6 +140,9 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
         )
         when(mockPsrVersionsService.getVersionsForYears(any(), any(), any())(any(), any())).thenReturn(
           Future.successful(versionsForYearsInProgressResponse)
+        )
+        when(mockPrePopulationService.findLastSubmittedPsrFbInPreviousYears(any(), any())).thenReturn(
+          Some("1")
         )
         val request = FakeRequest(GET, onPageLoad)
 
@@ -136,10 +159,13 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
         content must include(
           "<caption class=\"govuk-table__caption govuk-table__caption--m\">Submitted with changes in progress</caption>"
         )
+        verify(mockPsrOverviewService, times(1)).getOverview(any(), any(), any(), any())(any(), any())
+        verify(mockPsrVersionsService, times(1)).getVersionsForYears(any(), any(), any())(any(), any())
+        verify(mockPrePopulationService, times(1)).findLastSubmittedPsrFbInPreviousYears(any(), any())
     }
 
     "onSelectStart redirects to what you will need page" in runningApplication { implicit app =>
-      val request = FakeRequest(GET, onSelectStart)
+      val request = FakeRequest(GET, onSelectStart(None))
 
       val result = route(app, request).value
 
