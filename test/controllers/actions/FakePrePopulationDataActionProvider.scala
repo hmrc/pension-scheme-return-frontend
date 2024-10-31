@@ -16,16 +16,24 @@
 
 package controllers.actions
 
-import models.UserAnswers
-import models.requests.{AllowedAccessRequest, DataRequest}
+import play.api.mvc.ActionTransformer
+import models.requests.DataRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeDataCreationAction(dataToReturn: UserAnswers) extends DataCreationAction {
+import javax.inject.Inject
 
-  override protected def transform[A](request: AllowedAccessRequest[A]): Future[DataRequest[A]] =
-    Future(DataRequest(request, dataToReturn))
+class FakePrePopulationDataActionProvider @Inject() extends PrePopulationDataActionProvider {
 
-  override protected implicit val executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
+  override def apply(
+    optLastSubmittedPsrFbInPreviousYears: Option[String]
+  ): ActionTransformer[DataRequest, DataRequest] =
+    new ActionTransformer[DataRequest, DataRequest] {
+      override def transform[A](
+        request: DataRequest[A]
+      ): Future[DataRequest[A]] =
+        Future.successful(request)
+
+      override protected def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+    }
 }

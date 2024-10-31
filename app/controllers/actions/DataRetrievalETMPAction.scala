@@ -71,7 +71,7 @@ class DataRetrievalETMPAction(
           previousUserAnswers = None,
           Some(year),
           Some(current),
-          previousVersion = Some(0) // this function is only ever called when a the current version is 1 so this is safe
+          previousVersion = Some(0) // this function is only ever called when the current version is 1 so this is safe
         )
       }
     }

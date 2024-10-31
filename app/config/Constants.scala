@@ -30,6 +30,7 @@ object Constants {
   val SUBMISSION_DATE = "SUBMISSION_DATE"
   val SRN = "SRN"
   val SUBMISSION_VIEWED_FLAG = "SUBMISSION_VIEWED_FLAG"
+  val PREPOPULATION_FLAG = "prePopulationFlag"
 
   val psaIdKey = "PSAID"
   val pspIdKey = "PSPID"

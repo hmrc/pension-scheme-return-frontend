@@ -47,8 +47,8 @@ class OverviewController @Inject()(
   config: FrontendAppConfig,
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
-  getData: DataRetrievalAction,
   createData: DataCreationAction,
+  prePopulatedData: PrePopulationDataActionProvider,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   psrOverviewService: PsrOverviewService,
@@ -56,7 +56,8 @@ class OverviewController @Inject()(
   val psrRetrievalService: PsrRetrievalService,
   saveService: SaveService,
   view: OverviewView,
-  taxYearService: TaxYearService
+  taxYearService: TaxYearService,
+  prePopulationService: PrePopulationService
 )(implicit ec: ExecutionContext)
     extends PSRController
     with I18nSupport
@@ -90,12 +91,12 @@ class OverviewController @Inject()(
             val yearFrom = overviewResponse.periodStartDate
             val yearTo = overviewResponse.periodEndDate
             val compiled = overviewResponse.compiledVersionAvailable.getOrElse(YesNo.No) == YesNo.Yes
-            val fbNumber = versionsForYears
-              .find(x => LocalDate.parse(x.startDate) == yearFrom)
-              .flatMap(_.data.sortBy(_.reportVersion).lastOption)
-              .map(_.reportFormBundleNumber)
 
             val (status, url, label) = if (compiled) {
+              val fbNumber = versionsForYears
+                .find(x => LocalDate.parse(x.startDate) == yearFrom)
+                .flatMap(_.data.sortBy(_.reportVersion).lastOption)
+                .map(_.reportFormBundleNumber)
               (
                 ReportStatus.ReportStatusCompiled,
                 controllers.routes.OverviewController
@@ -104,7 +105,8 @@ class OverviewController @Inject()(
                     formatDateForApi(yearFrom),
                     "001",
                     fbNumber,
-                    overviewResponse.psrReportType.get.name
+                    overviewResponse.psrReportType.get.name,
+                    prePopulationService.findLastSubmittedPsrFbInPreviousYears(versionsForYears, yearFrom)
                   )
                   .url,
                 messages("site.continue")
@@ -113,7 +115,13 @@ class OverviewController @Inject()(
               (
                 ReportStatus.NotStarted,
                 controllers.routes.OverviewController
-                  .onSelectStart(srn, formatDateForApi(yearFrom), "001", overviewResponse.psrReportType.get.name)
+                  .onSelectStart(
+                    srn,
+                    formatDateForApi(yearFrom),
+                    "001",
+                    overviewResponse.psrReportType.get.name,
+                    prePopulationService.findLastSubmittedPsrFbInPreviousYears(versionsForYears, yearFrom)
+                  )
                   .url,
                 messages("site.start")
               )
@@ -179,7 +187,8 @@ class OverviewController @Inject()(
                             formatDateForApi(yearFrom),
                             "%03d".format(last.reportVersion),
                             Some(last.reportFormBundleNumber),
-                            reportType
+                            reportType,
+                            None
                           )
                           .url
                       )
@@ -220,7 +229,7 @@ class OverviewController @Inject()(
     }
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).async { implicit request =>
+    identify.andThen(allowAccess(srn)).async { implicit request =>
       val toDate = formatDateForApi(allDates.head._2.from)
       val fromDate = formatDateForApi(allDates.last._2.from)
       for {
@@ -233,36 +242,58 @@ class OverviewController @Inject()(
         .addingToSession((Constants.SRN, srn.value))
     }
 
-  def onSelectStart(srn: Srn, taxYear: String, version: String, reportType: String): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData).async { implicit request =>
-      reportType match {
-        case PsrReportType.Sipp.name =>
-          val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippStartJourney}"
-          Future.successful(
-            Redirect(sippUrl)
-              .addingToSession(Constants.TAX_YEAR -> taxYear)
-              .addingToSession(Constants.VERSION -> version)
-          )
-        case _ =>
-          val yearFrom = LocalDate.parse(taxYear)
-          val yearTo = yearFrom.plusYears(1).minusDays(1)
-          val dateRange = DateRange(yearFrom, yearTo)
-          for {
-            userAnswers <- Future.fromTry(request.userAnswers.set(WhichTaxYearPage(srn), dateRange))
-            _ <- saveService.save(userAnswers.copy(id = UNCHANGED_SESSION_PREFIX + userAnswers.id))
-            _ <- saveService.save(userAnswers)
-          } yield {
-            Redirect(controllers.routes.WhatYouWillNeedController.onPageLoad(srn, "", taxYear, version))
-          }
+  def onSelectStart(
+    srn: Srn,
+    taxYear: String,
+    version: String,
+    reportType: String,
+    lastSubmittedPsrFbInPreviousYears: Option[String]
+  ): Action[AnyContent] =
+    identify
+      .andThen(allowAccess(srn))
+      .andThen(createData)
+      .andThen(
+        prePopulatedData(
+          Option.when(reportType == PsrReportType.Standard.name)(lastSubmittedPsrFbInPreviousYears).flatten
+        )
+      )
+      .async { implicit request =>
+        reportType match {
+          case PsrReportType.Sipp.name =>
+            val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippStartJourney}"
+            Future.successful(
+              Redirect(sippUrl)
+                .addingToSession(Constants.TAX_YEAR -> taxYear)
+                .addingToSession(Constants.VERSION -> version)
+            )
+          case _ =>
+            val yearFrom = LocalDate.parse(taxYear)
+            val yearTo = yearFrom.plusYears(1).minusDays(1)
+            val dateRange = DateRange(yearFrom, yearTo)
+            for {
+              userAnswers <- Future.fromTry(request.userAnswers.set(WhichTaxYearPage(srn), dateRange))
+              _ <- saveService.save(userAnswers.copy(id = UNCHANGED_SESSION_PREFIX + userAnswers.id))
+              _ <- saveService.save(userAnswers)
+            } yield {
+              if (lastSubmittedPsrFbInPreviousYears.isDefined) {
+                Redirect(controllers.routes.WhatYouWillNeedController.onPageLoad(srn, "", taxYear, version))
+                  .addingToSession(Constants.PREPOPULATION_FLAG -> String.valueOf(true))
+              } else {
+                Redirect(
+                  controllers.routes.WhatYouWillNeedController.onPageLoad(srn, "", taxYear, version)
+                ).addingToSession(Constants.PREPOPULATION_FLAG -> String.valueOf(false))
+              }
+            }
+        }
       }
-    }
 
   def onSelectContinue(
     srn: Srn,
     taxYear: String,
     version: String,
     fbNumber: Option[String],
-    reportType: String
+    reportType: String,
+    lastSubmittedPsrFbInPreviousYears: Option[String]
   ): Action[AnyContent] =
     identifyAndRequireData(srn, taxYear, version).async { implicit request =>
       reportType match {
@@ -278,6 +309,12 @@ class OverviewController @Inject()(
               .getOrElse(result)
           }
         case _ =>
+          Future.successful(
+            Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
+              .addingToSession(
+                Constants.PREPOPULATION_FLAG -> String.valueOf(lastSubmittedPsrFbInPreviousYears.isDefined)
+              )
+          )
           Future.successful(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
       }
     }
@@ -301,7 +338,9 @@ class OverviewController @Inject()(
           val byPassedJourney =
             Redirect(controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode))
           val regularJourney = Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
-          isJourneyBypassed(srn).map(res => res.map(if (_) byPassedJourney else regularJourney).merge)
+          isJourneyBypassed(srn)
+            .map(res => res.map(if (_) byPassedJourney else regularJourney).merge)
+            .map(_.addingToSession(Constants.PREPOPULATION_FLAG -> String.valueOf(false)))
       }
     }
 }
