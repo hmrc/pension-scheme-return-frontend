@@ -61,7 +61,7 @@ object CheckStatusUtils {
 
   /**
    * This method determines whether or not a Land or Property record needs to be checked. A record needs checking if
-   * all of the pre-populated-then-cleared answers are missing & all of the other answers are present.
+   * any of the pre-populated-then-cleared answers are missing & all of the other answers are present.
    * @param userAnswers the answers provided by the user, from which we get the Land or Property record
    * @param srn the Scheme Reference Number, used for the .get calls
    * @param recordIndex the index of the record being checked
@@ -72,18 +72,19 @@ object CheckStatusUtils {
     srn: Srn,
     recordIndex: Max5000
   ): Boolean = {
-    val prePopClearedAnswersMissing: Boolean = (
+    val anyPrePopClearedAnswersMissing: Boolean = (
       userAnswers.get(IsLandOrPropertyResidentialPage(srn, recordIndex)),
       userAnswers.get(IsLandPropertyLeasedPage(srn, recordIndex)),
       userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, recordIndex)),
       userAnswers.get(IsLesseeConnectedPartyPage(srn, recordIndex)),
       userAnswers.get(LandOrPropertyTotalIncomePage(srn, recordIndex))
     ) match {
-      case (None, None, None, None, None) => true
-      case (_, _, _, _, _) => false
+      case (Some(_), Some(true), Some(_), Some(_), Some(_)) => false
+      case (Some(_), Some(false), None, None, Some(_)) => false
+      case (_, _, _, _, _) => true
     }
 
-    lazy val otherAnswersPresent: Boolean = (
+    lazy val allOtherAnswersPresent: Boolean = (
       userAnswers.get(LandPropertyInUKPage(srn, recordIndex)),
       userAnswers.get(LandOrPropertyChosenAddressPage(srn, recordIndex)),
       userAnswers.get(LandRegistryTitleNumberPage(srn, recordIndex)),
@@ -111,7 +112,7 @@ object CheckStatusUtils {
         false
     }
 
-    prePopClearedAnswersMissing && otherAnswersPresent
+    anyPrePopClearedAnswersMissing && allOtherAnswersPresent
   }
 
   /**

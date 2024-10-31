@@ -272,6 +272,19 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
 
         checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe true
       }
+
+      "when some pre-pop-cleared answers are present and some are missing" in {
+        val userAnswers =
+          addLOPBaseAnswers(
+            index1of5000,
+            addLOPContributionAnswers(
+              index1of5000,
+              landOrPropertyHeldTrue
+            )
+          ).unsafeSet(IsLandOrPropertyResidentialPage(srn, index1of5000), true)
+
+        checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe true
+      }
     }
 
     "must be false" - {
@@ -298,20 +311,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
         checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe false
       }
 
-      "when 1 pre-pop-cleared answer is present" in {
-        val userAnswers =
-          addLOPBaseAnswers(
-            index1of5000,
-            addLOPContributionAnswers(
-              index1of5000,
-              landOrPropertyHeldTrue
-            )
-          ).unsafeSet(IsLandOrPropertyResidentialPage(srn, index1of5000), true)
-
-        checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe false
-      }
-
-      "when all pre-pop-cleared answers are present" in {
+      "when all pre-pop-cleared answers are present (leased)" in {
         val userAnswers =
           addLOPBaseAnswers(
             index1of5000,
@@ -323,6 +323,24 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
               )
             )
           )
+
+        checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe false
+      }
+
+      "when all pre-pop-cleared answers are present (not leased)" in {
+        val userAnswers =
+          addLOPBaseAnswers(
+            index1of5000,
+            addLOPContributionAnswers(
+              index1of5000,
+              addLOPPrePopAnswers(
+                index1of5000,
+                landOrPropertyHeldTrue
+              )
+            )
+          ).unsafeSet(IsLandOrPropertyResidentialPage(srn, index1of5000), true)
+            .unsafeSet(IsLandPropertyLeasedPage(srn, index1of5000), false)
+            .unsafeSet(LandOrPropertyTotalIncomePage(srn, index1of5000), money)
 
         checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe false
       }
