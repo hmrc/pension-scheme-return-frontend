@@ -16,11 +16,13 @@
 
 package transformations
 
+import config.RefinedTypes.{Max5, Max5000}
 import play.api.test.FakeRequest
 import play.api.mvc.AnyContentAsEmpty
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import controllers.TestValues
-import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
+import eu.timepit.refined.refineMV
+import pages.nonsipp.landorproperty.{LandOrPropertyHeldPage, LandPropertyInUKPage}
 import models.requests.psr._
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
@@ -45,6 +47,7 @@ class AssetsTransformerSpec
     with TestValues
     with BeforeAndAfterEach {
 
+  private val index: Max5000 = refineMV(1)
   val allowedAccessRequest
     : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
@@ -89,6 +92,19 @@ class AssetsTransformerSpec
 
       val result = transformer.transformToEtmp(srn, defaultUserAnswers)(DataRequest(allowedAccessRequest, userAnswers))
       result mustBe Some(Assets(optLandOrProperty = None, optBorrowing = None, optBonds = None, optOtherAssets = None))
+    }
+
+    "should return Some Asset when LandOrPropertyHeldPage is None but data is present - pre-population" in {
+      val userAnswers = emptyUserAnswers
+        .unsafeSet(LandPropertyInUKPage(srn, index), true)
+
+      when(mockLandOrPropertyTransformer.transformToEtmp(any(), any(), any())(any())).thenReturn(Some(prePopulatedLandOrProperty))
+      when(mockBorrowingTransformer.transformToEtmp(any(), any(), any())(any())).thenReturn(None)
+      when(mockBondsTransformer.transformToEtmp(any(), any(), any())(any())).thenReturn(None)
+      when(mockOtherAssetsTransformer.transformToEtmp(any(), any(), any())(any())).thenReturn(None)
+
+      val result = transformer.transformToEtmp(srn, defaultUserAnswers)(DataRequest(allowedAccessRequest, userAnswers))
+      result must not be None
     }
   }
 
@@ -182,6 +198,13 @@ object AssetsTransformerSpec {
     optBorrowing = None,
     optBonds = None,
     optOtherAssets = None
+  )
+
+  val prePopulatedLandOrProperty: LandOrProperty = LandOrProperty(
+    None,
+    optLandOrPropertyHeld = None,
+    disposeAnyLandOrProperty = true,
+    landOrPropertyTransactions = Seq.empty // tests don't need to check these transactions in detail
   )
 
   val assetsWithBorrowing: Assets = Assets(
