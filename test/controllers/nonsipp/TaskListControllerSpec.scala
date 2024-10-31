@@ -21,6 +21,7 @@ import models.ConditionalYesNo._
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
 import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, OtherAssetsHeldPage, WhatIsOtherAssetPage}
 import views.html.TaskListView
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import eu.timepit.refined.refineMV
 import models.backend.responses.{PsrVersionsResponse, ReportStatus}
 import models._
@@ -44,9 +45,9 @@ import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import play.api.inject
 import viewmodels.models.TaskListStatus.TaskListStatus
 import pages.nonsipp.common.IdentityTypePage
-import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 import scala.concurrent.Future
+
 import java.time.LocalDateTime
 
 class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {

@@ -123,7 +123,7 @@ object CheckStatusUtils {
    * @param identityType relates to the seller involved: Individual, UKCompany, UKPartnership, or Other
    * @return true if all answers are present, else false
    */
-  def identitySubjectAnswersPresent(
+  private def identitySubjectAnswersPresent(
     userAnswers: UserAnswers,
     srn: Srn,
     recordIndex: Max5000,

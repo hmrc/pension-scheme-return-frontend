@@ -163,11 +163,11 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
 
       "when landOrPropertyHeld is Some(true) and 1 record is present which doesn't need checking" in {
         val userAnswers =
-          addLOPPrePopAnswers(
+          addLOPBaseAnswers(
             index1of5000,
             addLOPTransferAnswers(
               index1of5000,
-              addLOPBaseAnswers(
+              addLOPPrePopAnswers(
                 index1of5000,
                 landOrPropertyHeldTrue
               )
@@ -300,9 +300,9 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
 
       "when 1 pre-pop-cleared answer is present" in {
         val userAnswers =
-          addLOPContributionAnswers(
+          addLOPBaseAnswers(
             index1of5000,
-            addLOPBaseAnswers(
+            addLOPContributionAnswers(
               index1of5000,
               landOrPropertyHeldTrue
             )
@@ -313,11 +313,11 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
 
       "when all pre-pop-cleared answers are present" in {
         val userAnswers =
-          addLOPPrePopAnswers(
+          addLOPBaseAnswers(
             index1of5000,
             addLOPTransferAnswers(
               index1of5000,
-              addLOPBaseAnswers(
+              addLOPPrePopAnswers(
                 index1of5000,
                 landOrPropertyHeldTrue
               )
@@ -326,113 +326,57 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
 
         checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe false
       }
-    }
-  }
 
-  "identitySubjectAnswersPresent" - {
-
-    "for Land or Property" - {
-
-      "must be true" - {
-
-        "when both Individual answers are present" in {
-          val userAnswers = addLOPIndividualAnswers(index1of5000, landOrPropertyHeldTrue)
-
-          identitySubjectAnswersPresent(
-            userAnswers,
-            srn,
+      "when Individual answers are missing" in {
+        val userAnswers =
+          addLOPBaseAnswers(
             index1of5000,
-            LandOrPropertySeller,
-            Individual
-          ) mustBe true
-        }
+            addLOPAcquisitionAnswers(
+              index1of5000,
+              landOrPropertyHeldTrue
+            )
+          ).unsafeSet(IdentityTypePage(srn, index1of5000, LandOrPropertySeller), Individual)
 
-        "when both UKCompany answers are present" in {
-          val userAnswers = addLOPUKCompanyAnswers(index1of5000, landOrPropertyHeldTrue)
-
-          identitySubjectAnswersPresent(
-            userAnswers,
-            srn,
-            index1of5000,
-            LandOrPropertySeller,
-            UKCompany
-          ) mustBe true
-        }
-
-        "when both UKPartnership answers are present" in {
-          val userAnswers = addLOPUKPartnershipAnswers(index1of5000, landOrPropertyHeldTrue)
-
-          identitySubjectAnswersPresent(
-            userAnswers,
-            srn,
-            index1of5000,
-            LandOrPropertySeller,
-            UKPartnership
-          ) mustBe true
-        }
-
-        "when Other answer is present" in {
-          val userAnswers = addLOPOtherAnswers(index1of5000, landOrPropertyHeldTrue)
-
-          identitySubjectAnswersPresent(
-            userAnswers,
-            srn,
-            index1of5000,
-            LandOrPropertySeller,
-            Other
-          ) mustBe true
-        }
+        checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe false
       }
 
-      "must be false" - {
-
-        "when Individual answers are missing" in {
-          val userAnswers = defaultUserAnswers
-
-          identitySubjectAnswersPresent(
-            userAnswers,
-            srn,
+      "when UKCompany answers are missing" in {
+        val userAnswers =
+          addLOPBaseAnswers(
             index1of5000,
-            LandOrPropertySeller,
-            Individual
-          ) mustBe false
-        }
+            addLOPAcquisitionAnswers(
+              index1of5000,
+              landOrPropertyHeldTrue
+            )
+          ).unsafeSet(IdentityTypePage(srn, index1of5000, LandOrPropertySeller), UKCompany)
 
-        "when UKCompany answers are missing" in {
-          val userAnswers = defaultUserAnswers
+        checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe false
+      }
 
-          identitySubjectAnswersPresent(
-            userAnswers,
-            srn,
+      "when UKPartnership answers are missing" in {
+        val userAnswers =
+          addLOPBaseAnswers(
             index1of5000,
-            LandOrPropertySeller,
-            UKCompany
-          ) mustBe false
-        }
+            addLOPAcquisitionAnswers(
+              index1of5000,
+              landOrPropertyHeldTrue
+            )
+          ).unsafeSet(IdentityTypePage(srn, index1of5000, LandOrPropertySeller), UKPartnership)
 
-        "when UKPartnership answers are missing" in {
-          val userAnswers = defaultUserAnswers
+        checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe false
+      }
 
-          identitySubjectAnswersPresent(
-            userAnswers,
-            srn,
+      "when Other answer is missing" in {
+        val userAnswers =
+          addLOPBaseAnswers(
             index1of5000,
-            LandOrPropertySeller,
-            UKPartnership
-          ) mustBe false
-        }
+            addLOPAcquisitionAnswers(
+              index1of5000,
+              landOrPropertyHeldTrue
+            )
+          ).unsafeSet(IdentityTypePage(srn, index1of5000, LandOrPropertySeller), Other)
 
-        "when Other answer is missing" in {
-          val userAnswers = defaultUserAnswers
-
-          identitySubjectAnswersPresent(
-            userAnswers,
-            srn,
-            index1of5000,
-            LandOrPropertySeller,
-            Other
-          ) mustBe false
-        }
+        checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe false
       }
     }
   }
