@@ -43,9 +43,8 @@ object CheckStatusUtils {
     val journeysStartedList = userAnswers.get(LandPropertyInUKPages(srn)).getOrElse(Map.empty).keys.toList
 
     landOrPropertyHeld match {
-      case None => false
       case Some(false) => false
-      case Some(true) =>
+      case _ =>
         journeysStartedList
           .map(
             index => {

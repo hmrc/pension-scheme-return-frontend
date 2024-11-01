@@ -105,7 +105,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
 
     "must be true" - {
 
-      "when 1 record is present and needs checking" in {
+      "when landOrPropertyHeld is Some(true) & 1 record is present, which needs checking" in {
         val userAnswers =
           addLOPBaseAnswers(
             index1of5000,
@@ -118,7 +118,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
         checkLandOrPropertySection(userAnswers, srn) mustBe true
       }
 
-      "when 2 records are present and 1 needs checking" in {
+      "when landOrPropertyHeld is Some(true) & 2 records are present, 1 of which needs checking" in {
         val userAnswers =
           addLOPBaseAnswers(
             index1of5000,
@@ -139,15 +139,44 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
 
         checkLandOrPropertySection(userAnswers, srn) mustBe true
       }
+
+      "when landOrPropertyHeld is None & 1 record is present, which needs checking" in {
+        val userAnswers =
+          addLOPBaseAnswers(
+            index1of5000,
+            addLOPTransferAnswers(
+              index1of5000,
+              defaultUserAnswers
+            )
+          )
+
+        checkLandOrPropertySection(userAnswers, srn) mustBe true
+      }
+
+      "when landOrPropertyHeld is None & when 2 records are present, 1 of which needs checking" in {
+        val userAnswers =
+          addLOPBaseAnswers(
+            index1of5000,
+            addLOPContributionAnswers(
+              index1of5000,
+              addLOPBaseAnswers(
+                index2of5000,
+                addLOPTransferAnswers(
+                  index2of5000,
+                  addLOPPrePopAnswers(
+                    index2of5000,
+                    defaultUserAnswers
+                  )
+                )
+              )
+            )
+          )
+
+        checkLandOrPropertySection(userAnswers, srn) mustBe true
+      }
     }
 
     "must be false" - {
-
-      "when landOrPropertyHeld is None" in {
-        val userAnswers = defaultUserAnswers
-
-        checkLandOrPropertySection(userAnswers, srn) mustBe false
-      }
 
       "when landOrPropertyHeld is Some(false)" in {
         val userAnswers = landOrPropertyHeldFalse
@@ -155,13 +184,13 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
         checkLandOrPropertySection(userAnswers, srn) mustBe false
       }
 
-      "when landOrPropertyHeld is Some(true) and no records are present" in {
+      "when landOrPropertyHeld is Some(true) & no records are present" in {
         val userAnswers = landOrPropertyHeldTrue
 
         checkLandOrPropertySection(userAnswers, srn) mustBe false
       }
 
-      "when landOrPropertyHeld is Some(true) and 1 record is present which doesn't need checking" in {
+      "when landOrPropertyHeld is Some(true) & 1 record is present which doesn't need checking" in {
         val userAnswers =
           addLOPBaseAnswers(
             index1of5000,
@@ -176,6 +205,28 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
 
         checkLandOrPropertySection(userAnswers, srn) mustBe false
       }
+
+      "when landOrPropertyHeld is None & no records are present" in {
+        val userAnswers = defaultUserAnswers
+
+        checkLandOrPropertySection(userAnswers, srn) mustBe false
+      }
+
+      "when landOrPropertyHeld is None & 1 record is present which doesn't need checking" in {
+        val userAnswers =
+          addLOPBaseAnswers(
+            index1of5000,
+            addLOPContributionAnswers(
+              index1of5000,
+              addLOPPrePopAnswers(
+                index1of5000,
+                defaultUserAnswers
+              )
+            )
+          )
+
+        checkLandOrPropertySection(userAnswers, srn) mustBe false
+      }
     }
   }
 
@@ -183,7 +234,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
 
     "must be true" - {
 
-      "for valid pre-pop answers (Acquisition & Individual)" in {
+      "when all pre-pop-cleared answers are missing & all other answers are present (Acquisition & Individual)" in {
         val userAnswers =
           addLOPBaseAnswers(
             index1of5000,
@@ -199,7 +250,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
         checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe true
       }
 
-      "for valid pre-pop answers (Acquisition & UKCompany)" in {
+      "when all pre-pop-cleared answers are missing & all other answers are present (Acquisition & UKCompany)" in {
         val userAnswers =
           addLOPBaseAnswers(
             index1of5000,
@@ -215,7 +266,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
         checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe true
       }
 
-      "for valid pre-pop answers (Acquisition & UKPartnership)" in {
+      "when all pre-pop-cleared answers are missing & all other answers are present (Acquisition & UKPartnership)" in {
         val userAnswers =
           addLOPBaseAnswers(
             index1of5000,
@@ -231,7 +282,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
         checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe true
       }
 
-      "for valid pre-pop answers (Acquisition & Other)" in {
+      "when all pre-pop-cleared answers are missing & all other answers are present (Acquisition & Other)" in {
         val userAnswers =
           addLOPBaseAnswers(
             index1of5000,
@@ -247,7 +298,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
         checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe true
       }
 
-      "for valid pre-pop answers (Contribution)" in {
+      "when all pre-pop-cleared answers are missing & all other answers are present (Contribution)" in {
         val userAnswers =
           addLOPBaseAnswers(
             index1of5000,
@@ -260,7 +311,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
         checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe true
       }
 
-      "for valid pre-pop answers (Transfer)" in {
+      "when all pre-pop-cleared answers are missing & all other answers are present (Transfer)" in {
         val userAnswers =
           addLOPBaseAnswers(
             index1of5000,
@@ -273,7 +324,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
         checkLandOrPropertyRecord(userAnswers, srn, index1of5000) mustBe true
       }
 
-      "when some pre-pop-cleared answers are present and some are missing" in {
+      "when some pre-pop-cleared answers are present & some are missing" in {
         val userAnswers =
           addLOPBaseAnswers(
             index1of5000,
