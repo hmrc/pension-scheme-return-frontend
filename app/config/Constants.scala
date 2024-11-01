@@ -113,7 +113,7 @@ object Constants {
   val maxBorrows = 5000
   val borrowPageSize = 25
 
-  val maxInputLength = 35
+  val maxInputLength = 160
   val maxTextAreaLength = 160
   val maxOtherDescriptionLength = 35
   val maxTitleNumberLength = 35
