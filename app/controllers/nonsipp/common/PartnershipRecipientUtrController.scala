@@ -90,7 +90,7 @@ class PartnershipRecipientUtrController @Inject()(
 
 object PartnershipRecipientUtrController {
 
-  private def noFormErrors(subjectKey: String) = InputFormErrors.input(
+  private def noFormErrors(subjectKey: String) = InputFormErrors.textArea(
     s"$subjectKey.partnershipRecipientUtr.no.conditional.error.required",
     s"$subjectKey.partnershipRecipientUtr.no.conditional.error.invalid",
     s"$subjectKey.partnershipRecipientUtr.no.conditional.error.length"
