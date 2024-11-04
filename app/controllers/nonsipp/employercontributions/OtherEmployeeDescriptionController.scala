@@ -86,7 +86,7 @@ class OtherEmployeeDescriptionController @Inject()(
 }
 
 object OtherEmployeeDescriptionController {
-  def form(formProvider: TextFormProvider): Form[String] = formProvider.textArea(
+  def form(formProvider: TextFormProvider): Form[String] = formProvider.textAreaShorter(
     "otherEmployeeDescription.error.required",
     "otherEmployeeDescription.error.length",
     "otherEmployeeDescription.error.invalid"

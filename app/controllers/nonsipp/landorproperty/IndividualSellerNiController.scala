@@ -89,7 +89,7 @@ class IndividualSellerNiController @Inject()(
 
 object IndividualSellerNiController {
 
-  private val noFormErrors = InputFormErrors.input(
+  private val noFormErrors = InputFormErrors.textArea(
     "individualSellerNi.no.conditional.error.required",
     "individualSellerNi.no.conditional.error.invalid",
     "individualSellerNi.no.conditional.error.length"

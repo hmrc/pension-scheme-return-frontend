@@ -39,6 +39,6 @@ object Security extends (String => Security) {
 
   def isValid(security: String): Boolean = security != null && security.matches(validSecurityFormat)
 
-  def maxLengthCheck(security: String): Boolean = security != null && (maxLength > security.length)
+  def maxLengthCheck(security: String): Boolean = security != null && (maxLength >= security.length)
 
 }

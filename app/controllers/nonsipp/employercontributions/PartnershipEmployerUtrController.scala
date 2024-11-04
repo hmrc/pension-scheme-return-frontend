@@ -94,7 +94,7 @@ class PartnershipEmployerUtrController @Inject()(
 
 object PartnershipEmployerUtrController {
 
-  private val noFormErrors = InputFormErrors.input(
+  private val noFormErrors = InputFormErrors.textArea(
     "partnershipEmployerUtr.no.conditional.error.required",
     "partnershipEmployerUtr.no.conditional.error.invalid",
     "partnershipEmployerUtr.no.conditional.error.length"

@@ -100,7 +100,7 @@ class CompanyBuyerCrnController @Inject()(
 
 object CompanyBuyerCrnController {
 
-  private val noFormErrors = InputFormErrors.input(
+  private val noFormErrors = InputFormErrors.textArea(
     "companyBuyerCrn.no.conditional.error.required",
     "companyBuyerCrn.no.conditional.error.invalid",
     "companyBuyerCrn.no.conditional.error.length"
