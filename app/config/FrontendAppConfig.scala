@@ -18,7 +18,7 @@ package config
 
 import play.api.mvc.RequestHeader
 import com.google.inject.{Inject, Singleton}
-import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl._
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl.idFunctor
 import models.SchemeId.Srn
 import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, OnlyRelative, RedirectUrl}
 import play.api.Configuration
@@ -35,10 +35,11 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   private val contactFormServiceIdentifier = config.get[String]("microservice.services.contact-frontend.serviceId")
   private val betaFeedbackUrl = config.get[String]("microservice.services.contact-frontend.beta-feedback-url")
   private val reportProblemUrl = config.get[String]("microservice.services.contact-frontend.report-problem-url")
+  private val allowedRedirectUrls: Seq[String] = config.get[Seq[String]]("urls.allowedRedirects")
 
   def feedbackUrl(implicit request: RequestHeader): String = {
-    val redirectUrl: String =
-      RedirectUrl(host + request.uri).get(OnlyRelative | AbsoluteWithHostnameFromAllowlist("localhost")).encodedUrl
+    val redirectUrlPolicy = AbsoluteWithHostnameFromAllowlist(allowedRedirectUrls.toSet) | OnlyRelative
+    val redirectUrl: String = RedirectUrl(host + request.uri).get(redirectUrlPolicy).encodedUrl
     s"$betaFeedbackUrl?service=$contactFormServiceIdentifier&backUrl=$redirectUrl"
   }
 
@@ -69,7 +70,7 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   val upscanCallbackEndpoint: String =
     s"${pensionSchemeReturnFrontend.baseUrl}${config.get[String]("urls.upscanCallback")}"
 
-  val emailService: Service = config.get[Service]("microservice.services.email")
+  private val emailService: Service = config.get[Service]("microservice.services.email")
   val emailApiUrl: String = emailService.baseUrl
   val emailSendForce: Boolean = config.getOptional[Boolean]("email.force").getOrElse(false)
   val fileReturnTemplateId: String = config.get[String]("email.fileReturnTemplateId")
