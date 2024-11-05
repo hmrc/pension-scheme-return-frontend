@@ -249,7 +249,7 @@ object ReportedSharesDisposalListController {
     viewOnlyViewModel: Option[ViewOnlyViewModel],
     schemeName: String
   ): List[ListRow] =
-    if (disposals.isEmpty || mode.isViewOnlyMode) {
+    if (disposals.isEmpty && mode.isViewOnlyMode) {
       List(
         ListRow.viewNoLink(
           Message("sharesDisposal.reportedSharesDisposalList.view.none", schemeName),
