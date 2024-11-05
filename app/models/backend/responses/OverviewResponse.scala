@@ -30,7 +30,7 @@ case class OverviewResponse(
   ntfDateOfIssue: Option[LocalDate],
   psrDueDate: Option[LocalDate],
   psrReportType: Option[PsrReportType]
-) {}
+)
 
 object OverviewResponse {
   implicit val formats: Format[OverviewResponse] = Json.format[OverviewResponse]
