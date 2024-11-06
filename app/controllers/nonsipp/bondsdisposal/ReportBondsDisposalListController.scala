@@ -33,6 +33,7 @@ import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage
+import play.api.Logger
 import navigation.Navigator
 import controllers.nonsipp.bondsdisposal.ReportBondsDisposalListController._
 import forms.YesNoPageFormProvider
@@ -61,6 +62,8 @@ class ReportBondsDisposalListController @Inject()(
   saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
+
+  private val logger = Logger(getClass)
 
   val form: Form[Boolean] = ReportBondsDisposalListController.form(formProvider)
 
@@ -131,6 +134,7 @@ class ReportBondsDisposalListController @Inject()(
                 )
               )
             } else {
+              logger.info("no completed bond disposal, start a new one")
               Redirect(routes.BondsDisposalController.onPageLoad(srn, NormalMode))
             }
         )
@@ -252,6 +256,10 @@ class ReportBondsDisposalListController @Inject()(
           } yield (bondsIndex, disposalIndexes)
       }
       .map(_.toMap)
+      .leftMap { result =>
+        logger.warn("couldn't build indexes from completed bonds disposal progress page")
+        result
+      }
 
   private def getBondsDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(
     implicit request: DataRequest[_]
@@ -262,6 +270,10 @@ class ReportBondsDisposalListController @Inject()(
           index -> request.userAnswers
             .get(BondsCompleted(srn, index))
             .getOrRecoverJourney
+            .leftMap { result =>
+              logger.warn(s"couldn't find completed bonds page for index ${index} from bonds disposals completed")
+              result
+            }
             .map(bondsDisposal => (indexes, bondsDisposal))
       }
       .toList

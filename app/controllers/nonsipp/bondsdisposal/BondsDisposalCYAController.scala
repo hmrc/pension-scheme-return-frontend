@@ -21,6 +21,7 @@ import pages.nonsipp.bonds._
 import viewmodels.implicits._
 import play.api.mvc._
 import cats.implicits.toShow
+import config.Constants.maxDisposalPerBond
 import controllers.actions.IdentifyAndRequireData
 import models.requests.DataRequest
 import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
@@ -57,7 +58,7 @@ class BondsDisposalCYAController @Inject()(
     extends PSRController {
 
   def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
+    identifyAndRequireData(srn).async { implicit request =>
       saveService.save(
         request.userAnswers
           .set(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex), NoPointOfEntry)
@@ -75,88 +76,100 @@ class BondsDisposalCYAController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] =
-    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    identifyAndRequireData(srn, mode, year, current, previous).async { implicit request =>
       onPageLoadCommon(srn, bondIndex, disposalIndex, mode)
     }
 
   def onPageLoadCommon(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode)(
     implicit request: DataRequest[AnyContent]
-  ): Result =
+  ): Future[Result] =
     (
       for {
-        bondsName <- request.userAnswers
+        updatedUserAnswers <- request.userAnswers
+          .set(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.Completed)
+          .toOption
+          .getOrRecoverJourneyT
+        bondsName <- updatedUserAnswers
           .get(NameOfBondsPage(srn, bondIndex))
-          .getOrRecoverJourney
-        acquisitionType <- request.userAnswers
+          .getOrRecoverJourneyT
+        acquisitionType <- updatedUserAnswers
           .get(WhyDoesSchemeHoldBondsPage(srn, bondIndex))
-          .getOrRecoverJourney
-        costOfBonds <- request.userAnswers
+          .getOrRecoverJourneyT
+        costOfBonds <- updatedUserAnswers
           .get(CostOfBondsPage(srn, bondIndex))
-          .getOrRecoverJourney
+          .getOrRecoverJourneyT
 
-        howBondsDisposed <- request.userAnswers
+        howBondsDisposed <- updatedUserAnswers
           .get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex))
-          .getOrRecoverJourney
+          .getOrRecoverJourneyT
 
         dateBondsSold = Option.when(howBondsDisposed == Sold)(
-          request.userAnswers.get(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex)).get
+          updatedUserAnswers.get(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex)).get
         )
 
         considerationBondsSold = Option.when(howBondsDisposed == Sold)(
-          request.userAnswers.get(TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex)).get
+          updatedUserAnswers.get(TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex)).get
         )
         buyerName = Option.when(howBondsDisposed == Sold)(
-          request.userAnswers.get(BuyerNamePage(srn, bondIndex, disposalIndex)).get
+          updatedUserAnswers.get(BuyerNamePage(srn, bondIndex, disposalIndex)).get
         )
         isBuyerConnectedParty = Option.when(howBondsDisposed == Sold)(
-          request.userAnswers.get(IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex)).get
+          updatedUserAnswers.get(IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex)).get
         )
 
         bondsStillHeld <- request.userAnswers
           .get(BondsStillHeldPage(srn, bondIndex, disposalIndex))
-          .getOrRecoverJourney
+          .getOrRecoverJourneyT
+
+        disposalAmount = updatedUserAnswers
+          .map(BondsDisposalProgress.all(srn, bondIndex))
+          .count { case (_, progress) => progress.completed }
 
         schemeName = request.schemeDetails.schemeName
 
-      } yield Ok(
-        view(
-          viewModel(
-            ViewModelParameters(
-              srn,
-              bondIndex,
-              disposalIndex,
-              bondsName,
-              acquisitionType,
-              costOfBonds,
-              howBondsDisposed,
-              dateBondsSold,
-              considerationBondsSold,
-              buyerName,
-              isBuyerConnectedParty,
-              bondsStillHeld,
-              schemeName,
-              mode
-            ),
-            viewOnlyUpdated = false, // flag is not displayed on this tier
-            optYear = request.year,
-            optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+        _ <- saveService.save(updatedUserAnswers).liftF
+
+      } yield {
+        val isMaximumReached = disposalAmount >= maxDisposalPerBond
+
+        Ok(
+          view(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                bondIndex,
+                disposalIndex,
+                bondsName,
+                acquisitionType,
+                costOfBonds,
+                howBondsDisposed,
+                dateBondsSold,
+                considerationBondsSold,
+                buyerName,
+                isBuyerConnectedParty,
+                bondsStillHeld,
+                schemeName,
+                mode
+              ),
+              viewOnlyUpdated = false, // flag is not displayed on this tier
+              optYear = request.year,
+              optCurrentVersion = request.currentVersion,
+              optPreviousVersion = request.previousVersion,
+              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+              isMaximumReached
+            )
           )
         )
-      )
+      }
     ).merge
 
   def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
-        updatedUserAnswers <- Future.fromTry(
-          request.userAnswers.set(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.Completed)
-        )
-        _ <- saveService.save(updatedUserAnswers)
+        _ <- saveService.save(request.userAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
           srn,
-          updatedUserAnswers,
+          request.userAnswers,
           fallbackCall = controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
             .onPageLoad(srn, bondIndex, disposalIndex, mode)
         )
@@ -204,7 +217,8 @@ object BondsDisposalCYAController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    compilationOrSubmissionDate: Option[LocalDateTime] = None,
+    isMaximumReached: Boolean
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = parameters.mode,
@@ -223,7 +237,8 @@ object BondsDisposalCYAController {
         .singleSection(
           rows(parameters)
         )
-        .withMarginBottom(Margin.Fixed60Bottom),
+        .withMarginBottom(Margin.Fixed60Bottom)
+        .withInset(Option.when(isMaximumReached)(Message("bondsDisposalCYA.inset.maximumReached"))),
       refresh = None,
       buttonText =
         parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),

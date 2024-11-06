@@ -22,9 +22,7 @@ import play.api.mvc._
 import models.HowDisposed._
 import utils.ListUtils.ListOps
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
-import pages.nonsipp.landorpropertydisposal._
 import controllers.actions._
-import play.api.i18n._
 import models.requests.DataRequest
 import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
@@ -32,10 +30,14 @@ import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import cats.implicits.toShow
 import controllers.nonsipp.landorpropertydisposal.LandPropertyDisposalCYAController._
+import config.Constants.maxLandOrPropertyDisposals
+import pages.nonsipp.landorpropertydisposal._
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
+import play.api.i18n._
+import viewmodels.Margin
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
@@ -61,7 +63,7 @@ class LandPropertyDisposalCYAController @Inject()(
     disposalIndex: Max50,
     mode: Mode
   ): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
+    identifyAndRequireData(srn).async { implicit request =>
       onPageLoadCommon(srn, index, disposalIndex, mode)
     }
 
@@ -74,47 +76,60 @@ class LandPropertyDisposalCYAController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] =
-    identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
+    identifyAndRequireData(srn, mode, year, current, previous).async { implicit request =>
       onPageLoadCommon(srn, landOrPropertyIndex, disposalIndex, mode)
     }
 
   def onPageLoadCommon(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode)(
     implicit request: DataRequest[AnyContent]
-  ): Result =
+  ): Future[Result] =
     (
       for {
-        howWasPropertyDisposed <- requiredPage(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
-        addressLookUpPage <- requiredPage(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex))
-        landOrPropertyStillHeld <- requiredPage(LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex))
+        updatedUserAnswers <- request.userAnswers
+          .set(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndex, disposalIndex), SectionCompleted)
+          .toOption
+          .getOrRecoverJourneyT
+
+        howWasPropertyDisposed <- updatedUserAnswers
+          .get(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
+          .getOrRecoverJourneyT
+
+        addressLookUpPage <- updatedUserAnswers
+          .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex))
+          .getOrRecoverJourneyT
+
+        landOrPropertyStillHeld <- updatedUserAnswers
+          .get(LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex))
+          .getOrRecoverJourneyT
 
         totalProceedsSale = Option.when(howWasPropertyDisposed == Sold)(
-          request.userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex)).get
+          updatedUserAnswers.get(TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex)).get
         )
         independentValuation = Option.when(howWasPropertyDisposed == Sold)(
-          request.userAnswers.get(DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex)).get
+          updatedUserAnswers.get(DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex)).get
         )
         landOrPropertyDisposedType = Option.when(howWasPropertyDisposed == Sold)(
-          request.userAnswers
+          updatedUserAnswers
             .get(WhoPurchasedLandOrPropertyPage(srn: Srn, landOrPropertyIndex, disposalIndex))
             .get
         )
 
         whenWasPropertySold = Option.when(howWasPropertyDisposed == Sold)(
-          request.userAnswers.get(WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex)).get
+          updatedUserAnswers.get(WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex)).get
         )
 
         landOrPropertyDisposalBuyerConnectedParty = Option.when(howWasPropertyDisposed == Sold)(
-          request.userAnswers
+          updatedUserAnswers
             .get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, landOrPropertyIndex, disposalIndex))
             .get
         )
 
         recipientName = Option.when(howWasPropertyDisposed == Sold)(
           List(
-            request.userAnswers.get(LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)),
-            request.userAnswers.get(CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)),
-            request.userAnswers.get(PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)),
-            request.userAnswers
+            updatedUserAnswers.get(LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)),
+            updatedUserAnswers.get(CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)),
+            updatedUserAnswers.get(PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)),
+            updatedUserAnswers
               .get(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex))
               .map(_.name)
           ).flatten.head
@@ -122,16 +137,16 @@ class LandPropertyDisposalCYAController @Inject()(
 
         recipientDetails = Option.when(howWasPropertyDisposed == Sold)(
           List(
-            request.userAnswers
+            updatedUserAnswers
               .get(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex))
               .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
+            updatedUserAnswers
               .get(CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex))
               .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
+            updatedUserAnswers
               .get(PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex))
               .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
+            updatedUserAnswers
               .get(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex))
               .map(_.description)
           ).flatten.headOption
@@ -139,50 +154,61 @@ class LandPropertyDisposalCYAController @Inject()(
 
         recipientReasonNoDetails = Option.when(howWasPropertyDisposed == Sold)(
           List(
-            request.userAnswers
+            updatedUserAnswers
               .get(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex))
               .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
+            updatedUserAnswers
               .get(CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex))
               .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
+            updatedUserAnswers
               .get(PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex))
               .flatMap(_.value.swap.toOption.map(_.value))
           ).flatten.headOption
         )
+
+        disposalAmount = updatedUserAnswers
+          .map(LandPropertyDisposalCompleted.all(srn, landOrPropertyIndex))
+          .size
+
         schemeName = request.schemeDetails.schemeName
 
-      } yield Ok(
-        view(
-          viewModel(
-            ViewModelParameters(
+        _ <- saveService.save(updatedUserAnswers).liftF
+
+      } yield {
+        val isMaximumReached = disposalAmount >= maxLandOrPropertyDisposals
+        Ok(
+          view(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                landOrPropertyIndex,
+                disposalIndex,
+                schemeName,
+                howWasPropertyDisposed,
+                whenWasPropertySold,
+                addressLookUpPage,
+                landOrPropertyDisposedType,
+                landOrPropertyDisposalBuyerConnectedParty,
+                totalProceedsSale,
+                independentValuation,
+                landOrPropertyStillHeld,
+                recipientName,
+                recipientDetails.flatten,
+                recipientReasonNoDetails.flatten,
+                mode
+              ),
               srn,
-              landOrPropertyIndex,
-              disposalIndex,
-              schemeName,
-              howWasPropertyDisposed,
-              whenWasPropertySold,
-              addressLookUpPage,
-              landOrPropertyDisposedType,
-              landOrPropertyDisposalBuyerConnectedParty,
-              totalProceedsSale,
-              independentValuation,
-              landOrPropertyStillHeld,
-              recipientName,
-              recipientDetails.flatten,
-              recipientReasonNoDetails.flatten,
-              mode
-            ),
-            srn,
-            mode,
-            viewOnlyUpdated = false, // flag is not displayed on this tier
-            optYear = request.year,
-            optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+              mode,
+              viewOnlyUpdated = false, // flag is not displayed on this tier
+              optYear = request.year,
+              optCurrentVersion = request.currentVersion,
+              optPreviousVersion = request.previousVersion,
+              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+              isMaximumReached = isMaximumReached
+            )
           )
         )
-      )
+      }
     ).merge
 
   def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
@@ -251,7 +277,8 @@ object LandPropertyDisposalCYAController {
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
-    compilationOrSubmissionDate: Option[LocalDateTime] = None
+    compilationOrSubmissionDate: Option[LocalDateTime] = None,
+    isMaximumReached: Boolean
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,
@@ -266,25 +293,28 @@ object LandPropertyDisposalCYAController {
         viewOnly = "landPropertyDisposalCYA.viewOnly.heading"
       ),
       description = Some(ParagraphMessage("landOrPropertyCYA.paragraph")),
-      page = CheckYourAnswersViewModel.singleSection(
-        rows(
-          parameters.srn,
-          parameters.index,
-          parameters.disposalIndex,
-          parameters.schemeName,
-          parameters.howWasPropertyDisposed,
-          parameters.whenWasPropertySold,
-          parameters.addressLookUpPage,
-          parameters.landOrPropertyDisposedType,
-          parameters.recipientReasonNoDetails,
-          parameters.landOrPropertyDisposalBuyerConnectedParty,
-          parameters.totalProceedsSale,
-          parameters.independentValuation,
-          parameters.landOrPropertyStillHeld,
-          parameters.recipientName,
-          parameters.recipientDetails
+      page = CheckYourAnswersViewModel
+        .singleSection(
+          rows(
+            parameters.srn,
+            parameters.index,
+            parameters.disposalIndex,
+            parameters.schemeName,
+            parameters.howWasPropertyDisposed,
+            parameters.whenWasPropertySold,
+            parameters.addressLookUpPage,
+            parameters.landOrPropertyDisposedType,
+            parameters.recipientReasonNoDetails,
+            parameters.landOrPropertyDisposalBuyerConnectedParty,
+            parameters.totalProceedsSale,
+            parameters.independentValuation,
+            parameters.landOrPropertyStillHeld,
+            parameters.recipientName,
+            parameters.recipientDetails
+          )
         )
-      ),
+        .withMarginBottom(Margin.Fixed60Bottom)
+        .withInset(Option.when(isMaximumReached)(Message("landPropertyDisposalCYA.inset.maximumReached"))),
       refresh = None,
       buttonText =
         parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),

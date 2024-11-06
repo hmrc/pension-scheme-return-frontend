@@ -113,7 +113,8 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
                 None,
                 mode
               ),
-              viewOnlyUpdated = true
+              viewOnlyUpdated = true,
+              isMaximumReached = false
             )
           )
         }.withName(s"render correct $mode view for Sold journey")
@@ -190,7 +191,8 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
-              compilationOrSubmissionDate = Some(submissionDateTwo)
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              isMaximumReached = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
