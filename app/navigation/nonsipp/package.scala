@@ -22,7 +22,7 @@ import eu.timepit.refined.api.{Refined, Validate}
 package object nonsipp {
 
   // Given a list of indexes, this function will check for the next open index to start a new journey
-  // Will return None if the the resulting index is out of bounds of the supplied refined type
+  // Will return None if the resulting index is out of bounds of the supplied refined type
   def findNextOpenIndex[A](list: List[Int])(implicit ev: Validate[Int, A]): Option[Refined[Int, A]] = {
     val sortedList = list.sorted
     if (sortedList.isEmpty || sortedList.head != 0) {

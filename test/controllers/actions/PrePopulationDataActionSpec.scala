@@ -17,7 +17,7 @@
 package controllers.actions
 
 import play.api.test.FakeRequest
-import services.PsrRetrievalService
+import services.{PrePopulationService, PsrRetrievalService}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.mockito.Mockito._
 import play.api.mvc.AnyContentAsEmpty
@@ -28,17 +28,20 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Success
 
 class PrePopulationDataActionSpec extends ControllerBaseSpec with ScalaCheckPropertyChecks {
 
   val prePopulationDataAction =
     new PrePopulationDataActionProviderImpl(
       mockSessionRepository,
-      mockPsrRetrievalService
+      mockPsrRetrievalService,
+      mockPrePopulationService
     )(ExecutionContext.global)
 
   lazy val mockSessionRepository: SessionRepository = mock[SessionRepository]
   lazy val mockPsrRetrievalService: PsrRetrievalService = mock[PsrRetrievalService]
+  lazy val mockPrePopulationService: PrePopulationService = mock[PrePopulationService]
 
   class Harness[A](request: DataRequest[A]) {
 
@@ -51,6 +54,7 @@ class PrePopulationDataActionSpec extends ControllerBaseSpec with ScalaCheckProp
   override def beforeEach(): Unit = {
     reset(mockSessionRepository)
     reset(mockPsrRetrievalService)
+    reset(mockPrePopulationService)
   }
 
   val defaultDataRequest: DataRequest[AnyContentAsEmpty.type] =
@@ -70,9 +74,10 @@ class PrePopulationDataActionSpec extends ControllerBaseSpec with ScalaCheckProp
         any(),
         any()
       )
+      verify(mockPrePopulationService, never).buildPrePopulatedUserAnswers(any(), any())(any())
     }
 
-    "should fetch base return save on cache and return when optLastSubmittedPsrFbInPreviousYears exist" in {
+    "should fetch the base-return and save it on the cache and return when optLastSubmittedPsrFbInPreviousYears exist" in {
       when(
         mockPsrRetrievalService
           .getAndTransformStandardPsrDetails(optFbNumber = ArgumentMatchers.eq(Some("1")), any(), any(), any(), any())(
@@ -81,7 +86,10 @@ class PrePopulationDataActionSpec extends ControllerBaseSpec with ScalaCheckProp
             any()
           )
       ).thenReturn(Future.successful(defaultUserAnswers))
+      when(mockPrePopulationService.buildPrePopulatedUserAnswers(any(), any())(any()))
+        .thenReturn(Success(defaultUserAnswers))
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(()))
+
       val action = harness(defaultDataRequest)
 
       val result = action.callTransform(Some("1")).futureValue
@@ -93,6 +101,7 @@ class PrePopulationDataActionSpec extends ControllerBaseSpec with ScalaCheckProp
         any(),
         any()
       )
+      verify(mockPrePopulationService, times(1)).buildPrePopulatedUserAnswers(any(), any())(any())
     }
 
   }
