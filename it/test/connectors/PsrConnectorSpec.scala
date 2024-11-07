@@ -61,6 +61,7 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
 
   private val getStandardPsrDetailsUrl = s"/pension-scheme-return/psr/standard/$commonPstr"
   private val submitStandardUrl = s"/pension-scheme-return/psr/standard"
+  private val submitPrePopulatedUrl = s"/pension-scheme-return/psr/pre-populated"
   private val getOverviewUrl = s"/pension-scheme-return/psr/overview/$commonPstr"
   private val startDates = Seq(commonStartDate)
   private val getVersionsForYearsUrl =
@@ -185,6 +186,26 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
     }
   }
 
+  "submitPrePopulatedPsrDetails" - {
+
+    "submit pre-populated Psr" in runningApplication { implicit app =>
+      stubPost(
+        submitPrePopulatedUrl,
+        noContent()
+          .withHeader("Content-Type", "application/json")
+          .withHeader("userName", "userName")
+          .withHeader("schemeName", "schemeName")
+          .withHeader("srn", "S0000000042")
+      )
+
+      val result: Either[String, Unit] =
+        connector
+          .submitPrePopulatedPsr(minimalSubmissionData, commonUserName, commonSchemeName, Srn(commonSrn).get)
+          .futureValue
+
+      result mustBe Right(())
+    }
+  }
   "get getVersionsForYears" - {
 
     "return getVersionsForYears for start date and end date" in runningApplication { implicit app =>

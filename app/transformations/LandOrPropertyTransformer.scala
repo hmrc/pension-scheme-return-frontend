@@ -33,6 +33,7 @@ import com.google.inject.Singleton
 import pages.nonsipp.landorproperty.Paths.landOrProperty
 import models.SchemeId.Srn
 import models.requests.psr._
+import config.Constants.PREPOPULATION_FLAG
 import pages.nonsipp.landorpropertydisposal._
 import models.UserAnswers.implicits.UserAnswersTryOps
 
@@ -47,19 +48,25 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
   def transformToEtmp(srn: Srn, optLandOrPropertyHeld: Option[Boolean], initialUA: UserAnswers)(
     implicit request: DataRequest[_]
   ): Option[LandOrProperty] =
-    optLandOrPropertyHeld.map(landOrPropertyHeld => {
-      val disposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn)).getOrElse(false)
+    Option.when(optLandOrPropertyHeld.nonEmpty || request.userAnswers.map(LandPropertyInUKPages(srn)).toList.nonEmpty) {
+      val optDisposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn))
+      val dispose =
+        if (isPrePopulation(implicitly) && optDisposeAnyLandOrProperty.isEmpty) {
+          None // allow None only in pre-population
+        } else {
+          Option(optDisposeAnyLandOrProperty.getOrElse(false))
+        }
       LandOrProperty(
         recordVersion = Option.when(request.userAnswers.get(landOrProperty) == initialUA.get(landOrProperty))(
           request.userAnswers.get(LandOrPropertyRecordVersionPage(srn)).get
         ),
-        landOrPropertyHeld = landOrPropertyHeld,
-        disposeAnyLandOrProperty = disposeAnyLandOrProperty,
-        landOrPropertyTransactions = transformLandOrPropertyTransactionsToEtmp(srn, disposeAnyLandOrProperty)
+        optLandOrPropertyHeld = optLandOrPropertyHeld,
+        optDisposeAnyLandOrProperty = dispose,
+        landOrPropertyTransactions = transformLandOrPropertyTransactionsToEtmp(srn, optDisposeAnyLandOrProperty)
       )
-    })
+    }
 
-  private def transformLandOrPropertyTransactionsToEtmp(srn: Srn, disposeAnyLandOrProperty: Boolean)(
+  private def transformLandOrPropertyTransactionsToEtmp(srn: Srn, optDisposeAnyLandOrProperty: Option[Boolean])(
     implicit request: DataRequest[_]
   ): List[LandOrPropertyTransactions] =
     request.userAnswers
@@ -77,9 +84,6 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
               methodOfHolding <- request.userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, index))
 
               totalCostOfLandOrProperty <- request.userAnswers.get(LandOrPropertyTotalCostPage(srn, index))
-              isLandOrPropertyResidential <- request.userAnswers.get(IsLandOrPropertyResidentialPage(srn, index))
-              landOrPropertyLeased <- request.userAnswers.get(IsLandPropertyLeasedPage(srn, index))
-              totalIncomeOrReceipts <- request.userAnswers.get(LandOrPropertyTotalIncomePage(srn, index))
             } yield {
 
               val optNoneTransferRelatedDetails = buildOptNoneTransferRelatedDetails(methodOfHolding, srn, index)
@@ -100,13 +104,21 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
                   optConnectedPartyStatus = optAcquisitionRelatedDetails.map(_._2),
                   totalCostOfLandOrProperty = totalCostOfLandOrProperty.value,
                   optIndepValuationSupport = optNoneTransferRelatedDetails.map(_._1),
-                  isLandOrPropertyResidential = isLandOrPropertyResidential,
-                  optLeaseDetails = buildOptLandOrPropertyLeasedDetails(landOrPropertyLeased, srn, index),
-                  landOrPropertyLeased = landOrPropertyLeased,
-                  totalIncomeOrReceipts = totalIncomeOrReceipts.value
+                  optIsLandOrPropertyResidential = request.userAnswers.get(IsLandOrPropertyResidentialPage(srn, index)),
+                  optLeaseDetails = buildOptLandOrPropertyLeasedDetails(
+                    request.userAnswers.get(IsLandPropertyLeasedPage(srn, index)).getOrElse(false),
+                    srn,
+                    index
+                  ),
+                  optLandOrPropertyLeased = request.userAnswers.get(IsLandPropertyLeasedPage(srn, index)),
+                  optTotalIncomeOrReceipts = request.userAnswers
+                    .get(LandOrPropertyTotalIncomePage(srn, index))
+                    .fold(None: Option[Double])(
+                      money => Some(money.value)
+                    )
                 ),
                 optDisposedPropertyTransaction = Option
-                  .when(disposeAnyLandOrProperty)(buildOptDisposedPropertyTransactions(srn, index))
+                  .when(optDisposeAnyLandOrProperty.getOrElse(false))(buildOptDisposedPropertyTransactions(srn, index))
               )
             }
         }
@@ -114,8 +126,10 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, landOrProperty: LandOrProperty): Try[UserAnswers] = {
     val landOrPropertyTransactions = landOrProperty.landOrPropertyTransactions
-    val userAnswersOfLandOrPropertyHeld =
-      userAnswers.set(LandOrPropertyHeldPage(srn), landOrProperty.landOrPropertyHeld)
+    val userAnswersOfLandOrPropertyHeld = landOrProperty.optLandOrPropertyHeld match {
+      case Some(value) => userAnswers.set(LandOrPropertyHeldPage(srn), value)
+      case None => Try(userAnswers)
+    }
     val userAnswersWithRecordVersion =
       landOrProperty.recordVersion.fold(userAnswersOfLandOrPropertyHeld)(
         userAnswersOfLandOrPropertyHeld.set(LandOrPropertyRecordVersionPage(srn), _)
@@ -136,10 +150,14 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
           val totalCostOfLandOrProperty = LandOrPropertyTotalCostPage(srn, index) -> Money(
             heldPropertyTransaction.totalCostOfLandOrProperty
           )
-          val isLandOrPropertyResidential = IsLandOrPropertyResidentialPage(srn, index) -> heldPropertyTransaction.isLandOrPropertyResidential
-          val landOrPropertyLeased = IsLandPropertyLeasedPage(srn, index) -> heldPropertyTransaction.landOrPropertyLeased
-          val totalIncomeOrReceipts = LandOrPropertyTotalIncomePage(srn, index) -> Money(
-            heldPropertyTransaction.totalIncomeOrReceipts
+          val optIsLandOrPropertyResidential = heldPropertyTransaction.optIsLandOrPropertyResidential.map(
+            isResidential => IsLandOrPropertyResidentialPage(srn, index) -> isResidential
+          )
+          val optLandOrPropertyLeased = heldPropertyTransaction.optLandOrPropertyLeased.map(
+            isLandOrPropertyLeased => IsLandPropertyLeasedPage(srn, index) -> isLandOrPropertyLeased
+          )
+          val optTotalIncomeOrReceipts = heldPropertyTransaction.optTotalIncomeOrReceipts.map(
+            totalIncomeOrReceipts => LandOrPropertyTotalIncomePage(srn, index) -> Money(totalIncomeOrReceipts)
           )
           val optDateOfAcquisitionOrContribution = heldPropertyTransaction.dateOfAcquisitionOrContribution.map(
             date => LandOrPropertyWhenDidSchemeAcquirePage(srn, index) -> date
@@ -218,10 +236,18 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
 
           val optLeaseTuple = heldPropertyTransaction.optLeaseDetails.map(
             leaseDetails => {
-              val ldp = LandOrPropertyLeaseDetailsPage(srn, index) -> (leaseDetails.lesseeName, Money(
-                leaseDetails.annualLeaseAmount
-              ), leaseDetails.leaseGrantDate)
-              val leaseConnectedParty = IsLesseeConnectedPartyPage(srn, index) -> leaseDetails.connectedPartyStatus
+              val ldp = LandOrPropertyLeaseDetailsPage(srn, index) ->
+                leaseDetails.optLesseeName.map(
+                  lesseeName =>
+                    (
+                      lesseeName,
+                      Money(leaseDetails.optAnnualLeaseAmount.get.doubleValue), // assume it is present when name is present
+                      leaseDetails.optLeaseGrantDate.get
+                    )
+                )
+              val leaseConnectedParty = IsLesseeConnectedPartyPage(srn, index) ->
+                leaseDetails.optConnectedPartyStatus
+
               (ldp, leaseConnectedParty)
             }
           )
@@ -233,12 +259,16 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
             ua3 <- ua2.set(landRegistryTitleNumber._1, landRegistryTitleNumber._2)
             ua4 <- ua3.set(methodOfHolding._1, methodOfHolding._2)
             ua5 <- ua4.set(totalCostOfLandOrProperty._1, totalCostOfLandOrProperty._2)
-            ua6 <- ua5.set(isLandOrPropertyResidential._1, isLandOrPropertyResidential._2)
-            ua7 <- ua6.set(landOrPropertyLeased._1, landOrPropertyLeased._2)
-            ua8 <- ua7
-              .set(totalIncomeOrReceipts._1, totalIncomeOrReceipts._2)
-              .set(LandOrPropertyCompleted(srn, index), SectionCompleted)
-
+            ua6 <- optIsLandOrPropertyResidential.map(t => ua5.set(t._1, t._2)).getOrElse(Try(ua5))
+            ua7 <- optLandOrPropertyLeased.map(t => ua6.set(t._1, t._2)).getOrElse(Try(ua6))
+            ua8 <- optTotalIncomeOrReceipts
+              .map(
+                t =>
+                  ua7
+                    .set(t._1, t._2)
+                    .set(LandOrPropertyCompleted(srn, index), SectionCompleted)
+              )
+              .getOrElse(ua7.set(LandOrPropertyCompleted(srn, index), SectionCompleted)) // we need to store data in ETMP even if in case of pre-population TotalIncomeOrReceipts is missing
             ua9 <- optDateOfAcquisitionOrContribution.map(t => ua8.set(t._1, t._2)).getOrElse(Try(ua8))
             ua10 <- optIndepValuationSupport.map(t => ua9.set(t._1, t._2)).getOrElse(Try(ua9))
             ua11 <- optReceivedLandType.map(t => ua10.set(t._1, t._2)).getOrElse(Try(ua10))
@@ -251,8 +281,22 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
             ua17 <- optUKPartnershipTuple.map(t => ua16.set(t._2._1, t._2._2)).getOrElse(Try(ua16))
             ua18 <- optOther.map(t => ua17.set(t._1, t._2)).getOrElse(Try(ua17))
 
-            ua19 <- optLeaseTuple.map(t => ua18.set(t._1._1, t._1._2)).getOrElse(Try(ua18))
-            ua20 <- optLeaseTuple.map(t => ua19.set(t._2._1, t._2._2)).getOrElse(Try(ua19))
+            ua19 <- optLeaseTuple
+              .map(
+                optLeaseDetails =>
+                  optLeaseDetails._1._2.map(values => ua18.set(optLeaseDetails._1._1, values)).getOrElse(Try(ua18))
+              )
+              .getOrElse(Try(ua18))
+
+            ua20 <- optLeaseTuple
+              .map(
+                optLesseeConnectedParty =>
+                  optLesseeConnectedParty._2._2
+                    .map(b => ua19.set(optLesseeConnectedParty._2._1, b))
+                    .getOrElse(Try(ua19))
+              )
+              .getOrElse(Try(ua18))
+
             ua21 <- optSellerConnectedParty.map(t => ua20.set(t._1, t._2)).getOrElse(Try(ua20))
           } yield {
             buildOptDisposedTransactionUA(
@@ -260,7 +304,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
               srn,
               ua21,
               landOrPropertyTransactions(index.value - 1).optDisposedPropertyTransaction,
-              landOrProperty.disposeAnyLandOrProperty
+              landOrProperty.optDisposeAnyLandOrProperty
             )
           }
           triedUA.flatten
@@ -273,10 +317,15 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
     srn: Srn,
     userAnswers: UserAnswers,
     optDisposedPropertyTransaction: Option[Seq[DisposedPropertyTransaction]],
-    disposeAnyLandOrProperty: Boolean
+    optDisposeAnyLandOrProperty: Option[Boolean]
   ): Try[UserAnswers] = {
 
-    val initialUserAnswersOfDisposal = userAnswers.set(LandOrPropertyDisposalPage(srn), disposeAnyLandOrProperty)
+    val initialUserAnswersOfDisposal =
+      if (optDisposeAnyLandOrProperty.isEmpty) {
+        Try(userAnswers)
+      } else {
+        userAnswers.set(LandOrPropertyDisposalPage(srn), optDisposeAnyLandOrProperty.getOrElse(false))
+      }
 
     optDisposedPropertyTransaction
       .map(
@@ -579,22 +628,27 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
       }
       .flatten
 
+  private def isPrePopulation(implicit request: DataRequest[_]): Boolean =
+    request.session.get(PREPOPULATION_FLAG).fold(false)(_.toBoolean)
+
   private def buildOptLandOrPropertyLeasedDetails(
     landOrPropertyLeased: Boolean,
     srn: Srn,
     index: Refined[Int, OneTo5000]
-  )(implicit request: DataRequest[_]): Option[LeaseDetails] =
-    Option.when(landOrPropertyLeased) {
+  )(implicit request: DataRequest[_]): Option[LeaseDetails] = {
+    val isIt = isPrePopulation(implicitly)
+    Option.when(isIt || (!isPrePopulation(implicitly) && landOrPropertyLeased)) {
       val leaseDetails =
-        request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).get
-      val leaseConnectedParty = request.userAnswers.get(IsLesseeConnectedPartyPage(srn, index)).get
+        request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index))
+      val leaseConnectedParty = request.userAnswers.get(IsLesseeConnectedPartyPage(srn, index))
       LeaseDetails(
-        lesseeName = leaseDetails._1,
-        leaseGrantDate = leaseDetails._3,
-        annualLeaseAmount = leaseDetails._2.value,
-        connectedPartyStatus = leaseConnectedParty
+        optLesseeName = leaseDetails.map(_._1),
+        optLeaseGrantDate = leaseDetails.map(_._3),
+        optAnnualLeaseAmount = leaseDetails.map(_._2.value),
+        optConnectedPartyStatus = leaseConnectedParty.map(_.booleanValue())
       )
     }
+  }
 
   private def buildOptDisposedPropertyTransactions(
     srn: Srn,

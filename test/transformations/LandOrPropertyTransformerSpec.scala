@@ -32,6 +32,7 @@ import pages.nonsipp.common._
 import viewmodels.models.SectionCompleted
 import models.requests.{AllowedAccessRequest, DataRequest}
 import models.requests.psr._
+import config.Constants.PREPOPULATION_FLAG
 import pages.nonsipp.landorpropertydisposal.{Paths, _}
 import org.scalatest.OptionValues
 import play.api.libs.json.Json
@@ -40,6 +41,10 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
 
   val allowedAccessRequest
     : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequestPrePopulation: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+      .withSession((PREPOPULATION_FLAG, "true"))
+  ).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
   private val transformer = new LandOrPropertyTransformer()
@@ -54,10 +59,12 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
     "should omit Record Version when there is a change in userAnswers" in {
       val userAnswers = emptyUserAnswers
         .unsafeSet(LandOrPropertyHeldPage(srn), false)
+        .unsafeSet(LandOrPropertyDisposalPage(srn), false)
         .unsafeSet(LandOrPropertyRecordVersionPage(srn), "001")
 
       val initialUserAnswer = emptyUserAnswers
         .unsafeSet(LandOrPropertyHeldPage(srn), true)
+        .unsafeSet(LandOrPropertyDisposalPage(srn), false)
         .unsafeSet(LandOrPropertyRecordVersionPage(srn), "001")
 
       val result =
@@ -67,8 +74,8 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
       result mustBe Some(
         LandOrProperty(
           recordVersion = None,
-          landOrPropertyHeld = false,
-          disposeAnyLandOrProperty = false,
+          optLandOrPropertyHeld = Some(false),
+          optDisposeAnyLandOrProperty = Some(false),
           landOrPropertyTransactions = Seq.empty
         )
       )
@@ -77,6 +84,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
     "should return empty List when index as string not a valid number" in {
       val userAnswers = emptyUserAnswers
         .unsafeSet(LandOrPropertyHeldPage(srn), true)
+        .unsafeSet(LandOrPropertyDisposalPage(srn), false)
         .unsafeSet(LandOrPropertyRecordVersionPage(srn), "001")
         .unsafeSet(
           Paths.landOrPropertyTransactions \ "propertyDetails" \ "landOrPropertyInUK",
@@ -89,9 +97,27 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
       result mustBe Some(
         LandOrProperty(
           recordVersion = Some("001"),
-          landOrPropertyHeld = true,
-          disposeAnyLandOrProperty = false,
+          optLandOrPropertyHeld = Some(true),
+          optDisposeAnyLandOrProperty = Some(false),
           landOrPropertyTransactions = Seq.empty
+        )
+      )
+    }
+
+    "should return disposals None when LandOrPropertyDisposalPage is None and it is pre-population " in {
+      val userAnswers = emptyUserAnswers
+        .unsafeSet(LandOrPropertyHeldPage(srn), true)
+        .unsafeSet(LandOrPropertyRecordVersionPage(srn), "001")
+
+      val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
+
+      val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+      result mustBe Some(
+        LandOrProperty(
+          recordVersion = Some("001"),
+          optLandOrPropertyHeld = Some(true),
+          optDisposeAnyLandOrProperty = None,
+          landOrPropertyTransactions = Seq.empty // tests don't need to check these transactions in detail
         )
       )
     }
@@ -554,8 +580,8 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
   def buildLandOrProperty(name: String, propertyAcquiredFrom: PropertyAcquiredFrom): LandOrProperty =
     LandOrProperty(
       recordVersion = Some("001"),
-      landOrPropertyHeld = true,
-      disposeAnyLandOrProperty = true,
+      optLandOrPropertyHeld = Some(true),
+      optDisposeAnyLandOrProperty = Some(true),
       landOrPropertyTransactions = Seq(
         LandOrPropertyTransactions(
           propertyDetails = PropertyDetails(
@@ -572,17 +598,17 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
             optConnectedPartyStatus = Some(true),
             totalCostOfLandOrProperty = money.value,
             optIndepValuationSupport = Some(false),
-            isLandOrPropertyResidential = true,
+            optIsLandOrPropertyResidential = Some(true),
             optLeaseDetails = Some(
               LeaseDetails(
-                lesseeName = "lesseeName",
-                leaseGrantDate = localDate,
-                annualLeaseAmount = money.value,
-                connectedPartyStatus = false
+                optLesseeName = Some("lesseeName"),
+                optLeaseGrantDate = Some(localDate),
+                optAnnualLeaseAmount = Some(money.value),
+                optConnectedPartyStatus = Some(false)
               )
             ),
-            landOrPropertyLeased = true,
-            totalIncomeOrReceipts = money.value
+            optLandOrPropertyLeased = Some(true),
+            optTotalIncomeOrReceipts = Some(money.value)
           ),
           optDisposedPropertyTransaction = Some(
             Seq(
