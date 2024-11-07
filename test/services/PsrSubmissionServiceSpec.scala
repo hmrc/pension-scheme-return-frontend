@@ -65,11 +65,11 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     when(mockAuditService.sendEvent(any)(any(), any())).thenReturn(Future.successful(AuditResult.Success))
   }
 
-  val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+  private val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
     FakeRequest()
       .withSession((PREPOPULATION_FLAG, "false"))
   ).sample.value
-  val allowedAccessRequestPrePopulation: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+  private val allowedAccessRequestPrePopulation: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
     FakeRequest()
       .withSession((PREPOPULATION_FLAG, "true"))
   ).sample.value
