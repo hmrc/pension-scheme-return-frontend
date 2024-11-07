@@ -32,8 +32,8 @@ import models.HowDisposed.{HowDisposed, Other, Sold}
 import com.google.inject.Singleton
 import pages.nonsipp.landorproperty.Paths.landOrProperty
 import models.SchemeId.Srn
+import utils.nonsipp.PrePopulationUtils.isPrePopulation
 import models.requests.psr._
-import config.Constants.PREPOPULATION_FLAG
 import pages.nonsipp.landorpropertydisposal._
 import models.UserAnswers.implicits.UserAnswersTryOps
 
@@ -51,7 +51,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
     Option.when(optLandOrPropertyHeld.nonEmpty || request.userAnswers.map(LandPropertyInUKPages(srn)).toList.nonEmpty) {
       val optDisposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn))
       val dispose =
-        if (isPrePopulation(implicitly) && optDisposeAnyLandOrProperty.isEmpty) {
+        if (isPrePopulation && optDisposeAnyLandOrProperty.isEmpty) {
           None // allow None only in pre-population
         } else {
           Option(optDisposeAnyLandOrProperty.getOrElse(false))
@@ -628,16 +628,12 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
       }
       .flatten
 
-  private def isPrePopulation(implicit request: DataRequest[_]): Boolean =
-    request.session.get(PREPOPULATION_FLAG).fold(false)(_.toBoolean)
-
   private def buildOptLandOrPropertyLeasedDetails(
     landOrPropertyLeased: Boolean,
     srn: Srn,
     index: Refined[Int, OneTo5000]
-  )(implicit request: DataRequest[_]): Option[LeaseDetails] = {
-    val isIt = isPrePopulation(implicitly)
-    Option.when(isIt || (!isPrePopulation(implicitly) && landOrPropertyLeased)) {
+  )(implicit request: DataRequest[_]): Option[LeaseDetails] =
+    Option.when(isPrePopulation || landOrPropertyLeased) {
       val leaseDetails =
         request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index))
       val leaseConnectedParty = request.userAnswers.get(IsLesseeConnectedPartyPage(srn, index))
@@ -648,7 +644,6 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
         optConnectedPartyStatus = leaseConnectedParty.map(_.booleanValue())
       )
     }
-  }
 
   private def buildOptDisposedPropertyTransactions(
     srn: Srn,
