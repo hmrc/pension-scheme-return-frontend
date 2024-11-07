@@ -27,6 +27,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import models.requests.DataRequest
 import handlers.PostPsrException
 import models.SchemeId.Srn
+import utils.nonsipp.PrePopulationUtils.isPrePopulation
 import models.requests.psr._
 import config.Constants._
 import pages.nonsipp.CheckReturnDatesPage
@@ -121,7 +122,7 @@ class PsrSubmissionService @Inject()(
     submissionRequest: PsrSubmission,
     isSubmitted: Boolean
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Either[String, Unit]] =
-    if (isPrePopulation(implicitly) && !isSubmitted) {
+    if (isPrePopulation && !isSubmitted) {
       logger.info("Submit pre-populated PSR is called")
       psrConnector
         .submitPrePopulatedPsr(
@@ -223,8 +224,5 @@ class PsrSubmissionService @Inject()(
       )
     }
   }
-
-  private def isPrePopulation(implicit request: DataRequest[_]): Boolean =
-    request.session.get(PREPOPULATION_FLAG).fold(false)(_.toBoolean)
 
 }
