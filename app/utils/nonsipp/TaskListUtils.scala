@@ -103,7 +103,7 @@ object TaskListUtils {
 
     val sectionListWithoutDeclaration = getSectionListWithoutDeclaration(srn, schemeName, userAnswers, pensionSchemeId)
 
-    val (numberOfCompletedWithoutDeclaration, numberOfTotalWithoutDeclaration) = evaluateCompletedTotalTuple(
+    val (numberOfCompletedWithoutDeclaration, numberOfTotalWithoutDeclaration) = evaluateReadyForSubmissionTotalTuple(
       sectionListWithoutDeclaration
     )
 
