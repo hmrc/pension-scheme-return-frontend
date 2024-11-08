@@ -18,10 +18,12 @@ package controllers.nonsipp
 
 import models.ConditionalYesNo._
 import pages.nonsipp.otherassetsheld._
+import controllers.ControllerBaseSpec
 import models.SchemeHoldShare._
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer._
 import pages.nonsipp.landorpropertydisposal._
+import pages.nonsipp.memberpensionpayments._
 import pages.nonsipp.membersurrenderedbenefits._
 import models.{ConditionalYesNo, _}
 import models.SponsoringOrConnectedParty._
@@ -43,12 +45,8 @@ import play.api.mvc.Call
 import models.ManualOrUpload._
 import models.PensionSchemeType._
 import models.IdentityType._
-import config.RefinedTypes._
-import controllers.ControllerBaseSpec
 import views.html.TaskListView
 import models.TypeOfShares._
-import pages.nonsipp.memberpensionpayments._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import pages.nonsipp.sharesdisposal._
 import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
@@ -80,15 +78,6 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
   override def beforeEach(): Unit =
     when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(Seq()))
-
-  // Set test values
-  private val index1of300: Max300 = refineMV(1)
-  private val index1of50: Max50 = refineMV(1)
-  private val index1of5: Max5 = refineMV(1)
-  private val index1of5000: Max5000 = refineMV(1)
-  private val name: String = "name"
-  private val reason: String = "reason"
-  private val numAccountingPeriods: Max3 = refineMV(1)
 
   // Build userAnswers for current version
   private val currentUA: UserAnswers = defaultUserAnswers
@@ -288,7 +277,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     // Section 1 - Scheme Details
     // (S1) Basic Details
     .unsafeSet(CheckReturnDatesPage(srn), false)
-    .unsafeSet(AccountingPeriodPage(srn, numAccountingPeriods, NormalMode), dateRange)
+    .unsafeSet(AccountingPeriodPage(srn, index1of3, NormalMode), dateRange)
     .unsafeSet(ActiveBankAccountPage(srn), false)
     .unsafeSet(WhyNoBankAccountPage(srn), reason)
     .unsafeSet(HowManyMembersPage(srn, psaId), schemeMemberNumbers)

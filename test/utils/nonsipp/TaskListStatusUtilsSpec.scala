@@ -66,14 +66,6 @@ import viewmodels.models.{MemberState, SectionCompleted}
 
 class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
-  private val index1of300: Max300 = refineMV(1)
-  private val index1of50: Max50 = refineMV(1)
-  private val index1of5: Max5 = refineMV(1)
-  private val index1of5000: Max5000 = refineMV(1)
-  private val index2of5000: Max5000 = refineMV(2)
-  private val name: String = "name"
-  private val reason: String = "reason"
-
   private val currentUA: UserAnswers = defaultUserAnswers
     .unsafeSet(WhichTaxYearPage(srn), dateRange) // automatically set
     // Section 1 - Scheme Details
