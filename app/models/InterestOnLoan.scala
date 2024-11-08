@@ -22,6 +22,7 @@ import play.api.libs.functional.syntax.toFunctionalBuilderOps
 
 case class InterestOnLoan(loanInterestAmount: Money, loanInterestRate: Percentage, optIntReceivedCY: Option[Money]) {
   val asTuple: (Money, Percentage, Option[Money]) = (loanInterestAmount, loanInterestRate, optIntReceivedCY)
+  val hasMissingAnswer: Boolean = optIntReceivedCY.isEmpty
 }
 
 object InterestOnLoan {
