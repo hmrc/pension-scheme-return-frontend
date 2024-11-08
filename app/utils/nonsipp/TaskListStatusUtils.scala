@@ -680,7 +680,7 @@ object TaskListStatusUtils {
     toExclude: Option[String] = None
   ): TaskListStatus = {
     val c = currentUA.get(path).getOrElse(JsObject.empty).as[JsObject] - toExclude.getOrElse("") - "recordVersion"
-    val p = previousUA.get(path).getOrElse(JsObject.empty).as[JsObject] - toExclude.getOrElse("")
+    val p = previousUA.get(path).getOrElse(JsObject.empty).as[JsObject] - toExclude.getOrElse("") - "recordVersion"
     if (c == p) {
       Completed
     } else {

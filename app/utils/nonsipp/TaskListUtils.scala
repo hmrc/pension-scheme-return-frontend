@@ -73,7 +73,7 @@ object TaskListUtils {
         if (noChangesSincePreviousVersion) {
           LinkMessage(
             s"$prefix.view",
-            psaOrPspDeclarationUrl
+            controllers.nonsipp.routes.ReturnSubmittedController.onPageLoad(srn).url
           )
         } else {
           LinkMessage(
@@ -120,34 +120,6 @@ object TaskListUtils {
 
   }
 
-  def getSectionListOne(
-    srn: Srn,
-    schemeName: String,
-    userAnswers: UserAnswers,
-    pensionSchemeId: PensionSchemeId,
-    hasChanged: Boolean
-  ): List[TaskListSectionViewModel] = {
-
-    val sectionListWithoutDeclaration = getSectionListWithoutDeclaration(srn, schemeName, userAnswers, pensionSchemeId)
-
-    val (numSectionsReadyForSubmission, numSectionsTotal) = evaluateReadyForSubmissionTotalTuple(
-      sectionListWithoutDeclaration
-    )
-
-    val isLinkActive = numSectionsTotal == numSectionsReadyForSubmission
-
-    val declarationSectionViewModel =
-      getDeclarationSection(
-        srn,
-        pensionSchemeId.isPSP,
-        isLinkActive,
-        hasChanged,
-        schemeName
-      )
-
-    sectionListWithoutDeclaration :+ declarationSectionViewModel
-
-  }
 
   private def schemeDetailsSection(
     srn: Srn,
