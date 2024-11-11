@@ -28,6 +28,7 @@ import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import config.RefinedTypes.Max5000
 import controllers.ControllerBaseSpec
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 
@@ -212,6 +213,17 @@ class SharesListControllerSpec extends ControllerBaseSpec {
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with no shares")
+    )
+
+    act.like(
+      redirectToPage(
+        onSubmitViewOnly,
+        controllers.nonsipp.routes.ViewOnlyTaskListController
+          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+      ).after(
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      )
+        .withName("Submit redirects to view only taskList")
     )
 
     act.like(

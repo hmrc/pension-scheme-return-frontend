@@ -18,6 +18,7 @@ package services
 
 import connectors.PSRConnector
 import models.SchemeId.Srn
+import models.requests.AllowedAccessRequest
 import models.backend.responses.OverviewResponse
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,7 +29,8 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class PsrOverviewService @Inject()(psrConnector: PSRConnector) {
   def getOverview(pstr: String, fromDate: String, toDate: String, srn: Srn)(
-    implicit hc: HeaderCarrier,
+    implicit request: AllowedAccessRequest[_],
+    hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[Seq[OverviewResponse]]] =
     psrConnector.getOverview(pstr, fromDate, toDate, srn)

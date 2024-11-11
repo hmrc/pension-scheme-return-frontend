@@ -127,11 +127,11 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
         injected[ReturnsSubmittedView]
           .apply(viewModel(srn, page, data(srn), fromYearUi, toYearUi, schemeName))
       }.before(
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any())).thenReturn(
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
             Future.successful(versionsResponse)
           )
         )
-        .after(verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any()))
+        .after(verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any()))
         .withName("onPageLoad renders ok")
     )
 
@@ -140,11 +140,11 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
         injected[ReturnsSubmittedView]
           .apply(viewModel(srn, page, dataInProgress(srn), fromYearUi, toYearUi, schemeName))
       }.before(
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any())).thenReturn(
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
             Future.successful(versionsResponseInProgress)
           )
         )
-        .after(verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any()))
+        .after(verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any()))
         .withName("onPageLoad inProgress renders ok")
     )
 
@@ -166,7 +166,7 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
             submissionNumberOne
           )
       ).after {
-          verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any())
+          verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
           verify(mockPsrRetrievalService, never)
             .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
         }
@@ -185,7 +185,7 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
           ),
         emptyUserAnswers.unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersUnderThreshold)
       ).after {
-          verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any())
+          verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
           verify(mockPsrRetrievalService, never)
             .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
         }
@@ -207,7 +207,7 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
         userAnswers = emptyUserAnswers.unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold),
         previousUserAnswers = emptyUserAnswers.unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
       ).after {
-          verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any())
+          verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
           verify(mockPsrRetrievalService, never)
             .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
         }
@@ -222,7 +222,7 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
         controllers.routes.JourneyRecoveryController.onPageLoad(),
         userAnswers = emptyUserAnswers.unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
       ).after {
-          verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any())
+          verify(mockPsrVersionsService, never).getVersions(any(), any(), any())(any(), any(), any())
           verify(mockPsrRetrievalService, never)
             .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
         }
@@ -245,12 +245,12 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
         ),
         userAnswers = overThresholdUA
       ).after {
-          verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any())
+          verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
           verify(mockPsrRetrievalService, never)
             .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
         }
         .before(
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any())).thenReturn(
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
             Future.successful(Seq())
           )
         )
@@ -270,12 +270,12 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
         ),
         userAnswers = overThresholdUA
       ).after {
-          verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any())
+          verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
           verify(mockPsrRetrievalService, times(1))
             .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
         }
         .before {
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any())).thenReturn(
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
             Future.successful(versionsResponse)
           )
           when(
@@ -300,7 +300,7 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
         ),
         userAnswers = overThresholdUA
       ).before {
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any())).thenReturn(
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
             Future.successful(versionsResponse)
           )
           when(
@@ -309,7 +309,7 @@ class ReturnsSubmittedControllerSpec extends ControllerBaseSpec with CommonTestV
           ).thenReturn(Future.successful(overThresholdUA))
         }
         .after {
-          verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any())
+          verify(mockPsrVersionsService, times(1)).getVersions(any(), any(), any())(any(), any(), any())
           verify(mockPsrRetrievalService, times(1))
             .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
         }

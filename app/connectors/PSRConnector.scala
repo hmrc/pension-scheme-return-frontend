@@ -18,13 +18,15 @@ package connectors
 
 import config.FrontendAppConfig
 import play.api.libs.ws.WSRequest
-import models.requests.psr.PsrSubmission
 import models.AnswersSavedDisplayVersion
 import uk.gov.hmrc.http.client.HttpClientV2
+import models.requests.{AllowedAccessRequest, DataRequest}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import play.api.mvc.Call
 import handlers.GetPsrException
 import models.SchemeId.Srn
+import models.requests.psr.PsrSubmission
+import config.Constants.{PSA, PSP}
 import play.api.Logger
 import play.api.libs.json._
 import models.backend.responses.{OverviewResponse, PsrVersionsForYearsResponse, PsrVersionsResponse}
@@ -54,11 +56,15 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
     userName: String,
     schemeName: String,
     srn: Srn
-  )(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] =
+  )(
+    implicit request: DataRequest[_],
+    headerCarrier: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Either[String, Unit]] =
     http
       .post(url"$submitStandardUrl")
       .withBody(Json.toJson(psrSubmission))
-      .transform(buildHeaders(_, userName, schemeName, srn))
+      .transform(buildHeaders(_, userName, schemeName, srn, if (request.pensionSchemeId.isPSP) PSP else PSA))
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -73,11 +79,15 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
     userName: String,
     schemeName: String,
     srn: Srn
-  )(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] =
+  )(
+    implicit request: DataRequest[_],
+    headerCarrier: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Either[String, Unit]] =
     http
       .post(url"$submitPrePopulatedUrl")
       .withBody(Json.toJson(psrSubmission))
-      .transform(buildHeaders(_, userName, schemeName, srn))
+      .transform(buildHeaders(_, userName, schemeName, srn, if (request.pensionSchemeId.isPSP) PSP else PSA))
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -96,7 +106,11 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
     userName: String,
     schemeName: String,
     srn: Srn
-  )(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Option[PsrSubmission]] = {
+  )(
+    implicit request: DataRequest[_],
+    headerCarrier: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Option[PsrSubmission]] = {
     val queryParams = (optPeriodStartDate, optPsrVersion, optFbNumber) match {
       case (Some(startDate), Some(version), _) =>
         Seq(
@@ -108,7 +122,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
     }
     http
       .get(url"${getStandardUrl(pstr)}?$queryParams")
-      .transform(buildHeaders(_, userName, schemeName, srn))
+      .transform(buildHeaders(_, userName, schemeName, srn, if (request.pensionSchemeId.isPSP) PSP else PSA))
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -130,12 +144,18 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
   }
 
   def getVersionsForYears(pstr: String, startDates: Seq[String], srn: Srn, fallBackCall: Call)(
-    implicit hc: HeaderCarrier,
+    implicit request: AllowedAccessRequest[_],
+    hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsForYearsResponse]] =
     http
       .get(url"${versionsForYearsUrl(pstr, startDates)}")
-      .transform(_.addHttpHeaders("srn" -> srn.value))
+      .transform(
+        _.addHttpHeaders(
+          "srn" -> srn.value,
+          "requestRole" -> (if (request.pensionSchemeId.isPSP) PSP else PSA)
+        )
+      )
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -169,12 +189,19 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
       }
 
   def getVersions(pstr: String, startDate: String, srn: Srn, fallBackCall: Call)(
-    implicit hc: HeaderCarrier,
+    implicit request: DataRequest[_],
+    hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Seq[PsrVersionsResponse]] =
     http
       .get(url"${versionsUrl(pstr, startDate)}")
-      .transform(_.addHttpHeaders("srn" -> srn.value))
+      .transform(
+        _.addHttpHeaders(
+          "srn" -> srn.value,
+          "requestRole" -> (if (request.pensionSchemeId.isPSP) PSP
+                            else PSA)
+        )
+      )
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -206,7 +233,8 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
       }
 
   def getOverview(pstr: String, fromDate: String, toDate: String, srn: Srn)(
-    implicit hc: HeaderCarrier,
+    implicit request: AllowedAccessRequest[_],
+    hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[Seq[OverviewResponse]]] = {
 
@@ -215,10 +243,14 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
         "fromDate" -> fromDate,
         "toDate" -> toDate
       )
-
     http
       .get(url"${overviewUrl(pstr)}?$queryParams")
-      .transform(_.addHttpHeaders("srn" -> srn.value))
+      .transform(
+        _.addHttpHeaders(
+          "srn" -> srn.value,
+          "requestRole" -> (if (request.pensionSchemeId.isPSP) PSP else PSA)
+        )
+      )
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -236,11 +268,18 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
       }
   }
 
-  private def buildHeaders(wsRequest: WSRequest, userName: String, schemeName: String, srn: Srn): WSRequest =
+  private def buildHeaders(
+    wsRequest: WSRequest,
+    userName: String,
+    schemeName: String,
+    srn: Srn,
+    requestRole: String
+  ): WSRequest =
     wsRequest.addHttpHeaders(
       "Content-Type" -> "application/json",
       "userName" -> userName,
       "schemeName" -> schemeName,
-      "srn" -> srn.value
+      "srn" -> srn.value,
+      "requestRole" -> requestRole
     )
 }
