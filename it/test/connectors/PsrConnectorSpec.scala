@@ -22,10 +22,15 @@ import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import handlers.GetPsrException
 import models.SchemeId.Srn
+import models.UserAnswers
+import models.UserAnswers.SensitiveJsObject
+import models.requests.{AllowedAccessRequest, DataRequest}
 import org.scalatest.exceptions.TestFailedException
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{__, JsResultException, Json, JsonValidationError}
+import play.api.libs.json.{JsResultException, Json, JsonValidationError, __}
+import play.api.mvc.AnyContentAsEmpty
+import play.api.test.FakeRequest
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.CommonTestValues
@@ -34,6 +39,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.jdk.CollectionConverters._
 
 class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
+
+  implicit val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, UserAnswers("id", SensitiveJsObject(Json.obj("non" -> "empty"))))
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 

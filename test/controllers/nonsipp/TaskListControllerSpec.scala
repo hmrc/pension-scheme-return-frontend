@@ -66,7 +66,8 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any())).thenReturn(Future.successful(Seq()))
+    when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Seq()))
   }
 
   "TaskListController" - {
@@ -100,7 +101,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
         view(defaultViewModel, schemeName)
       }.withName("task list renders OK when version response without any submitted")
         .before(
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any()))
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
             .thenReturn(
               Future.successful(
                 Seq(
@@ -137,7 +138,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
         )
       }.withName("task list renders OK when version response with any submitted")
         .before(
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any()))
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
             .thenReturn(
               Future.successful(versionsResponse)
             )
@@ -163,7 +164,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
           )
       }.withName("task list renders OK when version response with any submitted but max version compiled")
         .before(
-          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any()))
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
             .thenReturn(
               Future.successful(versionsResponseInProgress)
             )
