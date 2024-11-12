@@ -16,17 +16,149 @@
 
 package utils.nonsipp
 
+import pages.nonsipp.shares._
 import models.IdentityType._
 import models.SchemeHoldLandProperty._
 import config.RefinedTypes.{Max5000, OneTo5000}
-import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineV
-import models.{IdentitySubject, IdentityType, UserAnswers}
+import models._
 import pages.nonsipp.common._
 import models.IdentitySubject._
+import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
+import models.SchemeId.Srn
 
 object CheckStatusUtils {
+
+  /**
+   * This method determines whether or not the Shares section needs to be checked. A section needs to be checked if 1 or
+   * more records in that section need to be checked.
+   * @param userAnswers the answers provided by the user, from which we get each Shares record
+   * @param srn the Scheme Reference Number, used for the .get calls
+   * @return true if any record requires checking, else false
+   */
+  def checkSharesSection(
+    userAnswers: UserAnswers,
+    srn: Srn
+  ): Boolean = {
+    val didSchemeHoldAnyShares = userAnswers.get(DidSchemeHoldAnySharesPage(srn))
+    val journeysStartedList = userAnswers.get(TypeOfSharesHeldPages(srn)).getOrElse(Map.empty).keys.toList
+
+    didSchemeHoldAnyShares match {
+      case Some(false) => false
+      case _ =>
+        journeysStartedList
+          .map(
+            index => {
+              refineV[OneTo5000](index.toInt + 1).fold(
+                _ => List.empty,
+                refinedIndex => checkSharesRecord(userAnswers, srn, refinedIndex)
+              )
+            }
+          )
+          .contains(true)
+    }
+  }
+
+  /**
+   * This method determines whether or not a Shares record needs to be checked. A record needs checking if any of the
+   * pre-populated-then-cleared answers are missing & all of the other answers are present.
+   * @param userAnswers the answers provided by the user, from which we get the Shares record
+   * @param srn the Scheme Reference Number, used for the .get calls
+   * @param recordIndex the index of the record being checked
+   * @return true if the record requires checking, else false
+   */
+  def checkSharesRecord(
+    userAnswers: UserAnswers,
+    srn: Srn,
+    recordIndex: Max5000
+  ): Boolean = {
+    val anyPrePopClearedAnswersMissing: Boolean = userAnswers.get(SharesTotalIncomePage(srn, recordIndex)).isEmpty
+
+    lazy val allOtherAnswersPresent: Boolean = (
+      userAnswers.get(TypeOfSharesHeldPage(srn, recordIndex)),
+      userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, recordIndex)),
+      userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, recordIndex)), // if Acquisition || Contribution
+      userAnswers.get(CompanyNameRelatedSharesPage(srn, recordIndex)),
+      userAnswers.get(SharesCompanyCrnPage(srn, recordIndex)),
+      userAnswers.get(ClassOfSharesPage(srn, recordIndex)),
+      userAnswers.get(HowManySharesPage(srn, recordIndex)),
+      // IdentityType pages are handled by the identitySubjectAnswersPresent method
+      userAnswers.get(SharesFromConnectedPartyPage(srn, recordIndex)), // if Unquoted
+      userAnswers.get(CostOfSharesPage(srn, recordIndex)),
+      userAnswers.get(SharesIndependentValuationPage(srn, recordIndex))
+    ) match {
+      // Acquisition
+      case (
+          Some(typeOfShares),
+          Some(SchemeHoldShare.Acquisition),
+          Some(_),
+          Some(_),
+          Some(_),
+          Some(_),
+          Some(_),
+          optUnquotedSharesConnectedParty,
+          Some(_),
+          Some(_)
+          ) =>
+        (
+          typeOfShares,
+          userAnswers.get(TotalAssetValuePage(srn, recordIndex)), // if Sponsoring Employer && Acquisition
+          userAnswers.get(IdentityTypePage(srn, recordIndex, SharesSeller)),
+          optUnquotedSharesConnectedParty
+        ) match {
+          case (SponsoringEmployer, Some(_), Some(identityType), None) =>
+            identitySubjectAnswersPresent(userAnswers, srn, recordIndex, SharesSeller, identityType)
+          case (Unquoted, None, Some(identityType), Some(_)) =>
+            identitySubjectAnswersPresent(userAnswers, srn, recordIndex, SharesSeller, identityType)
+          case (ConnectedParty, None, Some(identityType), None) =>
+            identitySubjectAnswersPresent(userAnswers, srn, recordIndex, SharesSeller, identityType)
+          case (_, _, _, _) => false
+        }
+      // Contribution
+      case (
+          Some(typeOfShares),
+          Some(SchemeHoldShare.Contribution),
+          Some(_),
+          Some(_),
+          Some(_),
+          Some(_),
+          Some(_),
+          optUnquotedSharesConnectedParty,
+          Some(_),
+          Some(_)
+          ) =>
+        (typeOfShares, optUnquotedSharesConnectedParty) match {
+          case (SponsoringEmployer, None) => true
+          case (Unquoted, Some(_)) => true
+          case (ConnectedParty, None) => true
+          case (_, _) => false
+        }
+      // Transfer
+      case (
+          Some(typeOfShares),
+          Some(SchemeHoldShare.Transfer),
+          None,
+          Some(_),
+          Some(_),
+          Some(_),
+          Some(_),
+          optUnquotedSharesConnectedParty,
+          Some(_),
+          Some(_)
+          ) =>
+        (typeOfShares, optUnquotedSharesConnectedParty) match {
+          case (SponsoringEmployer, None) => true
+          case (Unquoted, Some(_)) => true
+          case (ConnectedParty, None) => true
+          case (_, _) => false
+        }
+      case (_, _, _, _, _, _, _, _, _, _) =>
+        false
+    }
+
+    anyPrePopClearedAnswersMissing && allOtherAnswersPresent
+  }
 
   /**
    * This method determines whether or not the Land or Property section needs to be checked. A section needs to be
@@ -154,19 +286,49 @@ object CheckStatusUtils {
           case UKPartnership =>
             (
               userAnswers.get(PartnershipSellerNamePage(srn, recordIndex)),
-              userAnswers.get(PartnershipRecipientUtrPage(srn, recordIndex, LandOrPropertySeller))
+              userAnswers.get(PartnershipRecipientUtrPage(srn, recordIndex, identitySubject))
             ) match {
               case (Some(_), Some(_)) => true
               case (_, _) => false
             }
           case Other =>
-            userAnswers.get(OtherRecipientDetailsPage(srn, recordIndex, LandOrPropertySeller)) match {
+            userAnswers.get(OtherRecipientDetailsPage(srn, recordIndex, identitySubject)) match {
               case Some(_) => true
               case None => false
             }
         }
       case SharesSeller =>
-        false
+        identityType match {
+          case Individual =>
+            (
+              userAnswers.get(IndividualNameOfSharesSellerPage(srn, recordIndex)),
+              userAnswers.get(SharesIndividualSellerNINumberPage(srn, recordIndex))
+            ) match {
+              case (Some(_), Some(_)) => true
+              case (_, _) => false
+            }
+          case UKCompany =>
+            (
+              userAnswers.get(CompanyNameOfSharesSellerPage(srn, recordIndex)),
+              userAnswers.get(CompanyRecipientCrnPage(srn, recordIndex, identitySubject))
+            ) match {
+              case (Some(_), Some(_)) => true
+              case (_, _) => false
+            }
+          case UKPartnership =>
+            (
+              userAnswers.get(PartnershipShareSellerNamePage(srn, recordIndex)),
+              userAnswers.get(PartnershipRecipientUtrPage(srn, recordIndex, identitySubject))
+            ) match {
+              case (Some(_), Some(_)) => true
+              case (_, _) => false
+            }
+          case Other =>
+            userAnswers.get(OtherRecipientDetailsPage(srn, recordIndex, identitySubject)) match {
+              case Some(_) => true
+              case None => false
+            }
+        }
       case OtherAssetSeller =>
         false
       case Unknown =>
