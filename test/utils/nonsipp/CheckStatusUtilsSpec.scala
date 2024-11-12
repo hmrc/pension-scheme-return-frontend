@@ -251,7 +251,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
         checkSharesSection(userAnswers, srn) mustBe true
       }
 
-      "when didSchemeHoldAnyShares is None & when 2 records are present, 1 of which needs checking" in {
+      "when didSchemeHoldAnyShares is None & 2 records are present, 1 of which needs checking" in {
         val userAnswers =
           addSharesBaseAnswers(
             index1of5000,
@@ -294,7 +294,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
         checkSharesSection(userAnswers, srn) mustBe false
       }
 
-      "when didSchemeHoldAnyShares is Some(true) & 1 record is present which doesn't need checking" in {
+      "when didSchemeHoldAnyShares is Some(true) & 1 record is present, which doesn't need checking" in {
         val userAnswers =
           addSharesBaseAnswers(
             index1of5000,
@@ -316,7 +316,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
         checkSharesSection(userAnswers, srn) mustBe false
       }
 
-      "when didSchemeHoldAnyShares is None & 1 record is present which doesn't need checking" in {
+      "when didSchemeHoldAnyShares is None & 1 record is present, which doesn't need checking" in {
         val userAnswers =
           addSharesBaseAnswers(
             index1of5000,
@@ -633,7 +633,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
         checkLandOrPropertySection(userAnswers, srn) mustBe true
       }
 
-      "when landOrPropertyHeld is None & when 2 records are present, 1 of which needs checking" in {
+      "when landOrPropertyHeld is None & 2 records are present, 1 of which needs checking" in {
         val userAnswers =
           addLOPBaseAnswers(
             index1of5000,
@@ -670,7 +670,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
         checkLandOrPropertySection(userAnswers, srn) mustBe false
       }
 
-      "when landOrPropertyHeld is Some(true) & 1 record is present which doesn't need checking" in {
+      "when landOrPropertyHeld is Some(true) & 1 record is present, which doesn't need checking" in {
         val userAnswers =
           addLOPBaseAnswers(
             index1of5000,
@@ -692,7 +692,7 @@ class CheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionV
         checkLandOrPropertySection(userAnswers, srn) mustBe false
       }
 
-      "when landOrPropertyHeld is None & 1 record is present which doesn't need checking" in {
+      "when landOrPropertyHeld is None & 1 record is present, which doesn't need checking" in {
         val userAnswers =
           addLOPBaseAnswers(
             index1of5000,

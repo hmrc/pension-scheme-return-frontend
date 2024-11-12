@@ -75,8 +75,7 @@ object CheckStatusUtils {
   ): Boolean = {
     val anyPrePopClearedAnswersMissing: Boolean = userAnswers.get(SharesTotalIncomePage(srn, recordIndex)).isEmpty
 
-    lazy val allOtherAnswersPresent: Boolean = (
-      userAnswers.get(TypeOfSharesHeldPage(srn, recordIndex)),
+    lazy val baseAnswersPresent: Boolean = (
       userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, recordIndex)),
       userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, recordIndex)), // if Acquisition || Contribution
       userAnswers.get(CompanyNameRelatedSharesPage(srn, recordIndex)),
@@ -84,78 +83,48 @@ object CheckStatusUtils {
       userAnswers.get(ClassOfSharesPage(srn, recordIndex)),
       userAnswers.get(HowManySharesPage(srn, recordIndex)),
       // IdentityType pages are handled by the identitySubjectAnswersPresent method
-      userAnswers.get(SharesFromConnectedPartyPage(srn, recordIndex)), // if Unquoted
       userAnswers.get(CostOfSharesPage(srn, recordIndex)),
       userAnswers.get(SharesIndependentValuationPage(srn, recordIndex))
     ) match {
       // Acquisition
-      case (
-          Some(typeOfShares),
-          Some(SchemeHoldShare.Acquisition),
-          Some(_),
-          Some(_),
-          Some(_),
-          Some(_),
-          Some(_),
-          optUnquotedSharesConnectedParty,
-          Some(_),
-          Some(_)
-          ) =>
-        (
-          typeOfShares,
-          userAnswers.get(TotalAssetValuePage(srn, recordIndex)), // if Sponsoring Employer && Acquisition
-          userAnswers.get(IdentityTypePage(srn, recordIndex, SharesSeller)),
-          optUnquotedSharesConnectedParty
-        ) match {
-          case (SponsoringEmployer, Some(_), Some(identityType), None) =>
+      case (Some(SchemeHoldShare.Acquisition), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) =>
+        userAnswers.get(IdentityTypePage(srn, recordIndex, SharesSeller)) match {
+          case None => false
+          case Some(identityType) =>
             identitySubjectAnswersPresent(userAnswers, srn, recordIndex, SharesSeller, identityType)
-          case (Unquoted, None, Some(identityType), Some(_)) =>
-            identitySubjectAnswersPresent(userAnswers, srn, recordIndex, SharesSeller, identityType)
-          case (ConnectedParty, None, Some(identityType), None) =>
-            identitySubjectAnswersPresent(userAnswers, srn, recordIndex, SharesSeller, identityType)
-          case (_, _, _, _) => false
         }
       // Contribution
-      case (
-          Some(typeOfShares),
-          Some(SchemeHoldShare.Contribution),
-          Some(_),
-          Some(_),
-          Some(_),
-          Some(_),
-          Some(_),
-          optUnquotedSharesConnectedParty,
-          Some(_),
-          Some(_)
-          ) =>
-        (typeOfShares, optUnquotedSharesConnectedParty) match {
-          case (SponsoringEmployer, None) => true
-          case (Unquoted, Some(_)) => true
-          case (ConnectedParty, None) => true
-          case (_, _) => false
-        }
+      case (Some(SchemeHoldShare.Contribution), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) =>
+        true
       // Transfer
-      case (
-          Some(typeOfShares),
-          Some(SchemeHoldShare.Transfer),
-          None,
-          Some(_),
-          Some(_),
-          Some(_),
-          Some(_),
-          optUnquotedSharesConnectedParty,
-          Some(_),
-          Some(_)
-          ) =>
-        (typeOfShares, optUnquotedSharesConnectedParty) match {
-          case (SponsoringEmployer, None) => true
-          case (Unquoted, Some(_)) => true
-          case (ConnectedParty, None) => true
-          case (_, _) => false
-        }
-      case (_, _, _, _, _, _, _, _, _, _) =>
+      case (Some(SchemeHoldShare.Transfer), None, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_)) =>
+        true
+      case (_, _, _, _, _, _, _, _) =>
         false
     }
+
+    lazy val typeOfSharesAnswersPresent: Boolean = userAnswers.get(TypeOfSharesHeldPage(srn, recordIndex)) match {
+      // Sponsoring Employer
+      case Some(SponsoringEmployer) =>
+        (
+          userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, recordIndex)),
+          userAnswers.get(TotalAssetValuePage(srn, recordIndex)) // if Sponsoring Employer && Acquisition
+        ) match {
+          case (Some(SchemeHoldShare.Acquisition), Some(_)) => true
+          case (Some(_), None) => true
+          case (_, _) => false
+        }
+      // Unquoted
+      case Some(Unquoted) =>
+        userAnswers.get(SharesFromConnectedPartyPage(srn, recordIndex)).isDefined // if Unquoted
+      // Connected Party
+      case Some(ConnectedParty) =>
+        true
+      case _ =>
+        false
+    }
+
+    lazy val allOtherAnswersPresent = baseAnswersPresent && typeOfSharesAnswersPresent
 
     anyPrePopClearedAnswersMissing && allOtherAnswersPresent
   }
