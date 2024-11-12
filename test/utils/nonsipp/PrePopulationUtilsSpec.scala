@@ -27,16 +27,22 @@ import config.Constants.PREPOPULATION_FLAG
 
 class PrePopulationUtilsSpec extends ControllerBaseSpec with Matchers with OptionValues {
 
-  implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequestGen(FakeRequest()).sample.value, defaultUserAnswers)
-  implicit val requestWithFlagTrue: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequestGen(
-    FakeRequest()
-      .withSession((PREPOPULATION_FLAG, "true"))
-  ).sample.value, defaultUserAnswers)
-  implicit val requestWithFlagFalse: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequestGen(
-    FakeRequest()
-      .withSession((PREPOPULATION_FLAG, "false"))
-  ).sample.value, defaultUserAnswers)
-
+  implicit val request: DataRequest[AnyContentAsEmpty.type] =
+    DataRequest(allowedAccessRequestGen(FakeRequest()).sample.value, defaultUserAnswers)
+  implicit val requestWithFlagTrue: DataRequest[AnyContentAsEmpty.type] = DataRequest(
+    allowedAccessRequestGen(
+      FakeRequest()
+        .withSession((PREPOPULATION_FLAG, "true"))
+    ).sample.value,
+    defaultUserAnswers
+  )
+  implicit val requestWithFlagFalse: DataRequest[AnyContentAsEmpty.type] = DataRequest(
+    allowedAccessRequestGen(
+      FakeRequest()
+        .withSession((PREPOPULATION_FLAG, "false"))
+    ).sample.value,
+    defaultUserAnswers
+  )
 
   "isPrePopulation" - {
 

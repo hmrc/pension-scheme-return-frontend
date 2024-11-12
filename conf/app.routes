@@ -39,6 +39,9 @@ GET         /:srn/what-you-will-need/:taxYear/:version                          
 GET         /:srn/what-you-will-need                                                                           controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String = "2022-04-06", version: String = "001")
 GET         /:srn/what-you-will-need-next-page                                                                 controllers.WhatYouWillNeedController.onSubmit(srn: Srn, taxYear: String, fbNumber: String,  version: String)
 
+GET         /:srn/check-update-information-provided                                                            controllers.CheckUpdateInformationController.onPageLoad(srn: Srn)
+GET         /:srn/check-update-information-provided-next-page                                                  controllers.CheckUpdateInformationController.onSubmit(srn: Srn)
+
 GET         /:srn/which-tax-year                                                                               controllers.nonsipp.WhichTaxYearController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/which-tax-year                                                                               controllers.nonsipp.WhichTaxYearController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
