@@ -276,7 +276,7 @@ class OverviewController @Inject()(
               _ <- saveService.save(userAnswers)
             } yield {
               if (lastSubmittedPsrFbInPreviousYears.isDefined) {
-                Redirect(controllers.routes.WhatYouWillNeedController.onPageLoad(srn, "", taxYear, version))
+                Redirect(controllers.routes.CheckUpdateInformationController.onPageLoad(srn))
                   .addingToSession(Constants.PREPOPULATION_FLAG -> String.valueOf(true))
               } else {
                 Redirect(

@@ -68,6 +68,40 @@ class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
             "go from start page to check return dates page when answers are non empty but basic details are incomplete"
           )
       )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            CheckUpdateInformationPage,
+            (srn, _) => controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode),
+            _ => emptyUserAnswers
+          )
+          .withName("go from check update information page to check return dates page when answers are empty")
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            CheckUpdateInformationPage,
+            (srn, _) => controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode),
+            _ => defaultUserAnswers
+          )
+          .withName(
+            "go from update information page to check return dates page when answers are non empty but check dates returns page is empty"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            CheckUpdateInformationPage,
+            (srn, _) => controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode),
+            srn => defaultUserAnswers.set(CheckReturnDatesPage(srn), true).get
+          )
+          .withName(
+            "go from update information page to check return dates page when answers are non empty but basic details are incomplete"
+          )
+      )
     }
 
     "CheckMode" - {
