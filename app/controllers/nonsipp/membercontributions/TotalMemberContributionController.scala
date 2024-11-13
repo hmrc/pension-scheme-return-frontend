@@ -17,6 +17,8 @@
 package controllers.nonsipp.membercontributions
 
 import services.SaveService
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
@@ -53,22 +55,24 @@ class TotalMemberContributionController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
+  private val logger = LoggerFactory.getLogger(this.getClass.getSimpleName)
+
   private val form = TotalMemberContributionController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
+      request.userAnswers.get(MemberDetailsPage(srn, index)) match {
+        case None =>
+          logger.warn(s"Member details for member index $index not found")
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        case Some(memberDetails) =>
+          val preparedForm =
+            request.userAnswers
+              .get(TotalMemberContributionPage(srn, index))
+              .fold(form)(value => if (value.isZero) form else form.fill(value))
 
-      val preparedForm =
-        request.userAnswers
-          .get(TotalMemberContributionPage(srn, index))
-          .fold(form)(value => if (value.isZero) form else form.fill(value))
-
-      optionList(index.value - 1)
-        .map(_.fullName)
-        .getOrRecoverJourney
-        .map(memberName => Ok(view(preparedForm, viewModel(srn, index, memberName, form, mode))))
-        .merge
+          Ok(view(preparedForm, viewModel(srn, index, memberDetails.fullName, form, mode)))
+      }
     }
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =

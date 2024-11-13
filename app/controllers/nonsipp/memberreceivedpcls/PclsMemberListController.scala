@@ -18,21 +18,22 @@ package controllers.nonsipp.memberreceivedpcls
 
 import play.api.mvc._
 import com.google.inject.Inject
+import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import cats.implicits.toShow
+import controllers.actions._
+import controllers.nonsipp.memberreceivedpcls.PclsMemberListController._
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
 import viewmodels.implicits._
 import pages.nonsipp.memberreceivedpcls._
-import config.RefinedTypes.OneTo300
+import config.RefinedTypes.Max300
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
-import controllers.actions._
-import eu.timepit.refined.refineV
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
@@ -53,6 +54,8 @@ class PclsMemberListController @Inject()(
   view: TwoColumnsTripleAction
 ) extends PSRController {
 
+  private val logger = LoggerFactory.getLogger(this.getClass.getSimpleName)
+
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       onPageLoadCommon(srn, page, mode, showBackLink = true)
@@ -66,47 +69,51 @@ class PclsMemberListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    val showBackLink = true
-    onPageLoadCommon(srn, page, mode, showBackLink)
+    onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
   private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(
     implicit request: DataRequest[AnyContent]
-  ): Result = {
-    val ua = request.userAnswers
-    val optionList: List[Option[NameDOB]] = ua.membersOptionList(srn)
-
-    if (optionList.flatten.nonEmpty) {
-      val noPageEnabled = !ua.get(PensionCommencementLumpSumPage(srn)).getOrElse(false)
-      val viewModel = PclsMemberListController
-        .viewModel(
-          srn,
-          page,
-          mode,
-          optionList,
-          ua,
-          viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
-            getCompletedOrUpdatedTaskListStatus(
-              request.userAnswers,
-              request.previousUserAnswers.get,
-              pages.nonsipp.membercontributions.Paths.memberDetails \ "memberLumpSumReceived"
-            ) == Updated
-          } else {
-            false
-          },
-          optYear = request.year,
-          optCurrentVersion = request.currentVersion,
-          optPreviousVersion = request.previousVersion,
-          compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
-          noPageEnabled = noPageEnabled,
-          showBackLink = showBackLink
+  ): Result =
+    request.userAnswers.completedMembersDetails(srn) match {
+      case Left(err) =>
+        logger.warn(s"Error when fetching completed member details - $err")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      case Right(Nil) =>
+        logger.warn(s"No completed member details for srn $srn")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      case Right(completedMemberDetails) =>
+        val noPageEnabled = !request.userAnswers.get(PensionCommencementLumpSumPage(srn)).getOrElse(false)
+        val memberDetails = completedMemberDetails.map {
+          case (index, memberDetails) =>
+            (index, memberDetails, request.userAnswers.get(PensionCommencementLumpSumAmountPage(srn, index)))
+        }
+        Ok(
+          view(
+            viewModel(
+              srn,
+              page,
+              mode,
+              memberDetails,
+              viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+                getCompletedOrUpdatedTaskListStatus(
+                  request.userAnswers,
+                  request.previousUserAnswers.get,
+                  pages.nonsipp.membercontributions.Paths.memberDetails \ "memberLumpSumReceived"
+                ) == Updated
+              } else {
+                false
+              },
+              optYear = request.year,
+              optCurrentVersion = request.currentVersion,
+              optPreviousVersion = request.previousVersion,
+              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+              noPageEnabled = noPageEnabled,
+              showBackLink = showBackLink
+            )
+          )
         )
-
-      Ok(view(viewModel))
-    } else {
-      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
-  }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     Redirect(
@@ -139,74 +146,64 @@ object PclsMemberListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    memberList: List[Option[NameDOB]],
-    userAnswers: UserAnswers,
+    memberList: List[(Max300, NameDOB, Option[PensionCommencementLumpSum])],
     optYear: Option[String],
     optCurrentVersion: Option[Int],
     optPreviousVersion: Option[Int]
   ): List[List[TableElem]] =
-    memberList.zipWithIndex
+    memberList
       .map {
-        case (Some(memberName), index) =>
-          refineV[OneTo300](index + 1) match {
-            case Left(_) => Nil
-            case Right(nextIndex) =>
-              val items = userAnswers.get(PensionCommencementLumpSumAmountPage(srn, nextIndex))
-              if (items.isEmpty || items.exists(_.isZero)) {
-                List(
-                  TableElem(
-                    memberName.fullName
-                  ),
-                  TableElem(
-                    Message("pcls.memberlist.status.no.items")
-                  ),
-                  if (mode != ViewOnlyMode) {
-                    TableElem.add(
-                      controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
-                        .onSubmit(srn, nextIndex, NormalMode),
-                      Message("pcls.memberList.add.hidden.text", memberName.fullName)
-                    )
-                  } else {
-                    TableElem.empty
-                  },
-                  TableElem.empty
+        case (index, memberName, pcls) if pcls.isEmpty || pcls.exists(_.isZero) =>
+          List(
+            TableElem(
+              memberName.fullName
+            ),
+            TableElem(
+              "pcls.memberlist.status.no.items"
+            ),
+            if (mode != ViewOnlyMode) {
+              TableElem.add(
+                controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
+                  .onSubmit(srn, index, NormalMode),
+                hiddenText = Message("pcls.memberList.add.hidden.text", memberName.fullName)
+              )
+            } else {
+              TableElem.empty
+            },
+            TableElem.empty
+          )
+        case (index, memberName, _) =>
+          List(
+            TableElem(
+              memberName.fullName
+            ),
+            TableElem(
+              "pcls.memberlist.status.some.item"
+            ),
+            (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+              case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                TableElem.view(
+                  controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
+                    .onPageLoadViewOnly(srn, index, year, currentVersion, previousVersion),
+                  Message("pcls.memberList.remove.hidden.text", memberName.fullName)
                 )
-              } else {
-                List(
-                  TableElem(
-                    memberName.fullName
-                  ),
-                  TableElem(
-                    Message("pcls.memberlist.status.some.item", items.size)
-                  ),
-                  (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-                    case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                      TableElem.view(
-                        controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
-                          .onPageLoadViewOnly(srn, nextIndex, year, currentVersion, previousVersion),
-                        Message("pcls.memberList.remove.hidden.text", memberName.fullName)
-                      )
-                    case _ =>
-                      TableElem.change(
-                        controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
-                          .onSubmit(srn, nextIndex, CheckMode),
-                        Message("pcls.memberList.change.hidden.text", memberName.fullName)
-                      )
-                  },
-                  if (mode == ViewOnlyMode) {
-                    TableElem.empty
-                  } else {
-                    TableElem.remove(
-                      controllers.nonsipp.memberreceivedpcls.routes.RemovePclsController
-                        .onSubmit(srn, nextIndex),
-                      Message("pcls.memberList.remove.hidden.text", memberName.fullName)
-                    )
-                  }
+              case _ =>
+                TableElem.change(
+                  controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
+                    .onSubmit(srn, index, CheckMode),
+                  Message("pcls.memberList.change.hidden.text", memberName.fullName)
                 )
-              }
-          }
-        case _ => List.empty
-
+            },
+            if (mode == ViewOnlyMode) {
+              TableElem.empty
+            } else {
+              TableElem.remove(
+                controllers.nonsipp.memberreceivedpcls.routes.RemovePclsController
+                  .onSubmit(srn, index),
+                Message("pcls.memberList.remove.hidden.text", memberName.fullName)
+              )
+            }
+          )
       }
       .sortBy(_.headOption.map(_.text.toString))
 
@@ -214,8 +211,7 @@ object PclsMemberListController {
     srn: Srn,
     page: Int,
     mode: Mode,
-    memberList: List[Option[NameDOB]],
-    userAnswers: UserAnswers,
+    memberList: List[(Max300, NameDOB, Option[PensionCommencementLumpSum])],
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
@@ -228,11 +224,11 @@ object PclsMemberListController {
     val heading = "pcls.memberlist.heading"
 
     // in view-only mode or with direct url edit page value can be higher than needed
-    val currentPage = if ((page - 1) * Constants.pclsInListSize >= memberList.flatten.size) 1 else page
+    val currentPage = if ((page - 1) * Constants.pclsInListSize >= memberList.size) 1 else page
     val pagination = Pagination(
       currentPage = currentPage,
       pageSize = Constants.pclsInListSize,
-      memberList.flatten.size,
+      memberList.size,
       call = (mode, optYear, optCurrentVersion, optPreviousVersion) match {
         case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
           controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
@@ -242,10 +238,8 @@ object PclsMemberListController {
             .onPageLoad(srn, _, NormalMode)
       }
     )
-    val sumPcls = memberList.flatten.zipWithIndex.count {
-      case (_, index) =>
-        refineV[OneTo300](index + 1).toOption
-          .exists(nextIndex => userAnswers.get(PensionCommencementLumpSumAmountPage(srn, nextIndex)).isDefined)
+    val sumPcls = memberList.count {
+      case (_, _, items) => items.isDefined
     }
 
     val optDescription =
@@ -260,8 +254,8 @@ object PclsMemberListController {
 
     FormPageViewModel(
       mode = mode,
-      title = Message(title, memberList.flatten.size),
-      heading = Message(heading, memberList.flatten.size),
+      title = Message(title, memberList.size),
+      heading = Message(heading, memberList.size),
       description = optDescription,
       page = ActionTableViewModel(
         inset = "",
@@ -273,7 +267,7 @@ object PclsMemberListController {
             TableElem.empty
           )
         ),
-        rows = rows(srn, mode, memberList, userAnswers, optYear, optCurrentVersion, optPreviousVersion),
+        rows = rows(srn, mode, memberList, optYear, optCurrentVersion, optPreviousVersion),
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

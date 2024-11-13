@@ -20,14 +20,16 @@ import services.SaveService
 import viewmodels.implicits._
 import controllers.nonsipp.receivetransfer.TotalValueTransferController._
 import play.api.mvc._
+import org.slf4j.{Logger, LoggerFactory}
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
 import pages.nonsipp.receivetransfer.{TotalValueTransferPage, TransferringSchemeNamePage}
+import cats.syntax.applicative._
 import controllers.actions._
 import navigation.Navigator
 import forms.MoneyFormProvider
-import models.{Mode, Money, NameDOB}
+import models.{Mode, Money}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
@@ -53,66 +55,50 @@ class TotalValueTransferController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
+  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass.getSimpleName)
   private val form = TotalValueTransferController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
-
-      val transferSchemeName = request.userAnswers.get(TransferringSchemeNamePage(srn, index, secondaryIndex))
-      val preparedForm = {
-        request.userAnswers.get(TotalValueTransferPage(srn, index, secondaryIndex)).fold(form)(form.fill)
-      }
-
-      optionList(index.value - 1)
-        .map(_.fullName)
-        .getOrRecoverJourney
-        .map(
-          memberName =>
-            Ok(
-              view(
-                preparedForm,
-                viewModel(srn, index, secondaryIndex, memberName, transferSchemeName.get, form, mode)
-              )
-            )
+      (
+        for {
+          completedMemberDetails <- request.userAnswers.completedMemberDetails(srn, index).getOrRecoverJourney
+          (_, memberDetails) = completedMemberDetails
+          transferSchemeName <- request.userAnswers
+            .get(TransferringSchemeNamePage(srn, index, secondaryIndex))
+            .getOrRecoverJourney
+          preparedForm = request.userAnswers
+            .get(TotalValueTransferPage(srn, index, secondaryIndex))
+            .fold(form)(form.fill)
+        } yield Ok(
+          view(
+            preparedForm,
+            viewModel(srn, index, secondaryIndex, memberDetails.fullName, transferSchemeName, form, mode)
+          )
         )
-        .merge
-
+      ).merge
     }
 
   def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
-
-      val transferSchemeName = request.userAnswers.get(TransferringSchemeNamePage(srn, index, secondaryIndex))
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
-            Future.successful(
-              optionList(index.value - 1)
-                .map(_.fullName)
-                .getOrRecoverJourney
-                .map(
-                  memberName =>
-                    BadRequest(
-                      view(
-                        formWithErrors,
-                        viewModel(
-                          srn,
-                          index,
-                          secondaryIndex,
-                          memberName,
-                          transferSchemeName.get,
-                          form,
-                          mode
-                        )
-                      )
-                    )
+          formWithErrors =>
+            (
+              for {
+                completedMemberDetails <- request.userAnswers.completedMemberDetails(srn, index).getOrRecoverJourney
+                (_, memberDetails) = completedMemberDetails
+                transferSchemeName <- request.userAnswers
+                  .get(TransferringSchemeNamePage(srn, index, secondaryIndex))
+                  .getOrRecoverJourney
+              } yield BadRequest(
+                view(
+                  formWithErrors,
+                  viewModel(srn, index, secondaryIndex, memberDetails.fullName, transferSchemeName, form, mode)
                 )
-                .merge
-            )
-          },
+              )
+            ).merge.pure[Future],
           value =>
             for {
               updatedAnswers <- Future

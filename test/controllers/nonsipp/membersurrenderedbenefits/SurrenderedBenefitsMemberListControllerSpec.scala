@@ -17,7 +17,6 @@
 package controllers.nonsipp.membersurrenderedbenefits
 
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
-import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
@@ -64,22 +63,21 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
       .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
       .unsafeSet(SurrenderedBenefitsPage(srn), true)
+      .unsafeSet(SurrenderedBenefitsAmountPage(srn, refineMV(1)), money)
+
+  private val testMemberList: List[(Max300, NameDOB, Option[SurrenderedBenefitsAmount])] = List(
+    (refineMV[Max300.Refined](1), memberDetails, Some(money))
+  )
 
   "SurrenderedBenefitsMemberListController" - {
 
     "viewModel should show 'Surrendered Benefits ' when there are 0 Surrendered Benefits" in {
 
-      val userAnswersWithNoSurrenderedBenefits = userAnswers
-        .unsafeSet(SurrenderedBenefitsPage(srn), false)
-
-      val memberList: List[Option[NameDOB]] = List.empty
-
       val result = SurrenderedBenefitsMemberListController.viewModel(
         srn,
         page = 1,
         ViewOnlyMode,
-        memberList,
-        userAnswersWithNoSurrenderedBenefits,
+        memberList = List.empty,
         viewOnlyUpdated = false,
         schemeName = schemeName,
         noPageEnabled = false
@@ -89,22 +87,11 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
     }
 
     "viewModel should show '1 Surrendered Benefit' when there is 1 Surrendered Benefit" in {
-      val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
-
-      val userAnswersWithOneSurrenderedBenefit = userAnswers
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails1)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
-        .unsafeSet(SurrenderedBenefitsPage(srn), true)
-        .unsafeSet(SurrenderedBenefitsAmountPage(srn, refineMV(1)), Money(100))
-
-      val memberList: List[Option[NameDOB]] = List(Some(memberDetails1))
-
       val result = SurrenderedBenefitsMemberListController.viewModel(
         srn,
         page = 1,
         ViewOnlyMode,
-        memberList,
-        userAnswersWithOneSurrenderedBenefit,
+        testMemberList,
         viewOnlyUpdated = false,
         schemeName = schemeName,
         noPageEnabled = false
@@ -118,23 +105,16 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
       val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
       val memberDetails2 = NameDOB("testFirstName2", "testLastName2", LocalDate.of(1990, 12, 12))
 
-      val userAnswersWithOneSurrenderedBenefit = userAnswers
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails1)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
-        .unsafeSet(SurrenderedBenefitsAmountPage(srn, refineMV(1)), Money(1))
-        .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails2)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(2)), SectionCompleted)
-        .unsafeSet(SurrenderedBenefitsAmountPage(srn, refineMV(2)), Money(2))
-        .unsafeSet(SurrenderedBenefitsPage(srn), true)
-
-      val memberList: List[Option[NameDOB]] = List(Some(memberDetails1), Some(memberDetails2))
+      val memberList: List[(Max300, NameDOB, Option[SurrenderedBenefitsAmount])] = List(
+        (refineMV[Max300.Refined](1), memberDetails1, Some(money)),
+        (refineMV[Max300.Refined](1), memberDetails2, Some(money))
+      )
 
       val result = SurrenderedBenefitsMemberListController.viewModel(
         srn,
         page = 1,
         ViewOnlyMode,
         memberList,
-        userAnswersWithOneSurrenderedBenefit,
         viewOnlyUpdated = false,
         schemeName = schemeName,
         noPageEnabled = false
@@ -147,15 +127,12 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
     }
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
       injected[TwoColumnsTripleAction].apply(
         viewModel(
           srn,
           page = 1,
           NormalMode,
-          memberList,
-          userAnswers,
+          testMemberList,
           viewOnlyUpdated = false,
           schemeName = schemeName,
           noPageEnabled = false
@@ -202,15 +179,12 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
-          val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
           injected[TwoColumnsTripleAction].apply(
             viewModel(
               srn,
               page,
               mode = ViewOnlyMode,
-              memberList,
-              currentUserAnswers,
+              testMemberList,
               viewOnlyUpdated = false,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
@@ -223,21 +197,21 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
 
-    val updatedUserAnswers = currentUserAnswers
-      .unsafeSet(SurrenderedBenefitsAmountPage(srn, index), money)
+    act.like {
+      val updatedUserAnswers = currentUserAnswers
+        .unsafeSet(SurrenderedBenefitsAmountPage(srn, index), otherMoney)
 
-    act.like(
+      val memberList: List[(Max300, NameDOB, Option[SurrenderedBenefitsAmount])] = List(
+        (refineMV[Max300.Refined](1), memberDetails, Some(otherMoney))
+      )
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
-          val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
           injected[TwoColumnsTripleAction].apply(
             viewModel(
               srn,
               page,
               mode = ViewOnlyMode,
               memberList,
-              updatedUserAnswers,
               viewOnlyUpdated = true,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
@@ -248,11 +222,13 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
-    )
+    }
 
-    val noUserAnswers = currentUserAnswers.unsafeSet(SurrenderedBenefitsPage(srn), false)
+    act.like {
+      val noUserAnswers = currentUserAnswers
+        .unsafeSet(SurrenderedBenefitsPage(srn), false)
+        .unsafeRemove(SurrenderedBenefitsAmountPage(srn, refineMV(1)))
 
-    act.like(
       renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[TwoColumnsTripleAction].apply(
@@ -261,8 +237,7 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
               page,
               mode = ViewOnlyMode,
               List.empty,
-              noUserAnswers,
-              viewOnlyUpdated = false,
+              viewOnlyUpdated = true,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
@@ -272,7 +247,7 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
             )
           )
       }.withName("OnPageLoadViewOnly renders ok NO records")
-    )
+    }
 
     act.like(
       redirectToPage(

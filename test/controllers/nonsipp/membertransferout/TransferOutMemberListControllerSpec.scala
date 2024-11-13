@@ -17,13 +17,12 @@
 package controllers.nonsipp.membertransferout
 
 import play.api.test.FakeRequest
-import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import models._
 import pages.nonsipp.membertransferout._
-import controllers.nonsipp.membertransferout.TransferOutMemberListController._
+import controllers.nonsipp.membertransferout.TransferOutMemberListController.{CompletedTransfersOut, _}
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import config.RefinedTypes.{Max300, Max5}
 import controllers.ControllerBaseSpec
@@ -63,21 +62,22 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
     .unsafeSet(SchemeTransferOutPage(srn), true)
+    .unsafeSet(TransfersOutSectionCompleted(srn, refineMV(1), refineMV(1)), SectionCompleted)
+
+  val testMemberList: List[(Max300, NameDOB, CompletedTransfersOut)] = List(
+    (refineMV[Max300.Refined](1), memberDetails, 1)
+  )
 
   "TransferOutMemberListController" - {
 
     "viewModel should show 'No transfers' when there are no transfers" in {
-      val userAnswersWithNoTransfers = userAnswers
-        .unsafeSet(SchemeTransferOutPage(srn), false)
-
-      val memberList: List[Option[NameDOB]] = List.empty
+      val memberList: List[(Max300, NameDOB, CompletedTransfersOut)] = List.empty
 
       val result = TransferOutMemberListController.viewModel(
         srn,
         page = 1,
         ViewOnlyMode,
         memberList,
-        userAnswersWithNoTransfers,
         viewOnlyUpdated = false,
         schemeName = schemeName,
         noPageEnabled = true
@@ -89,22 +89,11 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
 
     "viewModel should show 1 transfer when there is 1 transfer" in {
 
-      val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
-
-      val userAnswersWithOneTransfer = userAnswers
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails1)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
-        .unsafeSet(ReceivingSchemeNamePages(srn, refineMV(1)), Map("schemeName1" -> "ReceivingScheme1"))
-        .unsafeSet(SchemeTransferOutPage(srn), true)
-
-      val memberList: List[Option[NameDOB]] = List(Some(memberDetails1))
-
       val result = TransferOutMemberListController.viewModel(
         srn,
         page = 1,
         ViewOnlyMode,
-        memberList,
-        userAnswersWithOneTransfer,
+        testMemberList,
         viewOnlyUpdated = false,
         schemeName = schemeName,
         noPageEnabled = false
@@ -118,23 +107,16 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
       val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
       val memberDetails2 = NameDOB("testFirstName2", "testLastName2", LocalDate.of(1991, 6, 15))
 
-      val userAnswersWithTwoTransfers = userAnswers
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails1)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
-        .unsafeSet(ReceivingSchemeNamePages(srn, refineMV(1)), Map("schemeName1" -> "ReceivingScheme1"))
-        .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails2)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(2)), SectionCompleted)
-        .unsafeSet(ReceivingSchemeNamePages(srn, refineMV(2)), Map("schemeName2" -> "ReceivingScheme2"))
-        .unsafeSet(SchemeTransferOutPage(srn), true)
-
-      val memberList: List[Option[NameDOB]] = List(Some(memberDetails1), Some(memberDetails2))
+      val memberList: List[(Max300, NameDOB, CompletedTransfersOut)] = List(
+        (refineMV[Max300.Refined](1), memberDetails1, 1),
+        (refineMV[Max300.Refined](2), memberDetails2, 1)
+      )
 
       val result = TransferOutMemberListController.viewModel(
         srn,
         page = 1,
         ViewOnlyMode,
         memberList,
-        userAnswersWithTwoTransfers,
         viewOnlyUpdated = false,
         schemeName = schemeName,
         noPageEnabled = false
@@ -144,15 +126,12 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
     }
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
       injected[TwoColumnsTripleAction].apply(
         viewModel(
           srn,
           page,
           NormalMode,
-          memberList,
-          userAnswers,
+          testMemberList,
           viewOnlyUpdated = false,
           schemeName = schemeName,
           noPageEnabled = false
@@ -197,15 +176,12 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
       act.like(
         renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
           implicit app => implicit request =>
-            val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
             injected[TwoColumnsTripleAction].apply(
               viewModel(
                 srn,
                 page,
                 mode = ViewOnlyMode,
-                memberList,
-                currentUserAnswers,
+                testMemberList,
                 viewOnlyUpdated = false,
                 optYear = Some(yearString),
                 optCurrentVersion = Some(submissionNumberTwo),
@@ -224,15 +200,12 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
       act.like(
         renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
           implicit app => implicit request =>
-            val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
             injected[TwoColumnsTripleAction].apply(
               viewModel(
                 srn,
                 page,
                 mode = ViewOnlyMode,
-                memberList,
-                updatedUserAnswers,
+                testMemberList,
                 viewOnlyUpdated = true,
                 optYear = Some(yearString),
                 optCurrentVersion = Some(submissionNumberTwo),
@@ -245,7 +218,12 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
         }.withName("OnPageLoadViewOnly renders ok with changed flag")
       )
 
-      val noUserAnswers = currentUserAnswers.unsafeSet(SchemeTransferOutPage(srn), false)
+      val noUserAnswers = defaultUserAnswers
+        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+        .unsafeSet(SchemeTransferOutPage(srn), false)
+        .unsafeSet(FbVersionPage(srn), "002")
+        .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
 
       act.like(
         renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -256,7 +234,6 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
                 page,
                 mode = ViewOnlyMode,
                 List.empty,
-                noUserAnswers,
                 viewOnlyUpdated = false,
                 optYear = Some(yearString),
                 optCurrentVersion = Some(submissionNumberTwo),

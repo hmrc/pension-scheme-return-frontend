@@ -66,8 +66,7 @@ class MemberPensionPaymentsListController @Inject()(
     current: Int,
     previous: Int
   ): Action[AnyContent] = identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-    val showBackLink = true
-    onPageLoadCommon(srn, page, mode, showBackLink)
+    onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
   private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(
@@ -130,8 +129,7 @@ class MemberPensionPaymentsListController @Inject()(
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, ViewOnlyMode, year, (current - 1).max(0), (previous - 1).max(0)) { implicit request =>
-      val showBackLink = false
-      onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
+      onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink = false)
     }
 }
 

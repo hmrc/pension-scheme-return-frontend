@@ -19,7 +19,6 @@ package controllers.nonsipp.memberreceivedpcls
 import play.api.test.FakeRequest
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
-import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.memberreceivedpcls.PclsMemberListController._
@@ -29,8 +28,6 @@ import config.RefinedTypes.Max300
 import controllers.ControllerBaseSpec
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
-
-import java.time.LocalDate
 
 class PclsMemberListControllerSpec extends ControllerBaseSpec {
 
@@ -65,22 +62,21 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
       .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
       .unsafeSet(PensionCommencementLumpSumPage(srn), true)
+      .unsafeSet(PensionCommencementLumpSumAmountPage(srn, refineMV(1)), lumpSumData)
+
+  private val testMemberList: List[(Max300, NameDOB, Option[PensionCommencementLumpSum])] = List(
+    (refineMV[Max300.Refined](1), memberDetails, Some(lumpSumData))
+  )
 
   "PclsMemberListController" - {
 
     "viewModel should show 'Pension commencement lump sum' when there are 0 PCLS" in {
 
-      val userAnswersWithNoPcls = userAnswers
-        .unsafeSet(PensionCommencementLumpSumPage(srn), false)
-
-      val memberList: List[Option[NameDOB]] = List.empty
-
       val result = PclsMemberListController.viewModel(
         srn,
         page = 1,
         ViewOnlyMode,
-        memberList,
-        userAnswersWithNoPcls,
+        memberList = List.empty,
         viewOnlyUpdated = false,
         noPageEnabled = true
       )
@@ -91,22 +87,11 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
 
     "viewModel should show 1 Pension commencement lump sum when there is 1 PCLS" in {
 
-      val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
-
-      val userAnswersWithOnePcls = userAnswers
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails1)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
-        .unsafeSet(PensionCommencementLumpSumAmountPage(srn, refineMV(1)), pensionCommencementLumpSumGen.sample.value)
-        .unsafeSet(PensionCommencementLumpSumPage(srn), true)
-
-      val memberList: List[Option[NameDOB]] = List(Some(memberDetails1))
-
       val result = PclsMemberListController.viewModel(
         srn,
         page = 1,
         ViewOnlyMode,
-        memberList,
-        userAnswersWithOnePcls,
+        testMemberList,
         viewOnlyUpdated = false,
         noPageEnabled = false
       )
@@ -117,26 +102,16 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
 
     "viewModel should show 2 Pension commencement lump sums when there are 2 PCLS" in {
 
-      val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
-      val memberDetails2 = NameDOB("testFirstName2", "testLastName2", LocalDate.of(1991, 6, 15))
-
-      val userAnswersWithTwoPcls = userAnswers
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails1)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
-        .unsafeSet(PensionCommencementLumpSumAmountPage(srn, refineMV(1)), pensionCommencementLumpSumGen.sample.value)
-        .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails2)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(2)), SectionCompleted)
-        .unsafeSet(PensionCommencementLumpSumAmountPage(srn, refineMV(2)), pensionCommencementLumpSumGen.sample.value)
-        .unsafeSet(PensionCommencementLumpSumPage(srn), true)
-
-      val memberList: List[Option[NameDOB]] = List(Some(memberDetails1), Some(memberDetails2))
+      val memberList: List[(Max300, NameDOB, Option[PensionCommencementLumpSum])] = List(
+        (refineMV[Max300.Refined](1), nameDobGen.sample.value, Some(pensionCommencementLumpSumGen.sample.value)),
+        (refineMV[Max300.Refined](1), nameDobGen.sample.value, Some(pensionCommencementLumpSumGen.sample.value))
+      )
 
       val result = PclsMemberListController.viewModel(
         srn,
         page = 1,
         ViewOnlyMode,
         memberList,
-        userAnswersWithTwoPcls,
         viewOnlyUpdated = false,
         noPageEnabled = false
       )
@@ -145,15 +120,12 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
     }
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
       injected[TwoColumnsTripleAction].apply(
         viewModel(
           srn,
           page,
           NormalMode,
-          memberList,
-          userAnswers,
+          testMemberList,
           viewOnlyUpdated = false,
           noPageEnabled = false
         )
@@ -206,15 +178,12 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
-          val memberList: List[Option[NameDOB]] = currentUserAnswers.membersOptionList(srn)
-
           injected[TwoColumnsTripleAction].apply(
             PclsMemberListController.viewModel(
               srn,
               page,
               mode = ViewOnlyMode,
-              memberList,
-              currentUserAnswers,
+              testMemberList,
               viewOnlyUpdated = false,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
@@ -226,21 +195,23 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
 
-    val updatedUserAnswers = currentUserAnswers
-      .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index), lumpSumData)
+    act.like {
+      val newLumpSumData = pensionCommencementLumpSumGen.sample.value
 
-    act.like(
+      val updatedUserAnswers = currentUserAnswers
+        .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index), newLumpSumData)
+
+      val memberList: List[(Max300, NameDOB, Option[PensionCommencementLumpSum])] = List(
+        (refineMV[Max300.Refined](1), memberDetails, Some(newLumpSumData))
+      )
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
-          val memberList: List[Option[NameDOB]] = updatedUserAnswers.membersOptionList(srn)
-
           injected[TwoColumnsTripleAction].apply(
             PclsMemberListController.viewModel(
               srn,
               page,
               mode = ViewOnlyMode,
               memberList,
-              updatedUserAnswers,
               viewOnlyUpdated = true,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
@@ -250,12 +221,12 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
-    )
+    }
 
-    val noUserAnswers = currentUserAnswers
-      .unsafeSet(PensionCommencementLumpSumPage(srn), false)
+    act.like {
+      val noUserAnswers = currentUserAnswers
+        .unsafeSet(PensionCommencementLumpSumPage(srn), false)
 
-    act.like(
       renderView(onPageLoadViewOnly, userAnswers = noUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
           injected[TwoColumnsTripleAction].apply(
@@ -264,8 +235,7 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
               page,
               mode = ViewOnlyMode,
               List.empty,
-              noUserAnswers,
-              viewOnlyUpdated = false,
+              viewOnlyUpdated = true,
               optYear = Some(yearString),
               optCurrentVersion = Some(submissionNumberTwo),
               optPreviousVersion = Some(submissionNumberOne),
@@ -274,7 +244,7 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
             )
           )
       }.withName("OnPageLoadViewOnly renders ok NO records")
-    )
+    }
 
     act.like(
       redirectToPage(
