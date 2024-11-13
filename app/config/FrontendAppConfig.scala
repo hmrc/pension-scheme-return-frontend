@@ -36,6 +36,7 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   private val betaFeedbackUrl = config.get[String]("microservice.services.contact-frontend.beta-feedback-url")
   private val reportProblemUrl = config.get[String]("microservice.services.contact-frontend.report-problem-url")
   private val allowedRedirectUrls: Seq[String] = config.get[Seq[String]]("urls.allowedRedirects")
+  val version = 5
 
   def feedbackUrl(implicit request: RequestHeader): String = {
     val redirectUrlPolicy = AbsoluteWithHostnameFromAllowlist(allowedRedirectUrls.toSet) | OnlyRelative

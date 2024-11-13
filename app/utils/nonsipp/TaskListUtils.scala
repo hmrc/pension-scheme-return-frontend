@@ -32,6 +32,8 @@ import models.SchemeId.Srn
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
+import java.time.LocalDate
+
 object TaskListUtils {
 
   private def getSectionListWithoutDeclaration(
@@ -56,7 +58,9 @@ object TaskListUtils {
     isPsp: Boolean,
     isLinkActive: Boolean,
     noChangesSincePreviousVersion: Boolean,
-    schemeName: String
+    schemeName: String,
+    dateRange: Option[LocalDate]
+//    version: Option[Int]
   ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.declaration"
 
@@ -73,7 +77,15 @@ object TaskListUtils {
         if (noChangesSincePreviousVersion) {
           LinkMessage(
             s"$prefix.view",
-            controllers.nonsipp.routes.ReturnSubmittedController.onPageLoad(srn).url
+            controllers.nonsipp.routes.ViewOnlyReturnSubmittedController
+              .onPageLoad(
+                srn,
+                dateRange.getOrElse("2021-04-06").toString,
+                5
+//                "2021-04-06", // I just hardcoded this value, it should be the tax year start date
+//                5 // I just hardcoded this value, it should be the version of the return, this value should be somewhere in the call stack for this method or you can fetch it as ua.get(FbVersionPage(srn))
+              )
+              .url
           )
         } else {
           LinkMessage(
@@ -96,7 +108,9 @@ object TaskListUtils {
     schemeName: String,
     userAnswers: UserAnswers,
     pensionSchemeId: PensionSchemeId,
-    noChangesSincePreviousVersion: Boolean
+    noChangesSincePreviousVersion: Boolean,
+    startDate: Option[LocalDate] = None
+//    version: Option[Int]
   ): List[TaskListSectionViewModel] = {
 
     val sectionListWithoutDeclaration = getSectionListWithoutDeclaration(srn, schemeName, userAnswers, pensionSchemeId)
@@ -113,13 +127,14 @@ object TaskListUtils {
         pensionSchemeId.isPSP,
         isLinkActive,
         noChangesSincePreviousVersion,
-        schemeName
+        schemeName,
+        startDate
+//        version
       )
 
     sectionListWithoutDeclaration :+ declarationSectionViewModel
 
   }
-
 
   private def schemeDetailsSection(
     srn: Srn,

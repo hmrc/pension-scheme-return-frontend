@@ -22,7 +22,6 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import controllers.PSRController
-import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
 import controllers.actions._
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import _root_.config.Constants.defaultFbVersion
@@ -30,6 +29,8 @@ import models.backend.responses.{PsrVersionsResponse, ReportStatus}
 import viewmodels.models.TaskListStatus._
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
+import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
+import config.FrontendAppConfig
 import views.html.TaskListView
 import models.SchemeId.Srn
 import cats.implicits.toShow
@@ -49,6 +50,7 @@ class TaskListController @Inject()(
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
+  config: FrontendAppConfig,
   view: TaskListView,
   psrVersionsService: PsrVersionsService
 )(implicit ec: ExecutionContext)
@@ -67,7 +69,7 @@ class TaskListController @Inject()(
         fbVersion = request.userAnswers.get(FbVersionPage(srn)).getOrElse(defaultFbVersion).toInt
         hasHistory = response.exists(isSubmitted)
         noChangesSincePreviousVersion = if (!hasHistory || request.previousUserAnswers.isEmpty) {
-          true
+          false
         } else {
           userAnswersUnchangedAllSections(
             request.userAnswers,
@@ -145,7 +147,15 @@ object TaskListController {
     noChangesSincePreviousVersion: Boolean
   ): PageViewModel[TaskListViewModel] = {
 
-    val sectionList = getSectionList(srn, schemeName, userAnswers, pensionSchemeId, noChangesSincePreviousVersion)
+    val sectionList =
+      getSectionList(
+        srn,
+        schemeName,
+        userAnswers,
+        pensionSchemeId,
+        noChangesSincePreviousVersion,
+        Some(startDate)
+      )
 
     val (numSectionsReadyForSubmission, numSectionsTotal) = evaluateReadyForSubmissionTotalTuple(sectionList)
 
