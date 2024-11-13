@@ -25,6 +25,7 @@ import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
 import controllers.actions._
 import pages.nonsipp.accountingperiod.AccountingPeriods
+import _root_.config.Constants.defaultFbVersion
 import models.backend.responses.{PsrVersionsResponse, ReportStatus}
 import viewmodels.models.TaskListStatus._
 import play.api.i18n.MessagesApi
@@ -33,7 +34,7 @@ import views.html.TaskListView
 import models.SchemeId.Srn
 import cats.implicits.toShow
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
-import pages.nonsipp.{CheckReturnDatesPage, CompilationOrSubmissionDatePage, WhichTaxYearPage}
+import pages.nonsipp._
 import utils.nonsipp.TaskListUtils._
 import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models._
@@ -62,6 +63,8 @@ class TaskListController @Inject()(
     withCompletedBasicDetails(srn) { dates =>
       for {
         response <- psrVersionsService.getVersions(request.schemeDetails.pstr, formatDateForApi(dates.from), srn)
+        lastVersion = if (response.nonEmpty) response.maxBy(_.reportVersion).reportVersion else defaultFbVersion.toInt
+        fbVersion = request.userAnswers.get(FbVersionPage(srn)).getOrElse(defaultFbVersion).toInt
         hasHistory = response.exists(isSubmitted)
         noChangesSincePreviousVersion = if (!hasHistory || request.previousUserAnswers.isEmpty) {
           true
@@ -85,7 +88,13 @@ class TaskListController @Inject()(
           hasHistory,
           noChangesSincePreviousVersion
         )
-      } yield Ok(view(viewModel, request.schemeDetails.schemeName))
+      } yield {
+        if (fbVersion < lastVersion) {
+          Redirect(controllers.routes.OverviewController.onPageLoad(srn).url)
+        } else {
+          Ok(view(viewModel, request.schemeDetails.schemeName))
+        }
+      }
     }
   }
 
