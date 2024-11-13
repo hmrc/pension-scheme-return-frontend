@@ -427,39 +427,53 @@ object TaskListStatusUtils {
     }
   }
 
-  def getLandOrPropertyTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val wereLandOrProperties = userAnswers.get(LandOrPropertyHeldPage(srn))
-    val numRecorded = userAnswers.get(LandOrPropertyCompleted.all(srn)).getOrElse(Map.empty).size
-
-    val firstQuestionPageUrl =
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController
-        .onPageLoad(srn, NormalMode)
-        .url
-
-    val listPageUrl =
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
-        .onPageLoad(srn, 1, NormalMode)
-        .url
-
-    val firstPages = userAnswers.get(LandPropertyInUKPages(srn))
-    val lastPages = userAnswers.get(LandOrPropertyTotalIncomePages(srn))
-    val incompleteIndex: Int = getIncompleteIndex(firstPages, lastPages)
-
-    val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
-      _ => firstQuestionPageUrl,
-      index =>
-        controllers.nonsipp.landorproperty.routes.LandPropertyInUKController
-          .onPageLoad(srn, index, NormalMode)
+  // if pre pop - check if any are in check state - if not resume regular status
+  // if any need checked - if some are done it's recorded if none then it's something else, stick to recorded for now
+  def getLandOrPropertyTaskListStatusAndLink(
+    userAnswers: UserAnswers,
+    srn: Srn,
+    isPrePop: Boolean
+  ): (TaskListStatus, String) =
+    if (isPrePop && CheckStatusUtils.checkLandOrPropertySection(userAnswers, srn)) {
+      (
+        Check,
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
+          .onPageLoad(srn, 1, NormalMode)
           .url
-    )
+      )
+    } else {
+      val wereLandOrPropertiesHeld = userAnswers.get(LandOrPropertyHeldPage(srn))
+      val numRecorded = userAnswers.get(LandOrPropertyCompleted.all(srn)).getOrElse(Map.empty).size
 
-    (wereLandOrProperties, numRecorded) match {
-      case (None, _) => (NotStarted, firstQuestionPageUrl)
-      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
-      case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
-      case (Some(true), _) => (Recorded(numRecorded, "landOrProperties"), listPageUrl)
+      val firstQuestionPageUrl =
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController
+          .onPageLoad(srn, NormalMode)
+          .url
+
+      val listPageUrl =
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
+          .onPageLoad(srn, 1, NormalMode)
+          .url
+
+      val firstPages = userAnswers.get(LandPropertyInUKPages(srn))
+      val lastPages = userAnswers.get(LandOrPropertyTotalIncomePages(srn))
+      val incompleteIndex: Int = getIncompleteIndex(firstPages, lastPages)
+
+      val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+        _ => firstQuestionPageUrl,
+        index =>
+          controllers.nonsipp.landorproperty.routes.LandPropertyInUKController
+            .onPageLoad(srn, index, NormalMode)
+            .url
+      )
+
+      (wereLandOrPropertiesHeld, numRecorded) match {
+        case (None, _) => (NotStarted, firstQuestionPageUrl)
+        case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+        case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
+        case (Some(true), _) => (Recorded(numRecorded, "landOrProperties"), listPageUrl)
+      }
     }
-  }
 
   def getLandOrPropertyDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereLandOrPropertyDisposals = userAnswers.get(LandOrPropertyDisposalPage(srn))

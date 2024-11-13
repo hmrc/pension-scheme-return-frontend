@@ -33,7 +33,7 @@ import viewmodels.models._
 import play.api.data.Form
 import utils.{BaseSpec, DisplayMessageUtils}
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
-import play.api.mvc.Call
+import play.api.mvc.{Security => _, _}
 import com.softwaremill.diffx.scalatest.DiffShouldMatcher
 import models.UserAnswers.SensitiveJsObject
 import play.api.http._

@@ -331,7 +331,7 @@ object BondsListController {
       description = Some(ParagraphMessage("bondsList.description")),
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows = rows(srn, mode, data, viewOnlyViewModel, schemeName),
+        sections = List(ListSection(rows(srn, mode, data, viewOnlyViewModel, schemeName))),
         radioText = Message("bondsList.radios"),
         showRadios = data.size < Constants.maxBondsTransactions,
         showInsetWithRadios = !(data.length < Constants.maxBondsTransactions),

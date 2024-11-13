@@ -28,16 +28,16 @@ object MapUtils {
   }
 
   implicit class UserAnswersMapOps[A](m: Map[String, A]) {
-    def mapKeysToIndex[Index](implicit ev: Validate[Int, Index]): Option[Map[Refined[Int, Index], A]] =
+    def refine[I: Validate[Int, *]]: Either[String, Map[Refined[Int, I], A]] =
       m.map {
           case (k, v) =>
-            k.toIntOption.flatMap(index => refineV[Index](index + 1).toOption).map(_ -> v)
+            for {
+              index <- k.toIntOption.toRight(s"index $k is not a number")
+              refined <- refineV[I](index + 1)
+            } yield (refined, v)
         }
         .toList
         .sequence
         .map(_.toMap)
-
-    def refine[I: Validate[Int, *]]: Option[List[Refined[Int, I]]] =
-      mapKeysToIndex[I].map(_.keys.toList)
   }
 }

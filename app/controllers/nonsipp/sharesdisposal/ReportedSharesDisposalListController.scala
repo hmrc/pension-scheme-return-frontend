@@ -404,7 +404,7 @@ object ReportedSharesDisposalListController {
       ),
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows(srn, mode, disposals, userAnswers, viewOnlyViewModel, schemeName),
+        sections = List(ListSection(rows(srn, mode, disposals, userAnswers, viewOnlyViewModel, schemeName))),
         Message("sharesDisposal.reportedSharesDisposalList.radios"),
         showRadios =
           !((numberOfDisposals >= maxSharesTransactions * maxDisposalsPerShare) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),

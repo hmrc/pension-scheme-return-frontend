@@ -44,7 +44,8 @@ class MemberCountUtilsSpec extends AnyFreeSpec with Matchers with OptionValues w
   "hasMemberNumbersChangedToOver99" - {
     "should return false" - {
       "when default data" in {
-        val result = MemberCountUtils.hasMemberNumbersChangedToOver99(defaultUserAnswers, srn, pensionSchemeId)
+        val result =
+          MemberCountUtils.hasMemberNumbersChangedToOver99(defaultUserAnswers, srn, pensionSchemeId, isPrePop = false)
         result mustBe false
       }
 
@@ -53,14 +54,20 @@ class MemberCountUtilsSpec extends AnyFreeSpec with Matchers with OptionValues w
           defaultUserAnswers
             .unsafeSet(HowManyMembersPage(srn, psaId), SchemeMemberNumbers(1, 2, 3)),
           srn,
-          pensionSchemeId
+          pensionSchemeId,
+          isPrePop = false
         )
         result mustBe false
       }
 
       "when only SchemeMemberNumbers > 99 exist" in {
         val result =
-          MemberCountUtils.hasMemberNumbersChangedToOver99(userAnswersOverThresholdNumbers, srn, pensionSchemeId)
+          MemberCountUtils.hasMemberNumbersChangedToOver99(
+            userAnswersOverThresholdNumbers,
+            srn,
+            pensionSchemeId,
+            isPrePop = false
+          )
         result mustBe false
       }
     }
@@ -71,7 +78,8 @@ class MemberCountUtilsSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswersOverThresholdNumbers
             .unsafeSet(MemberDetailsPage(srn, index), memberDetails),
           srn,
-          pensionSchemeId
+          pensionSchemeId,
+          isPrePop = false
         )
         result mustBe true
       }
@@ -80,7 +88,8 @@ class MemberCountUtilsSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswersOverThresholdNumbers
             .unsafeSet(LoansMadeOrOutstandingPage(srn), false),
           srn,
-          pensionSchemeId
+          pensionSchemeId,
+          isPrePop = false
         )
         result mustBe true
       }
@@ -90,7 +99,8 @@ class MemberCountUtilsSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswersOverThresholdNumbers
             .unsafeSet(MoneyBorrowedPage(srn), false),
           srn,
-          pensionSchemeId
+          pensionSchemeId,
+          isPrePop = false
         )
         result mustBe true
       }
@@ -102,7 +112,8 @@ class MemberCountUtilsSpec extends AnyFreeSpec with Matchers with OptionValues w
             .unsafeSet(ValueOfAssetsPage(srn, NormalMode), moneyInPeriod)
             .unsafeSet(FeesCommissionsWagesSalariesPage(srn, NormalMode), money),
           srn,
-          pensionSchemeId
+          pensionSchemeId,
+          isPrePop = false
         )
         result mustBe true
       }
@@ -112,7 +123,8 @@ class MemberCountUtilsSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswersOverThresholdNumbers
             .unsafeSet(DidSchemeHoldAnySharesPage(srn), false),
           srn,
-          pensionSchemeId
+          pensionSchemeId,
+          isPrePop = false
         )
         result mustBe true
       }
@@ -122,7 +134,8 @@ class MemberCountUtilsSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswersOverThresholdNumbers
             .unsafeSet(LandOrPropertyHeldPage(srn), false),
           srn,
-          pensionSchemeId
+          pensionSchemeId,
+          isPrePop = false
         )
         result mustBe true
       }
@@ -132,7 +145,8 @@ class MemberCountUtilsSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswersOverThresholdNumbers
             .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), false),
           srn,
-          pensionSchemeId
+          pensionSchemeId,
+          isPrePop = false
         )
         result mustBe true
       }
@@ -142,7 +156,8 @@ class MemberCountUtilsSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswersOverThresholdNumbers
             .unsafeSet(OtherAssetsHeldPage(srn), false),
           srn,
-          pensionSchemeId
+          pensionSchemeId,
+          isPrePop = false
         )
         result mustBe true
       }

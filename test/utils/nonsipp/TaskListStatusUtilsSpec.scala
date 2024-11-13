@@ -348,7 +348,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
     "should be Not Started" - {
       "when default data" in {
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(defaultUserAnswers, srn)
+        val result =
+          TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(defaultUserAnswers, srn, isPrePop = false)
         result mustBe (NotStarted, firstQuestionPageUrl)
       }
     }
@@ -357,7 +358,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when only landOrPropertyHeldPage true is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LandOrPropertyHeldPage(srn), true)
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        val result =
+          TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, firstQuestionPageUrl)
       }
 
@@ -366,7 +368,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(LandOrPropertyHeldPage(srn), true)
           .unsafeSet(LandPropertyInUKPages(srn), Map("0" -> true))
 
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        val result =
+          TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, secondQuestionPageUrl(index1of5000))
       }
     }
@@ -375,7 +378,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when only landOrPropertyHeldPage false is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LandOrPropertyHeldPage(srn), false)
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        val result =
+          TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(0, ""), firstQuestionPageUrl)
       }
 
@@ -387,7 +391,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(LandPropertyInUKPage(srn, refineMV(2)), true)
           .unsafeSet(LandOrPropertyCompleted(srn, index2of5000), SectionCompleted)
 
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        val result =
+          TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(2, "landOrProperties"), listPageUrl)
       }
 
@@ -398,7 +403,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(LandOrPropertyCompleted(srn, index1of5000), SectionCompleted)
           .unsafeSet(LandPropertyInUKPage(srn, refineMV(2)), true)
 
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        val result =
+          TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "landOrProperties"), listPageUrl)
       }
 
@@ -410,7 +416,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(LandPropertyInUKPage(srn, refineMV(2)), true)
           .unsafeSet(LandOrPropertyCompleted(srn, index2of5000), SectionCompleted)
 
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        val result =
+          TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "landOrProperties"), listPageUrl)
       }
     }

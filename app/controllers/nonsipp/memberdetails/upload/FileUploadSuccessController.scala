@@ -68,7 +68,12 @@ class FileUploadSuccessController @Inject()(
       case Some(UploadSuccess(memberDetails)) if memberDetails.nonEmpty =>
         (
           for {
-            indexes <- request.userAnswers.membersDetails(srn).refine[Max300.Refined].getOrRecoverJourneyT
+            indexes <- request.userAnswers
+              .membersDetails(srn)
+              .refine[Max300.Refined]
+              .toOption
+              .map(_.keys.toList)
+              .getOrRecoverJourneyT
             softDeletedMembers <- indexes
               .foldLeft(Try(request.userAnswers))((ua, index) => ua.flatMap(softDeleteMember(srn, index, _)))
               .mapK[Future]

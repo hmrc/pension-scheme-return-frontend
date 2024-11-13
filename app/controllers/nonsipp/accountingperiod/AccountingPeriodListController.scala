@@ -35,7 +35,7 @@ import models.{DateRange, Mode}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel}
+import viewmodels.models._
 
 import javax.inject.Named
 
@@ -120,7 +120,7 @@ object AccountingPeriodListController {
       Message(heading, periods.length),
       ListViewModel(
         inset = "accountingPeriods.inset",
-        rows(srn, mode, periods),
+        sections = List(ListSection(rows(srn, mode, periods))),
         Message("accountingPeriods.radios"),
         showRadios = periods.length < 3,
         paginatedViewModel = None

@@ -20,14 +20,12 @@ import services.SaveService
 import viewmodels.implicits._
 import controllers.nonsipp.receivetransfer.TotalValueTransferController._
 import play.api.mvc._
-import org.slf4j.{Logger, LoggerFactory}
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
 import pages.nonsipp.receivetransfer.{TotalValueTransferPage, TransferringSchemeNamePage}
 import cats.syntax.applicative._
 import controllers.actions._
-import navigation.Navigator
 import forms.MoneyFormProvider
 import models.{Mode, Money}
 import play.api.i18n.MessagesApi
@@ -37,6 +35,8 @@ import config.RefinedTypes.{Max300, Max5}
 import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
+import play.api.Logger
+import navigation.Navigator
 import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.models.{FormPageViewModel, QuestionField}
 
@@ -55,7 +55,7 @@ class TotalValueTransferController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  private implicit val logger: Logger = LoggerFactory.getLogger(this.getClass.getSimpleName)
+  private implicit val logger: Logger = Logger(getClass)
   private val form = TotalValueTransferController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =

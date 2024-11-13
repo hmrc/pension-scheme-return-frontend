@@ -404,7 +404,7 @@ object ReportedOtherAssetsDisposalListController {
       ),
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows(srn, mode, disposals, userAnswers, viewOnlyViewModel, schemeName),
+        sections = List(ListSection(rows(srn, mode, disposals, userAnswers, viewOnlyViewModel, schemeName))),
         Message("assetDisposal.reportedOtherAssetsDisposalList.radios"),
         showRadios =
           !((numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),

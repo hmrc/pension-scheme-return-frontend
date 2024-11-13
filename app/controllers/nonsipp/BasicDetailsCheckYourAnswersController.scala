@@ -145,7 +145,7 @@ class BasicDetailsCheckYourAnswersController @Inject()(
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    if (hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId)) {
+    if (hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId, isPrePopulation)) {
       auditAndRedirect(srn)(implicitly)
     } else {
       psrSubmissionService

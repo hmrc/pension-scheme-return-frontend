@@ -85,7 +85,8 @@ class PsaDeclarationController @Inject()(
                             isBypassed && hasMemberNumbersChangedToOver99(
                               request.userAnswers,
                               srn,
-                              request.pensionSchemeId
+                              request.pensionSchemeId,
+                              isPrePopulation
                             )
                           )
                       )
@@ -113,7 +114,12 @@ class PsaDeclarationController @Inject()(
           for {
             journeyByPassed <- isJourneyBypassed(srn)
             bypassed = journeyByPassed.getOrElse(false)
-            _ <- if (bypassed && hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId)) {
+            _ <- if (bypassed && hasMemberNumbersChangedToOver99(
+                request.userAnswers,
+                srn,
+                request.pensionSchemeId,
+                isPrePopulation
+              )) {
               psrSubmissionService.submitPsrDetailsBypassed(
                 srn = srn,
                 fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)

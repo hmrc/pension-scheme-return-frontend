@@ -166,13 +166,14 @@ trait ViewModelGenerators extends BasicGenerators {
   ): Gen[ListViewModel] =
     for {
       inset <- nonEmptyDisplayMessage
-      rows <- rows.fold(Gen.choose(1, 10))(Gen.const).flatMap(Gen.listOfN(_, summaryRowGen))
+      nRows <- rows.fold(Gen.choose(1, 10))(Gen.const)
+      rows <- Gen.listOfN(nRows, summaryRowGen)
       radioText <- nonEmptyMessage
       pagination <- if (paginate) Gen.option(paginationGen) else Gen.const(None)
       yesHint <- nonEmptyMessage
     } yield ListViewModel(
       inset,
-      rows,
+      List(ListSection(rows)),
       radioText,
       showRadios,
       pagination,

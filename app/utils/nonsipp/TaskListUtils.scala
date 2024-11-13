@@ -41,7 +41,8 @@ object TaskListUtils {
     srn: Srn,
     schemeName: String,
     userAnswers: UserAnswers,
-    pensionSchemeId: PensionSchemeId
+    pensionSchemeId: PensionSchemeId,
+    isPrePop: Boolean
   ): List[TaskListSectionViewModel] =
     List(
       schemeDetailsSection(srn, schemeName, userAnswers, pensionSchemeId),
@@ -49,7 +50,7 @@ object TaskListUtils {
       memberPaymentsSection(srn, userAnswers),
       loansSection(srn, schemeName, userAnswers),
       sharesSection(srn, userAnswers),
-      landOrPropertySection(srn, userAnswers),
+      landOrPropertySection(srn, userAnswers, isPrePop),
       bondsSection(srn, userAnswers),
       otherAssetsSection(srn, userAnswers)
     )
@@ -108,10 +109,12 @@ object TaskListUtils {
     pensionSchemeId: PensionSchemeId,
     previousUserAnswers: Option[UserAnswers],
     pureUserAnswers: Option[UserAnswers],
-    startDate: LocalDate
+    startDate: LocalDate,
+    isPrePop: Boolean
   ): List[TaskListSectionViewModel] = {
 
-    val sectionListWithoutDeclaration = getSectionListWithoutDeclaration(srn, schemeName, userAnswers, pensionSchemeId)
+    val sectionListWithoutDeclaration =
+      getSectionListWithoutDeclaration(srn, schemeName, userAnswers, pensionSchemeId, isPrePop)
 
     val (numSectionsReadyForSubmission, numSectionsTotal) = evaluateReadyForSubmissionTotalTuple(
       sectionListWithoutDeclaration
@@ -421,10 +424,10 @@ object TaskListUtils {
     TaskListSectionViewModel(s"$prefix.title", Right(viewModelList), None)
   }
 
-  private def landOrPropertySection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
+  private def landOrPropertySection(srn: Srn, userAnswers: UserAnswers, isPrePop: Boolean): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.landorproperty"
 
-    val landOrPropertyStatus = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(userAnswers, srn)
+    val landOrPropertyStatus = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(userAnswers, srn, isPrePop)
     val (landOrPropertyDisposalsStatus, landOrPropertyDisposalsLinkUrl) =
       TaskListStatusUtils.getLandOrPropertyDisposalsTaskListStatusWithLink(userAnswers, srn)
 
