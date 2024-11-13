@@ -16,52 +16,81 @@
 
 package services
 
-import utils.BaseSpec
 import services.PrePopulationServiceSpec._
+import controllers.TestValues
+import prepop.LandOrPropertyPrePopulationProcessor
 import models.backend.responses.{PsrVersionsForYearsResponse, PsrVersionsResponse, ReportStatus}
+import org.mockito.ArgumentMatchers.any
+import utils.BaseSpec
+import org.mockito.Mockito._
+
+import scala.util.Success
 
 import java.time.{LocalDate, LocalDateTime}
 
-class PrePopulationServiceSpec extends BaseSpec {
+class PrePopulationServiceSpec extends BaseSpec with TestValues {
 
-  private val service = new PrePopulationService()
+  lazy val mockLandOrPropertyPrePopulationProcessor: LandOrPropertyPrePopulationProcessor =
+    mock[LandOrPropertyPrePopulationProcessor]
+
+  private val service = new PrePopulationService(
+    mockLandOrPropertyPrePopulationProcessor
+  )
+
+  override def beforeEach(): Unit =
+    reset(mockLandOrPropertyPrePopulationProcessor)
 
   "PrePopulationService" - {
 
-    "should return None when versionsForYears is empty" in {
+    "findLastSubmittedPsrFbInPreviousYears" - {
 
-      val result = service.findLastSubmittedPsrFbInPreviousYears(
-        versionsForYears = Seq.empty,
-        yearFrom = LocalDate.of(2023, 4, 6)
-      )
-      result mustBe None
+      "should return None when versionsForYears is empty" in {
+
+        val result = service.findLastSubmittedPsrFbInPreviousYears(
+          versionsForYears = Seq.empty,
+          yearFrom = LocalDate.of(2023, 4, 6)
+        )
+        result mustBe None
+      }
+
+      "should return None when versionsForYears not contains versions before the start date" in {
+
+        val result = service.findLastSubmittedPsrFbInPreviousYears(
+          versionsForYears = currentAndFutureYears,
+          yearFrom = LocalDate.of(2023, 4, 6)
+        )
+        result mustBe None
+      }
+
+      "should return None when versionsForYears not contains any submitted in previous years" in {
+
+        val result = service.findLastSubmittedPsrFbInPreviousYears(
+          versionsForYears = containsPreviousYearsButNotSubmitted,
+          yearFrom = LocalDate.of(2023, 4, 6)
+        )
+        result mustBe None
+      }
+
+      "should find the latest submitted Psr Fb In Previous Years when versionsForYears contains at least one" in {
+
+        val result = service.findLastSubmittedPsrFbInPreviousYears(
+          versionsForYears = versionsForYears,
+          yearFrom = LocalDate.of(2023, 4, 6)
+        )
+        result mustBe Some("4")
+      }
     }
 
-    "should return None when versionsForYears not contains versions before the start date" in {
-
-      val result = service.findLastSubmittedPsrFbInPreviousYears(
-        versionsForYears = currentAndFutureYears,
-        yearFrom = LocalDate.of(2023, 4, 6)
-      )
-      result mustBe None
-    }
-
-    "should return None when versionsForYears not contains any submitted in previous years" in {
-
-      val result = service.findLastSubmittedPsrFbInPreviousYears(
-        versionsForYears = containsPreviousYearsButNotSubmitted,
-        yearFrom = LocalDate.of(2023, 4, 6)
-      )
-      result mustBe None
-    }
-
-    "should find the latest submitted Psr Fb In Previous Years when versionsForYears contains at least one" in {
-
-      val result = service.findLastSubmittedPsrFbInPreviousYears(
-        versionsForYears = versionsForYears,
-        yearFrom = LocalDate.of(2023, 4, 6)
-      )
-      result mustBe Some("4")
+    "buildPrePopulatedUserAnswers" - {
+      "should build prePopulated data by calling each journey processor" in {
+        when(mockLandOrPropertyPrePopulationProcessor.clean(any(), any())(any()))
+          .thenReturn(Success(defaultUserAnswers))
+        val result = service.buildPrePopulatedUserAnswers(emptyUserAnswers, emptyUserAnswers)(srn)
+        result mustBe Success(
+          defaultUserAnswers
+        )
+        verify(mockLandOrPropertyPrePopulationProcessor, times(1)).clean(any(), any())(any())
+      }
     }
   }
 }

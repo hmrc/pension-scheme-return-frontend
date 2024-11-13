@@ -16,15 +16,21 @@
 
 package services
 
+import models.SchemeId.Srn
+import prepop.LandOrPropertyPrePopulationProcessor
 import models.backend.responses._
+import models.UserAnswers
 
 import scala.math.Ordering.Implicits.infixOrderingOps
+import scala.util.Try
 
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class PrePopulationService @Inject() {
+class PrePopulationService @Inject()(
+  landOrPropertyPrePopulationProcessor: LandOrPropertyPrePopulationProcessor
+) {
 
   /**
    * this logic assumes gap years are allowed in pre-population
@@ -49,4 +55,8 @@ class PrePopulationService @Inject() {
     psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndInProgress
       || psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndSuccessfullyProcessed
   )
+
+  // Chain all journey cleanings under here
+  def buildPrePopulatedUserAnswers(baseReturnUA: UserAnswers, userAnswers: UserAnswers)(srn: Srn): Try[UserAnswers] =
+    landOrPropertyPrePopulationProcessor.clean(baseReturnUA, userAnswers)(srn)
 }

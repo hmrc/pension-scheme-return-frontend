@@ -57,9 +57,11 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
           Option(optDisposeAnyLandOrProperty.getOrElse(false))
         }
       LandOrProperty(
-        recordVersion = Option.when(request.userAnswers.get(landOrProperty) == initialUA.get(landOrProperty))(
-          request.userAnswers.get(LandOrPropertyRecordVersionPage(srn)).get
-        ),
+        recordVersion = Option
+          .when(request.userAnswers.get(landOrProperty) == initialUA.get(landOrProperty))(
+            request.userAnswers.get(LandOrPropertyRecordVersionPage(srn))
+          )
+          .flatten,
         optLandOrPropertyHeld = optLandOrPropertyHeld,
         optDisposeAnyLandOrProperty = dispose,
         landOrPropertyTransactions = transformLandOrPropertyTransactionsToEtmp(srn, optDisposeAnyLandOrProperty)

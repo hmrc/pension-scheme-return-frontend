@@ -60,12 +60,10 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
     "should omit Record Version when there is a change in userAnswers" in {
       val userAnswers = emptyUserAnswers
         .unsafeSet(LandOrPropertyHeldPage(srn), false)
-        .unsafeSet(LandOrPropertyDisposalPage(srn), false)
         .unsafeSet(LandOrPropertyRecordVersionPage(srn), "001")
 
       val initialUserAnswer = emptyUserAnswers
         .unsafeSet(LandOrPropertyHeldPage(srn), true)
-        .unsafeSet(LandOrPropertyDisposalPage(srn), false)
         .unsafeSet(LandOrPropertyRecordVersionPage(srn), "001")
 
       val result =
@@ -108,14 +106,13 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
     "should return disposals None when LandOrPropertyDisposalPage is None and it is pre-population " in {
       val userAnswers = emptyUserAnswers
         .unsafeSet(LandOrPropertyHeldPage(srn), true)
-        .unsafeSet(LandOrPropertyRecordVersionPage(srn), "001")
 
       val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
 
       val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
       result mustBe Some(
         LandOrProperty(
-          recordVersion = Some("001"),
+          recordVersion = None,
           optLandOrPropertyHeld = Some(true),
           optDisposeAnyLandOrProperty = None,
           landOrPropertyTransactions = Seq.empty // tests don't need to check these transactions in detail

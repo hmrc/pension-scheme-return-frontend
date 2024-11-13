@@ -16,9 +16,10 @@
 
 package controllers.actions
 
-import services.PsrRetrievalService
+import services.{PrePopulationService, PsrRetrievalService}
 import play.api.mvc.ActionTransformer
 import com.google.inject.ImplementedBy
+import models.SchemeId.Srn
 import config.Constants.UNCHANGED_SESSION_PREFIX
 import models.UserAnswers
 import repositories.SessionRepository
@@ -34,7 +35,8 @@ import javax.inject.{Inject, Singleton}
 class PrePopulationDataAction @Inject()(
   optLastSubmittedPsrFbInPreviousYears: Option[String],
   sessionRepository: SessionRepository,
-  psrRetrievalService: PsrRetrievalService
+  psrRetrievalService: PsrRetrievalService,
+  prePopulationService: PrePopulationService
 )(
   implicit val ec: ExecutionContext
 ) extends ActionTransformer[DataRequest, DataRequest] {
@@ -45,18 +47,22 @@ class PrePopulationDataAction @Inject()(
         implicit val hc: HeaderCarrier =
           HeaderCarrierConverter.fromRequestAndSession(existingDataRequest, existingDataRequest.session)
         val allowedAccessRequest = existingDataRequest.request
+        val srn: Srn = existingDataRequest.srn
         for {
-          baseReturn <- psrRetrievalService.getAndTransformStandardPsrDetails(
+          baseReturnUA <- psrRetrievalService.getAndTransformStandardPsrDetails(
             optFbNumber = Some(lastSubmittedPsrFbInPreviousYears),
-            fallBackCall = controllers.routes.OverviewController.onPageLoad(existingDataRequest.srn)
+            fallBackCall = controllers.routes.OverviewController.onPageLoad(srn)
           )(
             hc = implicitly,
             ec = implicitly,
             request = DataRequest[A](allowedAccessRequest, emptyUserAnswers(allowedAccessRequest))
           )
-          _ <- sessionRepository.set(baseReturn.copy(id = UNCHANGED_SESSION_PREFIX + baseReturn.id))
+          prePoppedUA <- Future.fromTry(
+            prePopulationService.buildPrePopulatedUserAnswers(baseReturnUA, existingDataRequest.userAnswers)(srn)
+          )
+          _ <- sessionRepository.set(prePoppedUA.copy(id = UNCHANGED_SESSION_PREFIX + prePoppedUA.id))
         } yield {
-          DataRequest(allowedAccessRequest, baseReturn)
+          DataRequest(allowedAccessRequest, prePoppedUA)
         }
 
       }
@@ -75,10 +81,16 @@ trait PrePopulationDataActionProvider {
 
 class PrePopulationDataActionProviderImpl @Inject()(
   sessionRepository: SessionRepository,
-  psrRetrievalService: PsrRetrievalService
+  psrRetrievalService: PsrRetrievalService,
+  prePopulationService: PrePopulationService
 )(implicit val ec: ExecutionContext)
     extends PrePopulationDataActionProvider {
 
   def apply(optLastSubmittedPsrFbInPreviousYears: Option[String]): PrePopulationDataAction =
-    new PrePopulationDataAction(optLastSubmittedPsrFbInPreviousYears, sessionRepository, psrRetrievalService)
+    new PrePopulationDataAction(
+      optLastSubmittedPsrFbInPreviousYears,
+      sessionRepository,
+      psrRetrievalService,
+      prePopulationService
+    )
 }
