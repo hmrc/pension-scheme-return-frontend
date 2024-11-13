@@ -175,7 +175,19 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
         .url
     }
 
-    "onSelectContinue redirects to what you will need page" in runningApplication { implicit app =>
+    "onSelectStart redirects to check updated information page when pre-population" in runningApplication {
+      implicit app =>
+        val request = FakeRequest(GET, onSelectStart(Some("01")))
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.CheckUpdateInformationController
+          .onPageLoad(srn)
+          .url
+    }
+
+    "onSelectContinue redirects to task list page" in runningApplication { implicit app =>
       val request = FakeRequest(GET, onSelectContinue)
 
       val result = route(app, request).value

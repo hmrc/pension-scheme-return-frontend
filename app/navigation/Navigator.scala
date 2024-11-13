@@ -38,18 +38,25 @@ class RootNavigator @Inject() extends Navigator {
     List(new JourneyNavigator {
       override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
         case WhatYouWillNeedPage(srn) =>
-          val isDataEmpty = userAnswers.data.decryptedValue == JsObject.empty
-          val isCheckReturnDatesPageEmpty = userAnswers.get(CheckReturnDatesPage(srn)).isEmpty
-          if (isDataEmpty || isCheckReturnDatesPageEmpty || isBasicDetailsIncomplete(srn, userAnswers)) {
-            routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
-          } else {
-            controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
-          }
+          navigateFromStartPage(userAnswers, srn)
+
+        case CheckUpdateInformationPage(srn) =>
+          navigateFromStartPage(userAnswers, srn)
       }
 
       override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
         _ => _ => PartialFunction.empty
     })
+
+  private def navigateFromStartPage(userAnswers: UserAnswers, srn: Srn): Call = {
+    val isDataEmpty = userAnswers.data.decryptedValue == JsObject.empty
+    val isCheckReturnDatesPageEmpty = userAnswers.get(CheckReturnDatesPage(srn)).isEmpty
+    if (isDataEmpty || isCheckReturnDatesPageEmpty || isBasicDetailsIncomplete(srn, userAnswers)) {
+      routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
+    } else {
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+    }
+  }
 
   override def defaultNormalMode: Call = controllers.routes.IndexController.onPageLoad()
 
