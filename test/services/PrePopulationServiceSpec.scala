@@ -18,8 +18,11 @@ package services
 
 import services.PrePopulationServiceSpec._
 import controllers.TestValues
-import prepop.LandOrPropertyPrePopulationProcessor
+import prepop.{LandOrPropertyPrePopulationProcessor, MemberPrePopulationProcessor}
+import utils.UserAnswersUtils.UserAnswersOps
+import play.api.libs.json._
 import models.backend.responses.{PsrVersionsForYearsResponse, PsrVersionsResponse, ReportStatus}
+import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import utils.BaseSpec
 import org.mockito.Mockito._
@@ -32,13 +35,18 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
 
   lazy val mockLandOrPropertyPrePopulationProcessor: LandOrPropertyPrePopulationProcessor =
     mock[LandOrPropertyPrePopulationProcessor]
+  lazy val mockMemberPrePopulationProcessor: MemberPrePopulationProcessor =
+    mock[MemberPrePopulationProcessor]
 
   private val service = new PrePopulationService(
-    mockLandOrPropertyPrePopulationProcessor
+    mockLandOrPropertyPrePopulationProcessor,
+    mockMemberPrePopulationProcessor
   )
 
-  override def beforeEach(): Unit =
+  override def beforeEach(): Unit = {
     reset(mockLandOrPropertyPrePopulationProcessor)
+    reset(mockMemberPrePopulationProcessor)
+  }
 
   "PrePopulationService" - {
 
@@ -83,13 +91,32 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
 
     "buildPrePopulatedUserAnswers" - {
       "should build prePopulated data by calling each journey processor" in {
-        when(mockLandOrPropertyPrePopulationProcessor.clean(any(), any())(any()))
-          .thenReturn(Success(defaultUserAnswers))
-        val result = service.buildPrePopulatedUserAnswers(emptyUserAnswers, emptyUserAnswers)(srn)
-        result mustBe Success(
-          defaultUserAnswers
-        )
+        val baseReturnUA = emptyUserAnswers
+        val currentUa = emptyUserAnswers.unsafeSet(__ \ "current", JsString("dummy-current-data"))
+        val lopUa = currentUa.unsafeSet(__ \ "lop", JsString("dummy-lop-data"))
+        val memberUa = lopUa.unsafeSet(__ \ "member", JsString("dummy-member-data"))
+
+        when(
+          mockLandOrPropertyPrePopulationProcessor
+            .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(currentUa))(ArgumentMatchers.eq(srn))
+        ).thenReturn(Success(lopUa))
+        when(
+          mockMemberPrePopulationProcessor
+            .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(lopUa))(ArgumentMatchers.eq(srn))
+        ).thenReturn(Success(memberUa))
+
+        val result = service.buildPrePopulatedUserAnswers(baseReturnUA, currentUa)(srn)
+        result.isSuccess mustBe true
+        result.get.data.decryptedValue mustBe Json.parse("""
+              |{
+              |  "current": "dummy-current-data",
+              |  "lop": "dummy-lop-data",
+              |  "member": "dummy-member-data"
+              |}
+              |""".stripMargin).as[JsObject]
+
         verify(mockLandOrPropertyPrePopulationProcessor, times(1)).clean(any(), any())(any())
+        verify(mockMemberPrePopulationProcessor, times(1)).clean(any(), any())(any())
       }
     }
   }

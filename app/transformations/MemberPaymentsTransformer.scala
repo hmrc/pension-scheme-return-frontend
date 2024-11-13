@@ -187,9 +187,11 @@ class MemberPaymentsTransformer @Inject()(
           }
           Some(
             MemberPayments(
-              recordVersion = Option.when(sameMemberPayments)(
-                userAnswers.get(MemberPaymentsRecordVersionPage(srn)).get
-              ),
+              recordVersion = Option
+                .when(sameMemberPayments)(
+                  userAnswers.get(MemberPaymentsRecordVersionPage(srn))
+                )
+                .flatten,
               memberDetails = memberDetailsWithCorrectVersion ++ softDeletedMembers,
               employerContributionMade = userAnswers.get(EmployerContributionsPage(srn)),
               transfersInMade = userAnswers.get(DidSchemeReceiveTransferPage(srn)),
