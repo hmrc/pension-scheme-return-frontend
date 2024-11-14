@@ -154,8 +154,8 @@ class LoansTransformer @Inject() extends Transformer {
                       (recipientName, recipientIdentityType, connectedParty, optRecipientSponsoringEmployer) = recipientIdentityDetails
                       equalInstallments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index))
                       datePeriodLoanDetails <- request.userAnswers.get(DatePeriodLoanPage(srn, index))
-                      loanAmountDetails <- request.userAnswers.get(AmountOfTheLoanPage(srn, index))
-                      (loanAmount, capRepaymentCY, amountOutstanding) = loanAmountDetails
+                      amountOfTheLoan <- request.userAnswers.get(AmountOfTheLoanPage(srn, index))
+                      (loanAmount, optCapRepaymentCY, optAmountOutstanding) = amountOfTheLoan.asTuple
                       optSecurity <- request.userAnswers.get(SecurityGivenForLoanPage(srn, index)).map(_.value.toOption)
                       loanInterestDetails <- request.userAnswers.get(InterestOnLoanPage(srn, index))
                       (loanInterestAmount, loanInterestRate, intReceivedCY) = loanInterestDetails
@@ -171,8 +171,8 @@ class LoansTransformer @Inject() extends Transformer {
                         LoanPeriod(datePeriodLoanDetails._1, datePeriodLoanDetails._2.value, datePeriodLoanDetails._3),
                         LoanAmountDetails(
                           loanAmount.value,
-                          capRepaymentCY.value,
-                          amountOutstanding.value
+                          optCapRepaymentCY.map(_.value),
+                          optAmountOutstanding.map(_.value)
                         ),
                         equalInstallments,
                         LoanInterestDetails(
@@ -351,14 +351,40 @@ class LoansTransformer @Inject() extends Transformer {
           Money(loanTransactions(index.value - 1).datePeriodLoanDetails.loanTotalSchemeAssets),
           loanTransactions(index.value - 1).datePeriodLoanDetails.loanPeriodInMonths)
       )
-      loanAmount = indexes.map(
-        index =>
-          AmountOfTheLoanPage(srn, index) -> (
-            Money(loanTransactions(index.value - 1).loanAmountDetails.loanAmount),
-            Money(loanTransactions(index.value - 1).loanAmountDetails.capRepaymentCY),
-            Money(loanTransactions(index.value - 1).loanAmountDetails.amountOutstanding)
-          )
-      )
+      fullLoanAmount = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).loanAmountDetails.optCapRepaymentCY.nonEmpty &&
+              loanTransactions(index.value - 1).loanAmountDetails.optAmountOutstanding.nonEmpty
+          }
+        )
+        .map(
+          index =>
+            AmountOfTheLoanPage(srn, index) -> {
+              AmountOfTheLoan(
+                Money(loanTransactions(index.value - 1).loanAmountDetails.loanAmount),
+                Some(Money(loanTransactions(index.value - 1).loanAmountDetails.optCapRepaymentCY.get)),
+                Some(Money(loanTransactions(index.value - 1).loanAmountDetails.optAmountOutstanding.get))
+              )
+            }
+        )
+      partialLoanAmount = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).loanAmountDetails.optCapRepaymentCY.isEmpty &&
+              loanTransactions(index.value - 1).loanAmountDetails.optAmountOutstanding.isEmpty
+          }
+        )
+        .map(
+          index =>
+            AmountOfTheLoanPage(srn, index) -> {
+              AmountOfTheLoan(
+                Money(loanTransactions(index.value - 1).loanAmountDetails.loanAmount),
+                None,
+                None
+              )
+            }
+        )
       equalInstallments = indexes.map(
         index => AreRepaymentsInstalmentsPage(srn, index) -> loanTransactions(index.value - 1).equalInstallments
       )
@@ -434,17 +460,18 @@ class LoansTransformer @Inject() extends Transformer {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
       ua6 <- datePeriodLoan.foldLeft(Try(ua51)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-      ua7 <- loanAmount.foldLeft(Try(ua6)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-      ua8 <- equalInstallments.foldLeft(Try(ua7)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-      ua9 <- loanInterest.foldLeft(Try(ua8)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-      ua10 <- securityGiven.foldLeft(Try(ua9)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-      ua11 <- securityNotGiven.foldLeft(Try(ua10)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-      ua12 <- outstandingArrearsOnLoan.foldLeft(Try(ua11)) {
+      ua7 <- fullLoanAmount.foldLeft(Try(ua6)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua8 <- partialLoanAmount.foldLeft(Try(ua7)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua9 <- equalInstallments.foldLeft(Try(ua8)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua10 <- loanInterest.foldLeft(Try(ua9)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua11 <- securityGiven.foldLeft(Try(ua10)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua12 <- securityNotGiven.foldLeft(Try(ua11)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua13 <- outstandingArrearsOnLoan.foldLeft(Try(ua12)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
-      ua13 <- noOutstandingArrearsOnLoan.foldLeft(Try(ua12)) {
+      ua14 <- noOutstandingArrearsOnLoan.foldLeft(Try(ua13)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
-    } yield ua13
+    } yield ua14
   }
 }

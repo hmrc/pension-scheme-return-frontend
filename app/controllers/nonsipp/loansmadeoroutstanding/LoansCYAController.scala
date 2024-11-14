@@ -115,7 +115,7 @@ class LoansCYAController @Inject()(
           Left(request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).get)
         }
         datePeriodLoan <- request.userAnswers.get(DatePeriodLoanPage(srn, index)).getOrRecoverJourney
-        loanAmount <- request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrRecoverJourney
+        amountOfTheLoan <- request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrRecoverJourney
         returnEndDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney.map(_.to)
         repaymentInstalments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)).getOrRecoverJourney
         loanInterest <- request.userAnswers.get(InterestOnLoanPage(srn, index)).getOrRecoverJourney
@@ -141,7 +141,7 @@ class LoansCYAController @Inject()(
             recipientReasonNoDetails,
             connectedParty,
             datePeriodLoan,
-            loanAmount,
+            amountOfTheLoan,
             returnEndDate,
             repaymentInstalments,
             loanInterest,
@@ -194,7 +194,7 @@ object LoansCYAController {
     recipientReasonNoDetails: Option[String],
     connectedParty: Either[Boolean, SponsoringOrConnectedParty],
     datePeriodLoan: (LocalDate, Money, Int),
-    loanAmount: (Money, Money, Money),
+    amountOfTheLoan: AmountOfTheLoan,
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
     loanInterest: (Money, Percentage, Money),
@@ -216,8 +216,8 @@ object LoansCYAController {
       ),
       heading = mode.fold(
         normal = "checkYourAnswers.heading",
-        check = Message("loanCheckYourAnswers.change.heading", loanAmount._1.displayAs, recipientName),
-        viewOnly = Message("loanCheckYourAnswers.viewOnly.heading", loanAmount._1.displayAs, recipientName)
+        check = Message("loanCheckYourAnswers.change.heading", amountOfTheLoan.loanAmount.displayAs, recipientName),
+        viewOnly = Message("loanCheckYourAnswers.viewOnly.heading", amountOfTheLoan.loanAmount.displayAs, recipientName)
       ),
       description = Some(ParagraphMessage("loansCYA.paragraph")),
       page = CheckYourAnswersViewModel(
@@ -231,7 +231,7 @@ object LoansCYAController {
           recipientReasonNoDetails,
           connectedParty,
           datePeriodLoan,
-          loanAmount,
+          amountOfTheLoan,
           returnEndDate,
           repaymentInstalments,
           loanInterest,
@@ -253,7 +253,8 @@ object LoansCYAController {
             link = None,
             submittedText = Some(Message("")),
             title = "loanCheckYourAnswers.viewOnly.title",
-            heading = Message("loanCheckYourAnswers.viewOnly.heading", loanAmount._1.displayAs, recipientName),
+            heading =
+              Message("loanCheckYourAnswers.viewOnly.heading", amountOfTheLoan.loanAmount.displayAs, recipientName),
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
@@ -279,7 +280,7 @@ object LoansCYAController {
     recipientReasonNoDetails: Option[String],
     connectedParty: Either[Boolean, SponsoringOrConnectedParty],
     datePeriodLoan: (LocalDate, Money, Int),
-    loanAmount: (Money, Money, Money),
+    amountOfTheLoan: AmountOfTheLoan,
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
     loanInterest: (Money, Percentage, Money),
@@ -288,7 +289,7 @@ object LoansCYAController {
     mode: Mode
   ): List[CheckYourAnswersSection] = {
     val (loanDate, assetsValue, loanPeriod) = datePeriodLoan
-    val (totalLoan, repayments, outstanding) = loanAmount
+    val (totalLoan, repayments, outstanding) = amountOfTheLoan.asTuple
     val (interestPayable, interestRate, interestPayments) = loanInterest
 
     recipientSection(
@@ -540,13 +541,15 @@ object LoansCYAController {
     srn: Srn,
     index: Max5000,
     totalLoan: Money,
-    repayments: Money,
-    outstanding: Money,
+    repayments: Option[Money],
+    outstanding: Option[Money],
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
     mode: Mode
   ): List[CheckYourAnswersSection] = {
     val repaymentsInstalmentsValue = if (repaymentInstalments) "site.yes" else "site.no"
+    val optCapRepaymentCYString = if (repayments.isDefined) s"£${repayments.get.displayAs}" else ""
+    val optAmountOutstandingString = if (outstanding.isDefined) s"£${outstanding.get.displayAs}" else ""
 
     List(
       CheckYourAnswersSection(
@@ -561,7 +564,7 @@ object LoansCYAController {
             ),
           CheckYourAnswersRowViewModel(
             "loanCheckYourAnswers.section3.loanAmount.repayments",
-            s"£${repayments.displayAs}"
+            optCapRepaymentCYString
           ).withAction(
             SummaryAction(
               "site.change",
@@ -570,7 +573,7 @@ object LoansCYAController {
           ),
           CheckYourAnswersRowViewModel(
             Message("loanCheckYourAnswers.section3.loanAmount.outstanding", returnEndDate.show),
-            s"£${outstanding.displayAs}"
+            optAmountOutstandingString
           ).withAction(
             SummaryAction(
               "site.change",

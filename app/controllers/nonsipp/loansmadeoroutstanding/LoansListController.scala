@@ -221,7 +221,7 @@ class LoansListController @Inject()(
         case (index, recipientName) =>
           request.userAnswers
             .get(AmountOfTheLoanPage(srn, index))
-            .map(_._1)
+            .map(_.loanAmount)
             .getOrRecoverJourney
             .map((index, recipientName, _))
       }

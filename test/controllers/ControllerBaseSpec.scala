@@ -142,6 +142,8 @@ trait TestValues {
   val moneyNegative: Money = Money(1123456)
   val moneyZero: Money = Money(0)
   val moneyInPeriod: MoneyInPeriod = MoneyInPeriod(money, Money(1))
+  val amountOfTheLoan: AmountOfTheLoan = AmountOfTheLoan(money, Some(money), Some(money))
+  val partialAmountOfTheLoan: AmountOfTheLoan = AmountOfTheLoan(money, None, None)
   val security: Security = Security("securityGivenForLoan")
   val double: Double = 7.7
   val percentage: Percentage = Percentage(7.7)

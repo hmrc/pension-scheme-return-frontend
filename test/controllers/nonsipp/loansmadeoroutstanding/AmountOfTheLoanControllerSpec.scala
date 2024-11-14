@@ -17,11 +17,12 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import services.SchemeDateService
+import controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.partialAnswersForm
 import play.api.inject.bind
 import views.html.MultipleQuestionView
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
-import models.{DateRange, NormalMode}
+import models._
 import pages.nonsipp.loansmadeoroutstanding.AmountOfTheLoanPage
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
@@ -49,6 +50,9 @@ class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
   def setSchemeDate(date: Option[DateRange]): Unit =
     when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(date)
 
+  val partialUserAnswers: UserAnswers =
+    defaultUserAnswers.unsafeSet(AmountOfTheLoanPage(srn, index), partialAmountOfTheLoan)
+
   "AmountOfTheLoanController" - {
 
     val schemeName = defaultSchemeDetails.schemeName
@@ -64,11 +68,16 @@ class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
       view(form, viewModel(form))
     })
 
-    act.like(renderPrePopView(onPageLoad, AmountOfTheLoanPage(srn, index), (money, money, money)) {
+    act.like(renderPrePopView(onPageLoad, AmountOfTheLoanPage(srn, index), amountOfTheLoan) {
       implicit app => implicit request =>
         val view = injected[MultipleQuestionView]
         view(form.fill((money, money, money)), viewModel(form))
-    })
+    }.withName("return OK and the correct pre-populated view for a GET (full answers)"))
+
+    act.like(renderViewWithPrePopSession(onPageLoad, partialUserAnswers) { implicit app => implicit request =>
+      val view = injected[MultipleQuestionView]
+      view(partialAnswersForm.fill((money, None, None)), viewModel(form))
+    }.withName("return OK and the correct pre-populated view for a GET (partial answers only)"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

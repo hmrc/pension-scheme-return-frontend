@@ -22,6 +22,7 @@ import queries.Settable
 import play.api.mvc.{Call, Request}
 import play.twirl.api.Html
 import play.api.inject.bind
+import config.Constants.PREPOPULATION_FLAG
 import models.UserAnswers
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -61,6 +62,25 @@ trait ControllerBehaviours {
         isPsa = isPsa
       )
       render(appBuilder, call)(view)
+    }
+
+  def renderViewWithPrePopSession(
+    call: => Call,
+    userAnswers: UserAnswers = defaultUserAnswers,
+    pureUserAnswers: UserAnswers = defaultUserAnswers,
+    optPreviousAnswers: Option[UserAnswers] = None,
+    isPsa: Boolean = true
+  )(
+    view: Application => Request[_] => Html
+  ): BehaviourTest =
+    "return OK and the correct view".hasBehaviour {
+      val appBuilder = applicationBuilder(
+        userAnswers = Some(userAnswers),
+        pureUserAnswers = Some(pureUserAnswers),
+        previousUserAnswers = optPreviousAnswers,
+        isPsa = isPsa
+      )
+      render(appBuilder, call, (PREPOPULATION_FLAG, "true"))(view)
     }
 
   def renderPrePopView[A: Writes](call: => Call, page: Settable[A], value: A)(
@@ -116,11 +136,11 @@ trait ControllerBehaviours {
       }
     }
 
-  private def render(appBuilder: GuiceApplicationBuilder, call: => Call)(
+  private def render(appBuilder: GuiceApplicationBuilder, call: => Call, session: (String, String)*)(
     view: Application => Request[_] => Html
   ): Unit =
     running(_ => appBuilder) { app =>
-      val request = FakeRequest(call)
+      val request = FakeRequest(call).withSession(session: _*)
       val result = route(app, request).value
       val expectedView = view(app)(request)
 

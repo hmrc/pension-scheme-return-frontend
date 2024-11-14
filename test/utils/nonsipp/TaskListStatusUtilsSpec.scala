@@ -134,7 +134,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     .unsafeSet(IndividualRecipientNinoPage(srn, index1of5000), ConditionalYesNo.yes[String, Nino](nino))
     .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, index1of5000), true)
     .unsafeSet(DatePeriodLoanPage(srn, index1of5000), (localDate, money, loanPeriod))
-    .unsafeSet(AmountOfTheLoanPage(srn, index1of5000), (money, money, money))
+    .unsafeSet(AmountOfTheLoanPage(srn, index1of5000), amountOfTheLoan)
     .unsafeSet(AreRepaymentsInstalmentsPage(srn, index1of5000), true)
     .unsafeSet(InterestOnLoanPage(srn, index1of5000), (money, percentage, money))
     .unsafeSet(SecurityGivenForLoanPage(srn, index1of5000), ConditionalYesNo.yes[Unit, Security](security))

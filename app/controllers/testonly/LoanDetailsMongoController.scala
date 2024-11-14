@@ -97,7 +97,11 @@ class LoanDetailsMongoController @Inject()(
       )
       loanAmount = indexes.map(
         index =>
-          AmountOfTheLoanPage(srn, index) -> (Money(12.00, "12.00"), Money(12.00, "12.00"), Money(12.00, "12.00"))
+          AmountOfTheLoanPage(srn, index) -> AmountOfTheLoan(
+            Money(12.00, "12.00"),
+            Some(Money(12.00, "12.00")),
+            Some(Money(12.00, "12.00"))
+          )
       )
       equalInstallments = indexes.map(index => AreRepaymentsInstalmentsPage(srn, index) -> true)
       loanInterest = indexes.map(

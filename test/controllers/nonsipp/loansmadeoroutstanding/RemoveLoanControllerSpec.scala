@@ -41,13 +41,13 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
     .unsafeSet(CompanyRecipientNamePage(srn, refineMV(1)), "recipientName1")
-    .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), (money, money, money))
+    .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
     .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKPartnership)
     .unsafeSet(PartnershipRecipientNamePage(srn, refineMV(2)), "recipientName2")
-    .unsafeSet(AmountOfTheLoanPage(srn, refineMV(2)), (money, money, money))
+    .unsafeSet(AmountOfTheLoanPage(srn, refineMV(2)), amountOfTheLoan)
     .unsafeSet(IdentityTypePage(srn, refineMV(3), IdentitySubject.LoanRecipient), IdentityType.Individual)
     .unsafeSet(IndividualRecipientNamePage(srn, refineMV(3)), "recipientName3")
-    .unsafeSet(AmountOfTheLoanPage(srn, refineMV(3)), (money, money, money))
+    .unsafeSet(AmountOfTheLoanPage(srn, refineMV(3)), amountOfTheLoan)
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
