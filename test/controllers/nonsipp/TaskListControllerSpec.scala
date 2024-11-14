@@ -41,7 +41,7 @@ import config.RefinedTypes.{Max3, Max5000}
 import controllers.ControllerBaseSpec
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import pages.nonsipp.sharesdisposal._
-import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
+import pages.nonsipp.{CheckReturnDatesPage, FbVersionPage, WhichTaxYearPage}
 import play.api.inject
 import viewmodels.models.TaskListStatus.TaskListStatus
 import pages.nonsipp.common.IdentityTypePage
@@ -77,6 +77,9 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
       .unsafeSet(ActiveBankAccountPage(srn), true)
       .unsafeSet(HowManyMembersPage.bySrn(srn), schemeMemberNumbers)
       .unsafeSet(WhichTaxYearPage(srn), dateRange)
+      .unsafeSet(FbVersionPage(srn), commonVersion)
+    val populatedUserAnswersV2 = populatedUserAnswers.unsafeSet(FbVersionPage(srn), "002")
+    val populatedUserAnswersV3 = populatedUserAnswers.unsafeSet(FbVersionPage(srn), "003")
 
     lazy val defaultViewModel = TaskListController.viewModel(
       srn,
@@ -96,7 +99,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
     }.withName("task list renders OK when no version response"))
 
     act.like(
-      renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
+      renderView(onPageLoad, populatedUserAnswersV3) { implicit app => implicit request =>
         val view = injected[TaskListView]
         view(defaultViewModel, schemeName)
       }.withName("task list renders OK when version response without any submitted")
@@ -121,7 +124,11 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
     )
 
     act.like(
-      renderView(onPageLoad, populatedUserAnswers, optPreviousAnswers = None) { implicit app => implicit request =>
+      renderView(
+        onPageLoad,
+        populatedUserAnswersV2,
+        optPreviousAnswers = None
+      ) { implicit app => implicit request =>
         val view = injected[TaskListView]
         view(
           TaskListController.viewModel(
@@ -146,7 +153,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
     )
 
     act.like(
-      renderView(onPageLoad, populatedUserAnswers, optPreviousAnswers = Some(populatedUserAnswers)) {
+      renderView(onPageLoad, populatedUserAnswersV3, optPreviousAnswers = Some(populatedUserAnswers)) {
         implicit app => implicit request =>
           val view = injected[TaskListView]
           view(
@@ -178,6 +185,21 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
           .onPageLoad(Some(RedirectUrl(controllers.routes.OverviewController.onPageLoad(srn).url))),
         defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
       )
+    )
+
+    act.like(
+      redirectToPage(
+        onPageLoad,
+        controllers.routes.OverviewController.onPageLoad(srn),
+        populatedUserAnswers,
+        populatedUserAnswers
+      ).before(
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+            .thenReturn(
+              Future.successful(versionsResponseInProgress)
+            )
+        )
+        .withName("task list redirects to overview page when a historical submission is in user answers")
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
