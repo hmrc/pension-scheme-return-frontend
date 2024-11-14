@@ -88,7 +88,8 @@ class TaskListController @Inject()(
           request.userAnswers,
           request.pensionSchemeId,
           hasHistory,
-          noChangesSincePreviousVersion
+          noChangesSincePreviousVersion,
+          version = 1
         )
       } yield {
         if (fbVersion < lastVersion) {
@@ -144,7 +145,8 @@ object TaskListController {
     userAnswers: UserAnswers,
     pensionSchemeId: PensionSchemeId,
     hasHistory: Boolean,
-    noChangesSincePreviousVersion: Boolean
+    noChangesSincePreviousVersion: Boolean,
+    version: Int
   ): PageViewModel[TaskListViewModel] = {
 
     val sectionList =
@@ -154,7 +156,8 @@ object TaskListController {
         userAnswers,
         pensionSchemeId,
         noChangesSincePreviousVersion,
-        Some(startDate)
+        Some(startDate),
+        Option(version)
       )
 
     val (numSectionsReadyForSubmission, numSectionsTotal) = evaluateReadyForSubmissionTotalTuple(sectionList)

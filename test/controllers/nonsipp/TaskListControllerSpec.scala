@@ -89,7 +89,8 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
       populatedUserAnswers,
       pensionSchemeId,
       hasHistory = false,
-      noChangesSincePreviousVersion = false
+      noChangesSincePreviousVersion = false,
+      1
     )
     lazy val onPageLoad = routes.TaskListController.onPageLoad(srn)
 
@@ -139,7 +140,8 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
             populatedUserAnswers,
             pensionSchemeId,
             hasHistory = true,
-            noChangesSincePreviousVersion = true
+            noChangesSincePreviousVersion = true,
+            1
           ),
           schemeName
         )
@@ -165,7 +167,8 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
               populatedUserAnswers,
               pensionSchemeId,
               hasHistory = true,
-              noChangesSincePreviousVersion = true
+              noChangesSincePreviousVersion = true,
+              1
             ),
             schemeName
           )
@@ -1192,7 +1195,8 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
       userAnswersPopulated,
       pensionSchemeId,
       hasHistory = false,
-      noChangesSincePreviousVersion = false
+      noChangesSincePreviousVersion = false,
+      1
     )
     val sections = customViewModel.page.sections.toList
     sections(sectionIndex).title.key mustBe expectedTitleKey

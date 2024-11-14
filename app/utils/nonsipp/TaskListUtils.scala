@@ -59,10 +59,12 @@ object TaskListUtils {
     isLinkActive: Boolean,
     noChangesSincePreviousVersion: Boolean,
     schemeName: String,
-    dateRange: Option[LocalDate]
-//    version: Option[Int]
+    dateRange: Option[LocalDate],
+    version: Option[Int]
   ): TaskListSectionViewModel = {
+
     val prefix = "nonsipp.tasklist.declaration"
+    val startDateRange = "2021-04-06"
 
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -80,10 +82,8 @@ object TaskListUtils {
             controllers.nonsipp.routes.ViewOnlyReturnSubmittedController
               .onPageLoad(
                 srn,
-                dateRange.getOrElse("2021-04-06").toString,
-                5
-//                "2021-04-06", // I just hardcoded this value, it should be the tax year start date
-//                5 // I just hardcoded this value, it should be the version of the return, this value should be somewhere in the call stack for this method or you can fetch it as ua.get(FbVersionPage(srn))
+                dateRange.getOrElse(startDateRange).toString,
+                version.getOrElse(1)
               )
               .url
           )
@@ -109,8 +109,8 @@ object TaskListUtils {
     userAnswers: UserAnswers,
     pensionSchemeId: PensionSchemeId,
     noChangesSincePreviousVersion: Boolean,
-    startDate: Option[LocalDate] = None
-//    version: Option[Int]
+    startDate: Option[LocalDate] = None,
+    version: Option[Int]
   ): List[TaskListSectionViewModel] = {
 
     val sectionListWithoutDeclaration = getSectionListWithoutDeclaration(srn, schemeName, userAnswers, pensionSchemeId)
@@ -128,8 +128,8 @@ object TaskListUtils {
         isLinkActive,
         noChangesSincePreviousVersion,
         schemeName,
-        startDate
-//        version
+        startDate,
+        version
       )
 
     sectionListWithoutDeclaration :+ declarationSectionViewModel
