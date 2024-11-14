@@ -121,7 +121,7 @@ class PsaDeclarationController @Inject()(
             } else {
               psrSubmissionService.submitPsrDetails(
                 srn = srn,
-                isSubmitted = false,
+                isSubmitted = true,
                 fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
               )
             }
