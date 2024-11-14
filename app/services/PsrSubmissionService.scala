@@ -222,9 +222,7 @@ class PsrSubmissionService @Inject()(
                 req.schemeDetails.schemeName,
                 req.userAnswers,
                 req.pensionSchemeId,
-                noChangesSincePreviousVersion = false,
-                None,
-                None
+                noChangesSincePreviousVersion = false
               ),
               messagesApi
             ).list
