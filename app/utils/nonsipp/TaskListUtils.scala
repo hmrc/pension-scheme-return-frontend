@@ -23,14 +23,17 @@ import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
 import pages.nonsipp.otherassetsheld.OtherAssetsCompleted
 import utils.nonsipp.TaskListStatusUtils._
 import pages.nonsipp.landorproperty.LandOrPropertyCompleted
+import config.Constants.defaultFbVersion
 import pages.nonsipp.accountingperiod.AccountingPeriods
-import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.{CheckReturnDatesPage, FbStatus, FbVersionPage}
 import models._
 import viewmodels.models.TaskListStatus._
 import cats.data.NonEmptyList
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage._
 import viewmodels.models._
+
+import java.time.LocalDate
 
 object TaskListUtils {
 
@@ -55,25 +58,41 @@ object TaskListUtils {
     srn: Srn,
     isPsp: Boolean,
     isLinkActive: Boolean,
-    schemeName: String
+    showViewDeclarationLink: Boolean,
+    schemeName: String,
+    startDate: LocalDate,
+    version: Option[Int]
   ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.declaration"
 
     TaskListSectionViewModel(
       s"$prefix.title",
-      if (isLinkActive) {
-        val psaOrPspDeclarationUrl =
-          if (isPsp) {
-            controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn).url
-          } else {
-            controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn).url
-          }
-        LinkMessage(
-          s"$prefix.complete",
-          psaOrPspDeclarationUrl
-        )
-      } else {
-        Message(s"$prefix.incomplete")
+      (isLinkActive, showViewDeclarationLink) match {
+        case (true, true) =>
+          LinkMessage(
+            s"$prefix.view",
+            controllers.nonsipp.routes.ViewOnlyReturnSubmittedController
+              .onPageLoad(
+                srn,
+                startDate.toString,
+                version.getOrElse(defaultFbVersion.toInt)
+              )
+              .url
+          )
+        case (true, false) => {
+          val psaOrPspDeclarationUrl =
+            if (isPsp) {
+              controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn).url
+            } else {
+              controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn).url
+            }
+          LinkMessage(
+            s"$prefix.complete",
+            psaOrPspDeclarationUrl
+          )
+        }
+        case (false, _) =>
+          Message(s"$prefix.incomplete")
       },
       LinkMessage(
         Message(s"$prefix.saveandreturn", schemeName),
@@ -86,7 +105,10 @@ object TaskListUtils {
     srn: Srn,
     schemeName: String,
     userAnswers: UserAnswers,
-    pensionSchemeId: PensionSchemeId
+    pensionSchemeId: PensionSchemeId,
+    previousUserAnswers: Option[UserAnswers],
+    pureUserAnswers: Option[UserAnswers],
+    startDate: LocalDate
   ): List[TaskListSectionViewModel] = {
 
     val sectionListWithoutDeclaration = getSectionListWithoutDeclaration(srn, schemeName, userAnswers, pensionSchemeId)
@@ -97,12 +119,34 @@ object TaskListUtils {
 
     val isLinkActive = numSectionsTotal == numSectionsReadyForSubmission
 
+    val (answersUnchanged, fbVersion: Option[Int]) = (isLinkActive, previousUserAnswers, pureUserAnswers) match {
+      case (false, _, _) =>
+        // no submission link is shown, no need to distinguish
+        (false, None)
+      case (_, None, _) =>
+        // there is no "history"
+        (false, None)
+      case (_, Some(previous), Some(pure)) if pure.get(FbStatus(srn)).exists(_.isSubmitted) =>
+        // need to check all sections
+        (
+          userAnswersUnchangedAllSections(userAnswers, pure),
+          Some(previous.get(FbVersionPage(srn)).getOrElse(defaultFbVersion).toInt)
+        )
+      case (_, Some(_), Some(pure)) if !pure.get(FbStatus(srn)).exists(_.isSubmitted) =>
+        // status has already switched to compiled, answers changed
+        (false, None)
+      case (_, _, _) => (false, None)
+    }
+
     val declarationSectionViewModel =
       getDeclarationSection(
         srn,
         pensionSchemeId.isPSP,
         isLinkActive,
-        schemeName
+        answersUnchanged,
+        schemeName,
+        startDate,
+        fbVersion
       )
 
     sectionListWithoutDeclaration :+ declarationSectionViewModel

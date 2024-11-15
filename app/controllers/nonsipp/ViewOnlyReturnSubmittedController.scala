@@ -96,7 +96,7 @@ object ViewOnlyReturnSubmittedController {
       case _ => List.empty
     }
 
-    val dateSubmittedRow: Option[(Message, Message)] = psrVersionsResponse.lift(version) match {
+    val dateSubmittedRow: Option[(Message, Message)] = psrVersionsResponse.find(p => p.reportVersion == version) match {
       case Some(psrVersionResponse) =>
         Some(
           Message("returnSubmitted.table.field3") -> Message(

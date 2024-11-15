@@ -24,11 +24,11 @@ import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
 import viewmodels.models.SectionCompleted
+import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import config.RefinedTypes.Max5000
 import controllers.ControllerBaseSpec
-import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 

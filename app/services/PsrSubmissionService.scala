@@ -217,7 +217,15 @@ class PsrSubmissionService @Inject()(
         taskList = Json
           .toJson(
             transformTaskListToCipFormat(
-              getSectionList(req.srn, req.schemeDetails.schemeName, req.userAnswers, req.pensionSchemeId),
+              getSectionList(
+                req.srn,
+                req.schemeDetails.schemeName,
+                req.userAnswers,
+                req.pensionSchemeId,
+                req.previousUserAnswers,
+                req.pureUserAnswers,
+                taxYear.from
+              ),
               messagesApi
             ).list
           )

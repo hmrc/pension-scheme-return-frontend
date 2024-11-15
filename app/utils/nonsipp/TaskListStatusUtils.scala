@@ -695,11 +695,11 @@ object TaskListStatusUtils {
 
     val designatoryCurrent = currentUA
       .get(schemeDesignatory)
-      .get
+      .getOrElse(JsObject.empty)
       .as[JsObject] - "totalAssetValue" - "totalPayments" - "totalCash" - "recordVersion"
     val designatoryPrevious = previousUA
       .get(schemeDesignatory)
-      .get
+      .getOrElse(JsObject.empty)
       .as[JsObject] - "totalAssetValue" - "totalPayments" - "totalCash" - "recordVersion"
     val schemeDesignatoriesSame = designatoryCurrent == designatoryPrevious
 
