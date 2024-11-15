@@ -108,7 +108,9 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
           completedUserAnswers,
           schemeName,
           viewOnlyViewModel = None,
-          showBackLink = true
+          showBackLink = true,
+          maximumDisposalsReached = false,
+          allBondsFullyDisposed = false
         )
       )
     }.withName("Completed Journey"))
@@ -172,7 +174,9 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
               completedUserAnswers,
               schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel),
-              showBackLink = true
+              showBackLink = true,
+              maximumDisposalsReached = true,
+              allBondsFullyDisposed = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
@@ -196,7 +200,9 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
               updatedUserAnswers,
               schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-              showBackLink = true
+              showBackLink = true,
+              maximumDisposalsReached = true,
+              allBondsFullyDisposed = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -233,7 +239,9 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
                   previousVersion = submissionNumberZero
                 )
               ),
-              showBackLink = false
+              showBackLink = false,
+              maximumDisposalsReached = true,
+              allBondsFullyDisposed = false
             )
           )
       }.withName("OnPreviousViewOnly renders view with parameters for the previous submission")

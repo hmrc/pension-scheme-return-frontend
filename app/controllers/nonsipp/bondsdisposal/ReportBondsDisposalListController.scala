@@ -112,33 +112,47 @@ class ReportBondsDisposalListController @Inject()(
       val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
       val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
       val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
-      getBondsDisposalsWithIndexes(srn, completedDisposals)
-        .map(
-          bondsDisposalsWithIndexes =>
-            if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
-              Ok(
-                view(
-                  form,
-                  viewModel(
-                    srn,
-                    mode,
-                    page,
-                    bondsDisposalsWithIndexes,
-                    numberOfDisposals,
-                    maxPossibleNumberOfDisposals,
-                    request.userAnswers,
-                    request.schemeDetails.schemeName,
-                    viewOnlyViewModel,
-                    showBackLink = showBackLink
-                  )
-                )
-              )
-            } else {
-              logger.info("no completed bond disposal, start a new one")
-              Redirect(routes.BondsDisposalController.onPageLoad(srn, NormalMode))
+
+      getBondsDisposalsWithIndexes(srn, completedDisposals).map { bondsDisposalsWithIndexes =>
+        val allBondsFullyDisposed: Boolean = bondsDisposalsWithIndexes.forall {
+          case ((bondIndex, disposalIndexes), _) =>
+            disposalIndexes.exists { disposalIndex =>
+              request.userAnswers.get(BondsStillHeldPage(srn, bondIndex, disposalIndex)).contains(0)
             }
-        )
-        .merge
+        }
+
+        val maximumDisposalsReached = numberOfDisposals >= maxBondsTransactions * maxDisposalPerBond ||
+          numberOfDisposals >= maxPossibleNumberOfDisposals ||
+          allBondsFullyDisposed
+
+        logger.debug(s"All Bonds Fully Disposed: $allBondsFullyDisposed")
+        logger.debug(s"Maximum Disposals Reached: $maximumDisposalsReached")
+
+        if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
+          Ok(
+            view(
+              form,
+              viewModel(
+                srn,
+                mode,
+                page,
+                bondsDisposalsWithIndexes,
+                numberOfDisposals,
+                maxPossibleNumberOfDisposals,
+                request.userAnswers,
+                request.schemeDetails.schemeName,
+                viewOnlyViewModel,
+                showBackLink = showBackLink,
+                maximumDisposalsReached = maximumDisposalsReached,
+                allBondsFullyDisposed = allBondsFullyDisposed
+              )
+            )
+          )
+        } else {
+          logger.info("No completed bond disposal, start a new one")
+          Redirect(routes.BondsDisposalController.onPageLoad(srn, NormalMode))
+        }
+      }.merge
     }.merge
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
@@ -148,7 +162,19 @@ class ReportBondsDisposalListController @Inject()(
           val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
           val numberOfBondsItems = request.userAnswers.map(BondsCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalPerBond * numberOfBondsItems
-          if (numberOfDisposals >= maxBondsTransactions * maxDisposalPerBond || numberOfDisposals >= maxPossibleNumberOfDisposals) {
+
+          val allBondsFullyDisposed: Boolean = completedDisposals.forall {
+            case (bondIndex, disposalIndexes) =>
+              disposalIndexes.exists { disposalIndex =>
+                request.userAnswers.get(BondsStillHeldPage(srn, bondIndex, disposalIndex)).contains(0)
+              }
+          }
+
+          val maximumDisposalsReached = numberOfDisposals >= maxBondsTransactions * maxDisposalPerBond ||
+            numberOfDisposals >= maxPossibleNumberOfDisposals ||
+            allBondsFullyDisposed
+
+          if (maximumDisposalsReached) {
             Redirect(
               navigator.nextPage(ReportBondsDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
             ).pure[Future]
@@ -158,25 +184,27 @@ class ReportBondsDisposalListController @Inject()(
               .fold(
                 errors =>
                   getBondsDisposalsWithIndexes(srn, completedDisposals)
-                    .map(
-                      indexes =>
-                        BadRequest(
-                          view(
-                            errors,
-                            viewModel(
-                              srn,
-                              mode,
-                              page,
-                              indexes,
-                              numberOfDisposals,
-                              maxPossibleNumberOfDisposals,
-                              request.userAnswers,
-                              request.schemeDetails.schemeName,
-                              showBackLink = true
-                            )
+                    .map { indexes =>
+                      BadRequest(
+                        view(
+                          errors,
+                          viewModel(
+                            srn,
+                            mode,
+                            page,
+                            indexes,
+                            numberOfDisposals,
+                            maxPossibleNumberOfDisposals,
+                            request.userAnswers,
+                            request.schemeDetails.schemeName,
+                            viewOnlyViewModel = None,
+                            showBackLink = true,
+                            maximumDisposalsReached = maximumDisposalsReached,
+                            allBondsFullyDisposed = allBondsFullyDisposed
                           )
                         )
-                    )
+                      )
+                    }
                     .merge
                     .pure[Future],
                 addAnotherDisposal =>
@@ -201,7 +229,6 @@ class ReportBondsDisposalListController @Inject()(
         }
         .map(_.merge)
   }
-
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async {
       Future.successful(
@@ -367,24 +394,26 @@ object ReportBondsDisposalListController {
     userAnswers: UserAnswers,
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
-    showBackLink: Boolean
+    showBackLink: Boolean,
+    maximumDisposalsReached: Boolean,
+    allBondsFullyDisposed: Boolean
   ): FormPageViewModel[ListViewModel] = {
 
     val (title, heading) = ((mode, numberOfDisposals) match {
-      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals == 0 =>
+      case (ViewOnlyMode, num) if num == 0 =>
         ("bondsDisposal.reportBondsDisposalList.view.title", "bondsDisposal.reportBondsDisposalList.view.heading.none")
 
-      case (ViewOnlyMode, _) if numberOfDisposals > 1 =>
+      case (ViewOnlyMode, num) if num > 1 =>
         (
           "bondsDisposal.reportBondsDisposalList.view.title.plural",
           "bondsDisposal.reportBondsDisposalList.view.heading.plural"
         )
-      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals > 1 =>
+      case (ViewOnlyMode, _) =>
         (
           "bondsDisposal.reportBondsDisposalList.view.title",
           "bondsDisposal.reportBondsDisposalList.view.heading"
         )
-      case (ViewOnlyMode, numberOfDisposals) if numberOfDisposals > 1 =>
+      case (_, num) if num > 1 =>
         (
           "bondsDisposal.reportBondsDisposalList.title.plural",
           "bondsDisposal.reportBondsDisposalList.heading.plural"
@@ -402,7 +431,7 @@ object ReportBondsDisposalListController {
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.reportedSharesDisposalListSize,
-      numberOfDisposals,
+      totalSize = numberOfDisposals,
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.ReportBondsDisposalListController
@@ -415,7 +444,7 @@ object ReportBondsDisposalListController {
     val conditionalInsetText: DisplayMessage = {
       if (numberOfDisposals >= maxBondsTransactions * maxDisposalPerBond) {
         Message("bondsDisposal.reportBondsDisposalList.inset.maximumReached")
-      } else if (numberOfDisposals >= maxPossibleNumberOfDisposals) {
+      } else if (numberOfDisposals >= maxPossibleNumberOfDisposals || allBondsFullyDisposed) {
         ParagraphMessage("bondsDisposal.reportBondsDisposalList.inset.allBondsDisposed.paragraph1") ++
           ParagraphMessage("bondsDisposal.reportBondsDisposalList.inset.allBondsDisposed.paragraph2")
       } else {
@@ -423,21 +452,25 @@ object ReportBondsDisposalListController {
       }
     }
 
+    val showRadios = !maximumDisposalsReached && !mode.isViewOnlyMode &&
+      numberOfDisposals < maxPossibleNumberOfDisposals && !allBondsFullyDisposed
+
+    val description = Option.when(
+      !maximumDisposalsReached && !allBondsFullyDisposed
+    )(
+      ParagraphMessage("bondsDisposal.reportBondsDisposalList.description")
+    )
+
     FormPageViewModel(
       mode = mode,
       title = title,
       heading = heading,
-      description = Option.when(
-        !((numberOfDisposals >= maxBondsTransactions * maxDisposalPerBond) | (numberOfDisposals >= maxPossibleNumberOfDisposals))
-      )(
-        ParagraphMessage("bondsDisposal.reportBondsDisposalList.description")
-      ),
+      description = description,
       page = ListViewModel(
         inset = conditionalInsetText,
         rows(srn, mode, bondsDisposalsWithIndexes, userAnswers, viewOnlyViewModel, schemeName),
         Message("bondsDisposal.reportBondsDisposalList.radios"),
-        showRadios =
-          !((numberOfDisposals >= maxBondsTransactions * maxDisposalPerBond) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
+        showRadios = showRadios,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

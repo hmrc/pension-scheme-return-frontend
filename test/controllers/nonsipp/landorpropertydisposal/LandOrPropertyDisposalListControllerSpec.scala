@@ -90,7 +90,8 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
             schemeName,
             viewOnlyViewModel = None,
             showBackLink = true,
-            maximumDisposalsReached = false
+            maximumDisposalsReached = false,
+            allPropertiesFullyDisposed = false
           )
         )
     })
@@ -136,7 +137,8 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
                 schemeName,
                 viewOnlyViewModel = Some(viewOnlyViewModel),
                 showBackLink = true,
-                maximumDisposalsReached = false
+                maximumDisposalsReached = false,
+                allPropertiesFullyDisposed = false
               )
             )
         }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
@@ -165,7 +167,8 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
               schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
               showBackLink = true,
-              maximumDisposalsReached = false
+              maximumDisposalsReached = false,
+              allPropertiesFullyDisposed = false
             )
           )
         }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated true")
@@ -204,7 +207,8 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
                 )
               ),
               showBackLink = false,
-              maximumDisposalsReached = false
+              maximumDisposalsReached = false,
+              allPropertiesFullyDisposed = false
             )
           )
         }.withName("OnPreviousViewOnly renders the view correctly")

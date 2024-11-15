@@ -18,6 +18,7 @@ package controllers.nonsipp.sharesdisposal
 
 import services.PsrSubmissionService
 import pages.nonsipp.shares._
+import config.Constants.{maxDisposalsPerShare, maxSharesTransactions}
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, IndependentValuationPage, SharesDisposalProgress}
 import forms.YesNoPageFormProvider
@@ -80,8 +81,6 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
   private val howSharesDisposedFour = Other(otherDetails)
 
   private val disposalIndexes = List(disposalIndexOne, disposalIndexTwo)
-  private val sharesDisposalsWithIndexes =
-    Map((shareIndexOne, disposalIndexes), (shareIndexTwo, disposalIndexes))
 
   private val completedUserAnswers = defaultUserAnswers
   // Shares #1
@@ -115,6 +114,26 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
+  private val sharesDisposalsWithIndexes: List[((Max5000, List[Max50]), SectionCompleted)] = List(
+    ((shareIndexOne, disposalIndexes), SectionCompleted),
+    ((shareIndexTwo, disposalIndexes), SectionCompleted)
+  )
+  private val numberOfSharesItems = sharesDisposalsWithIndexes.size
+
+  private val numberOfDisposals = sharesDisposalsWithIndexes.map {
+    case ((_, disposalIndexes), _) =>
+      disposalIndexes.size
+  }.sum
+
+  private val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
+
+  private val allSharesFullyDisposed = false
+
+  private val maximumDisposalsReached =
+    numberOfDisposals >= maxSharesTransactions * maxDisposalsPerShare ||
+      numberOfDisposals >= maxPossibleNumberOfDisposals ||
+      allSharesFullyDisposed
+
   override protected val additionalBindings: List[GuiceableModule] = List(
     inject.bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
@@ -129,10 +148,14 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
           page,
           mode = NormalMode,
           sharesDisposalsWithIndexes,
+          numberOfDisposals,
+          maxPossibleNumberOfDisposals,
           completedUserAnswers,
           schemeName,
           viewOnlyViewModel = None,
-          showBackLink = true
+          showBackLink = true,
+          maximumDisposalsReached = maximumDisposalsReached,
+          allSharesFullyDisposed = allSharesFullyDisposed
         )
       )
     }.withName("Completed Journey"))
@@ -191,10 +214,14 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
                 page,
                 mode = ViewOnlyMode,
                 sharesDisposalsWithIndexes,
+                numberOfDisposals,
+                maxPossibleNumberOfDisposals,
                 completedUserAnswers,
                 schemeName,
                 viewOnlyViewModel = Some(viewOnlyViewModel),
-                showBackLink = true
+                showBackLink = true,
+                maximumDisposalsReached = maximumDisposalsReached,
+                allSharesFullyDisposed = allSharesFullyDisposed
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -214,10 +241,14 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
                 page,
                 mode = ViewOnlyMode,
                 sharesDisposalsWithIndexes,
-                updatedUserAnswers,
+                numberOfDisposals,
+                maxPossibleNumberOfDisposals,
+                completedUserAnswers,
                 schemeName,
                 viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-                showBackLink = true
+                showBackLink = true,
+                maximumDisposalsReached = maximumDisposalsReached,
+                allSharesFullyDisposed = allSharesFullyDisposed
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -235,11 +266,15 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
             srn,
             page,
             mode = ViewOnlyMode,
-            Map(),
+            List.empty,
+            numberOfDisposals = 0,
+            maxPossibleNumberOfDisposals,
             noDisposalsUserAnswers,
             schemeName,
             viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-            showBackLink = true
+            showBackLink = true,
+            maximumDisposalsReached = maximumDisposalsReached,
+            allSharesFullyDisposed = allSharesFullyDisposed
           )
         )
       }.withName("OnPageLoadViewOnly renders ok with no disposals")
@@ -269,6 +304,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
             page,
             mode = ViewOnlyMode,
             sharesDisposalsWithIndexes,
+            numberOfDisposals,
+            maxPossibleNumberOfDisposals,
             completedUserAnswers,
             schemeName,
             viewOnlyViewModel = Some(
@@ -278,7 +315,9 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
                 previousVersion = (submissionNumberOne - 1).max(0)
               )
             ),
-            showBackLink = false
+            showBackLink = false,
+            maximumDisposalsReached = maximumDisposalsReached,
+            allSharesFullyDisposed = allSharesFullyDisposed
           )
         )
       }.withName("OnPreviousViewOnly renders the view correctly")

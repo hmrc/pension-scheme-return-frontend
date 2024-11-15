@@ -29,6 +29,7 @@ import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListCo
 import _root_.config.Constants.{maxDisposalPerOtherAsset, maxOtherAssetsTransactions}
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
+import play.api.mvc.Results.Redirect
 import _root_.config.RefinedTypes.{Max50, Max5000}
 import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, WhatIsOtherAssetPage}
 import models.HowDisposed._
@@ -106,36 +107,68 @@ class ReportedOtherAssetsDisposalListController @Inject()(
     implicit request: DataRequest[AnyContent]
   ): Result =
     getCompletedDisposals(srn).map { completedDisposals =>
-      if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
-        Ok(
-          view(
-            form,
-            viewModel(
-              srn,
-              mode,
-              page,
-              completedDisposals,
-              request.userAnswers,
-              request.schemeDetails.schemeName,
-              viewOnlyViewModel,
-              showBackLink = showBackLink
+      val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+      val numberOfOtherAssetsItems = request.userAnswers.map(OtherAssetsCompleted.all(srn)).size
+      val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
+
+      getOtherAssetsDisposalsWithIndexes(srn, completedDisposals).map { assetsDisposalsWithIndexes =>
+        val allAssetsFullyDisposed: Boolean = assetsDisposalsWithIndexes.forall {
+          case ((assetIndex, disposalIndexes), _) =>
+            disposalIndexes.exists { disposalIndex =>
+              request.userAnswers.get(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex)).contains(false)
+            }
+        }
+
+        val maximumDisposalsReached = numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset ||
+          numberOfDisposals >= maxPossibleNumberOfDisposals ||
+          allAssetsFullyDisposed
+
+        if (viewOnlyViewModel.nonEmpty || completedDisposals.values.exists(_.nonEmpty)) {
+          Ok(
+            view(
+              form,
+              viewModel(
+                srn,
+                mode,
+                page,
+                assetsDisposalsWithIndexes,
+                numberOfDisposals,
+                maxPossibleNumberOfDisposals,
+                request.userAnswers,
+                request.schemeDetails.schemeName,
+                viewOnlyViewModel,
+                showBackLink = showBackLink,
+                maximumDisposalsReached = maximumDisposalsReached,
+                allAssetsFullyDisposed = allAssetsFullyDisposed
+              )
             )
           )
-        )
-      } else {
-        Redirect(routes.OtherAssetsDisposalController.onPageLoad(srn, NormalMode))
-      }
+        } else {
+          Redirect(routes.OtherAssetsDisposalController.onPageLoad(srn, NormalMode))
+        }
+      }.merge
     }.merge
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       getCompletedDisposals(srn)
-        .map { disposals =>
-          val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+        .traverse { completedDisposals =>
+          val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
           val numberOfOtherAssetsItems = request.userAnswers.map(OtherAssetsCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
 
-          if (numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset || (numberOfDisposals >= maxPossibleNumberOfDisposals)) {
+          val allAssetsFullyDisposed: Boolean = completedDisposals.forall {
+            case (assetIndex, disposalIndexes) =>
+              disposalIndexes.exists { disposalIndex =>
+                request.userAnswers.get(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex)).contains(false)
+              }
+          }
+
+          val maximumDisposalsReached = numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset ||
+            numberOfDisposals >= maxPossibleNumberOfDisposals ||
+            allAssetsFullyDisposed
+
+          if (maximumDisposalsReached) {
             Redirect(
               navigator
                 .nextPage(ReportedOtherAssetsDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
@@ -145,39 +178,57 @@ class ReportedOtherAssetsDisposalListController @Inject()(
               .bindFromRequest()
               .fold(
                 errors =>
-                  BadRequest(
-                    view(
-                      errors,
-                      viewModel(
-                        srn,
+                  getOtherAssetsDisposalsWithIndexes(srn, completedDisposals)
+                    .map { assetsDisposalsWithIndexes =>
+                      BadRequest(
+                        view(
+                          errors,
+                          viewModel(
+                            srn,
+                            mode,
+                            page,
+                            assetsDisposalsWithIndexes,
+                            numberOfDisposals,
+                            maxPossibleNumberOfDisposals,
+                            request.userAnswers,
+                            request.schemeDetails.schemeName,
+                            viewOnlyViewModel = None,
+                            showBackLink = true,
+                            maximumDisposalsReached = maximumDisposalsReached,
+                            allAssetsFullyDisposed = allAssetsFullyDisposed
+                          )
+                        )
+                      )
+                    }
+                    .merge
+                    .pure[Future],
+                reportAnotherDisposal =>
+                  if (reportAnotherDisposal) {
+                    Redirect(
+                      navigator.nextPage(
+                        ReportedOtherAssetsDisposalListPage(srn, reportAnotherDisposal),
                         mode,
-                        page,
-                        disposals,
-                        request.userAnswers,
-                        request.schemeDetails.schemeName,
-                        viewOnlyViewModel = None,
-                        showBackLink = true
+                        request.userAnswers
+                      )
+                    ).pure[Future]
+                  } else {
+                    for {
+                      updatedUserAnswers <- request.userAnswers
+                        .set(OtherAssetsDisposalCompleted(srn), SectionCompleted)
+                        .mapK[Future]
+                      _ <- saveService.save(updatedUserAnswers)
+                    } yield Redirect(
+                      navigator.nextPage(
+                        ReportedOtherAssetsDisposalListPage(srn, reportAnotherDisposal),
+                        mode,
+                        updatedUserAnswers
                       )
                     )
-                  ).pure[Future],
-                reportAnotherDisposal =>
-                  for {
-                    updatedUserAnswers <- request.userAnswers
-                      .setWhen(!reportAnotherDisposal)(OtherAssetsDisposalCompleted(srn), SectionCompleted)
-                      .mapK[Future]
-                    _ <- saveService.save(updatedUserAnswers)
-                  } yield Redirect(
-                    navigator.nextPage(
-                      ReportedOtherAssetsDisposalListPage(srn, reportAnotherDisposal),
-                      mode,
-                      updatedUserAnswers
-                    )
-                  )
+                  }
               )
           }
         }
-        .leftMap(_.pure[Future])
-        .merge
+        .map(_.merge)
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -310,6 +361,22 @@ object ReportedOtherAssetsDisposalListController {
         .sortBy(_.change.fold("")(_.url))
     }
 
+  private def getOtherAssetsDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(
+    implicit request: DataRequest[_]
+  ): Either[Result, List[((Max5000, List[Max50]), SectionCompleted)]] =
+    disposals
+      .map {
+        case indexes @ (index, _) =>
+          index -> request.userAnswers
+            .get(OtherAssetsCompleted(srn, index))
+            .toRight(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            .map(otherAssetCompletionStatus => (indexes, otherAssetCompletionStatus))
+      }
+      .toList
+      .sortBy { case (index, _) => index.value }
+      .map { case (_, result) => result }
+      .sequence
+
   private def buildMessage(messageString: String, otherAssetsDisposalData: OtherAssetsDisposalData): Message =
     otherAssetsDisposalData match {
       case OtherAssetsDisposalData(_, _, companyName, typeOfDisposal) =>
@@ -325,16 +392,19 @@ object ReportedOtherAssetsDisposalListController {
     srn: Srn,
     mode: Mode,
     page: Int,
-    disposals: Map[Max5000, List[Max50]],
+    assetsDisposalsWithIndexes: List[((Max5000, List[Max50]), SectionCompleted)],
+    numberOfDisposals: Int,
+    maxPossibleNumberOfDisposals: Int,
     userAnswers: UserAnswers,
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
-    showBackLink: Boolean
+    showBackLink: Boolean,
+    maximumDisposalsReached: Boolean,
+    allAssetsFullyDisposed: Boolean
   ): FormPageViewModel[ListViewModel] = {
 
-    val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-    val numberOfOtherAssetsItems = userAnswers.map(OtherAssetsCompleted.all(srn)).size
-    val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
+    val disposals: Map[Max5000, List[Max50]] =
+      assetsDisposalsWithIndexes.map { case ((assetIndex, disposalIndexes), _) => (assetIndex, disposalIndexes) }.toMap
 
     val (title, heading) = ((mode, numberOfDisposals) match {
 
@@ -372,7 +442,7 @@ object ReportedOtherAssetsDisposalListController {
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.reportedOtherAssetsDisposalListSize,
-      numberOfDisposals,
+      totalSize = numberOfDisposals,
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.ReportedOtherAssetsDisposalListController
@@ -385,7 +455,7 @@ object ReportedOtherAssetsDisposalListController {
     val conditionalInsetText: DisplayMessage = {
       if (numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset) {
         Message("assetDisposal.reportedOtherAssetsDisposalList.inset.maximumReached")
-      } else if (numberOfDisposals >= maxPossibleNumberOfDisposals) {
+      } else if (numberOfDisposals >= maxPossibleNumberOfDisposals || allAssetsFullyDisposed) {
         ParagraphMessage("assetDisposal.reportedOtherAssetsDisposalList.inset.allOtherAssetsDisposed.paragraph1") ++
           ParagraphMessage("assetDisposal.reportedOtherAssetsDisposalList.inset.allOtherAssetsDisposed.paragraph2")
       } else {
@@ -393,21 +463,25 @@ object ReportedOtherAssetsDisposalListController {
       }
     }
 
+    val showRadios = !maximumDisposalsReached && !mode.isViewOnlyMode &&
+      numberOfDisposals < maxPossibleNumberOfDisposals && !allAssetsFullyDisposed
+
+    val description = Option.when(
+      !maximumDisposalsReached && !allAssetsFullyDisposed
+    )(
+      ParagraphMessage("assetDisposal.reportedOtherAssetsDisposalList.description")
+    )
+
     FormPageViewModel(
       mode = mode,
       title = title,
       heading = heading,
-      description = Option.when(
-        !((numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset) | (numberOfDisposals >= maxPossibleNumberOfDisposals))
-      )(
-        ParagraphMessage("assetDisposal.reportedOtherAssetsDisposalList.description")
-      ),
+      description = description,
       page = ListViewModel(
         inset = conditionalInsetText,
         rows(srn, mode, disposals, userAnswers, viewOnlyViewModel, schemeName),
         Message("assetDisposal.reportedOtherAssetsDisposalList.radios"),
-        showRadios =
-          !((numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset) | (numberOfDisposals >= maxPossibleNumberOfDisposals)),
+        showRadios = showRadios,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
