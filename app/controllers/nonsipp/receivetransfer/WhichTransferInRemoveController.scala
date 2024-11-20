@@ -50,6 +50,34 @@ class WhichTransferInRemoveController @Inject()(
   val form: Form[Max5] = WhichTransferInRemoveController.form(formProvider)
 
   def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+//    val completed: List[Max5] = request.userAnswers
+//      .map(ReceiveTransferProgress.all(srn, memberIndex))
+//      .filter {
+//        case (_, status) => status.completed
+//      }
+//      .keys
+//      .toList
+//      .refine[Max5.Refined]
+//
+//    completed match {
+//      case Nil =>
+//        Redirect(
+//          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+//            .onPageLoad(srn, page = 1, NormalMode)
+//        )
+//      case head :: Nil =>
+//        Redirect(
+//          controllers.nonsipp.receivetransfer.routes.RemoveTransferInController.onSubmit(srn, memberIndex, head)
+//        )
+//      case _ =>
+//        (
+//          for {
+//            memberName <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney
+//            values <- getJourneyValues(srn, memberIndex)
+//          } yield Ok(view(form, viewModel(srn, memberIndex, memberName.fullName, values)))
+//        ).merge
+//    }
+
     val totalValue = request.userAnswers.map(TotalValueTransferPages(srn, memberIndex))
     val transferringSchemeName = request.userAnswers.map(TransferringSchemeNamePages(srn, memberIndex))
     if (totalValue.size == 1) {
@@ -103,6 +131,29 @@ class WhichTransferInRemoveController @Inject()(
         f(sortedMap)
     }
   }
+
+//  private def getJourneyValues(srn: Srn, memberIndex: Max300)(
+//    implicit request: DataRequest[_]
+//  ): Either[Result, Map[Int, (Money, String)]] =
+//    request.userAnswers
+//      .map(ReceiveTransferProgress.all(srn, memberIndex))
+//      .filter {
+//        case (_, status) => status.completed
+//      }
+//      .keys
+//      .toList
+//      .refine[Max5.Refined]
+//      .traverse { secondaryIndex =>
+//        for {
+//          totalContribution <- request.userAnswers
+//            .get(TotalValueTransferPage(srn, memberIndex, secondaryIndex))
+//            .getOrRecoverJourney
+//          employerName <- request.userAnswers
+//            .get(TransferringSchemeNamePage(srn, memberIndex, secondaryIndex))
+//            .getOrRecoverJourney
+//        } yield (secondaryIndex, totalContribution, employerName)
+//      }
+
 }
 
 object WhichTransferInRemoveController {

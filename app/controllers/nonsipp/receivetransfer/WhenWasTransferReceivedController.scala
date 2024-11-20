@@ -35,6 +35,7 @@ import cats.implicits.toShow
 import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, WhenWasTransferReceivedPage}
 import utils.DateTimeUtils.localDateShow
 import models._
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 import models.requests.DataRequest
@@ -111,12 +112,30 @@ class WhenWasTransferReceivedController @Inject()(
             },
             value =>
               for {
-                updatedAnswers <- Future
-                  .fromTry(request.userAnswers.set(WhenWasTransferReceivedPage(srn, index, secondaryIndex), value))
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(
-                navigator.nextPage(WhenWasTransferReceivedPage(srn, index, secondaryIndex), mode, updatedAnswers)
-              )
+                updatedAnswers <- request.userAnswers
+                  .set(WhenWasTransferReceivedPage(srn, index, secondaryIndex), value)
+//                  .mapK[Future]
+                  .mapK
+                nextPage = navigator
+                  .nextPage(WhenWasTransferReceivedPage(srn, index, secondaryIndex), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(
+                  srn,
+                  index,
+                  secondaryIndex,
+                  updatedAnswers,
+                  nextPage,
+                  alwaysCompleted = true
+                )
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(nextPage)
+
+//              for {
+//                updatedAnswers <- Future
+//                  .fromTry(request.userAnswers.set(WhenWasTransferReceivedPage(srn, index, secondaryIndex), value))
+//                _ <- saveService.save(updatedAnswers)
+//              } yield Redirect(
+//                navigator.nextPage(WhenWasTransferReceivedPage(srn, index, secondaryIndex), mode, updatedAnswers)
+//              )
           )
       }
     }

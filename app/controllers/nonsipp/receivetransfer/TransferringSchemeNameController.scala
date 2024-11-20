@@ -25,13 +25,14 @@ import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
 import play.api.i18n.MessagesApi
-import viewmodels.models._
 import play.api.data.Form
 import config.RefinedTypes.{Max300, Max5}
 import controllers.PSRController
 import controllers.nonsipp.receivetransfer.TransferringSchemeNameController._
 import views.html.TextInputView
 import models.SchemeId.Srn
+import utils.FunctionKUtils._
+import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -65,12 +66,19 @@ class TransferringSchemeNameController @Inject()(
             Future.successful(BadRequest(view(formWithErrors, viewModel(srn, memberIndex, index, mode)))),
           value =>
             for {
-              updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(TransferringSchemeNamePage(srn, memberIndex, index), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(TransferringSchemeNamePage(srn, memberIndex, index), mode, updatedAnswers)
-            )
+              updatedAnswers <- request.userAnswers.set(TransferringSchemeNamePage(srn, memberIndex, index), value).mapK
+              nextPage = navigator.nextPage(TransferringSchemeNamePage(srn, memberIndex, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, memberIndex, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
+
+//            for {
+//              updatedAnswers <- Future
+//                .fromTry(request.userAnswers.set(TransferringSchemeNamePage(srn, memberIndex, index), value))
+//              _ <- saveService.save(updatedAnswers)
+//            } yield Redirect(
+//              navigator.nextPage(TransferringSchemeNamePage(srn, memberIndex, index), mode, updatedAnswers)
+//            )
         )
     }
 }

@@ -36,6 +36,7 @@ import views.html.YesNoPageView
 import models.SchemeId.Srn
 import controllers.actions._
 import controllers.nonsipp.receivetransfer.DidTransferIncludeAssetController._
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, SectionCompleted, YesNoPageViewModel}
 
@@ -104,16 +105,34 @@ class DidTransferIncludeAssetController @Inject()(
           },
           value =>
             for {
-              updatedAnswers <- Future
-                .fromTry(
-                  request.userAnswers
-                    .set(DidTransferIncludeAssetPage(srn, index, secondaryIndex), value)
-                    .set(TransfersInSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
-                )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(DidTransferIncludeAssetPage(srn, index, secondaryIndex), mode, updatedAnswers)
-            )
+              updatedAnswers <- request.userAnswers
+                .set(DidTransferIncludeAssetPage(srn, index, secondaryIndex), value)
+                .set(TransfersInSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
+                .mapK[Future]
+              nextPage = navigator
+                .nextPage(DidTransferIncludeAssetPage(srn, index, secondaryIndex), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                index,
+                secondaryIndex,
+                updatedAnswers,
+                nextPage,
+                alwaysCompleted = true
+              )
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
+
+//            for {
+//              updatedAnswers <- Future
+//                .fromTry(
+//                  request.userAnswers
+//                    .set(DidTransferIncludeAssetPage(srn, index, secondaryIndex), value)
+//                    .set(TransfersInSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
+//                )
+//              _ <- saveService.save(updatedAnswers)
+//            } yield Redirect(
+//              navigator.nextPage(DidTransferIncludeAssetPage(srn, index, secondaryIndex), mode, updatedAnswers)
+//            )
         )
     }
 }

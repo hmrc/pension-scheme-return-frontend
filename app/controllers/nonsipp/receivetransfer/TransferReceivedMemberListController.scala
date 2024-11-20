@@ -21,10 +21,11 @@ import play.api.mvc._
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
+import pages.nonsipp.receivetransfer.ReceiveTransferProgress.TransfersInSectionCompletedUserAnswersOps
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
-import config.RefinedTypes.Max300
+import config.RefinedTypes.{Max300, Max5}
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
@@ -40,6 +41,7 @@ import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
 import models._
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.models.SectionJourneyStatus.InProgress
 import viewmodels.models._
 
 import scala.concurrent.Future
@@ -85,18 +87,20 @@ class TransferReceivedMemberListController @Inject()(
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       case Right(completedMemberDetails) =>
         val noPageEnabled = !request.userAnswers.get(DidSchemeReceiveTransferPage(srn)).getOrElse(false)
-        val membersWithTransfers = completedMemberDetails.map {
-          case (index, memberDetails) =>
-            val completedTransfersIn = request.userAnswers.map(TransfersInSectionCompleted.all(srn, index)).values.size
-            (index, memberDetails, completedTransfersIn)
-        }
+
+//        val membersWithTransfers = completedMemberDetails.map {
+//          case (index, memberDetails) =>
+//            val completedTransfersIn = request.userAnswers.map(TransfersInSectionCompleted.all(srn, index)).values.size
+//            (index, memberDetails, completedTransfersIn)
+//        }
+
         Ok(
           view(
             viewModel(
               srn,
               page,
               mode,
-              membersWithTransfers,
+              membersWithTransfers = buildReceiveTransfer(srn, completedMemberDetails),
               viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
                 getCompletedOrUpdatedTaskListStatus(
                   request.userAnswers,
@@ -137,75 +141,159 @@ class TransferReceivedMemberListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
+  private def buildReceiveTransfer(srn: Srn, indexes: List[(Max300, NameDOB)])(
+    implicit request: DataRequest[_]
+  ): List[MemberWithReceiveTransfer] = indexes.map {
+    case (index, nameDOB) =>
+      MemberWithReceiveTransfer(
+        memberIndex = index,
+        transferFullName = nameDOB.fullName,
+        receive = request.userAnswers
+          .receiveTransferProgress(srn, index)
+          .map {
+            case (secondaryIndex, status) =>
+              ReceiveTransfer(secondaryIndex, status)
+          }
+      )
+  }
+
 }
 
 object TransferReceivedMemberListController {
 
-  private[receivetransfer] type CompletedTransfersIn = Int
+//  private[receivetransfer] type CompletedTransfersIn = Int
 
   private def rows(
     srn: Srn,
     mode: Mode,
-    membersWithTransfers: List[(Max300, NameDOB, CompletedTransfersIn)],
+//    membersWithTransfers: List[(Max300, NameDOB, CompletedTransfersIn)],
+    membersWithTransfers: List[MemberWithReceiveTransfer],
     optYear: Option[String],
     optCurrentVersion: Option[Int],
     optPreviousVersion: Option[Int]
   ): List[List[TableElem]] =
     membersWithTransfers
-      .map {
-        case (index, memberName, completedTransfersIn) =>
-          if (completedTransfersIn == 0) {
-            List(
-              TableElem(
-                memberName.fullName
-              ),
-              TableElem(
-                Message("transferIn.MemberList.status.no.contributions")
-              ),
-              if (mode != ViewOnlyMode) {
-                TableElem.add(
-                  controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
-                    .onSubmit(srn, index, refineMV(1), mode)
+      .map { membersWithTransfers =>
+        val noContributions = membersWithTransfers.receive.isEmpty
+        val onlyInProgressContributions = membersWithTransfers.receive.forall(_.status.inProgress)
+
+        if (noContributions || onlyInProgressContributions) {
+          List(
+            TableElem(
+              membersWithTransfers.transferFullName
+            ),
+            TableElem(
+              Message("transferIn.MemberList.status.no.contributions")
+            ),
+//      membersWithTransfers
+//        .map {
+//          case (index, memberName, completedTransfersIn) =>
+//            if (completedTransfersIn == 0) {
+//              List(
+//                TableElem(
+//                  memberName.fullName
+//                ),
+//                TableElem(
+//                  Message("transferIn.MemberList.status.no.contributions")
+//                ),
+//                if (mode != ViewOnlyMode) {
+//                  TableElem.add(
+//                    controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+//                      .onSubmit(srn, index, refineMV(1), mode)
+//                  )
+//                } else {
+//                  TableElem.empty
+//                },
+//                TableElem.empty
+            if (mode != ViewOnlyMode) {
+              TableElem.add(
+                membersWithTransfers.receive.find(_.status.inProgress) match {
+                  case Some(ReceiveTransfer(_, InProgress(url))) => url
+                  case _ =>
+                    controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+                      .onSubmit(srn, membersWithTransfers.memberIndex, refineMV(1), mode)
+                      .url
+                },
+                Message(
+                  "receiveTransfer.MemberList.add.hidden.text",
+                  membersWithTransfers.transferFullName
+                )
+              )
+            } else {
+              TableElem.empty
+            },
+            // Remove link
+            TableElem.empty
+          )
+        } else {
+          List(
+            TableElem(
+              membersWithTransfers.transferFullName
+            ),
+            TableElem(
+              if (membersWithTransfers.receive.size == 1) {
+                Message(
+                  "transferIn.MemberList.singleStatus.some.contribution",
+                  membersWithTransfers.receive.size
                 )
               } else {
-                TableElem.empty
-              },
-              TableElem.empty
-            )
-          } else {
-            List(
-              TableElem(
-                memberName.fullName
-              ),
-              TableElem(
-                if (completedTransfersIn == 1)
-                  Message("transferIn.MemberList.singleStatus.some.contribution", completedTransfersIn)
-                else
-                  Message("transferIn.MemberList.status.some.contributions", completedTransfersIn)
-              ),
-              (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-                case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                  TableElem.view(
-                    controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
-                      .onPageLoadViewOnly(srn, index, year, currentVersion, previousVersion),
-                    hiddenText = memberName.fullName
-                  )
-                case _ =>
-                  TableElem.change(
-                    controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
-                      .onSubmit(srn, index, CheckMode)
-                  )
-              },
-              if (mode == ViewOnlyMode) {
-                TableElem.empty
-              } else {
-                TableElem.remove(
-                  controllers.nonsipp.receivetransfer.routes.WhichTransferInRemoveController
-                    .onSubmit(srn, index)
+                Message(
+                  "transferIn.MemberList.status.some.contributions",
+                  membersWithTransfers.receive.count(_.status.completed)
                 )
               }
-            )
-          }
+            ),
+//                TableElem(
+//                  if (completedTransfersIn == 1)
+//                    Message("transferIn.MemberList.singleStatus.some.contribution", completedTransfersIn)
+//                  else
+//                    Message("transferIn.MemberList.status.some.contributions", completedTransfersIn)
+//                ),
+            (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+              case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                TableElem.view(
+                  controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+                    .onPageLoadViewOnly(
+                      srn,
+                      membersWithTransfers.memberIndex,
+                      year,
+                      currentVersion,
+                      previousVersion
+                    ),
+                  hiddenText = membersWithTransfers.transferFullName
+                )
+              case _ =>
+                TableElem.change(
+                  controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+                    .onSubmit(srn, membersWithTransfers.memberIndex, CheckMode),
+                  Message(
+                    "receiveTransfer.MemberList.add.hidden.text",
+                    membersWithTransfers.transferFullName
+                  )
+                )
+            },
+            if (mode == ViewOnlyMode) {
+              TableElem.empty
+            } else {
+              TableElem.remove(
+                controllers.nonsipp.receivetransfer.routes.WhichTransferInRemoveController
+                  .onSubmit(srn, membersWithTransfers.memberIndex),
+                Message(
+                  "receiveTransfer.MemberList.add.hidden.text",
+                  membersWithTransfers.transferFullName
+                )
+              )
+            }
+//                if (mode == ViewOnlyMode) {
+//                  TableElem.empty
+//                } else {
+//                  TableElem.remove(
+//                    controllers.nonsipp.receivetransfer.routes.WhichTransferInRemoveController
+//                      .onSubmit(srn, index)
+//                  )
+//                }
+          )
+        }
       }
       .sortBy(_.headOption.map(_.text.toString))
 
@@ -213,7 +301,7 @@ object TransferReceivedMemberListController {
     srn: Srn,
     page: Int,
     mode: Mode,
-    membersWithTransfers: List[(Max300, NameDOB, CompletedTransfersIn)],
+    membersWithTransfers: List[MemberWithReceiveTransfer],
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
@@ -231,7 +319,7 @@ object TransferReceivedMemberListController {
         ("transferIn.MemberList.title.plural", "transferIn.MemberList.heading.plural")
       }
 
-    val totalTransfersIn: Int = membersWithTransfers.map(_._3).sum
+//        val totalTransfersIn: Int = membersWithTransfers.map(_._3).sum
 
     // in view-only mode or with direct url edit page value can be higher than needed
     val currentPage = if ((page - 1) * Constants.transferInListSize >= membersWithTransfers.size) 1 else page
@@ -274,7 +362,14 @@ object TransferReceivedMemberListController {
             TableElem.empty
           )
         ),
-        rows = rows(srn, mode, membersWithTransfers, optYear, optCurrentVersion, optPreviousVersion),
+        rows = rows(
+          srn,
+          mode,
+          membersWithTransfers.sortBy(_.transferFullName),
+          optYear,
+          optCurrentVersion,
+          optPreviousVersion
+        ),
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
@@ -293,6 +388,7 @@ object TransferReceivedMemberListController {
       onSubmit = controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
         .onSubmit(srn, page, mode),
       optViewOnlyDetails = if (mode.isViewOnlyMode) {
+        val totalTransfersIn: Int = membersWithTransfers.map(_.receive.size).sum
         Some(
           ViewOnlyDetailsViewModel(
             updated = viewOnlyUpdated,
@@ -343,4 +439,13 @@ object TransferReceivedMemberListController {
       showBackLink = showBackLink
     )
   }
+
+  protected[receivetransfer] case class MemberWithReceiveTransfer(
+    memberIndex: Max300,
+    transferFullName: String,
+    receive: List[ReceiveTransfer]
+  )
+
+  protected[receivetransfer] case class ReceiveTransfer(receiveIndex: Max5, status: SectionJourneyStatus)
+
 }

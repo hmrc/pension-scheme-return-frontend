@@ -37,6 +37,7 @@ import views.html.MoneyView
 import models.SchemeId.Srn
 import play.api.Logger
 import navigation.Navigator
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.models.{FormPageViewModel, QuestionField}
 
@@ -101,14 +102,30 @@ class TotalValueTransferController @Inject()(
             ).merge.pure[Future],
           value =>
             for {
-              updatedAnswers <- Future
-                .fromTry(
-                  request.userAnswers.transformAndSet(TotalValueTransferPage(srn, index, secondaryIndex), value)
-                )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(TotalValueTransferPage(srn, index, secondaryIndex), mode, updatedAnswers)
-            )
+              updatedAnswers <- request.userAnswers
+                .set(TotalValueTransferPage(srn, index, secondaryIndex), value)
+                .mapK[Future]
+              nextPage = navigator
+                .nextPage(TotalValueTransferPage(srn, index, secondaryIndex), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                index,
+                secondaryIndex,
+                updatedAnswers,
+                nextPage,
+                alwaysCompleted = true
+              )
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
+//            for {
+//              updatedAnswers <- Future
+//                .fromTry(
+//                  request.userAnswers.transformAndSet(TotalValueTransferPage(srn, index, secondaryIndex), value)
+//                )
+//              _ <- saveService.save(updatedAnswers)
+//            } yield Redirect(
+//              navigator.nextPage(TotalValueTransferPage(srn, index, secondaryIndex), mode, updatedAnswers)
+//            )
         )
     }
 }

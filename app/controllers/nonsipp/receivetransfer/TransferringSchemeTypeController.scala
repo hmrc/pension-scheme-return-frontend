@@ -36,6 +36,7 @@ import views.html.RadioListView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -96,12 +97,21 @@ class TransferringSchemeTypeController @Inject()(
             ),
         answer =>
           for {
-            updatedAnswers <- Future
-              .fromTry(request.userAnswers.set(TransferringSchemeTypePage(srn, index, secondaryIndex), answer))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(
-            navigator.nextPage(TransferringSchemeTypePage(srn, index, secondaryIndex), mode, updatedAnswers)
-          )
+            updatedAnswers <- request.userAnswers
+              .set(TransferringSchemeTypePage(srn, index, secondaryIndex), answer)
+              .mapK
+            nextPage = navigator.nextPage(TransferringSchemeTypePage(srn, index, secondaryIndex), mode, updatedAnswers)
+            updatedProgressAnswers <- saveProgress(srn, index, secondaryIndex, updatedAnswers, nextPage)
+            _ <- saveService.save(updatedProgressAnswers)
+          } yield Redirect(nextPage)
+
+//          for {
+//            updatedAnswers <- Future
+//              .fromTry(request.userAnswers.set(TransferringSchemeTypePage(srn, index, secondaryIndex), answer))
+//            _ <- saveService.save(updatedAnswers)
+//          } yield Redirect(
+//            navigator.nextPage(TransferringSchemeTypePage(srn, index, secondaryIndex), mode, updatedAnswers)
+//          )
       )
   }
 }
