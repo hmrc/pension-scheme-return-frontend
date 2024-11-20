@@ -20,7 +20,8 @@ import utils.BaseSpec
 import prepop.LandOrPropertyPrePopulationProcessorSpec._
 import models.UserAnswers.SensitiveJsObject
 import controllers.TestValues
-import play.api.libs.json.{JsObject, JsValue, Json}
+import utils.UserAnswersUtils.UserAnswersOps
+import play.api.libs.json._
 
 import scala.util.Success
 
@@ -31,8 +32,8 @@ class LandOrPropertyPrePopulationProcessorSpec extends BaseSpec with TestValues 
   "LandOrPropertyPrePopulationProcessor" - {
 
     "clean" - {
-      "should cleanup the LoP details from baseReturn and put it onto currentUA when disposal Lop exist" in {
-        val currentUa = emptyUserAnswers
+      "should cleanup the LoP details from baseReturn and merge it onto currentUA when disposal Lop exist" in {
+        val currentUa = emptyUserAnswers.unsafeSet(__ \ "current", JsString("dummy-current-data"))
         val result = processor.clean(
           baseUA = emptyUserAnswers.copy(data = SensitiveJsObject(baseReturnWithDisposalsJsValue.as[JsObject])),
           currentUA = currentUa
@@ -42,8 +43,8 @@ class LandOrPropertyPrePopulationProcessorSpec extends BaseSpec with TestValues 
         )
       }
 
-      "should cleanup the LoP details from baseReturn and put it onto currentUA when disposal Lop not exist" in {
-        val currentUa = emptyUserAnswers
+      "should cleanup the LoP details from baseReturn and merge it onto currentUA when disposal Lop not exist" in {
+        val currentUa = emptyUserAnswers.unsafeSet(__ \ "current", JsString("dummy-current-data"))
         val result = processor.clean(
           baseUA = emptyUserAnswers.copy(data = SensitiveJsObject(baseReturnWithoutDisposalsJsValue.as[JsObject])),
           currentUA = currentUa
@@ -580,6 +581,7 @@ object LandOrPropertyPrePopulationProcessorSpec {
 
   val cleanResultAfterDisposalsRemovedJsValue: JsValue = Json.parse("""
       |{
+      |  "current": "dummy-current-data",
       |  "assets": {
       |    "landOrProperty": {
       |      "landOrPropertyTransactions": {
@@ -654,6 +656,7 @@ object LandOrPropertyPrePopulationProcessorSpec {
 
   val cleanResultJsValue: JsValue = Json.parse("""
       |{
+      |  "current": "dummy-current-data",
       |  "assets": {
       |    "landOrProperty": {
       |      "landOrPropertyTransactions": {

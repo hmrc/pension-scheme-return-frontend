@@ -51,7 +51,8 @@ class LandOrPropertyPrePopulationProcessor @Inject() {
       .flatMap(_.transform((Paths.heldPropertyTransactions \ "landOrPropertyLeased").prune(_)))
       .flatMap(_.transform((Paths.heldPropertyTransactions \ "leaseDetails").prune(_)))
       .flatMap(_.transform((Paths.heldPropertyTransactions \ "totalIncomeOrReceipts").prune(_))) match {
-      case JsSuccess(value, _) => Success(currentUA.copy(data = SensitiveJsObject(value)))
+      case JsSuccess(value, _) =>
+        Success(currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue))))
       case _ => Try(currentUA)
     }
 

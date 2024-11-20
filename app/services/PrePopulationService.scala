@@ -17,7 +17,7 @@
 package services
 
 import models.SchemeId.Srn
-import prepop.LandOrPropertyPrePopulationProcessor
+import prepop.{LandOrPropertyPrePopulationProcessor, MemberPrePopulationProcessor}
 import models.backend.responses._
 import models.UserAnswers
 
@@ -29,7 +29,8 @@ import javax.inject.{Inject, Singleton}
 
 @Singleton
 class PrePopulationService @Inject()(
-  landOrPropertyPrePopulationProcessor: LandOrPropertyPrePopulationProcessor
+  landOrPropertyPrePopulationProcessor: LandOrPropertyPrePopulationProcessor,
+  memberPrePopulationProcessor: MemberPrePopulationProcessor
 ) {
 
   /**
@@ -56,7 +57,11 @@ class PrePopulationService @Inject()(
       || psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndSuccessfullyProcessed
   )
 
-  // Chain all journey cleanings under here
   def buildPrePopulatedUserAnswers(baseReturnUA: UserAnswers, userAnswers: UserAnswers)(srn: Srn): Try[UserAnswers] =
-    landOrPropertyPrePopulationProcessor.clean(baseReturnUA, userAnswers)(srn)
+    for {
+      ua0 <- landOrPropertyPrePopulationProcessor.clean(baseReturnUA, userAnswers)(srn)
+      ua1 <- memberPrePopulationProcessor.clean(baseReturnUA, ua0)(srn)
+    } yield {
+      ua1
+    }
 }
