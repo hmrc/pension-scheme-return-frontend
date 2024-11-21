@@ -17,12 +17,10 @@
 package connectors
 
 import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
-import com.google.inject.ImplementedBy
 import config.{Constants, FrontendAppConfig}
 import uk.gov.hmrc.http.UpstreamErrorResponse.WithStatusCode
-import models.PensionSchemeId.{PsaId, PspId}
 import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
-import play.api.Logger
+import play.api.Logging
 import models.MinimalDetails
 import uk.gov.hmrc.http.client.HttpClientV2
 import utils.FutureUtils.FutureOps
@@ -34,29 +32,16 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class MinimalDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2)
-    extends MinimalDetailsConnector {
+class MinimalDetailsConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) extends Logging {
 
-  private val url = s"${appConfig.pensionsAdministrator}/pension-administrator/get-minimal-psa"
+  private val url = s"${appConfig.pensionsAdministrator}/pension-administrator/get-minimal-details-self"
 
-  override def fetch(
-    psaId: PsaId
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]] =
-    fetch("psaId", psaId.value)
-
-  override def fetch(
-    pspId: PspId
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]] =
-    fetch("pspId", pspId.value)
-
-  // API 1442 (Get psa/psp minimal details)
-  private def fetch(
-    idType: String,
-    idValue: String
+  def fetch(
+    loggedInAsPsa: Boolean
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]] =
     http
       .get(url"$url")
-      .setHeader(idType -> idValue)
+      .setHeader("loggedInAsPsa" -> String.valueOf(loggedInAsPsa))
       .execute[MinimalDetails]
       .map(Right(_))
       .recover {
@@ -65,21 +50,9 @@ class MinimalDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: 
         case e @ WithStatusCode(FORBIDDEN) if e.message.contains(Constants.delimitedPSA) =>
           Left(DelimitedAdmin)
       }
-      .tapError(_ => Future.successful(logger.warn(s"Failed to fetch minimal details for $idType and $idValue")))
-}
-
-@ImplementedBy(classOf[MinimalDetailsConnectorImpl])
-trait MinimalDetailsConnector {
-
-  protected val logger: Logger = Logger(classOf[MinimalDetailsConnector])
-
-  def fetch(
-    psaId: PsaId
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]]
-
-  def fetch(
-    pspId: PspId
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]]
+      .tapError(
+        _ => Future.successful(logger.warn(s"Failed to fetch minimal details for loggedInAsPsa and $loggedInAsPsa"))
+      )
 }
 
 sealed trait MinimalDetailsError

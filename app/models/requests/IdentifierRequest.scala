@@ -31,7 +31,6 @@ sealed abstract class IdentifierRequest[A](request: Request[A]) extends WrappedR
       case p: PractitionerRequest[A] => practitioner(p)
     }
 
-  def getExternalId: String = fold(_.externalId, _.externalId)
   def getUserId: String = fold(_.userId, _.userId)
 
   def pensionSchemeId: PensionSchemeId = fold(_.psaId, _.pspId)
