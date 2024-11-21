@@ -101,8 +101,8 @@ class AllowAccessAction(
     request: IdentifierRequest[A]
   )(implicit hc: HeaderCarrier): Future[Either[MinimalDetailsError, MinimalDetails]] =
     request.fold(
-      a => minimalDetailsConnector.fetch(a.psaId),
-      p => minimalDetailsConnector.fetch(p.pspId)
+      _ => minimalDetailsConnector.fetch(loggedInAsPsa = true),
+      _ => minimalDetailsConnector.fetch(loggedInAsPsa = false)
     )
 
   object HasRlsFlag {

@@ -21,7 +21,6 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import config.Constants
 import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
-import models.PensionSchemeId
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
@@ -36,17 +35,14 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
   override implicit lazy val applicationBuilder: GuiceApplicationBuilder =
     super.applicationBuilder.configure("microservice.services.pensionAdministrator.port" -> wireMockPort)
 
-  val url = "/pension-administrator/get-minimal-psa"
+  val url = "/pension-administrator/get-minimal-details-self"
 
-  def stubGet(key: String, id: String, response: ResponseDefinitionBuilder): StubMapping =
+  def stubGet(loggedInAsPsa: Boolean, response: ResponseDefinitionBuilder): StubMapping =
     wireMockServer.stubFor(
       get(urlEqualTo(url))
-        .withHeader(key, equalTo(id))
+        .withHeader("loggedInAsPsa", equalTo(String.valueOf(loggedInAsPsa)))
         .willReturn(response)
     )
-
-  val psaId: PensionSchemeId.PsaId = psaIdGen.sample.value
-  val pspId: PensionSchemeId.PspId = pspIdGen.sample.value
 
   def connector(implicit app: Application): MinimalDetailsConnector = injected[MinimalDetailsConnector]
 
@@ -54,26 +50,26 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
 
     "return psa minimal details" in runningApplication { implicit app =>
       val md = minimalDetailsGen.sample.value
-      stubGet("psaId", psaId.value, ok(Json.stringify(Json.toJson(md))))
+      stubGet(loggedInAsPsa = true, ok(Json.stringify(Json.toJson(md))))
 
-      val result = connector.fetch(psaId).futureValue
+      val result = connector.fetch(loggedInAsPsa = true).futureValue
 
       result mustBe Right(md)
     }
 
     "return psp minimal details" in runningApplication { implicit app =>
       val md = minimalDetailsGen.sample.value
-      stubGet("pspId", pspId.value, ok(Json.stringify(Json.toJson(md))))
+      stubGet(loggedInAsPsa = false, ok(Json.stringify(Json.toJson(md))))
 
-      val result = connector.fetch(pspId).futureValue
+      val result = connector.fetch(loggedInAsPsa = false).futureValue
 
       result mustBe Right(md)
     }
 
     "return a details not found when 404 returned with message" in runningApplication { implicit app =>
-      stubGet("psaId", psaId.value, notFound.withBody(Constants.detailsNotFound))
+      stubGet(loggedInAsPsa = true, notFound.withBody(Constants.detailsNotFound))
 
-      val result = connector.fetch(psaId).futureValue
+      val result = connector.fetch(loggedInAsPsa = true).futureValue
 
       result mustBe Left(DetailsNotFound)
     }
@@ -82,26 +78,26 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
       implicit app =>
         val body = stringContains(Constants.delimitedPSA).sample.value
 
-        stubGet("psaId", psaId.value, forbidden.withBody(body))
+        stubGet(loggedInAsPsa = true, forbidden.withBody(body))
 
-        val result = connector.fetch(psaId).futureValue
+        val result = connector.fetch(loggedInAsPsa = true).futureValue
 
         result mustBe Left(DelimitedAdmin)
     }
 
     "fail future when a 404 returned" in runningApplication { implicit app =>
-      stubGet("psaId", psaId.value, notFound)
+      stubGet(loggedInAsPsa = true, notFound)
 
       assertThrows[Exception] {
-        connector.fetch(psaId).futureValue
+        connector.fetch(loggedInAsPsa = true).futureValue
       }
     }
 
     "fail future for any other http failure code" in runningApplication { implicit app =>
-      stubGet("psaId", psaId.value, badRequest)
+      stubGet(loggedInAsPsa = true, badRequest)
 
       assertThrows[Exception] {
-        connector.fetch(psaId).futureValue
+        connector.fetch(loggedInAsPsa = true).futureValue
       }
     }
   }

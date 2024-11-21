@@ -79,12 +79,8 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
     when(mockSchemeDetailsConnector.checkAssociation(meq(pspId), meq(srn))(any(), any()))
       .thenReturn(result)
 
-  def setupMinimalDetails(psaId: PsaId, result: Future[Either[MinimalDetailsError, MinimalDetails]]): Unit =
-    when(mockMinimalDetailsConnector.fetch(meq(psaId))(any(), any()))
-      .thenReturn(result)
-
-  def setupMinimalDetails(pspId: PspId, result: Future[Either[MinimalDetailsError, MinimalDetails]]): Unit =
-    when(mockMinimalDetailsConnector.fetch(meq(pspId))(any(), any()))
+  def setupMinimalDetails(loggedInAsPsa: Boolean, result: Future[Either[MinimalDetailsError, MinimalDetails]]): Unit =
+    when(mockMinimalDetailsConnector.fetch(meq(loggedInAsPsa))(any(), any()))
       .thenReturn(result)
 
   override def beforeEach(): Unit = {
@@ -94,11 +90,11 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
     // setup green path
     setupSchemeDetails(psaId, srn, Future.successful(Some(schemeDetails)))
     setupCheckAssociation(psaId, srn, Future.successful(true))
-    setupMinimalDetails(psaId, Future.successful(Right(minimalDetails)))
+    setupMinimalDetails(loggedInAsPsa = true, Future.successful(Right(minimalDetails)))
 
     setupSchemeDetails(pspId, srn, Future.successful(Some(schemeDetails)))
     setupCheckAssociation(pspId, srn, Future.successful(true))
-    setupMinimalDetails(pspId, Future.successful(Right(minimalDetails)))
+    setupMinimalDetails(loggedInAsPsa = false, Future.successful(Right(minimalDetails)))
   }
 
   val psaId: PsaId = psaIdGen.sample.value
@@ -154,7 +150,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
 
       "psa minimal details return not found" in runningApplication { implicit app =>
-        setupMinimalDetails(psaId, Future.successful(Left(DetailsNotFound)))
+        setupMinimalDetails(loggedInAsPsa = true, Future.successful(Left(DetailsNotFound)))
 
         val result = handler(administratorRequest).run(srn)(FakeRequest())
         val expectedUrl = routes.UnauthorisedController.onPageLoad().url
@@ -163,7 +159,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
 
       "psp minimal details return not found" in runningApplication { implicit app =>
-        setupMinimalDetails(pspId, Future.successful(Left(DetailsNotFound)))
+        setupMinimalDetails(loggedInAsPsa = false, Future.successful(Left(DetailsNotFound)))
 
         val result = handler(practitionerRequest).run(srn)(FakeRequest())
         val expectedUrl = routes.UnauthorisedController.onPageLoad().url
@@ -215,7 +211,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "redirect to update contact details page" - {
 
       "psa rls flag is set" in runningApplication { implicit app =>
-        setupMinimalDetails(psaId, Future.successful(Right(minimalDetails.copy(rlsFlag = true))))
+        setupMinimalDetails(loggedInAsPsa = true, Future.successful(Right(minimalDetails.copy(rlsFlag = true))))
 
         val result = handler(administratorRequest).run(srn)(FakeRequest())
         val expectedUrl = appConfig.urls.pensionAdministrator.updateContactDetails
@@ -224,7 +220,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
 
       "psp rls flag is set" in runningApplication { implicit app =>
-        setupMinimalDetails(pspId, Future.successful(Right(minimalDetails.copy(rlsFlag = true))))
+        setupMinimalDetails(loggedInAsPsa = false, Future.successful(Right(minimalDetails.copy(rlsFlag = true))))
 
         val result = handler(practitionerRequest).run(srn)(FakeRequest())
         val expectedUrl = appConfig.urls.pensionPractitioner.updateContactDetails
@@ -236,7 +232,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "redirect to contact hmrc page" - {
 
       "psa deceased flag is set" in runningApplication { implicit app =>
-        setupMinimalDetails(psaId, Future.successful(Right(minimalDetails.copy(deceasedFlag = true))))
+        setupMinimalDetails(loggedInAsPsa = true, Future.successful(Right(minimalDetails.copy(deceasedFlag = true))))
 
         val result = handler(administratorRequest).run(srn)(FakeRequest())
         val expectedUrl = appConfig.urls.managePensionsSchemes.contactHmrc
@@ -245,7 +241,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
 
       "psp deceased flag is set" in runningApplication { implicit app =>
-        setupMinimalDetails(pspId, Future.successful(Right(minimalDetails.copy(deceasedFlag = true))))
+        setupMinimalDetails(loggedInAsPsa = false, Future.successful(Right(minimalDetails.copy(deceasedFlag = true))))
 
         val result = handler(practitionerRequest).run(srn)(FakeRequest())
         val expectedUrl = appConfig.urls.managePensionsSchemes.contactHmrc
@@ -257,7 +253,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "redirect to cannot access deregistered page" - {
 
       "psa minimal details return delimited admin" in runningApplication { implicit app =>
-        setupMinimalDetails(psaId, Future.successful(Left(DelimitedAdmin)))
+        setupMinimalDetails(loggedInAsPsa = true, Future.successful(Left(DelimitedAdmin)))
 
         val result = handler(administratorRequest).run(srn)(FakeRequest())
         val expectedUrl = appConfig.urls.managePensionsSchemes.cannotAccessDeregistered
@@ -266,7 +262,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
 
       "psp minimal details return delimited admin" in runningApplication { implicit app =>
-        setupMinimalDetails(pspId, Future.successful(Left(DelimitedAdmin)))
+        setupMinimalDetails(loggedInAsPsa = false, Future.successful(Left(DelimitedAdmin)))
 
         val result = handler(practitionerRequest).run(srn)(FakeRequest())
         val expectedUrl = appConfig.urls.managePensionsSchemes.cannotAccessDeregistered

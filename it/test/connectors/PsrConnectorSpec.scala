@@ -28,7 +28,7 @@ import models.requests.{AllowedAccessRequest, DataRequest}
 import org.scalatest.exceptions.TestFailedException
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsResultException, Json, JsonValidationError, __}
+import play.api.libs.json.{__, JsResultException, Json, JsonValidationError}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.mvc.Http.HeaderNames
@@ -40,8 +40,11 @@ import scala.jdk.CollectionConverters._
 
 class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
 
-  implicit val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
-  implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, UserAnswers("id", SensitiveJsObject(Json.obj("non" -> "empty"))))
+  implicit val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+  ).sample.value
+  implicit val request: DataRequest[AnyContentAsEmpty.type] =
+    DataRequest(allowedAccessRequest, UserAnswers("id", SensitiveJsObject(Json.obj("non" -> "empty"))))
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
