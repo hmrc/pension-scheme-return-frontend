@@ -39,13 +39,13 @@ package object receivetransfer {
   }
 
   def saveProgress(
-                    srn: Srn,
-                    index: Max300,
-                    secondaryIndex: Max5,
-                    userAnswers: UserAnswers,
-                    nextPage: Call,
-                    alwaysCompleted: Boolean = false
-                  ): Future[UserAnswers] =
+    srn: Srn,
+    index: Max300,
+    secondaryIndex: Max5,
+    userAnswers: UserAnswers,
+    nextPage: Call,
+    alwaysCompleted: Boolean = false
+  ): Future[UserAnswers] =
     if (nextPage.isCyaPage) {
       userAnswers
         .set(

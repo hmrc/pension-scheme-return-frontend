@@ -71,14 +71,6 @@ class TransferringSchemeNameController @Inject()(
               updatedProgressAnswers <- saveProgress(srn, memberIndex, index, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
-
-//            for {
-//              updatedAnswers <- Future
-//                .fromTry(request.userAnswers.set(TransferringSchemeNamePage(srn, memberIndex, index), value))
-//              _ <- saveService.save(updatedAnswers)
-//            } yield Redirect(
-//              navigator.nextPage(TransferringSchemeNamePage(srn, memberIndex, index), mode, updatedAnswers)
-//            )
         )
     }
 }

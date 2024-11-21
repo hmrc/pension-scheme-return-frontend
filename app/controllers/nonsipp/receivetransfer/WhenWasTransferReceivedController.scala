@@ -114,8 +114,7 @@ class WhenWasTransferReceivedController @Inject()(
               for {
                 updatedAnswers <- request.userAnswers
                   .set(WhenWasTransferReceivedPage(srn, index, secondaryIndex), value)
-//                  .mapK[Future]
-                  .mapK
+                  .mapK[Future]
                 nextPage = navigator
                   .nextPage(WhenWasTransferReceivedPage(srn, index, secondaryIndex), mode, updatedAnswers)
                 updatedProgressAnswers <- saveProgress(
@@ -123,19 +122,10 @@ class WhenWasTransferReceivedController @Inject()(
                   index,
                   secondaryIndex,
                   updatedAnswers,
-                  nextPage,
-                  alwaysCompleted = true
+                  nextPage
                 )
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
-
-//              for {
-//                updatedAnswers <- Future
-//                  .fromTry(request.userAnswers.set(WhenWasTransferReceivedPage(srn, index, secondaryIndex), value))
-//                _ <- saveService.save(updatedAnswers)
-//              } yield Redirect(
-//                navigator.nextPage(WhenWasTransferReceivedPage(srn, index, secondaryIndex), mode, updatedAnswers)
-//              )
           )
       }
     }

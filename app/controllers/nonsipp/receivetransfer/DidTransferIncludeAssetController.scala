@@ -121,18 +121,6 @@ class DidTransferIncludeAssetController @Inject()(
               )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
-
-//            for {
-//              updatedAnswers <- Future
-//                .fromTry(
-//                  request.userAnswers
-//                    .set(DidTransferIncludeAssetPage(srn, index, secondaryIndex), value)
-//                    .set(TransfersInSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
-//                )
-//              _ <- saveService.save(updatedAnswers)
-//            } yield Redirect(
-//              navigator.nextPage(DidTransferIncludeAssetPage(srn, index, secondaryIndex), mode, updatedAnswers)
-//            )
         )
     }
 }

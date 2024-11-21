@@ -60,19 +60,14 @@ object TransfersInSectionCompleted {
 
   def exists(srn: Srn, userAnswers: UserAnswers): Boolean = userAnswers.map(all(srn)).values.exists(_.values.nonEmpty)
 
-//  implicit class TransfersInSectionCompletedUserAnswersOps(ua: UserAnswers) {
-//    def transfersInSectionCompleted(srn: Srn, index: Max300): List[Max5] =
-//      ua.map(TransfersInSectionCompletedForMember(srn, index))
-//        .toList
-//        .collect {
-//          case (index, _) => index
-//        }
-//        .refine[Max5.Refined]
-//  }
-
-  implicit class TransfersInSectionCompletedUserAnswersOps(userAnswers: UserAnswers) {
-    def transfersInSectionCompleted(srn: Srn, memberIndex: Max300): List[Max5] =
-      userAnswers.map(TransfersInSectionCompleted.all(srn, memberIndex)).keys.toList.refine[Max5.Refined]
+  implicit class TransfersInSectionCompletedUserAnswersOps(ua: UserAnswers) {
+    def transfersInSectionCompleted(srn: Srn, index: Max300): List[Max5] =
+      ua.map(TransfersInSectionCompletedForMember(srn, index))
+        .toList
+        .collect {
+          case (index, _) => index
+        }
+        .refine[Max5.Refined]
   }
 
 }

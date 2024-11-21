@@ -26,7 +26,7 @@ import models.UserAnswers
 import viewmodels.models.SectionJourneyStatus
 
 case class ReceiveTransferProgress(srn: Srn, memberIndex: Max300, secondaryIndex: Max5)
-  extends QuestionPage[SectionJourneyStatus] {
+    extends QuestionPage[SectionJourneyStatus] {
 
   override def path: JsPath = JsPath \ toString \ memberIndex.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
@@ -41,7 +41,6 @@ object ReceiveTransferProgress {
 
       override def toString: String = "receiveTransferProgress"
     }
-
 
   def all(srn: Srn): IndexedQuestionPage[Map[String, SectionJourneyStatus]] =
     new IndexedQuestionPage[Map[String, SectionJourneyStatus]] {

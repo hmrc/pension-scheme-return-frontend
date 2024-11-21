@@ -21,21 +21,22 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
+import utils.ListUtils.ListOps
+import controllers.actions._
 import controllers.nonsipp.receivetransfer.WhichTransferInRemoveController._
 import forms.RadioListFormProvider
-import models.Money
+import models.{Money, NormalMode}
 import play.api.i18n.MessagesApi
-import play.api.data.Form
 import config.RefinedTypes._
 import controllers.PSRController
 import views.html.ListRadiosView
 import models.SchemeId.Srn
 import cats.implicits._
-import pages.nonsipp.receivetransfer.{TotalValueTransferPages, TransferringSchemeNamePages}
-import controllers.actions._
-import eu.timepit.refined.refineV
+import pages.nonsipp.receivetransfer._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
 
 import scala.collection.immutable.SortedMap
 
@@ -50,65 +51,46 @@ class WhichTransferInRemoveController @Inject()(
   val form: Form[Max5] = WhichTransferInRemoveController.form(formProvider)
 
   def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-//    val completed: List[Max5] = request.userAnswers
-//      .map(ReceiveTransferProgress.all(srn, memberIndex))
-//      .filter {
-//        case (_, status) => status.completed
-//      }
-//      .keys
-//      .toList
-//      .refine[Max5.Refined]
-//
-//    completed match {
-//      case Nil =>
-//        Redirect(
-//          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-//            .onPageLoad(srn, page = 1, NormalMode)
-//        )
-//      case head :: Nil =>
-//        Redirect(
-//          controllers.nonsipp.receivetransfer.routes.RemoveTransferInController.onSubmit(srn, memberIndex, head)
-//        )
-//      case _ =>
-//        (
-//          for {
-//            memberName <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney
-//            values <- getJourneyValues(srn, memberIndex)
-//          } yield Ok(view(form, viewModel(srn, memberIndex, memberName.fullName, values)))
-//        ).merge
-//    }
-
-    val totalValue = request.userAnswers.map(TotalValueTransferPages(srn, memberIndex))
-    val transferringSchemeName = request.userAnswers.map(TransferringSchemeNamePages(srn, memberIndex))
-    if (totalValue.size == 1) {
-      refineV[OneTo5](totalValue.head._1.toInt + 1).fold(
-        _ => Redirect(controllers.routes.UnauthorisedController.onPageLoad()),
-        index =>
-          Redirect(
-            controllers.nonsipp.receivetransfer.routes.RemoveTransferInController.onSubmit(srn, memberIndex, index)
-          )
-      )
-    } else {
-      request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
-        withIndexedValues(totalValue, transferringSchemeName) { sortedValues =>
-          Ok(view(form, viewModel(srn, memberIndex, memberName.fullName, sortedValues)))
-        }
+    val completed: List[Max5] = request.userAnswers
+      .map(ReceiveTransferProgress.all(srn, memberIndex))
+      .filter {
+        case (_, status) => status.completed
       }
+      .keys
+      .toList
+      .refine[Max5.Refined]
+
+    completed match {
+      case Nil =>
+        Redirect(
+          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+            .onPageLoad(srn, page = 1, NormalMode)
+        )
+      case head :: Nil =>
+        Redirect(
+          controllers.nonsipp.receivetransfer.routes.RemoveTransferInController.onSubmit(srn, memberIndex, head)
+        )
+      case _ =>
+        (
+          for {
+            memberName <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney
+            values <- getJourneyValues(srn, memberIndex)
+          } yield Ok(view(form, viewModel(srn, memberIndex, memberName.fullName, values)))
+        ).merge
     }
   }
 
   def onSubmit(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val totalValue = request.userAnswers.map(TotalValueTransferPages(srn, memberIndex))
-    val transferringSchemeName = request.userAnswers.map(TransferringSchemeNamePages(srn, memberIndex))
     form
       .bindFromRequest()
       .fold(
         errors =>
-          request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
-            withIndexedValues(totalValue, transferringSchemeName)(
-              sortedValues => BadRequest(view(errors, viewModel(srn, memberIndex, memberName.fullName, sortedValues)))
-            )
-          },
+          (
+            for {
+              memberName <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney
+              values <- getJourneyValues(srn, memberIndex)
+            } yield BadRequest(view(errors, viewModel(srn, memberIndex, memberName.fullName, values)))
+          ).merge,
         answer =>
           Redirect(
             controllers.nonsipp.receivetransfer.routes.RemoveTransferInController
@@ -132,27 +114,27 @@ class WhichTransferInRemoveController @Inject()(
     }
   }
 
-//  private def getJourneyValues(srn: Srn, memberIndex: Max300)(
-//    implicit request: DataRequest[_]
-//  ): Either[Result, Map[Int, (Money, String)]] =
-//    request.userAnswers
-//      .map(ReceiveTransferProgress.all(srn, memberIndex))
-//      .filter {
-//        case (_, status) => status.completed
-//      }
-//      .keys
-//      .toList
-//      .refine[Max5.Refined]
-//      .traverse { secondaryIndex =>
-//        for {
-//          totalContribution <- request.userAnswers
-//            .get(TotalValueTransferPage(srn, memberIndex, secondaryIndex))
-//            .getOrRecoverJourney
-//          employerName <- request.userAnswers
-//            .get(TransferringSchemeNamePage(srn, memberIndex, secondaryIndex))
-//            .getOrRecoverJourney
-//        } yield (secondaryIndex, totalContribution, employerName)
-//      }
+  private def getJourneyValues(srn: Srn, memberIndex: Max300)(
+    implicit request: DataRequest[_]
+  ) =
+    request.userAnswers
+      .map(ReceiveTransferProgress.all(srn, memberIndex))
+      .filter {
+        case (_, status) => status.completed
+      }
+      .keys
+      .toList
+      .refine[Max5.Refined]
+      .traverse { secondaryIndex =>
+        for {
+          totalValue <- request.userAnswers
+            .get(TotalValueTransferPage(srn, memberIndex, secondaryIndex))
+            .getOrRecoverJourney
+          transferringSchemeName <- request.userAnswers
+            .get(TransferringSchemeNamePage(srn, memberIndex, secondaryIndex))
+            .getOrRecoverJourney
+        } yield (secondaryIndex, totalValue, transferringSchemeName)
+      }
 
 }
 
@@ -162,18 +144,14 @@ object WhichTransferInRemoveController {
       "whichTransferInRemove.error.required"
     )
 
-  private def buildRows(values: Map[Int, (Money, String)]): List[ListRadiosRow] =
+  private def buildRows(values: List[(Max5, Money, String)]): List[ListRadiosRow] =
     values.flatMap {
-      case (index, value) =>
-        refineV[Max5000.Refined](index + 1).fold(
-          _ => Nil,
-          index =>
-            List(
-              ListRadiosRow(
-                index.value,
-                Message("whichTransferInRemove.radio.label", value._1.displayAs, value._2)
-              )
-            )
+      case (index, total, transferringSchemeName) =>
+        List(
+          ListRadiosRow(
+            index.value,
+            Message("whichTransferInRemove.radio.label", total.displayAs, transferringSchemeName)
+          )
         )
     }.toList
 
@@ -181,7 +159,7 @@ object WhichTransferInRemoveController {
     srn: Srn,
     memberIndex: Max300,
     memberName: String,
-    values: Map[Int, (Money, String)]
+    values: List[(Max5, Money, String)]
   ): FormPageViewModel[ListRadiosViewModel] = {
     val rows = buildRows(values)
 

@@ -104,14 +104,6 @@ class TransferringSchemeTypeController @Inject()(
             updatedProgressAnswers <- saveProgress(srn, index, secondaryIndex, updatedAnswers, nextPage)
             _ <- saveService.save(updatedProgressAnswers)
           } yield Redirect(nextPage)
-
-//          for {
-//            updatedAnswers <- Future
-//              .fromTry(request.userAnswers.set(TransferringSchemeTypePage(srn, index, secondaryIndex), answer))
-//            _ <- saveService.save(updatedAnswers)
-//          } yield Redirect(
-//            navigator.nextPage(TransferringSchemeTypePage(srn, index, secondaryIndex), mode, updatedAnswers)
-//          )
       )
   }
 }

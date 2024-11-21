@@ -78,14 +78,8 @@ class TransfersInCYAController @Inject()(
       for {
         memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
         secondaryIndexes <- request.userAnswers
-//          .map(ReceiveTransferProgress.all(srn, index))
-//          .filter { case (_, status) => status.completed }
           .get(TransfersInSectionCompletedForMember(srn, index))
           .map(_.keys.toList.flatMap(refineStringIndex[Max5.Refined]))
-//          .keys
-//          .toList
-//          .map(refineStringIndex[Max5.Refined])
-//          .sequence
           .getOrRecoverJourney
 
       } yield {
