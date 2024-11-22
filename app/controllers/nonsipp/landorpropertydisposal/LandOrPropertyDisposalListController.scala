@@ -314,7 +314,7 @@ object LandOrPropertyDisposalListController {
     } else {
       addressesWithIndexes.flatMap {
         case ((addressIndex, disposalIndexes), address) =>
-          disposalIndexes.map { disposalIndex =>
+          disposalIndexes.sortBy(_.value).map { disposalIndex =>
             val landOrPropertyDisposalData = LandOrPropertyDisposalData(
               addressIndex,
               disposalIndex,

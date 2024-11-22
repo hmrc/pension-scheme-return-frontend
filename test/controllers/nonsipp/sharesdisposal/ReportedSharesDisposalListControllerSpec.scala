@@ -80,7 +80,7 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
   private val howSharesDisposedThree = Transferred
   private val howSharesDisposedFour = Other(otherDetails)
 
-  private val disposalIndexes = List(disposalIndexOne, disposalIndexTwo)
+  private val disposalIndexes = List(disposalIndexTwo, disposalIndexOne)
 
   private val completedUserAnswers = defaultUserAnswers
   // Shares #1

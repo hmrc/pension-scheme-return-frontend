@@ -333,7 +333,7 @@ object ReportBondsDisposalListController {
     } else {
       bondsDisposalsWithIndexes.flatMap {
         case ((bondIndex, disposalIndexes), bondsDisposal) =>
-          disposalIndexes.map { disposalIndex =>
+          disposalIndexes.sortBy(_.value).map { disposalIndex =>
             val bondsDisposalData = BondsDisposalData(
               bondIndex,
               disposalIndex,

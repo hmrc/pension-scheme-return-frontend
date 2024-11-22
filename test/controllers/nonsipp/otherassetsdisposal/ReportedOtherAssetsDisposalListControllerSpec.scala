@@ -75,7 +75,7 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
   private val howOtherAssetsDisposedTwo = Transferred
   private val howOtherAssetsDisposedThree = Other(otherDetails)
 
-  private val disposalIndexes = List(disposalIndexOne, disposalIndexTwo)
+  private val disposalIndexes = List(disposalIndexTwo, disposalIndexOne)
 
   private val completedUserAnswers = defaultUserAnswers
   // Other Assets #1

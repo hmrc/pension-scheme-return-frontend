@@ -71,7 +71,7 @@ class ReportBondsDisposalListControllerSpec extends ControllerBaseSpec {
   private val numberOfDisposals = 2
   private val maxPossibleNumberOfDisposals = 100
 
-  private val disposalIndexes = List(disposalIndexOne, disposalIndexTwo)
+  private val disposalIndexes = List(disposalIndexTwo, disposalIndexOne)
   private val bondsDisposalsWithIndexes =
     List(((bondIndexOne, disposalIndexes), SectionCompleted))
 

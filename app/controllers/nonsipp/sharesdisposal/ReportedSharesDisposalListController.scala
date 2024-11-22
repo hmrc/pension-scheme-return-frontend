@@ -19,22 +19,22 @@ package controllers.nonsipp.sharesdisposal
 import services.SaveService
 import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController._
 import viewmodels.implicits._
-import com.google.inject.Inject
+import controllers.PSRController
+import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import cats.implicits._
-import config.Constants.{maxDisposalsPerShare, maxSharesTransactions}
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal._
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import pages.nonsipp.shares._
 import play.api.mvc._
-import config.RefinedTypes.{Max50, Max5000}
-import controllers.PSRController
-import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
-import config.Constants
+import _root_.config.RefinedTypes.{Max50, Max5000}
+import com.google.inject.Inject
 import views.html.ListView
 import models.TypeOfShares._
 import models.SchemeId.Srn
+import _root_.config.Constants
+import config.Constants.{maxDisposalsPerShare, maxSharesTransactions}
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import models.HowSharesDisposed._
@@ -290,6 +290,7 @@ class ReportedSharesDisposalListController @Inject()(
           key -> secondaryMap.filter { case (_, status) => status.completed }
       }
       .toList
+      .sortBy(_._1)
       .traverse {
         case (key, sectionCompleted) =>
           for {
@@ -324,52 +325,49 @@ object ReportedSharesDisposalListController {
         )
       )
     } else {
-      disposals
-        .flatMap {
-          case (shareIndex, disposalIndexes) =>
-            disposalIndexes.map { disposalIndex =>
-              val sharesDisposalData = SharesDisposalData(
-                shareIndex,
-                disposalIndex,
-                userAnswers.get(TypeOfSharesHeldPage(srn, shareIndex)).get,
-                userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).get,
-                userAnswers.get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex)).get
-              )
+      disposals.flatMap {
+        case (shareIndex, disposalIndexes) =>
+          disposalIndexes.sortBy(_.value).map { disposalIndex =>
+            val sharesDisposalData = SharesDisposalData(
+              shareIndex,
+              disposalIndex,
+              userAnswers.get(TypeOfSharesHeldPage(srn, shareIndex)).get,
+              userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).get,
+              userAnswers.get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex)).get
+            )
 
-              (mode, viewOnlyViewModel) match {
-                case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
-                  ListRow.view(
-                    buildMessage("sharesDisposal.reportedSharesDisposalList.row", sharesDisposalData),
-                    routes.SharesDisposalCYAController
-                      .onPageLoadViewOnly(srn, shareIndex, disposalIndex, year, currentVersion, previousVersion)
-                      .url,
-                    buildMessage(
-                      "sharesDisposal.reportedSharesDisposalList.row.view.hidden",
-                      sharesDisposalData
-                    )
+            (mode, viewOnlyViewModel) match {
+              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
+                ListRow.view(
+                  buildMessage("sharesDisposal.reportedSharesDisposalList.row", sharesDisposalData),
+                  routes.SharesDisposalCYAController
+                    .onPageLoadViewOnly(srn, shareIndex, disposalIndex, year, currentVersion, previousVersion)
+                    .url,
+                  buildMessage(
+                    "sharesDisposal.reportedSharesDisposalList.row.view.hidden",
+                    sharesDisposalData
                   )
-                case (_, _) =>
-                  ListRow(
-                    buildMessage("sharesDisposal.reportedSharesDisposalList.row", sharesDisposalData),
-                    changeUrl = routes.SharesDisposalCYAController
-                      .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
-                      .url,
-                    changeHiddenText = buildMessage(
-                      "sharesDisposal.reportedSharesDisposalList.row.change.hidden",
-                      sharesDisposalData
-                    ),
-                    removeUrl =
-                      routes.RemoveShareDisposalController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode).url,
-                    removeHiddenText = buildMessage(
-                      "sharesDisposal.reportedSharesDisposalList.row.remove.hidden",
-                      sharesDisposalData
-                    )
+                )
+              case (_, _) =>
+                ListRow(
+                  buildMessage("sharesDisposal.reportedSharesDisposalList.row", sharesDisposalData),
+                  changeUrl = routes.SharesDisposalCYAController
+                    .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+                    .url,
+                  changeHiddenText = buildMessage(
+                    "sharesDisposal.reportedSharesDisposalList.row.change.hidden",
+                    sharesDisposalData
+                  ),
+                  removeUrl =
+                    routes.RemoveShareDisposalController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode).url,
+                  removeHiddenText = buildMessage(
+                    "sharesDisposal.reportedSharesDisposalList.row.remove.hidden",
+                    sharesDisposalData
                   )
-              }
+                )
             }
-        }
-        .toList
-        .sortBy(_.change.fold("")(_.url))
+          }
+      }.toList
     }
 
   private def buildMessage(messageString: String, sharesDisposalData: SharesDisposalData): Message =
