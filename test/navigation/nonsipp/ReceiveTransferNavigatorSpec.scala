@@ -23,6 +23,7 @@ import pages.nonsipp.receivetransfer._
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import models.NormalMode
+import viewmodels.models.SectionJourneyStatus
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
 
@@ -141,6 +142,10 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           defaultUserAnswers
             .unsafeSet(ReportAnotherTransferInPage(srn, index, secondaryIndex), true)
             .unsafeSet(TotalValueTransferPages(srn, index), existingIndexes.map(_ -> money).toMap)
+            .unsafeSet(
+              ReceiveTransferProgress.all(srn, index),
+              existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
+            )
 
         act.like(
           normalmode
