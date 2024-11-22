@@ -64,9 +64,6 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
       SectionJourneyStatus.Completed
     )
 
-//  val testMemberList: List[(Max300, NameDOB, CompletedTransfersIn)] = List(
-//    (refineMV[Max300.Refined](1), memberDetails, 1)
-//  )
 
   val testMemberList: List[MemberWithReceiveTransfer] = List(
     MemberWithReceiveTransfer(
@@ -116,14 +113,6 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
     }
 
     "viewModel should show '2 Transfers in' when there are 2 transfers" in {
-//      val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
-//      val memberDetails2 = NameDOB("testFirstName2", "testLastName2", LocalDate.of(1991, 6, 15))
-//
-//      val memberList: List[(Max300, NameDOB, CompletedTransfersIn)] = List(
-//        (refineMV[Max300.Refined](1), memberDetails1, 1),
-//        (refineMV[Max300.Refined](2), memberDetails2, 1)
-//      )
-
       val memberList: List[MemberWithReceiveTransfer] = List.fill(2)(
         MemberWithReceiveTransfer(
           memberIndex = refineMV(1),

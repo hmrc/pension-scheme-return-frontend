@@ -56,15 +56,6 @@ class WhichTransferInRemoveControllerSpec extends ControllerBaseSpec {
 
   "WhichTransferInRemoveController" - {
 
-//    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-//      val view = injected[ListRadiosView]
-//
-//      view(
-//        form(injected[RadioListFormProvider]),
-//        viewModel(srn, refineMV(1), memberDetail1.fullName, memberDetailsMap)
-//      )
-//    })
-
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[ListRadiosView].apply(
         form(injected[RadioListFormProvider]),
