@@ -64,7 +64,6 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
       SectionJourneyStatus.Completed
     )
 
-
   val testMemberList: List[MemberWithReceiveTransfer] = List(
     MemberWithReceiveTransfer(
       memberIndex = refineMV(1),

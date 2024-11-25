@@ -111,7 +111,8 @@ trait SoftDelete { _: PSRController =>
         TotalValueTransferPage(srn, index, secondaryIndex),
         DidTransferIncludeAssetPage(srn, index, secondaryIndex),
         TransferringSchemeTypePage(srn, index, secondaryIndex),
-        ReportAnotherTransferInPage(srn, index, secondaryIndex)
+        ReportAnotherTransferInPage(srn, index, secondaryIndex),
+        ReceiveTransferProgress(srn, index, secondaryIndex)
       )
 
     val transfersOutPages: Max5 => List[Removable[_]] = secondaryIndex =>
