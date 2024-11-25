@@ -51,7 +51,7 @@ case class HeldSharesTransaction(
   costOfShares: Double,
   supportedByIndepValuation: Boolean,
   optTotalAssetValue: Option[Double],
-  totalDividendsOrReceipts: Double
+  optTotalDividendsOrReceipts: Option[Double]
 )
 
 case class DisposedSharesTransaction(

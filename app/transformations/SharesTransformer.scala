@@ -89,7 +89,6 @@ class SharesTransformer @Inject() extends Transformer {
                   totalShares <- request.userAnswers.get(HowManySharesPage(srn, index))
                   costOfShares <- request.userAnswers.get(CostOfSharesPage(srn, index))
                   supportedByIndepValuation <- request.userAnswers.get(SharesIndependentValuationPage(srn, index))
-                  totalDividendsOrReceipts <- request.userAnswers.get(SharesTotalIncomePage(srn, index))
                 } yield {
                   val optDateOfAcqOrContrib = Option.when(schemeHoldShare != Transfer)(
                     request.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)).get
@@ -103,6 +102,8 @@ class SharesTransformer @Inject() extends Transformer {
                     Option.when((schemeHoldShare == Acquisition) && (typeOfSharesHeld == SponsoringEmployer))(
                       request.userAnswers.get(TotalAssetValuePage(srn, index)).get
                     )
+
+                  val optTotalDividendsOrReceipts = request.userAnswers.get(SharesTotalIncomePage(srn, index))
 
                   val optAcquisitionRelatedDetails = buildOptAcquisitionRelatedDetails(schemeHoldShare, srn, index)
 
@@ -124,7 +125,7 @@ class SharesTransformer @Inject() extends Transformer {
                       costOfShares = costOfShares.value,
                       supportedByIndepValuation = supportedByIndepValuation,
                       optTotalAssetValue = optTotalAssetValue.map(_.value),
-                      totalDividendsOrReceipts = totalDividendsOrReceipts.value
+                      optTotalDividendsOrReceipts = optTotalDividendsOrReceipts.map(_.value)
                     ),
                     optDisposedSharesTransaction = Option
                       .when(sharesDisposal)(buildOptDisposedSharesTransactions(srn, index))
@@ -579,10 +580,9 @@ class SharesTransformer @Inject() extends Transformer {
                   heldSharesTransaction.supportedByIndepValuation
                 )
                 ua19 <- optTotalAssetValue.map(t => ua18.set(t._1, t._2)).getOrElse(Try(ua18))
-                ua20 <- ua19.set(
-                  SharesTotalIncomePage(srn, index),
-                  Money(heldSharesTransaction.totalDividendsOrReceipts)
-                )
+                ua20 <- heldSharesTransaction.optTotalDividendsOrReceipts
+                  .map(t => ua19.set(SharesTotalIncomePage(srn, index), Money(t)))
+                  .getOrElse(Try(ua19))
                 ua21 <- ua20.set(SharesCompleted(srn, index), SectionCompleted)
               } yield {
                 buildOptDisposedShareTransactionUA(
