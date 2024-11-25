@@ -64,7 +64,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
 
       val result =
         transformer.transformToEtmp(srn = srn, initialUserAnswer)(DataRequest(allowedAccessRequest, userAnswers))
-      result mustBe Some(Shares(None, Some(true), None, None))
+      result mustBe Some(Shares(None, Some(false), None, None))
     }
 
     "should return recordVersion when there is no change among UAs" - {
