@@ -24,7 +24,7 @@ import play.api.libs.json.JsPath
 
 case class HowManySharesPage(srn: Srn, index: Max5000) extends QuestionPage[Int] {
 
-  override def path: JsPath = Paths.heldSharesTransaction \ index.arrayIndex.toString \ toString
+  override def path: JsPath = Paths.heldSharesTransaction \ toString \ index.arrayIndex.toString
 
   override def toString: String = "totalShares"
 }
