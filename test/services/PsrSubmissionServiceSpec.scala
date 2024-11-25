@@ -495,7 +495,7 @@ object PsrSubmissionServiceSpec {
     Assets(optLandOrProperty = None, optBorrowing = None, optBonds = None, optOtherAssets = None)
   )
   val optShares: Option[Shares] = Some(
-    Shares(recordVersion = Some("001"), optShareTransactions = None, optTotalValueQuotedShares = None)
+    Shares(recordVersion = Some("001"), Some(false), optShareTransactions = None, optTotalValueQuotedShares = None)
   )
 
   val declaration: PsrDeclaration = PsrDeclaration(

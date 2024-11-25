@@ -415,7 +415,7 @@ object PsrRetrievalServiceSpec {
     surrenderMade = Some(true)
   )
 
-  val shares: Shares = Shares(Some("001"), optShareTransactions = None, optTotalValueQuotedShares = None)
+  val shares: Shares = Shares(Some("001"), Some(false), optShareTransactions = None, optTotalValueQuotedShares = None)
 
   val psrDeclaration: PsrDeclaration = PsrDeclaration(
     submittedBy = PSA,

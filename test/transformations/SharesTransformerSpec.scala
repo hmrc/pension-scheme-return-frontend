@@ -64,7 +64,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
 
       val result =
         transformer.transformToEtmp(srn = srn, initialUserAnswer)(DataRequest(allowedAccessRequest, userAnswers))
-      result mustBe Some(Shares(None, None, None))
+      result mustBe Some(Shares(None, Some(true), None, None))
     }
 
     "should return recordVersion when there is no change among UAs" - {
@@ -79,6 +79,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
         result mustBe Some(
           Shares(
             recordVersion = Some("001"),
+            optDidSchemeHoldAnyShares = Some(true),
             optShareTransactions = None,
             optTotalValueQuotedShares = Some(money.value)
           )
@@ -112,6 +113,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
         result mustBe Some(
           Shares(
             recordVersion = Some("001"),
+            Some(true),
             optShareTransactions = Some(
               List(
                 ShareTransaction(
@@ -132,7 +134,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
                     costOfShares = money.value,
                     supportedByIndepValuation = true,
                     optTotalAssetValue = None,
-                    totalDividendsOrReceipts = money.value
+                    optTotalDividendsOrReceipts = Some(money.value)
                   ),
                   optDisposedSharesTransaction = Some(
                     Seq(
@@ -167,7 +169,12 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
       val result = transformer.transformFromEtmp(
         userAnswers,
         srn,
-        Shares(recordVersion = Some("001"), optShareTransactions = None, optTotalValueQuotedShares = None)
+        Shares(
+          recordVersion = Some("001"),
+          optDidSchemeHoldAnyShares = None,
+          optShareTransactions = None,
+          optTotalValueQuotedShares = None
+        )
       )
       result.fold(
         ex => fail(ex.getMessage),
@@ -182,6 +189,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
         srn,
         Shares(
           recordVersion = Some("001"),
+          optDidSchemeHoldAnyShares = Some(true),
           optShareTransactions = Some(
             List(
               ShareTransaction(
@@ -203,7 +211,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
                   costOfShares = money.value,
                   supportedByIndepValuation = true,
                   optTotalAssetValue = Some(money.value),
-                  totalDividendsOrReceipts = money.value
+                  optTotalDividendsOrReceipts = Some(money.value)
                 ),
                 optDisposedSharesTransaction = Some(
                   List(
@@ -263,7 +271,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
                   costOfShares = money.value,
                   supportedByIndepValuation = true,
                   optTotalAssetValue = None,
-                  totalDividendsOrReceipts = money.value
+                  optTotalDividendsOrReceipts = Some(money.value)
                 ),
                 optDisposedSharesTransaction = Some(
                   List(
@@ -302,7 +310,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
                   costOfShares = money.value,
                   supportedByIndepValuation = false,
                   optTotalAssetValue = None,
-                  totalDividendsOrReceipts = money.value
+                  optTotalDividendsOrReceipts = Some(money.value)
                 ),
                 optDisposedSharesTransaction = None
               )

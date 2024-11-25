@@ -33,6 +33,7 @@ import models.requests.DataRequest
 import eu.timepit.refined.api.Refined
 import models.TypeOfShares.{SponsoringEmployer, Unquoted}
 import models.SchemeId.Srn
+import utils.nonsipp.PrePopulationUtils.isPrePopulation
 import models.requests.psr._
 import models.UserAnswers.implicits.UserAnswersTryOps
 import uk.gov.hmrc.domain.Nino
@@ -50,15 +51,20 @@ class SharesTransformer @Inject() extends Transformer {
     initialUA: UserAnswers
   )(implicit request: DataRequest[_]): Option[Shares] = {
     val optDidSchemeHoldAnyShares = request.userAnswers.get(DidSchemeHoldAnySharesPage(srn))
-    optDidSchemeHoldAnyShares.map { _ =>
+    if (optDidSchemeHoldAnyShares.nonEmpty || isPrePopulation) {
       val sharesDisposal = request.userAnswers.get(SharesDisposalPage(srn)).getOrElse(false)
-      Shares(
-        recordVersion = Option.when(request.userAnswers.get(shares) == initialUA.get(shares))(
-          request.userAnswers.get(SharesRecordVersionPage(srn)).get
-        ),
-        optShareTransactions = buildOptShareTransactions(srn, sharesDisposal),
-        optTotalValueQuotedShares = buildOptQuotedShares(srn)
+      Some(
+        Shares(
+          recordVersion = Option.when(request.userAnswers.get(shares) == initialUA.get(shares))(
+            request.userAnswers.get(SharesRecordVersionPage(srn)).get
+          ),
+          optDidSchemeHoldAnyShares,
+          optShareTransactions = buildOptShareTransactions(srn, sharesDisposal),
+          optTotalValueQuotedShares = buildOptQuotedShares(srn)
+        )
       )
+    } else {
+      None
     }
   }
 
@@ -447,9 +453,15 @@ class SharesTransformer @Inject() extends Transformer {
     shares: Shares
   ): Try[UserAnswers] = {
 
-    val userAnswersOfShares = userAnswers
-      .set(DidSchemeHoldAnySharesPage(srn), shares.optShareTransactions.isDefined)
-      .set(SharesListPage(srn), shares.optShareTransactions.nonEmpty)
+    val userAnswersOfShares = {
+      Option
+        .when(shares.optDidSchemeHoldAnyShares.nonEmpty)(
+          userAnswers
+            .set(DidSchemeHoldAnySharesPage(srn), shares.optShareTransactions.isDefined)
+            .set(SharesListPage(srn), shares.optShareTransactions.nonEmpty)
+        )
+        .getOrElse(Try(userAnswers))
+    }
 
     val userAnswersWithQuotedShares = shares.optTotalValueQuotedShares.fold(userAnswersOfShares)(
       totalValueQuotedShares => userAnswersOfShares.set(TotalValueQuotedSharesPage(srn), Money(totalValueQuotedShares))
