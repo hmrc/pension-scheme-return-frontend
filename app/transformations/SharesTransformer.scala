@@ -33,6 +33,7 @@ import models.requests.DataRequest
 import eu.timepit.refined.api.Refined
 import models.TypeOfShares.{SponsoringEmployer, Unquoted}
 import models.SchemeId.Srn
+import utils.nonsipp.PrePopulationUtils.isPrePopulation
 import models.requests.psr._
 import models.UserAnswers.implicits.UserAnswersTryOps
 import uk.gov.hmrc.domain.Nino
@@ -50,15 +51,20 @@ class SharesTransformer @Inject() extends Transformer {
     initialUA: UserAnswers
   )(implicit request: DataRequest[_]): Option[Shares] = {
     val optDidSchemeHoldAnyShares = request.userAnswers.get(DidSchemeHoldAnySharesPage(srn))
-    optDidSchemeHoldAnyShares.map { _ =>
+    if (optDidSchemeHoldAnyShares.nonEmpty || isPrePopulation) {
       val sharesDisposal = request.userAnswers.get(SharesDisposalPage(srn)).getOrElse(false)
-      Shares(
-        recordVersion = Option.when(request.userAnswers.get(shares) == initialUA.get(shares))(
-          request.userAnswers.get(SharesRecordVersionPage(srn)).get
-        ),
-        optShareTransactions = buildOptShareTransactions(srn, sharesDisposal),
-        optTotalValueQuotedShares = buildOptQuotedShares(srn)
+      Some(
+        Shares(
+          recordVersion = Option.when(request.userAnswers.get(shares) == initialUA.get(shares))(
+            request.userAnswers.get(SharesRecordVersionPage(srn)).get
+          ),
+          optDidSchemeHoldAnyShares,
+          optShareTransactions = buildOptShareTransactions(srn, sharesDisposal),
+          optTotalValueQuotedShares = buildOptQuotedShares(srn)
+        )
       )
+    } else {
+      None
     }
   }
 
@@ -89,7 +95,6 @@ class SharesTransformer @Inject() extends Transformer {
                   totalShares <- request.userAnswers.get(HowManySharesPage(srn, index))
                   costOfShares <- request.userAnswers.get(CostOfSharesPage(srn, index))
                   supportedByIndepValuation <- request.userAnswers.get(SharesIndependentValuationPage(srn, index))
-                  totalDividendsOrReceipts <- request.userAnswers.get(SharesTotalIncomePage(srn, index))
                 } yield {
                   val optDateOfAcqOrContrib = Option.when(schemeHoldShare != Transfer)(
                     request.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)).get
@@ -103,6 +108,8 @@ class SharesTransformer @Inject() extends Transformer {
                     Option.when((schemeHoldShare == Acquisition) && (typeOfSharesHeld == SponsoringEmployer))(
                       request.userAnswers.get(TotalAssetValuePage(srn, index)).get
                     )
+
+                  val optTotalDividendsOrReceipts = request.userAnswers.get(SharesTotalIncomePage(srn, index))
 
                   val optAcquisitionRelatedDetails = buildOptAcquisitionRelatedDetails(schemeHoldShare, srn, index)
 
@@ -124,7 +131,7 @@ class SharesTransformer @Inject() extends Transformer {
                       costOfShares = costOfShares.value,
                       supportedByIndepValuation = supportedByIndepValuation,
                       optTotalAssetValue = optTotalAssetValue.map(_.value),
-                      totalDividendsOrReceipts = totalDividendsOrReceipts.value
+                      optTotalDividendsOrReceipts = optTotalDividendsOrReceipts.map(_.value)
                     ),
                     optDisposedSharesTransaction = Option
                       .when(sharesDisposal)(buildOptDisposedSharesTransactions(srn, index))
@@ -446,9 +453,15 @@ class SharesTransformer @Inject() extends Transformer {
     shares: Shares
   ): Try[UserAnswers] = {
 
-    val userAnswersOfShares = userAnswers
-      .set(DidSchemeHoldAnySharesPage(srn), shares.optShareTransactions.isDefined)
-      .set(SharesListPage(srn), shares.optShareTransactions.nonEmpty)
+    val userAnswersOfShares = {
+      Option
+        .when(shares.optDidSchemeHoldAnyShares.nonEmpty)(
+          userAnswers
+            .set(DidSchemeHoldAnySharesPage(srn), shares.optShareTransactions.isDefined)
+            .set(SharesListPage(srn), shares.optShareTransactions.nonEmpty)
+        )
+        .getOrElse(Try(userAnswers))
+    }
 
     val userAnswersWithQuotedShares = shares.optTotalValueQuotedShares.fold(userAnswersOfShares)(
       totalValueQuotedShares => userAnswersOfShares.set(TotalValueQuotedSharesPage(srn), Money(totalValueQuotedShares))
@@ -579,10 +592,9 @@ class SharesTransformer @Inject() extends Transformer {
                   heldSharesTransaction.supportedByIndepValuation
                 )
                 ua19 <- optTotalAssetValue.map(t => ua18.set(t._1, t._2)).getOrElse(Try(ua18))
-                ua20 <- ua19.set(
-                  SharesTotalIncomePage(srn, index),
-                  Money(heldSharesTransaction.totalDividendsOrReceipts)
-                )
+                ua20 <- heldSharesTransaction.optTotalDividendsOrReceipts
+                  .map(t => ua19.set(SharesTotalIncomePage(srn, index), Money(t)))
+                  .getOrElse(Try(ua19))
                 ua21 <- ua20.set(SharesCompleted(srn, index), SectionCompleted)
               } yield {
                 buildOptDisposedShareTransactionUA(

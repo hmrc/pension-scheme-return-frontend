@@ -16,6 +16,7 @@
 
 package transformations
 
+import config.Constants.PREPOPULATION_FLAG
 import play.api.test.FakeRequest
 import org.scalatest.matchers.must.Matchers
 import models.IdentityType.UKCompany
@@ -42,6 +43,11 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
 
   val allowedAccessRequest
     : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequestPrePopulation: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+      .withSession((PREPOPULATION_FLAG, "true"))
+  ).sample.value
+
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
   private val transformer = new SharesTransformer
@@ -64,7 +70,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
 
       val result =
         transformer.transformToEtmp(srn = srn, initialUserAnswer)(DataRequest(allowedAccessRequest, userAnswers))
-      result mustBe Some(Shares(None, None, None))
+      result mustBe Some(Shares(None, Some(false), None, None))
     }
 
     "should return recordVersion when there is no change among UAs" - {
@@ -79,6 +85,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
         result mustBe Some(
           Shares(
             recordVersion = Some("001"),
+            optDidSchemeHoldAnyShares = Some(true),
             optShareTransactions = None,
             optTotalValueQuotedShares = Some(money.value)
           )
@@ -112,6 +119,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
         result mustBe Some(
           Shares(
             recordVersion = Some("001"),
+            Some(true),
             optShareTransactions = Some(
               List(
                 ShareTransaction(
@@ -132,7 +140,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
                     costOfShares = money.value,
                     supportedByIndepValuation = true,
                     optTotalAssetValue = None,
-                    totalDividendsOrReceipts = money.value
+                    optTotalDividendsOrReceipts = Some(money.value)
                   ),
                   optDisposedSharesTransaction = Some(
                     Seq(
@@ -158,6 +166,55 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           )
         )
       }
+      "should return Share Transactions in pre-population" in {
+        val userAnswers = emptyUserAnswers
+          .unsafeSet(SharesRecordVersionPage(srn), "001")
+          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), Unquoted)
+          .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, refineMV(1)), Contribution)
+          .unsafeSet(CompanyNameRelatedSharesPage(srn, refineMV(1)), "nameOfSharesCompany")
+          .unsafeSet(SharesCompanyCrnPage(srn, refineMV(1)), ConditionalYesNo.no[String, Crn]("CRN-No-Reason"))
+          .unsafeSet(ClassOfSharesPage(srn, refineMV(1)), "classOfShares")
+          .unsafeSet(HowManySharesPage(srn, refineMV(1)), 123)
+          .unsafeSet(CostOfSharesPage(srn, refineMV(1)), money)
+          .unsafeSet(SharesIndependentValuationPage(srn, refineMV(1)), true)
+          .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, refineMV(1)), localDate)
+          .unsafeSet(SharesFromConnectedPartyPage(srn, refineMV(1)), false)
+
+        val result = transformer.transformToEtmp(srn = srn, userAnswers)(DataRequest(allowedAccessRequestPrePopulation, userAnswers))
+        result mustBe Some(
+          Shares(
+            recordVersion = Some("001"),
+            optDidSchemeHoldAnyShares = None,
+            optShareTransactions = Some(
+              List(
+                ShareTransaction(
+                  typeOfSharesHeld = Unquoted,
+                  shareIdentification = ShareIdentification(
+                    nameOfSharesCompany = "nameOfSharesCompany",
+                    optCrnNumber = None,
+                    optReasonNoCRN = Some("CRN-No-Reason"),
+                    classOfShares = "classOfShares"
+                  ),
+                  heldSharesTransaction = HeldSharesTransaction(
+                    schemeHoldShare = Contribution,
+                    optDateOfAcqOrContrib = Some(localDate),
+                    totalShares = 123,
+                    optAcquiredFromName = None,
+                    optPropertyAcquiredFrom = None,
+                    optConnectedPartyStatus = Some(false),
+                    costOfShares = money.value,
+                    supportedByIndepValuation = true,
+                    optTotalAssetValue = None,
+                    optTotalDividendsOrReceipts = None
+                  ),
+                  optDisposedSharesTransaction = None
+                )
+              )
+            ),
+            optTotalValueQuotedShares = None
+          )
+        )
+      }
     }
   }
 
@@ -167,7 +224,12 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
       val result = transformer.transformFromEtmp(
         userAnswers,
         srn,
-        Shares(recordVersion = Some("001"), optShareTransactions = None, optTotalValueQuotedShares = None)
+        Shares(
+          recordVersion = Some("001"),
+          optDidSchemeHoldAnyShares = None,
+          optShareTransactions = None,
+          optTotalValueQuotedShares = None
+        )
       )
       result.fold(
         ex => fail(ex.getMessage),
@@ -182,6 +244,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
         srn,
         Shares(
           recordVersion = Some("001"),
+          optDidSchemeHoldAnyShares = Some(true),
           optShareTransactions = Some(
             List(
               ShareTransaction(
@@ -203,7 +266,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
                   costOfShares = money.value,
                   supportedByIndepValuation = true,
                   optTotalAssetValue = Some(money.value),
-                  totalDividendsOrReceipts = money.value
+                  optTotalDividendsOrReceipts = Some(money.value)
                 ),
                 optDisposedSharesTransaction = Some(
                   List(
@@ -263,7 +326,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
                   costOfShares = money.value,
                   supportedByIndepValuation = true,
                   optTotalAssetValue = None,
-                  totalDividendsOrReceipts = money.value
+                  optTotalDividendsOrReceipts = Some(money.value)
                 ),
                 optDisposedSharesTransaction = Some(
                   List(
@@ -302,7 +365,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
                   costOfShares = money.value,
                   supportedByIndepValuation = false,
                   optTotalAssetValue = None,
-                  totalDividendsOrReceipts = money.value
+                  optTotalDividendsOrReceipts = Some(money.value)
                 ),
                 optDisposedSharesTransaction = None
               )
@@ -413,6 +476,106 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           userAnswers.get(TotalAssetValuePage(srn, refineMV(3))) mustBe None
           userAnswers.get(SharesTotalIncomePage(srn, refineMV(3))) mustBe Some(money)
           userAnswers.get(TotalValueQuotedSharesPage(srn)) mustBe Some(money)
+        }
+      )
+    }
+    "when it is pre-population" in {
+
+      val result = transformer.transformFromEtmp(
+        emptyUserAnswers,
+        srn,
+        Shares(
+          recordVersion = Some("001"),
+          optDidSchemeHoldAnyShares = None,
+          optShareTransactions = Some(
+            List(
+              ShareTransaction(
+                typeOfSharesHeld = SponsoringEmployer,
+                shareIdentification = ShareIdentification(
+                  nameOfSharesCompany = "nameOfSharesCompany",
+                  optCrnNumber = None,
+                  optReasonNoCRN = Some("optReasonNoCRN"),
+                  classOfShares = "classOfShares"
+                ),
+                heldSharesTransaction = HeldSharesTransaction(
+                  schemeHoldShare = SchemeHoldShare.Acquisition,
+                  optDateOfAcqOrContrib = Some(localDate),
+                  totalShares = totalShares,
+                  optAcquiredFromName = Some("optAcquiredFromName"),
+                  optPropertyAcquiredFrom =
+                    Some(PropertyAcquiredFrom(IdentityType.Individual, None, Some(noninoReason), None)),
+                  optConnectedPartyStatus = None,
+                  costOfShares = money.value,
+                  supportedByIndepValuation = true,
+                  optTotalAssetValue = Some(money.value),
+                  optTotalDividendsOrReceipts = None
+                ),
+                optDisposedSharesTransaction = None
+              ),
+              ShareTransaction(
+                typeOfSharesHeld = TypeOfShares.Unquoted,
+                shareIdentification = ShareIdentification(
+                  nameOfSharesCompany = "nameOfSharesCompany",
+                  optCrnNumber = None,
+                  optReasonNoCRN = Some("optReasonNoCRN"),
+                  classOfShares = "classOfShares"
+                ),
+                heldSharesTransaction = HeldSharesTransaction(
+                  schemeHoldShare = SchemeHoldShare.Contribution,
+                  optDateOfAcqOrContrib = Some(localDate),
+                  totalShares = totalShares,
+                  optAcquiredFromName = None,
+                  optPropertyAcquiredFrom = None,
+                  optConnectedPartyStatus = Some(true),
+                  costOfShares = money.value,
+                  supportedByIndepValuation = true,
+                  optTotalAssetValue = None,
+                  optTotalDividendsOrReceipts = None
+                ),
+                optDisposedSharesTransaction = None
+              ),
+              ShareTransaction(
+                typeOfSharesHeld = TypeOfShares.ConnectedParty,
+                shareIdentification = ShareIdentification(
+                  nameOfSharesCompany = "nameOfSharesCompany",
+                  optCrnNumber = None,
+                  optReasonNoCRN = Some("optReasonNoCRN"),
+                  classOfShares = "classOfShares"
+                ),
+                heldSharesTransaction = HeldSharesTransaction(
+                  schemeHoldShare = SchemeHoldShare.Transfer,
+                  optDateOfAcqOrContrib = None,
+                  totalShares = totalShares,
+                  optAcquiredFromName = None,
+                  optPropertyAcquiredFrom = None,
+                  optConnectedPartyStatus = None,
+                  costOfShares = money.value,
+                  supportedByIndepValuation = false,
+                  optTotalAssetValue = None,
+                  optTotalDividendsOrReceipts = None
+                ),
+                optDisposedSharesTransaction = None
+              )
+            )
+          ),
+          optTotalValueQuotedShares = None
+        )
+      )
+
+      result.fold(
+        ex => fail(ex.getMessage + "\n" + ex.getStackTrace.mkString("\n")),
+        userAnswers => {
+          userAnswers.get(SharesRecordVersionPage(srn)) mustBe Some("001")
+          userAnswers.get(DidSchemeHoldAnySharesPage(srn)) mustBe None
+
+          // share-index-1
+          userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe None
+
+          // share-index-2
+          userAnswers.get(SharesTotalIncomePage(srn, refineMV(2))) mustBe None
+
+          // share-index-3
+          userAnswers.get(SharesTotalIncomePage(srn, refineMV(3))) mustBe None
         }
       )
     }

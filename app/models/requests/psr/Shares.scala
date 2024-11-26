@@ -23,6 +23,7 @@ import java.time.LocalDate
 
 case class Shares(
   recordVersion: Option[String],
+  optDidSchemeHoldAnyShares: Option[Boolean],
   optShareTransactions: Option[List[ShareTransaction]],
   optTotalValueQuotedShares: Option[Double]
 )
@@ -51,7 +52,7 @@ case class HeldSharesTransaction(
   costOfShares: Double,
   supportedByIndepValuation: Boolean,
   optTotalAssetValue: Option[Double],
-  totalDividendsOrReceipts: Double
+  optTotalDividendsOrReceipts: Option[Double]
 )
 
 case class DisposedSharesTransaction(
