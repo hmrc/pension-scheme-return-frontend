@@ -174,7 +174,7 @@ object TransferReceivedMemberListController {
               membersWithTransfers.transferFullName
             ),
             TableElem(
-              Message("transferIn.MemberList.status.no.transfer")
+              Message("transferIn.MemberList.status.no.transfers")
             ),
             if (mode != ViewOnlyMode) {
               TableElem.add(
