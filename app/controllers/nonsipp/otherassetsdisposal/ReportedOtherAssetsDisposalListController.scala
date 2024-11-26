@@ -279,6 +279,7 @@ class ReportedOtherAssetsDisposalListController @Inject()(
           key -> secondaryMap.filter { case (_, status) => status.completed }
       }
       .toList
+      .sortBy(_._1)
       .traverse {
         case (key, sectionCompleted) =>
           for {
@@ -313,52 +314,49 @@ object ReportedOtherAssetsDisposalListController {
         )
       )
     } else {
-      disposals
-        .flatMap {
-          case (otherAssetsIndex, disposalIndexes) =>
-            disposalIndexes.map { disposalIndex =>
-              val otherAssetsDisposalData = OtherAssetsDisposalData(
-                otherAssetsIndex,
-                disposalIndex,
-                userAnswers.get(WhatIsOtherAssetPage(srn, otherAssetsIndex)).get,
-                userAnswers.get(HowWasAssetDisposedOfPage(srn, otherAssetsIndex, disposalIndex)).get
-              )
+      disposals.flatMap {
+        case (otherAssetsIndex, disposalIndexes) =>
+          disposalIndexes.sortBy(_.value).map { disposalIndex =>
+            val otherAssetsDisposalData = OtherAssetsDisposalData(
+              otherAssetsIndex,
+              disposalIndex,
+              userAnswers.get(WhatIsOtherAssetPage(srn, otherAssetsIndex)).get,
+              userAnswers.get(HowWasAssetDisposedOfPage(srn, otherAssetsIndex, disposalIndex)).get
+            )
 
-              (mode, viewOnlyViewModel) match {
-                case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
-                  ListRow.view(
-                    buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
-                    routes.AssetDisposalCYAController
-                      .onPageLoadViewOnly(srn, otherAssetsIndex, disposalIndex, year, currentVersion, previousVersion)
-                      .url,
-                    buildMessage(
-                      "assetDisposal.reportedOtherAssetsDisposalList.row.view.hidden",
-                      otherAssetsDisposalData
-                    )
+            (mode, viewOnlyViewModel) match {
+              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
+                ListRow.view(
+                  buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
+                  routes.AssetDisposalCYAController
+                    .onPageLoadViewOnly(srn, otherAssetsIndex, disposalIndex, year, currentVersion, previousVersion)
+                    .url,
+                  buildMessage(
+                    "assetDisposal.reportedOtherAssetsDisposalList.row.view.hidden",
+                    otherAssetsDisposalData
                   )
-                case (_, _) =>
-                  ListRow(
-                    buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
-                    changeUrl = routes.AssetDisposalCYAController
-                      .onPageLoad(srn, otherAssetsIndex, disposalIndex, CheckMode)
-                      .url,
-                    changeHiddenText = buildMessage(
-                      "assetDisposal.reportedOtherAssetsDisposalList.row.change.hidden",
-                      otherAssetsDisposalData
-                    ),
-                    removeUrl = routes.RemoveAssetDisposalController
-                      .onPageLoad(srn, otherAssetsIndex, disposalIndex)
-                      .url,
-                    removeHiddenText = buildMessage(
-                      "assetDisposal.reportedOtherAssetsDisposalList.row.remove.hidden",
-                      otherAssetsDisposalData
-                    )
+                )
+              case (_, _) =>
+                ListRow(
+                  buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
+                  changeUrl = routes.AssetDisposalCYAController
+                    .onPageLoad(srn, otherAssetsIndex, disposalIndex, CheckMode)
+                    .url,
+                  changeHiddenText = buildMessage(
+                    "assetDisposal.reportedOtherAssetsDisposalList.row.change.hidden",
+                    otherAssetsDisposalData
+                  ),
+                  removeUrl = routes.RemoveAssetDisposalController
+                    .onPageLoad(srn, otherAssetsIndex, disposalIndex)
+                    .url,
+                  removeHiddenText = buildMessage(
+                    "assetDisposal.reportedOtherAssetsDisposalList.row.remove.hidden",
+                    otherAssetsDisposalData
                   )
-              }
+                )
             }
-        }
-        .toList
-        .sortBy(_.change.fold("")(_.url))
+          }
+      }.toList
     }
 
   private def getOtherAssetsDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(

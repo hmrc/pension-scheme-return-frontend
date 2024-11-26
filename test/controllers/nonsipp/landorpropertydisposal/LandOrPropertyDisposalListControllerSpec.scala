@@ -63,13 +63,15 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
   private val address1 = addressGen.sample.value
 
   private val addressesWithIndexes: List[((Max5000, List[Max50]), Address)] = List(
-    refineMV[Max5000.Refined](1) -> List(refineMV[Max50.Refined](1)) -> address1
+    refineMV[Max5000.Refined](1) -> List(refineMV[Max50.Refined](1), refineMV[Max50.Refined](2)) -> address1
   )
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(2)), SectionCompleted)
     .unsafeSet(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1)), SectionCompleted)
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(1)), address1)
+    .unsafeSet(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(2)), HowDisposed.Transferred)
     .unsafeSet(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
     .unsafeSet(LandOrPropertyDisposalPage(srn), true)
 
@@ -84,7 +86,7 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
             NormalMode,
             page = 1,
             addressesWithIndexes,
-            numberOfDisposals = 1,
+            numberOfDisposals = 2,
             maxPossibleNumberOfDisposals = 50,
             userAnswers,
             schemeName,
@@ -131,7 +133,7 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
                 ViewOnlyMode,
                 page = 1,
                 addressesWithIndexes,
-                numberOfDisposals = 1,
+                numberOfDisposals = 2,
                 maxPossibleNumberOfDisposals = 50,
                 userAnswers,
                 schemeName,
@@ -161,7 +163,7 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
               ViewOnlyMode,
               page = 1,
               addressesWithIndexes,
-              numberOfDisposals = 1,
+              numberOfDisposals = 2,
               maxPossibleNumberOfDisposals = 50,
               userAnswers,
               schemeName,
@@ -195,7 +197,7 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
               ViewOnlyMode,
               page = 1,
               addressesWithIndexes,
-              numberOfDisposals = 1,
+              numberOfDisposals = 2,
               maxPossibleNumberOfDisposals = 50,
               userAnswers,
               schemeName,
