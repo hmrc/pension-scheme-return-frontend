@@ -165,16 +165,16 @@ object TransferReceivedMemberListController {
   ): List[List[TableElem]] =
     membersWithTransfers
       .map { membersWithTransfers =>
-        val noContributions = membersWithTransfers.receive.isEmpty
-        val onlyInProgressContributions = membersWithTransfers.receive.forall(_.status.inProgress)
+        val noTransfers = membersWithTransfers.receive.isEmpty
+        val onlyInProgressTransfers = membersWithTransfers.receive.forall(_.status.inProgress)
 
-        if (noContributions || onlyInProgressContributions) {
+        if (noTransfers || onlyInProgressTransfers) {
           List(
             TableElem(
               membersWithTransfers.transferFullName
             ),
             TableElem(
-              Message("transferIn.MemberList.status.no.contributions")
+              Message("transferIn.MemberList.status.no.transfer")
             ),
             if (mode != ViewOnlyMode) {
               TableElem.add(
@@ -204,12 +204,12 @@ object TransferReceivedMemberListController {
             TableElem(
               if (membersWithTransfers.receive.size == 1) {
                 Message(
-                  "transferIn.MemberList.singleStatus.some.contribution",
+                  "transferIn.MemberList.singleStatus.some.transfer",
                   membersWithTransfers.receive.size
                 )
               } else {
                 Message(
-                  "transferIn.MemberList.status.some.contributions",
+                  "transferIn.MemberList.status.some.transfers",
                   membersWithTransfers.receive.count(_.status.completed)
                 )
               }
