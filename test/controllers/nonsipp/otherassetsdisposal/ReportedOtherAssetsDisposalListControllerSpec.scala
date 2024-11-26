@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsdisposal
 import services.PsrSubmissionService
 import pages.nonsipp.otherassetsdisposal._
 import views.html.ListView
+import config.Constants.{maxDisposalPerOtherAsset, maxOtherAssetsTransactions}
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController._
 import forms.YesNoPageFormProvider
@@ -75,8 +76,6 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
   private val howOtherAssetsDisposedThree = Other(otherDetails)
 
   private val disposalIndexes = List(disposalIndexOne, disposalIndexTwo)
-  private val otherAssetsDisposalsWithIndexes =
-    Map((otherAssetIndexOne, disposalIndexes), (otherAssetIndexTwo, disposalIndexes))
 
   private val completedUserAnswers = defaultUserAnswers
   // Other Assets #1
@@ -112,6 +111,24 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
     inject.bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
+  private val otherAssetsDisposalsWithIndexes: List[((Max5000, List[Max50]), SectionCompleted)] = List(
+    ((otherAssetIndexOne, disposalIndexes), SectionCompleted),
+    ((otherAssetIndexTwo, disposalIndexes), SectionCompleted)
+  )
+  private val numberOfDisposals = otherAssetsDisposalsWithIndexes.map {
+    case ((_, disposalIndexes), _) =>
+      disposalIndexes.size
+  }.sum
+
+  private val numberOfOtherAssetsItems = otherAssetsDisposalsWithIndexes.size
+
+  private val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
+
+  private val allAssetsFullyDisposed = false
+
+  private val maximumDisposalsReached = numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset ||
+    numberOfDisposals >= maxPossibleNumberOfDisposals || allAssetsFullyDisposed
+
   "ReportedOtherAssetsDisposalListController" - {
 
     act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
@@ -122,10 +139,14 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
           NormalMode,
           page,
           otherAssetsDisposalsWithIndexes,
+          numberOfDisposals,
+          maxPossibleNumberOfDisposals,
           completedUserAnswers,
           schemeName,
           viewOnlyViewModel = None,
-          showBackLink = true
+          showBackLink = true,
+          maximumDisposalsReached = maximumDisposalsReached,
+          allAssetsFullyDisposed = allAssetsFullyDisposed
         )
       )
     }.withName("Completed Journey"))
@@ -184,10 +205,14 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               page,
               otherAssetsDisposalsWithIndexes,
+              numberOfDisposals,
+              maxPossibleNumberOfDisposals,
               completedUserAnswers,
               schemeName,
-              viewOnlyViewModel = Some(viewOnlyViewModel),
-              showBackLink = true
+              viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = false)),
+              showBackLink = true,
+              maximumDisposalsReached = maximumDisposalsReached,
+              allAssetsFullyDisposed = allAssetsFullyDisposed
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
@@ -206,10 +231,14 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
               mode = ViewOnlyMode,
               page,
               otherAssetsDisposalsWithIndexes,
-              updatedUserAnswers,
+              numberOfDisposals,
+              maxPossibleNumberOfDisposals,
+              completedUserAnswers,
               schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-              showBackLink = true
+              showBackLink = true,
+              maximumDisposalsReached = maximumDisposalsReached,
+              allAssetsFullyDisposed = allAssetsFullyDisposed
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -227,11 +256,15 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
             srn,
             mode = ViewOnlyMode,
             page,
-            Map(),
+            List.empty,
+            numberOfDisposals = 0,
+            maxPossibleNumberOfDisposals,
             noDisposalsUserAnswers,
             schemeName,
             viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-            showBackLink = true
+            showBackLink = true,
+            maximumDisposalsReached = false,
+            allAssetsFullyDisposed = false
           )
         )
       }.withName("OnPageLoadViewOnly renders ok with no disposals")
@@ -261,6 +294,8 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
             mode = ViewOnlyMode,
             page,
             otherAssetsDisposalsWithIndexes,
+            numberOfDisposals,
+            maxPossibleNumberOfDisposals,
             completedUserAnswers,
             schemeName,
             viewOnlyViewModel = Some(
@@ -269,7 +304,9 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
                 previousVersion = submissionNumberZero
               )
             ),
-            showBackLink = false
+            showBackLink = false,
+            maximumDisposalsReached = maximumDisposalsReached,
+            allAssetsFullyDisposed = allAssetsFullyDisposed
           )
         )
       }.withName(
