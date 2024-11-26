@@ -20,6 +20,8 @@ import pages.QuestionPage
 import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
 import play.api.libs.json.{__, JsPath}
+import pages.nonsipp.common._
+import models.IdentitySubject.SharesSeller
 
 package object shares {
 
@@ -50,7 +52,11 @@ package object shares {
       TypeOfSharesHeldPage(srn, index),
       WhenDidSchemeAcquireSharesPage(srn, index),
       WhyDoesSchemeHoldSharesPage(srn, index),
-      SharesCompleted(srn, index)
+      SharesCompleted(srn, index),
+      IdentityTypePage(srn, index, SharesSeller),
+      CompanyRecipientCrnPage(srn, index, SharesSeller),
+      OtherRecipientDetailsPage(srn, index, SharesSeller),
+      PartnershipRecipientUtrPage(srn, index, SharesSeller)
     )
     if (isLastRecord) list :+ DidSchemeHoldAnySharesPage(srn) else list
   }

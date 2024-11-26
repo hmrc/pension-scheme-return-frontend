@@ -55,9 +55,11 @@ class SharesTransformer @Inject() extends Transformer {
       val sharesDisposal = request.userAnswers.get(SharesDisposalPage(srn)).getOrElse(false)
       Some(
         Shares(
-          recordVersion = Option.when(request.userAnswers.get(shares) == initialUA.get(shares))(
-            request.userAnswers.get(SharesRecordVersionPage(srn)).get
-          ),
+          recordVersion = Option
+            .when(request.userAnswers.get(shares) == initialUA.get(shares))(
+              request.userAnswers.get(SharesRecordVersionPage(srn))
+            )
+            .flatten,
           optDidSchemeHoldAnyShares,
           optShareTransactions = buildOptShareTransactions(srn, sharesDisposal),
           optTotalValueQuotedShares = buildOptQuotedShares(srn)
