@@ -23,7 +23,8 @@ case class ListRow(
   text: DisplayMessage,
   change: Option[ListRowLink],
   remove: Option[ListRowLink],
-  view: Option[ViewOnlyLink]
+  view: Option[ViewOnlyLink],
+  check: Option[ListRowLink]
 )
 
 sealed trait ViewOnlyLink
@@ -42,7 +43,8 @@ object ListRow {
     text,
     change = Some(ListRowLink(changeUrl, changeHiddenText)),
     remove = Some(ListRowLink(removeUrl, removeHiddenText)),
-    view = None
+    view = None,
+    check = None
   )
 
   def view(text: DisplayMessage, url: String, hiddenText: Message): ListRow =
@@ -50,7 +52,8 @@ object ListRow {
       text,
       change = None,
       remove = None,
-      view = Some(ListRowLink(url, hiddenText))
+      view = Some(ListRowLink(url, hiddenText)),
+      check = None
     )
 
   def viewNoLink(text: DisplayMessage, value: DisplayMessage): ListRow =
@@ -58,13 +61,32 @@ object ListRow {
       text,
       change = None,
       remove = None,
-      view = Some(ListRowNoLink(value))
+      view = Some(ListRowNoLink(value)),
+      check = None
     )
+
+  def check(text: DisplayMessage, url: String, hiddenText: Message): ListRow =
+    ListRow(
+      text,
+      change = None,
+      remove = None,
+      view = None,
+      check = Some(ListRowLink(url, hiddenText))
+    )
+}
+
+case class ListSection(
+  heading: Option[DisplayMessage],
+  rows: List[ListRow]
+)
+
+object ListSection {
+  def apply(rows: List[ListRow]): ListSection = ListSection(None, rows)
 }
 
 case class ListViewModel(
   inset: DisplayMessage,
-  rows: List[ListRow],
+  sections: List[ListSection],
   radioText: Message,
   // whether to render the radio buttons to add another entity to the list or continue
   showRadios: Boolean = true,

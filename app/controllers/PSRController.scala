@@ -19,10 +19,7 @@ package controllers
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import play.api.mvc.Result
-import org.slf4j.{Logger, LoggerFactory}
 import config.RefinedTypes._
-import play.api.libs.json.{Reads, Writes}
-import models.backend.responses.{IndividualDetails, PsrVersionsResponse}
 import pages.nonsipp.membersurrenderedbenefits.{
   SurrenderedBenefitsAmountPage,
   WhenDidMemberSurrenderBenefitsPage,
@@ -45,6 +42,10 @@ import models.requests.psr._
 import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
 import cats.syntax.either._
 import eu.timepit.refined.refineV
+import play.api.Logger
+import play.api.libs.json.{Reads, Writes}
+import utils.nonsipp.PrePopulationUtils
+import models.backend.responses.{IndividualDetails, PsrVersionsResponse}
 import pages.nonsipp.membertransferout._
 import play.api.i18n.I18nSupport
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -55,9 +56,9 @@ import scala.util.Try
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-abstract class PSRController extends FrontendBaseController with I18nSupport {
+abstract class PSRController extends FrontendBaseController with I18nSupport with PrePopulationUtils {
 
-  private val logger = LoggerFactory.getLogger("PSRController")
+  private val logger = Logger("PSRController")
 
   implicit def requestToUserAnswers(implicit req: DataRequest[_]): UserAnswers = req.userAnswers
 
@@ -119,6 +120,14 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
         }
     }
 
+  implicit class EitherOps[A](maybe: Either[String, A]) {
+    def getOrRecoverJourney(implicit logger: Logger): Either[Result, A] =
+      maybe.leftMap { errMsg =>
+        logger.warn(errMsg)
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+  }
+
   implicit class OptionOps[A](maybe: Option[A]) {
     def getOrRecoverJourney[F[_]: Applicative](f: A => F[Result]): F[Result] = maybe match {
       case Some(value) => f(value)
@@ -151,24 +160,11 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
     }
   }
 
-  implicit class EitherOps[A](maybe: Either[String, A]) {
-    def getOrRecoverJourney(implicit logger: Logger): Either[Result, A] =
-      maybe.leftMap { errMsg =>
-        logger.warn(errMsg)
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
-  }
-
   implicit class FutureOps[A](f: Future[A]) {
     def liftF(implicit ec: ExecutionContext): EitherT[Future, Result, A] = EitherT.liftF(f)
   }
 
   implicit class ListIndexOps[A](l: List[A]) {
-    def zipWithIndexToMap: Map[String, A] =
-      l.zipWithIndex
-        .map(t => t._2.toString -> t._1)
-        .toMap
-
     def zipWithRefinedIndex[I: Validate[Int, *]]: Either[Result, List[(Refined[Int, I], A)]] =
       l.zipWithIndex.traverse { case (a, index) => refineIndex(index).map(_ -> a).getOrRecoverJourney }
   }

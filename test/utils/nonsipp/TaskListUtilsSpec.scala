@@ -143,7 +143,8 @@ class TaskListUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with
         psaIdGen.sample.value,
         Some(previousUA),
         Some(currentUA),
-        dateRange.from
+        dateRange.from,
+        isPrePop = false
       )
       sectionList.size mustBe 9
       sectionList.reverse.head.items.fold(
@@ -167,7 +168,8 @@ class TaskListUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with
         psaIdGen.sample.value,
         Some(previousUA),
         Some(currentUA),
-        dateRange.from
+        dateRange.from,
+        isPrePop = false
       )
       sectionList.size mustBe 9
       sectionList.reverse.head.items.fold(
@@ -187,7 +189,8 @@ class TaskListUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with
         pspIdGen.sample.value,
         Some(previousUA),
         Some(currentUA),
-        dateRange.from
+        dateRange.from,
+        isPrePop = false
       )
       sectionList.size mustBe 9
       sectionList.reverse.head.items.fold(
@@ -208,7 +211,8 @@ class TaskListUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with
         psaIdGen.sample.value,
         Some(previousUA),
         Some(currentUA),
-        dateRange.from
+        dateRange.from,
+        isPrePop = false
       )
       sectionList.size mustBe 9
       sectionList.reverse.head.items.fold(
@@ -218,7 +222,16 @@ class TaskListUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with
     }
     "should return submit declaration link if there is no history" in {
       val sectionList =
-        getSectionList(srn, schemeName, currentUA, psaIdGen.sample.value, None, Some(currentUA), dateRange.from)
+        getSectionList(
+          srn,
+          schemeName,
+          currentUA,
+          psaIdGen.sample.value,
+          None,
+          Some(currentUA),
+          dateRange.from,
+          isPrePop = false
+        )
       sectionList.size mustBe 9
       sectionList.reverse.head.items.fold(
         message =>

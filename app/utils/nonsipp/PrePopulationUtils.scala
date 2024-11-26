@@ -19,7 +19,9 @@ package utils.nonsipp
 import config.Constants.PREPOPULATION_FLAG
 import models.requests.DataRequest
 
-object PrePopulationUtils {
+object PrePopulationUtils extends PrePopulationUtils
+
+trait PrePopulationUtils {
 
   def isPrePopulation(implicit request: DataRequest[_]): Boolean =
     request.session.get(PREPOPULATION_FLAG).fold(false)(_.toBoolean)

@@ -323,7 +323,7 @@ object BorrowInstancesListController {
       description = Some(ParagraphMessage("borrowList.description")),
       page = ListViewModel(
         inset = "borrowList.inset",
-        rows(srn, mode, borrowingInstances, viewOnlyViewModel, schemeName),
+        sections = List(ListSection(rows(srn, mode, borrowingInstances, viewOnlyViewModel, schemeName))),
         Message("borrowList.radios"),
         showRadios = borrowingInstances.size < Constants.maxBorrows,
         paginatedViewModel = Some(

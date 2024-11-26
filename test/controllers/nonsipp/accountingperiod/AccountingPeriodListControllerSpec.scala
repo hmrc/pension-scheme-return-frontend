@@ -73,7 +73,7 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
 
       forAll(srnGen, rowsGen, modeGen) { (srn, rows, mode) =>
         val viewModel = AccountingPeriodListController.viewModel(srn, mode, rows)
-        viewModel.page.rows.length mustBe rows.length
+        viewModel.page.sections.map(_.rows.size).sum mustBe rows.length
       }
     }
 
@@ -82,7 +82,7 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
 
       forAll(srnGen, rowsGen, modeGen) { (srn, rows, mode) =>
         val viewModel = AccountingPeriodListController.viewModel(srn, mode, rows)
-        viewModel.page.rows.length must be <= 3
+        viewModel.page.sections.length must be <= 3
       }
     }
   }

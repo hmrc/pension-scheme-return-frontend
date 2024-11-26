@@ -330,7 +330,7 @@ object LoansListController {
       description = description,
       page = ListViewModel(
         inset = "loansList.inset",
-        rows(srn, mode, recipients, viewOnlyViewModel, schemeName),
+        sections = List(ListSection(rows(srn, mode, recipients, viewOnlyViewModel, schemeName))),
         Message("loansList.radios"),
         showRadios = recipients.length < Constants.maxLoans,
         paginatedViewModel = Some(

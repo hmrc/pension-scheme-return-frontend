@@ -468,7 +468,8 @@ object ReportBondsDisposalListController {
       description = description,
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows(srn, mode, bondsDisposalsWithIndexes, userAnswers, viewOnlyViewModel, schemeName),
+        sections =
+          List(ListSection(rows(srn, mode, bondsDisposalsWithIndexes, userAnswers, viewOnlyViewModel, schemeName))),
         Message("bondsDisposal.reportBondsDisposalList.radios"),
         showRadios = showRadios,
         paginatedViewModel = Some(

@@ -26,6 +26,8 @@ import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models._
+import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
+import models.IdentitySubject.LandOrPropertySeller
 import viewmodels.models.SectionCompleted
 import eu.timepit.refined.api.Refined
 import org.mockito.ArgumentMatchers.any
@@ -36,11 +38,20 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
 
   val indexOne: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
   val indexTwo: Refined[Int, OneTo5000] = refineMV[OneTo5000](2)
+  val indexThree: Refined[Int, OneTo5000] = refineMV[OneTo5000](3)
 
-  private val address1 = addressGen.sample.value
-  private val address2 = addressGen.sample.value
+  private val address1 = addressGen.sample.value.copy(addressLine1 = "test 1")
+  private val address2 = addressGen.sample.value.copy(addressLine1 = "test 2")
+  private val address3 = addressGen.sample.value.copy(addressLine1 = "test 3")
 
-  private val addresses = Map("0" -> address1, "1" -> address2)
+  private val addresses = Map(
+    indexOne -> address1,
+    indexTwo -> address2
+  )
+
+  private val addressesToCheck = Map(
+    indexThree -> address3
+  )
 
   private val completedUserAnswers = defaultUserAnswers
     .unsafeSet(LandPropertyInUKPage(srn, indexOne), true)
@@ -68,6 +79,15 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, indexTwo), money)
     .unsafeSet(RemovePropertyPage(srn, indexTwo), true)
     .unsafeSet(LandOrPropertyHeldPage(srn), true)
+
+  private val completedUserAnswersToCheck = completedUserAnswers
+    .unsafeSet(LandPropertyInUKPage(srn, indexThree), true)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, indexThree), address3)
+    .unsafeSet(LandRegistryTitleNumberPage(srn, indexThree), ConditionalYesNo.yes[String, String]("some-number"))
+    .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, indexThree), SchemeHoldLandProperty.Transfer)
+    .unsafeSet(LandOrPropertyTotalCostPage(srn, indexThree), money)
+    .unsafeSet(IdentityTypePage(srn, indexThree, LandOrPropertySeller), IdentityType.Other)
+    .unsafeSet(OtherRecipientDetailsPage(srn, indexThree, LandOrPropertySeller), otherRecipientDetails)
 
   private val noUserAnswers = defaultUserAnswers
     .unsafeSet(LandOrPropertyHeldPage(srn), false)
@@ -111,11 +131,29 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
           1,
           NormalMode,
           addresses,
+          Map.empty,
           schemeName,
-          showBackLink = true
+          showBackLink = true,
+          isPrePop = false
         )
       )
     }.withName("Completed Journey"))
+
+    act.like(renderViewWithPrePopSession(onPageLoad, completedUserAnswersToCheck) { implicit app => implicit request =>
+      injected[ListView].apply(
+        form(new YesNoPageFormProvider()),
+        viewModel(
+          srn,
+          page = 1,
+          NormalMode,
+          addresses,
+          addressesToCheck,
+          schemeName,
+          showBackLink = true,
+          isPrePop = true
+        )
+      )
+    }.withName("Completed PrePop Journey"))
 
     act.like(
       redirectToPage(
@@ -167,9 +205,11 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
               page,
               mode = ViewOnlyMode,
               addresses,
+              Map.empty,
               schemeName,
               Some(viewOnlyViewModel),
-              showBackLink = true
+              showBackLink = true,
+              isPrePop = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -188,9 +228,11 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
               page,
               mode = ViewOnlyMode,
               addresses,
+              Map.empty,
               schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-              showBackLink = true
+              showBackLink = true,
+              isPrePop = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -208,10 +250,12 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
             srn,
             page,
             mode = ViewOnlyMode,
-            Map(),
+            Map.empty,
+            Map.empty,
             schemeName,
             viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-            showBackLink = true
+            showBackLink = true,
+            isPrePop = false
           )
         )
       }.withName("OnPageLoadViewOnly renders ok with no land or property")
@@ -240,6 +284,7 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
           page,
           mode = ViewOnlyMode,
           addresses,
+          Map.empty,
           schemeName,
           Some(
             viewOnlyViewModel.copy(
@@ -247,7 +292,8 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
               previousVersion = (submissionNumberOne - 1).max(0)
             )
           ),
-          showBackLink = false
+          showBackLink = false,
+          isPrePop = false
         )
       )
     }.withName("OnPreviousViewOnly renders the view correctly")

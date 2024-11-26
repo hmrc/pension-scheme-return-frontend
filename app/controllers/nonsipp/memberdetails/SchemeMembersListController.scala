@@ -308,7 +308,7 @@ object SchemeMembersListController {
         .when(lengthOfFilteredMembers < Constants.maxSchemeMembers)(ParagraphMessage("schemeMembersList.paragraph")),
       page = ListViewModel(
         inset = "schemeMembersList.inset",
-        rows,
+        sections = List(ListSection(rows)),
         radioText,
         showInsetWithRadios = !mode.isViewOnlyMode && lengthOfFilteredMembers == Constants.maxSchemeMembers,
         paginatedViewModel = Some(

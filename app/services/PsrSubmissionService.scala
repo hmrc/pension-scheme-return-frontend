@@ -224,7 +224,8 @@ class PsrSubmissionService @Inject()(
                 req.pensionSchemeId,
                 req.previousUserAnswers,
                 req.pureUserAnswers,
-                taxYear.from
+                taxYear.from,
+                isPrePopulation
               ),
               messagesApi
             ).list

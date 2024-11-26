@@ -17,17 +17,18 @@
 package pages.nonsipp.memberdetails
 
 import utils.RefinedUtils.RefinedIntOps
-import pages.nonsipp.employercontributions.{Paths => _}
 import pages.{IndexedQuestionPage, QuestionPage}
 import config.RefinedTypes.Max300
 import models.SchemeId.Srn
+import pages.nonsipp.receivetransfer.{Paths => _}
+import cats.syntax.bifunctor._
 import play.api.libs.json.JsPath
 import pages.nonsipp.membersurrenderedbenefits.{Paths => _}
 import models.{NameDOB, UserAnswers}
 import pages.nonsipp.membertransferout.{Paths => _}
 import utils.MapUtils.UserAnswersMapOps
-import cats.implicits.toTraverseOps
-import pages.nonsipp.receivetransfer.{Paths => _}
+import cats.syntax.traverse._
+import pages.nonsipp.employercontributions.{Paths => _}
 
 case class MemberDetailsPage(srn: Srn, index: Max300) extends QuestionPage[NameDOB] {
 
@@ -67,9 +68,9 @@ object MembersDetailsPage {
     def completedMembersDetails(srn: Srn): Either[String, List[(Max300, NameDOB)]] =
       ua.map(MembersDetailsCompletedPages(srn))
         .refine[Max300.Refined]
-        .toRight("Error when refining completed members indexes")
+        .leftMap("Error when refining completed members indexes - " + _)
         .flatMap {
-          _.traverse { index =>
+          _.keys.toList.traverse { index =>
             ua.get(MemberDetailsPage(srn, index))
               .toRight(s"Error when fetching member details page with completed index $index")
               .map(index -> _)

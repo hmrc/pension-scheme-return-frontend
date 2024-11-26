@@ -34,7 +34,12 @@ object MemberCountUtils {
    * @param pensionSchemeId
    * @return true if total active and deferred member number > 99 AND some other data input is present that is normally accessible from the task list
    */
-  def hasMemberNumbersChangedToOver99(userAnswers: UserAnswers, srn: Srn, pensionSchemeId: PensionSchemeId): Boolean = {
+  def hasMemberNumbersChangedToOver99(
+    userAnswers: UserAnswers,
+    srn: Srn,
+    pensionSchemeId: PensionSchemeId,
+    isPrePop: Boolean
+  ): Boolean = {
     val noDataStatuses = List(TaskListStatus.NotStarted, TaskListStatus.UnableToStart)
     val currentSchemeMembers = userAnswers.get(HowManyMembersPage(srn, pensionSchemeId))
     lazy val memberDetailsExist = userAnswers
@@ -51,7 +56,8 @@ object MemberCountUtils {
       )
     )
     lazy val sharesExist = !noDataStatuses.contains(getSharesTaskListStatusAndLink(userAnswers, srn)._1)
-    lazy val landOrPropertyExist = !noDataStatuses.contains(getLandOrPropertyTaskListStatusAndLink(userAnswers, srn)._1)
+    lazy val landOrPropertyExist =
+      !noDataStatuses.contains(getLandOrPropertyTaskListStatusAndLink(userAnswers, srn, isPrePop)._1)
     lazy val bondsExist = !noDataStatuses.contains(getBondsTaskListStatusAndLink(userAnswers, srn)._1)
     lazy val otherAssetsExist = !noDataStatuses.contains(getOtherAssetsTaskListStatusAndLink(userAnswers, srn)._1)
 

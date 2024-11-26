@@ -91,7 +91,8 @@ class PspDeclarationController @Inject()(
                             isBypassed && hasMemberNumbersChangedToOver99(
                               request.userAnswers,
                               srn,
-                              request.pensionSchemeId
+                              request.pensionSchemeId,
+                              isPrePopulation
                             )
                           )
                       )
@@ -112,7 +113,7 @@ class PspDeclarationController @Inject()(
     identifyAndRequireData(srn).async { implicit request =>
       val fbVersion = request.userAnswers.get(FbVersionPage(srn)).getOrElse(defaultFbVersion) // 000 as no versions yet - initial submission
       val hasNumberOfMembersChangedToOver99 =
-        hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId)
+        hasMemberNumbersChangedToOver99(request.userAnswers, srn, request.pensionSchemeId, isPrePopulation)
       schemeDateService.schemeDate(srn) match {
         case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         case Some(dates) =>

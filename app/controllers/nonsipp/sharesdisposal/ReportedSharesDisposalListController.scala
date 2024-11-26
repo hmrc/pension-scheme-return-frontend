@@ -477,7 +477,7 @@ object ReportedSharesDisposalListController {
       description = description,
       page = ListViewModel(
         inset = conditionalInsetText,
-        rows(srn, mode, disposals, userAnswers, viewOnlyViewModel, schemeName),
+        sections = List(ListSection(rows(srn, mode, disposals, userAnswers, viewOnlyViewModel, schemeName))),
         Message("sharesDisposal.reportedSharesDisposalList.radios"),
         showRadios = showRadios,
         paginatedViewModel = Some(

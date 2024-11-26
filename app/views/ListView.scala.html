@@ -55,26 +55,32 @@
                 <h1 class="govuk-heading-l">@renderMessage(viewmodel.optViewOnlyDetails.get.heading)</h1>
             }
 
-            @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.rows)(paginatedViewModel =>
-                viewmodel.page.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
-            ) { rows =>
-                @hmrcListWithActions(ListWithActionsViewModel(
-                    rows.map(value =>
-                        ListWithActionsItemViewModel(
-                            renderMessage(value.text),
-                            value.change.map(change => ListWithActionsActionViewModel(messages("site.change"), change.url)
-                            .withVisuallyHiddenText(change.hiddenText.toMessage)).toList ++
-                                    value.remove.map(remove => ListWithActionsActionViewModel(messages("site.remove"), remove.url)
-                                    .withVisuallyHiddenText(remove.hiddenText.toMessage)).toList ++
-                                    value.view.map {
-                                        case ListRowLink(url, hiddenText) => ListWithActionsActionViewModel(messages("site.view"), url)
-                                        .withVisuallyHiddenText(hiddenText.toMessage)
-                                        case ListRowNoLink(text) => ListWithActionsActionViewModel.noLink(renderMessage(text))
-                                    }.toList
-
+            @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.sections)(paginatedViewModel =>
+                viewmodel.page.sections.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
+            ) { sections =>
+                @sections.map { section =>
+                    @section.heading.map { heading =>
+                        <h2 class="govuk-heading-m">@renderMessage(heading)</h2>
+                    }
+                    @hmrcListWithActions(ListWithActionsViewModel(
+                        section.rows.map(value =>
+                            ListWithActionsItemViewModel(
+                                renderMessage(value.text),
+                                value.change.map(change => ListWithActionsActionViewModel(messages("site.change"), change.url)
+                                  .withVisuallyHiddenText(change.hiddenText.toMessage)).toList ++
+                                value.remove.map(remove => ListWithActionsActionViewModel(messages("site.remove"), remove.url)
+                                  .withVisuallyHiddenText(remove.hiddenText.toMessage)).toList ++
+                                value.check.map(check => ListWithActionsActionViewModel(messages("site.check"), check.url)
+                                  .withVisuallyHiddenText(check.hiddenText.toMessage)).toList ++
+                                value.view.map {
+                                    case ListRowLink(url, hiddenText) => ListWithActionsActionViewModel(messages("site.view"), url)
+                                    .withVisuallyHiddenText(hiddenText.toMessage)
+                                    case ListRowNoLink(text) => ListWithActionsActionViewModel.noLink(renderMessage(text))
+                                }.toList
+                            )
                         )
-                    )
-                ))
+                    ))
+                }
             }
 
             @viewmodel.page.paginatedViewModel.map { paginatedViewModel =>
