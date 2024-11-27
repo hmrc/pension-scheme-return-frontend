@@ -81,6 +81,7 @@ class TransfersInCYAController @Inject()(
           .get(TransfersInSectionCompletedForMember(srn, index))
           .map(_.keys.toList.flatMap(refineStringIndex[Max5.Refined]))
           .getOrRecoverJourney
+
       } yield {
         secondaryIndexes
           .traverse(

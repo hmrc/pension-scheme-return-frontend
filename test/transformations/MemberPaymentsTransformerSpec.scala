@@ -213,6 +213,7 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(TransferringSchemeTypePage(srn, index, transfersInIndex), PensionSchemeType.RegisteredPS("123"))
     .unsafeSet(DidSchemeReceiveTransferPage(srn), true)
     .unsafeSet(ReportAnotherTransferInPage(srn, index, transfersInIndex), false)
+    .unsafeSet(ReceiveTransferProgress(srn, index, transfersInIndex), SectionJourneyStatus.Completed)
     // pcls
     .unsafeSet(PensionCommencementLumpSumPage(srn), true)
     .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index), PensionCommencementLumpSum(money, money))

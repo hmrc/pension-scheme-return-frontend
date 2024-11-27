@@ -79,8 +79,9 @@ object ReceiveTransferNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         (
           for {
-            map <- userAnswers.get(TotalValueTransferPages(srn, index)).getOrRecoverJourney
-            indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+            map <- userAnswers.get(ReceiveTransferProgress.all(srn, index)).getOrRecoverJourney
+            filtered = map.filter { case (_, status) => status.completed }
+            indexes <- filtered.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
             nextIndex <- findNextOpenIndex[Max5.Refined](indexes).getOrRecoverJourney
           } yield controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
             .onPageLoad(srn, index, nextIndex, NormalMode)
@@ -143,8 +144,9 @@ object ReceiveTransferNavigator extends JourneyNavigator {
           if (userAnswers.get(page).contains(true)) {
             (
               for {
-                map <- userAnswers.get(TotalValueTransferPages(srn, index)).getOrRecoverJourney
-                indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+                map <- userAnswers.get(ReceiveTransferProgress.all(srn, index)).getOrRecoverJourney
+                filtered = map.filter { case (_, status) => status.completed }
+                indexes <- filtered.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
                 nextIndex <- findNextOpenIndex[Max5.Refined](indexes).getOrRecoverJourney
               } yield controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
                 .onPageLoad(srn, index, nextIndex, NormalMode)

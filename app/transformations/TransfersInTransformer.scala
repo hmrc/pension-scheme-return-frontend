@@ -22,7 +22,7 @@ import config.RefinedTypes.{Max300, Max5}
 import models.SchemeId.Srn
 import pages.nonsipp.receivetransfer._
 import models.{Money, UserAnswers}
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import models.requests.psr._
 import models.UserAnswers.implicits.UserAnswersTryOps
 
@@ -73,7 +73,8 @@ class TransfersInTransformer @Inject() extends Transformer {
             _.set(TotalValueTransferPage(srn, index, secondaryIndex), Money(transferIn.transferValue)),
             _.set(DidTransferIncludeAssetPage(srn, index, secondaryIndex), transferIn.transferIncludedAsset),
             _.set(TransferringSchemeTypePage(srn, index, secondaryIndex), transferIn.transferSchemeType),
-            _.set(ReportAnotherTransferInPage(srn, index, secondaryIndex), false)
+            _.set(ReportAnotherTransferInPage(srn, index, secondaryIndex), false),
+            _.set(ReceiveTransferProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed)
           )
         }
     }

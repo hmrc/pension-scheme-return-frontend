@@ -18,18 +18,15 @@ package controllers.nonsipp.receivetransfer
 
 import play.api.test.FakeRequest
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
+import controllers.ControllerBaseSpec
 import views.html.TwoColumnsTripleAction
-import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInSectionCompleted}
+import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, ReceiveTransferProgress}
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import models._
-import config.RefinedTypes.Max300
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.receivetransfer.TransferReceivedMemberListController._
 import eu.timepit.refined.refineMV
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.SectionCompleted
-
-import java.time.LocalDate
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 
 class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
 
@@ -62,17 +59,29 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
     .unsafeSet(DidSchemeReceiveTransferPage(srn), true)
-    .unsafeSet(TransfersInSectionCompleted(srn, refineMV(1), refineMV(1)), SectionCompleted)
+    .unsafeSet(
+      ReceiveTransferProgress(srn, refineMV(1), refineMV(1)),
+      SectionJourneyStatus.Completed
+    )
 
-  val testMemberList: List[(Max300, NameDOB, CompletedTransfersIn)] = List(
-    (refineMV[Max300.Refined](1), memberDetails, 1)
+  val testMemberList: List[MemberWithReceiveTransfer] = List(
+    MemberWithReceiveTransfer(
+      memberIndex = refineMV(1),
+      transferFullName = memberDetails.fullName,
+      receive = List(
+        ReceiveTransfer(
+          receiveIndex = refineMV(1),
+          status = SectionJourneyStatus.Completed
+        )
+      )
+    )
   )
 
   "TransferReceivedMemberListController" - {
 
     "viewModel should show 'No transfers' when there are no transfers" in {
 
-      val memberList: List[(Max300, NameDOB, CompletedTransfersIn)] = List.empty
+      val memberList: List[MemberWithReceiveTransfer] = List.empty
 
       val result = TransferReceivedMemberListController.viewModel(
         srn,
@@ -103,12 +112,17 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
     }
 
     "viewModel should show '2 Transfers in' when there are 2 transfers" in {
-      val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
-      val memberDetails2 = NameDOB("testFirstName2", "testLastName2", LocalDate.of(1991, 6, 15))
-
-      val memberList: List[(Max300, NameDOB, CompletedTransfersIn)] = List(
-        (refineMV[Max300.Refined](1), memberDetails1, 1),
-        (refineMV[Max300.Refined](2), memberDetails2, 1)
+      val memberList: List[MemberWithReceiveTransfer] = List.fill(2)(
+        MemberWithReceiveTransfer(
+          memberIndex = refineMV(1),
+          transferFullName = "Test Member",
+          receive = List(
+            ReceiveTransfer(
+              receiveIndex = refineMV(1),
+              status = SectionJourneyStatus.Completed
+            )
+          )
+        )
       )
 
       val result = TransferReceivedMemberListController.viewModel(
