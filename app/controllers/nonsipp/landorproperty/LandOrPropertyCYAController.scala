@@ -141,20 +141,23 @@ class LandOrPropertyCYAController @Inject()(
           ).flatten.headOption
         )
 
-        landOrPropertyResidential <- requiredPage(IsLandOrPropertyResidentialPage(srn, index))
-        landOrPropertyLease <- requiredPage(IsLandPropertyLeasedPage(srn, index))
-        landOrPropertyTotalIncome <- requiredPage(LandOrPropertyTotalIncomePage(srn, index))
+        landOrPropertyResidential = request.userAnswers.get(IsLandOrPropertyResidentialPage(srn, index))
+        landOrPropertyLease = request.userAnswers.get(IsLandPropertyLeasedPage(srn, index))
+        landOrPropertyTotalIncome = request.userAnswers.get(LandOrPropertyTotalIncomePage(srn, index)).get
 
-        leaseDetails = Option.when(landOrPropertyLease) {
-          val landOrPropertyLeaseDetailsPage = request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).get
-          val leaseConnectedParty = request.userAnswers.get(IsLesseeConnectedPartyPage(srn, index)).get
+        leaseDetails = (landOrPropertyLease) match {
+          case Some(_) =>
+            val landOrPropertyLeaseDetailsPage = request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).get
+            val leaseConnectedParty = request.userAnswers.get(IsLesseeConnectedPartyPage(srn, index)).get
 
-          Tuple4(
-            landOrPropertyLeaseDetailsPage._1,
-            landOrPropertyLeaseDetailsPage._2,
-            landOrPropertyLeaseDetailsPage._3,
-            leaseConnectedParty
-          )
+            Option(
+              (
+                landOrPropertyLeaseDetailsPage._1,
+                landOrPropertyLeaseDetailsPage._2,
+                landOrPropertyLeaseDetailsPage._3,
+                leaseConnectedParty
+              )
+            )
         }
 
         schemeName = request.schemeDetails.schemeName
@@ -232,8 +235,8 @@ object LandOrPropertyCYAController {
     recipientDetails: Option[String],
     recipientReasonNoDetails: Option[String],
     landOrPropertySellerConnectedParty: Option[Boolean],
-    landOrPropertyResidential: Boolean,
-    landOrPropertyLease: Boolean,
+    landOrPropertyResidential: Option[Boolean],
+    landOrPropertyLease: Option[Boolean],
     landOrPropertyTotalIncome: Money,
     addressLookUpPage: Address,
     leaseDetails: Option[(String, Money, LocalDate, Boolean)],
@@ -326,8 +329,8 @@ object LandOrPropertyCYAController {
     landOrPropertySellerConnectedParty: Option[Boolean],
     landPropertyIndependentValuation: Option[Boolean],
     leaseDetails: Option[(String, Money, LocalDate, Boolean)],
-    landOrPropertyResidential: Boolean,
-    landOrPropertyLease: Boolean,
+    landOrPropertyResidential: Option[Boolean],
+    landOrPropertyLease: Option[Boolean],
     landOrPropertyTotalIncome: Money,
     addressLookUpPage: Address,
     mode: Mode
@@ -713,8 +716,8 @@ object LandOrPropertyCYAController {
   private def leaseDetailsAndIncome(
     srn: Srn,
     index: Max5000,
-    landOrPropertyResidential: Boolean,
-    landOrPropertyLease: Boolean,
+    landOrPropertyResidential: Option[Boolean],
+    landOrPropertyLease: Option[Boolean],
     landOrPropertyTotalIncome: Money,
     address: String,
     mode: Mode
@@ -723,33 +726,67 @@ object LandOrPropertyCYAController {
       CheckYourAnswersSection(
         Some(Heading2.medium(("landOrPropertyCYA.section4.heading", address))),
         List(
-          CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section4.residential", address),
-            if (landOrPropertyResidential) "site.yes" else "site.no"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, mode).url
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyResidential.hidden")
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section4.propertyLease", address),
-            if (landOrPropertyLease) "site.yes" else "site.no"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.IsLandPropertyLeasedController.onPageLoad(srn, index, mode).url
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyLease.hidden")
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section4.propertyTotalIncome", address),
-            s"£${landOrPropertyTotalIncome.displayAs}"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.LandOrPropertyTotalIncomeController.onPageLoad(srn, index, mode).url + "#landOrPropertyTotalIncome"
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyTotalIncome.hidden")
-          )
+          landOrPropertyResidential match {
+            case Some(value) =>
+              CheckYourAnswersRowViewModel(
+                Message("landOrPropertyCYA.section4.residential", address),
+                if (value) "site.yes" else "site.no"
+              ).withAction(
+                SummaryAction(
+                  "site.change",
+                  routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, mode).url
+                ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyResidential.hidden")
+              )
+            case None =>
+              CheckYourAnswersRowViewModel.link(
+                Message("landOrPropertyCYA.section4.residential", address),
+                "Enter if any part is residential",
+                routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, mode).url
+              )
+          },
+          // Second item
+          landOrPropertyLease match {
+            case Some(value) =>
+              CheckYourAnswersRowViewModel(
+                Message("landOrPropertyCYA.section4.propertyLease", address),
+                if (value) "site.yes" else "site.no"
+              ).withAction(
+                SummaryAction(
+                  "site.change",
+                  routes.IsLandPropertyLeasedController.onPageLoad(srn, index, mode).url
+                ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyLease.hidden")
+              )
+
+            case _ =>
+              CheckYourAnswersRowViewModel.link(
+                Message("landOrPropertyCYA.section4.propertyLease", address),
+                "Enter if it is leased",
+                routes.IsLandPropertyLeasedController.onPageLoad(srn, index, mode).url
+              )
+          },
+          // Third item
+          landOrPropertyTotalIncome.displayAs match {
+            case income if income.nonEmpty =>
+              CheckYourAnswersRowViewModel(
+                Message("landOrPropertyCYA.section4.propertyTotalIncome", address),
+                s"£$income"
+              ).withAction(
+                SummaryAction(
+                  "site.change",
+                  routes.LandOrPropertyTotalIncomeController
+                    .onPageLoad(srn, index, mode)
+                    .url + "#landOrPropertyTotalIncome"
+                ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyTotalIncome.hidden")
+              )
+            case _ =>
+              CheckYourAnswersRowViewModel.link(
+                Message("landOrPropertyCYA.section4.propertyTotalIncome", address),
+                "Enter total income in period of return",
+                routes.LandOrPropertyTotalIncomeController
+                  .onPageLoad(srn, index, mode)
+                  .url + "#landOrPropertyTotalIncome"
+              )
+          }
         )
       )
     )
@@ -768,40 +805,82 @@ object LandOrPropertyCYAController {
       CheckYourAnswersSection(
         Some(Heading2.medium("landOrPropertyCYA.section5.heading")),
         List(
-          CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section5.leaseName", leaseName.show),
-            s"${leaseName.show}"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.LandOrPropertyLeaseDetailsController.onPageLoad(srn, index, mode).url + "#leaseName"
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section5.assetsValue.hidden")
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section5.leaseValue", leaseValue.displayAs),
-            s"£${leaseValue.displayAs}"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.LandOrPropertyLeaseDetailsController.onPageLoad(srn, index, mode).url + "#leaseValue"
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section5.assetsValue.hidden")
-          ),
-          CheckYourAnswersRowViewModel("landOrPropertyCYA.section5.leaseDate", leaseDate.show)
-            .withAction(
-              SummaryAction(
-                "site.change",
+          leaseName.show match {
+            case name if name.nonEmpty =>
+              CheckYourAnswersRowViewModel(
+                Message("landOrPropertyCYA.section5.leaseName", name),
+                s"$name"
+              ).withAction(
+                SummaryAction(
+                  "site.change",
+                  routes.LandOrPropertyLeaseDetailsController.onPageLoad(srn, index, mode).url + "#leaseName"
+                ).withVisuallyHiddenContent("landOrPropertyCYA.section5.assetsValue.hidden")
+              )
+
+            case _ =>
+              CheckYourAnswersRowViewModel.link(
+                Message("landOrPropertyCYA.section5.leaseName", leaseName.show),
+                "Enter lessee name",
+                routes.LandOrPropertyLeaseDetailsController.onPageLoad(srn, index, mode).url + "#leaseName"
+              )
+          },
+          leaseValue.displayAs match {
+            case value if value.nonEmpty =>
+              CheckYourAnswersRowViewModel(
+                Message("landOrPropertyCYA.section5.leaseValue", value),
+                s"£$value"
+              ).withAction(
+                SummaryAction(
+                  "site.change",
+                  routes.LandOrPropertyLeaseDetailsController.onPageLoad(srn, index, mode).url + "#leaseValue"
+                ).withVisuallyHiddenContent("landOrPropertyCYA.section5.leaseValue.hidden")
+              )
+
+            case _ =>
+              CheckYourAnswersRowViewModel.link(
+                Message("landOrPropertyCYA.section5.leaseValue", leaseValue.displayAs),
+                "Enter annual lease amount",
+                routes.LandOrPropertyLeaseDetailsController.onPageLoad(srn, index, mode).url + "#leaseValue"
+              )
+          },
+          leaseDate.show match {
+            case date if date.nonEmpty =>
+              CheckYourAnswersRowViewModel(
+                Message("landOrPropertyCYA.section5.leaseDate", date),
+                date
+              ).withAction(
+                SummaryAction(
+                  "site.change",
+                  routes.LandOrPropertyLeaseDetailsController.onPageLoad(srn, index, mode).url
+                ).withVisuallyHiddenContent("landOrPropertyCYA.section5.leaseDate.hidden")
+              )
+
+            case _ =>
+              CheckYourAnswersRowViewModel.link(
+                Message("landOrPropertyCYA.section5.leaseDate", leaseDate.show),
+                "Enter date lease was granted",
                 routes.LandOrPropertyLeaseDetailsController.onPageLoad(srn, index, mode).url
-              ).withVisuallyHiddenContent("landOrPropertyCYA.section5.leaseDate.hidden")
-            ),
-          CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section5.connectedParty", leaseName.show),
-            if (leaseConnectedParty) "site.yes" else "site.no"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.IsLesseeConnectedPartyController.onPageLoad(srn, index, mode).url
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section5.leaseConnected.hidden")
-          )
+              )
+          },
+          leaseConnectedParty match {
+            case true | false =>
+              CheckYourAnswersRowViewModel(
+                Message("landOrPropertyCYA.section5.connectedParty", leaseName.show),
+                if (leaseConnectedParty) "site.yes" else "site.no"
+              ).withAction(
+                SummaryAction(
+                  "site.change",
+                  routes.IsLesseeConnectedPartyController.onPageLoad(srn, index, mode).url
+                ).withVisuallyHiddenContent("landOrPropertyCYA.section5.connectedParty.hidden")
+              )
+
+            case _ =>
+              CheckYourAnswersRowViewModel.link(
+                Message("landOrPropertyCYA.section5.connectedParty", leaseName.show),
+                "Enter if any lessee is a connected party",
+                routes.IsLesseeConnectedPartyController.onPageLoad(srn, index, mode).url
+              )
+          }
         )
       )
     )
