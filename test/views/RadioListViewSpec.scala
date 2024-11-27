@@ -21,8 +21,8 @@ import play.api.mvc.AnyContentAsEmpty
 import views.html.RadioListView
 import forms.RadioListFormProvider
 import models.Enumerable
-import viewmodels.DisplayMessage.Empty
-import viewmodels.models.{RadioListRowDivider, RadioListRowViewModel, RadioListViewModel}
+import viewmodels.DisplayMessage._
+import viewmodels.models._
 
 class RadioListViewSpec extends ViewSpec {
 

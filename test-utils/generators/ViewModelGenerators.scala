@@ -29,7 +29,7 @@ trait ViewModelGenerators extends BasicGenerators {
 
   def formPageViewModelGen[A](implicit gen: Gen[A]): Gen[FormPageViewModel[A]] =
     for {
-      title <- nonEmptyMessage
+      title <- nonEmptyMessage(30)
       heading <- nonEmptyInlineMessage
       description <- Gen.option(nonEmptyBlockMessage)
       page <- gen
@@ -207,7 +207,7 @@ trait ViewModelGenerators extends BasicGenerators {
 
   def furtherDetailsViewModel: Gen[FurtherDetailsViewModel] =
     for {
-      title <- nonEmptyMessage
+      title <- nonEmptyMessage(30)
       contents <- nonEmptyDisplayMessage
     } yield {
       FurtherDetailsViewModel(title, contents)
@@ -215,15 +215,15 @@ trait ViewModelGenerators extends BasicGenerators {
 
   def radioListRowViewModelGen: Gen[RadioListRowViewModel] =
     for {
-      content <- nonEmptyMessage
-      value <- nonEmptyString
+      content <- nonEmptyMessage(30)
+      value <- uniqueStringGen
     } yield {
       RadioListRowViewModel(content, value)
     }
 
   implicit val radioListViewModelGen: Gen[RadioListViewModel] =
     for {
-      legend <- Gen.option(nonEmptyMessage)
+      legend <- Gen.option(nonEmptyMessage(30))
       items <- Gen.listOfN(5, radioListRowViewModelGen)
       divider <- Gen.oneOf(Nil, List(RadioListRowDivider("divider")))
     } yield {
