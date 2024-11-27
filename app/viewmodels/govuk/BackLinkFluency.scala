@@ -30,15 +30,12 @@ trait BackLinkFluency {
       BackLink(
         href = href,
         content = Text(messages("site.back"))
-      ).withAttribute("aria-label" -> messages("site.back.aria-label"))
+      )
   }
 
   implicit class FluentBackLink(backLink: BackLink) {
 
     def withCssClass(newClass: String): BackLink =
       backLink.copy(classes = s"${backLink.classes} $newClass")
-
-    def withAttribute(attribute: (String, String)): BackLink =
-      backLink.copy(attributes = backLink.attributes + attribute)
   }
 }

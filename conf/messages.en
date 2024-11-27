@@ -2,7 +2,6 @@ service.name = Managing Pension Schemes
 service.title = Managing Pension Schemes
 
 site.back = Back
-site.back.aria-label = Return to previous page
 site.add = Add
 site.remove = Remove
 site.change = Change
