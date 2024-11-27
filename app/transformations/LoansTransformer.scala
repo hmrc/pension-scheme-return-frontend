@@ -157,8 +157,8 @@ class LoansTransformer @Inject() extends Transformer {
                       amountOfTheLoan <- request.userAnswers.get(AmountOfTheLoanPage(srn, index))
                       (loanAmount, optCapRepaymentCY, optAmountOutstanding) = amountOfTheLoan.asTuple
                       optSecurity <- request.userAnswers.get(SecurityGivenForLoanPage(srn, index)).map(_.value.toOption)
-                      loanInterestDetails <- request.userAnswers.get(InterestOnLoanPage(srn, index))
-                      (loanInterestAmount, loanInterestRate, intReceivedCY) = loanInterestDetails
+                      interestOnLoan <- request.userAnswers.get(InterestOnLoanPage(srn, index))
+                      (loanInterestAmount, loanInterestRate, optIntReceivedCY) = interestOnLoan.asTuple
                       optOutstandingArrearsOnLoan <- request.userAnswers
                         .get(OutstandingArrearsOnLoanPage(srn, index))
                         .map(_.value.toOption)
@@ -178,7 +178,7 @@ class LoansTransformer @Inject() extends Transformer {
                         LoanInterestDetails(
                           loanInterestAmount.value,
                           loanInterestRate.value,
-                          intReceivedCY.value
+                          optIntReceivedCY.map(_.value)
                         ),
                         optSecurity.map(_.security),
                         optOutstandingArrearsOnLoan.map(_.value)
@@ -388,14 +388,38 @@ class LoansTransformer @Inject() extends Transformer {
       equalInstallments = indexes.map(
         index => AreRepaymentsInstalmentsPage(srn, index) -> loanTransactions(index.value - 1).equalInstallments
       )
-      loanInterest = indexes.map(
-        index =>
-          InterestOnLoanPage(srn, index) -> (
-            Money(loanTransactions(index.value - 1).loanInterestDetails.loanInterestAmount),
-            Percentage(loanTransactions(index.value - 1).loanInterestDetails.loanInterestRate),
-            Money(loanTransactions(index.value - 1).loanInterestDetails.intReceivedCY)
-          )
-      )
+      fullLoanInterest = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).loanInterestDetails.optIntReceivedCY.nonEmpty
+          }
+        )
+        .map(
+          index =>
+            InterestOnLoanPage(srn, index) -> {
+              InterestOnLoan(
+                Money(loanTransactions(index.value - 1).loanInterestDetails.loanInterestAmount),
+                Percentage(loanTransactions(index.value - 1).loanInterestDetails.loanInterestRate),
+                Some(Money(loanTransactions(index.value - 1).loanInterestDetails.optIntReceivedCY.get))
+              )
+            }
+        )
+      partialLoanInterest = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).loanInterestDetails.optIntReceivedCY.isEmpty
+          }
+        )
+        .map(
+          index =>
+            InterestOnLoanPage(srn, index) -> {
+              InterestOnLoan(
+                Money(loanTransactions(index.value - 1).loanInterestDetails.loanInterestAmount),
+                Percentage(loanTransactions(index.value - 1).loanInterestDetails.loanInterestRate),
+                None
+              )
+            }
+        )
       securityGiven = indexes
         .filter(
           index => {
@@ -463,15 +487,17 @@ class LoansTransformer @Inject() extends Transformer {
       ua7 <- fullLoanAmount.foldLeft(Try(ua6)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua8 <- partialLoanAmount.foldLeft(Try(ua7)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua9 <- equalInstallments.foldLeft(Try(ua8)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-      ua10 <- loanInterest.foldLeft(Try(ua9)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-      ua11 <- securityGiven.foldLeft(Try(ua10)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-      ua12 <- securityNotGiven.foldLeft(Try(ua11)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-      ua13 <- outstandingArrearsOnLoan.foldLeft(Try(ua12)) {
+      ua10 <- fullLoanInterest.foldLeft(Try(ua9)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua11 <- partialLoanInterest.foldLeft(Try(ua10)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+
+      ua12 <- securityGiven.foldLeft(Try(ua11)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua13 <- securityNotGiven.foldLeft(Try(ua12)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua14 <- outstandingArrearsOnLoan.foldLeft(Try(ua13)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
-      ua14 <- noOutstandingArrearsOnLoan.foldLeft(Try(ua13)) {
+      ua15 <- noOutstandingArrearsOnLoan.foldLeft(Try(ua14)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
-    } yield ua14
+    } yield ua15
   }
 }

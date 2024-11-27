@@ -16,16 +16,21 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import utils.RefinedUtils.RefinedIntOps
-import pages.QuestionPage
-import config.RefinedTypes.Max5000
-import models.SchemeId.Srn
-import play.api.libs.json.JsPath
+import config.RefinedTypes.OneTo5000
+import eu.timepit.refined.refineMV
 import models.InterestOnLoan
+import pages.behaviours.PageBehaviours
 
-case class InterestOnLoanPage(srn: Srn, index: Max5000) extends QuestionPage[InterestOnLoan] {
+class InterestOnLoanPageSpec extends PageBehaviours {
 
-  override def path: JsPath = Paths.loanTransactions \ toString \ index.arrayIndex.toString
+  "InterestOnLoanPage" - {
+    val srn = srnGen.sample.value
+    val index = refineMV[OneTo5000](1)
 
-  override def toString: String = "loanInterestPage"
+    beRetrievable[InterestOnLoan](InterestOnLoanPage(srn, index))
+
+    beSettable[InterestOnLoan](InterestOnLoanPage(srn, index))
+
+    beRemovable[InterestOnLoan](InterestOnLoanPage(srn, index))
+  }
 }

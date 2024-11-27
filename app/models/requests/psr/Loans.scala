@@ -61,7 +61,7 @@ case class LoanAmountDetails(
 case class LoanInterestDetails(
   loanInterestAmount: Double,
   loanInterestRate: Double,
-  intReceivedCY: Double
+  optIntReceivedCY: Option[Double]
 )
 
 object Loans {

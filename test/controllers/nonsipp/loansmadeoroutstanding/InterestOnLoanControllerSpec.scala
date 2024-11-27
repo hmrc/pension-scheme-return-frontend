@@ -18,7 +18,8 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import views.html.MultipleQuestionView
 import eu.timepit.refined.refineMV
-import models.NormalMode
+import models.{NormalMode, UserAnswers}
+import controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.partialAnswersForm
 import pages.nonsipp.loansmadeoroutstanding.InterestOnLoanPage
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
@@ -28,40 +29,34 @@ class InterestOnLoanControllerSpec extends ControllerBaseSpec {
   val maxAllowedAmount = 999999999.99
   private val index = refineMV[OneTo5000](1)
 
+  val partialUserAnswers: UserAnswers =
+    defaultUserAnswers.unsafeSet(InterestOnLoanPage(srn, index), partialInterestOnLoan)
+
   "InterestOnLoanController" - {
 
     val schemeName = defaultSchemeDetails.schemeName
 
+    val form = InterestOnLoanController.form()
     lazy val viewModel = InterestOnLoanController.viewModel(srn, index, NormalMode, schemeName, _)
 
     lazy val onPageLoad = routes.InterestOnLoanController.onPageLoad(srn, index, NormalMode)
     lazy val onSubmit = routes.InterestOnLoanController.onSubmit(srn, index, NormalMode)
 
-    act.like(
-      renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad) { implicit app => implicit request =>
+      val view = injected[MultipleQuestionView]
+      view(InterestOnLoanController.form(), viewModel(InterestOnLoanController.form()))
+    })
+
+    act.like(renderPrePopView(onPageLoad, InterestOnLoanPage(srn, index), interestOnLoan) {
+      implicit app => implicit request =>
         val view = injected[MultipleQuestionView]
+        view(form.fill((money, percentage, money)), viewModel(form))
+    }.withName("return OK and the correct pre-populated view for a GET (full answers)"))
 
-        view(
-          InterestOnLoanController.form(),
-          viewModel(InterestOnLoanController.form())
-        )
-      }
-    )
-
-    act.like(
-      renderPrePopView(
-        onPageLoad,
-        InterestOnLoanPage(srn, index),
-        (money, percentage, money)
-      ) { implicit app => implicit request =>
-        val view = injected[MultipleQuestionView]
-
-        view(
-          InterestOnLoanController.form().fill((money, percentage, money)),
-          viewModel(InterestOnLoanController.form())
-        )
-      }
-    )
+    act.like(renderViewWithPrePopSession(onPageLoad, partialUserAnswers) { implicit app => implicit request =>
+      val view = injected[MultipleQuestionView]
+      view(partialAnswersForm.fill((money, percentage, None)), viewModel(form))
+    }.withName("return OK and the correct pre-populated view for a GET (partial answers only)"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

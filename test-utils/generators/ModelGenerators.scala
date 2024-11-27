@@ -227,6 +227,14 @@ trait ModelGenerators extends BasicGenerators {
     PensionCommencementLumpSum(received, relevant)
   }
 
+  implicit val percentageGen: Gen[Percentage] = for {
+    percentageDouble <- Gen.choose(0.00, 100.00)
+  } yield {
+    //val decimalString = decimals.map(d => s".$d").getOrElse("")
+    //val result = s"$whole$decimalString".toDouble
+    Percentage(percentageDouble)
+  }
+
   val ninoPrefix: Gen[String] = {
 
     (for {
@@ -376,6 +384,25 @@ trait ModelGenerators extends BasicGenerators {
 
   implicit val amountOfTheLoanGen: Gen[AmountOfTheLoan] = {
     Gen.oneOf(fullAmountOfTheLoanGenerator, partialAmountOfTheLoanGenerator)
+  }
+
+  val interestOnLoanGenerator: Gen[InterestOnLoan] = for {
+    loanInterestAmount <- moneyGen
+    loanInterestRate <- percentageGen
+    optIntReceivedCY <- Gen.option(moneyGen)
+  } yield {
+    InterestOnLoan(loanInterestAmount, loanInterestRate, optIntReceivedCY)
+  }
+
+  val partialInterestOnLoanGenerator: Gen[InterestOnLoan] = for {
+    loanInterestAmount <- moneyGen
+    loanInterestRate <- percentageGen
+  } yield {
+    InterestOnLoan(loanInterestAmount, loanInterestRate, None)
+  }
+
+  implicit val interestOnLoanGen: Gen[InterestOnLoan] = {
+    Gen.oneOf(interestOnLoanGenerator, partialInterestOnLoanGenerator)
   }
 }
 

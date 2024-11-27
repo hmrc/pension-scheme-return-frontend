@@ -80,7 +80,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(DatePeriodLoanPage(srn, index), (localDate, money, loanPeriod))
     .unsafeSet(AmountOfTheLoanPage(srn, index), amountOfTheLoan)
     .unsafeSet(AreRepaymentsInstalmentsPage(srn, index), true)
-    .unsafeSet(InterestOnLoanPage(srn, index), (money, percentage, money))
+    .unsafeSet(InterestOnLoanPage(srn, index), interestOnLoan)
     .unsafeSet(SecurityGivenForLoanPage(srn, index), ConditionalYesNo.yes[Unit, Security](security))
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.yes[Unit, Money](money))
 
@@ -102,7 +102,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
               amountOfTheLoan = amountOfTheLoan,
               returnEndDate = dateRange.to,
               repaymentInstalments = true,
-              loanInterest = (money, percentage, money),
+              interestOnLoan = interestOnLoan,
               outstandingArrearsOnLoan = Some(money),
               securityOnLoan = Some(security),
               mode,
@@ -148,7 +148,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
       .unsafeSet(DatePeriodLoanPage(srn, index), (localDate, money, loanPeriod))
       .unsafeSet(AmountOfTheLoanPage(srn, index), amountOfTheLoan)
       .unsafeSet(AreRepaymentsInstalmentsPage(srn, index), true)
-      .unsafeSet(InterestOnLoanPage(srn, index), (money, percentage, money))
+      .unsafeSet(InterestOnLoanPage(srn, index), interestOnLoan)
       .unsafeSet(SecurityGivenForLoanPage(srn, index), ConditionalYesNo.yes[Unit, Security](security))
       .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.yes[Unit, Money](money))
 
@@ -161,7 +161,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
       .unsafeSet(DatePeriodLoanPage(srn, index), (localDate, money, loanPeriod))
       .unsafeSet(AmountOfTheLoanPage(srn, index), amountOfTheLoan)
       .unsafeSet(AreRepaymentsInstalmentsPage(srn, index), true)
-      .unsafeSet(InterestOnLoanPage(srn, index), (money, percentage, money))
+      .unsafeSet(InterestOnLoanPage(srn, index), interestOnLoan)
       .unsafeSet(SecurityGivenForLoanPage(srn, index), ConditionalYesNo.yes[Unit, Security](security))
       .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.yes[Unit, Money](money))
 
@@ -182,7 +182,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
               amountOfTheLoan = amountOfTheLoan,
               returnEndDate = dateRange.to,
               repaymentInstalments = true,
-              loanInterest = (money, percentage, money),
+              interestOnLoan = interestOnLoan,
               outstandingArrearsOnLoan = Some(money),
               securityOnLoan = Some(security),
               ViewOnlyMode,

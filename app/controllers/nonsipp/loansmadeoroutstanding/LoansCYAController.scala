@@ -118,7 +118,7 @@ class LoansCYAController @Inject()(
         amountOfTheLoan <- request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrRecoverJourney
         returnEndDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney.map(_.to)
         repaymentInstalments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)).getOrRecoverJourney
-        loanInterest <- request.userAnswers.get(InterestOnLoanPage(srn, index)).getOrRecoverJourney
+        interestOnLoan <- request.userAnswers.get(InterestOnLoanPage(srn, index)).getOrRecoverJourney
         outstandingArrearsOnLoan <- request.userAnswers
           .get(OutstandingArrearsOnLoanPage(srn, index))
           .map(_.value.toOption)
@@ -144,7 +144,7 @@ class LoansCYAController @Inject()(
             amountOfTheLoan,
             returnEndDate,
             repaymentInstalments,
-            loanInterest,
+            interestOnLoan,
             outstandingArrearsOnLoan,
             securityOnLoan,
             mode,
@@ -197,7 +197,7 @@ object LoansCYAController {
     amountOfTheLoan: AmountOfTheLoan,
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
-    loanInterest: (Money, Percentage, Money),
+    interestOnLoan: InterestOnLoan,
     outstandingArrearsOnLoan: Option[Money],
     securityOnLoan: Option[Security],
     mode: Mode,
@@ -234,7 +234,7 @@ object LoansCYAController {
           amountOfTheLoan,
           returnEndDate,
           repaymentInstalments,
-          loanInterest,
+          interestOnLoan,
           outstandingArrearsOnLoan,
           securityOnLoan,
           mode match {
@@ -283,14 +283,14 @@ object LoansCYAController {
     amountOfTheLoan: AmountOfTheLoan,
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
-    loanInterest: (Money, Percentage, Money),
+    interestOnLoan: InterestOnLoan,
     outstandingArrearsOnLoan: Option[Money],
     securityOnLoan: Option[Security],
     mode: Mode
   ): List[CheckYourAnswersSection] = {
     val (loanDate, assetsValue, loanPeriod) = datePeriodLoan
     val (totalLoan, repayments, outstanding) = amountOfTheLoan.asTuple
-    val (interestPayable, interestRate, interestPayments) = loanInterest
+    val (interestPayable, interestRate, interestPayments) = interestOnLoan.asTuple
 
     recipientSection(
       srn,
@@ -601,9 +601,11 @@ object LoansCYAController {
     index: Max5000,
     interestPayable: Money,
     interestRate: Percentage,
-    interestPayments: Money,
+    interestPayments: Option[Money],
     mode: Mode
-  ): List[CheckYourAnswersSection] =
+  ): List[CheckYourAnswersSection] = {
+    val optIntReceivedCYString = if (interestPayments.isDefined) s"£${interestPayments.get.displayAs}" else ""
+
     List(
       CheckYourAnswersSection(
         Some(Heading2.medium("loanCheckYourAnswers.section4.heading")),
@@ -622,7 +624,7 @@ object LoansCYAController {
                 routes.InterestOnLoanController.onPageLoad(srn, index, mode).url + "#rate"
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.rate.hidden")
             ),
-          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.payments", s"£${interestPayments.displayAs}")
+          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.payments", optIntReceivedCYString)
             .withAction(
               SummaryAction(
                 "site.change",
@@ -632,6 +634,7 @@ object LoansCYAController {
         )
       )
     )
+  }
 
   private def loanSecuritySection(
     srn: Srn,
