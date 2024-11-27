@@ -86,7 +86,7 @@ class RemoveLoanController @Inject()(
           l => l,
           name => {
             val loanAmount =
-              request.userAnswers.get(AmountOfTheLoanPage(srn, index)).map(_._1).getOrRecoverJourney
+              request.userAnswers.get(AmountOfTheLoanPage(srn, index)).map(_.loanAmount).getOrRecoverJourney
             loanAmount.fold(
               l => l,
               amount =>

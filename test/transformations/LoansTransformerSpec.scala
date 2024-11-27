@@ -89,7 +89,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), true)
           .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), false)
           .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), (money, money, money))
+          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
           .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), (money, percentage, money))
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
@@ -108,7 +108,11 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
                 connectedPartyStatus = true,
                 optRecipientSponsoringEmployer = None,
                 datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-                loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+                loanAmountDetails = LoanAmountDetails(
+                  amountOfTheLoan.loanAmount.value,
+                  amountOfTheLoan.optCapRepaymentCY.map(_.value),
+                  amountOfTheLoan.optAmountOutstanding.map(_.value)
+                ),
                 equalInstallments = false,
                 loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
                 optSecurityGivenDetails = Some(security.value),
@@ -129,7 +133,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), false)
           .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), true)
           .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), (money, money, money))
+          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
           .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), (money, percentage, money))
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
@@ -148,7 +152,11 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
                 connectedPartyStatus = false,
                 optRecipientSponsoringEmployer = None,
                 datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-                loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+                loanAmountDetails = LoanAmountDetails(
+                  amountOfTheLoan.loanAmount.value,
+                  amountOfTheLoan.optCapRepaymentCY.map(_.value),
+                  amountOfTheLoan.optAmountOutstanding.map(_.value)
+                ),
                 equalInstallments = true,
                 loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
                 optSecurityGivenDetails = Some(security.value),
@@ -172,7 +180,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1)), Sponsoring)
           .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), false)
           .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), (money, money, money))
+          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
           .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), (money, percentage, money))
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
@@ -191,7 +199,11 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
                 connectedPartyStatus = false,
                 optRecipientSponsoringEmployer = Some(Sponsoring.name),
                 datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-                loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+                loanAmountDetails = LoanAmountDetails(
+                  amountOfTheLoan.loanAmount.value,
+                  amountOfTheLoan.optCapRepaymentCY.map(_.value),
+                  amountOfTheLoan.optAmountOutstanding.map(_.value)
+                ),
                 equalInstallments = false,
                 loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
                 optSecurityGivenDetails = Some(security.value),
@@ -214,7 +226,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           )
           .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), true)
           .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), (money, money, money))
+          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
           .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), (money, percentage, money))
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
@@ -233,7 +245,11 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
                 connectedPartyStatus = false,
                 optRecipientSponsoringEmployer = None,
                 datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-                loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+                loanAmountDetails = LoanAmountDetails(
+                  amountOfTheLoan.loanAmount.value,
+                  amountOfTheLoan.optCapRepaymentCY.map(_.value),
+                  amountOfTheLoan.optAmountOutstanding.map(_.value)
+                ),
                 equalInstallments = true,
                 loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
                 optSecurityGivenDetails = Some(security.value),
@@ -257,7 +273,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1)), ConnectedParty)
           .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), false)
           .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), (money, money, money))
+          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
           .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), (money, percentage, money))
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
@@ -276,7 +292,11 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
                 connectedPartyStatus = true,
                 optRecipientSponsoringEmployer = Some(ConnectedParty.name),
                 datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-                loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+                loanAmountDetails = LoanAmountDetails(
+                  amountOfTheLoan.loanAmount.value,
+                  amountOfTheLoan.optCapRepaymentCY.map(_.value),
+                  amountOfTheLoan.optAmountOutstanding.map(_.value)
+                ),
                 equalInstallments = false,
                 loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
                 optSecurityGivenDetails = Some(security.value),
@@ -300,7 +320,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1)), Neither)
           .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), true)
           .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), (money, money, money))
+          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
           .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), (money, percentage, money))
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
@@ -320,7 +340,11 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
                 connectedPartyStatus = false,
                 optRecipientSponsoringEmployer = Some(Neither.name),
                 datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-                loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+                loanAmountDetails = LoanAmountDetails(
+                  amountOfTheLoan.loanAmount.value,
+                  amountOfTheLoan.optCapRepaymentCY.map(_.value),
+                  amountOfTheLoan.optAmountOutstanding.map(_.value)
+                ),
                 equalInstallments = true,
                 loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
                 optSecurityGivenDetails = Some(security.value),
@@ -343,7 +367,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1)), Neither)
           .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), true)
           .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), (money, money, money))
+          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), amountOfTheLoan)
           .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), (money, percentage, money))
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
@@ -362,7 +386,57 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
                 connectedPartyStatus = false,
                 optRecipientSponsoringEmployer = Some(Neither.name),
                 datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-                loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+                loanAmountDetails = LoanAmountDetails(
+                  amountOfTheLoan.loanAmount.value,
+                  amountOfTheLoan.optCapRepaymentCY.map(_.value),
+                  amountOfTheLoan.optAmountOutstanding.map(_.value)
+                ),
+                equalInstallments = true,
+                loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
+                optSecurityGivenDetails = Some(security.value),
+                optOutstandingArrearsOnLoan = Some(money.value)
+              )
+            )
+          )
+        )
+      }
+
+      "should return transformed object when optional pre-pop fields are missing" in {
+        val userAnswers = emptyUserAnswers
+          .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+          .unsafeSet(LoansRecordVersionPage(srn), "001")
+          .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.Other))
+          .unsafeSet(
+            OtherRecipientDetailsPage(srn, refineMV(1), IdentitySubject.LoanRecipient),
+            RecipientDetails("OtherRecipientDetailsName", "otherDescription")
+          )
+          .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1)), Neither)
+          .unsafeSet(AreRepaymentsInstalmentsPage(srn, refineMV(1)), true)
+          .unsafeSet(DatePeriodLoanPage(srn, refineMV(1)), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
+          .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), partialAmountOfTheLoan)
+          .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
+          .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), (money, percentage, money))
+          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+
+        val request = DataRequest(allowedAccessRequest, userAnswers)
+
+        val result = transformer.transformToEtmp(srn, userAnswers)(request)
+        result mustBe Some(
+          Loans(
+            recordVersion = Some("001"),
+            schemeHadLoans = true,
+            loanTransactions = List(
+              LoanTransactions(
+                recipientIdentityType = RecipientIdentityType(IdentityType.Other, None, None, Some("otherDescription")),
+                loanRecipientName = "OtherRecipientDetailsName",
+                connectedPartyStatus = false,
+                optRecipientSponsoringEmployer = Some(Neither.name),
+                datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
+                loanAmountDetails = LoanAmountDetails(
+                  partialAmountOfTheLoan.loanAmount.value,
+                  partialAmountOfTheLoan.optCapRepaymentCY.map(_.value),
+                  partialAmountOfTheLoan.optAmountOutstanding.map(_.value)
+                ),
                 equalInstallments = true,
                 loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
                 optSecurityGivenDetails = Some(security.value),
@@ -373,6 +447,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         )
       }
     }
+
   }
 
   "Should transform loan details from ETMP" - {
@@ -429,7 +504,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswers.get(DatePeriodLoanPage(srn, refineMV(1))) mustBe Some(
             (localDate, Money(Double.MinPositiveValue), Int.MaxValue)
           )
-          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))) mustBe Some((money, money, money))
+          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))) mustBe Some(amountOfTheLoan)
           userAnswers.get(AreRepaymentsInstalmentsPage(srn, refineMV(1))) mustBe Some(false)
           userAnswers.get(InterestOnLoanPage(srn, refineMV(1))) mustBe Some((money, percentage, money))
           userAnswers.get(SecurityGivenForLoanPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes(security))
@@ -461,6 +536,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         }
       )
     }
+
     "when company crn" in {
 
       val userAnswers = emptyUserAnswers
@@ -493,6 +569,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         }
       )
     }
+
     "when company no crn" in {
 
       val userAnswers = emptyUserAnswers
@@ -521,6 +598,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         }
       )
     }
+
     "when partnership utr" in {
 
       val userAnswers = emptyUserAnswers
@@ -546,6 +624,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         }
       )
     }
+
     "when partnership no utr" in {
 
       val userAnswers = emptyUserAnswers
@@ -574,6 +653,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         }
       )
     }
+
     "when other" in {
 
       val userAnswers = emptyUserAnswers
@@ -602,7 +682,42 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       )
     }
 
-    def loans(name: String, recipientIdentityType: RecipientIdentityType, sponsoringEmployer: Boolean = false): Loans =
+    "when optional pre-pop fields are missing" in {
+
+      val userAnswers = emptyUserAnswers
+
+      val result = transformer.transformFromEtmp(
+        userAnswers,
+        allowedAccessRequest.srn,
+        loans(
+          otherRecipientName,
+          RecipientIdentityType(IdentityType.Other, None, None, Some(otherRecipientDescription)),
+          amountOfTheLoan = partialAmountOfTheLoan
+        )
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(LoansRecordVersionPage(srn)) mustBe Some("001")
+          userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
+          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
+            IdentityType.Other
+          )
+          userAnswers.get(OtherRecipientDetailsPage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
+            RecipientDetails(otherRecipientName, otherRecipientDescription)
+          )
+          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1))) mustBe None
+          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))) mustBe Some(partialAmountOfTheLoan)
+        }
+      )
+    }
+
+    def loans(
+      name: String,
+      recipientIdentityType: RecipientIdentityType,
+      sponsoringEmployer: Boolean = false,
+      amountOfTheLoan: AmountOfTheLoan = amountOfTheLoan
+    ): Loans =
       Loans(
         recordVersion = Some("001"),
         schemeHadLoans = true,
@@ -613,7 +728,11 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
             connectedPartyStatus = true,
             optRecipientSponsoringEmployer = if (sponsoringEmployer) Some("Yes") else None,
             datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-            loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+            loanAmountDetails = LoanAmountDetails(
+              amountOfTheLoan.loanAmount.value,
+              amountOfTheLoan.optCapRepaymentCY.map(_.value),
+              amountOfTheLoan.optAmountOutstanding.map(_.value)
+            ),
             equalInstallments = false,
             loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
             optSecurityGivenDetails = Some(security.value),

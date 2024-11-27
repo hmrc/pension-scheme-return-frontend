@@ -359,6 +359,24 @@ trait ModelGenerators extends BasicGenerators {
       SectionJourneyStatus.InProgress("test url"),
       SectionJourneyStatus.Completed
     )
+
+  val fullAmountOfTheLoanGenerator: Gen[AmountOfTheLoan] = for {
+    loanAmount <- moneyGen
+    optCapRepaymentCY <- Gen.option(moneyGen)
+    optAmountOutstanding <- Gen.option(moneyGen)
+  } yield {
+    AmountOfTheLoan(loanAmount, optCapRepaymentCY, optAmountOutstanding)
+  }
+
+  val partialAmountOfTheLoanGenerator: Gen[AmountOfTheLoan] = for {
+    loanAmount <- moneyGen
+  } yield {
+    AmountOfTheLoan(loanAmount, None, None)
+  }
+
+  implicit val amountOfTheLoanGen: Gen[AmountOfTheLoan] = {
+    Gen.oneOf(fullAmountOfTheLoanGenerator, partialAmountOfTheLoanGenerator)
+  }
 }
 
 object ModelGenerators extends ModelGenerators

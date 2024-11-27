@@ -78,7 +78,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(CompanyRecipientCrnPage(srn, index, subject), ConditionalYesNo.yes[String, Crn](crn))
     .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.ConnectedParty)
     .unsafeSet(DatePeriodLoanPage(srn, index), (localDate, money, loanPeriod))
-    .unsafeSet(AmountOfTheLoanPage(srn, index), (money, money, money))
+    .unsafeSet(AmountOfTheLoanPage(srn, index), amountOfTheLoan)
     .unsafeSet(AreRepaymentsInstalmentsPage(srn, index), true)
     .unsafeSet(InterestOnLoanPage(srn, index), (money, percentage, money))
     .unsafeSet(SecurityGivenForLoanPage(srn, index), ConditionalYesNo.yes[Unit, Security](security))
@@ -99,7 +99,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
               recipientReasonNoDetails = None,
               connectedParty = Right(SponsoringOrConnectedParty.ConnectedParty),
               datePeriodLoan = (localDate, money, loanPeriod),
-              loanAmount = (money, money, money),
+              amountOfTheLoan = amountOfTheLoan,
               returnEndDate = dateRange.to,
               repaymentInstalments = true,
               loanInterest = (money, percentage, money),
@@ -146,7 +146,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
       .unsafeSet(CompanyRecipientCrnPage(srn, index, subject), ConditionalYesNo.yes[String, Crn](crn))
       .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.ConnectedParty)
       .unsafeSet(DatePeriodLoanPage(srn, index), (localDate, money, loanPeriod))
-      .unsafeSet(AmountOfTheLoanPage(srn, index), (money, money, money))
+      .unsafeSet(AmountOfTheLoanPage(srn, index), amountOfTheLoan)
       .unsafeSet(AreRepaymentsInstalmentsPage(srn, index), true)
       .unsafeSet(InterestOnLoanPage(srn, index), (money, percentage, money))
       .unsafeSet(SecurityGivenForLoanPage(srn, index), ConditionalYesNo.yes[Unit, Security](security))
@@ -159,7 +159,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
       .unsafeSet(CompanyRecipientCrnPage(srn, index, subject), ConditionalYesNo.yes[String, Crn](crn))
       .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.ConnectedParty)
       .unsafeSet(DatePeriodLoanPage(srn, index), (localDate, money, loanPeriod))
-      .unsafeSet(AmountOfTheLoanPage(srn, index), (money, money, money))
+      .unsafeSet(AmountOfTheLoanPage(srn, index), amountOfTheLoan)
       .unsafeSet(AreRepaymentsInstalmentsPage(srn, index), true)
       .unsafeSet(InterestOnLoanPage(srn, index), (money, percentage, money))
       .unsafeSet(SecurityGivenForLoanPage(srn, index), ConditionalYesNo.yes[Unit, Security](security))
@@ -179,7 +179,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
               recipientReasonNoDetails = None,
               connectedParty = Right(SponsoringOrConnectedParty.ConnectedParty),
               datePeriodLoan = (localDate, money, loanPeriod),
-              loanAmount = (money, money, money),
+              amountOfTheLoan = amountOfTheLoan,
               returnEndDate = dateRange.to,
               repaymentInstalments = true,
               loanInterest = (money, percentage, money),

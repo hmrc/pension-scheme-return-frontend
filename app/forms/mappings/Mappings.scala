@@ -95,6 +95,17 @@ trait Mappings extends Formatters with Constraints {
   ): FieldMapping[Money] =
     of(moneyFormatter(moneyFormErrors, args))
 
+  def optionalMoney(
+    moneyFormErrors: MoneyFormErrors,
+    args: Seq[String] = Seq.empty
+  ): Mapping[Option[Money]] =
+    optional(
+      money(
+        moneyFormErrors,
+        args
+      )
+    )
+
   def security(
     securityFormErrors: SecurityFormErrors,
     args: Seq[String] = Seq.empty

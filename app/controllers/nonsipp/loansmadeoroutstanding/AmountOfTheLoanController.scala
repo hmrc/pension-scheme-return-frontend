@@ -19,17 +19,20 @@ package controllers.nonsipp.loansmadeoroutstanding
 import services.{SaveService, SchemeDateService}
 import viewmodels.implicits._
 import play.api.mvc._
-import com.google.inject.Inject
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
 import config.RefinedTypes.Max5000
 import cats.implicits.toShow
-import config.Constants.maxCurrencyValue
 import controllers.actions._
 import navigation.Navigator
-import forms.MoneyFormProvider
+import forms.{MoneyFormProvider, MultipleQuestionFormProvider}
 import forms.mappings.errors.MoneyFormErrors
+import controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController._
+import forms.mappings.Mappings
+import com.google.inject.Inject
 import views.html.MultipleQuestionView
 import models.SchemeId.Srn
+import utils.nonsipp.PrePopulationUtils.isPrePopulation
+import config.Constants.maxCurrencyValue
 import utils.DateTimeUtils.localDateShow
 import models.{DateRange, Mode, Money}
 import pages.nonsipp.loansmadeoroutstanding.AmountOfTheLoanPage
@@ -61,7 +64,17 @@ class AmountOfTheLoanController @Inject()(
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       usingSchemeDate[Id](srn) { period =>
+        val previousAnswer = request.userAnswers.get(AmountOfTheLoanPage(srn, index))
         val form = AmountOfTheLoanController.form(formProvider, period)
+
+        val preparedForm = if (isPrePopulation) {
+          previousAnswer.fold(partialAnswersForm)(
+            amountOfTheLoan => partialAnswersForm.fill(amountOfTheLoan.asTuple)
+          )
+        } else {
+          request.userAnswers.fillForm(AmountOfTheLoanPage(srn, index), form)
+        }
+
         val viewModel = AmountOfTheLoanController.viewModel(
           srn,
           index,
@@ -71,7 +84,7 @@ class AmountOfTheLoanController @Inject()(
           form
         )
 
-        Ok(view(request.userAnswers.fillForm(AmountOfTheLoanPage(srn, index), form), viewModel))
+        Ok(view(preparedForm, viewModel))
       }
   }
 
@@ -111,24 +124,40 @@ class AmountOfTheLoanController @Inject()(
 
 object AmountOfTheLoanController {
 
+  private val field1Errors: MoneyFormErrors =
+    MoneyFormErrors(
+      "amountOfTheLoan.loanAmount.error.required",
+      "amountOfTheLoan.loanAmount.error.nonNumeric",
+      (maxCurrencyValue, "amountOfTheLoan.loanAmount.error.tooLarge")
+    )
+
+  private val field2Errors: MoneyFormErrors =
+    MoneyFormErrors(
+      "amountOfTheLoan.capRepaymentCY.error.required",
+      "amountOfTheLoan.capRepaymentCY.error.nonNumeric",
+      (maxCurrencyValue, "amountOfTheLoan.capRepaymentCY.error.tooLarge")
+    )
+
+  private val field3Errors: MoneyFormErrors =
+    MoneyFormErrors(
+      "amountOfTheLoan.amountOutstanding.error.required",
+      "amountOfTheLoan.amountOutstanding.error.nonNumeric",
+      (maxCurrencyValue, "amountOfTheLoan.amountOutstanding.error.tooLarge")
+    )
+
   def form(formProvider: MoneyFormProvider, period: DateRange): Form[(Money, Money, Money)] =
     formProvider(
-      MoneyFormErrors(
-        "amountOfTheLoan.loanAmount.error.required",
-        "amountOfTheLoan.loanAmount.error.nonNumeric",
-        (maxCurrencyValue, "amountOfTheLoan.loanAmount.error.tooLarge")
-      ),
-      MoneyFormErrors(
-        "amountOfTheLoan.capRepaymentCY.error.required",
-        "amountOfTheLoan.capRepaymentCY.error.nonNumeric",
-        (maxCurrencyValue, "amountOfTheLoan.capRepaymentCY.error.tooLarge")
-      ),
-      MoneyFormErrors(
-        "amountOfTheLoan.amountOutstanding.error.required",
-        "amountOfTheLoan.amountOutstanding.error.nonNumeric",
-        (maxCurrencyValue, "amountOfTheLoan.amountOutstanding.error.tooLarge")
-      ),
+      field1Errors,
+      field2Errors,
+      field3Errors,
       Seq(period.to.show)
+    )
+
+  val partialAnswersForm: Form[(Money, Option[Money], Option[Money])] =
+    MultipleQuestionFormProvider(
+      Mappings.money(field1Errors),
+      Mappings.optionalMoney(field2Errors),
+      Mappings.optionalMoney(field3Errors)
     )
 
   def viewModel(
