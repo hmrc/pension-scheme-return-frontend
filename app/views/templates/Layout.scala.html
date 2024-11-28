@@ -15,108 +15,110 @@
  *@
 
 @import config.FrontendAppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.config.StandardAlphaBanner
 @import views.html.helper.CSPNonce
 
 @this(
-    appConfig: FrontendAppConfig,
-    govukLayout: GovukLayout,
-    govukBackLink: GovukBackLink,
-    govukNotificationBanner: GovukNotificationBanner,
-    hmrcHead: HmrcHead,
-    hmrcStandardHeader: HmrcStandardHeader,
-    hmrcStandardFooter: HmrcStandardFooter,
-    hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
-    hmrcLanguageSelect: HmrcLanguageSelect,
-    hmrcTimeoutDialog: HmrcTimeoutDialog,
-    hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
-    hmrcScripts: HmrcScripts,
-    alphaBanner: StandardBetaBanner
+  appConfig: FrontendAppConfig,
+  govukLayout: GovukLayout,
+  govukBackLink: GovukBackLink,
+  govukNotificationBanner: GovukNotificationBanner,
+  hmrcHead: HmrcHead,
+  hmrcStandardHeader: HmrcStandardHeader,
+  hmrcStandardFooter: HmrcStandardFooter,
+  hmrcLanguageSelect: HmrcLanguageSelect,
+  hmrcTimeoutDialog: HmrcTimeoutDialog,
+  hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
+  hmrcScripts: HmrcScripts,
+  betaBanner: StandardBetaBanner
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, refresh: Option[Int] = None, notificationBanner: Option[(String, String, String)] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+@(pageTitle: String,
+  showBackLink: Boolean = true,
+  timeout: Boolean = true,
+  showSignOut: Boolean = true,
+  refresh: Option[Int] = None,
+  notificationBanner: Option[(String, String, String)] = None
+)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @head = {
 
-    @hmrcHead(
-        headBlock = if(timeout) { Some(
-            hmrcTimeoutDialog(TimeoutDialog(
-                timeout             = Some(appConfig.timeout),
-                countdown           = Some(appConfig.countdown),
-                keepAliveUrl        = Some(routes.KeepAliveController.keepAlive().url),
-                keepAliveButtonText = Some(messages("timeout.keepAlive")),
-                signOutUrl          = Some(controllers.auth.routes.AuthController.signOut().url),
-                timeoutUrl          = Some(controllers.auth.routes.AuthController.signOutNoSurvey().url),
-                signOutButtonText   = Some(messages("timeout.signOut")),
-                title               = Some(messages("timeout.title")),
-                message             = Some(messages("timeout.message"))
-            )))
-        } else None
-    )
+  @hmrcHead(
+    headBlock = if(timeout) { Some(
+      hmrcTimeoutDialog(TimeoutDialog(
+        timeout             = Some(appConfig.timeout),
+        countdown           = Some(appConfig.countdown),
+        keepAliveUrl        = Some(routes.KeepAliveController.keepAlive().url),
+        keepAliveButtonText = Some(messages("timeout.keepAlive")),
+        signOutUrl          = Some(controllers.auth.routes.AuthController.signOut().url),
+        timeoutUrl          = Some(controllers.auth.routes.AuthController.signOutNoSurvey().url),
+        signOutButtonText   = Some(messages("timeout.signOut")),
+        title               = Some(messages("timeout.title")),
+        message             = Some(messages("timeout.message"))
+      )))
+    } else None
+  )
 
-    <link href="@routes.Assets.versioned("stylesheets/application.css")" media="all" rel="stylesheet" type="text/css" @CSPNonce.attr />
-    @refresh.map{i => <meta http-equiv="refresh" content="@i">}
+  <link href="@routes.Assets.versioned("stylesheets/application.css")"
+    media="all"
+    rel="stylesheet"
+    type="text/css"
+    @CSPNonce.attr />
+    @refresh.map { i =>
+      <meta http-equiv="refresh" content="@i">
+  }
 }
 
 @additionalScripts = {
-    <script src='@controllers.routes.Assets.versioned("javascripts/application.min.js")' @CSPNonce.attr></script>
-    <script @{CSPNonce.attr} src="@routes.Assets.versioned("javascripts/print.js")"></script>
+  <script src='@controllers.routes.Assets.versioned("javascripts/application.min.js")' @CSPNonce.attr></script>
+  <script @{CSPNonce.attr} src="@routes.Assets.versioned("javascripts/print.js")"></script>
 }
 
 @beforeContent = {
 
-    @if(appConfig.features.welshTranslation) {
-        @hmrcLanguageSelect(LanguageSelect(
-            if (messages.lang.code == "cy") Cy else En,
-            (En, routes.LanguageSwitchController.switchToLanguage("en").url),
-            (Cy, routes.LanguageSwitchController.switchToLanguage("cy").url)
-        ))
-    }
+  @if(showBackLink) {
+    @govukBackLink(BackLinkViewModel(href = "#").withCssClass("js-visible"))
+  }
 
-    @if(showBackLink) {
-        @govukBackLink(BackLinkViewModel(href = "#").withCssClass("js-visible"))
-    }
-
-    @if(notificationBanner.isDefined) {
-        @govukNotificationBanner(NotificationBanner(
-            content = HtmlContent(
-                s"""
-                | <h3 class="govuk-notification-banner__heading">
-                |   ${renderMessage(notificationBanner.get._2)}
-                | </h3>
-                | <p class="govuk-body">${renderMessage(notificationBanner.get._3)}</p>
-                |""".stripMargin
-            ),
-            disableAutoFocus = Some(true),
-            title = notificationBanner.get._1,
-            titleHeadingLevel = Some(3),
-            role = Some("alert"),
-            classes = "govuk-!-margin-top-7 govuk-!-margin-bottom-2"
-        ))
-    }
+  @if(notificationBanner.isDefined) {
+    @govukNotificationBanner(NotificationBanner(
+      content = HtmlContent(
+          s"""
+          | <h3 class="govuk-notification-banner__heading">
+          |   ${renderMessage(notificationBanner.get._2)}
+          | </h3>
+          | <p class="govuk-body">${renderMessage(notificationBanner.get._3)}</p>
+          |""".stripMargin
+      ),
+      disableAutoFocus = Some(true),
+      title = notificationBanner.get._1,
+      titleHeadingLevel = Some(3),
+      role = Some("alert"),
+      classes = "govuk-!-margin-top-7 govuk-!-margin-bottom-2"
+    ))
+  }
 }
 
 @content = {
-    <div data-testid="main-content">
-        @contentBlock
-    </div>
+  <div data-testid="main-content">
+    @contentBlock
+  </div>
 
-    <div class="govuk-!-margin-top-8">
-        @hmrcReportTechnicalIssueHelper()
-    </div>
+  <div class="govuk-!-margin-top-8">
+    @hmrcReportTechnicalIssueHelper()
+  </div>
 }
 
 @govukLayout(
-    pageTitle   = Some(pageTitle),
-    headBlock   = Some(head),
-    headerBlock = Some(hmrcStandardHeader(
-        serviceUrl  = Some(appConfig.urls.managePensionsSchemes.overview),
-        signOutUrl  = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut().url) else None,
-        phaseBanner = Some(alphaBanner(appConfig.feedbackUrl))
-    )),
-    beforeContentBlock = Some(beforeContent),
-    footerBlock        = Some(hmrcStandardFooter()),
-    scriptsBlock       = Some(hmrcScripts(
-      scriptsBlock = Some(additionalScripts)
-    ))
+  pageTitle   = Some(pageTitle),
+  headBlock   = Some(head),
+  headerBlock = Some(hmrcStandardHeader(
+    serviceUrl  = Some(appConfig.urls.managePensionsSchemes.overview),
+    signOutUrl  = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut().url) else None,
+    phaseBanner = Some(betaBanner(appConfig.feedbackUrl))
+  )),
+  beforeContentBlock = Some(beforeContent),
+  footerBlock        = Some(hmrcStandardFooter()),
+  scriptsBlock       = Some(hmrcScripts(
+    scriptsBlock = Some(additionalScripts)
+  ))
 )(content)
