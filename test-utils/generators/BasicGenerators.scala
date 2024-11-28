@@ -104,6 +104,8 @@ trait BasicGenerators extends EitherValues {
       s"$c$s"
     }
 
+  val uniqueStringGen: Gen[String] = Gen.uuid.map(_.toString)
+
   def nonEmptyListOf[A](gen: Gen[A]): Gen[NonEmptyList[A]] =
     Gen.nonEmptyListOf(gen).map {
       case head :: tail => NonEmptyList(head, tail)
@@ -170,6 +172,7 @@ trait BasicGenerators extends EitherValues {
     )
 
   val nonEmptyMessage: Gen[Message] = nonEmptyString.map(Message(_))
+  def nonEmptyMessage(size: Int): Gen[Message] = nonEmptyString.map(s => Message(s.take(size)))
   val relativeUrl: Gen[String] =
     nonEmptyListOf(nonEmptyString).map(_.toList.mkString("/", "/", "/"))
   val nonEmptyLinkMessage: Gen[LinkMessage] =

@@ -16,14 +16,12 @@
 
 package transformations
 
-import config.Constants.PREPOPULATION_FLAG
 import play.api.test.FakeRequest
 import org.scalatest.matchers.must.Matchers
 import models.IdentityType.UKCompany
 import controllers.TestValues
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
 import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
-import models.requests.psr._
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal._
 import utils.UserAnswersUtils.UserAnswersOps
@@ -36,6 +34,8 @@ import org.scalatest.freespec.AnyFreeSpec
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.shares._
 import play.api.mvc.AnyContentAsEmpty
+import models.requests.psr._
+import config.Constants.PREPOPULATION_FLAG
 import org.scalatest.OptionValues
 import models.HowSharesDisposed._
 
@@ -180,7 +180,9 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, refineMV(1)), localDate)
           .unsafeSet(SharesFromConnectedPartyPage(srn, refineMV(1)), false)
 
-        val result = transformer.transformToEtmp(srn = srn, userAnswers)(DataRequest(allowedAccessRequestPrePopulation, userAnswers))
+        val result = transformer.transformToEtmp(srn = srn, userAnswers)(
+          DataRequest(allowedAccessRequestPrePopulation, userAnswers)
+        )
         result mustBe Some(
           Shares(
             recordVersion = Some("001"),
