@@ -230,8 +230,6 @@ trait ModelGenerators extends BasicGenerators {
   implicit val percentageGen: Gen[Percentage] = for {
     percentageDouble <- Gen.choose(0.00, 100.00)
   } yield {
-    //val decimalString = decimals.map(d => s".$d").getOrElse("")
-    //val result = s"$whole$decimalString".toDouble
     Percentage(percentageDouble)
   }
 
