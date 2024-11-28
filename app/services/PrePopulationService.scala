@@ -17,7 +17,7 @@
 package services
 
 import models.SchemeId.Srn
-import prepop.{LandOrPropertyPrePopulationProcessor, MemberPrePopulationProcessor}
+import prepop.{LandOrPropertyPrePopulationProcessor, MemberPrePopulationProcessor, SharesPrePopulationProcessor}
 import models.backend.responses._
 import models.UserAnswers
 
@@ -30,7 +30,8 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class PrePopulationService @Inject()(
   landOrPropertyPrePopulationProcessor: LandOrPropertyPrePopulationProcessor,
-  memberPrePopulationProcessor: MemberPrePopulationProcessor
+  memberPrePopulationProcessor: MemberPrePopulationProcessor,
+  sharesPrePopulationProcessor: SharesPrePopulationProcessor
 ) {
 
   /**
@@ -61,7 +62,8 @@ class PrePopulationService @Inject()(
     for {
       ua0 <- landOrPropertyPrePopulationProcessor.clean(baseReturnUA, userAnswers)(srn)
       ua1 <- memberPrePopulationProcessor.clean(baseReturnUA, ua0)(srn)
+      ua2 <- sharesPrePopulationProcessor.clean(baseReturnUA, ua1)(srn)
     } yield {
-      ua1
+      ua2
     }
 }

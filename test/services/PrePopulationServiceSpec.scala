@@ -18,7 +18,7 @@ package services
 
 import services.PrePopulationServiceSpec._
 import controllers.TestValues
-import prepop.{LandOrPropertyPrePopulationProcessor, MemberPrePopulationProcessor}
+import prepop.{LandOrPropertyPrePopulationProcessor, MemberPrePopulationProcessor, SharesPrePopulationProcessor}
 import utils.UserAnswersUtils.UserAnswersOps
 import play.api.libs.json._
 import models.backend.responses.{PsrVersionsForYearsResponse, PsrVersionsResponse, ReportStatus}
@@ -38,14 +38,19 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
   lazy val mockMemberPrePopulationProcessor: MemberPrePopulationProcessor =
     mock[MemberPrePopulationProcessor]
 
+  lazy val mockSharesPrePopulationProcessor: SharesPrePopulationProcessor =
+    mock[SharesPrePopulationProcessor]
+
   private val service = new PrePopulationService(
     mockLandOrPropertyPrePopulationProcessor,
-    mockMemberPrePopulationProcessor
+    mockMemberPrePopulationProcessor,
+    mockSharesPrePopulationProcessor
   )
 
   override def beforeEach(): Unit = {
     reset(mockLandOrPropertyPrePopulationProcessor)
     reset(mockMemberPrePopulationProcessor)
+    reset(mockSharesPrePopulationProcessor)
   }
 
   "PrePopulationService" - {
@@ -95,6 +100,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
         val currentUa = emptyUserAnswers.unsafeSet(__ \ "current", JsString("dummy-current-data"))
         val lopUa = currentUa.unsafeSet(__ \ "lop", JsString("dummy-lop-data"))
         val memberUa = lopUa.unsafeSet(__ \ "member", JsString("dummy-member-data"))
+        val sharesUa = memberUa.unsafeSet(__ \ "shares", JsString("dummy-shares-data"))
 
         when(
           mockLandOrPropertyPrePopulationProcessor
@@ -104,6 +110,10 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
           mockMemberPrePopulationProcessor
             .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(lopUa))(ArgumentMatchers.eq(srn))
         ).thenReturn(Success(memberUa))
+        when(
+          mockSharesPrePopulationProcessor
+            .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(memberUa))(ArgumentMatchers.eq(srn))
+        ).thenReturn(Success(sharesUa))
 
         val result = service.buildPrePopulatedUserAnswers(baseReturnUA, currentUa)(srn)
         result.isSuccess mustBe true
@@ -111,12 +121,14 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
               |{
               |  "current": "dummy-current-data",
               |  "lop": "dummy-lop-data",
-              |  "member": "dummy-member-data"
+              |  "member": "dummy-member-data",
+              |  "shares": "dummy-shares-data"
               |}
               |""".stripMargin).as[JsObject]
 
         verify(mockLandOrPropertyPrePopulationProcessor, times(1)).clean(any(), any())(any())
         verify(mockMemberPrePopulationProcessor, times(1)).clean(any(), any())(any())
+        verify(mockSharesPrePopulationProcessor, times(1)).clean(any(), any())(any())
       }
     }
   }
