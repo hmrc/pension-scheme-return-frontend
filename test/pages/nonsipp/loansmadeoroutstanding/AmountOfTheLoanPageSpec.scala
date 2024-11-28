@@ -19,7 +19,6 @@ package pages.nonsipp.loansmadeoroutstanding
 import config.RefinedTypes.OneTo5000
 import eu.timepit.refined.refineMV
 import models.AmountOfTheLoan
-import pages.nonsipp.loansmadeoroutstanding.AmountOfTheLoanPage
 import pages.behaviours.PageBehaviours
 
 class AmountOfTheLoanPageSpec extends PageBehaviours {

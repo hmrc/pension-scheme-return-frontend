@@ -147,6 +147,8 @@ trait TestValues {
   val security: Security = Security("securityGivenForLoan")
   val double: Double = 7.7
   val percentage: Percentage = Percentage(7.7)
+  val interestOnLoan: InterestOnLoan = InterestOnLoan(money, percentage, Some(money))
+  val partialInterestOnLoan: InterestOnLoan = InterestOnLoan(money, percentage, None)
   val loanPeriod = 5
   val companyName = "testCompanyName"
   val partnershipName = "testPartnershipName"

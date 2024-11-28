@@ -21,11 +21,11 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
 import config.RefinedTypes.Max5000
-import config.Constants.{maxCurrencyValue, maxPercentage, minPercentage}
 import controllers.actions._
 import navigation.Navigator
 import forms.MultipleQuestionFormProvider
 import models.{Mode, Money, Percentage}
+import controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController._
 import pages.nonsipp.loansmadeoroutstanding.InterestOnLoanPage
 import play.api.data.Form
 import forms.mappings.errors.{MoneyFormErrors, PercentageFormErrors}
@@ -33,6 +33,8 @@ import forms.mappings.Mappings
 import com.google.inject.Inject
 import views.html.MultipleQuestionView
 import models.SchemeId.Srn
+import utils.nonsipp.PrePopulationUtils.isPrePopulation
+import config.Constants.{maxCurrencyValue, maxPercentage, minPercentage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
@@ -55,18 +57,26 @@ class InterestOnLoanController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      {
-        val form = InterestOnLoanController.form()
-        val viewModel = InterestOnLoanController.viewModel(
-          srn,
-          index,
-          mode,
-          request.schemeDetails.schemeName,
-          form
-        )
+      val previousAnswer = request.userAnswers.get(InterestOnLoanPage(srn, index))
+      val form = InterestOnLoanController.form()
 
-        Ok(view(request.userAnswers.fillForm(InterestOnLoanPage(srn, index), form), viewModel))
+      val preparedForm = if (isPrePopulation) {
+        previousAnswer.fold(partialAnswersForm)(
+          interestOnLoan => partialAnswersForm.fill(interestOnLoan.asTuple)
+        )
+      } else {
+        request.userAnswers.fillForm(InterestOnLoanPage(srn, index), form)
       }
+
+      val viewModel = InterestOnLoanController.viewModel(
+        srn,
+        index,
+        mode,
+        request.schemeDetails.schemeName,
+        form
+      )
+
+      Ok(view(preparedForm, viewModel))
   }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
@@ -121,6 +131,13 @@ object InterestOnLoanController {
       Mappings.money(field1Errors),
       Mappings.percentage(field2Errors),
       Mappings.money(field3Errors)
+    )
+
+  val partialAnswersForm: Form[(Money, Percentage, Option[Money])] =
+    MultipleQuestionFormProvider(
+      Mappings.money(field1Errors),
+      Mappings.percentage(field2Errors),
+      Mappings.optionalMoney(field3Errors)
     )
 
   def viewModel(
