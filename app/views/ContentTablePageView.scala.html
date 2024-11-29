@@ -29,6 +29,10 @@
 
     <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
+    @viewmodel.page.beforeTable.map { before =>
+        @renderMessage(before)
+    }
+
     @govukTable(TableViewModel(
         viewmodel.page.rows.map { case (key, value) =>
             Seq(
@@ -38,7 +42,13 @@
         }
     ))
 
-    @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.page.inset)))
+    @viewmodel.page.afterTable.map { after =>
+        @renderMessage(after)
+    }
+
+    @viewmodel.page.inset.map { inset =>
+        @govukInsetText(InsetTextViewModel(renderMessage(inset)))
+    }
 
     <p class="govuk-body">
         @govukButton(

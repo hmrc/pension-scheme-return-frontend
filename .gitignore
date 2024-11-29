@@ -35,3 +35,8 @@ bin
 *.iws
 /.bsp/sbt.json
 /.java-version
+.vscode/
+.metals/
+.bloop/
+project/.bloop/
+project/metals.sbt

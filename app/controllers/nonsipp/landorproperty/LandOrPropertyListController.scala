@@ -265,7 +265,7 @@ object LandOrPropertyListController {
                 List(
                   index -> ListRow.check(
                     address.addressLine1,
-                    routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckMode).url,
+                    routes.LandOrPropertyCheckAndUpdateController.onPageLoad(srn, index).url,
                     Message("landOrPropertyList.row.check.hiddenText", address.addressLine1)
                   )
                 )
