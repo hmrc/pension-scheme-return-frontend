@@ -44,7 +44,6 @@
           label = LabelViewModel(renderMessage(viewmodel.page.firstField.label)).withCssClass("govuk-label govuk-label--m")
         )
         .withHint(viewmodel.page.firstField.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
-        .asNumeric()
         .withWidth(Fixed10)
         .withPrefix(PrefixOrSuffix(content = Text("£")))
       )
