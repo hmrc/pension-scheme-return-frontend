@@ -26,6 +26,7 @@ object FieldType {
   case object Date extends FieldType
   case object Percentage extends FieldType
   case object Textarea extends FieldType
+  case object Numeric extends FieldType
 
   case class ConditionalTextarea(prefix: String) extends FieldType
 
