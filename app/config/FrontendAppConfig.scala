@@ -45,10 +45,7 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
 
   def reportAProblemUrl: String = s"$reportProblemUrl?service=$contactFormServiceIdentifier"
 
-  def languageMap: Map[String, Lang] = Map(
-    "en" -> Lang("en"),
-    "cy" -> Lang("cy")
-  )
+  def languageMap: Map[String, Lang] = Map("en" -> Lang("en"))
 
   val timeout: Int = config.get[Int]("timeout-dialog.timeout")
   val countdown: Int = config.get[Int]("timeout-dialog.countdown")
@@ -100,10 +97,6 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
         taxYear,
         encryptedUserName
       )}"
-
-  object features {
-    val welshTranslation: Boolean = config.get[Boolean]("features.welsh-translation")
-  }
 
   object urls {
     val loginUrl: String = config.get[String]("urls.login")
