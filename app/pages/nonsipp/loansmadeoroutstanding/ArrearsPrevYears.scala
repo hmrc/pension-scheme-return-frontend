@@ -28,3 +28,10 @@ case class ArrearsPrevYears(srn: Srn, index: Max5000) extends QuestionPage[Boole
 
   override def toString: String = "arrearsPrevYears"
 }
+
+case class ArrearsPrevYearsMap(srn: Srn) extends QuestionPage[Map[String, Boolean]] {
+
+  override def path: JsPath = Paths.loanTransactions \ toString
+
+  override def toString: String = "arrearsPrevYears"
+}

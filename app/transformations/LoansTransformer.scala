@@ -48,9 +48,11 @@ class LoansTransformer @Inject() extends Transformer {
     if (optSchemeHadLoans.nonEmpty || isPrePopulation) {
       Some(
         Loans(
-          Option.when(request.userAnswers.get(loans) == initialUA.get(loans))(
-            request.userAnswers.get(LoansRecordVersionPage(srn)).get
-          ),
+          Option
+            .when(request.userAnswers.get(loans) == initialUA.get(loans))(
+              request.userAnswers.get(LoansRecordVersionPage(srn))
+            )
+            .flatten,
           optSchemeHadLoans,
           request.userAnswers
             .map(IdentityTypes(srn, IdentitySubject.LoanRecipient))

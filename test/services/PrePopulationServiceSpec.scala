@@ -18,7 +18,7 @@ package services
 
 import services.PrePopulationServiceSpec._
 import controllers.TestValues
-import prepop.{LandOrPropertyPrePopulationProcessor, MemberPrePopulationProcessor, SharesPrePopulationProcessor}
+import prepop._
 import utils.UserAnswersUtils.UserAnswersOps
 import play.api.libs.json._
 import models.backend.responses.{PsrVersionsForYearsResponse, PsrVersionsResponse, ReportStatus}
@@ -37,20 +37,23 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     mock[LandOrPropertyPrePopulationProcessor]
   lazy val mockMemberPrePopulationProcessor: MemberPrePopulationProcessor =
     mock[MemberPrePopulationProcessor]
-
   lazy val mockSharesPrePopulationProcessor: SharesPrePopulationProcessor =
     mock[SharesPrePopulationProcessor]
+  lazy val mockLoansPrePopulationProcessor: LoansPrePopulationProcessor =
+    mock[LoansPrePopulationProcessor]
 
   private val service = new PrePopulationService(
     mockLandOrPropertyPrePopulationProcessor,
     mockMemberPrePopulationProcessor,
-    mockSharesPrePopulationProcessor
+    mockSharesPrePopulationProcessor,
+    mockLoansPrePopulationProcessor
   )
 
   override def beforeEach(): Unit = {
     reset(mockLandOrPropertyPrePopulationProcessor)
     reset(mockMemberPrePopulationProcessor)
     reset(mockSharesPrePopulationProcessor)
+    reset(mockLoansPrePopulationProcessor)
   }
 
   "PrePopulationService" - {
@@ -101,6 +104,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
         val lopUa = currentUa.unsafeSet(__ \ "lop", JsString("dummy-lop-data"))
         val memberUa = lopUa.unsafeSet(__ \ "member", JsString("dummy-member-data"))
         val sharesUa = memberUa.unsafeSet(__ \ "shares", JsString("dummy-shares-data"))
+        val loansUa = sharesUa.unsafeSet(__ \ "loans", JsString("dummy-loans-data"))
 
         when(
           mockLandOrPropertyPrePopulationProcessor
@@ -114,6 +118,10 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
           mockSharesPrePopulationProcessor
             .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(memberUa))(ArgumentMatchers.eq(srn))
         ).thenReturn(Success(sharesUa))
+        when(
+          mockLoansPrePopulationProcessor
+            .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(sharesUa))(ArgumentMatchers.eq(srn))
+        ).thenReturn(Success(loansUa))
 
         val result = service.buildPrePopulatedUserAnswers(baseReturnUA, currentUa)(srn)
         result.isSuccess mustBe true
@@ -122,13 +130,15 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
               |  "current": "dummy-current-data",
               |  "lop": "dummy-lop-data",
               |  "member": "dummy-member-data",
-              |  "shares": "dummy-shares-data"
+              |  "shares": "dummy-shares-data",
+              |  "loans": "dummy-loans-data"
               |}
               |""".stripMargin).as[JsObject]
 
         verify(mockLandOrPropertyPrePopulationProcessor, times(1)).clean(any(), any())(any())
         verify(mockMemberPrePopulationProcessor, times(1)).clean(any(), any())(any())
         verify(mockSharesPrePopulationProcessor, times(1)).clean(any(), any())(any())
+        verify(mockLoansPrePopulationProcessor, times(1)).clean(any(), any())(any())
       }
     }
   }

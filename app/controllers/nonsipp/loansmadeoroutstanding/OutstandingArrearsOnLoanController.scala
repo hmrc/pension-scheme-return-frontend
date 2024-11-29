@@ -85,8 +85,7 @@ class OutstandingArrearsOnLoanController @Inject()(
             formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, period)))),
             value =>
               for {
-                yesNoAnswer <- Future
-                  .fromTry(request.userAnswers.set(ArrearsPrevYears(srn, index), if (value.isRight) true else false))
+                yesNoAnswer <- Future.fromTry(request.userAnswers.set(ArrearsPrevYears(srn, index), value.isRight))
                 updatedAnswers <- Future
                   .fromTry(yesNoAnswer.set(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo(value)))
                 _ <- saveService.save(updatedAnswers)
