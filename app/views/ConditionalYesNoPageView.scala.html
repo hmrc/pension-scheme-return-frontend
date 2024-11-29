@@ -15,97 +15,88 @@
  *@
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukErrorSummary: GovukErrorSummary,
-    govukRadios: GovukRadios,
-    govukInput: GovukInput,
-    govukTextarea: GovukTextarea,
-    govukDetails: GovukDetails,
-    govukButton: GovukButton,
+  layout: templates.Layout,
+  formHelper: FormWithCSRF,
+  govukErrorSummary: GovukErrorSummary,
+  govukRadios: GovukRadios,
+  govukInput: GovukInput,
+  govukTextarea: GovukTextarea,
+  govukDetails: GovukDetails,
+  govukButton: GovukButton,
 )
 
-@(form: Form[_], viewmodel: FormPageViewModel[ConditionalYesNoPageViewModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], viewModel: FormPageViewModel[ConditionalYesNoPageViewModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, viewmodel.title.toMessage), refresh = viewmodel.refresh) {
+@layout(pageTitle = title(form, viewModel.title.toMessage), refresh = viewModel.refresh) {
 
-    @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
+  @formHelper(action = viewModel.onSubmit, Symbol("autocomplete") -> "off") {
 
-        @if(form.hasErrors) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
-        }
-
-        <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
-
-        <div class="govuk-hint">@viewmodel.page.hint.map(renderMessage)</div>
-
-        @viewmodel.description.map(renderMessage)
-
-        @govukRadios(
-            RadiosViewModel.conditionalYesNo(
-                field = form("value"),
-                fieldYes = form("value.yes"),
-                fieldNo = form("value.no"),
-                yes = viewmodel.page.yes,
-                no = viewmodel.page.no,
-                whenYes = {
-                    case (message, FieldType.Input) => input("value.yes", message)
-                    case (message, FieldType.Textarea) => textArea("value.yes", message)
-                    case (message, FieldType.Currency) => currency("value.yes", message)
-                },
-                whenNo = {
-                    case (message, FieldType.Input) => input("value.no", message)
-                    case (message, FieldType.Textarea) => textArea("value.no", message)
-                    case (message, FieldType.Currency) => currency("value.no", message)
-                },
-                legend = viewmodel.page.legend,
-                heading = viewmodel.heading
-            )
-            .withAttribute("id" -> "value")
-        )
-
-        @viewmodel.page.details.map { detail =>
-            @govukDetails(
-                DetailsViewModel(
-                    renderMessage(detail.title),
-                    renderMessage(detail.contents)
-                )
-            )
-        }
-
-        @govukButton(
-            ButtonViewModel(renderMessage(viewmodel.buttonText))
-        )
+    @if(form.hasErrors) {
+      @govukErrorSummary(ErrorSummaryViewModel(form))
     }
+
+    <h1 class="govuk-heading-l">@renderMessage(viewModel.heading)</h1>
+
+    @if(viewModel.page.hint.nonEmpty) {
+      <div class="govuk-hint">@viewModel.page.hint.map(renderMessage)</div>
+    }
+
+    @viewModel.description.map(renderMessage)
+
+    @govukRadios(
+      RadiosViewModel.conditionalYesNo(
+        field = form("value"),
+        fieldYes = form("value.yes"),
+        fieldNo = form("value.no"),
+        yes = viewModel.page.yes,
+        no = viewModel.page.no,
+        whenYes = {
+          case (message, FieldType.Input) => input("value.yes", message)
+          case (message, FieldType.Textarea) => textArea("value.yes", message)
+          case (message, FieldType.Currency) => currency("value.yes", message)
+        },
+        whenNo = {
+          case (message, FieldType.Input) => input("value.no", message)
+          case (message, FieldType.Textarea) => textArea("value.no", message)
+          case (message, FieldType.Currency) => currency("value.no", message)
+        },
+        legend = viewModel.page.legend,
+        heading = viewModel.heading
+      )
+      .withAttribute("id" -> "value")
+    )
+
+    @viewModel.page.details.map { detail =>
+      @govukDetails(DetailsViewModel(renderMessage(detail.title), renderMessage(detail.contents)))
+    }
+
+    @govukButton(ButtonViewModel(renderMessage(viewModel.buttonText)))
+  }
 }
 
 @input(key: String, message: DisplayMessage) = @{
-    govukInput(
-        InputViewModel(form(key), LabelViewModel(renderMessage(message)))
-                .withId(key)
-    )
+  govukInput(InputViewModel(form(key), LabelViewModel(renderMessage(message))).withId(key))
 }
 
 @textArea(key: String, message: DisplayMessage) = @{
-    govukTextarea(
-        TextareaViewModel(key, form(key).value)
-                .withLabel(renderMessage(message))
-                .withHint(viewmodel.page.yes.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
-                .withRows(5)
-                .withError(form(key).errors.headOption)
-    )
+  govukTextarea(
+    TextareaViewModel(key, form(key).value)
+          .withLabel(renderMessage(message))
+          .withHint(viewModel.page.yes.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
+          .withRows(5)
+          .withError(form(key).errors.headOption)
+  )
 }
 
-
 @currency(key: String, message: DisplayMessage) = @{
-    govukInput(
-        InputViewModel(
-            field = form(key),
-            label = LabelViewModel(renderMessage(message))
-        )
-        .withId(key)
-        .asNumeric()
-        .withWidth(InputWidth.Fixed10)
-        .withPrefix(PrefixOrSuffix(content = Text("£")))
+  govukInput(
+    InputViewModel(
+      field = form(key),
+      label = LabelViewModel(renderMessage(message))
     )
+    .withId(key)
+    .asNumeric()
+    .withWidth(InputWidth.Fixed10)
+    .withPrefix(PrefixOrSuffix(content = Text("£")))
+  )
 }

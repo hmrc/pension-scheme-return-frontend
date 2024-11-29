@@ -26,52 +26,44 @@
   govukButton: GovukButton,
 )
 
-@(form: Form[Boolean], viewmodel: FormPageViewModel[YesNoPageViewModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[Boolean], viewModel: FormPageViewModel[YesNoPageViewModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, viewmodel.title.toMessage), refresh = viewmodel.refresh) {
+@layout(pageTitle = title(form, viewModel.title.toMessage), refresh = viewModel.refresh) {
 
-  @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
+  @formHelper(action = viewModel.onSubmit, Symbol("autocomplete") -> "off") {
 
     @if(form.hasErrors) {
       @govukErrorSummary(ErrorSummaryViewModel(form))
     }
 
-    <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+    <h1 class="govuk-heading-l">@renderMessage(viewModel.heading)</h1>
 
-    <div class="govuk-hint">@viewmodel.page.hint.map(renderMessage)</div>
+    @viewModel.description.map(renderMessage)
 
-    @viewmodel.description.map(renderMessage)
-
-                    @viewmodel.details.map { detail =>
-                            @govukDetails(
-                                DetailsViewModel(
-                                     renderMessage(detail.title),
-                                    renderMessage(detail.contents))
-                            )
-                   }
+    @viewModel.details.map { detail =>
+      @govukDetails(DetailsViewModel(renderMessage(detail.title), renderMessage(detail.contents)))
+    }
 
     @govukRadios(
-        RadiosViewModel.yesNo(
-            field = form("value"),
-            legend = viewmodel.page.legend
-                        .map(legend => Some(LegendViewModel(renderMessage(legend)).withSize(LegendSize.Medium)))
-                        .getOrElse(Some(LegendViewModel(renderMessage(viewmodel.heading)).asPageHeading(LegendSize.Large).withCssClass("govuk-visually-hidden"))),
-            yes = viewmodel.page.yes.map(renderMessage(_)),
-            no = viewmodel.page.no.map(renderMessage(_))
-        )
+      RadiosViewModel.yesNo(
+        field = form("value"),
+        legend = viewModel.page.legend
+                    .map(legend => Some(LegendViewModel(renderMessage(legend))
+                    .withSize(LegendSize.Medium)))
+                    .getOrElse(Some(LegendViewModel(renderMessage(viewModel.heading))
+                    .asPageHeading(LegendSize.Large)
+                    .withCssClass("govuk-visually-hidden"))),
+        yes = viewModel.page.yes.map(renderMessage(_)),
+        no = viewModel.page.no.map(renderMessage(_))
+      )
     )
 
-    @viewmodel.page.details.map { detail =>
-            @govukDetails(
-                DetailsViewModel(
-                    renderMessage(detail.title),
-                    renderMessage(detail.contents)
-                )
-            )
+    @viewModel.page.details.map { detail =>
+      @govukDetails(DetailsViewModel(renderMessage(detail.title), renderMessage(detail.contents)))
     }
 
     @govukButton(
-      ButtonViewModel(renderMessage(viewmodel.buttonText)).withAttribute("data-prevent-double-click","true")
+      ButtonViewModel(renderMessage(viewModel.buttonText)).withAttribute("data-prevent-double-click","true")
     )
   }
 }
