@@ -55,10 +55,6 @@
                 <h1 class="govuk-heading-l">@renderMessage(viewmodel.optViewOnlyDetails.get.heading)</h1>
             }
 
-            @if(viewmodel.page.sections.size == 1){
-
-            }
-
             @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.sections)(paginatedViewModel =>
                 viewmodel.page.sections.paginateSections(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
             ) { sections =>
