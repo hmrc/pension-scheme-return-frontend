@@ -98,21 +98,6 @@ trait ViewModelGenerators extends BasicGenerators {
       CheckYourAnswersViewModel(sections)
     }
 
-  implicit val bankAccountViewModelGen: Gen[BankAccountViewModel] =
-    for {
-      bankNameHeading <- nonEmptyMessage
-      accountNumberHeading <- nonEmptyMessage
-      accountNumberHint <- nonEmptyMessage
-      sortCodeHeading <- nonEmptyMessage
-      sortCodeHint <- nonEmptyMessage
-    } yield BankAccountViewModel(
-      bankNameHeading,
-      accountNumberHeading,
-      accountNumberHint,
-      sortCodeHeading,
-      sortCodeHint
-    )
-
   implicit val submissionViewModelGen: Gen[SubmissionViewModel] =
     for {
       title <- nonEmptyMessage
