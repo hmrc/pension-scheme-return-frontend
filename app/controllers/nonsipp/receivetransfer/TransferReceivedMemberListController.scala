@@ -186,7 +186,7 @@ object TransferReceivedMemberListController {
                       .url
                 },
                 Message(
-                  "receiveTransfer.MemberList.add.hidden.text",
+                  "transferIn.MemberList.add.hidden.text",
                   membersWithTransfers.transferFullName
                 )
               )
@@ -232,7 +232,7 @@ object TransferReceivedMemberListController {
                   controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
                     .onSubmit(srn, membersWithTransfers.memberIndex, CheckMode),
                   Message(
-                    "receiveTransfer.MemberList.add.hidden.text",
+                    "transferIn.MemberList.change.hidden.text",
                     membersWithTransfers.transferFullName
                   )
                 )
@@ -244,7 +244,7 @@ object TransferReceivedMemberListController {
                 controllers.nonsipp.receivetransfer.routes.WhichTransferInRemoveController
                   .onSubmit(srn, membersWithTransfers.memberIndex),
                 Message(
-                  "receiveTransfer.MemberList.add.hidden.text",
+                  "transferIn.MemberList.remove.hidden.text",
                   membersWithTransfers.transferFullName
                 )
               )

@@ -18,7 +18,7 @@ package viewmodels.models
 
 import play.api.mvc.Call
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{LinkMessage, Message}
+import viewmodels.DisplayMessage.Message
 
 case class TableElem(
   text: DisplayMessage,
@@ -31,18 +31,12 @@ object TableElem {
   val empty: TableElem = TableElem(DisplayMessage.Empty)
   def add(call: Call, hiddenText: Message): TableElem =
     TableElem(Message("site.add"), Some(hiddenText), Some(call.url), Some("site.add"))
-  def add(call: Call): TableElem =
-    TableElem(LinkMessage(Message("site.add"), call.url), None, None, Some("site.add"))
   def add(url: String, hiddenText: Message): TableElem =
     TableElem(Message("site.add"), Some(hiddenText), Some(url), Some("site.add"))
   def change(call: Call, hiddenText: Message): TableElem =
     TableElem(Message("site.change"), Some(hiddenText), Some(call.url), Some("site.change"))
-  def change(call: Call): TableElem =
-    TableElem(LinkMessage(Message("site.change"), call.url), None, None, Some("site.change"))
   def remove(call: Call, hiddenText: Message): TableElem =
     TableElem(Message("site.remove"), Some(hiddenText), Some(call.url), Some("site.remove"))
-  def remove(call: Call): TableElem =
-    TableElem(LinkMessage(Message("site.remove"), call.url), None, None, Some("site.remove"))
   def view(call: Call, hiddenText: Message): TableElem =
     TableElem(Message("site.view"), Some(hiddenText), Some(call.url), Some("site.view"))
 }

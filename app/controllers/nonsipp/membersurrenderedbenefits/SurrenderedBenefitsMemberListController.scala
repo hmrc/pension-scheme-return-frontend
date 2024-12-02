@@ -168,7 +168,11 @@ object SurrenderedBenefitsMemberListController {
             if (!mode.isViewOnlyMode) {
               TableElem.add(
                 controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsAmountController
-                  .onSubmit(srn, index, mode)
+                  .onSubmit(srn, index, mode),
+                Message(
+                  "surrenderedBenefits.memberList.add.hidden.text",
+                  memberName.fullName
+                )
               )
             } else {
               TableElem.empty
@@ -199,7 +203,11 @@ object SurrenderedBenefitsMemberListController {
               case _ =>
                 TableElem.change(
                   controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
-                    .onPageLoad(srn, index, CheckMode)
+                    .onPageLoad(srn, index, CheckMode),
+                  Message(
+                    "surrenderedBenefits.memberList.change.hidden.text",
+                    memberName.fullName
+                  )
                 )
             },
             if (mode.isViewOnlyMode) {
@@ -207,7 +215,11 @@ object SurrenderedBenefitsMemberListController {
             } else {
               TableElem.remove(
                 controllers.nonsipp.membersurrenderedbenefits.routes.RemoveSurrenderedBenefitsController
-                  .onSubmit(srn, index)
+                  .onSubmit(srn, index),
+                Message(
+                  "surrenderedBenefits.memberList.remove.hidden.text",
+                  memberName.fullName
+                )
               )
             }
           )
