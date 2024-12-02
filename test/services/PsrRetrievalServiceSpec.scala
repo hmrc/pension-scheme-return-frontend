@@ -376,7 +376,7 @@ object PsrRetrievalServiceSpec {
   )
   val loans: Loans = Loans(
     Some("001"),
-    schemeHadLoans = true,
+    optSchemeHadLoans = Some(true),
     loanTransactions = Seq.empty
   )
 

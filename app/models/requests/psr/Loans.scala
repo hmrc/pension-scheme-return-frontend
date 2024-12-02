@@ -23,7 +23,7 @@ import java.time.LocalDate
 
 case class Loans(
   recordVersion: Option[String],
-  schemeHadLoans: Boolean,
+  optSchemeHadLoans: Option[Boolean],
   loanTransactions: Seq[LoanTransactions]
 )
 

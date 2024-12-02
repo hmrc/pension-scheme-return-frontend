@@ -20,7 +20,6 @@ import play.api.test.FakeRequest
 import org.scalatest.freespec.AnyFreeSpec
 import play.api.mvc.AnyContentAsEmpty
 import controllers.TestValues
-import models.requests.psr._
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
@@ -29,6 +28,8 @@ import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
 import org.scalatest.matchers.must.Matchers
 import models.ConditionalYesNo._
+import models.requests.psr._
+import config.Constants.PREPOPULATION_FLAG
 import org.scalatest.OptionValues
 import uk.gov.hmrc.domain.Nino
 import models.SponsoringOrConnectedParty.{ConnectedParty, Neither, Sponsoring}
@@ -36,8 +37,12 @@ import models.requests.{AllowedAccessRequest, DataRequest}
 
 class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
-  val allowedAccessRequest
-    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] =
+    allowedAccessRequestGen(FakeRequest()).sample.value
+
+  val allowedAccessRequestPrePopulation: AllowedAccessRequest[AnyContentAsEmpty.type] =
+    allowedAccessRequestGen(FakeRequest().withSession((PREPOPULATION_FLAG, "true"))).sample.value
+
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
   private val transformer = new LoansTransformer()
@@ -59,7 +64,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         .unsafeSet(LoansRecordVersionPage(srn), "001")
 
       val result = transformer.transformToEtmp(srn, initialUA)(DataRequest(allowedAccessRequest, userAnswers))
-      result mustBe Some(Loans(recordVersion = None, schemeHadLoans = false, loanTransactions = Seq.empty))
+      result mustBe Some(Loans(recordVersion = None, optSchemeHadLoans = Some(false), loanTransactions = Seq.empty))
     }
 
     "should return recordVersion when there is no change among UAs" - {
@@ -76,7 +81,9 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
         val result = transformer.transformToEtmp(srn, userAnswers)(request)
-        result mustBe Some(Loans(recordVersion = Some("001"), schemeHadLoans = true, loanTransactions = Seq.empty))
+        result mustBe Some(
+          Loans(recordVersion = Some("001"), optSchemeHadLoans = Some(true), loanTransactions = Seq.empty)
+        )
       }
 
       "should return transformed object when IdentityType is Individual with Nino" in {
@@ -100,7 +107,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
-            schemeHadLoans = true,
+            optSchemeHadLoans = Some(true),
             loanTransactions = List(
               LoanTransactions(
                 recipientIdentityType = RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None),
@@ -148,7 +155,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
-            schemeHadLoans = true,
+            optSchemeHadLoans = Some(true),
             loanTransactions = List(
               LoanTransactions(
                 recipientIdentityType = RecipientIdentityType(IdentityType.Individual, None, Some("noNinoReason"), None),
@@ -199,7 +206,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
-            schemeHadLoans = true,
+            optSchemeHadLoans = Some(true),
             loanTransactions = List(
               LoanTransactions(
                 recipientIdentityType = RecipientIdentityType(IdentityType.UKCompany, Some(crn.value), None, None),
@@ -249,7 +256,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
-            schemeHadLoans = true,
+            optSchemeHadLoans = Some(true),
             loanTransactions = List(
               LoanTransactions(
                 recipientIdentityType = RecipientIdentityType(IdentityType.UKCompany, None, Some("noCrnReason"), None),
@@ -300,7 +307,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
-            schemeHadLoans = true,
+            optSchemeHadLoans = Some(true),
             loanTransactions = List(
               LoanTransactions(
                 recipientIdentityType = RecipientIdentityType(IdentityType.UKPartnership, Some(utr.value), None, None),
@@ -351,7 +358,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
-            schemeHadLoans = true,
+            optSchemeHadLoans = Some(true),
             loanTransactions = List(
               LoanTransactions(
                 recipientIdentityType =
@@ -402,7 +409,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
-            schemeHadLoans = true,
+            optSchemeHadLoans = Some(true),
             loanTransactions = List(
               LoanTransactions(
                 recipientIdentityType = RecipientIdentityType(IdentityType.Other, None, None, Some("otherDescription")),
@@ -431,7 +438,6 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
       "should return transformed object when optional pre-pop fields are missing" in {
         val userAnswers = emptyUserAnswers
-          .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
           .unsafeSet(LoansRecordVersionPage(srn), "001")
           .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.Other))
           .unsafeSet(
@@ -444,15 +450,14 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), partialAmountOfTheLoan)
           .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), partialInterestOnLoan)
-          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
 
-        val request = DataRequest(allowedAccessRequest, userAnswers)
+        val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
 
         val result = transformer.transformToEtmp(srn, userAnswers)(request)
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
-            schemeHadLoans = true,
+            optSchemeHadLoans = None,
             loanTransactions = List(
               LoanTransactions(
                 recipientIdentityType = RecipientIdentityType(IdentityType.Other, None, None, Some("otherDescription")),
@@ -462,24 +467,23 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
                 datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
                 loanAmountDetails = LoanAmountDetails(
                   partialAmountOfTheLoan.loanAmount.value,
-                  partialAmountOfTheLoan.optCapRepaymentCY.map(_.value),
-                  partialAmountOfTheLoan.optAmountOutstanding.map(_.value)
+                  None,
+                  None
                 ),
                 equalInstallments = true,
                 loanInterestDetails = LoanInterestDetails(
                   partialInterestOnLoan.loanInterestAmount.value,
                   partialInterestOnLoan.loanInterestRate.value,
-                  partialInterestOnLoan.optIntReceivedCY.map(_.value)
+                  None
                 ),
                 optSecurityGivenDetails = Some(security.value),
-                optOutstandingArrearsOnLoan = Some(money.value)
+                optOutstandingArrearsOnLoan = None
               )
             )
           )
         )
       }
     }
-
   }
 
   "Should transform loan details from ETMP" - {
@@ -491,7 +495,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       val result = transformer.transformFromEtmp(
         userAnswers,
         allowedAccessRequest.srn,
-        Loans(recordVersion = Some("001"), schemeHadLoans = false, loanTransactions = List.empty)
+        Loans(recordVersion = Some("001"), optSchemeHadLoans = Some(false), loanTransactions = List.empty)
       )
 
       result.fold(
@@ -722,25 +726,34 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         userAnswers,
         allowedAccessRequest.srn,
         loans(
-          otherRecipientName,
-          RecipientIdentityType(IdentityType.Other, None, None, Some(otherRecipientDescription)),
+          name = individualRecipientName,
+          recipientIdentityType = RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None),
+          optSchemeHadLoans = None,
           amountOfTheLoan = partialAmountOfTheLoan,
-          interestOnLoan = partialInterestOnLoan
+          interestOnLoan = partialInterestOnLoan,
+          optOutstandingArrearsOnLoan = None
         )
       )
       result.fold(
         ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(LoansRecordVersionPage(srn)) mustBe Some("001")
-          userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
+          userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe None
+
           userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
-            IdentityType.Other
+            IdentityType.Individual
           )
-          userAnswers.get(OtherRecipientDetailsPage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
-            RecipientDetails(otherRecipientName, otherRecipientDescription)
+          userAnswers.get(IndividualRecipientNamePage(srn, refineMV(1))) mustBe Some(individualRecipientName)
+          userAnswers.get(IndividualRecipientNinoPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes(nino))
+          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
+          userAnswers.get(DatePeriodLoanPage(srn, refineMV(1))) mustBe Some(
+            (localDate, Money(Double.MinPositiveValue), Int.MaxValue)
           )
-          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1))) mustBe None
           userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))) mustBe Some(partialAmountOfTheLoan)
+          userAnswers.get(AreRepaymentsInstalmentsPage(srn, refineMV(1))) mustBe Some(false)
+          userAnswers.get(InterestOnLoanPage(srn, refineMV(1))) mustBe Some(partialInterestOnLoan)
+          userAnswers.get(SecurityGivenForLoanPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes(security))
+          userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo(Left(())))
         }
       )
     }
@@ -748,13 +761,15 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
     def loans(
       name: String,
       recipientIdentityType: RecipientIdentityType,
+      optSchemeHadLoans: Option[Boolean] = Some(true),
       sponsoringEmployer: Boolean = false,
       amountOfTheLoan: AmountOfTheLoan = amountOfTheLoan,
-      interestOnLoan: InterestOnLoan = interestOnLoan
+      interestOnLoan: InterestOnLoan = interestOnLoan,
+      optOutstandingArrearsOnLoan: Option[Double] = Some(money.value)
     ): Loans =
       Loans(
         recordVersion = Some("001"),
-        schemeHadLoans = true,
+        optSchemeHadLoans = optSchemeHadLoans,
         Seq(
           LoanTransactions(
             recipientIdentityType = recipientIdentityType,
@@ -774,7 +789,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
               interestOnLoan.optIntReceivedCY.map(_.value)
             ),
             optSecurityGivenDetails = Some(security.value),
-            optOutstandingArrearsOnLoan = Some(money.value)
+            optOutstandingArrearsOnLoan = optOutstandingArrearsOnLoan
           )
         )
       )
