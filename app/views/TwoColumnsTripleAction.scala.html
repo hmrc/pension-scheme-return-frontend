@@ -27,7 +27,7 @@
 )
 @(viewModel: FormPageViewModel[ActionTableViewModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(if(viewModel.mode == ViewOnlyMode && viewModel.optViewOnlyDetails.nonEmpty) viewModel.optViewOnlyDetails.get.title.toMessage else viewModel.title.toMessage), showBackLink = viewModel.showBackLink) {
+@layout(pageTitle = paginatedTitleNoForm(viewModel.page.paginatedViewModel, if(viewModel.mode == ViewOnlyMode && viewModel.optViewOnlyDetails.nonEmpty) viewModel.optViewOnlyDetails.get.title.toMessage else viewModel.title.toMessage), showBackLink = viewModel.showBackLink) {
 
     @formHelper(action = if(viewModel.mode == ViewOnlyMode && viewModel.optViewOnlyDetails.nonEmpty) viewModel.optViewOnlyDetails.get.onSubmit else viewModel.onSubmit, Symbol("autocomplete") -> "off") {
 
@@ -64,6 +64,12 @@
         }
 
         @if(viewModel.mode != ViewOnlyMode || (viewModel.mode == ViewOnlyMode && viewModel.optViewOnlyDetails.nonEmpty && viewModel.optViewOnlyDetails.get.noLabel.isEmpty)) {
+            @viewModel.page.paginatedViewModel.map{ paginatedViewModel =>
+                @if(paginatedViewModel.pagination.totalPages > 1) {
+                    <div><p id="pagination-label" class="govuk-body">@{renderMessage(paginatedViewModel.label)}</p></div>
+                }
+            }
+
             @defining(viewModel.page.paginatedViewModel.fold(viewModel.page.rows)(paginatedViewModel =>
                 viewModel.page.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
             ){ rows: List[List[TableElem]] =>
@@ -92,7 +98,6 @@
             }
             @viewModel.page.paginatedViewModel.map{ paginatedViewModel =>
                 @if(paginatedViewModel.pagination.totalPages > 1) {
-                    <p id="pagination-label" class="govuk-body">@{renderMessage(paginatedViewModel.label)}</p>
                     @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
                 }
             }

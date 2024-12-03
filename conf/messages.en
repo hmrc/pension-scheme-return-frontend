@@ -17,6 +17,7 @@ site.remove.param = Remove {0}
 site.viewOrChange = View or change
 site.start = Start
 site.param = {0}
+site.title.postfix = (page {0} of {1})
 
 site.continue = Continue
 site.saveAndContinue = Save and continue
