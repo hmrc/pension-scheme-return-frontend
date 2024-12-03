@@ -32,7 +32,7 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   val host: String = config.get[String]("host")
   val appName: String = config.get[String]("appName")
 
-  private val contactFormServiceIdentifier = config.get[String]("microservice.services.contact-frontend.serviceId")
+  private val contactFormServiceIdentifier = config.get[String]("contact-frontend.serviceId")
   private val betaFeedbackUrl = config.get[String]("microservice.services.contact-frontend.beta-feedback-url")
   private val reportProblemUrl = config.get[String]("microservice.services.contact-frontend.report-problem-url")
   private val allowedRedirectUrls: Seq[String] = config.get[Seq[String]]("urls.allowedRedirects")
