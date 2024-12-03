@@ -176,7 +176,11 @@ object TransferOutMemberListController {
                     Message("site.add"),
                     controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
                       .onSubmit(srn, index, refineMV(1), mode)
-                      .url
+                      .url,
+                    Message(
+                      "transferOut.memberList.add.hidden.text",
+                      memberName.fullName
+                    )
                   )
                 )
               } else {
@@ -212,7 +216,11 @@ object TransferOutMemberListController {
                 case _ =>
                   TableElem.change(
                     controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
-                      .onPageLoad(srn, index, CheckMode)
+                      .onPageLoad(srn, index, CheckMode),
+                    Message(
+                      "transferOut.memberList.change.hidden.text",
+                      memberName.fullName
+                    )
                   )
               },
               if (mode.isViewOnlyMode) {
@@ -220,7 +228,11 @@ object TransferOutMemberListController {
               } else {
                 TableElem.remove(
                   controllers.nonsipp.membertransferout.routes.WhichTransferOutRemoveController
-                    .onSubmit(srn, index)
+                    .onSubmit(srn, index),
+                  Message(
+                    "transferOut.memberList.remove.hidden.text",
+                    memberName.fullName
+                  )
                 )
               }
             )

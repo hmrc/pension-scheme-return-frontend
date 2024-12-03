@@ -986,6 +986,9 @@ surrenderedBenefits.memberList.inset2 = If you need to add a new member, go to t
 surrenderedBenefits.memberList.pagination.label = Showing {0} - {1} of {2} members
 surrenderedBenefits.memberList.status.no.items = No surrendered benefits
 surrenderedBenefits.memberList.status.some.item = Surrendered benefits reported
+surrenderedBenefits.memberList.add.hidden.text = surrendered benefits for {0}
+surrenderedBenefits.memberList.change.hidden.text = surrendered benefits for {0}
+surrenderedBenefits.memberList.remove.hidden.text = surrendered benefits for {0}
 
 surrenderedBenefits.memberList.viewOnly.title = Surrendered benefits
 surrenderedBenefits.memberList.viewOnly.heading = Surrendered benefits
@@ -2498,6 +2501,9 @@ transferIn.MemberList.pagination.label = Showing {0} - {1} of {2} members
 transferIn.MemberList.status.no.transfers = No transfers in
 transferIn.MemberList.singleStatus.some.transfer = {0} transfer in
 transferIn.MemberList.status.some.transfers = {0} transfers in
+transferIn.MemberList.add.hidden.text = transfers in for {0}
+transferIn.MemberList.change.hidden.text = transfers in for {0}
+transferIn.MemberList.remove.hidden.text = transfers in for {0}
 
 transferIn.MemberList.viewOnly.title = Transfers in
 transferIn.MemberList.viewOnly.heading = Transfers in
@@ -2711,6 +2717,9 @@ transferOut.memberList.status.no.contributions =  No transfers out
 transferOut.memberList.singleStatus.some.contribution = 1 transfer out
 transferOut.memberList.status.some.contributions = {0} transfers out
 transferOut.memberList.viewOnly.title = Transfers out
+transferOut.memberList.add.hidden.text = transfers out for {0}
+transferOut.memberList.change.hidden.text = transfers out for {0}
+transferOut.memberList.remove.hidden.text = transfers out for {0}
 
 transferOut.memberList.viewOnly.heading = Transfers out
 transferOut.memberList.viewOnly.singular = 1 transfer out
