@@ -56,7 +56,7 @@
             }
 
             @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.sections)(paginatedViewModel =>
-                viewmodel.page.sections.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
+                viewmodel.page.sections.paginateSections(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
             ) { sections =>
                 @sections.map { section =>
                     @section.heading.map { heading =>

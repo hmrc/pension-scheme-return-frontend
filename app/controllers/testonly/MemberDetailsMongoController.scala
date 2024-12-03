@@ -23,7 +23,7 @@ import models.SchemeId.Srn
 import cats.implicits._
 import repositories.SessionRepository
 import models.UserAnswers
-import viewmodels.models.MemberState
+import viewmodels.models.{MemberState, SectionCompleted}
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 import play.api.i18n.I18nSupport
@@ -66,6 +66,7 @@ class MemberDetailsMongoController @Inject()(
             .flatMap(_.remove(MemberDetailsNinoPage(srn, index)))
             .flatMap(_.remove(NoNINOPage(srn, index)))
             .flatMap(_.remove(MemberStatus(srn, index)))
+            .flatMap(_.remove(MemberDetailsCompletedPage(srn, index)))
       }
     } yield updatedUserAnswers
 
@@ -78,10 +79,12 @@ class MemberDetailsMongoController @Inject()(
       hasNinoPages = indexes.map(index => DoesMemberHaveNinoPage(srn, index) -> false)
       noNinoReasonPages = indexes.map(index => NoNINOPage(srn, index) -> "test reason")
       memberStates = indexes.map(index => MemberStatus(srn, index))
+      completed = indexes.map(index => MemberDetailsCompletedPage(srn, index))
 
       ua1 <- memberDetails.foldLeft(Try(userAnswers)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua2 <- hasNinoPages.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua3 <- noNinoReasonPages.foldLeft(Try(ua2)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua4 <- memberStates.foldLeft(Try(ua3)) { case (ua, page) => ua.flatMap(_.set(page, MemberState.New)) }
-    } yield ua4
+      ua5 <- completed.foldLeft(Try(ua4)) { case (ua, page) => ua.flatMap(_.set(page, SectionCompleted)) }
+    } yield ua5
 }

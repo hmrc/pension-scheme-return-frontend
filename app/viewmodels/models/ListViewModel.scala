@@ -82,6 +82,16 @@ case class ListSection(
 
 object ListSection {
   def apply(rows: List[ListRow]): ListSection = ListSection(None, rows)
+
+  implicit class ListSectionOps(list: List[ListSection]) {
+    def paginateSections(currentPage: Int, pageSize: Int): List[ListSection] =
+      list
+        .flatMap(section => section.rows.map(row => (section, row)))
+        .slice((currentPage - 1) * pageSize, ((currentPage - 1) * pageSize) + pageSize)
+        .groupBy(_._1)
+        .toList
+        .map { case (section, rows) => section.copy(rows = rows.map(_._2)) }
+  }
 }
 
 case class ListViewModel(
