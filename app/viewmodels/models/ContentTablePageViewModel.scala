@@ -21,11 +21,19 @@ import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{InlineMessage, Message}
 
 case class ContentTablePageViewModel(
-  inset: DisplayMessage,
+  inset: Option[DisplayMessage], // will be displayed under the table
+  beforeTable: Option[DisplayMessage],
+  afterTable: Option[DisplayMessage],
   rows: List[(DisplayMessage, DisplayMessage)]
 )
 
 object ContentTablePageViewModel {
+
+  def apply(
+    inset: DisplayMessage,
+    rows: List[(DisplayMessage, DisplayMessage)]
+  ): ContentTablePageViewModel =
+    ContentTablePageViewModel(Some(inset), beforeTable = None, afterTable = None, rows)
 
   def apply(
     title: Message,

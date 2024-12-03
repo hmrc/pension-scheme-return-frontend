@@ -172,3 +172,6 @@ GET         /:srn/land-property-non-uk-address/:index                        con
 POST        /:srn/land-property-non-uk-address/:index                        controllers.nonsipp.landorproperty.LandPropertyAddressManualController.onSubmit(srn: Srn, index: Max5000, isUkAddress: Boolean = false, mode: Mode = NormalMode)
 GET         /:srn/change-land-property-non-uk-address/:index                 controllers.nonsipp.landorproperty.LandPropertyAddressManualController.onPageLoad(srn: Srn, index: Max5000, isUkAddress: Boolean = false, mode: Mode = CheckMode)
 POST        /:srn/change-land-property-non-uk-address/:index                 controllers.nonsipp.landorproperty.LandPropertyAddressManualController.onSubmit(srn: Srn, index: Max5000, isUkAddress: Boolean = false, mode: Mode = CheckMode)
+
+GET         /:srn/check-update-land-property-information/:index                     controllers.nonsipp.landorproperty.LandOrPropertyCheckAndUpdateController.onPageLoad(srn: Srn, index: Max5000)
+GET         /:srn/submit-check-update-land-property-information/:index              controllers.nonsipp.landorproperty.LandOrPropertyCheckAndUpdateController.onSubmit(srn: Srn, index: Max5000)

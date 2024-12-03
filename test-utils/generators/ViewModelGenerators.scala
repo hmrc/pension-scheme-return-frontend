@@ -62,9 +62,11 @@ trait ViewModelGenerators extends BasicGenerators {
   implicit val contentTablePageViewModelGen: Gen[ContentTablePageViewModel] =
     for {
       inset <- nonEmptyDisplayMessage
+      before <- nonEmptyParagraphMessage
+      after <- nonEmptyParagraphMessage
       rows <- Gen.listOf(tupleOf(nonEmptyMessage, nonEmptyMessage))
     } yield {
-      ContentTablePageViewModel(inset, rows)
+      ContentTablePageViewModel(Some(inset), Some(before), Some(after), rows)
     }
 
   val actionItemGen: Gen[SummaryAction] =

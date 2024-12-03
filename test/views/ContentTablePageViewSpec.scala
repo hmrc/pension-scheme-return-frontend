@@ -55,7 +55,19 @@ class ContentTablePageViewSpec extends ViewSpec {
 
       "render inset text" in {
         forAll(viewModelGen) { viewModel =>
-          inset(view(viewModel)).text() mustBe messageKey(viewModel.page.inset, " ")
+          inset(view(viewModel)).text() mustBe messageKey(viewModel.page.inset.value, " ")
+        }
+      }
+
+      "render before text" in {
+        forAll(viewModelGen) { viewModel =>
+          p(view(viewModel)) must contain(messageKey(viewModel.page.beforeTable.value, " "))
+        }
+      }
+
+      "render after text" in {
+        forAll(viewModelGen) { viewModel =>
+          p(view(viewModel)) must contain(messageKey(viewModel.page.afterTable.value, " "))
         }
       }
 
