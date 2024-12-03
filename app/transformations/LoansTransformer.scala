@@ -160,11 +160,16 @@ class LoansTransformer @Inject() extends Transformer {
                       optSecurity <- request.userAnswers.get(SecurityGivenForLoanPage(srn, index)).map(_.value.toOption)
                       interestOnLoan <- request.userAnswers.get(InterestOnLoanPage(srn, index))
                       (loanInterestAmount, loanInterestRate, optIntReceivedCY) = interestOnLoan.asTuple
-                      optOutstandingArrearsOnLoan = request.userAnswers
-                        .get(OutstandingArrearsOnLoanPage(srn, index))
-                        .map(_.value) match {
-                        case Some(Right(money)) => Some(money.value)
-                        case _ => None
+                      optArrearsPrevYears = request.userAnswers.get(ArrearsPrevYears(srn, index))
+                      optOutstandingArrearsOnLoan = if (optArrearsPrevYears.isEmpty) {
+                        None
+                      } else {
+                        request.userAnswers
+                          .get(OutstandingArrearsOnLoanPage(srn, index))
+                          .map(_.value)
+                          .get
+                          .map(_.value)
+                          .toOption
                       }
                     } yield {
                       LoanTransactions(
@@ -185,6 +190,7 @@ class LoansTransformer @Inject() extends Transformer {
                           optIntReceivedCY.map(_.value)
                         ),
                         optSecurity.map(_.security),
+                        optArrearsPrevYears,
                         optOutstandingArrearsOnLoan
                       )
                     }
@@ -451,6 +457,15 @@ class LoansTransformer @Inject() extends Transformer {
             SecurityGivenForLoanPage(srn, index) ->
               ConditionalYesNo.no[Unit, Security](())
         )
+      arrearsPrevYears = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).optArrearsPrevYears.nonEmpty
+          }
+        )
+        .map(
+          index => ArrearsPrevYears(srn, index) -> loanTransactions(index.value - 1).optArrearsPrevYears.get
+        )
       outstandingArrearsOnLoan = indexes
         .filter(
           index => {
@@ -499,12 +514,13 @@ class LoansTransformer @Inject() extends Transformer {
       ua11 <- partialLoanInterest.foldLeft(Try(ua10)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua12 <- securityGiven.foldLeft(Try(ua11)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua13 <- securityNotGiven.foldLeft(Try(ua12)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-      ua14 <- outstandingArrearsOnLoan.foldLeft(Try(ua13)) {
+      ua14 <- arrearsPrevYears.foldLeft(Try(ua13)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua15 <- outstandingArrearsOnLoan.foldLeft(Try(ua14)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
-      ua15 <- noOutstandingArrearsOnLoan.foldLeft(Try(ua14)) {
+      ua16 <- noOutstandingArrearsOnLoan.foldLeft(Try(ua15)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
-    } yield ua15
+    } yield ua16
   }
 }

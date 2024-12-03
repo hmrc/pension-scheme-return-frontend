@@ -82,6 +82,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(AreRepaymentsInstalmentsPage(srn, index), true)
     .unsafeSet(InterestOnLoanPage(srn, index), interestOnLoan)
     .unsafeSet(SecurityGivenForLoanPage(srn, index), ConditionalYesNo.yes[Unit, Security](security))
+    .unsafeSet(ArrearsPrevYears(srn, index), true)
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.yes[Unit, Money](money))
 
   "LoansCYAController" - {
@@ -103,6 +104,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
               returnEndDate = dateRange.to,
               repaymentInstalments = true,
               interestOnLoan = interestOnLoan,
+              arrearsPrevYears = Some(true),
               outstandingArrearsOnLoan = Some(money),
               securityOnLoan = Some(security),
               mode,
@@ -150,7 +152,8 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
       .unsafeSet(AreRepaymentsInstalmentsPage(srn, index), true)
       .unsafeSet(InterestOnLoanPage(srn, index), interestOnLoan)
       .unsafeSet(SecurityGivenForLoanPage(srn, index), ConditionalYesNo.yes[Unit, Security](security))
-      .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.yes[Unit, Money](money))
+      .unsafeSet(ArrearsPrevYears(srn, index), false)
+      .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.no[Unit, Money](()))
 
     val previousUserAnswers = currentUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")
@@ -163,6 +166,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
       .unsafeSet(AreRepaymentsInstalmentsPage(srn, index), true)
       .unsafeSet(InterestOnLoanPage(srn, index), interestOnLoan)
       .unsafeSet(SecurityGivenForLoanPage(srn, index), ConditionalYesNo.yes[Unit, Security](security))
+      .unsafeSet(ArrearsPrevYears(srn, index), true)
       .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.yes[Unit, Money](money))
 
     act.like(
@@ -183,7 +187,8 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
               returnEndDate = dateRange.to,
               repaymentInstalments = true,
               interestOnLoan = interestOnLoan,
-              outstandingArrearsOnLoan = Some(money),
+              arrearsPrevYears = Some(false),
+              outstandingArrearsOnLoan = None,
               securityOnLoan = Some(security),
               ViewOnlyMode,
               viewOnlyUpdated = false,

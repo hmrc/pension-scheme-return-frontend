@@ -54,6 +54,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(AreRepaymentsInstalmentsPage(srn, indexOne), false)
     .unsafeSet(InterestOnLoanPage(srn, indexOne), interestOnLoan)
     .unsafeSet(SecurityGivenForLoanPage(srn, indexOne), ConditionalYesNo.yes[Unit, Security](security))
+    .unsafeSet(ArrearsPrevYears(srn, indexOne), true)
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, indexOne), ConditionalYesNo.yes[Unit, Money](money))
     .unsafeSet(IdentityTypePage(srn, indexTwo, subject), IdentityType.UKPartnership)
     .unsafeSet(PartnershipRecipientNamePage(srn, indexTwo), "recipientName2")
@@ -67,6 +68,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(AreRepaymentsInstalmentsPage(srn, indexTwo), false)
     .unsafeSet(InterestOnLoanPage(srn, indexTwo), interestOnLoan)
     .unsafeSet(SecurityGivenForLoanPage(srn, indexTwo), ConditionalYesNo.no[Unit, Security](()))
+    .unsafeSet(ArrearsPrevYears(srn, indexOne), false)
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, indexTwo), ConditionalYesNo.no[Unit, Money](()))
     .unsafeSet(IdentityTypePage(srn, indexThree, subject), IdentityType.Individual)
     .unsafeSet(IndividualRecipientNamePage(srn, indexThree), "recipientName3")
@@ -77,6 +79,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(AreRepaymentsInstalmentsPage(srn, indexThree), false)
     .unsafeSet(InterestOnLoanPage(srn, indexThree), interestOnLoan)
     .unsafeSet(SecurityGivenForLoanPage(srn, indexThree), ConditionalYesNo.yes[Unit, Security](security))
+    .unsafeSet(ArrearsPrevYears(srn, indexOne), true)
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, indexThree), ConditionalYesNo.yes[Unit, Money](money))
 
   private val inProgressUserAnswers = defaultUserAnswers

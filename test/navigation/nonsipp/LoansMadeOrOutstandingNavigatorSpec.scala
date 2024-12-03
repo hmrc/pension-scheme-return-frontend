@@ -94,10 +94,9 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
 
       val completedLoanUserAnswers: Srn => UserAnswers =
         srn =>
-          defaultUserAnswers.unsafeSet(
-            OutstandingArrearsOnLoanPage(srn, refineMV(1)),
-            ConditionalYesNo.no[Unit, Money](())
-          )
+          defaultUserAnswers
+            .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), false)
+            .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.no[Unit, Money](()))
 
       act.like(
         normalmode

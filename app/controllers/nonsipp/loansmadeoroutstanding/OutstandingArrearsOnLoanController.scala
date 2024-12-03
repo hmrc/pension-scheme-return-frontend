@@ -24,7 +24,6 @@ import forms.mappings.Mappings
 import controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController._
 import config.RefinedTypes.Max5000
 import cats.implicits.toShow
-import config.Constants.maxCurrencyValue
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -32,9 +31,11 @@ import viewmodels.models._
 import forms.mappings.errors.MoneyFormErrors
 import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
+import utils.nonsipp.PrePopulationUtils.isPrePopulation
+import config.Constants.maxCurrencyValue
 import utils.DateTimeUtils.localDateShow
 import models._
-import pages.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanPage
+import pages.nonsipp.loansmadeoroutstanding.{ArrearsPrevYears, OutstandingArrearsOnLoanPage}
 import cats.{Id, Monad}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -61,8 +62,15 @@ class OutstandingArrearsOnLoanController @Inject()(
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       usingSchemeDate[Id](srn) { period =>
+        val storedYesNoAnswer = request.userAnswers.get(ArrearsPrevYears(srn, index))
         val form = OutstandingArrearsOnLoanController.form(formProvider, period)
-        val preparedForm = request.userAnswers.fillForm(OutstandingArrearsOnLoanPage(srn, index), form)
+
+        val preparedForm = if (isPrePopulation && storedYesNoAnswer.isEmpty) {
+          form
+        } else {
+          request.userAnswers.fillForm(OutstandingArrearsOnLoanPage(srn, index), form)
+        }
+
         Ok(view(preparedForm, viewModel(srn, index, mode, period)))
       }
   }
@@ -77,8 +85,10 @@ class OutstandingArrearsOnLoanController @Inject()(
             formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, period)))),
             value =>
               for {
+                yesNoAnswer <- Future
+                  .fromTry(request.userAnswers.set(ArrearsPrevYears(srn, index), if (value.isRight) true else false))
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.set(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo(value)))
+                  .fromTry(yesNoAnswer.set(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo(value)))
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(navigator.nextPage(OutstandingArrearsOnLoanPage(srn, index), mode, updatedAnswers))
           )

@@ -16,6 +16,7 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
+import utils.RefinedUtils.RefinedIntOps
 import pages.QuestionPage
 import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
@@ -23,7 +24,7 @@ import play.api.libs.json.JsPath
 
 case class ArrearsPrevYears(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = Paths.loanTransactions \ toString
+  override def path: JsPath = Paths.loanTransactions \ toString \ index.arrayIndex.toString
 
   override def toString: String = "arrearsPrevYears"
 }

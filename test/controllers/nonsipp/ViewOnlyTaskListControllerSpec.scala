@@ -158,6 +158,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(AreRepaymentsInstalmentsPage(srn, index1of5000), true)
     .unsafeSet(InterestOnLoanPage(srn, index1of5000), interestOnLoan)
     .unsafeSet(SecurityGivenForLoanPage(srn, index1of5000), ConditionalYesNo.yes[Unit, Security](security))
+    .unsafeSet(ArrearsPrevYears(srn, index1of5000), true)
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, index1of5000), ConditionalYesNo.yes[Unit, Money](money))
     // (S4) Money Borrowed
     .unsafeSet(MoneyBorrowedPage(srn), true)
@@ -356,6 +357,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
     .unsafeSet(AreRepaymentsInstalmentsPage(srn, index1of5000), true)
     .unsafeSet(InterestOnLoanPage(srn, index1of5000), interestOnLoan)
     .unsafeSet(SecurityGivenForLoanPage(srn, index1of5000), ConditionalYesNo.yes[Unit, Security](security))
+    .unsafeSet(ArrearsPrevYears(srn, index1of5000), true)
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, index1of5000), ConditionalYesNo.yes[Unit, Money](money))
     // (S4) Money Borrowed
     .unsafeSet(MoneyBorrowedPage(srn), true)

@@ -37,6 +37,7 @@ case class LoanTransactions(
   equalInstallments: Boolean,
   loanInterestDetails: LoanInterestDetails,
   optSecurityGivenDetails: Option[String],
+  optArrearsPrevYears: Option[Boolean],
   optOutstandingArrearsOnLoan: Option[Double]
 )
 
