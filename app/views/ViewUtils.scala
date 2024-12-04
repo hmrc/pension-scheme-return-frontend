@@ -17,9 +17,34 @@
 package views
 
 import play.api.i18n.Messages
+import viewmodels.models.PaginatedViewModel
 import play.api.data.Form
 
 object ViewUtils {
+  def paginatedTitle(
+    paginationViewModel: Option[PaginatedViewModel],
+    form: Form[_],
+    title: String,
+    section: Option[String] = None
+  )(
+    implicit messages: Messages
+  ): String =
+    titleNoForm(
+      title = s"${errorPrefix(form)} ${messages(title)} ${paginationPostfix(paginationViewModel)}",
+      section = section
+    )
+
+  def paginatedTitleNoForm(
+    paginationViewModel: Option[PaginatedViewModel],
+    title: String,
+    section: Option[String] = None
+  )(
+    implicit messages: Messages
+  ): String =
+    titleNoForm(
+      title = s"${messages(title)} ${paginationPostfix(paginationViewModel)}",
+      section = section
+    )
 
   def title(form: Form[_], title: String, section: Option[String] = None)(implicit messages: Messages): String =
     titleNoForm(
@@ -30,6 +55,20 @@ object ViewUtils {
   def titleNoForm(title: String, section: Option[String] = None)(implicit messages: Messages): String =
     s"${messages(title)} - ${section.fold("")(messages(_) + " - ")}${messages("service.title")} - ${messages("site.govuk")}"
 
-  def errorPrefix(form: Form[_])(implicit messages: Messages): String =
+  private def errorPrefix(form: Form[_])(implicit messages: Messages): String =
     if (form.hasErrors || form.hasGlobalErrors) messages("error.browser.title.prefix") else ""
+
+  private def paginationPostfix(paginationViewModel: Option[PaginatedViewModel])(implicit messages: Messages): String =
+    paginationViewModel.fold("")(
+      paginatedViewModel =>
+        if (paginatedViewModel.pagination.totalPages > 1) {
+          messages(
+            "site.title.postfix",
+            paginatedViewModel.pagination.currentPage,
+            paginatedViewModel.pagination.totalPages
+          )
+        } else {
+          ""
+        }
+    )
 }
