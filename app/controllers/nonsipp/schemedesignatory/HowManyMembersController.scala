@@ -141,9 +141,9 @@ object HowManyMembersController {
     Message("howManyMembers.heading", schemeName, endDate.show),
     TripleQuestion(
       form,
-      QuestionField.input("howManyMembers.field1", hint = Some("howManyMembers.field1.hint")),
-      QuestionField.input("howManyMembers.field2", hint = Some("howManyMembers.field2.hint")),
-      QuestionField.input("howManyMembers.field3", hint = Some("howManyMembers.field3.hint"))
+      QuestionField.numeric("howManyMembers.field1", hint = Some("howManyMembers.field1.hint")),
+      QuestionField.numeric("howManyMembers.field2", hint = Some("howManyMembers.field2.hint")),
+      QuestionField.numeric("howManyMembers.field3", hint = Some("howManyMembers.field3.hint"))
     ),
     routes.HowManyMembersController.onSubmit(srn, mode)
   )

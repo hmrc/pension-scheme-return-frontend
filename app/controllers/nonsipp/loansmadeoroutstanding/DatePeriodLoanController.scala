@@ -162,7 +162,7 @@ object DatePeriodLoanController {
       form,
       QuestionField.date("datePeriodLoan.field1", Some("datePeriodLoan.hint")),
       QuestionField.currency(Message("datePeriodLoan.field2", schemeName)),
-      QuestionField.input("datePeriodLoan.field3", hint = Some("datePeriodLoan.field3.hint"))
+      QuestionField.numeric("datePeriodLoan.field3", hint = Some("datePeriodLoan.field3.hint"))
     ),
     details = None,
     routes.DatePeriodLoanController.onSubmit(srn, index, mode)

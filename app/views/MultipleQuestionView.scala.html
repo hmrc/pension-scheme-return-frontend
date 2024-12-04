@@ -54,6 +54,7 @@
       @{
           viewmodel.page.fields.zipWithIndex.map {
             case (field @ QuestionField(_, _, width, _, FieldType.Input), index) => input(index, width, field)
+            case (field @ QuestionField(_, _, width, _, FieldType.Numeric), index) => numeric(index,width, field)
             case (field @ QuestionField(_, _, _, _, FieldType.Currency), index) => currency(index, field)
             case (field @ QuestionField(_, _, _, _, FieldType.Percentage), index) => percentage(index, field)
             case (field @ QuestionField(_, _, _, _, FieldType.Date), index) => date(index, field)
@@ -75,6 +76,19 @@
             label = LabelViewModel(renderMessage(field.label))
         )
         .withId(s"value.${index + 1}")
+        .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
+        .withWidth(width.fold[InputWidth](InputWidth.Fixed10)(identity))
+    )
+}
+
+@numeric(index: Int, width: Option[InputWidth], field: QuestionField) = {
+    @govukInput(
+        InputViewModel(
+             field = form(s"value.${index + 1}"),
+             label = LabelViewModel(renderMessage(field.label))
+        )
+        .withId(s"value.${index + 1}")
+        .asNumeric()
         .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
         .withWidth(width.fold[InputWidth](InputWidth.Fixed10)(identity))
     )

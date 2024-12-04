@@ -131,6 +131,9 @@ object QuestionField {
   def input(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
     QuestionField(label, hint, None, Nil, FieldType.Input)
 
+  def numeric(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
+    QuestionField(label, hint, None, Nil, FieldType.Numeric)
+
   def currency(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
     QuestionField(label, hint, None, Nil, FieldType.Currency)
 
