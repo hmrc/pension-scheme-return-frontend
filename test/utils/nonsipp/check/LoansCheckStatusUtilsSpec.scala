@@ -18,7 +18,7 @@ package utils.nonsipp.check
 
 import models.IdentityType._
 import utils.nonsipp.check.LoansCheckStatusUtils.{checkLoansRecord, checkLoansSection}
-import eu.timepit.refined.refineMV
+import org.scalatest.OptionValues
 import models._
 import pages.nonsipp.common._
 import models.SponsoringOrConnectedParty.{ConnectedParty, Neither, Sponsoring}
@@ -26,20 +26,10 @@ import org.scalatest.matchers.must.Matchers
 import models.ConditionalYesNo._
 import config.RefinedTypes.Max5000
 import controllers.ControllerBaseSpec
-import org.scalatest.OptionValues
-import uk.gov.hmrc.domain.Nino
 import pages.nonsipp.loansmadeoroutstanding._
 import models.IdentitySubject.LoanRecipient
 
 class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionValues {
-
-  // Test values
-  private val name: String = "name"
-  private val index1of5000: Max5000 = refineMV(1)
-  private val index2of5000: Max5000 = refineMV(2)
-  private val conditionalYesNoNino: ConditionalYesNo[String, Nino] = ConditionalYesNo.yes(nino)
-  private val conditionalYesNoCrn: ConditionalYesNo[String, Crn] = ConditionalYesNo.yes(crn)
-  private val conditionalYesNoUtr: ConditionalYesNo[String, Utr] = ConditionalYesNo.yes(utr)
 
   private val conditionalYesSecurity: ConditionalYes[Security] = ConditionalYesNo.yes(security)
   private val conditionalYesArrears: ConditionalYes[Money] = ConditionalYesNo.yes(money)
@@ -58,7 +48,7 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
       .unsafeSet(AmountOfTheLoanPage(srn, index), partialAmountOfTheLoan)
       .unsafeSet(InterestOnLoanPage(srn, index), partialInterestOnLoan)
 
-  // Loans: Branching on IdentityTypePage
+  // Branching on IdentityTypePage
   private def addLoansIndividualAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers
       .unsafeSet(IdentityTypePage(srn, index, LoanRecipient), Individual)

@@ -18,8 +18,8 @@ package utils.nonsipp.check
 
 import pages.nonsipp.shares._
 import models.IdentityType._
-import eu.timepit.refined.refineMV
 import utils.nonsipp.check.SharesCheckStatusUtils.{checkSharesRecord, checkSharesSection}
+import org.scalatest.OptionValues
 import models._
 import pages.nonsipp.common._
 import models.IdentitySubject._
@@ -27,18 +27,8 @@ import org.scalatest.matchers.must.Matchers
 import models.ConditionalYesNo._
 import config.RefinedTypes.Max5000
 import controllers.ControllerBaseSpec
-import org.scalatest.OptionValues
-import uk.gov.hmrc.domain.Nino
 
 class SharesCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionValues {
-
-  // Test values
-  private val name: String = "name"
-  private val index1of5000: Max5000 = refineMV(1)
-  private val index2of5000: Max5000 = refineMV(2)
-  private val conditionalYesNoNino: ConditionalYesNo[String, Nino] = ConditionalYesNo.yes(nino)
-  private val conditionalYesNoCrn: ConditionalYesNo[String, Crn] = ConditionalYesNo.yes(crn)
-  private val conditionalYesNoUtr: ConditionalYesNo[String, Utr] = ConditionalYesNo.yes(utr)
 
   private val didSchemeHoldAnySharesTrue = defaultUserAnswers.unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
   private val didSchemeHoldAnySharesFalse = defaultUserAnswers.unsafeSet(DidSchemeHoldAnySharesPage(srn), false)
@@ -52,7 +42,7 @@ class SharesCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with O
       .unsafeSet(CostOfSharesPage(srn, index), money)
       .unsafeSet(SharesIndependentValuationPage(srn, index), true)
 
-  // Shares: Branching on TypeOfSharesHeldPage
+  // Branching on TypeOfSharesHeldPage
   private def addSharesSponsoringEmployerAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers
       .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer)
@@ -66,7 +56,7 @@ class SharesCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with O
     userAnswers
       .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty)
 
-  // Shares: Branching on WhyDoesSchemeHoldSharesPage
+  // Branching on WhyDoesSchemeHoldSharesPage
   private def addSharesAcquisitionAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers
       .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition)
@@ -81,7 +71,7 @@ class SharesCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with O
     userAnswers
       .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Transfer)
 
-  // Shares: Branching on IdentityTypePage
+  // Branching on IdentityTypePage
   private def addSharesIndividualAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers
       .unsafeSet(IdentityTypePage(srn, index, SharesSeller), Individual)

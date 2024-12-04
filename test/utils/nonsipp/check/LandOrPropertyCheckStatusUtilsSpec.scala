@@ -18,8 +18,8 @@ package utils.nonsipp.check
 
 import models.IdentityType._
 import pages.nonsipp.landorproperty._
-import eu.timepit.refined.refineMV
 import utils.nonsipp.check.LandOrPropertyCheckStatusUtils.{checkLandOrPropertyRecord, checkLandOrPropertySection}
+import org.scalatest.OptionValues
 import models._
 import pages.nonsipp.common._
 import models.IdentitySubject._
@@ -27,18 +27,8 @@ import org.scalatest.matchers.must.Matchers
 import models.ConditionalYesNo._
 import config.RefinedTypes.Max5000
 import controllers.ControllerBaseSpec
-import org.scalatest.OptionValues
-import uk.gov.hmrc.domain.Nino
 
 class LandOrPropertyCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionValues {
-
-  // Test values
-  private val name: String = "name"
-  private val index1of5000: Max5000 = refineMV(1)
-  private val index2of5000: Max5000 = refineMV(2)
-  private val conditionalYesNoNino: ConditionalYesNo[String, Nino] = ConditionalYesNo.yes(nino)
-  private val conditionalYesNoCrn: ConditionalYesNo[String, Crn] = ConditionalYesNo.yes(crn)
-  private val conditionalYesNoUtr: ConditionalYesNo[String, Utr] = ConditionalYesNo.yes(utr)
 
   private val conditionalYesNoLRTN: ConditionalYesNo[String, String] = ConditionalYesNo.yes("landRegistryTitleNumber")
 
@@ -52,7 +42,7 @@ class LandOrPropertyCheckStatusUtilsSpec extends ControllerBaseSpec with Matcher
       .unsafeSet(LandRegistryTitleNumberPage(srn, index), conditionalYesNoLRTN)
       .unsafeSet(LandOrPropertyTotalCostPage(srn, index), money)
 
-  // LOP: Branching on WhyDoesSchemeHoldLandPropertyPage
+  // Branching on WhyDoesSchemeHoldLandPropertyPage
   private def addLOPAcquisitionAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers
       .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index), SchemeHoldLandProperty.Acquisition)
@@ -70,7 +60,7 @@ class LandOrPropertyCheckStatusUtilsSpec extends ControllerBaseSpec with Matcher
     userAnswers
       .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index), SchemeHoldLandProperty.Transfer)
 
-  // LOP: Branching on IdentityTypePage
+  // Branching on IdentityTypePage
   private def addLOPIndividualAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers
       .unsafeSet(IdentityTypePage(srn, index, LandOrPropertySeller), Individual)
