@@ -23,6 +23,9 @@ case class SubmissionViewModel(
   title: Message,
   panelHeading: Message,
   panelContent: Message,
-  content: DisplayMessage,
+  email: Option[DisplayMessage] = None,
+  scheme: DisplayMessage,
+  periodOfReturn: DisplayMessage,
+  dateSubmitted: DisplayMessage,
   whatHappensNextContent: DisplayMessage
 )

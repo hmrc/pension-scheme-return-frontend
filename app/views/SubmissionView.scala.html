@@ -16,7 +16,8 @@
 
 @this(
         layout: templates.Layout,
-        govukPanel: GovukPanel
+        govukPanel: GovukPanel,
+        govukSummaryList: GovukSummaryList
 )
 
 @(viewModel: SubmissionViewModel)(implicit request: Request[_], messages: Messages)
@@ -29,7 +30,34 @@
     ))
 
     <div id="content">
-        @renderMessage(viewModel.content)
+        @viewModel.email.map(renderMessage)
+
+        @govukSummaryList(SummaryList(
+            rows = Seq(
+                SummaryListRow(
+                    key = Key(
+                        content = messages("returnSubmitted.table.field1")
+                    ),
+                    value = Value(
+                        content = HtmlContent(renderMessage(viewModel.scheme))
+                    ),
+                ),
+                SummaryListRow(
+                    key = Key(
+                        content = messages("returnSubmitted.table.field2")
+                    ),
+                    value = Value(
+                        content = HtmlContent(renderMessage(viewModel.periodOfReturn))
+                    ),
+                ),
+                SummaryListRow(
+                    key = Key(
+                        content = messages("returnSubmitted.table.field3")
+                    ),
+                    value = Value(
+                        content = HtmlContent(renderMessage(viewModel.dateSubmitted))
+                    ),
+                ))))
     </div>
 
     <h2 class="govuk-heading-m">@messages("site.whatHappensNext")</h2>

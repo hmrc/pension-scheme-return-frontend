@@ -19,19 +19,18 @@ package controllers.nonsipp
 import services.{PsrRetrievalService, PsrVersionsService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import utils.ListUtils.ListOps
 import controllers.PSRController
 import config.FrontendAppConfig
 import cats.implicits.toShow
 import controllers.actions._
 import pages.nonsipp.WhichTaxYearPage
 import models.backend.responses.PsrVersionsResponse
-import play.api.i18n.MessagesApi
-import cats.data.NonEmptyList
 import views.html.SubmissionView
 import models.SchemeId.Srn
 import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models.{DateRange, UserAnswers}
+import play.api.i18n.MessagesApi
+import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage._
 import viewmodels.models.SubmissionViewModel
 
@@ -88,33 +87,29 @@ object ViewOnlyReturnSubmittedController {
     managePensionSchemeDashboardUrl: String
   ): SubmissionViewModel = {
 
-    val schemeRow = Message("returnSubmitted.table.field1") -> Message(schemeName)
-
-    val periodOfReturnRow: List[(Message, Message)] = retrievedUserAnswers.get(WhichTaxYearPage(srn)) match {
+    val periodOfReturn: DisplayMessage = retrievedUserAnswers.get(WhichTaxYearPage(srn)) match {
       case Some(dateRange) =>
-        List(Message("returnSubmitted.table.field2") -> Message("site.to", dateRange.from.show, dateRange.to.show))
-      case _ => List.empty
+        Message("site.to", dateRange.from.show, dateRange.to.show)
+      case _ => Empty
     }
 
-    val dateSubmittedRow: Option[(Message, Message)] = psrVersionsResponse.find(p => p.reportVersion == version) match {
+    val dateSubmitted: DisplayMessage = psrVersionsResponse.find(p => p.reportVersion == version) match {
       case Some(psrVersionResponse) =>
-        Some(
-          Message("returnSubmitted.table.field3") -> Message(
-            "site.at",
-            psrVersionResponse.compilationOrSubmissionDate.show,
-            psrVersionResponse.compilationOrSubmissionDate.format(DateRange.readableTimeFormat).toLowerCase()
-          )
+        Message(
+          "site.at",
+          psrVersionResponse.compilationOrSubmissionDate.show,
+          psrVersionResponse.compilationOrSubmissionDate.format(DateRange.readableTimeFormat).toLowerCase()
         )
-      case None => None
+      case None => Empty
     }
-
-    val tailRows: List[(Message, Message)] = periodOfReturnRow :?+ dateSubmittedRow
 
     SubmissionViewModel(
       "returnSubmitted.title",
       "returnSubmitted.panel.heading",
       "returnSubmitted.panel.content",
-      content = TableMessage(NonEmptyList(schemeRow, tailRows)),
+      scheme = Message(schemeName),
+      periodOfReturn = periodOfReturn,
+      dateSubmitted = dateSubmitted,
       whatHappensNextContent =
         ParagraphMessage("returnSubmitted.whatHappensNext.paragraph1") ++
           ParagraphMessage(
