@@ -23,7 +23,7 @@ import views.html.TwoColumnsTripleAction
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import models._
 import config.RefinedTypes.Max300
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, MemberListBaseSpec}
 import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import eu.timepit.refined.refineMV
 import viewmodels.DisplayMessage.Message
@@ -31,7 +31,7 @@ import viewmodels.models.SectionCompleted
 
 import java.time.LocalDate
 
-class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
+class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.MemberPensionPaymentsListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.MemberPensionPaymentsListController.onSubmit(srn, page = 1, NormalMode)
@@ -283,8 +283,7 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) must include("Submitted on")
-        (contentAsString(result) must not).include("govuk-back-link")
+        checkContent(contentAsString(result))
       }
     }
   }

@@ -18,7 +18,7 @@ package controllers.nonsipp.receivetransfer
 
 import play.api.test.FakeRequest
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, MemberListBaseSpec}
 import views.html.TwoColumnsTripleAction
 import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, ReceiveTransferProgress}
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
@@ -28,7 +28,7 @@ import eu.timepit.refined.refineMV
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 
-class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
+class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.TransferReceivedMemberListController.onPageLoad(srn, page, NormalMode)
   private lazy val onSubmit = routes.TransferReceivedMemberListController.onSubmit(srn, page, NormalMode)
@@ -159,9 +159,7 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
 
         status(result) mustEqual OK
 
-        contentAsString(result) must include("Submitted on")
-
-        (contentAsString(result) must not).include("govuk-back-link")
+        checkContent(contentAsString(result))
       }
     }
 

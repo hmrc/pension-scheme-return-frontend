@@ -25,11 +25,11 @@ import controllers.nonsipp.memberreceivedpcls.PclsMemberListController._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import models._
 import config.RefinedTypes.Max300
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, MemberListBaseSpec}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 
-class PclsMemberListControllerSpec extends ControllerBaseSpec {
+class PclsMemberListControllerSpec extends ControllerBaseSpec with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.PclsMemberListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.PclsMemberListController.onSubmit(srn, page = 1, NormalMode)
@@ -162,8 +162,7 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) must include("Submitted on")
-        (contentAsString(result) must not).include("govuk-back-link")
+        checkContent(contentAsString(result))
       }
     }
 

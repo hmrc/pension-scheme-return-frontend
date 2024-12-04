@@ -25,13 +25,13 @@ import pages.nonsipp.membertransferout._
 import controllers.nonsipp.membertransferout.TransferOutMemberListController.{CompletedTransfersOut, _}
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import config.RefinedTypes.{Max300, Max5}
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, MemberListBaseSpec}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 
 import java.time.LocalDate
 
-class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
+class TransferOutMemberListControllerSpec extends ControllerBaseSpec with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.TransferOutMemberListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.TransferOutMemberListController.onSubmit(srn, page = 1, NormalMode)
@@ -168,8 +168,7 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
 
           status(result) mustEqual OK
 
-          contentAsString(result) must include("Submitted on")
-          (contentAsString(result) must not).include("govuk-back-link")
+          checkContent(contentAsString(result))
         }
       }
 

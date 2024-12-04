@@ -143,7 +143,7 @@ object MemberPensionPaymentsListController {
     optYear: Option[String],
     optCurrentVersion: Option[Int],
     optPreviousVersion: Option[Int]
-  ): List[List[TableElem]] =
+  ): List[List[TableElemBase]] =
     memberList.zipWithIndex
       .map {
         case (Some(memberName), index) =>
@@ -159,35 +159,37 @@ object MemberPensionPaymentsListController {
                   TableElem(
                     "memberPensionPayments.memberList.pensionPaymentsReported"
                   ),
-                  (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-                    case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                      TableElem.view(
-                        controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-                          .onPageLoadViewOnly(
-                            srn,
-                            nextIndex,
-                            year = year,
-                            current = currentVersion,
-                            previous = previousVersion
-                          ),
+                  TableElemDoubleLink(
+                    (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                      case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                        TableElem.view(
+                          controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
+                            .onPageLoadViewOnly(
+                              srn,
+                              nextIndex,
+                              year = year,
+                              current = currentVersion,
+                              previous = previousVersion
+                            ),
+                          Message("memberPensionPayments.memberList.remove.hidden.text", memberName.fullName)
+                        )
+                      case _ =>
+                        TableElem.change(
+                          controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
+                            .onPageLoad(srn, nextIndex, CheckMode),
+                          Message("memberPensionPayments.memberList.change.hidden.text", memberName.fullName)
+                        )
+                    },
+                    if (mode == ViewOnlyMode) {
+                      TableElem.empty
+                    } else {
+                      TableElem.remove(
+                        controllers.nonsipp.memberpensionpayments.routes.RemovePensionPaymentsController
+                          .onPageLoad(srn, nextIndex),
                         Message("memberPensionPayments.memberList.remove.hidden.text", memberName.fullName)
                       )
-                    case _ =>
-                      TableElem.change(
-                        controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-                          .onPageLoad(srn, nextIndex, CheckMode),
-                        Message("memberPensionPayments.memberList.change.hidden.text", memberName.fullName)
-                      )
-                  },
-                  if (mode == ViewOnlyMode) {
-                    TableElem.empty
-                  } else {
-                    TableElem.remove(
-                      controllers.nonsipp.memberpensionpayments.routes.RemovePensionPaymentsController
-                        .onPageLoad(srn, nextIndex),
-                      Message("memberPensionPayments.memberList.remove.hidden.text", memberName.fullName)
-                    )
-                  }
+                    }
+                  )
                 )
               } else {
                 List(
@@ -205,14 +207,13 @@ object MemberPensionPaymentsListController {
                     )
                   } else {
                     TableElem.empty
-                  },
-                  TableElem.empty
+                  }
                 )
               }
           }
         case _ => List.empty
       }
-      .sortBy(_.headOption.map(_.text.toString))
+      .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString))
 
   def viewModel(
     srn: Srn,
@@ -281,7 +282,6 @@ object MemberPensionPaymentsListController {
           List(
             TableElem("memberList.memberName"),
             TableElem("memberList.status"),
-            TableElem.empty,
             TableElem.empty
           )
         ),

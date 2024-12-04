@@ -166,7 +166,7 @@ object EmployerContributionsMemberListController {
     optYear: Option[String],
     optCurrentVersion: Option[Int],
     optPreviousVersion: Option[Int]
-  ): List[List[TableElem]] =
+  ): List[List[TableElemBase]] =
     memberWithEmployerContributions.map { memberWithEmployerContributions =>
       val noContributions = memberWithEmployerContributions.contributions.isEmpty
       val onlyInProgressContributions = memberWithEmployerContributions.contributions.forall(_.status.inProgress)
@@ -195,9 +195,7 @@ object EmployerContributionsMemberListController {
             )
           } else {
             TableElem.empty
-          },
-          // Remove link
-          TableElem.empty
+          }
         )
       } else {
         List(
@@ -217,47 +215,49 @@ object EmployerContributionsMemberListController {
               )
             }
           ),
-          // Change link
-          (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-            case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-              TableElem.view(
-                controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                  .onPageLoadViewOnly(
-                    srn,
-                    memberWithEmployerContributions.memberIndex,
-                    page = 1,
-                    year = year,
-                    current = currentVersion,
-                    previous = previousVersion
-                  ),
+          TableElemDoubleLink(
+            // Change link
+            (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+              case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                TableElem.view(
+                  controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                    .onPageLoadViewOnly(
+                      srn,
+                      memberWithEmployerContributions.memberIndex,
+                      page = 1,
+                      year = year,
+                      current = currentVersion,
+                      previous = previousVersion
+                    ),
+                  Message(
+                    "employerContributions.MemberList.remove.hidden.text",
+                    memberWithEmployerContributions.employerFullName
+                  )
+                )
+              case _ =>
+                TableElem.change(
+                  controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                    .onSubmit(srn, memberWithEmployerContributions.memberIndex, page = 1, CheckMode),
+                  Message(
+                    "employerContributions.MemberList.change.hidden.text",
+                    memberWithEmployerContributions.employerFullName
+                  )
+                )
+            },
+            // Remove link
+            if (mode == ViewOnlyMode) {
+              TableElem.empty
+            } else {
+              TableElem.remove(
+                controllers.nonsipp.employercontributions.routes.WhichEmployerContributionRemoveController
+                  .onSubmit(srn, memberWithEmployerContributions.memberIndex),
                 Message(
                   "employerContributions.MemberList.remove.hidden.text",
                   memberWithEmployerContributions.employerFullName
                 )
               )
-            case _ =>
-              TableElem.change(
-                controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                  .onSubmit(srn, memberWithEmployerContributions.memberIndex, page = 1, CheckMode),
-                Message(
-                  "employerContributions.MemberList.change.hidden.text",
-                  memberWithEmployerContributions.employerFullName
-                )
-              )
-          },
-          // Remove link
-          if (mode == ViewOnlyMode) {
-            TableElem.empty
-          } else {
-            TableElem.remove(
-              controllers.nonsipp.employercontributions.routes.WhichEmployerContributionRemoveController
-                .onSubmit(srn, memberWithEmployerContributions.memberIndex),
-              Message(
-                "employerContributions.MemberList.remove.hidden.text",
-                memberWithEmployerContributions.employerFullName
-              )
-            )
-          }
+            }
+          )
         )
       }
     }
@@ -318,7 +318,6 @@ object EmployerContributionsMemberListController {
           List(
             TableElem("memberList.memberName"),
             TableElem("memberList.status"),
-            TableElem.empty,
             TableElem.empty
           )
         ),

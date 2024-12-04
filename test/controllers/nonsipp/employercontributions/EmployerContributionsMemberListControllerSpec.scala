@@ -26,11 +26,11 @@ import controllers.nonsipp.employercontributions.EmployerContributionsMemberList
 import models.{NormalMode, ViewOnlyMode}
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import config.RefinedTypes.Max300
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, MemberListBaseSpec}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
-class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
+class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.EmployerContributionsMemberListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.EmployerContributionsMemberListController.onSubmit(srn, page = 1, NormalMode)
@@ -192,9 +192,7 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
 
         status(result) mustEqual OK
 
-        contentAsString(result) must include("Submitted on")
-
-        (contentAsString(result) must not).include("govuk-back-link")
+        checkContent(contentAsString(result))
       }
     }
 

@@ -152,37 +152,39 @@ object MemberContributionListController {
     optYear: Option[String],
     optCurrentVersion: Option[Int],
     optPreviousVersion: Option[Int]
-  ): List[List[TableElem]] =
-    memberList
+  ): List[List[TableElemBase]] = {
+    val x = memberList
       .map {
         case (index, memberName, memberContribution) =>
           if (memberContribution.exists(!_.isZero)) {
             List(
               TableElem(memberName.fullName),
               TableElem("Member contributions reported"),
-              (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-                case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                  TableElem.view(
-                    controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
-                      .onPageLoadViewOnly(srn, index, year, currentVersion, previousVersion),
+              TableElemDoubleLink(
+                (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                  case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                    TableElem.view(
+                      controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
+                        .onPageLoadViewOnly(srn, index, year, currentVersion, previousVersion),
+                      Message("ReportContribution.MemberList.remove.hidden.text", memberName.fullName)
+                    )
+                  case _ =>
+                    TableElem.change(
+                      controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
+                        .onPageLoad(srn, index, CheckMode),
+                      Message("ReportContribution.MemberList.change.hidden.text", memberName.fullName)
+                    )
+                },
+                if (mode == ViewOnlyMode) {
+                  TableElem.empty
+                } else {
+                  TableElem.remove(
+                    controllers.nonsipp.membercontributions.routes.RemoveMemberContributionController
+                      .onPageLoad(srn, index),
                     Message("ReportContribution.MemberList.remove.hidden.text", memberName.fullName)
                   )
-                case _ =>
-                  TableElem.change(
-                    controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
-                      .onPageLoad(srn, index, CheckMode),
-                    Message("ReportContribution.MemberList.change.hidden.text", memberName.fullName)
-                  )
-              },
-              if (mode == ViewOnlyMode) {
-                TableElem.empty
-              } else {
-                TableElem.remove(
-                  controllers.nonsipp.membercontributions.routes.RemoveMemberContributionController
-                    .onPageLoad(srn, index),
-                  Message("ReportContribution.MemberList.remove.hidden.text", memberName.fullName)
-                )
-              }
+                }
+              )
             )
           } else {
             List(
@@ -196,13 +198,12 @@ object MemberContributionListController {
                 )
               } else {
                 TableElem.empty
-              },
-              TableElem.empty
+              }
             )
           }
-
       }
-      .sortBy(_.headOption.map(_.text.toString))
+    x.sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString))
+  }
 
   def viewModel(
     srn: Srn,
@@ -273,7 +274,6 @@ object MemberContributionListController {
           List(
             TableElem("memberList.memberName"),
             TableElem("memberList.status"),
-            TableElem.empty,
             TableElem.empty
           )
         ),

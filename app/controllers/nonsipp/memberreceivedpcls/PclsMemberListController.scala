@@ -150,7 +150,7 @@ object PclsMemberListController {
     optYear: Option[String],
     optCurrentVersion: Option[Int],
     optPreviousVersion: Option[Int]
-  ): List[List[TableElem]] =
+  ): List[List[TableElemBase]] =
     memberList
       .map {
         case (index, memberName, pcls) if pcls.isEmpty || pcls.exists(_.isZero) =>
@@ -169,8 +169,7 @@ object PclsMemberListController {
               )
             } else {
               TableElem.empty
-            },
-            TableElem.empty
+            }
           )
         case (index, memberName, _) =>
           List(
@@ -180,32 +179,34 @@ object PclsMemberListController {
             TableElem(
               "pcls.memberlist.status.some.item"
             ),
-            (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-              case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                TableElem.view(
-                  controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
-                    .onPageLoadViewOnly(srn, index, year, currentVersion, previousVersion),
+            TableElemDoubleLink(
+              (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                  TableElem.view(
+                    controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
+                      .onPageLoadViewOnly(srn, index, year, currentVersion, previousVersion),
+                    Message("pcls.memberList.remove.hidden.text", memberName.fullName)
+                  )
+                case _ =>
+                  TableElem.change(
+                    controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
+                      .onSubmit(srn, index, CheckMode),
+                    Message("pcls.memberList.change.hidden.text", memberName.fullName)
+                  )
+              },
+              if (mode == ViewOnlyMode) {
+                TableElem.empty
+              } else {
+                TableElem.remove(
+                  controllers.nonsipp.memberreceivedpcls.routes.RemovePclsController
+                    .onSubmit(srn, index),
                   Message("pcls.memberList.remove.hidden.text", memberName.fullName)
                 )
-              case _ =>
-                TableElem.change(
-                  controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
-                    .onSubmit(srn, index, CheckMode),
-                  Message("pcls.memberList.change.hidden.text", memberName.fullName)
-                )
-            },
-            if (mode == ViewOnlyMode) {
-              TableElem.empty
-            } else {
-              TableElem.remove(
-                controllers.nonsipp.memberreceivedpcls.routes.RemovePclsController
-                  .onSubmit(srn, index),
-                Message("pcls.memberList.remove.hidden.text", memberName.fullName)
-              )
-            }
+              }
+            )
           )
       }
-      .sortBy(_.headOption.map(_.text.toString))
+      .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString))
 
   def viewModel(
     srn: Srn,
@@ -263,7 +264,6 @@ object PclsMemberListController {
           List(
             TableElem("memberList.memberName"),
             TableElem("memberList.status"),
-            TableElem.empty,
             TableElem.empty
           )
         ),

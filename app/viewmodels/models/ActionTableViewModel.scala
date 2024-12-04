@@ -20,12 +20,18 @@ import play.api.mvc.Call
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.Message
 
+sealed trait TableElemBase
+
 case class TableElem(
   text: DisplayMessage,
   hiddenText: Option[Message] = None,
   url: Option[String] = None,
   messageKey: Option[String] = None
-)
+) extends TableElemBase
+
+case class TableElemDoubleLink(
+  tableElems: (TableElem, TableElem)
+) extends TableElemBase
 
 object TableElem {
   val empty: TableElem = TableElem(DisplayMessage.Empty)
@@ -44,7 +50,7 @@ object TableElem {
 case class ActionTableViewModel(
   inset: DisplayMessage,
   head: Option[List[TableElem]],
-  rows: List[List[TableElem]],
+  rows: List[List[TableElemBase]],
   paginatedViewModel: Option[PaginatedViewModel] = None,
   yesHintText: Option[Message] = None,
   showInset: Boolean = false
