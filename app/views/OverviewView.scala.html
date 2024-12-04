@@ -37,27 +37,37 @@
 
     <h1 class="govuk-heading-xl">@messages("overview.heading")</h1>
 
+
+
     @if(seqOfOutstandingReturns.nonEmpty) {
         @if(seqOfOutstandingReturns.size > 1) {
             <h2 class="govuk-heading-l govuk-!-margin-top-4">@messages("overview.outstanding.heading.plural")</h2>
+            @components.OverviewTable(
+                seqOfOutstandingReturns,
+                messages("overview.outstanding.table.header1"),
+                messages("overview.outstanding.table.header2"),
+                messages("overview.outstanding.table.header3"),
+                messages("overview.outstanding.table.header4"),
+                caption = messages("overview.captionOutstanding.heading.plural")
+            )
         } else {
             <h2 class="govuk-heading-l govuk-!-margin-top-4">@messages("overview.outstanding.heading")</h2>
+            @components.OverviewTable(
+                seqOfOutstandingReturns,
+                messages("overview.outstanding.table.header1"),
+                messages("overview.outstanding.table.header2"),
+                messages("overview.outstanding.table.header3"),
+                messages("overview.outstanding.table.header4"),
+                caption = messages("overview.captionOutstanding.heading")
+            )
         }
-        @components.OverviewTable(
-            seqOfOutstandingReturns,
-            messages("overview.outstanding.table.header1"),
-            messages("overview.outstanding.table.header2"),
-            messages("overview.outstanding.table.header3"),
-            messages("overview.outstanding.table.header4"),
-            caption = messages("overview.heading")
-        )
     }
 
     @if(seqOfPreviousReturns.nonEmpty) {
         @if(seqOfPreviousReturns.size > 1) {
-            <h2 class="govuk-heading-l govuk-!-margin-top-4">@messages("overview.previous.heading.plural")</h2>
+            <h2 class="govuk-heading-l govuk-!-margin-top-8">@messages("overview.previous.heading.plural")</h2>
         } else {
-            <h2 class="govuk-heading-l govuk-!-margin-top-4">@messages("overview.previous.heading")</h2>
+            <h2 class="govuk-heading-l govuk-!-margin-top-8">@messages("overview.previous.heading")</h2>
         }
 
         @if(seqOfPreviousReturns.exists(!_.submitted)) {

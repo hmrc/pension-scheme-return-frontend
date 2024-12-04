@@ -18,8 +18,8 @@
 
 @(rows: Seq[OverviewSummary], colOne: String, colTwo: String, colThree: String, colFour: String, caption: String)(implicit messages: Messages)
 
-<table class="govuk-table" role="table">
-    <caption class="govuk-visually-hidden">@caption</caption>
+<table class="govuk-table">
+    <caption class="govuk-table__caption govuk-table__caption--m">@caption</caption>
     <thead class="govuk-table__head">
         <tr class="govuk-table__row">
             <th scope="col" class="govuk-table__header">@colOne</th>
@@ -36,15 +36,13 @@
             <td class="govuk-table__cell">@summaryListRow.secondValue</td>
             @summaryListRow.actions.map { actions =>
                 <td class="govuk-table__cell govuk-table__cell--numeric whitespace-nowrap">
-                    <ul class="govuk-summary-list__actions-list">
                         @actions.items.map { item =>
-                            <li class="govuk-summary-list__actions-list-item">
+
                                 <a class="govuk-link" href="@item.href">
                                     @item.content.asHtml<span class="govuk-visually-hidden">@renderMessage(summaryListRow.key)</span>
                                 </a>
-                            </li>
+
                         }
-                    </ul>
                 </td>
             }
         </tr>
