@@ -474,7 +474,7 @@ object PsrSubmissionServiceSpec {
     )
   )
   val optLoans: Option[Loans] = Some(
-    Loans(recordVersion = Some("001"), schemeHadLoans = true, loanTransactions = Seq.empty)
+    Loans(recordVersion = Some("001"), optSchemeHadLoans = Some(true), loanTransactions = Seq.empty)
   )
   val optMemberPayments: Option[MemberPayments] = Some(
     MemberPayments(

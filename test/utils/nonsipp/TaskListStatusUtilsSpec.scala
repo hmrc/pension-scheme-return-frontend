@@ -138,6 +138,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     .unsafeSet(AreRepaymentsInstalmentsPage(srn, index1of5000), true)
     .unsafeSet(InterestOnLoanPage(srn, index1of5000), interestOnLoan)
     .unsafeSet(SecurityGivenForLoanPage(srn, index1of5000), ConditionalYesNo.yes[Unit, Security](security))
+    .unsafeSet(ArrearsPrevYears(srn, index1of5000), true)
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, index1of5000), ConditionalYesNo.yes[Unit, Money](money))
     // (S4) Money Borrowed
     .unsafeSet(MoneyBorrowedPage(srn), true)
@@ -305,11 +306,15 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when LoansMadeOrOutstandingPage true and equal number of first pages and last pages" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+          // First loan:
           .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
           .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1)), Sponsoring)
+          .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+          // Second loan:
           .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
-          .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), true)
+          .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(2)), true)
+          .unsafeSet(ArrearsPrevYears(srn, refineMV(2)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(2)), ConditionalYesNo.yes[Unit, Money](money))
         val (status, link) = TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn)
         status mustBe Recorded(2, "loans")
@@ -321,6 +326,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
           .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
           .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
+          .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
 
         val (status, link) = TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn)

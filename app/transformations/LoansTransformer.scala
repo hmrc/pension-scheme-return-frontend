@@ -21,13 +21,14 @@ import models.IdentityType.reads
 import config.RefinedTypes.OneTo5000
 import models.SchemeId.Srn
 import cats.implicits.{catsSyntaxTuple2Semigroupal, catsSyntaxTuple3Semigroupal}
-import models.requests.psr._
 import uk.gov.hmrc.domain.Nino
 import models._
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.loansmadeoroutstanding.Paths.loans
 import models.ConditionalYesNo._
+import utils.nonsipp.PrePopulationUtils.isPrePopulation
+import models.requests.psr._
 import models.RecipientDetails.format
 import eu.timepit.refined.refineV
 import models.SponsoringOrConnectedParty.ConnectedParty
@@ -44,13 +45,13 @@ class LoansTransformer @Inject() extends Transformer {
 
   def transformToEtmp(srn: Srn, initialUA: UserAnswers)(implicit request: DataRequest[_]): Option[Loans] = {
     val optSchemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn))
-    optSchemeHadLoans.map(
-      schemeHadLoans =>
+    if (optSchemeHadLoans.nonEmpty || isPrePopulation) {
+      Some(
         Loans(
           Option.when(request.userAnswers.get(loans) == initialUA.get(loans))(
             request.userAnswers.get(LoansRecordVersionPage(srn)).get
           ),
-          schemeHadLoans,
+          optSchemeHadLoans,
           request.userAnswers
             .map(IdentityTypes(srn, IdentitySubject.LoanRecipient))
             .map {
@@ -159,9 +160,17 @@ class LoansTransformer @Inject() extends Transformer {
                       optSecurity <- request.userAnswers.get(SecurityGivenForLoanPage(srn, index)).map(_.value.toOption)
                       interestOnLoan <- request.userAnswers.get(InterestOnLoanPage(srn, index))
                       (loanInterestAmount, loanInterestRate, optIntReceivedCY) = interestOnLoan.asTuple
-                      optOutstandingArrearsOnLoan <- request.userAnswers
-                        .get(OutstandingArrearsOnLoanPage(srn, index))
-                        .map(_.value.toOption)
+                      optArrearsPrevYears = request.userAnswers.get(ArrearsPrevYears(srn, index))
+                      optOutstandingArrearsOnLoan = if (optArrearsPrevYears.isEmpty) {
+                        None
+                      } else {
+                        request.userAnswers
+                          .get(OutstandingArrearsOnLoanPage(srn, index))
+                          .map(_.value)
+                          .get
+                          .map(_.value)
+                          .toOption
+                      }
                     } yield {
                       LoanTransactions(
                         recipientIdentityType,
@@ -181,7 +190,8 @@ class LoansTransformer @Inject() extends Transformer {
                           optIntReceivedCY.map(_.value)
                         ),
                         optSecurity.map(_.security),
-                        optOutstandingArrearsOnLoan.map(_.value)
+                        optArrearsPrevYears,
+                        optOutstandingArrearsOnLoan
                       )
                     }
                 }
@@ -189,7 +199,10 @@ class LoansTransformer @Inject() extends Transformer {
             .toList
             .flatten
         )
-    )
+      )
+    } else {
+      None
+    }
   }
 
   def transformFromEtmp(
@@ -200,6 +213,7 @@ class LoansTransformer @Inject() extends Transformer {
 
     val loanTransactions = loans.loanTransactions.toList
     val optRecordVersion = loans.recordVersion.map(LoansRecordVersionPage(srn) -> _)
+    val optSchemeHadLoans = loans.optSchemeHadLoans.map(LoansMadeOrOutstandingPage(srn) -> _)
 
     for {
       indexes <- buildIndexesForMax5000(loanTransactions.size)
@@ -443,6 +457,15 @@ class LoansTransformer @Inject() extends Transformer {
             SecurityGivenForLoanPage(srn, index) ->
               ConditionalYesNo.no[Unit, Security](())
         )
+      arrearsPrevYears = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).optArrearsPrevYears.nonEmpty
+          }
+        )
+        .map(
+          index => ArrearsPrevYears(srn, index) -> loanTransactions(index.value - 1).optArrearsPrevYears.get
+        )
       outstandingArrearsOnLoan = indexes
         .filter(
           index => {
@@ -467,7 +490,7 @@ class LoansTransformer @Inject() extends Transformer {
       ua0 <- optRecordVersion.foldLeft(Try(userAnswers)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
-      ua1 <- ua0.set(LoansMadeOrOutstandingPage(srn), loans.schemeHadLoans)
+      ua1 <- optSchemeHadLoans.foldLeft(Try(ua0)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua2 <- identityTypes.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua3 <- loanRecipientName.foldLeft(Try(ua2)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua31 <- otherRecipientName.foldLeft(Try(ua3)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
@@ -489,15 +512,15 @@ class LoansTransformer @Inject() extends Transformer {
       ua9 <- equalInstallments.foldLeft(Try(ua8)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua10 <- fullLoanInterest.foldLeft(Try(ua9)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua11 <- partialLoanInterest.foldLeft(Try(ua10)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-
       ua12 <- securityGiven.foldLeft(Try(ua11)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua13 <- securityNotGiven.foldLeft(Try(ua12)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-      ua14 <- outstandingArrearsOnLoan.foldLeft(Try(ua13)) {
+      ua14 <- arrearsPrevYears.foldLeft(Try(ua13)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua15 <- outstandingArrearsOnLoan.foldLeft(Try(ua14)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
-      ua15 <- noOutstandingArrearsOnLoan.foldLeft(Try(ua14)) {
+      ua16 <- noOutstandingArrearsOnLoan.foldLeft(Try(ua15)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
-    } yield ua15
+    } yield ua16
   }
 }

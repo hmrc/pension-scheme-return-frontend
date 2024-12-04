@@ -119,6 +119,7 @@ class LoansCYAController @Inject()(
         returnEndDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney.map(_.to)
         repaymentInstalments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)).getOrRecoverJourney
         interestOnLoan <- request.userAnswers.get(InterestOnLoanPage(srn, index)).getOrRecoverJourney
+        arrearsPrevYears = request.userAnswers.get(ArrearsPrevYears(srn, index))
         outstandingArrearsOnLoan <- request.userAnswers
           .get(OutstandingArrearsOnLoanPage(srn, index))
           .map(_.value.toOption)
@@ -145,6 +146,7 @@ class LoansCYAController @Inject()(
             returnEndDate,
             repaymentInstalments,
             interestOnLoan,
+            arrearsPrevYears,
             outstandingArrearsOnLoan,
             securityOnLoan,
             mode,
@@ -198,6 +200,7 @@ object LoansCYAController {
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
     interestOnLoan: InterestOnLoan,
+    arrearsPrevYears: Option[Boolean],
     outstandingArrearsOnLoan: Option[Money],
     securityOnLoan: Option[Security],
     mode: Mode,
@@ -235,6 +238,7 @@ object LoansCYAController {
           returnEndDate,
           repaymentInstalments,
           interestOnLoan,
+          arrearsPrevYears,
           outstandingArrearsOnLoan,
           securityOnLoan,
           mode match {
@@ -284,6 +288,7 @@ object LoansCYAController {
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
     interestOnLoan: InterestOnLoan,
+    arrearsPrevYears: Option[Boolean],
     outstandingArrearsOnLoan: Option[Money],
     securityOnLoan: Option[Security],
     mode: Mode
@@ -305,7 +310,7 @@ object LoansCYAController {
       loanAmountSection(srn, index, totalLoan, repayments, outstanding, returnEndDate, repaymentInstalments, mode) ++
       loanInterestSection(srn, index, interestPayable, interestRate, interestPayments, mode) ++
       loanSecuritySection(srn, index, securityOnLoan, mode) ++
-      loanOutstandingSection(srn, index, outstandingArrearsOnLoan, returnEndDate, mode)
+      loanOutstandingSection(srn, index, arrearsPrevYears, outstandingArrearsOnLoan, returnEndDate, mode)
 
   }
 
@@ -670,11 +675,17 @@ object LoansCYAController {
   private def loanOutstandingSection(
     srn: Srn,
     index: Max5000,
+    arrearsPrevYears: Option[Boolean],
     outstandingArrearsOnLoan: Option[Money],
     returnEndDate: LocalDate,
     mode: Mode
   ): List[CheckYourAnswersSection] = {
-    val outstandingMessage = if (outstandingArrearsOnLoan.isEmpty) "site.no" else "site.yes"
+    val outstandingMessage = arrearsPrevYears match {
+      case Some(true) => "site.yes"
+      case Some(false) => "site.no"
+      case None => ""
+    }
+
     List(
       CheckYourAnswersSection(
         Some(Heading2.medium("loanCheckYourAnswers.section6.heading")),

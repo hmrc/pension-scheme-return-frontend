@@ -663,8 +663,10 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
           defaultUserAnswers
             .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
             .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
+            .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
             .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
             .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+            .unsafeSet(ArrearsPrevYears(srn, refineMV(2)), true)
             .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(2)), ConditionalYesNo.yes[Unit, Money](money))
 
         testViewModel(

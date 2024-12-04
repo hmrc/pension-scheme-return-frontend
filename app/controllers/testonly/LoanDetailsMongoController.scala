@@ -74,6 +74,7 @@ class LoanDetailsMongoController @Inject()(
             .flatMap(_.remove(AreRepaymentsInstalmentsPage(srn, index)))
             .flatMap(_.remove(InterestOnLoanPage(srn, index)))
             .flatMap(_.remove(SecurityGivenForLoanPage(srn, index)))
+            .flatMap(_.remove(ArrearsPrevYears(srn, index)))
             .flatMap(_.remove(OutstandingArrearsOnLoanPage(srn, index)))
       }
     } yield updatedUserAnswers
@@ -116,6 +117,9 @@ class LoanDetailsMongoController @Inject()(
         index =>
           SecurityGivenForLoanPage(srn, index) -> ConditionalYesNo.yes[Unit, Security](Security("securityGivenForLoan"))
       )
+      arrearsPrevYears = indexes.map(
+        index => ArrearsPrevYears(srn, index) -> true
+      )
       outstandingArrearsOnLoan = indexes.map(
         index =>
           OutstandingArrearsOnLoanPage(srn, index) -> ConditionalYesNo.yes[Unit, Money](Money(1234.00, "1,234.00"))
@@ -133,9 +137,10 @@ class LoanDetailsMongoController @Inject()(
       ua8 <- equalInstallments.foldLeft(Try(ua7)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua9 <- loanInterest.foldLeft(Try(ua8)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua10 <- securityGiven.foldLeft(Try(ua9)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-      ua11 <- outstandingArrearsOnLoan.foldLeft(Try(ua10)) {
+      ua11 <- arrearsPrevYears.foldLeft(Try(ua10)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua12 <- outstandingArrearsOnLoan.foldLeft(Try(ua11)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
-    } yield ua11
+    } yield ua12
 
 }

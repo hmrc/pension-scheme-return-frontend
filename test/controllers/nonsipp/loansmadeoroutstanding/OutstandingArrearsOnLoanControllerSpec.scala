@@ -24,7 +24,7 @@ import eu.timepit.refined.refineMV
 import play.api.inject
 import forms.YesNoPageFormProvider
 import models._
-import pages.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanPage
+import pages.nonsipp.loansmadeoroutstanding.{ArrearsPrevYears, OutstandingArrearsOnLoanPage}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{reset, when}
@@ -41,6 +41,15 @@ class OutstandingArrearsOnLoanControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit = routes.OutstandingArrearsOnLoanController.onSubmit(srn, index, NormalMode)
 
   private val conditionalYes: ConditionalYes[Money] = ConditionalYesNo.yes(money)
+  private val conditionalNo: ConditionalYesNo[Unit, Money] = ConditionalYesNo.no(())
+
+  private val arrearsAnswersYes: UserAnswers = defaultUserAnswers
+    .unsafeSet(ArrearsPrevYears(srn, index), true)
+    .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), conditionalYes)
+
+  private val arrearsAnswersNo: UserAnswers = defaultUserAnswers
+    .unsafeSet(ArrearsPrevYears(srn, index), false)
+    .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), conditionalNo)
 
   val schemeDatePeriod: DateRange = DateRange(LocalDate.parse("2020-04-06"), LocalDate.parse("2021-04-05"))
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
@@ -58,28 +67,66 @@ class OutstandingArrearsOnLoanControllerSpec extends ControllerBaseSpec {
 
   "OutstandingArrearsOnLoanController" - {
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[ConditionalYesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider], dateRange), viewModel(srn, index, NormalMode, dateRange))
-    })
+    "Standard tests" - {
 
-    act.like(renderPrePopView(onPageLoad, OutstandingArrearsOnLoanPage(srn, index), conditionalYes) {
-      implicit app => implicit request =>
+      act.like(renderView(onPageLoad) { implicit app => implicit request =>
+        injected[ConditionalYesNoPageView]
+          .apply(form(injected[YesNoPageFormProvider], dateRange), viewModel(srn, index, NormalMode, dateRange))
+      })
+
+      act.like(renderPrePopView(onPageLoad, OutstandingArrearsOnLoanPage(srn, index), conditionalYes) {
+        implicit app => implicit request =>
+          injected[ConditionalYesNoPageView]
+            .apply(
+              form(injected[YesNoPageFormProvider], dateRange).fill(conditionalYes.value),
+              viewModel(srn, index, NormalMode, dateRange)
+            )
+      }.withName("return OK and the correct pre-populated view for a GET ('Yes' with money answer)"))
+
+      act.like(renderPrePopView(onPageLoad, OutstandingArrearsOnLoanPage(srn, index), conditionalNo) {
+        implicit app => implicit request =>
+          injected[ConditionalYesNoPageView]
+            .apply(
+              form(injected[YesNoPageFormProvider], dateRange).fill(conditionalNo.value),
+              viewModel(srn, index, NormalMode, dateRange)
+            )
+      }.withName("return OK and the correct pre-populated view for a GET ('No' answer)"))
+
+      act.like(redirectNextPage(onSubmit, "value" -> "true", "value.yes" -> "1"))
+      act.like(redirectNextPage(onSubmit, "value" -> "false"))
+
+      act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
+
+      act.like(saveAndContinue(onSubmit, "value" -> "true", "value.yes" -> "1"))
+
+      act.like(invalidForm(onSubmit))
+      act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+    }
+
+    "Pre-pop tests" - {
+      act.like(renderViewWithPrePopSession(onPageLoad, defaultUserAnswers) { implicit app => implicit request =>
+        injected[ConditionalYesNoPageView]
+          .apply(
+            form(injected[YesNoPageFormProvider], dateRange),
+            viewModel(srn, index, NormalMode, dateRange)
+          )
+      }.withName("return OK and the correct pre-populated view for a GET (neither answer)"))
+
+      act.like(renderViewWithPrePopSession(onPageLoad, arrearsAnswersYes) { implicit app => implicit request =>
         injected[ConditionalYesNoPageView]
           .apply(
             form(injected[YesNoPageFormProvider], dateRange).fill(conditionalYes.value),
             viewModel(srn, index, NormalMode, dateRange)
           )
-    })
+      }.withName("return OK and the correct pre-populated view for a GET ('Yes' with money answer)"))
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true", "value.yes" -> "1"))
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
-
-    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
-
-    act.like(saveAndContinue(onSubmit, "value" -> "true", "value.yes" -> "1"))
-
-    act.like(invalidForm(onSubmit))
-    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+      act.like(renderViewWithPrePopSession(onPageLoad, arrearsAnswersNo) { implicit app => implicit request =>
+        injected[ConditionalYesNoPageView]
+          .apply(
+            form(injected[YesNoPageFormProvider], dateRange).fill(conditionalNo.value),
+            viewModel(srn, index, NormalMode, dateRange)
+          )
+      }.withName("return OK and the correct pre-populated view for a GET ('No' answer)"))
+    }
   }
 }

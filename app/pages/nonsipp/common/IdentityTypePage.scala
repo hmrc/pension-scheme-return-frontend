@@ -64,6 +64,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           AmountOfTheLoanPage(srn, index),
           AreRepaymentsInstalmentsPage(srn, index),
           InterestOnLoanPage(srn, index),
+          ArrearsPrevYears(srn, index),
           OutstandingArrearsOnLoanPage(srn, index),
           SecurityGivenForLoanPage(srn, index)
         )
