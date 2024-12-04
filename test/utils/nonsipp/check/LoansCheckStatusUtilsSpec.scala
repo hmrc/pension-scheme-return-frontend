@@ -298,12 +298,13 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
             index1of5000,
             addLoansIndividualAnswers(
               index1of5000,
-              addLoansPartialAnswers(
+              addLoansPrePopAnswers(
                 index1of5000,
                 schemeHadLoansTrue
               )
             )
-          ).unsafeSet(OutstandingArrearsOnLoanPage(srn, index1of5000), conditionalYesArrears)
+          ).unsafeRemove(ArrearsPrevYears(srn, index1of5000))
+            .unsafeRemove(OutstandingArrearsOnLoanPage(srn, index1of5000))
 
         checkLoansRecord(userAnswers, srn, index1of5000) mustBe true
       }
@@ -323,7 +324,10 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
             index1of5000,
             addLoansUKCompanyAnswers(
               index1of5000,
-              schemeHadLoansTrue
+              addLoansPartialAnswers(
+                index1of5000,
+                schemeHadLoansTrue
+              )
             )
           ).unsafeRemove(IdentityTypePage(srn, index1of5000, LoanRecipient))
 
@@ -350,7 +354,10 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
         val userAnswers =
           addLoansBaseAnswers(
             index1of5000,
-            schemeHadLoansTrue
+            addLoansPartialAnswers(
+              index1of5000,
+              schemeHadLoansTrue
+            )
           ).unsafeSet(IdentityTypePage(srn, index1of5000, LoanRecipient), Individual)
 
         checkLoansRecord(userAnswers, srn, index1of5000) mustBe false
@@ -360,7 +367,10 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
         val userAnswers =
           addLoansBaseAnswers(
             index1of5000,
-            schemeHadLoansTrue
+            addLoansPartialAnswers(
+              index1of5000,
+              schemeHadLoansTrue
+            )
           ).unsafeSet(IdentityTypePage(srn, index1of5000, LoanRecipient), UKCompany)
 
         checkLoansRecord(userAnswers, srn, index1of5000) mustBe false
@@ -370,7 +380,10 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
         val userAnswers =
           addLoansBaseAnswers(
             index1of5000,
-            schemeHadLoansTrue
+            addLoansPartialAnswers(
+              index1of5000,
+              schemeHadLoansTrue
+            )
           ).unsafeSet(IdentityTypePage(srn, index1of5000, LoanRecipient), UKPartnership)
 
         checkLoansRecord(userAnswers, srn, index1of5000) mustBe false
@@ -380,7 +393,10 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
         val userAnswers =
           addLoansBaseAnswers(
             index1of5000,
-            schemeHadLoansTrue
+            addLoansPartialAnswers(
+              index1of5000,
+              schemeHadLoansTrue
+            )
           ).unsafeSet(IdentityTypePage(srn, index1of5000, LoanRecipient), Other)
 
         checkLoansRecord(userAnswers, srn, index1of5000) mustBe false
