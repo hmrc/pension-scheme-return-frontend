@@ -196,6 +196,12 @@ trait TestValues {
     LocalDateTime.of(2020, 12, 12, 10, 30, 15)
   val submissionDateOne: LocalDateTime =
     LocalDateTime.of(2019, 11, 11, 9, 29, 14)
+//  val name: String = "name"
+//  val index1of5000: Max5000 = refineMV(1)
+//  val index2of5000: Max5000 = refineMV(2)
+//  val conditionalYesNoNino: ConditionalYesNo[String, Nino] = ConditionalYesNo.yes(nino)
+//  val conditionalYesNoCrn: ConditionalYesNo[String, Crn] = ConditionalYesNo.yes(crn)
+//  val conditionalYesNoUtr: ConditionalYesNo[String, Utr] = ConditionalYesNo.yes(utr)
 
   val address: Address = Address(
     "test-id",
