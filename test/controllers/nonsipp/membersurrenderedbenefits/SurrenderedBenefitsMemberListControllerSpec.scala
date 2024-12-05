@@ -25,13 +25,13 @@ import models._
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListController._
 import play.api.test.FakeRequest
 import config.RefinedTypes.Max300
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, MemberListBaseSpec}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 
 import java.time.LocalDate
 
-class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
+class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.SurrenderedBenefitsMemberListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.SurrenderedBenefitsMemberListController.onSubmit(srn, page = 1, NormalMode)
@@ -171,8 +171,7 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
 
         status(result) mustEqual OK
 
-        contentAsString(result) must include("Submitted on")
-        (contentAsString(result) must not).include("govuk-back-link")
+        checkContent(contentAsString(result))
       }
     }
 

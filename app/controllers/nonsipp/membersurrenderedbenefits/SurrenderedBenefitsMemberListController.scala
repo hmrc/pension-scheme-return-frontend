@@ -154,7 +154,7 @@ object SurrenderedBenefitsMemberListController {
     optYear: Option[String],
     optCurrentVersion: Option[Int],
     optPreviousVersion: Option[Int]
-  ): List[List[TableElem]] =
+  ): List[List[TableElemBase]] =
     memberList
       .map {
         case (index, memberName, None) =>
@@ -176,8 +176,7 @@ object SurrenderedBenefitsMemberListController {
               )
             } else {
               TableElem.empty
-            },
-            TableElem.empty
+            }
           )
         case (index, memberName, _) =>
           List(
@@ -187,44 +186,46 @@ object SurrenderedBenefitsMemberListController {
             TableElem(
               "surrenderedBenefits.memberList.status.some.item"
             ),
-            (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-              case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                TableElem.view(
-                  controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
-                    .onPageLoadViewOnly(
-                      srn,
-                      index,
-                      year = year,
-                      current = currentVersion,
-                      previous = previousVersion
-                    ),
-                  hiddenText = Message("surrenderedBenefits.memberList.add.hidden.text", memberName.fullName)
-                )
-              case _ =>
-                TableElem.change(
-                  controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
-                    .onPageLoad(srn, index, CheckMode),
+            TableElemDoubleLink(
+              (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                  TableElem.view(
+                    controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
+                      .onPageLoadViewOnly(
+                        srn,
+                        index,
+                        year = year,
+                        current = currentVersion,
+                        previous = previousVersion
+                      ),
+                    hiddenText = Message("surrenderedBenefits.memberList.add.hidden.text", memberName.fullName)
+                  )
+                case _ =>
+                  TableElem.change(
+                    controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
+                      .onPageLoad(srn, index, CheckMode),
+                    Message(
+                      "surrenderedBenefits.memberList.change.hidden.text",
+                      memberName.fullName
+                    )
+                  )
+              },
+              if (mode.isViewOnlyMode) {
+                TableElem.empty
+              } else {
+                TableElem.remove(
+                  controllers.nonsipp.membersurrenderedbenefits.routes.RemoveSurrenderedBenefitsController
+                    .onSubmit(srn, index),
                   Message(
-                    "surrenderedBenefits.memberList.change.hidden.text",
+                    "surrenderedBenefits.memberList.remove.hidden.text",
                     memberName.fullName
                   )
                 )
-            },
-            if (mode.isViewOnlyMode) {
-              TableElem.empty
-            } else {
-              TableElem.remove(
-                controllers.nonsipp.membersurrenderedbenefits.routes.RemoveSurrenderedBenefitsController
-                  .onSubmit(srn, index),
-                Message(
-                  "surrenderedBenefits.memberList.remove.hidden.text",
-                  memberName.fullName
-                )
-              )
-            }
+              }
+            )
           )
       }
-      .sortBy(_.headOption.map(_.text.toString))
+      .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString))
 
   def viewModel(
     srn: Srn,
@@ -284,7 +285,6 @@ object SurrenderedBenefitsMemberListController {
           List(
             TableElem("memberList.memberName"),
             TableElem("memberList.status"),
-            TableElem.empty,
             TableElem.empty
           )
         ),

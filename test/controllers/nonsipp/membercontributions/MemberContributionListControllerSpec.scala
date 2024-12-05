@@ -25,13 +25,13 @@ import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import models._
 import config.RefinedTypes.Max300
-import controllers.ControllerBaseSpec
+import controllers.{ControllerBaseSpec, MemberListBaseSpec}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SectionCompleted
 
 import java.time.LocalDate
 
-class MemberContributionListControllerSpec extends ControllerBaseSpec {
+class MemberContributionListControllerSpec extends ControllerBaseSpec with MemberListBaseSpec {
 
   private lazy val onPageLoad = routes.MemberContributionListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.MemberContributionListController.onSubmit(srn, page = 1, NormalMode)
@@ -120,9 +120,7 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
 
         status(result) mustEqual OK
 
-        contentAsString(result) must include("Submitted on")
-
-        (contentAsString(result) must not).include("govuk-back-link")
+        checkContent(contentAsString(result))
       }
     }
 

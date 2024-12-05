@@ -53,10 +53,10 @@
                 rows = rows.map(
                     otherRows =>
                     otherRows.map( aRow =>
-                        TableRow(HtmlContent(renderMessage(aRow.text)))
+                        TableRow(HtmlContent(renderMessage(aRow.asInstanceOf[TableElem].text)))
                     )
                 ),
-                 )
+              )
             )
         }
 

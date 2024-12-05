@@ -162,7 +162,7 @@ object TransferReceivedMemberListController {
     optYear: Option[String],
     optCurrentVersion: Option[Int],
     optPreviousVersion: Option[Int]
-  ): List[List[TableElem]] =
+  ): List[List[TableElemBase]] =
     membersWithTransfers
       .map { membersWithTransfers =>
         val noTransfers = membersWithTransfers.receive.isEmpty
@@ -192,9 +192,7 @@ object TransferReceivedMemberListController {
               )
             } else {
               TableElem.empty
-            },
-            // Remove link
-            TableElem.empty
+            }
           )
         } else {
           List(
@@ -214,45 +212,47 @@ object TransferReceivedMemberListController {
                 )
               }
             ),
-            (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-              case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                TableElem.view(
-                  controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
-                    .onPageLoadViewOnly(
-                      srn,
-                      membersWithTransfers.memberIndex,
-                      year,
-                      currentVersion,
-                      previousVersion
-                    ),
-                  hiddenText = membersWithTransfers.transferFullName
-                )
-              case _ =>
-                TableElem.change(
-                  controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
-                    .onSubmit(srn, membersWithTransfers.memberIndex, CheckMode),
+            TableElemDoubleLink(
+              (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                  TableElem.view(
+                    controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+                      .onPageLoadViewOnly(
+                        srn,
+                        membersWithTransfers.memberIndex,
+                        year,
+                        currentVersion,
+                        previousVersion
+                      ),
+                    hiddenText = membersWithTransfers.transferFullName
+                  )
+                case _ =>
+                  TableElem.change(
+                    controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+                      .onSubmit(srn, membersWithTransfers.memberIndex, CheckMode),
+                    Message(
+                      "transferIn.MemberList.change.hidden.text",
+                      membersWithTransfers.transferFullName
+                    )
+                  )
+              },
+              if (mode == ViewOnlyMode) {
+                TableElem.empty
+              } else {
+                TableElem.remove(
+                  controllers.nonsipp.receivetransfer.routes.WhichTransferInRemoveController
+                    .onSubmit(srn, membersWithTransfers.memberIndex),
                   Message(
-                    "transferIn.MemberList.change.hidden.text",
+                    "transferIn.MemberList.remove.hidden.text",
                     membersWithTransfers.transferFullName
                   )
                 )
-            },
-            if (mode == ViewOnlyMode) {
-              TableElem.empty
-            } else {
-              TableElem.remove(
-                controllers.nonsipp.receivetransfer.routes.WhichTransferInRemoveController
-                  .onSubmit(srn, membersWithTransfers.memberIndex),
-                Message(
-                  "transferIn.MemberList.remove.hidden.text",
-                  membersWithTransfers.transferFullName
-                )
-              )
-            }
+              }
+            )
           )
         }
       }
-      .sortBy(_.headOption.map(_.text.toString))
+      .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString))
 
   def viewModel(
     srn: Srn,
@@ -313,7 +313,6 @@ object TransferReceivedMemberListController {
           List(
             TableElem("memberList.memberName"),
             TableElem("memberList.status"),
-            TableElem.empty,
             TableElem.empty
           )
         ),
