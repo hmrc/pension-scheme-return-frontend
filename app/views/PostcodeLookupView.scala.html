@@ -39,7 +39,7 @@
         @govukInput(
             InputViewModel(
                 field = form("postcode"),
-                label = LabelViewModel(renderMessage(viewmodel.page.lookupLabel))
+                label = LabelViewModel(renderMessage(viewmodel.page.lookupLabel)).withCssClass(LabelSize.Small.toString)
             )
             .withWidth(OneThird)
         )
@@ -47,7 +47,7 @@
         @govukInput(
             InputViewModel(
                 field = form("filter"),
-                label = LabelViewModel(renderMessage(viewmodel.page.filterLabel))
+                label = LabelViewModel(renderMessage(viewmodel.page.filterLabel)).withCssClass(LabelSize.Small.toString)
             )
             .withWidth(Fixed20)
         )
