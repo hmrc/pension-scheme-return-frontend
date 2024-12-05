@@ -129,7 +129,7 @@ object ValueOfSchemeAssetsWhenMoneyBorrowedController {
       Message("valueOfSchemeAssetsWhenMoneyBorrowed.heading", schemeName, date),
       SingleQuestion(
         form,
-        QuestionField.input(Empty)
+        QuestionField.currency(Empty)
       ),
       routes.ValueOfSchemeAssetsWhenMoneyBorrowedController.onSubmit(srn, index, mode)
     )

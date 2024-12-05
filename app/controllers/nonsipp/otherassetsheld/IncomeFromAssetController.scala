@@ -116,7 +116,7 @@ object IncomeFromAssetController {
       Message("otherAssets.incomeFromAsset.heading"),
       SingleQuestion(
         form,
-        QuestionField.input(Empty, Some("otherAssets.incomeFromAsset.hint"))
+        QuestionField.currency(Empty, Some("otherAssets.incomeFromAsset.hint"))
       ),
       controllers.nonsipp.otherassetsheld.routes.IncomeFromAssetController
         .onSubmit(srn, index, mode)

@@ -111,7 +111,7 @@ object LandOrPropertyTotalIncomeController {
       Message("landOrPropertyTotalIncome.heading", addressLine1),
       SingleQuestion(
         form,
-        QuestionField.input(Empty, Some("landOrPropertyTotalIncome.hint"))
+        QuestionField.currency(Empty, Some("landOrPropertyTotalIncome.hint"))
       ),
       controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController.onSubmit(srn, index, mode)
     )

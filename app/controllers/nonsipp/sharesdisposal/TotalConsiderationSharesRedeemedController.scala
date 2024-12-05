@@ -130,7 +130,7 @@ object TotalConsiderationSharesRedeemedController {
     FormPageViewModel(
       title = Message("sharesDisposal.totalConsiderationSharesRedeemed.title"),
       heading = Message("sharesDisposal.totalConsiderationSharesRedeemed.heading", numShares, companyName),
-      page = SingleQuestion(form, QuestionField.input(Empty)),
+      page = SingleQuestion(form, QuestionField.currency(Empty)),
       onSubmit = routes.TotalConsiderationSharesRedeemedController.onSubmit(srn, shareIndex, disposalIndex, mode)
     )
 }

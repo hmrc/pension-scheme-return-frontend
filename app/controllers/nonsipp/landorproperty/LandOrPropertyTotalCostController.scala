@@ -108,7 +108,7 @@ object LandOrPropertyTotalCostController {
       Message("landOrPropertyTotalCost.heading", addressLine1),
       SingleQuestion(
         form,
-        QuestionField.input(Empty, Some("landOrPropertyTotalCost.hint"))
+        QuestionField.currency(Empty, Some("landOrPropertyTotalCost.hint"))
       ),
       routes.LandOrPropertyTotalCostController.onSubmit(srn, index, mode)
     )

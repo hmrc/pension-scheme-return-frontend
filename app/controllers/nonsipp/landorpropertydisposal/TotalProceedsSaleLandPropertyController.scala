@@ -129,7 +129,7 @@ object TotalProceedsSaleLandPropertyController {
       details = None,
       page = SingleQuestion(
         form,
-        QuestionField.input(
+        QuestionField.currency(
           Empty,
           Some(
             ParagraphMessage("totalProceedsSaleLandProperty.paragraph") ++

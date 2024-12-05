@@ -111,7 +111,7 @@ object CostOfOtherAssetController {
       Message("otherAssets.costOfOtherAsset.heading"),
       SingleQuestion(
         form,
-        QuestionField.input(Empty, Some("otherAssets.costOfOtherAsset.hint"))
+        QuestionField.currency(Empty, Some("otherAssets.costOfOtherAsset.hint"))
       ),
       controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
         .onSubmit(srn, index, mode)

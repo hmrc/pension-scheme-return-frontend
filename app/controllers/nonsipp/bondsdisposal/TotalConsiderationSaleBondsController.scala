@@ -111,7 +111,7 @@ object TotalConsiderationSaleBondsController {
     FormPageViewModel(
       title = Message("bondsDisposal.totalConsiderationBondsSold.title"),
       heading = Message("bondsDisposal.totalConsiderationBondsSold.heading"),
-      page = SingleQuestion(form, QuestionField.input(Empty)),
+      page = SingleQuestion(form, QuestionField.currency(Empty)),
       onSubmit = routes.TotalConsiderationSaleBondsController.onSubmit(srn, bondIndex, disposalIndex, mode)
     )
 }

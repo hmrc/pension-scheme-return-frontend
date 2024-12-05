@@ -139,7 +139,7 @@ object TotalEmployerContributionController {
       Message("totalEmployerContribution.heading", employerName, memberName),
       SingleQuestion(
         form,
-        QuestionField.input(Empty, Some("totalEmployerContribution.hint"))
+        QuestionField.currency(Empty, Some("totalEmployerContribution.hint"))
       ),
       controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
         .onSubmit(srn, index, secondaryIndex, mode)

@@ -111,7 +111,7 @@ object TotalConsiderationSaleAssetController {
     FormPageViewModel(
       title = Message("totalConsiderationSaleAsset.title"),
       heading = Message("totalConsiderationSaleAsset.heading"),
-      page = SingleQuestion(form, QuestionField.input(Empty)),
+      page = SingleQuestion(form, QuestionField.currency(Empty)),
       onSubmit = routes.TotalConsiderationSaleAssetController.onSubmit(srn, assetIndex, disposalIndex, mode)
     )
 }
