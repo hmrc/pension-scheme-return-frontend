@@ -105,13 +105,19 @@ trait ViewModelGenerators extends BasicGenerators {
       title <- nonEmptyMessage
       panelHeading <- nonEmptyMessage
       panelContent <- nonEmptyMessage
-      content <- nonEmptyMessage
+      email <- Gen.option(nonEmptyMessage)
+      scheme <- nonEmptyMessage
+      periodOfReturn <- nonEmptyMessage
+      dateSubmitted <- nonEmptyMessage
       whatHappensNextContent <- nonEmptyMessage
     } yield SubmissionViewModel(
       title,
       panelHeading,
       panelContent,
-      content,
+      email,
+      scheme,
+      periodOfReturn,
+      dateSubmitted,
       whatHappensNextContent
     )
 

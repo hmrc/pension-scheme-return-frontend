@@ -17,6 +17,7 @@
 package views
 
 import play.api.test.FakeRequest
+import play.api.mvc.AnyContentAsEmpty
 import forms.mappings.Mappings
 import views.html.SubmissionView
 
@@ -24,7 +25,7 @@ class SubmissionViewSpec extends ViewSpec with Mappings {
   runningApplication { implicit app =>
     val view = injected[SubmissionView]
 
-    implicit val request = FakeRequest()
+    implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
     "SubmissionView" - {
       act.like(renderTitle(submissionViewModelGen)(view(_), _.title.key))
@@ -37,9 +38,30 @@ class SubmissionViewSpec extends ViewSpec with Mappings {
         }
       }
 
-      "render content" in {
+      "render the summary list keys" in {
+
         forAll(submissionViewModelGen) { viewModel =>
-          mainContent(view(viewModel)).getElementById("content").text() mustBe messageKey(viewModel.content)
+          val scheme = messages("returnSubmitted.table.field1")
+          val periodOfReturn = messages("returnSubmitted.table.field2")
+          val dateSubmitted = messages("returnSubmitted.table.field3")
+          summaryListKeys(view(viewModel)) must contain theSameElementsAs List(scheme, periodOfReturn, dateSubmitted)
+        }
+      }
+
+      "render the summary list values" in {
+        forAll(submissionViewModelGen) { viewModel =>
+          val dateSubmitted = messageKey(viewModel.dateSubmitted)
+          val periodOfReturn = messageKey(viewModel.periodOfReturn)
+          val scheme = messageKey(viewModel.scheme)
+
+          summaryListValues(view(viewModel)) must contain theSameElementsAs List(scheme, periodOfReturn, dateSubmitted)
+        }
+      }
+
+      "render the email" in {
+        forAll(submissionViewModelGen) { viewModel =>
+          val email = viewModel.email.map(messageKey(_)).getOrElse("")
+          mainContent(view(viewModel)).getElementById("content").text() must include(email)
         }
       }
 

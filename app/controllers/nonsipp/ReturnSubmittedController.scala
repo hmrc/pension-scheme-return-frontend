@@ -93,18 +93,14 @@ object ReturnSubmittedController {
       "returnSubmitted.title",
       "returnSubmitted.panel.heading",
       "returnSubmitted.panel.content",
-      content = ParagraphMessage(Message("returnSubmitted.paragraph", email)) ++
-        TableMessage(
-          NonEmptyList.of(
-            Message("returnSubmitted.table.field1") -> Message(schemeName),
-            Message("returnSubmitted.table.field2") -> returnPeriodsToMessage(returnPeriods),
-            Message("returnSubmitted.table.field3") -> Message(
-              "site.at",
-              submissionDate.show,
-              submissionDate.format(DateRange.readableTimeFormat).toLowerCase()
-            )
-          )
-        ),
+      email = Some(ParagraphMessage(Message("returnSubmitted.paragraph", email))),
+      scheme = Message(schemeName),
+      periodOfReturn = returnPeriodsToMessage(returnPeriods),
+      dateSubmitted = Message(
+        "site.at",
+        submissionDate.show,
+        submissionDate.format(DateRange.readableTimeFormat).toLowerCase()
+      ),
       whatHappensNextContent =
         ParagraphMessage("returnSubmitted.whatHappensNext.paragraph1") ++
           ParagraphMessage(
