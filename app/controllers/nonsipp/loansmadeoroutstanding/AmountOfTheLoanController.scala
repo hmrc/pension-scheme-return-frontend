@@ -173,9 +173,9 @@ object AmountOfTheLoanController {
       Message("amountOfTheLoan.heading", schemeName),
       page = TripleQuestion(
         form,
-        QuestionField.input(Message("amountOfTheLoan.loanAmount.label")),
-        QuestionField.input(Message("amountOfTheLoan.capRepaymentCY.label")),
-        QuestionField.input(Message("amountOfTheLoan.amountOutstanding.label", period.to.show))
+        QuestionField.currency(Message("amountOfTheLoan.loanAmount.label")),
+        QuestionField.currency(Message("amountOfTheLoan.capRepaymentCY.label")),
+        QuestionField.currency(Message("amountOfTheLoan.amountOutstanding.label", period.to.show))
       ),
       routes.AmountOfTheLoanController.onSubmit(srn, index, mode)
     )
