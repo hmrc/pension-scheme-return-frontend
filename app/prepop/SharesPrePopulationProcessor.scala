@@ -48,7 +48,7 @@ class SharesPrePopulationProcessor @Inject() {
       .flatMap(_.transform(DidSchemeHoldAnySharesPage(srn).path.prune(_)))
       .flatMap(_.transform(SharesDisposalPage(srn).path.prune(_)))
       .flatMap(_.transform(disposedSharesTransaction.prune(_)))
-      .flatMap(_.transform((Paths.heldSharesTransaction \ "totalDividendsOrReceipts").prune(_))) match {
+      .flatMap(_.transform(SharesTotalIncomePages(srn).path.prune(_))) match {
       case JsSuccess(value, _) =>
         Success(currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue))))
       case _ => Try(currentUA)
