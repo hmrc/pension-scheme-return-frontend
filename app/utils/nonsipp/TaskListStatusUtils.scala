@@ -42,6 +42,7 @@ import eu.timepit.refined.refineV
 import viewmodels.models.TaskListStatus._
 import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import pages.nonsipp.common.IdentityTypes
+import utils.nonsipp.check.LandOrPropertyCheckStatusUtils
 import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutSectionCompleted}
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
 import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsDisposalProgress}
@@ -434,7 +435,7 @@ object TaskListStatusUtils {
     srn: Srn,
     isPrePop: Boolean
   ): (TaskListStatus, String) =
-    if (isPrePop && CheckStatusUtils.checkLandOrPropertySection(userAnswers, srn)) {
+    if (isPrePop && LandOrPropertyCheckStatusUtils.checkLandOrPropertySection(userAnswers, srn)) {
       (
         Check,
         controllers.nonsipp.landorproperty.routes.LandOrPropertyListController

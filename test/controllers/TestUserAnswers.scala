@@ -18,13 +18,11 @@ package controllers
 
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, SchemeDesignatoryRecordVersionPage}
 import pages.nonsipp.memberdetails._
-import eu.timepit.refined.refineMV
+import viewmodels.models.MemberState.New
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriodRecordVersionPage}
 import models.{DateRange, NormalMode, UserAnswers}
 import pages.nonsipp.declaration.PensionSchemeDeclarationPage
 import viewmodels.models.{DeclarationViewModel, SectionCompleted, Submitted}
-import config.RefinedTypes.{Max3, Max300}
-import viewmodels.models.MemberState.New
 import pages.nonsipp._
 import org.scalatest.OptionValues
 
@@ -43,11 +41,9 @@ trait TestUserAnswers extends ControllerBaseSpec with TestValues {
     to = LocalDate.of(2022, 4, 5)
   )
 
-  val index1of3: Max3 = refineMV(1)
   val recordVersion = "001"
   val currentReturnTaxYearSubmissionDate: LocalDateTime = LocalDateTime.of(2023, 4, 5, 0, 0, 0)
   val declarationData: DeclarationViewModel = DeclarationViewModel("PSP", "20000008", Some("A0000001"))
-  val index1of300: Max300 = refineMV(1)
 
   // UserAnswers for the current return from the current tax year
   val currentTaxYearUserAnswersWithFewMembers: UserAnswers = defaultUserAnswers
