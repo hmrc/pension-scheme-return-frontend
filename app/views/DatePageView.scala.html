@@ -35,7 +35,7 @@
         <h1 class="govuk-heading-l">@renderMessage(viewModel.heading)</h1>
 
         @if(viewModel.page.hint.isDefined) {
-            <div class="govuk-hint">@renderMessage(viewModel.page.hint.get)</div>
+            <div class="govuk-hint" aria-describedby="value">@renderMessage(viewModel.page.hint.get)</div>
         }
 
         @govukDateInput(

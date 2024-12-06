@@ -152,8 +152,8 @@ object MemberContributionListController {
     optYear: Option[String],
     optCurrentVersion: Option[Int],
     optPreviousVersion: Option[Int]
-  ): List[List[TableElemBase]] = {
-    val x = memberList
+  ): List[List[TableElemBase]] =
+    memberList
       .map {
         case (index, memberName, memberContribution) =>
           if (memberContribution.exists(!_.isZero)) {
@@ -202,8 +202,7 @@ object MemberContributionListController {
             )
           }
       }
-    x.sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString))
-  }
+      .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString))
 
   def viewModel(
     srn: Srn,
