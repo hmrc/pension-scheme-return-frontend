@@ -45,29 +45,41 @@ class ListViewModelSpec extends AnyFreeSpec with Matchers {
 
 // TODO: PSR-1643 uncomment when fixing pagination for pre pop list pages
 
-//    "multiple sections" - {
-//      "don't paginate when they all fit on one page" in {
-//        val list = List(
-//          ListSection(buildRows(10)),
-//          ListSection(buildRows(10)),
-//        )
-//
-//        list.paginateSections(1, 20) shouldMatchTo list
-//      }
-//      "paginate across multiple pages" in {
-//        val rows = buildRows(25)
-//        val list = List(
-//          ListSection(Some(Message("section 1")), rows.take(5)),
-//          ListSection(Some(Message("section 2")), rows.slice(5, 25)),
-//        )
-//
-//        list.paginateSections(1, 10) mustEqual List(
-//          ListSection(Some(Message("section 1")), rows.take(5)),
-//          ListSection(Some(Message("section 2")), rows.slice(5, 10))
-//        )
-//        list.paginateSections(2, 10) mustEqual List(ListSection(Some(Message("section 2")), rows.slice(10, 20)))
-//        list.paginateSections(3, 10) mustEqual List(ListSection(Some(Message("section 2")), rows.slice(20, 25)))
-//      }
-//    }
+    "multiple sections" - {
+      "don't paginate when they all fit on one page" in {
+        val rows = buildRows(20)
+        val list = List(
+          ListSection(rows.take(10)),
+          ListSection(rows.slice(10, 20))
+        )
+
+        list.paginateSections(1, 20) mustEqual list
+      }
+
+      "paginate across multiple pages" in {
+        val rows = buildRows(25)
+        val list = List(
+          ListSection(Some(Message("section 1")), rows.take(5)),
+          ListSection(Some(Message("section 2")), rows.slice(5, 25))
+        )
+
+        // Page 1: First 10 rows
+        list.paginateSections(1, 10) mustEqual List(
+          ListSection(Some(Message("section 1")), rows.take(5)),
+          ListSection(Some(Message("section 2")), rows.slice(5, 10))
+        )
+
+        // Page 2: Next 10 rows
+        list.paginateSections(2, 10) mustEqual List(
+          ListSection(Some(Message("section 2")), rows.slice(10, 20))
+        )
+
+        // Page 3: Remaining rows
+        list.paginateSections(3, 10) mustEqual List(
+          ListSection(Some(Message("section 2")), rows.slice(20, 25))
+        )
+      }
+
+    }
   }
 }

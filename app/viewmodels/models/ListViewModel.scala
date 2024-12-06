@@ -83,14 +83,18 @@ case class ListSection(
 object ListSection {
   def apply(rows: List[ListRow]): ListSection = ListSection(None, rows)
 
-  implicit class ListSectionOps(list: List[ListSection]) {
-    def paginateSections(currentPage: Int, pageSize: Int): List[ListSection] =
-      list
+  implicit class ListSectionOps(sections: List[ListSection]) {
+    def paginateSections(currentPage: Int, pageSize: Int): List[ListSection] = {
+      val slicedRows = sections
         .flatMap(section => section.rows.map(row => (section, row)))
-        .slice((currentPage - 1) * pageSize, ((currentPage - 1) * pageSize) + pageSize)
-        .groupBy(_._1)
-        .toList
-        .map { case (section, rows) => section.copy(rows = rows.map(_._2)) }
+        .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
+      sections.flatMap { section =>
+        val rowsForSection = slicedRows.collect { case (`section`, row) => row }
+        Option.when(rowsForSection.nonEmpty)(section.copy(rows = rowsForSection))
+      }
+    }
+
   }
 }
 

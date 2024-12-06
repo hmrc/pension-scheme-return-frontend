@@ -335,12 +335,12 @@ object LandOrPropertyListController {
       }
     }
 
-    val currentPage = if ((page - 1) * Constants.landOrPropertiesSize >= addresses.size) 1 else page
+    val currentPage = if ((page - 1) * Constants.landOrPropertiesSize >= addressesSize) 1 else page
 
     val pagination = Pagination(
       currentPage = currentPage,
       pageSize = Constants.landOrPropertiesSize,
-      addresses.size,
+      addressesSize,
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.LandOrPropertyListController
