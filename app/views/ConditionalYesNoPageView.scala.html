@@ -40,7 +40,7 @@
     }
 
     @if(viewModel.page.legend.nonEmpty) {
-      <div class="govuk-hint">@viewModel.page.hint.map(renderMessage)</div>
+      <div class="govuk-hint" aria-describedby="value.yes">@viewModel.page.hint.map(renderMessage)</div>
     }
 
     @viewModel.description.map(renderMessage)
