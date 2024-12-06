@@ -73,7 +73,7 @@
     @govukInput(
         InputViewModel(
             field = form(s"value.${index + 1}"),
-            label = LabelViewModel(renderMessage(field.label))
+            label = LabelViewModel(renderMessage(field.label)).withCssClass(LabelSize.Small.toString)
         )
         .withId(s"value.${index + 1}")
         .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
@@ -85,7 +85,7 @@
     @govukInput(
         InputViewModel(
              field = form(s"value.${index + 1}"),
-             label = LabelViewModel(renderMessage(field.label))
+             label = LabelViewModel(renderMessage(field.label)).withCssClass(LabelSize.Small.toString)
         )
         .withId(s"value.${index + 1}")
         .asNumeric()
@@ -111,7 +111,7 @@
     @govukInput(
         InputViewModel(
             field = form(s"value.${index + 1}"),
-            label = LabelViewModel(renderMessage(field.label))
+            label = LabelViewModel(renderMessage(field.label)).withCssClass(LabelSize.Small.toString)
         )
         .withId(s"value.${index + 1}")
         .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
@@ -124,7 +124,7 @@
     @govukDateInput(
         DateViewModel(
             field  = form(s"value.${index + 1}"),
-            legend = LegendViewModel(renderMessage(field.label))
+            legend = LegendViewModel(renderMessage(field.label)).withCssClass(LegendSize.Small.toString)
         )
         .withId(s"value.${index + 1}")
         .withHint(HintViewModel(renderMessage(field.hint.getOrElse(""))))
