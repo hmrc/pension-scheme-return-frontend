@@ -35,9 +35,11 @@
       @govukErrorSummary(ErrorSummaryViewModel(form))
     }
 
-    <h1 class="govuk-heading-l">@renderMessage(viewModel.heading)</h1>
+    @if(viewModel.page.legend.nonEmpty) {
+      <h1 class="govuk-heading-l">@renderMessage(viewModel.heading)</h1>
+    }
 
-    @if(viewModel.page.hint.nonEmpty) {
+    @if(viewModel.page.legend.nonEmpty) {
       <div class="govuk-hint">@viewModel.page.hint.map(renderMessage)</div>
     }
 
@@ -63,6 +65,7 @@
         legend = viewModel.page.legend,
         heading = viewModel.heading
       )
+      .withHint(viewModel.page.hint.map(hint => Hint(content = HtmlContent(renderMessage(hint)))))
       .withAttribute("id" -> "value")
     )
 
