@@ -179,7 +179,6 @@ trait RadiosFluency {
                     case _ => heading.toString
                   }
                 ).asPageHeading(LegendSize.Large)
-                  .withCssClass("govuk-visually-hidden")
               )
           )
         ),
