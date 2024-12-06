@@ -155,6 +155,7 @@ whatYouWillNeed.listItem3 = if the pension scheme had at least one open bank acc
 whatYouWillNeed.listItem4 = how many members the pension scheme had at the end of the tax year or accounting period
 whatYouWillNeed.paragraph1 = You may need to provide more information, like details of members, payments and assets, to complete the return.
 whatYouWillNeed.paragraph2 = You do not have to complete the whole return at once. You can save your answers and come back to them later.
+whatYouWillNeed.breadcrumb.overview = Pension Scheme Return overview
 
 checkUpdateInformation.title = Check and update the information you provided
 checkUpdateInformation.heading = Check and update the information you provided
@@ -162,6 +163,7 @@ checkUpdateInformation.paragraph1 = Some of the information that you provided fr
 checkUpdateInformation.paragraph2 = You must check that the information is correct, or make any required changes before submitting this period's return.
 checkUpdateInformation.h2 = Saving your answers
 checkUpdateInformation.paragraph3 = You do not have to complete the whole return at once. You can save your answers and come back to them later.
+checkUpdateInformation.breadcrumb.overview = Pension Scheme Return overview
 
 whichTaxYear.title = Which tax year are you submitting a return for?
 whichTaxYear.heading = Which tax year are you submitting a return for?

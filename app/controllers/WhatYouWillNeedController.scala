@@ -20,6 +20,7 @@ import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.WhatYouWillNeedPage
+import config.FrontendAppConfig
 import controllers.actions._
 import navigation.Navigator
 import models.{CheckMode, NormalMode}
@@ -42,13 +43,32 @@ class WhatYouWillNeedController @Inject()(
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  config: FrontendAppConfig,
   view: ContentPageView
 ) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(srn: Srn, fbNumber: String, taxYear: String, version: String): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      Ok(view(WhatYouWillNeedController.viewModel(srn, fbNumber, taxYear, version)))
+      val dashboardUrl =
+        if (request.pensionSchemeId.isPSP) {
+          config.urls.managePensionsSchemes.schemeSummaryPSPDashboard(srn)
+        } else {
+          config.urls.managePensionsSchemes.schemeSummaryDashboard(srn)
+        }
+
+      Ok(
+        view(
+          WhatYouWillNeedController.viewModel(
+            srn,
+            fbNumber,
+            taxYear,
+            version,
+            request.schemeDetails.schemeName,
+            dashboardUrl
+          )
+        )
+      )
     }
 
   def onSubmit(srn: Srn, fbNumber: String, taxYear: String, version: String): Action[AnyContent] =
@@ -67,7 +87,14 @@ class WhatYouWillNeedController @Inject()(
 
 object WhatYouWillNeedController {
 
-  def viewModel(srn: Srn, fbNumber: String, taxYear: String, version: String): FormPageViewModel[ContentPageViewModel] =
+  def viewModel(
+    srn: Srn,
+    fbNumber: String,
+    taxYear: String,
+    version: String,
+    schemeName: String,
+    dashboardUrl: String
+  ): FormPageViewModel[ContentPageViewModel] =
     FormPageViewModel(
       Message("whatYouWillNeed.title"),
       Message("whatYouWillNeed.heading"),
@@ -85,5 +112,12 @@ object WhatYouWillNeedController {
           ) ++
           ParagraphMessage("whatYouWillNeed.paragraph1") ++
           ParagraphMessage("whatYouWillNeed.paragraph2")
+      )
+      .withBreadcrumbs(
+        List(
+          schemeName -> dashboardUrl,
+          "whatYouWillNeed.breadcrumb.overview" -> controllers.routes.OverviewController.onPageLoad(srn).url,
+          "whatYouWillNeed.title" -> "#"
+        )
       )
 }

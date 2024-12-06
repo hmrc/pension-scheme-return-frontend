@@ -33,7 +33,8 @@ case class FormPageViewModel[+A](
   mode: Mode = NormalMode,
   optViewOnlyDetails: Option[ViewOnlyDetailsViewModel] = None,
   optNotificationBanner: Option[(String, String, String)] = None,
-  showBackLink: Boolean = true
+  showBackLink: Boolean = true,
+  breadcrumbs: Option[List[(String, String)]] = None
 ) {
 
   def withDescription(message: Option[DisplayMessage]): FormPageViewModel[A] =
@@ -47,6 +48,9 @@ case class FormPageViewModel[+A](
 
   def withButtonText(message: Message): FormPageViewModel[A] =
     copy(buttonText = message)
+
+  def withBreadcrumbs(breadcrumbs: List[(String, String)]): FormPageViewModel[A] =
+    copy(breadcrumbs = Some(breadcrumbs))
 }
 
 object FormPageViewModel {

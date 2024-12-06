@@ -21,6 +21,7 @@
   appConfig: FrontendAppConfig,
   govukLayout: GovukLayout,
   govukBackLink: GovukBackLink,
+  govukBreadcrumbs: GovukBreadcrumbs,
   govukNotificationBanner: GovukNotificationBanner,
   hmrcHead: HmrcHead,
   hmrcStandardHeader: HmrcStandardHeader,
@@ -34,6 +35,7 @@
 
 @(pageTitle: String,
   showBackLink: Boolean = true,
+  breadcrumbs: Option[List[(String, String)]] = None,
   timeout: Boolean = true,
   showSignOut: Boolean = true,
   refresh: Option[Int] = None,
@@ -78,6 +80,16 @@
   @if(showBackLink) {
     @govukBackLink(BackLinkViewModel(href = "#").withCssClass("js-visible"))
   }
+
+@if(breadcrumbs.isDefined) {
+  @govukBreadcrumbs(
+    Breadcrumbs(
+      items = breadcrumbs.get.map { breadcrumb =>
+        BreadcrumbsItem(content = breadcrumb._1, href = Some(breadcrumb._2))
+      }
+    )
+  )
+}
 
   @if(notificationBanner.isDefined) {
     @govukNotificationBanner(NotificationBanner(
