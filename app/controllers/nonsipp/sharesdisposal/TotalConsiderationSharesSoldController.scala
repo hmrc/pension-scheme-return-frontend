@@ -125,7 +125,7 @@ object TotalConsiderationSharesSoldController {
     FormPageViewModel(
       title = Message("sharesDisposal.totalConsiderationSharesSold.title"),
       heading = Message("sharesDisposal.totalConsiderationSharesSold.heading", numShares, companyName),
-      page = SingleQuestion(form, QuestionField.input(Empty)),
+      page = SingleQuestion(form, QuestionField.currency(Empty)),
       onSubmit = routes.TotalConsiderationSharesSoldController.onSubmit(srn, shareIndex, disposalIndex, mode)
     )
 }

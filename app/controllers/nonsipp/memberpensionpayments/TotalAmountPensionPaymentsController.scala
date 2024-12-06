@@ -131,7 +131,7 @@ object TotalAmountPensionPaymentsController {
       Message("totalAmountPensionPayments.heading", memberName),
       SingleQuestion(
         form,
-        QuestionField.input(Empty)
+        QuestionField.currency(Empty)
       ),
       controllers.nonsipp.memberpensionpayments.routes.TotalAmountPensionPaymentsController
         .onSubmit(srn, index, mode)

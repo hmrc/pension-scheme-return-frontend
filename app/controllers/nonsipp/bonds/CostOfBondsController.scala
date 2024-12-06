@@ -111,7 +111,7 @@ object CostOfBondsController {
       Message("bonds.costOfBonds.heading"),
       SingleQuestion(
         form,
-        QuestionField.input(Empty, Some("bonds.costOfBonds.hint"))
+        QuestionField.currency(Empty, Some("bonds.costOfBonds.hint"))
       ),
       controllers.nonsipp.bonds.routes.CostOfBondsController
         .onSubmit(srn, index, mode)

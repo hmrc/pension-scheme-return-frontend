@@ -123,7 +123,7 @@ object TotalAssetValueController {
       ),
       SingleQuestion(
         form,
-        QuestionField.input(Empty)
+        QuestionField.currency(Empty)
       ),
       routes.TotalAssetValueController
         .onSubmit(srn, index, mode)

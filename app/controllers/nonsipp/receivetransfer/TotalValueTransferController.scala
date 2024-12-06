@@ -138,7 +138,7 @@ object TotalValueTransferController {
       Message("totalValueTransfer.heading", transferSchemeName, memberName),
       SingleQuestion(
         form,
-        QuestionField.input(Empty)
+        QuestionField.currency(Empty)
       ),
       controllers.nonsipp.receivetransfer.routes.TotalValueTransferController
         .onSubmit(srn, index, secondaryIndex, mode)

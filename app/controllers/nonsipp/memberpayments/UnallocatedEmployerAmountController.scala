@@ -106,7 +106,7 @@ object UnallocatedEmployerAmountController {
       Message("unallocatedEmployerAmount.heading", schemeName),
       SingleQuestion(
         form,
-        QuestionField.input(Empty)
+        QuestionField.currency(Empty)
       ),
       controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController.onSubmit(srn, mode)
     )

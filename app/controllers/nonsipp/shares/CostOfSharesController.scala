@@ -119,7 +119,7 @@ object CostOfSharesController {
       ),
       SingleQuestion(
         form,
-        QuestionField.input(Empty, Some("shares.costOfShares.hint"))
+        QuestionField.currency(Empty, Some("shares.costOfShares.hint"))
       ),
       controllers.nonsipp.shares.routes.CostOfSharesController
         .onSubmit(srn, index, mode)

@@ -124,7 +124,7 @@ object TotalValueQuotedSharesController {
       Message("totalValueQuotedShares.heading", schemeName, period.to.show),
       SingleQuestion(
         form,
-        QuestionField.input(Empty)
+        QuestionField.currency(Empty)
       ),
       routes.TotalValueQuotedSharesController.onSubmit(srn)
     )

@@ -132,7 +132,7 @@ object TotalMemberContributionController {
       Message("totalMemberContribution.heading", memberName),
       SingleQuestion(
         form,
-        QuestionField.input(Empty, Some("totalMemberContribution.hint"))
+        QuestionField.currency(Empty, Some("totalMemberContribution.hint"))
       ),
       controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
         .onSubmit(srn, index, mode)

@@ -116,7 +116,7 @@ object IncomeFromBondsController {
       Message("bonds.incomeFromBonds.heading"),
       SingleQuestion(
         form,
-        QuestionField.input(Empty, Some("bonds.incomeFromBonds.hint"))
+        QuestionField.currency(Empty, Some("bonds.incomeFromBonds.hint"))
       ),
       controllers.nonsipp.bonds.routes.IncomeFromBondsController
         .onSubmit(srn, index, mode)

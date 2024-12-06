@@ -107,7 +107,7 @@ object SharesTotalIncomeController {
       Message("sharesTotalIncome.heading", companyName),
       SingleQuestion(
         form,
-        QuestionField.input(Empty, Some("sharesTotalIncome.hint"))
+        QuestionField.currency(Empty, Some("sharesTotalIncome.hint"))
       ),
       routes.SharesTotalIncomeController.onSubmit(srn, index, mode)
     )

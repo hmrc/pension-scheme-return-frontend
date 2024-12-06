@@ -113,7 +113,7 @@ object SurrenderedBenefitsAmountController {
     FormPageViewModel(
       title = "surrenderedBenefits.amount.title",
       heading = Message("surrenderedBenefits.amount.heading", memberName),
-      page = SingleQuestion(form, QuestionField.input(Empty)),
+      page = SingleQuestion(form, QuestionField.currency(Empty)),
       onSubmit = routes.SurrenderedBenefitsAmountController.onSubmit(srn, memberIndex, mode)
     )
 }
