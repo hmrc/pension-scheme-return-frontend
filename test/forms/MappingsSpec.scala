@@ -19,10 +19,12 @@ package forms
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import forms.mappings.Mappings
-import org.scalatest.OptionValues
-import models.{Crn, Enumerable, Money}
+import config.Constants.{maxPercentage, minPercentage}
+import models._
 import play.api.data.{Form, FormError}
-import forms.mappings.errors.{InputFormErrors, MoneyFormErrors}
+import forms.mappings.errors.{InputFormErrors, MoneyFormErrors, PercentageFormErrors}
+import org.scalatest.OptionValues
+import uk.gov.hmrc.domain.Nino
 
 object MappingsSpec {
 
@@ -267,6 +269,11 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
       result.get mustEqual Money(10.01, "10.01")
     }
 
+    "must remove whitespaces" in {
+      val result = testForm.bind(Map("value" -> "10. 10"))
+      result.get mustEqual Money(10.1, "10.10")
+    }
+
     "must not bind an empty value" in {
       val result = testForm.bind(Map("value" -> ""))
       result.errors must contain(FormError("value", "error.required"))
@@ -479,4 +486,238 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
       result.errors must contain(FormError("value", "invalid format"))
     }
   }
+
+  "validatedText" - {
+    val fieldErrors: InputFormErrors =
+      InputFormErrors.input(
+        "error.required",
+        "invalid",
+        "max"
+      )
+
+    val testForm =
+      Form(
+        "value" -> validatedText(
+          "value",
+          fieldErrors.requiredKey,
+          fieldErrors.regexChecks,
+          fieldErrors.max._1,
+          fieldErrors.max._2
+        )
+      )
+
+    "must bind a valid string" in {
+      val result = testForm.bind(Map("value" -> "foobar"))
+      result.get mustEqual "foobar"
+    }
+
+    "must not bind an empty string" in {
+      val result = testForm.bind(Map("value" -> ""))
+      result.errors must contain(FormError("value", "error.required"))
+    }
+
+    "must not bind a string of whitespace only" in {
+      val result = testForm.bind(Map("value" -> " \t"))
+      result.errors must contain(FormError("value", "error.required"))
+    }
+
+    "must not bind an empty map" in {
+      val result = testForm.bind(Map.empty[String, String])
+      result.errors must contain(FormError("value", "error.required"))
+    }
+
+    "must return a custom error message" in {
+      val form = Form("value" -> text("custom.error"))
+      val result = form.bind(Map("value" -> ""))
+      result.errors must contain(FormError("value", "custom.error"))
+    }
+  }
+
+  "nino" - {
+    val fieldErrors: InputFormErrors =
+      InputFormErrors.input(
+        "error.required",
+        "invalid",
+        "max"
+      )
+
+    val testForm: Form[Nino] =
+      Form("value" -> nino("error.required", "error.invalid"))
+
+    "must bind a valid nino" in {
+      val result = testForm.bind(Map("value" -> "AB 123456 A"))
+      result.get mustEqual Nino("AB123456A")
+    }
+
+    "must not bind an empty nino" in {
+      val result = testForm.bind(Map("value" -> ""))
+      result.errors must contain(FormError("value", "error.required"))
+    }
+
+    "must not bind a nino of whitespace only" in {
+      val result = testForm.bind(Map("value" -> " \t"))
+      result.errors must contain(FormError("value", "error.required"))
+    }
+
+    "must not bind an empty map" in {
+      val result = testForm.bind(Map.empty[String, String])
+      result.errors must contain(FormError("value", "error.required"))
+    }
+
+    "must return a custom error message" in {
+      val form = Form("value" -> text("custom.error"))
+      val result = form.bind(Map("value" -> ""))
+      result.errors must contain(FormError("value", "custom.error"))
+    }
+  }
+
+  "nino with duplicates" - {
+    val fieldErrors: InputFormErrors =
+      InputFormErrors.input(
+        "error.required",
+        "invalid",
+        "max"
+      )
+
+    val duplicates = List(Nino("AB123456C"), Nino("AB123456D"))
+    val testForm: Form[Nino] =
+      Form("value" -> ninoNoDuplicates("error.required", "error.invalid", duplicates, "error.duplicate"))
+
+    "must bind a valid nino" in {
+      val result = testForm.bind(Map("value" -> "AB 123456 A"))
+      result.get mustEqual Nino("AB123456A")
+    }
+
+    "must not bind an empty nino" in {
+      val result = testForm.bind(Map("value" -> ""))
+      result.errors must contain(FormError("value", "error.required"))
+    }
+
+    "must not bind a duplicate nino" in {
+      val result = testForm.bind(Map("value" -> "AB123456C"))
+      result.errors must contain(FormError("value", "error.duplicate"))
+    }
+
+    "must not bind a duplicate nino with whitespaces" in {
+      val result = testForm.bind(Map("value" -> "AB12 3456C"))
+      result.errors must contain(FormError("value", "error.duplicate"))
+    }
+
+    "must not bind a nino of whitespace only" in {
+      val result = testForm.bind(Map("value" -> " \t"))
+      result.errors must contain(FormError("value", "error.required"))
+    }
+
+    "must not bind an empty map" in {
+      val result = testForm.bind(Map.empty[String, String])
+      result.errors must contain(FormError("value", "error.required"))
+    }
+
+    "must return a custom error message" in {
+      val form = Form("value" -> text("custom.error"))
+      val result = form.bind(Map("value" -> ""))
+      result.errors must contain(FormError("value", "custom.error"))
+    }
+  }
+
+  "postcode" - {
+    val fieldErrors: InputFormErrors =
+      InputFormErrors.postcode(
+        "required",
+        "invalid characters",
+        "invalid format"
+      )
+
+    val testForm = Form(
+      "value" -> postCode(fieldErrors)
+    )
+
+    "must bind a valid value" in {
+      val result = testForm.bind(Map("value" -> "AB1 1BA"))
+      result.get mustEqual "AB11BA"
+    }
+
+    "must trim whitespaces" in {
+      val result = testForm.bind(Map("value" -> " AB1 \t1BA "))
+      result.get mustEqual "AB11BA"
+    }
+
+    "must not bind an invalid value" in {
+      val result = testForm.bind(Map("value" -> "*"))
+      result.errors must contain(FormError("value", "invalid format"))
+    }
+  }
+  "percentage" - {
+    val formErrors = PercentageFormErrors(
+      "error.required",
+      "error.nonNumeric",
+      (maxPercentage, "error.tooLarge"),
+      (minPercentage, "error.tooLow")
+    )
+    val testForm: Form[Percentage] =
+      Form(
+        "value" -> percentage(formErrors)
+      )
+
+    "must bind a valid percentage" in {
+      val result = testForm.bind(Map("value" -> "1.00"))
+      result.get mustEqual Percentage(1, "1.00")
+    }
+
+    "must bind a valid Percentage" in {
+      val result = testForm.bind(Map("value" -> "10.1"))
+      result.get mustEqual Percentage(10.1, "10.1")
+    }
+
+    "must remove whitespaces" in {
+      val result = testForm.bind(Map("value" -> "10. 10"))
+      result.get mustEqual Percentage(10.1, "10.10")
+    }
+
+    "must not bind an empty value" in {
+      val result = testForm.bind(Map("value" -> ""))
+      result.errors must contain(FormError("value", "error.required"))
+    }
+
+    "must not bind an empty map" in {
+      val result = testForm.bind(Map.empty[String, String])
+      result.errors must contain(FormError("value", "error.required"))
+    }
+
+    "must not bind a string" in {
+      val result = testForm.bind(Map("value" -> "error"))
+      result.errors must contain(FormError("value", "error.nonNumeric"))
+    }
+
+    "must not bind a double with more than 2 decimal places" in {
+      val result = testForm.bind(Map("value" -> "10.001"))
+      result.errors must contain(FormError("value", "error.nonNumeric"))
+    }
+
+    "must not bind double that is too large" in {
+      val result = testForm.bind(Map("value" -> "1000.00"))
+      result.errors must contain(FormError("value", "error.tooLarge"))
+    }
+
+    "must bind max allowed value" in {
+      val result = testForm.bind(Map("value" -> "999.99"))
+      result.get.value mustEqual 999.99
+    }
+
+    "must unbind a valid value" in {
+      val result = testForm.fill(Percentage(123.4))
+      result.apply("value").value.value mustEqual "123.4"
+    }
+
+    "must unbind using displayAs" in {
+      val result = testForm.fill(Percentage(123, "123"))
+      result.apply("value").value.value mustEqual "123"
+    }
+
+    "must not bind when smaller than -999.99" in {
+      val result = testForm.bind(Map("value" -> "-1000.00"))
+      result.errors must contain(FormError("value", "error.tooLow"))
+    }
+  }
+
 }

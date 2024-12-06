@@ -75,7 +75,9 @@ class MemberPaymentsTransformer @Inject()(
           MemberDetails(
             state = MemberState.Deleted,
             memberPSRVersion = softDeletedMember.memberPSRVersion,
-            personalDetails = softDeletedMember.memberDetails,
+            personalDetails = softDeletedMember.memberDetails.copy(
+              nino = softDeletedMember.memberDetails.nino.map(_.filterNot(_.isWhitespace))
+            ),
             employerContributions = softDeletedMember.employerContributions,
             transfersIn = softDeletedMember.transfersIn,
             transfersOut = softDeletedMember.transfersOut,
