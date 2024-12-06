@@ -91,9 +91,11 @@
                 }
             }
 
-            @viewmodel.page.paginatedViewModel.map { paginatedViewModel =>
-                @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
-            }
+                   @viewmodel.page.paginatedViewModel.map { paginatedViewModel =>
+                       @if(paginatedViewModel.pagination.totalPages > 1) {
+                          @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
+                       }
+                   }
 
             @if(!viewmodel.mode.isViewOnlyMode) {
                 @viewmodel.description.map(renderMessage)
