@@ -27,7 +27,7 @@ import models.{CheckMode, SchemeMemberNumbers}
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.reset
 
-class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedControllerSpec extends ControllerBaseSpec {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
@@ -43,16 +43,44 @@ class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
   override protected def beforeAll(): Unit =
     reset(mockPsrRetrievalService)
 
+  private val dashboardUrlPsa =
+    "http://localhost:8204/manage-pension-schemes/pension-scheme-summary/" + srn.value
+
+  private val dashboardUrlPsp =
+    "http://localhost:8204/manage-pension-schemes/" + srn.value + "/dashboard/pension-scheme-details"
+
   "WhatYouWillNeedController" - {
 
-    "return OK and the correct view for a GET" in runningApplication { implicit app =>
+    "return OK and the correct view for a GET (with PSA breadcrumb link)" in runningApplication { implicit app =>
       val view = injected[ContentPageView]
       val request = FakeRequest(GET, onPageLoad)
       val result = route(app, request).value
-      val expectedView = view(WhatYouWillNeedController.viewModel(srn, fbNumber, "", ""))(request, createMessages(app))
+      val expectedView = view(WhatYouWillNeedController.viewModel(srn, fbNumber, "", "", schemeName, dashboardUrlPsa))(
+        request,
+        createMessages(app)
+      )
 
       status(result) mustEqual OK
       contentAsString(result) mustEqual expectedView.toString
+    }
+
+    "return OK and the correct view for a GET (with PSP breadcrumb link)" in {
+      val application = applicationBuilder(isPsa = false).build()
+
+      running(application) {
+
+        val view = application.injector.instanceOf[ContentPageView]
+        val request = FakeRequest(GET, onPageLoad)
+        val result = route(application, request).value
+        val expectedView =
+          view(WhatYouWillNeedController.viewModel(srn, fbNumber, "", "", schemeName, dashboardUrlPsp))(
+            request,
+            createMessages(application)
+          )
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual expectedView.toString
+      }
     }
 
     "redirect to the next page" in {
@@ -71,6 +99,7 @@ class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
         redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
+
     "redirect to the next page more than 100 members" in {
       val pensionSchemeId = pensionSchemeIdGen.sample.value
       val ua = defaultUserAnswers.unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(50, 60, 70))

@@ -31,16 +31,44 @@ class CheckUpdateInformationControllerSpec extends ControllerBaseSpec {
   lazy val onPageLoad: String = routes.CheckUpdateInformationController.onPageLoad(srn).url
   lazy val onSubmit: String = routes.CheckUpdateInformationController.onSubmit(srn).url
 
+  private val dashboardUrlPsa =
+    "http://localhost:8204/manage-pension-schemes/pension-scheme-summary/" + srn.value
+
+  private val dashboardUrlPsp =
+    "http://localhost:8204/manage-pension-schemes/" + srn.value + "/dashboard/pension-scheme-details"
+
   "CheckUpdateInformationController" - {
 
-    "return OK and the correct view for a GET" in runningApplication { implicit app =>
+    "return OK and the correct view for a GET (with PSA breadcrumb link)" in runningApplication { implicit app =>
       val view = injected[ContentPageView]
       val request = FakeRequest(GET, onPageLoad)
       val result = route(app, request).value
-      val expectedView = view(CheckUpdateInformationController.viewModel(srn))(request, createMessages(app))
+      val expectedView = view(CheckUpdateInformationController.viewModel(srn, schemeName, dashboardUrlPsa))(
+        request,
+        createMessages(app)
+      )
 
       status(result) mustEqual OK
       contentAsString(result) mustEqual expectedView.toString
+    }
+
+    "return OK and the correct view for a GET (with PSP breadcrumb link)" in {
+      val application = applicationBuilder(isPsa = false).build()
+
+      running(application) {
+
+        val view = application.injector.instanceOf[ContentPageView]
+        val request = FakeRequest(GET, onPageLoad)
+        val result = route(application, request).value
+        val expectedView =
+          view(CheckUpdateInformationController.viewModel(srn, schemeName, dashboardUrlPsp))(
+            request,
+            createMessages(application)
+          )
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual expectedView.toString
+      }
     }
 
     "redirect to the next page" in {
