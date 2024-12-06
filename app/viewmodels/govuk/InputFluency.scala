@@ -67,6 +67,9 @@ trait InputFluency {
     def describedBy(value: String): Input =
       input.copy(describedBy = Some(value))
 
+    def describedBy(value: Option[String]): Input =
+      input.copy(describedBy = value)
+
     def withHint(hint: Hint): Input =
       input.copy(hint = Some(hint))
 

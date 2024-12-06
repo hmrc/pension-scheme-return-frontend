@@ -77,5 +77,8 @@ trait TextAreaFluency {
 
     def withHint(hint: Option[Hint]): Textarea =
       textArea.copy(hint = hint)
+
+    def describedBy(value: Option[String]): Textarea =
+      textArea.copy(describedBy = value)
   }
 }
