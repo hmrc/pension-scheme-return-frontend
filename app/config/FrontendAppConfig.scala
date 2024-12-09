@@ -29,7 +29,6 @@ import java.time.LocalDate
 @Singleton
 class FrontendAppConfig @Inject()(config: Configuration) { self =>
 
-  val host: String = config.get[String]("host")
   val appName: String = config.get[String]("appName")
 
   private val contactFormServiceIdentifier = config.get[String]("contact-frontend.serviceId")
@@ -39,7 +38,7 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
 
   def feedbackUrl(implicit request: RequestHeader): String = {
     val redirectUrlPolicy = AbsoluteWithHostnameFromAllowlist(allowedRedirectUrls.toSet) | OnlyRelative
-    val redirectUrl: String = RedirectUrl(host + request.uri).get(redirectUrlPolicy).encodedUrl
+    val redirectUrl: String = RedirectUrl(request.uri).get(redirectUrlPolicy).encodedUrl
     s"$betaFeedbackUrl?service=$contactFormServiceIdentifier&backUrl=$redirectUrl"
   }
 
