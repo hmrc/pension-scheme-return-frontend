@@ -28,21 +28,21 @@
   govukSelect: GovukSelect
 )
 
-@(form: Form[_], viewmodel: FormPageViewModel[MultipleQuestionsViewModel[_]])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], viewModel: FormPageViewModel[MultipleQuestionsViewModel[_]])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, viewmodel.title.toMessage)) {
+@layout(pageTitle = title(form, viewModel.title.toMessage)) {
 
-  @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
+  @formHelper(action = viewModel.onSubmit, Symbol("autocomplete") -> "off") {
 
     @if(form.hasErrors) {
       @govukErrorSummary(ErrorSummaryViewModel(form))
     }
 
-      <h1 class="govuk-heading-l govuk-!-margin-bottom-3">@renderMessage(viewmodel.heading)</h1>
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-3">@renderMessage(viewModel.heading)</h1>
 
-      @viewmodel.description.map(renderMessage)
+      @viewModel.description.map(renderMessage)
 
-      @viewmodel.details.map { detail =>
+      @viewModel.details.map { detail =>
         @govukDetails(
             DetailsViewModel(
                 renderMessage(detail.title),
@@ -52,7 +52,7 @@
       }
 
       @{
-          viewmodel.page.fields.zipWithIndex.map {
+          viewModel.page.fields.zipWithIndex.map {
             case (field @ QuestionField(_, _, width, _, FieldType.Input), index) => input(index, width, field)
             case (field @ QuestionField(_, _, width, _, FieldType.Numeric), index) => numeric(index,width, field)
             case (field @ QuestionField(_, _, _, _, FieldType.Currency), index) => currency(index, field)
@@ -64,7 +64,7 @@
 
 
     @govukButton(
-      ButtonViewModel(renderMessage(viewmodel.buttonText))
+      ButtonViewModel(renderMessage(viewModel.buttonText))
     )
   }
 }
@@ -73,7 +73,7 @@
     @govukInput(
         InputViewModel(
             field = form(s"value.${index + 1}"),
-            label = LabelViewModel(renderMessage(field.label))
+            label = LabelViewModel(renderMessage(field.label)).withCssClass(LabelSize.Small.toString)
         )
         .withId(s"value.${index + 1}")
         .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
@@ -85,7 +85,7 @@
     @govukInput(
         InputViewModel(
              field = form(s"value.${index + 1}"),
-             label = LabelViewModel(renderMessage(field.label))
+             label = LabelViewModel(renderMessage(field.label)).withCssClass(LabelSize.Small.toString)
         )
         .withId(s"value.${index + 1}")
         .asNumeric()
@@ -98,7 +98,7 @@
     @govukInput(
         InputViewModel(
             field = form(s"value.${index + 1}"),
-            label = LabelViewModel(renderMessage(field.label))
+            label = LabelViewModel(renderMessage(field.label)).withCssClass(LabelSize.Small.toString)
         )
         .withId(s"value.${index + 1}")
         .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
@@ -111,7 +111,7 @@
     @govukInput(
         InputViewModel(
             field = form(s"value.${index + 1}"),
-            label = LabelViewModel(renderMessage(field.label))
+            label = LabelViewModel(renderMessage(field.label)).withCssClass(LabelSize.Small.toString)
         )
         .withId(s"value.${index + 1}")
         .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
@@ -124,7 +124,7 @@
     @govukDateInput(
         DateViewModel(
             field  = form(s"value.${index + 1}"),
-            legend = LegendViewModel(renderMessage(field.label))
+            legend = LegendViewModel(renderMessage(field.label)).withCssClass(LegendSize.Small.toString)
         )
         .withId(s"value.${index + 1}")
         .withHint(HintViewModel(renderMessage(field.hint.getOrElse(""))))
@@ -137,7 +137,7 @@
         name = s"value.${index + 1}",
         classes = s"${field.width.fold[InputWidth](InputWidth.Fixed10)(identity).toString} location-autocomplete",
         attributes = Map("aria-labelledby" -> s"value_${index + 1}", "data-all-countries" -> ""),
-        label = Label(forAttr = Some(s"value_${index + 1}-select"), content = HtmlContent(renderMessage(field.label))),
+        label = Label(forAttr = Some(s"value_${index + 1}-select"), content = HtmlContent(renderMessage(field.label)), classes = LegendSize.Small.toString),
         items = Seq(SelectItem(value = Some(""))) ++
                 field.selectSource.map(selectInput =>
                     SelectItem(
