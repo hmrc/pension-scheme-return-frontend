@@ -243,7 +243,7 @@ trait Formatters {
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Money] =
         baseFormatter
-          .bind(key, data.view.mapValues(_.replace("£", "")).toMap)
+          .bind(key, data.view.mapValues(_.replace("£", "").filterNot(_.isWhitespace)).toMap)
           .flatMap { double =>
             if (BigDecimal(double).bigDecimal.toPlainString.matches(decimalRegex)) {
               Right(Money(double))
@@ -268,10 +268,10 @@ trait Formatters {
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Percentage] =
         baseFormatter
-          .bind(key, data.view.mapValues(_.replace("%", "")).toMap)
+          .bind(key, data.view.mapValues(_.replace("%", "").filterNot(_.isWhitespace)).toMap)
           .flatMap { double =>
             if (double.toString().matches(decimalRegex)) {
-              Right(Percentage(double, data(key).replace("%", "")))
+              Right(Percentage(double, data(key).replace("%", "").filterNot(_.isWhitespace)))
             } else {
               Left(Seq(FormError(key, errors.nonNumericKey, args)))
             }
@@ -279,31 +279,6 @@ trait Formatters {
 
       override def unbind(key: String, value: Percentage): Map[String, String] =
         Map(key -> value.displayAs)
-    }
-
-  private[mappings] def securityFormatter(
-    errors: SecurityFormErrors,
-    args: Seq[String] = Seq.empty
-  ): Formatter[Security] =
-    new Formatter[Security] {
-
-      private val baseFormatter =
-        doubleFormatter(errors.requiredKey, errors.nonNumericKey, errors.max, (0, "error.tooSmall"), args)
-      private val decimalRegex = "^-?\\d+(\\.\\d{1,2})?$"
-
-      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Security] =
-        baseFormatter
-          .bind(key, data.view.toMap)
-          .flatMap { double =>
-            if (BigDecimal(double).toString().matches(decimalRegex)) {
-              Right(Security(double.toString))
-            } else {
-              Left(Seq(FormError(key, errors.nonNumericKey, args)))
-            }
-          }
-
-      override def unbind(key: String, value: Security): Map[String, String] =
-        Map(key -> value.security)
     }
 
   private[mappings] def enumerableFormatter[A](requiredKey: String, invalidKey: String, args: Seq[String] = Seq.empty)(

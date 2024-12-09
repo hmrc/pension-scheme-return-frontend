@@ -49,9 +49,10 @@ object PensionSchemeType {
   }
 
   implicit val writes: Writes[PensionSchemeType] = {
-    case RegisteredPS(description) => Json.obj("key" -> RegisteredPS.name, "value" -> description)
+    case RegisteredPS(description) =>
+      Json.obj("key" -> RegisteredPS.name, "value" -> description.filterNot(_.isWhitespace))
     case QualifyingRecognisedOverseasPS(description) =>
-      Json.obj("key" -> QualifyingRecognisedOverseasPS.name, "value" -> description)
+      Json.obj("key" -> QualifyingRecognisedOverseasPS.name, "value" -> description.filterNot(_.isWhitespace))
     case Other(description) => Json.obj("key" -> Other.name, "value" -> description)
   }
 
