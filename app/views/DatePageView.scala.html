@@ -36,10 +36,6 @@
           <h1 class="govuk-heading-l">@renderMessage(viewModel.heading)</h1>
         }
 
-        @if(viewModel.page.legend.nonEmpty) {
-            <div class="govuk-hint">@renderMessage(viewModel.page.hint.get)</div>
-        }
-
         @govukDateInput(
             DateViewModel(
                 field = form("value"),
@@ -47,7 +43,7 @@
                     .map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
                     .getOrElse(LegendViewModel(renderMessage(viewModel.heading)).asPageHeading(LegendSize.Large))
             )
-          .withHint(Hint(content = HtmlContent(renderMessage(viewModel.page.hint.getOrElse("")))))
+          .withHint(viewModel.page.hint.map(h => HintViewModel(renderMessage(h))))
         )
         @govukButton(
             ButtonViewModel(renderMessage(viewModel.buttonText))

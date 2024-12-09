@@ -41,10 +41,6 @@
           <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
         }
 
-        @if(viewmodel.page.hint.nonEmpty) {
-            <div class="govuk-hint">@viewmodel.page.hint.map(renderMessage)</div>
-        }
-
         @viewmodel.description.map(renderMessage)
 
         @govukRadios(
@@ -72,6 +68,7 @@
                     .asPageHeading(LegendSize.Large)
                     )
             )
+            .withHint(viewmodel.page.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
         )
 
         @govukButton(
