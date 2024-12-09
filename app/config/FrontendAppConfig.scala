@@ -29,7 +29,6 @@ import java.time.LocalDate
 @Singleton
 class FrontendAppConfig @Inject()(config: Configuration) { self =>
 
-  val host: String = config.get[String]("host")
   val appName: String = config.get[String]("appName")
 
   private val contactFormServiceIdentifier = config.get[String]("contact-frontend.serviceId")

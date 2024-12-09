@@ -16,8 +16,6 @@
 
 package views
 
-import play.api.test.FakeRequest
-import play.api.mvc.AnyContentAsEmpty
 import forms.mappings.Mappings
 import play.api.data.Forms.mapping
 import views.html.MoneyViewWithDescription
@@ -48,8 +46,6 @@ class MoneyViewWithDescriptionSpec extends ViewSpec with Mappings {
     val tripleMoneyQuestion = formPageViewModelGen(tripleQuestionGen(tripleMoneyForm))
     val invalidSingleMoneyQuestion = formPageViewModelGen(singleQuestionGen(invalidMoneyForm))
     val viewModelGen = Gen.oneOf(singleMoneyQuestion, tripleMoneyQuestion, invalidSingleMoneyQuestion)
-
-    implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
     "MoneyViewWithDescription" - {
 

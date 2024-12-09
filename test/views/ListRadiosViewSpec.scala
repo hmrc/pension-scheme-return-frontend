@@ -16,7 +16,6 @@
 
 package views
 
-import play.api.test.FakeRequest
 import config.RefinedTypes.Max5000
 import views.html.ListRadiosView
 import org.scalacheck.Gen
@@ -33,8 +32,6 @@ class ListRadiosViewSpec extends ViewSpec {
     implicit val view: ListRadiosView = injected[ListRadiosView]
     val formProvider = injected[RadioListFormProvider]
     val form = formProvider[Max5000]("summaryView.required")
-
-    implicit val request: FakeRequest[_] = FakeRequest()
 
     def viewModelGen(
       rows: Option[Int] = None

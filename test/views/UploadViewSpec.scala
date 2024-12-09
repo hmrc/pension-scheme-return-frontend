@@ -16,7 +16,6 @@
 
 package views
 
-import play.api.test.FakeRequest
 import forms.mappings.Mappings
 import views.html.UploadView
 import viewmodels.models.UploadViewModel
@@ -25,8 +24,6 @@ class UploadViewSpec extends ViewSpec with Mappings {
 
   runningApplication { implicit app =>
     val view = injected[UploadView]
-
-    implicit val request = FakeRequest()
 
     val viewModelGen = formPageViewModelGen[UploadViewModel]
 

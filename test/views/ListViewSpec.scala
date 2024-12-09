@@ -16,7 +16,6 @@
 
 package views
 
-import play.api.test.FakeRequest
 import play.twirl.api.Html
 import views.html.ListView
 import forms.YesNoPageFormProvider
@@ -30,8 +29,6 @@ class ListViewSpec extends ViewSpec {
     implicit val view: ListView = injected[ListView]
     val formProvider = injected[YesNoPageFormProvider]
     val form = formProvider("summaryView.required")
-
-    implicit val request: FakeRequest[_] = FakeRequest()
 
     def viewModelGen(showRadios: Boolean = true, rows: Option[Int] = None) =
       formPageViewModelGen(summaryViewModelGen(showRadios = showRadios, rows = rows))
