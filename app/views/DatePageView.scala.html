@@ -32,9 +32,11 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@renderMessage(viewModel.heading)</h1>
+        @if(viewModel.page.legend.nonEmpty) {
+          <h1 class="govuk-heading-l">@renderMessage(viewModel.heading)</h1>
+        }
 
-        @if(viewModel.page.hint.isDefined) {
+        @if(viewModel.page.legend.nonEmpty) {
             <div class="govuk-hint">@renderMessage(viewModel.page.hint.get)</div>
         }
 
@@ -43,8 +45,9 @@
                 field = form("value"),
                 legend = viewModel.page.legend
                     .map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
-                    .getOrElse(LegendViewModel(renderMessage(viewModel.heading)).asPageHeading(LegendSize.Large).withCssClass("govuk-visually-hidden"))
+                    .getOrElse(LegendViewModel(renderMessage(viewModel.heading)).asPageHeading(LegendSize.Large))
             )
+          .withHint(Hint(content = HtmlContent(renderMessage(viewModel.page.hint.getOrElse("")))))
         )
         @govukButton(
             ButtonViewModel(renderMessage(viewModel.buttonText))
