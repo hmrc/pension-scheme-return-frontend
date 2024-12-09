@@ -44,10 +44,10 @@ class WhatYouWillNeedControllerSpec extends ControllerBaseSpec {
     reset(mockPsrRetrievalService)
 
   private val dashboardUrlPsa =
-    "http://localhost:8204/manage-pension-schemes/pension-scheme-summary/" + srn.value
+    s"http://localhost:8204/manage-pension-schemes/pension-scheme-summary/${srn.value}"
 
   private val dashboardUrlPsp =
-    "http://localhost:8204/manage-pension-schemes/" + srn.value + "/dashboard/pension-scheme-details"
+    s"http://localhost:8204/manage-pension-schemes/${srn.value}/dashboard/pension-scheme-details"
 
   "WhatYouWillNeedController" - {
 
