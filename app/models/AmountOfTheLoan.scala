@@ -22,6 +22,7 @@ import play.api.libs.functional.syntax.toFunctionalBuilderOps
 
 case class AmountOfTheLoan(loanAmount: Money, optCapRepaymentCY: Option[Money], optAmountOutstanding: Option[Money]) {
   val asTuple: (Money, Option[Money], Option[Money]) = (loanAmount, optCapRepaymentCY, optAmountOutstanding)
+  val hasMissingAnswers: Boolean = optCapRepaymentCY.isEmpty || optAmountOutstanding.isEmpty
 }
 
 object AmountOfTheLoan {

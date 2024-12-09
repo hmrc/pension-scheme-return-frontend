@@ -20,6 +20,7 @@ import services.PsrVersionsService
 import models.ConditionalYesNo._
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
 import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, OtherAssetsHeldPage, WhatIsOtherAssetPage}
+import controllers.ControllerBaseSpec
 import views.html.TaskListView
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import eu.timepit.refined.refineMV
@@ -37,8 +38,6 @@ import org.mockito.Mockito.when
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage, UnregulatedOrConnectedBondsHeldPage}
-import config.RefinedTypes.{Max3, Max5000}
-import controllers.ControllerBaseSpec
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import pages.nonsipp.sharesdisposal._
 import pages.nonsipp.{CheckReturnDatesPage, FbVersionPage, WhichTaxYearPage}
@@ -53,9 +52,6 @@ import java.time.LocalDateTime
 class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
   val pensionSchemeId: PensionSchemeId = pensionSchemeIdGen.sample.value
-  val index1of3: Max3 = refineMV(1)
-  val index1of5000: Max5000 = refineMV(1)
-  val reason = "reason"
 
   private val mockPsrVersionsService = mock[PsrVersionsService]
 
