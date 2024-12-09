@@ -20,6 +20,7 @@ import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.CheckUpdateInformationPage
+import config.FrontendAppConfig
 import controllers.actions._
 import navigation.Navigator
 import models.{CheckMode, NormalMode}
@@ -42,13 +43,29 @@ class CheckUpdateInformationController @Inject()(
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  config: FrontendAppConfig,
   view: ContentPageView
 ) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      Ok(view(CheckUpdateInformationController.viewModel(srn)))
+      val dashboardUrl =
+        if (request.pensionSchemeId.isPSP) {
+          config.urls.managePensionsSchemes.schemeSummaryPSPDashboard(srn)
+        } else {
+          config.urls.managePensionsSchemes.schemeSummaryDashboard(srn)
+        }
+
+      Ok(
+        view(
+          CheckUpdateInformationController.viewModel(
+            srn,
+            request.schemeDetails.schemeName,
+            dashboardUrl
+          )
+        )
+      )
     }
 
   def onSubmit(srn: Srn): Action[AnyContent] =
@@ -68,7 +85,7 @@ class CheckUpdateInformationController @Inject()(
 
 object CheckUpdateInformationController {
 
-  def viewModel(srn: Srn): FormPageViewModel[ContentPageViewModel] =
+  def viewModel(srn: Srn, schemeName: String, dashboardUrl: String): FormPageViewModel[ContentPageViewModel] =
     FormPageViewModel(
       Message("checkUpdateInformation.title"),
       Message("checkUpdateInformation.heading"),
@@ -80,5 +97,12 @@ object CheckUpdateInformationController {
           ParagraphMessage("checkUpdateInformation.paragraph2") ++
           Heading2.medium("checkUpdateInformation.h2") ++
           ParagraphMessage("checkUpdateInformation.paragraph3")
+      )
+      .withBreadcrumbs(
+        List(
+          schemeName -> dashboardUrl,
+          "checkUpdateInformation.breadcrumb.overview" -> controllers.routes.OverviewController.onPageLoad(srn).url,
+          "checkUpdateInformation.title" -> "#"
+        )
       )
 }

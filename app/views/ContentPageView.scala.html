@@ -23,40 +23,40 @@
 
 @(viewmodel: FormPageViewModel[ContentPageViewModel])(implicit request: Request[_], messages: Messages)
 
- @if(viewmodel.page.isStartButton) {
+@if(viewmodel.page.isStartButton) {
 
-   @layout(pageTitle = titleNoForm(viewmodel.title.toMessage), showBackLink = false) {
+  @layout(pageTitle = titleNoForm(viewmodel.title.toMessage), showBackLink = false, breadcrumbs = viewmodel.breadcrumbs) {
 
-        @if(viewmodel.page.isLargeHeading) {
-            <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
-        } else {
-            <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)</h1>
-        }
+    @if(viewmodel.page.isLargeHeading) {
+      <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+    } else {
+      <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)</h1>
+    }
 
-   @viewmodel.description.map(renderMessage)
+    @viewmodel.description.map(renderMessage)
 
-         <p class="govuk-body">
-             @govukButton(
-                ButtonViewModel(viewmodel.buttonText.toMessage).asLink(viewmodel.onSubmit.url)
-             )
+    <p class="govuk-body">
+      @govukButton(
+        ButtonViewModel(viewmodel.buttonText.toMessage).asLink(viewmodel.onSubmit.url)
+      )
     </p>
-   }
+  }
 
 } else {
-        @layout(pageTitle = titleNoForm(viewmodel.title.toMessage), notificationBanner = viewmodel.optNotificationBanner) {
+  @layout(pageTitle = titleNoForm(viewmodel.title.toMessage), notificationBanner = viewmodel.optNotificationBanner) {
 
-            @if(viewmodel.page.isLargeHeading) {
-                <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
-            } else {
-                <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)</h1>
-            }
+    @if(viewmodel.page.isLargeHeading) {
+      <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+    } else {
+      <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)</h1>
+    }
 
-        @viewmodel.description.map(renderMessage)
+    @viewmodel.description.map(renderMessage)
 
-            <p class="govuk-body">
-                @govukButton(
-                     ButtonViewModel(viewmodel.buttonText.toMessage).asLink(viewmodel.onSubmit.url).withAttribute("data-prevent-double-click","true")
-                )
-            </p>
-        }
+    <p class="govuk-body">
+      @govukButton(
+        ButtonViewModel(viewmodel.buttonText.toMessage).asLink(viewmodel.onSubmit.url).withAttribute("data-prevent-double-click","true")
+      )
+    </p>
+  }
 }
