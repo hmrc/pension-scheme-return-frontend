@@ -38,7 +38,7 @@ import models.NormalMode
 import controllers.ControllerBaseSpec
 $! Generic end !$
 
-import forms.mappings.errors.MoneyFormErrorProvider
+import forms.MoneyFormProvider
 import views.html.MoneyView
 
 class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
@@ -68,11 +68,11 @@ class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
 
     $! Generic (change view and form value) !$
     act like renderView(onPageLoad$if(!requiredPage.empty)$, userAnswers$endif$) { implicit app => implicit request =>
-      injected[MoneyView].apply(form(injected[MoneyFormErrorProvider]), viewModel(srn, $if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$NormalMode))
+      injected[MoneyView].apply(form(injected[MoneyFormProvider]), viewModel(srn, $if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$NormalMode))
     }
 
     act like renderPrePopView(onPageLoad, $className;format="cap"$Page(srn$if(!index.empty)$, index$endif$$if(!secondaryIndex.empty)$, secondaryIndex$endif$), money$if(!requiredPage.empty)$, userAnswers$endif$) { implicit app => implicit request =>
-      injected[MoneyView].apply(form(injected[MoneyFormErrorProvider]).fill(money), viewModel(srn, $if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$NormalMode))
+      injected[MoneyView].apply(form(injected[MoneyFormProvider]).fill(money), viewModel(srn, $if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$NormalMode))
     }
     $! Generic end !$
 

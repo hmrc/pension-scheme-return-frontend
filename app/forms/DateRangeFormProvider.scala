@@ -25,7 +25,7 @@ import com.google.inject.Inject
 import play.api.data.Forms.mapping
 import config.RefinedTypes.Max3
 
-class DateRangeFormProvider @Inject()() extends Mappings {
+class DateRangeFormProvider @Inject() extends Mappings {
 
   def apply(
     startDateErrors: DateFormErrors,
