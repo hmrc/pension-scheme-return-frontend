@@ -37,8 +37,8 @@
     @if(form.hasErrors) {
       @govukErrorSummary(ErrorSummaryViewModel(
         form,
-        errorLinkOverrides = Map("value.1" -> "value.1.day")))
-      )
+        errorLinkOverrides = errorLinkOverrideHelper
+      ))
     }
 
       <h1 class="govuk-heading-l govuk-!-margin-bottom-3">@renderMessage(viewModel.heading)</h1>
@@ -156,4 +156,11 @@
             autoSelect = true
         )
     )).withFormField(form(s"value.${index + 1}")))
+}
+
+@errorLinkOverrideHelper = @{
+  viewModel.page.fields.zipWithIndex.collect {
+    case (field @ QuestionField(_, _, _, _, FieldType.Date), index) =>
+      s"value.${index + 1}" -> s"value.${index + 1}.day"
+  }.toMap
 }
