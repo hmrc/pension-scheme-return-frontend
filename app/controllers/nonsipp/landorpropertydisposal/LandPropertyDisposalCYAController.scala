@@ -431,7 +431,7 @@ object LandPropertyDisposalCYAController {
           controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
-        ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.propertyDisposed.hidden")
+        ).withVisuallyHiddenContent(("landPropertyDisposalCYA.section1.propertyDisposed.hidden", addressLine1))
       )
     )
   }
@@ -561,7 +561,9 @@ object LandPropertyDisposalCYAController {
           controllers.nonsipp.landorpropertydisposal.routes.WhenWasPropertySoldController
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
-        ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.whenWasPropertySold.hidden")
+        ).withVisuallyHiddenContent(
+          ("landPropertyDisposalCYA.section1.whenWasPropertySold.hidden", addressLookUpPage.addressLine1)
+        )
       ),
       CheckYourAnswersRowViewModel(
         Message("landPropertyDisposalCYA.section1.totalProceedsSale", addressLookUpPage.addressLine1),
@@ -573,7 +575,7 @@ object LandPropertyDisposalCYAController {
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(
-          "landPropertyDisposalCYA.section1.totalProceedsSaleInfo.hidden"
+          ("landPropertyDisposalCYA.section1.totalProceedsSaleInfo.hidden", addressLookUpPage.addressLine1)
         )
       ),
       CheckYourAnswersRowViewModel(
@@ -585,7 +587,9 @@ object LandPropertyDisposalCYAController {
           controllers.nonsipp.landorpropertydisposal.routes.WhoPurchasedLandOrPropertyController
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
-        ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.whoPurchasedLandOrProperty.hidden")
+        ).withVisuallyHiddenContent(
+          ("landPropertyDisposalCYA.section1.whoPurchasedLandOrProperty.hidden", addressLookUpPage.addressLine1)
+        )
       ),
       CheckYourAnswersRowViewModel("landPropertyDisposalCYA.section1.recipientName", recipientName)
         .withAction(
@@ -617,7 +621,7 @@ object LandPropertyDisposalCYAController {
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(
-          "landPropertyDisposalCYA.section1.landOrPropertyDisposalBuyerConnectedPartyInfo.hidden"
+          ("landPropertyDisposalCYA.section1.landOrPropertyDisposalBuyerConnectedPartyInfo.hidden", recipientName)
         )
       ) :+
       CheckYourAnswersRowViewModel(
@@ -633,7 +637,7 @@ object LandPropertyDisposalCYAController {
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(
-          "landPropertyDisposalCYA.section1.DisposalIndependentValuationInfo.hidden"
+          ("landPropertyDisposalCYA.section1.DisposalIndependentValuationInfo.hidden", recipientName)
         )
       ) :+
       CheckYourAnswersRowViewModel(
@@ -650,7 +654,7 @@ object LandPropertyDisposalCYAController {
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(
-          "landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden"
+          ("landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden", recipientName)
         )
       )
   }
@@ -678,7 +682,7 @@ object LandPropertyDisposalCYAController {
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(
-          "landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden"
+          ("landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden", addressLookUpPage.addressLine1)
         )
       )
     )
@@ -702,7 +706,9 @@ object LandPropertyDisposalCYAController {
           controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
-        ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.propertyDisposedDetails.hidden")
+        ).withVisuallyHiddenContent(
+          ("landPropertyDisposalCYA.section1.propertyDisposedDetails.hidden", addressLookUpPage.addressLine1)
+        )
       ),
       CheckYourAnswersRowViewModel(
         Message(
@@ -718,7 +724,7 @@ object LandPropertyDisposalCYAController {
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(
-          "landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden"
+          ("landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden", addressLookUpPage.addressLine1)
         )
       )
     )

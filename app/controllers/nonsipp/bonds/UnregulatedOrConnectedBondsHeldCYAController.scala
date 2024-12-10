@@ -279,7 +279,7 @@ object UnregulatedOrConnectedBondsHeldCYAController {
       whenDidSchemeAcquireBonds.get.show
     ).withAction(
       SummaryAction("site.change", routes.WhenDidSchemeAcquireBondsController.onSubmit(srn, index, mode).url)
-        .withVisuallyHiddenContent("bonds.checkYourAnswers.section.whenDidSchemeAcquireBonds.hidden")
+        .withVisuallyHiddenContent(("bonds.checkYourAnswers.section.whenDidSchemeAcquireBonds.hidden", schemeName))
     )
 
   private def bondsFromConnectedPartyRow(
@@ -293,7 +293,7 @@ object UnregulatedOrConnectedBondsHeldCYAController {
       if (bondsFromConnectedParty.get) "site.yes" else "site.no"
     ).withAction(
       SummaryAction("site.change", routes.BondsFromConnectedPartyController.onSubmit(srn, index, mode).url)
-        .withVisuallyHiddenContent("bonds.checkYourAnswers.section.bondsFromConnectedPartyPage.hidden")
+        .withVisuallyHiddenContent("bonds.checkYourAnswers.section.bondsFromConnectedParty.hidden")
     )
 
   private def unconditionalRowsPart1(
@@ -317,7 +317,7 @@ object UnregulatedOrConnectedBondsHeldCYAController {
       }
     ).withAction(
       SummaryAction("site.change", routes.WhyDoesSchemeHoldBondsController.onSubmit(srn, index, mode).url)
-        .withVisuallyHiddenContent("bonds.checkYourAnswers.section.whyDoesSchemeHoldBonds.hidden")
+        .withVisuallyHiddenContent(("bonds.checkYourAnswers.section.whyDoesSchemeHoldBonds.hidden", schemeName))
     )
   )
 
