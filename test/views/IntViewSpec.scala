@@ -16,8 +16,6 @@
 
 package views
 
-import play.api.test.FakeRequest
-import play.api.mvc.AnyContentAsEmpty
 import forms.mappings.Mappings
 import play.api.data.Forms.mapping
 import views.html.IntView
@@ -46,8 +44,6 @@ class IntViewSpec extends ViewSpec with Mappings {
     val invalidViewModel = formPageViewModelGen(singleQuestionGen(invalidForm))
     val tripleIntViewModel = formPageViewModelGen(tripleQuestionGen(tripleIntForm))
     val viewModelGen = Gen.oneOf(singleIntViewModel, tripleIntViewModel, invalidViewModel)
-
-    implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
     "IntView" - {
 

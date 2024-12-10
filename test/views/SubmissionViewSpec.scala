@@ -16,16 +16,12 @@
 
 package views
 
-import play.api.test.FakeRequest
-import play.api.mvc.AnyContentAsEmpty
 import forms.mappings.Mappings
 import views.html.SubmissionView
 
 class SubmissionViewSpec extends ViewSpec with Mappings {
   runningApplication { implicit app =>
     val view = injected[SubmissionView]
-
-    implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
     "SubmissionView" - {
       act.like(renderTitle(submissionViewModelGen)(view(_), _.title.key))

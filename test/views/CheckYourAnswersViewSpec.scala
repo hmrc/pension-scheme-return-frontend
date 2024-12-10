@@ -16,7 +16,6 @@
 
 package views
 
-import play.api.test.FakeRequest
 import views.html.CheckYourAnswersView
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{CheckYourAnswersViewModel, SummaryAction}
@@ -25,8 +24,6 @@ class CheckYourAnswersViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
     val view = injected[CheckYourAnswersView]
-
-    implicit val request = FakeRequest()
 
     val viewModelGen = formPageViewModelGen[CheckYourAnswersViewModel]
 

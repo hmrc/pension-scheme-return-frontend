@@ -16,7 +16,6 @@
 
 package views
 
-import play.api.test.FakeRequest
 import controllers.TestValues
 import views.html.TaskListView
 import viewmodels.models.TaskListStatus.UnableToStart
@@ -26,9 +25,6 @@ class TaskListViewSpec extends ViewSpec with TestValues {
 
   runningApplication { implicit app =>
     val view = injected[TaskListView]
-
-    implicit val request = FakeRequest()
-
     val viewModelGen = pageViewModelGen[TaskListViewModel]
 
     def items(viewmodel: TaskListViewModel): List[TaskListItemViewModel] =

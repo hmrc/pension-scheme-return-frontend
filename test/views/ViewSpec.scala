@@ -16,6 +16,7 @@
 
 package views
 
+import play.api.test.FakeRequest
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import utils.{BaseSpec, DisplayMessageUtils}
 import views.components.Components
@@ -30,6 +31,8 @@ trait ViewSpec
     with HtmlHelper
     with ViewBehaviours
     with DisplayMessageUtils {
+
+  implicit val request: FakeRequest[_] = FakeRequest("GET", "/test")
 
   def renderedErrorMessage(key: String): String = s"Error: $key"
 
