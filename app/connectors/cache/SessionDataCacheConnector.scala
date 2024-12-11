@@ -32,18 +32,17 @@ import javax.inject.Inject
 class SessionDataCacheConnectorImpl @Inject()(config: FrontendAppConfig, http: HttpClientV2)
     extends SessionDataCacheConnector {
 
-  private def url(cacheId: String): String =
-    s"${config.pensionsAdministrator}/pension-administrator/journey-cache/session-data/$cacheId"
+  private def url: String = s"${config.pensionsAdministrator}/pension-administrator/journey-cache/session-data-self"
 
   override def fetch(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SessionData]] =
     http
-      .get(url"${url(cacheId)}")
+      .get(url"$url")
       .execute[Option[SessionData]]
       .tapError(t => Future.successful(logger.warn(s"Failed to fetch $cacheId with message ${t.getMessage}")))
 
   override def remove(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http
-      .delete(url"${url(cacheId)}")
+      .delete(url"$url")
       .execute[Unit]
       .tapError(t => Future.successful(logger.warn(s"Failed to delete $cacheId with message ${t.getMessage}")))
 }
