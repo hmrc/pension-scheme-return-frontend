@@ -32,7 +32,10 @@
     @formHelper(action = viewModel.onSubmit, Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
+            @govukErrorSummary(ErrorSummaryViewModel(
+              form,
+              errorLinkOverrides = Map("dateOfBirth" -> "dateOfBirth.day"))
+            )
         }
 
         <h1 class="govuk-heading-l">@renderMessage(viewModel.heading)</h1>
