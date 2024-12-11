@@ -21,4 +21,4 @@ import forms.mappings.errors.MoneyFormErrors
 import forms.mappings.Mappings
 import com.google.inject.Inject
 
-class MoneyFormProvider @Inject()() extends FormProvider[MoneyFormErrors, Money](Mappings.money)
+class MoneyFormProvider @Inject() extends FormProvider[MoneyFormErrors, Money](Mappings.money)

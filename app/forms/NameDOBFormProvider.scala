@@ -24,7 +24,7 @@ import forms.mappings.errors.DateFormErrors
 
 import javax.inject.Inject
 
-class NameDOBFormProvider @Inject()() extends Mappings {
+class NameDOBFormProvider @Inject() extends Mappings {
 
   val nameMaxLength = 35
   val nameRegex = "^[a-zA-Z\\-' ]+$"
