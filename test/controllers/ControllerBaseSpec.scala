@@ -19,10 +19,9 @@ package controllers
 import play.api.test._
 import services.SaveService
 import queries.{Removable, Settable}
-import config.RefinedTypes.Max5000
+import config.RefinedTypes._
 import play.api.inject.bind
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
-import controllers.actions._
 import models.PensionSchemeId.PsaId
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators._
@@ -39,6 +38,8 @@ import models.UserAnswers.SensitiveJsObject
 import play.api.http._
 import cats.data.NonEmptyList
 import models.SchemeId.Srn
+import controllers.actions._
+import eu.timepit.refined.refineMV
 import org.scalatest.OptionValues
 import play.api.Application
 import uk.gov.hmrc.domain.Nino
@@ -196,6 +197,17 @@ trait TestValues {
     LocalDateTime.of(2020, 12, 12, 10, 30, 15)
   val submissionDateOne: LocalDateTime =
     LocalDateTime.of(2019, 11, 11, 9, 29, 14)
+  val name: String = "name"
+  val reason: String = "reason"
+  val index1of3: Max3 = refineMV(1)
+  val index1of5: Max5 = refineMV(1)
+  val index1of50: Max50 = refineMV(1)
+  val index1of300: Max300 = refineMV(1)
+  val index1of5000: Max5000 = refineMV(1)
+  val index2of5000: Max5000 = refineMV(2)
+  val conditionalYesNoNino: ConditionalYesNo[String, Nino] = ConditionalYesNo.yes(nino)
+  val conditionalYesNoCrn: ConditionalYesNo[String, Crn] = ConditionalYesNo.yes(crn)
+  val conditionalYesNoUtr: ConditionalYesNo[String, Utr] = ConditionalYesNo.yes(utr)
 
   val address: Address = Address(
     "test-id",
