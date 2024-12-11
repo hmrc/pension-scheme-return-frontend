@@ -533,7 +533,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
     "should be Not Started" - {
       "when default data" in {
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(defaultUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(defaultUserAnswers, srn, isPrePop = false)
         result mustBe (NotStarted, firstQuestionPageUrl)
       }
     }
@@ -542,7 +542,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when only DidSchemeHoldAnyShares false is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), false)
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(0, ""), firstQuestionPageUrl)
       }
 
@@ -551,7 +551,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
           .unsafeSet(TypeOfSharesHeldPage(srn, index1of5000), TypeOfShares.ConnectedParty)
           .unsafeSet(SharesCompleted(srn, index1of5000), SectionCompleted)
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "shares"), listPageUrl)
       }
 
@@ -564,7 +564,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
           .unsafeSet(SharesCompleted(srn, refineMV(2)), SectionCompleted)
 
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "shares"), listPageUrl)
       }
 
@@ -577,7 +577,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           // second share:
           .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
 
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "shares"), listPageUrl)
       }
     }
@@ -586,7 +586,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when only DidSchemeHoldAnyShares true is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, firstQuestionPageUrl)
       }
 
@@ -594,7 +594,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
           .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), TypeOfShares.Unquoted)
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, secondQuestionPageUrl(index1of5000))
       }
 
@@ -605,7 +605,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           // second share:
           .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
 
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, secondQuestionPageUrl(index2of5000))
       }
     }
