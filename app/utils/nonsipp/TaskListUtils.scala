@@ -49,7 +49,7 @@ object TaskListUtils {
       membersSection(srn, schemeName, userAnswers),
       memberPaymentsSection(srn, userAnswers),
       loansSection(srn, schemeName, userAnswers),
-      sharesSection(srn, userAnswers),
+      sharesSection(srn, userAnswers, isPrePop),
       landOrPropertySection(srn, userAnswers, isPrePop),
       bondsSection(srn, userAnswers),
       otherAssetsSection(srn, userAnswers)
@@ -392,9 +392,9 @@ object TaskListUtils {
     )
   }
 
-  private def sharesSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
+  private def sharesSection(srn: Srn, userAnswers: UserAnswers, isPrePop: Boolean): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.shares"
-    val (sharesStatus, sharesLink) = getSharesTaskListStatusAndLink(userAnswers, srn)
+    val (sharesStatus, sharesLink) = getSharesTaskListStatusAndLink(userAnswers, srn, isPrePop)
     val (sharesDisposalsStatus, sharesDisposalsLinkUrl) =
       TaskListStatusUtils.getSharesDisposalsTaskListStatusWithLink(userAnswers, srn)
 

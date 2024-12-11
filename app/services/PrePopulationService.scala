@@ -65,7 +65,5 @@ class PrePopulationService @Inject()(
       ua1 <- memberPrePopulationProcessor.clean(baseReturnUA, ua0)(srn)
       ua2 <- sharesPrePopulationProcessor.clean(baseReturnUA, ua1)(srn)
       ua3 <- loanPrePopulationProcessor.clean(baseReturnUA, ua2)(srn)
-    } yield {
-      ua3
-    }
+    } yield ua3
 }

@@ -13,6 +13,7 @@ site.previous = Previous
 site.view = View
 site.view.param = View {0}
 site.change.param = Change {0}
+site.check.param = Check {0}
 site.remove.param = Remove {0}
 site.viewOrChange = View or change
 site.start = Start
@@ -2935,10 +2936,18 @@ sharesTotalIncome.error.tooLarge = Total income from these shares in the period 
 
 sharesList.title = You have added {0} share transaction
 sharesList.title.plural = You have added {0} share transactions
+sharesList.title.prepop.check = Total of {0} shares in a sponsoring employer, acquired from a connected party, or unquoted shares
+sharesList.title.prepop = {0} share in a sponsoring employer, acquired from a connected party, or unquoted shares
+sharesList.title.prepop.plural = {0} shares in a sponsoring employer, acquired from a connected party, or unquoted shares
 sharesList.heading = You have added {0} share transaction
 sharesList.heading.plural = You have added {0} share transactions
+sharesList.heading.prepop.check = Total of {0} shares in a sponsoring employer, acquired from a connected party, or unquoted shares
+sharesList.heading.prepop = {0} share in a sponsoring employer, acquired from a connected party, or unquoted shares
+sharesList.heading.prepop.plural = {0} shares in a sponsoring employer, acquired from a connected party, or unquoted shares
 sharesList.row.withDate = {0} in {1} {2} on {3}
 sharesList.row = {0} in {1} {2}
+sharesList.section.check = Check details added in a previous return
+sharesList.section.added = Updated in this return
 
 sharesList.view.title = View share transactions
 sharesList.view.title.plural = View share transactions
@@ -2957,10 +2966,13 @@ sharesList.acquisition.acquired = acquired
 sharesList.acquisition.contributed = contributed
 sharesList.acquisition.transferred = transferred in
 sharesList.description = You must tell us about all shares in a sponsoring employer, unquoted shares, or any other shares acquired from a connected party held by the pension scheme at any point during the period of this return.
-sharesList.radios = Do you need to add another share transaction?
+sharesList.description.prepop = You must check all shares previously added. You must tell us about all shares in a sponsoring employer, unquoted shares, or any other shares acquired from a connected party held by the pension scheme at any point during the period of this return.
+sharesList.description.disposal = You can report any disposals in the ‘Disposal of shares in a sponsoring employer, acquired from a connected party, or unquoted shares’ section.
+sharesList.radios = Do you need to add another share?
 sharesList.inset = You cannot add another share transaction as you have entered the maximum of 5,000.
-sharesList.error.required = Select yes if you need to add another share transaction
+sharesList.error.required = Select yes to add another share, or no to return to task list
 sharesList.pagination.label = Showing {0} - {1} of {2} shares
+
 
 companyNameOfSharesBuyer.title = What is the buyer’s company name?
 companyNameOfSharesBuyer.heading = What is the buyer’s company name?

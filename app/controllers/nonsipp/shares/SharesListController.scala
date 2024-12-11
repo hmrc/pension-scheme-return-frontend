@@ -21,7 +21,6 @@ import viewmodels.implicits._
 import com.google.inject.Inject
 import utils.ListUtils._
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
-import _root_.config.Constants
 import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
@@ -33,15 +32,20 @@ import views.html.ListView
 import models.SchemeId.Srn
 import cats.implicits.{catsSyntaxApplicativeId, toShow, toTraverseOps}
 import controllers.nonsipp.shares.SharesListController._
+import _root_.config.Constants
+import config.Constants.maxSharesTransactions
 import pages.nonsipp.CompilationOrSubmissionDatePage
+import play.api.Logger
 import navigation.Navigator
 import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models._
+import utils.nonsipp.check.SharesCheckStatusUtils
 import play.api.i18n.MessagesApi
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
+import utils.MapUtils.UserAnswersMapOps
 import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -59,6 +63,8 @@ class SharesListController @Inject()(
   saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
+
+  private implicit val logger = Logger(getClass)
 
   val form: Form[Boolean] = SharesListController.form(formProvider)
 
@@ -105,23 +111,26 @@ class SharesListController @Inject()(
     val indexes: List[Max5000] = request.userAnswers.map(SharesCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
 
     if (indexes.nonEmpty || mode.isViewOnlyMode) {
-      sharesData(srn, indexes).map { data =>
-        val filledForm =
-          request.userAnswers.get(SharesListPage(srn)).fold(form)(form.fill)
-        Ok(
-          view(
-            filledForm,
-            SharesListController.viewModel(
-              srn,
-              page,
-              mode,
-              data,
-              request.schemeDetails.schemeName,
-              viewOnlyViewModel,
-              showBackLink = showBackLink
+      shares(srn).map {
+        case (sharesToCheck, shares) =>
+          val filledForm =
+            request.userAnswers.get(SharesListPage(srn)).fold(form)(form.fill)
+          Ok(
+            view(
+              filledForm,
+              viewModel(
+                srn,
+                page,
+                mode,
+                shares,
+                sharesToCheck,
+                request.schemeDetails.schemeName,
+                viewOnlyViewModel,
+                showBackLink = showBackLink,
+                isPrePopulation
+              )
             )
           )
-        )
       }.merge
     } else {
       Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
@@ -130,35 +139,36 @@ class SharesListController @Inject()(
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      val indexes: List[Max5000] = request.userAnswers.map(SharesCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
-
-      if (indexes.size >= Constants.maxSharesTransactions) {
-        Future.successful(
-          Redirect(
-            navigator.nextPage(SharesListPage(srn), mode, request.userAnswers)
-          )
-        )
-      } else {
-        form
-          .bindFromRequest()
-          .fold(
-            errors => {
-              sharesData(srn, indexes)
-                .map { data =>
-                  BadRequest(view(errors, viewModel(srn, page, mode, data, "", showBackLink = true)))
-                }
-                .merge
-                .pure[Future]
-            },
-            addAnother =>
-              for {
-                updatedUserAnswers <- Future.fromTry(request.userAnswers.set(SharesListPage(srn), addAnother))
-                _ <- saveService.save(updatedUserAnswers)
-              } yield Redirect(
-                navigator.nextPage(SharesListPage(srn), mode, updatedUserAnswers)
+      shares(srn).traverse {
+        case (sharesToCheck, shares) =>
+          if (sharesToCheck.size + shares.size >= Constants.maxSharesTransactions) {
+            Future.successful(
+              Redirect(
+                navigator.nextPage(SharesListPage(srn), mode, request.userAnswers)
               )
-          )
-      }
+            )
+          } else {
+            form
+              .bindFromRequest()
+              .fold(
+                errors => {
+                  BadRequest(
+                    view(
+                      errors,
+                      viewModel(srn, page, mode, shares, sharesToCheck, "", None, showBackLink = true, isPrePopulation)
+                    )
+                  ).pure[Future]
+                },
+                addAnother =>
+                  for {
+                    updatedUserAnswers <- Future.fromTry(request.userAnswers.set(SharesListPage(srn), addAnother))
+                    _ <- saveService.save(updatedUserAnswers)
+                  } yield Redirect(
+                    navigator.nextPage(SharesListPage(srn), mode, updatedUserAnswers)
+                  )
+              )
+          }
+      }.merge
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -195,20 +205,42 @@ class SharesListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
   }
 
-  private def sharesData(srn: Srn, indexes: List[Max5000])(
-    implicit req: DataRequest[_]
-  ): Either[Result, List[SharesData]] =
-    indexes
-      .sortBy(listRow => listRow.value)
-      .map { index =>
-        for {
-          typeOfSharesHeld <- requiredPage(TypeOfSharesHeldPage(srn, index))
-          companyName <- requiredPage(CompanyNameRelatedSharesPage(srn, index))
-          acquisitionType <- requiredPage(WhyDoesSchemeHoldSharesPage(srn, index))
-          acquisitionDate = req.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index))
-        } yield SharesData(index, typeOfSharesHeld, companyName, acquisitionType, acquisitionDate)
-      }
-      .sequence
+  private def shares(srn: Srn)(
+    implicit request: DataRequest[_],
+    logger: Logger
+  ): Either[Result, (List[SharesData], List[SharesData])] = {
+    // if return has been pre-populated, partition shares by those that need to be checked
+    def buildShares(index: Max5000): Either[Result, SharesData] =
+      for {
+        typeOfSharesHeld <- requiredPage(TypeOfSharesHeldPage(srn, index))
+        companyName <- requiredPage(CompanyNameRelatedSharesPage(srn, index))
+        acquisitionType <- requiredPage(WhyDoesSchemeHoldSharesPage(srn, index))
+        acquisitionDate = request.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index))
+      } yield SharesData(index, typeOfSharesHeld, companyName, acquisitionType, acquisitionDate)
+
+    if (isPrePopulation) {
+      for {
+        indexes <- request.userAnswers
+          .map(TypeOfSharesHeldPages(srn))
+          .refine[Max5000.Refined]
+          .map(_.keys.toList)
+          .getOrRecoverJourney
+        shares <- indexes.traverse(buildShares)
+      } yield shares.partition(
+        shares => SharesCheckStatusUtils.checkSharesRecord(request.userAnswers, srn, shares.index)
+      )
+    } else {
+      val noSharesToCheck = List.empty[SharesData]
+      for {
+        indexes <- request.userAnswers
+          .map(TypeOfSharesHeldPages(srn))
+          .refine[Max5000.Refined]
+          .map(_.keys.toList)
+          .getOrRecoverJourney
+        shares <- indexes.traverse(buildShares)
+      } yield (noSharesToCheck, shares)
+    }
+  }
 }
 
 object SharesListController {
@@ -222,7 +254,8 @@ object SharesListController {
     mode: Mode,
     memberList: List[SharesData],
     viewOnlyViewModel: Option[ViewOnlyViewModel],
-    schemeName: String
+    schemeName: String,
+    check: Boolean = false
   ): List[ListRow] =
     (memberList, mode) match {
       case (Nil, mode) if mode.isViewOnlyMode =>
@@ -261,6 +294,12 @@ object SharesListController {
                     .url,
                   Message("site.view.param", sharesMessage)
                 )
+              case _ if check =>
+                ListRow.check(
+                  sharesMessage,
+                  controllers.routes.UnauthorisedController.onPageLoad().url,
+                  Message("site.check.param", sharesMessage)
+                )
               case _ =>
                 ListRow(
                   sharesMessage,
@@ -278,34 +317,45 @@ object SharesListController {
     srn: Srn,
     page: Int,
     mode: Mode,
-    data: List[SharesData],
+    shares: List[SharesData],
+    sharesToCheck: List[SharesData],
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
-    showBackLink: Boolean
+    showBackLink: Boolean,
+    isPrePop: Boolean
   ): FormPageViewModel[ListViewModel] = {
 
-    val lengthOfData = data.length
+    val sharesSize = if (isPrePop) shares.length + sharesToCheck.size else shares.length
 
-    val (title, heading) = ((mode, lengthOfData) match {
-      case (ViewOnlyMode, lengthOfData) if lengthOfData == 0 =>
+    val (title, heading) = (mode match {
+      // View only
+      case ViewOnlyMode if sharesSize == 0 =>
         ("sharesList.view.title.none", "sharesList.view.heading.none")
-      case (ViewOnlyMode, lengthOfData) if lengthOfData > 1 =>
+      case ViewOnlyMode if sharesSize > 1 =>
         ("sharesList.view.title.plural", "sharesList.view.heading.plural")
-      case (ViewOnlyMode, _) =>
+      case ViewOnlyMode =>
         ("sharesList.view.title", "sharesList.view.heading")
-      case (_, lengthOfData) if lengthOfData > 1 =>
+      // Pre-pop
+      case _ if isPrePop && shares.nonEmpty =>
+        ("sharesList.title.prepop.check", "sharesList.heading.prepop.check")
+      case _ if isPrePop && sharesSize > 1 =>
+        ("sharesList.title.prepop.plural", "sharesList.heading.prepop.plural")
+      case _ if isPrePop =>
+        ("sharesList.title.prepop", "sharesList.heading.prepop")
+      // Normal
+      case _ if sharesSize > 1 =>
         ("sharesList.title.plural", "sharesList.heading.plural")
       case _ =>
         ("sharesList.title", "sharesList.heading")
     }) match {
       case (title, heading) =>
-        (Message(title, lengthOfData), Message(heading, lengthOfData))
+        (Message(title, sharesSize), Message(heading, sharesSize))
     }
 
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.pageSize,
-      totalSize = data.size,
+      totalSize = sharesSize,
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           routes.SharesListController
@@ -315,11 +365,46 @@ object SharesListController {
       }
     )
 
+    val paragraph = Option.when(sharesSize < maxSharesTransactions) {
+      if (sharesToCheck.nonEmpty) {
+        ParagraphMessage("sharesList.description.prepop") ++
+          ParagraphMessage("sharesList.description.disposal")
+      } else {
+        ParagraphMessage("sharesList.description") ++
+          ParagraphMessage("sharesList.description.disposal")
+      }
+    }
+
     val conditionalInsetText: DisplayMessage = {
-      if (data.size >= Constants.maxSharesTransactions) {
+      if (sharesSize >= Constants.maxSharesTransactions) {
         ParagraphMessage("sharesList.inset")
       } else {
         Message("")
+      }
+    }
+
+    val sections = {
+      if (isPrePop) {
+        Option
+          .when(sharesToCheck.nonEmpty)(
+            ListSection(
+              heading = Some("sharesList.section.check"),
+              rows(srn, mode, sharesToCheck, viewOnlyViewModel, schemeName, check = true)
+            )
+          )
+          .toList ++
+          Option
+            .when(shares.nonEmpty)(
+              ListSection(
+                heading = Some("sharesList.section.added"),
+                rows(srn, mode, shares, viewOnlyViewModel, schemeName)
+              )
+            )
+            .toList
+      } else {
+        List(
+          ListSection(rows(srn, mode, shares, viewOnlyViewModel, schemeName))
+        )
       }
     }
 
@@ -327,13 +412,13 @@ object SharesListController {
       mode = mode,
       title = title,
       heading = heading,
-      description = Some(ParagraphMessage("sharesList.description")),
+      description = paragraph,
       page = ListViewModel(
         inset = conditionalInsetText,
-        sections = List(ListSection(rows(srn, mode, data, viewOnlyViewModel, schemeName))),
+        sections = sections,
         radioText = Message("sharesList.radios"),
-        showRadios = data.size < Constants.maxSharesTransactions,
-        showInsetWithRadios = !(data.length < Constants.maxSharesTransactions),
+        showRadios = sharesSize < Constants.maxSharesTransactions,
+        showInsetWithRadios = !(sharesSize < Constants.maxSharesTransactions),
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
