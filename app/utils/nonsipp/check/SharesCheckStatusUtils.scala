@@ -16,16 +16,16 @@
 
 package utils.nonsipp.check
 
-import models.ConditionalYesNo._
-import pages.nonsipp.shares._
-import models.IdentityType._
 import config.RefinedTypes.{Max5000, OneTo5000}
 import eu.timepit.refined.refineV
+import models.ConditionalYesNo._
+import models.IdentitySubject._
+import models.IdentityType._
+import models.SchemeId.Srn
+import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
 import models._
 import pages.nonsipp.common._
-import models.IdentitySubject._
-import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
-import models.SchemeId.Srn
+import pages.nonsipp.shares._
 
 object SharesCheckStatusUtils {
 
