@@ -18,6 +18,7 @@ site.viewOrChange = View or change
 site.start = Start
 site.param = {0}
 site.title.postfix = (page {0} of {1})
+site.selectAMember = Select a member
 
 site.continue = Continue
 site.saveAndContinue = Save and continue
@@ -884,7 +885,7 @@ pensionCommencementLumpSum.heading = Did any member receive a pension commenceme
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
 
 pcls.memberlist.title = Select a member to report PCLS
-pcls.memberlist.heading = Select a member to report PCLS
+pcls.memberlist.heading = Add PCLS
 pcls.memberlist.paragraph1 = You must tell us about all PCLS received by members of the scheme during the period of this return.
 pcls.memberlist.paragraph2 = If you need to add a new member, go to the ‘Details of members’ section of this return.
 pcls.memberlist.pagination.label = Showing {0} - {1} of {2} members
@@ -983,7 +984,7 @@ surrenderedBenefits.whyDidMemberSurrenderBenefits.error.invalid = The reason the
 surrenderedBenefits.whyDidMemberSurrenderBenefits.error.length = The reason the member surrendered these benefits must be 35 characters or fewer
 
 surrenderedBenefits.memberList.title = Select a member to report surrendered benefits
-surrenderedBenefits.memberList.heading = Select a member to report surrendered benefits
+surrenderedBenefits.memberList.heading = Add surrendered benefits
 surrenderedBenefits.memberList.inset1 = You must tell us about all benefits surrendered by members of the scheme during the period of this return.
 surrenderedBenefits.memberList.inset2 = If you need to add a new member, go to the ‘Details of members’ section of this return.
 surrenderedBenefits.memberList.pagination.label = Showing {0} - {1} of {2} members
@@ -2508,8 +2509,8 @@ WhatYouWillNeed.PensionCommencementLumpSum.bullet2 = the relevant pension in res
 
 transferIn.MemberList.title = Select a member to report transfers in
 transferIn.MemberList.title.plural = Select a member to report transfers in
-transferIn.MemberList.heading = Select a member to report transfers in
-transferIn.MemberList.heading.plural = Select a member to report transfers in
+transferIn.MemberList.heading = Add transfers in
+transferIn.MemberList.heading.plural = Add transfers in
 transferIn.MemberList.paragraph1 = You must tell us about all transfers received for members of the scheme during the period of this return.
 transferIn.MemberList.paragraph2 = If you need to add a new member, go to the ‘Details of members’ section of this return.
 transferIn.MemberList.inset = You cannot add another transfer in as you have entered the maximum of 5,000.
@@ -2539,8 +2540,8 @@ contributionsFromAnotherEmployer.error.required = Select yes if employer contrib
 
 employerContributions.MemberList.title = Select a member to report employer contributions
 employerContributions.MemberList.title.plural = Select a member to report employer contributions
-employerContributions.MemberList.heading = Select a member to report employer contributions
-employerContributions.MemberList.heading.plural = Select a member to report employer contributions
+employerContributions.MemberList.heading = Add member contributions
+employerContributions.MemberList.heading.plural = Add member contributions
 employerContributions.MemberList.paragraph1 = You must tell us about all employer contributions made for members into this scheme during the period of this return.
 employerContributions.MemberList.paragraph2 = If you need to add a new member, go to the ‘Details of members’ section of this return.
 employerContributions.MemberList.pagination.label = Showing {0} - {1} of {2} members
@@ -2561,8 +2562,8 @@ employerContributions.MemberList.view.none = Were employer contributions made fo
 
 ReportContribution.MemberList.title = Select a member to report member contributions
 ReportContribution.MemberList.title.plural = Select a member to report member contributions
-ReportContribution.MemberList.heading = Select a member to report member contributions
-ReportContribution.MemberList.heading.plural = Select a member to report member contributions
+ReportContribution.MemberList.heading = Add member contributions
+ReportContribution.MemberList.heading.plural = Add member contributions
 ReportContribution.MemberList.paragraph1 = You must tell us about all member contributions made by or for members into this scheme during the period of this return.
 ReportContribution.MemberList.paragraph2 = If you need to add a new member, go to the ‘Details of members’ section of this return.
 ReportContribution.MemberList.pagination.label = Showing {0} - {1} of {2} members
@@ -2724,8 +2725,8 @@ WhatYouWillNeed.TransferOut.tellUs5 = the date the transfer was made
 
 transferOut.memberList.title = Select a member to report transfers out
 transferOut.memberList.title.plural = Select a member to report transfers out
-transferOut.memberList.heading = Select a member to report transfers out
-transferOut.memberList.heading.plural = Select a member to report transfers out
+transferOut.memberList.heading = Add transfers out
+transferOut.memberList.heading.plural = Add transfers out
 transferOut.memberList.paragraph1 = You must tell us about all transfers out for members of the scheme during the period of this return.
 transferOut.memberList.paragraph2 = If you need to add a new member, go to the ‘Details of members’ section of this return.
 transferOut.memberList.pagination.label = Showing {0} - {1} of {2} members
@@ -2807,8 +2808,8 @@ transferOut.whichTransferOutRemove.radio.label = Transfer out to {0} on {1}
 
 memberPensionPayments.memberList.title = Select a member to report pension payments
 memberPensionPayments.memberList.title.plural = Select a member to report pension payments
-memberPensionPayments.memberList.heading = Select a member to report pension payments
-memberPensionPayments.memberList.heading.plural = Select a member to report pension payments
+memberPensionPayments.memberList.heading = Add pension payments
+memberPensionPayments.memberList.heading.plural = Add pension payments
 memberPensionPayments.memberList.paragraphOne = You must tell us about all pension payments received by members of the scheme during the period of this return.
 memberPensionPayments.memberList.paragraphTwo = If you need to add a new member, go to the ‘Details of members’ section of this return.
 memberPensionPayments.memberList.pagination.label = Showing {0} - {1} of {2} members
