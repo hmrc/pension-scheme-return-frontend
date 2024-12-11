@@ -489,14 +489,11 @@ object TaskListStatusUtils {
             .url
       )
 
-      val ifNeedsChecking = answersMissingLandOrPropertySection(userAnswers, srn)
-
-      (wereLandOrPropertiesHeld, numRecorded, ifNeedsChecking) match {
-        case (_, _, true) => (Check, listPageUrl) // TODO: navigate to new list page
-        case (None, _, false) => (NotStarted, firstQuestionPageUrl)
-        case (Some(false), _, false) => (Recorded(0, ""), firstQuestionPageUrl)
-        case (Some(true), 0, false) => (InProgress, inProgressCalculatedUrl)
-        case (Some(true), _, false) => (Recorded(numRecorded, "landOrProperties"), listPageUrl)
+      (wereLandOrPropertiesHeld, numRecorded) match {
+        case (None, _) => (NotStarted, firstQuestionPageUrl)
+        case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+        case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
+        case (Some(true), _) => (Recorded(numRecorded, "landOrProperties"), listPageUrl)
       }
     }
 
