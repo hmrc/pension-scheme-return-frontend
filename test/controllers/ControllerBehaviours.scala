@@ -73,7 +73,7 @@ trait ControllerBehaviours {
   )(
     view: Application => Request[_] => Html
   ): BehaviourTest =
-    "return OK and the correct view".hasBehaviour {
+    "return OK and the correct view with PrePop session".hasBehaviour {
       val appBuilder = applicationBuilder(
         userAnswers = Some(userAnswers),
         pureUserAnswers = Some(pureUserAnswers),
