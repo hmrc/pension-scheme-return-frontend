@@ -23,23 +23,24 @@ import play.api.mvc._
 import config.{Constants, FrontendAppConfig}
 import cats.implicits.toShow
 import controllers.actions._
-import pages.nonsipp.WhichTaxYearPage
 import uk.gov.hmrc.time.TaxYear
 import viewmodels.DisplayMessage.Message
 import views.html.OverviewView
 import models.SchemeId.Srn
 import config.Constants.UNCHANGED_SESSION_PREFIX
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions}
+import pages.nonsipp.WhichTaxYearPage
+import play.api.Logger
 import utils.nonsipp.SchemeDetailNavigationUtils
 import models.backend.responses._
 import utils.DateTimeUtils.localDateShow
 import models._
-import play.api.Logger
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import viewmodels.OverviewSummary
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
+
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -301,11 +302,11 @@ class OverviewController @Inject()(
     identifyAndRequireData(srn, taxYear, version).async { implicit request =>
       reportType match {
         case PsrReportType.Sipp.name =>
-          Try(version.toInt).fold(
-            { throwable =>
-              logger.error(s"Could not parse version [$version] to int", throwable)
+          version.toIntOption match {
+            case None =>
+              logger.error(s"Could not parse version [$version] to int")
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            }, { versionInt =>
+            case Some(versionInt) =>
               val path = if (versionInt == 1) {
                 config.urls.sippContinueJourney //Standard journey - undeclared changes made
               } else {
@@ -322,8 +323,8 @@ class OverviewController @Inject()(
                   .map(fb => result.addingToSession(Constants.FB_NUMBER -> fb))
                   .getOrElse(result)
               }
-            }
-          )
+          }
+
         case _ =>
           Future.successful(
             Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
