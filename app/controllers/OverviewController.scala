@@ -39,7 +39,6 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import viewmodels.OverviewSummary
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 import java.time.LocalDate
 import javax.inject.Inject
