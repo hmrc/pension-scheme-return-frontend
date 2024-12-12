@@ -41,7 +41,9 @@ trait ErrorSummaryFluency {
       errorLinkOverrides: Map[String, String]
     )(implicit messages: Messages): ErrorSummary = {
 
-      val allErrors = errors.distinctBy(_.message).map { error =>
+      val priorityError = errors.headOption.toList
+
+      val allErrors = priorityError.map { error =>
         ErrorLink(
           href = Some(s"#${errorLinkOverrides.getOrElse(error.key, error.key)}"),
           content = Text(messages(error.message, error.args.map {

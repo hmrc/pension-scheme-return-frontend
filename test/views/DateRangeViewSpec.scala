@@ -58,11 +58,6 @@ class DateRangeViewSpec extends ViewSpec {
           .withName("render startDate errors")
       }
 
-      act.like {
-        renderErrors(viewModelGen)(view(invalidForm, _), _ => "endDate.required")
-          .withName("render endDate errors")
-      }
-
       "render the start date label" in {
 
         forAll(viewModelGen) { viewModel =>
