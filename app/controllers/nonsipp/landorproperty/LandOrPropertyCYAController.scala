@@ -210,7 +210,7 @@ class LandOrPropertyCYAController @Inject()(
         _ =>
           Redirect(
             navigator
-              .nextPage(LandOrPropertyCYAPage(srn), mode, updatedAnswers)
+              .nextPage(LandOrPropertyCYAPage(srn), NormalMode, updatedAnswers)
           )
       )
     }

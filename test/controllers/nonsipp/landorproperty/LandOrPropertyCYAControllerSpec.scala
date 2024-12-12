@@ -16,8 +16,9 @@
 
 package controllers.nonsipp.landorproperty
 
-import services.PsrSubmissionService
+import services.{PsrSubmissionService, SaveService}
 import models.ConditionalYesNo._
+import play.api.mvc.Call
 import models.SchemeHoldLandProperty.Transfer
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
@@ -25,6 +26,7 @@ import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models._
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
@@ -34,21 +36,25 @@ import controllers.ControllerBaseSpec
 class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+  private implicit val mockSaveService: SaveService = mock[SaveService]
+  private val userAnswersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
-  override protected def beforeAll(): Unit =
+  override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
+    reset(mockSaveService)
+    MockSaveService.save()
+  }
 
   private val index = refineMV[OneTo5000](1)
   private val page = 1
 
-  private def onPageLoad(mode: Mode) =
-    routes.LandOrPropertyCYAController.onPageLoad(srn, index, mode)
+  private def onPageLoad(mode: Mode): Call = routes.LandOrPropertyCYAController.onPageLoad(srn, index, mode)
 
-  private def onSubmit(mode: Mode) = routes.LandOrPropertyCYAController.onSubmit(srn, index, mode)
+  private def onSubmit(mode: Mode): Call = routes.LandOrPropertyCYAController.onSubmit(srn, index, mode)
 
   private lazy val onPageLoadViewOnly = routes.LandOrPropertyCYAController.onPageLoadViewOnly(
     srn,
@@ -68,13 +74,15 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(LandPropertyInUKPage(srn, index), true)
+    .unsafeSet(LandOrPropertyPostcodeLookupPage(srn, index), postcodeLookup)
+    .unsafeSet(AddressLookupResultsPage(srn, index), List(address, address, address))
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
     .unsafeSet(LandRegistryTitleNumberPage(srn, index), ConditionalYesNo.yes[String, String]("landRegistryTitleNumber"))
     .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index), Transfer)
     .unsafeSet(LandOrPropertyTotalCostPage(srn, index), money)
     .unsafeSet(IsLandOrPropertyResidentialPage(srn, index), false)
-    .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
-    .unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
     .unsafeSet(IsLandPropertyLeasedPage(srn, index), false)
+    .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
 
   "LandOrPropertyCYAController" - {
     List(NormalMode, CheckMode).foreach { mode =>
@@ -116,6 +124,22 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
             reset(mockPsrSubmissionService)
           })
           .withName(s"redirect to next page when in $mode mode")
+      )
+
+      act.like(
+        redirectToPage(
+          call = onSubmit(mode),
+          page =
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, page, NormalMode),
+          userAnswers = filledUserAnswers,
+          previousUserAnswers = emptyUserAnswers,
+          mockSaveService = Some(mockSaveService)
+        ).before(MockPsrSubmissionService.submitPsrDetails())
+          .after {
+            MockSaveService.capture(userAnswersCaptor)
+            userAnswersCaptor.getValue.get(LandOrPropertyHeldPage(srn)) mustEqual Some(true)
+          }
+          .withName(s"set LandOrPropertyHeldPage to true when submitting in $mode")
       )
 
       act.like(
