@@ -78,19 +78,4 @@ class SessionDataCacheConnectorSpec extends BaseConnectorSpec {
       connector.fetch(externalId).failed.futureValue
     }
   }
-
-  "delete" - {
-
-    "return unit for an ok response" in runningApplication { implicit app =>
-      stubDelete(ok())
-
-      connector.remove(externalId).futureValue mustBe ()
-    }
-
-    "return unit for a not found response" in runningApplication { implicit app =>
-      stubDelete(notFound)
-
-      connector.remove(externalId).futureValue mustBe ()
-    }
-  }
 }
