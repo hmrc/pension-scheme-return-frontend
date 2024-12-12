@@ -18,19 +18,19 @@ package controllers.nonsipp.memberpensionpayments
 
 import controllers.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsController._
 import services.SaveService
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc._
-import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
+import _root_.config.RefinedTypes._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import config.Constants
+import controllers.PSRController
+import _root_.config.Constants
 import navigation.Navigator
 import forms.MoneyFormProvider
-import models.{Mode, Money, NameDOB}
+import models.{Mode, Money}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
-import config.RefinedTypes.Max300
-import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
@@ -57,55 +57,44 @@ class TotalAmountPensionPaymentsController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
+      request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
+        val preparedForm =
+          request.userAnswers
+            .get(TotalAmountPensionPaymentsPage(srn, index))
+            .fold(form)(value => if (value.isZero) form else form.fill(value))
 
-      val preparedForm =
-        request.userAnswers
-          .get(TotalAmountPensionPaymentsPage(srn, index))
-          .fold(form)(value => if (value.isZero) form else form.fill(value))
-
-      optionList(index.value - 1)
-        .map(_.fullName)
-        .getOrRecoverJourney
-        .map(memberName => Ok(view(preparedForm, viewModel(srn, index, memberName, form, mode))))
-        .merge
+        Ok(view(preparedForm, viewModel(srn, index, memberName.fullName, form, mode)))
+      }
     }
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
-
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => {
-            Future.successful(
-              optionList(index.value - 1)
-                .map(_.fullName)
-                .getOrRecoverJourney
-                .map(
-                  memberName =>
-                    BadRequest(
-                      view(
-                        formWithErrors,
-                        viewModel(srn, index, memberName, form, mode)
-                      )
-                    )
+      request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => {
+              Future.successful(
+                BadRequest(
+                  view(
+                    formWithErrors,
+                    viewModel(srn, index, memberName.fullName, form, mode)
+                  )
                 )
-                .merge
-            )
-          },
-          value =>
-            for {
-              updatedAnswers <- Future
-                .fromTry(
-                  request.userAnswers.transformAndSet(TotalAmountPensionPaymentsPage(srn, index), value)
-                )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(TotalAmountPensionPaymentsPage(srn, index), mode, updatedAnswers)
-            )
-        )
+              )
+            },
+            value =>
+              for {
+                updatedAnswers <- Future
+                  .fromTry(
+                    request.userAnswers.transformAndSet(TotalAmountPensionPaymentsPage(srn, index), value)
+                  )
+                _ <- saveService.save(updatedAnswers)
+              } yield Redirect(
+                navigator.nextPage(TotalAmountPensionPaymentsPage(srn, index), mode, updatedAnswers)
+              )
+          )
+      }
     }
 }
 

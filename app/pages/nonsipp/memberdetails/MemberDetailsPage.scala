@@ -52,10 +52,6 @@ object MembersDetailsPage {
   implicit class MembersDetailsOps(ua: UserAnswers) {
     def membersDetails(srn: Srn): Map[String, NameDOB] = ua.map(MembersDetailsPages(srn))
 
-    // TODO: replace usages with completedMemberDetails as the option is not required
-    def membersOptionList(srn: Srn): List[Option[NameDOB]] =
-      completedMembersDetails(srn).sequence.map(_.toOption.map { case (_, details) => details })
-
     def completedMemberDetails(srn: Srn, index: Max300): Either[String, (Max300, NameDOB)] =
       ua.get(MemberDetailsCompletedPage(srn, index))
         .toRight("Error when refining completed members indexes")
