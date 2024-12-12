@@ -76,7 +76,7 @@ class TotalMemberContributionControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "1"))
+    act.like(saveAndContinue(onSubmit, userAnswers, "value" -> "1"))
 
     act.like(invalidForm(onSubmit, userAnswers))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

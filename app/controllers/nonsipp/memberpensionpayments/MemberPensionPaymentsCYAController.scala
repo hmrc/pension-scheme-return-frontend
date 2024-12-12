@@ -17,15 +17,14 @@
 package controllers.nonsipp.memberpensionpayments
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.memberdetails.MemberStatus
+import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc._
 import controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController._
-import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import models._
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
-import config.RefinedTypes.Max300
+import config.RefinedTypes._
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
@@ -80,32 +79,27 @@ class MemberPensionPaymentsCYAController @Inject()(
   def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
     (
       for {
-        pensionPayment <- request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index))
-        optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
-      } yield optionList(index.value - 1)
-        .map(_.fullName)
-        .getOrRecoverJourney
-        .map(
-          memberName =>
-            Ok(
-              view(
-                viewModel(
-                  srn,
-                  memberName,
-                  index,
-                  pensionPayment,
-                  mode,
-                  viewOnlyUpdated = false,
-                  optYear = request.year,
-                  optCurrentVersion = request.currentVersion,
-                  optPreviousVersion = request.previousVersion,
-                  compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
-                )
-              )
+        memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
+        pensionPayment <- request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)).getOrRecoverJourney
+      } yield {
+        Ok(
+          view(
+            viewModel(
+              srn,
+              memberDetails.fullName,
+              index,
+              pensionPayment,
+              mode,
+              viewOnlyUpdated = false,
+              optYear = request.year,
+              optCurrentVersion = request.currentVersion,
+              optPreviousVersion = request.previousVersion,
+              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
             )
+          )
         )
-        .merge
-    ).get
+      }
+    ).merge
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
