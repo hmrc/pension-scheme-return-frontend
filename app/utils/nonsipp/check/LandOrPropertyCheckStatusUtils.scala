@@ -89,11 +89,11 @@ object LandOrPropertyCheckStatusUtils {
       userAnswers.get(LandOrPropertyChosenAddressPage(srn, recordIndex)),
       userAnswers.get(LandRegistryTitleNumberPage(srn, recordIndex)),
       userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, recordIndex)),
-      userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, recordIndex)),
+      userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, recordIndex)), // if Acquisition || Contribution
       // IdentityType pages are handled by the identitySubjectAnswersPresent method
-      userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, recordIndex)),
+      userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, recordIndex)), // if Acquisition
       userAnswers.get(LandOrPropertyTotalCostPage(srn, recordIndex)),
-      userAnswers.get(LandPropertyIndependentValuationPage(srn, recordIndex))
+      userAnswers.get(LandPropertyIndependentValuationPage(srn, recordIndex)) // if Acquisition || Contribution
     ) match {
       // Acquisition
       case (Some(_), Some(_), Some(_), Some(Acquisition), Some(_), Some(_), Some(_), Some(_)) =>
