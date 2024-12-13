@@ -44,7 +44,7 @@ private[mappings] class LocalDateFormatter(
 
   private def formatDate(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
 
-    def int(required: String, max: Int) = intFormatter(
+    def int(required: String, max: Int): Formatter[Int] = intFormatter(
       IntFormErrors(
         requiredKey = required,
         wholeNumberKey = dateFormErrors.invalidCharacters,
@@ -92,10 +92,28 @@ private[mappings] class LocalDateFormatter(
           )
         )
       case _ =>
-        formatDate(key, data).left.map {
-          _.map(_.copy(args = args))
+        formatDate(key, data).left.map { errors =>
+          prioritizeError(errors.map(_.copy(args = args)))
         }
     }
+  }
+
+  private def prioritizeError(allErrors: Seq[FormError]): Seq[FormError] = {
+    val priorityMapping: Map[String, Int] = Map(
+      "required" -> 0,
+      "invalid" -> 1
+    )
+
+    allErrors
+      .sortBy { error =>
+        priorityMapping
+          .collectFirst {
+            case (key, priority) if error.message.contains(key) => priority
+          }
+          .getOrElse(2) // Default priority for errors not matching "required" or "invalid"
+      }
+      .headOption
+      .toSeq
   }
 
   override def unbind(key: String, value: LocalDate): Map[String, String] =
