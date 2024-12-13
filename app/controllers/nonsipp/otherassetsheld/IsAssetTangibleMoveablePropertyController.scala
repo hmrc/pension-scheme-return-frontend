@@ -33,7 +33,7 @@ import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
-import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -102,23 +102,22 @@ object IsAssetTangibleMoveablePropertyController {
     tangibleMoveableProperty: String,
     mode: Mode
   ): FormPageViewModel[YesNoPageViewModel] =
-    YesNoPageViewModel(
+    FormPageViewModel(
       Message("otherAssets.tangibleMoveableProperty.title"),
       Message("otherAssets.tangibleMoveableProperty.heading"),
-      Option(
-        FurtherDetailsViewModel(
-          Message("otherAssets.tangibleMoveableProperty.content"),
-          ParagraphMessage(
-            LinkMessage(
-              "otherAssets.tangibleMoveableProperty.paragraph.link",
-              tangibleMoveableProperty,
-              Map("rel" -> "noreferrer noopener", "target" -> "_blank")
-            ),
-            "otherAssets.tangibleMoveableProperty.paragraph"
-          )
-        )
+      YesNoPageViewModel(
+        legend = Some(Message("otherAssets.tangibleMoveableProperty.label"))
       ),
-      controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
-        .onSubmit(srn, index, mode)
+      onSubmit =
+        controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController.onSubmit(srn, index, mode)
+    ).withDescription(
+      ParagraphMessage(
+        LinkMessage(
+          "otherAssets.tangibleMoveableProperty.paragraph.link",
+          tangibleMoveableProperty,
+          Map("rel" -> "noreferrer noopener", "target" -> "_blank")
+        ),
+        "otherAssets.tangibleMoveableProperty.paragraph"
+      )
     )
 }

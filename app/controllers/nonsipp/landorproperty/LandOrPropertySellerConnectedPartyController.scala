@@ -33,7 +33,7 @@ import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage._
-import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import models.requests.DataRequest
 import play.api.data.Form
 
@@ -123,30 +123,30 @@ object LandOrPropertySellerConnectedPartyController {
     incomeTaxAct: String,
     mode: Mode
   ): FormPageViewModel[YesNoPageViewModel] =
-    YesNoPageViewModel(
+    FormPageViewModel(
       Message("landOrPropertySellerConnectedParty.title"),
-      Message("landOrPropertySellerConnectedParty.heading", individualName),
-      Option(
-        FurtherDetailsViewModel(
-          Message("landOrPropertySellerConnectedParty.content"),
-          ParagraphMessage("landOrPropertySellerConnectedParty.paragraph1") ++
-            ParagraphMessage("landOrPropertySellerConnectedParty.paragraph2") ++
-            ParagraphMessage("landOrPropertySellerConnectedParty.paragraph3") ++
-            ListMessage(
-              ListType.Bullet,
-              "landOrPropertySellerConnectedParty.bullet1",
-              "landOrPropertySellerConnectedParty.bullet2"
-            ) ++
-            ParagraphMessage(
-              "landOrPropertySellerConnectedParty.paragraph4",
-              LinkMessage(
-                "landOrPropertySellerConnectedParty.paragraph4.link",
-                incomeTaxAct,
-                Map("rel" -> "noreferrer noopener", "target" -> "_blank")
-              )
-            )
-        )
+      Message("landOrPropertySellerConnectedParty.heading"),
+      YesNoPageViewModel(
+        legend = Some(Message("landOrPropertySellerConnectedParty.label", individualName))
       ),
-      controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onSubmit(srn, index, mode)
+      onSubmit = controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
+        .onSubmit(srn, index, mode)
+    ).withDescription(
+      ParagraphMessage("landOrPropertySellerConnectedParty.paragraph1") ++
+        ParagraphMessage("landOrPropertySellerConnectedParty.paragraph2") ++
+        ParagraphMessage("landOrPropertySellerConnectedParty.paragraph3") ++
+        ListMessage(
+          ListType.Bullet,
+          "landOrPropertySellerConnectedParty.bullet1",
+          "landOrPropertySellerConnectedParty.bullet2"
+        ) ++
+        ParagraphMessage(
+          "landOrPropertySellerConnectedParty.paragraph4",
+          LinkMessage(
+            "landOrPropertySellerConnectedParty.paragraph4.link",
+            incomeTaxAct,
+            Map("rel" -> "noreferrer noopener", "target" -> "_blank")
+          )
+        )
     )
 }

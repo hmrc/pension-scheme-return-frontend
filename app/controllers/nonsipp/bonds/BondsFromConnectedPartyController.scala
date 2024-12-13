@@ -33,7 +33,7 @@ import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage._
-import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -102,31 +102,29 @@ object BondsFromConnectedPartyController {
     incomeTaxAct: String,
     mode: Mode
   ): FormPageViewModel[YesNoPageViewModel] =
-    YesNoPageViewModel(
+    FormPageViewModel(
       Message("bonds.connectedParty.title"),
       Message("bonds.connectedParty.heading"),
-      Option(
-        FurtherDetailsViewModel(
-          Message("bonds.connectedParty.content"),
-          ParagraphMessage("bonds.connectedParty.paragraph1") ++
-            ParagraphMessage("bonds.connectedParty.paragraph2") ++
-            ParagraphMessage("bonds.connectedParty.paragraph3") ++
-            ListMessage(
-              ListType.Bullet,
-              "bonds.connectedParty.bullet1",
-              "bonds.connectedParty.bullet2"
-            ) ++
-            ParagraphMessage(
-              "bonds.connectedParty.paragraph4",
-              LinkMessage(
-                "bonds.connectedParty.paragraph4.link",
-                incomeTaxAct,
-                Map("rel" -> "noreferrer noopener", "target" -> "_blank")
-              )
-            )
-        )
+      YesNoPageViewModel(
+        legend = Some(Message("bonds.connectedParty.label"))
       ),
-      controllers.nonsipp.bonds.routes.BondsFromConnectedPartyController
-        .onSubmit(srn, index, mode)
+      onSubmit = controllers.nonsipp.bonds.routes.BondsFromConnectedPartyController.onSubmit(srn, index, mode)
+    ).withDescription(
+      ParagraphMessage("bonds.connectedParty.paragraph1") ++
+        ParagraphMessage("bonds.connectedParty.paragraph2") ++
+        ParagraphMessage("bonds.connectedParty.paragraph3") ++
+        ListMessage(
+          ListType.Bullet,
+          "bonds.connectedParty.bullet1",
+          "bonds.connectedParty.bullet2"
+        ) ++
+        ParagraphMessage(
+          "bonds.connectedParty.paragraph4",
+          LinkMessage(
+            "bonds.connectedParty.paragraph4.link",
+            incomeTaxAct,
+            Map("rel" -> "noreferrer noopener", "target" -> "_blank")
+          )
+        )
     )
 }
