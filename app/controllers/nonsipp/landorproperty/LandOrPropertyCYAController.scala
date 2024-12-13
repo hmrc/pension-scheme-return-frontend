@@ -201,8 +201,9 @@ class LandOrPropertyCYAController @Inject()(
           .mapK[Future]
         _ <- saveService.save(updatedAnswers)
         result <- psrSubmissionService
-          .submitPsrDetails(
+          .submitPsrDetailsWithUA(
             srn,
+            updatedAnswers,
             fallbackCall =
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, mode)
           )

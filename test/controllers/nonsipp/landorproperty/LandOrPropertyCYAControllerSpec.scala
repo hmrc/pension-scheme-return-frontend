@@ -118,9 +118,9 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
 
       act.like(
         redirectNextPage(onSubmit(mode))
-          .before(MockPsrSubmissionService.submitPsrDetails())
+          .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
           .after({
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
           .withName(s"redirect to next page when in $mode mode")
@@ -134,7 +134,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
           userAnswers = filledUserAnswers,
           previousUserAnswers = emptyUserAnswers,
           mockSaveService = Some(mockSaveService)
-        ).before(MockPsrSubmissionService.submitPsrDetails())
+        ).before(MockPsrSubmissionService.submitPsrDetailsWithUA())
           .after {
             MockSaveService.capture(userAnswersCaptor)
             userAnswersCaptor.getValue.get(LandOrPropertyHeldPage(srn)) mustEqual Some(true)
@@ -207,7 +207,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.landorproperty.routes.LandOrPropertyListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
         )
         .withName("Submit redirects to land or property list")
     )
