@@ -426,6 +426,9 @@ POST        /:srn/remove-loan/:index                                            
 GET         /:srn/change-remove-loan/:index                                                                    controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-remove-loan/:index                                                                    controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
+GET         /:srn/check-update-loans-information/:index                                                        controllers.nonsipp.loansmadeoroutstanding.LoansCheckAndUpdateController.onPageLoad(srn: Srn, index: Max5000)
+GET         /:srn/submit-check-update-loans-information/:index                                                 controllers.nonsipp.loansmadeoroutstanding.LoansCheckAndUpdateController.onSubmit(srn: Srn, index: Max5000)
+
 GET         /:srn/check-answers-financial-details                                                              controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/submit-check-answers-financial-details                                                       controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-check-answers-financial-details                                                       controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
