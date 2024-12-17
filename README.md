@@ -12,7 +12,7 @@ return that must be completed for each scheme by the PSA or PSP for the scheme.
 
 Run the following command to start all the related services for this project:
 ```bash
-sm2 -start PSR_ALL
+
 ```
 Included in the above command is `PENSION_SCHEME_RETURN_FRONTEND`, which is this repository's most recent release.
 If you want to run your local version of this code instead, run:
