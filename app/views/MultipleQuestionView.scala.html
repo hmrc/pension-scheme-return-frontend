@@ -93,7 +93,7 @@
         .withId(s"value.${index + 1}")
         .asNumeric()
         .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
-        .withWidth(width.fold[InputWidth](InputWidth.Fixed10)(identity))
+        .withWidth(width.getOrElse(InputWidth.Fixed4))
     )
 }
 
