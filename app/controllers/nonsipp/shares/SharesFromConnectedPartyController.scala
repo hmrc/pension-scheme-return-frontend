@@ -33,7 +33,7 @@ import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage._
-import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import models.requests.DataRequest
 import play.api.data.Form
 
@@ -169,62 +169,58 @@ object SharesFromConnectedPartyController {
     mode: Mode
   ): FormPageViewModel[YesNoPageViewModel] =
     if (schemeHoldShare.name.equals("01")) {
-
-      YesNoPageViewModel(
+      FormPageViewModel(
         Message("sharesFromConnectedParty.acquisitionTitle"),
-        Message("sharesFromConnectedParty.acquisitionHeading", individualName),
-        Option(
-          FurtherDetailsViewModel(
-            Message("sharesFromConnectedParty.acquisitionContent"),
-            ParagraphMessage("sharesFromConnectedParty.acquisitionParagraph1") ++
-              ParagraphMessage("sharesFromConnectedParty.acquisitionParagraph2") ++
-              ParagraphMessage("sharesFromConnectedParty.acquisitionParagraph3") ++
-              ListMessage(
-                ListType.Bullet,
-                "sharesFromConnectedParty.acquisitionBullet1",
-                "sharesFromConnectedParty.acquisitionBullet2"
-              ) ++
-              ParagraphMessage(
-                "sharesFromConnectedParty.acquisitionParagraph4",
-                LinkMessage(
-                  "sharesFromConnectedParty.acquisitionParagraph4.link",
-                  incomeTaxAct,
-                  Map("rel" -> "noreferrer noopener", "target" -> "_blank")
-                )
-              )
-          )
+        Message("sharesFromConnectedParty.acquisitionHeading"),
+        YesNoPageViewModel(
+          legend = Some(Message("sharesFromConnectedParty.acquisitionHeading", individualName))
         ),
-        controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onSubmit(srn, index, mode)
+        onSubmit = controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onSubmit(srn, index, mode)
+      ).withDescription(
+        ParagraphMessage("sharesFromConnectedParty.acquisitionParagraph1") ++
+          ParagraphMessage("sharesFromConnectedParty.acquisitionParagraph2") ++
+          ParagraphMessage("sharesFromConnectedParty.acquisitionParagraph3") ++
+          ListMessage(
+            ListType.Bullet,
+            "sharesFromConnectedParty.acquisitionBullet1",
+            "sharesFromConnectedParty.acquisitionBullet2"
+          ) ++
+          ParagraphMessage(
+            "sharesFromConnectedParty.acquisitionParagraph4",
+            LinkMessage(
+              "sharesFromConnectedParty.acquisitionParagraph4.link",
+              incomeTaxAct,
+              Map("rel" -> "noreferrer noopener", "target" -> "_blank")
+            )
+          )
       )
-
     } else {
       schemeHoldShare.name.equals("02")
       schemeHoldShare.name.equals("03")
-      YesNoPageViewModel(
+      FormPageViewModel(
         Message("sharesFromConnectedParty.title1"),
         Message("sharesFromConnectedParty.heading1", companyName),
-        Option(
-          FurtherDetailsViewModel(
-            Message("sharesFromConnectedParty.content1"),
-            ParagraphMessage("sharesFromConnectedParty.paragraph1") ++
-              ParagraphMessage("sharesFromConnectedParty.paragraph2") ++
-              ParagraphMessage("sharesFromConnectedParty.paragraph3") ++
-              ListMessage(
-                ListType.Bullet,
-                "sharesFromConnectedParty.bullet1",
-                "sharesFromConnectedParty.bullet2"
-              ) ++
-              ParagraphMessage(
-                "sharesFromConnectedParty.paragraph4",
-                LinkMessage(
-                  "sharesFromConnectedParty.paragraph4.link",
-                  incomeTaxAct,
-                  Map("rel" -> "noreferrer noopener", "target" -> "_blank")
-                )
-              )
-          )
+        YesNoPageViewModel(
+          legend = Some(Message("sharesFromConnectedParty.label", companyName))
         ),
-        controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onSubmit(srn, index, mode)
+        onSubmit = controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onSubmit(srn, index, mode)
+      ).withDescription(
+        ParagraphMessage("sharesFromConnectedParty.paragraph1") ++
+          ParagraphMessage("sharesFromConnectedParty.paragraph2") ++
+          ParagraphMessage("sharesFromConnectedParty.paragraph3") ++
+          ListMessage(
+            ListType.Bullet,
+            "sharesFromConnectedParty.bullet1",
+            "sharesFromConnectedParty.bullet2"
+          ) ++
+          ParagraphMessage(
+            "sharesFromConnectedParty.paragraph4",
+            LinkMessage(
+              "sharesFromConnectedParty.paragraph4.link",
+              incomeTaxAct,
+              Map("rel" -> "noreferrer noopener", "target" -> "_blank")
+            )
+          )
       )
     }
 }

@@ -34,10 +34,9 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import pages.nonsipp.moneyborrowed.{IsLenderConnectedPartyPage, LenderNamePage}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
-import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.Option
 
 import javax.inject.{Inject, Named}
 
@@ -103,30 +102,29 @@ object IsLenderConnectedPartyController {
     incomeTaxAct: String,
     mode: Mode
   ): FormPageViewModel[YesNoPageViewModel] =
-    YesNoPageViewModel(
+    FormPageViewModel(
       Message("isLenderConnectedParty.title"),
-      Message("isLenderConnectedParty.heading", lenderName),
-      Option(
-        FurtherDetailsViewModel(
-          Message("isLenderConnectedParty.content"),
-          ParagraphMessage("isLenderConnectedParty.paragraph1") ++
-            ParagraphMessage("isLenderConnectedParty.paragraph2") ++
-            ParagraphMessage("isLenderConnectedParty.paragraph3") ++
-            ListMessage(
-              ListType.Bullet,
-              "isLenderConnectedParty.list1",
-              "isLenderConnectedParty.list2"
-            ) ++
-            ParagraphMessage(
-              "isLenderConnectedParty.paragraph4",
-              LinkMessage(
-                "isLenderConnectedParty.paragraph4.link",
-                incomeTaxAct,
-                Map("rel" -> "noreferrer noopener", "target" -> "_blank")
-              )
-            )
-        )
+      Message("isLenderConnectedParty.heading"),
+      YesNoPageViewModel(
+        legend = Some(Message("isLenderConnectedParty.label", lenderName))
       ),
-      routes.IsLenderConnectedPartyController.onSubmit(srn, index, mode)
+      onSubmit = routes.IsLenderConnectedPartyController.onSubmit(srn, index, mode)
+    ).withDescription(
+      ParagraphMessage("isLenderConnectedParty.paragraph1") ++
+        ParagraphMessage("isLenderConnectedParty.paragraph2") ++
+        ParagraphMessage("isLenderConnectedParty.paragraph3") ++
+        ListMessage(
+          ListType.Bullet,
+          "isLenderConnectedParty.list1",
+          "isLenderConnectedParty.list2"
+        ) ++
+        ParagraphMessage(
+          "isLenderConnectedParty.paragraph4",
+          LinkMessage(
+            "isLenderConnectedParty.paragraph4.link",
+            incomeTaxAct,
+            Map("rel" -> "noreferrer noopener", "target" -> "_blank")
+          )
+        )
     )
 }

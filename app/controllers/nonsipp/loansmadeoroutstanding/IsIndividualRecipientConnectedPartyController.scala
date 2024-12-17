@@ -34,7 +34,7 @@ import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
-import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -102,32 +102,31 @@ object IsIndividualRecipientConnectedPartyController {
     incomeTaxAct: String,
     mode: Mode
   ): FormPageViewModel[YesNoPageViewModel] =
-    YesNoPageViewModel(
+    FormPageViewModel(
       Message("isIndividualRecipientConnectedParty.title"),
       Message("isIndividualRecipientConnectedParty.heading", individualName),
-      Option(
-        FurtherDetailsViewModel(
-          Message("isIndividualRecipientConnectedParty.content"),
-          ParagraphMessage("isIndividualRecipientConnectedParty.paragraph1") ++
-            ParagraphMessage("isIndividualRecipientConnectedParty.paragraph2") ++
-            ParagraphMessage(
-              "isIndividualRecipientConnectedParty.paragraph3"
-            ) ++
-            ListMessage(
-              ListType.Bullet,
-              "isIndividualRecipientConnectedParty.list1",
-              "isIndividualRecipientConnectedParty.list2"
-            ) ++
-            ParagraphMessage(
-              "isIndividualRecipientConnectedParty.paragraph4",
-              LinkMessage(
-                "isIndividualRecipientConnectedParty.paragraph4.link",
-                incomeTaxAct,
-                Map("rel" -> "noreferrer noopener", "target" -> "_blank")
-              )
-            )
-        )
+      YesNoPageViewModel(
+        legend = Some(Message("isIndividualRecipientConnectedParty.label", individualName))
       ),
-      routes.IsIndividualRecipientConnectedPartyController.onSubmit(srn, index, mode)
+      onSubmit = routes.IsIndividualRecipientConnectedPartyController.onSubmit(srn, index, mode)
+    ).withDescription(
+      ParagraphMessage("isIndividualRecipientConnectedParty.paragraph1") ++
+        ParagraphMessage("isIndividualRecipientConnectedParty.paragraph2") ++
+        ParagraphMessage(
+          "isIndividualRecipientConnectedParty.paragraph3"
+        ) ++
+        ListMessage(
+          ListType.Bullet,
+          "isIndividualRecipientConnectedParty.list1",
+          "isIndividualRecipientConnectedParty.list2"
+        ) ++
+        ParagraphMessage(
+          "isIndividualRecipientConnectedParty.paragraph4",
+          LinkMessage(
+            "isIndividualRecipientConnectedParty.paragraph4.link",
+            incomeTaxAct,
+            Map("rel" -> "noreferrer noopener", "target" -> "_blank")
+          )
+        )
     )
 }
