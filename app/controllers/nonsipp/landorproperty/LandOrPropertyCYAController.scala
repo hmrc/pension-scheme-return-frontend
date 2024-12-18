@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.landorproperty
 
-import services.PsrSubmissionService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
@@ -36,6 +36,7 @@ import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
@@ -50,7 +51,8 @@ class LandOrPropertyCYAController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView,
-  psrSubmissionService: PsrSubmissionService
+  psrSubmissionService: PsrSubmissionService,
+  saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -193,16 +195,25 @@ class LandOrPropertyCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      psrSubmissionService
-        .submitPsrDetails(
-          srn,
-          fallbackCall =
-            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, mode)
-        )
-        .map {
-          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          case Some(_) => Redirect(navigator.nextPage(LandOrPropertyCYAPage(srn), NormalMode, request.userAnswers))
-        }
+      for {
+        updatedAnswers <- request.userAnswers
+          .setWhen(request.userAnswers.get(LandOrPropertyHeldPage(srn)).isEmpty)(LandOrPropertyHeldPage(srn), true)
+          .mapK[Future]
+        _ <- saveService.save(updatedAnswers)
+        result <- psrSubmissionService
+          .submitPsrDetailsWithUA(
+            srn,
+            updatedAnswers,
+            fallbackCall =
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, mode)
+          )
+      } yield result.getOrRecoverJourney(
+        _ =>
+          Redirect(
+            navigator
+              .nextPage(LandOrPropertyCYAPage(srn), NormalMode, updatedAnswers)
+          )
+      )
     }
 
   def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =

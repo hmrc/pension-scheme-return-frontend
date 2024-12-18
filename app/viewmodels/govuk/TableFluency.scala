@@ -44,6 +44,12 @@ trait TableFluency {
 
     def withMarginBottom(maybeMargin: Option[Margin]): Table =
       maybeMargin.fold(list)(margin => list.withCssClass(margin.className))
+
+    def withCaption(caption: String): Table =
+      list.copy(caption = Some(caption))
+
+    def withCaptionClasses(captionClasses: String): Table =
+      list.copy(captionClasses = captionClasses)
   }
 
   object TableRowViewModel {

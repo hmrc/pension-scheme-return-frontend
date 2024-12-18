@@ -258,7 +258,7 @@ class SharesCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with O
 
     "must be true" - {
 
-      "when pre-pop-cleared answer is missing and all other answers are present" - {
+      "when pre-pop-cleared answer is missing & all other answers are present" - {
 
         "(Acquisition & Sponsoring Employer & Individual)" in {
           val userAnswers =
@@ -420,7 +420,7 @@ class SharesCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with O
         checkSharesRecord(userAnswers, srn, index1of5000) mustBe false
       }
 
-      "when all pre-pop-cleared answers are present" in {
+      "when pre-pop-cleared answer is present" in {
         val userAnswers =
           addSharesBaseAnswers(
             index1of5000,
