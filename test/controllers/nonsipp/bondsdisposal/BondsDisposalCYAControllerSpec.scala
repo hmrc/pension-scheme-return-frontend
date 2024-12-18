@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.bondsdisposal
 
-import services.PsrSubmissionService
+import services.{PsrSubmissionService, SaveService}
 import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
@@ -36,14 +36,17 @@ import scala.concurrent.Future
 class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+  private implicit val mockSaveService: SaveService = mock[SaveService]
 
   override protected val additionalBindings: List[GuiceableModule] =
-    List(bind[PsrSubmissionService].toInstance(mockPsrSubmissionService))
+    List(bind[PsrSubmissionService].toInstance(mockPsrSubmissionService), bind[SaveService].toInstance(mockSaveService))
 
   override protected def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
+    reset(mockSaveService)
     when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(())))
+    when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
   }
 
   private def onPageLoad(mode: Mode) =
@@ -115,7 +118,11 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
               isMaximumReached = false
             )
           )
-        }.withName(s"render correct $mode view for Sold journey")
+        }.after({
+            verify(mockSaveService, times(1)).save(any())(any(), any())
+            reset(mockPsrSubmissionService)
+          })
+          .withName(s"render correct $mode view for Sold journey")
       )
 
       act.like(
@@ -188,7 +195,11 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
               isMaximumReached = false
             )
           )
-      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
+      }.after({
+          verify(mockSaveService, never()).save(any())(any(), any())
+          reset(mockPsrSubmissionService)
+        })
+        .withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
     act.like(
       redirectToPage(

@@ -62,6 +62,7 @@ class BondsDisposalCYAController @Inject()(
       saveService.save(
         request.userAnswers
           .set(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex), NoPointOfEntry)
+          .set(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.Completed)
           .getOrElse(request.userAnswers)
       )
       onPageLoadCommon(srn, bondIndex, disposalIndex, mode)
@@ -85,50 +86,43 @@ class BondsDisposalCYAController @Inject()(
   ): Future[Result] =
     (
       for {
-        updatedUserAnswers <- request.userAnswers
-          .set(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.Completed)
-          .toOption
-          .getOrRecoverJourneyT
-        bondsName <- updatedUserAnswers
+        bondsName <- request.userAnswers
           .get(NameOfBondsPage(srn, bondIndex))
           .getOrRecoverJourneyT
-        acquisitionType <- updatedUserAnswers
+        acquisitionType <- request.userAnswers
           .get(WhyDoesSchemeHoldBondsPage(srn, bondIndex))
           .getOrRecoverJourneyT
-        costOfBonds <- updatedUserAnswers
+        costOfBonds <- request.userAnswers
           .get(CostOfBondsPage(srn, bondIndex))
           .getOrRecoverJourneyT
 
-        howBondsDisposed <- updatedUserAnswers
+        howBondsDisposed <- request.userAnswers
           .get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex))
           .getOrRecoverJourneyT
 
         dateBondsSold = Option.when(howBondsDisposed == Sold)(
-          updatedUserAnswers.get(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex)).get
+          request.userAnswers.get(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex)).get
         )
 
         considerationBondsSold = Option.when(howBondsDisposed == Sold)(
-          updatedUserAnswers.get(TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex)).get
+          request.userAnswers.get(TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex)).get
         )
         buyerName = Option.when(howBondsDisposed == Sold)(
-          updatedUserAnswers.get(BuyerNamePage(srn, bondIndex, disposalIndex)).get
+          request.userAnswers.get(BuyerNamePage(srn, bondIndex, disposalIndex)).get
         )
         isBuyerConnectedParty = Option.when(howBondsDisposed == Sold)(
-          updatedUserAnswers.get(IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex)).get
+          request.userAnswers.get(IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex)).get
         )
 
         bondsStillHeld <- request.userAnswers
           .get(BondsStillHeldPage(srn, bondIndex, disposalIndex))
           .getOrRecoverJourneyT
 
-        disposalAmount = updatedUserAnswers
+        disposalAmount = request.userAnswers
           .map(BondsDisposalProgress.all(srn, bondIndex))
           .count { case (_, progress) => progress.completed }
 
         schemeName = request.schemeDetails.schemeName
-
-        _ <- saveService.save(updatedUserAnswers).liftF
-
       } yield {
         val isMaximumReached = disposalAmount >= maxDisposalPerBond
 
