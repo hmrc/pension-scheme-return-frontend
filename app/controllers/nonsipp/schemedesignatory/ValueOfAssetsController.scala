@@ -144,12 +144,12 @@ object ValueOfAssetsController {
       ),
       onSubmit = routes.ValueOfAssetsController.onSubmit(srn, mode)
     ).withDescription(
-      ParagraphMessage("valueOfAssets.paragraph") ++
+      ParagraphMessage("valueOfAssets.paragraph0") ++
+        ParagraphMessage("valueOfAssets.paragraph1") ++
         ListMessage(
           ListType.Bullet,
           "valueOfAssets.bullet1",
-          "valueOfAssets.bullet2",
-          "valueOfAssets.bullet3"
+          "valueOfAssets.bullet2"
         )
     )
 }
