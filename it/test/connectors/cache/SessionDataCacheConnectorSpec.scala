@@ -36,7 +36,7 @@ class SessionDataCacheConnectorSpec extends BaseConnectorSpec {
     super.applicationBuilder.configure("microservice.services.pensionAdministrator.port" -> wireMockPort)
 
   val externalId = "test-id"
-  lazy val url = s"/pension-administrator/journey-cache/session-data/$externalId"
+  lazy val url = s"/pension-administrator/journey-cache/session-data-self"
 
   def stubGet(response: ResponseDefinitionBuilder): StubMapping =
     stubGet(url, response)
@@ -72,37 +72,10 @@ class SessionDataCacheConnectorSpec extends BaseConnectorSpec {
       connector.fetch(externalId).futureValue mustBe None
     }
 
-    "return none for wrong externalId" in runningApplication { implicit app =>
-      stubGet(okResponse(Administrator))
-
-      connector.fetch("unknown-id").futureValue mustBe None
-    }
-
     "return a failed future for bad request" in runningApplication { implicit app =>
       stubGet(badRequest)
 
       connector.fetch(externalId).failed.futureValue
-    }
-  }
-
-  "delete" - {
-
-    "return unit for an ok response" in runningApplication { implicit app =>
-      stubDelete(ok())
-
-      connector.remove(externalId).futureValue mustBe ()
-    }
-
-    "return unit for a not found response" in runningApplication { implicit app =>
-      stubDelete(notFound)
-
-      connector.remove(externalId).futureValue mustBe ()
-    }
-
-    "return unit for external id that doesn't exist" in runningApplication { implicit app =>
-      stubDelete(ok())
-
-      connector.remove("unknown-id").futureValue mustBe ()
     }
   }
 }

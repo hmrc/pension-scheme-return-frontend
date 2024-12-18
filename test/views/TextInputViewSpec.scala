@@ -16,7 +16,6 @@
 
 package views
 
-import play.api.test.FakeRequest
 import forms.mappings.Mappings
 import views.html.TextInputView
 import play.api.data
@@ -32,8 +31,6 @@ class TextInputViewSpec extends ViewSpec with Mappings {
     )
 
     val invalidForm = textInputForm.bind(Map("value" -> ""))
-
-    implicit val request = FakeRequest()
 
     val viewModelGen = formPageViewModelGen[TextInputViewModel]
 

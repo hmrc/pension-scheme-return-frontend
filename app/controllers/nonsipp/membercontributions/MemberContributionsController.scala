@@ -29,7 +29,7 @@ import views.html.YesNoPageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.{ListMessage, ListType, ParagraphMessage}
+import viewmodels.DisplayMessage._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import models.requests.DataRequest
 import play.api.data.Form
@@ -97,10 +97,13 @@ object MemberContributionsController {
   )
 
   def viewModel(srn: Srn, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
-    YesNoPageViewModel(
+    FormPageViewModel(
       "memberContributions.title",
       "memberContributions.heading",
-      routes.MemberContributionsController.onSubmit(srn, mode)
+      YesNoPageViewModel(
+        legend = Some(Message("memberContributions.legend"))
+      ),
+      onSubmit = routes.MemberContributionsController.onSubmit(srn, mode)
     ).withDescription(
       ParagraphMessage("memberContributions.paragraph") ++
         ListMessage(ListType.Bullet, "memberContributions.listItem1", "memberContributions.listItem2")

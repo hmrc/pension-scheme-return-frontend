@@ -21,9 +21,11 @@ import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
 import models.ManualOrUpload.Manual
+import controllers.TestValues
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer._
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
+import pages.nonsipp.memberpensionpayments.PensionPaymentsReceivedPage
 import pages.nonsipp.sharesdisposal._
 import utils.UserAnswersUtils.UserAnswersOps
 import models._
@@ -35,10 +37,6 @@ import pages.nonsipp.memberdetails._
 import org.scalatest.freespec.AnyFreeSpec
 import pages.nonsipp.membercontributions.MemberContributionsPage
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
-import config.RefinedTypes._
-import controllers.TestValues
-import pages.nonsipp.memberpensionpayments.PensionPaymentsReceivedPage
-import eu.timepit.refined.refineMV
 import pages.nonsipp._
 import org.scalatest.OptionValues
 import utils.nonsipp.TaskListUtils._
@@ -55,9 +53,6 @@ import viewmodels.DisplayMessage.{LinkMessage, Message}
 import viewmodels.models.{MemberState, SectionCompleted, Submitted}
 
 class TaskListUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
-
-  private val index1of300: Max300 = refineMV(1)
-  private val index1of5000: Max5000 = refineMV(1)
 
   private val currentUA: UserAnswers = defaultUserAnswers
     .unsafeSet(WhichTaxYearPage(srn), dateRange)

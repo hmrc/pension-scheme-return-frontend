@@ -33,7 +33,7 @@ import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage._
-import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import models.requests.DataRequest
 import play.api.data.Form
 
@@ -123,30 +123,30 @@ object OtherAssetSellerConnectedPartyController {
     incomeTaxAct: String,
     mode: Mode
   ): FormPageViewModel[YesNoPageViewModel] =
-    YesNoPageViewModel(
+    FormPageViewModel(
       Message("otherAssets.sellerConnectedParty.title"),
-      Message("otherAssets.sellerConnectedParty.heading", individualName),
-      Option(
-        FurtherDetailsViewModel(
-          Message("otherAssets.sellerConnectedParty.content"),
-          ParagraphMessage("otherAssets.sellerConnectedParty.paragraph1") ++
-            ParagraphMessage("otherAssets.sellerConnectedParty.paragraph2") ++
-            ParagraphMessage("otherAssets.sellerConnectedParty.paragraph3") ++
-            ListMessage(
-              ListType.Bullet,
-              "otherAssets.sellerConnectedParty.bullet1",
-              "otherAssets.sellerConnectedParty.bullet2"
-            ) ++
-            ParagraphMessage(
-              "otherAssets.sellerConnectedParty.paragraph4",
-              LinkMessage(
-                "otherAssets.sellerConnectedParty.paragraph4.link",
-                incomeTaxAct,
-                Map("rel" -> "noreferrer noopener", "target" -> "_blank")
-              )
-            )
-        )
+      Message("otherAssets.sellerConnectedParty.heading"),
+      YesNoPageViewModel(
+        legend = Some(Message("otherAssets.sellerConnectedParty.label", individualName))
       ),
-      controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController.onSubmit(srn, index, mode)
+      onSubmit =
+        controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController.onSubmit(srn, index, mode)
+    ).withDescription(
+      ParagraphMessage("otherAssets.sellerConnectedParty.paragraph1") ++
+        ParagraphMessage("otherAssets.sellerConnectedParty.paragraph2") ++
+        ParagraphMessage("otherAssets.sellerConnectedParty.paragraph3") ++
+        ListMessage(
+          ListType.Bullet,
+          "otherAssets.sellerConnectedParty.bullet1",
+          "otherAssets.sellerConnectedParty.bullet2"
+        ) ++
+        ParagraphMessage(
+          "otherAssets.sellerConnectedParty.paragraph4",
+          LinkMessage(
+            "otherAssets.sellerConnectedParty.paragraph4.link",
+            incomeTaxAct,
+            Map("rel" -> "noreferrer noopener", "target" -> "_blank")
+          )
+        )
     )
 }

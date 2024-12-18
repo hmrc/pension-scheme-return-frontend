@@ -16,7 +16,6 @@
 
 package views
 
-import play.api.test.FakeRequest
 import play.api.data.Forms.{mapping, text}
 import views.html.DateRangeView
 import play.api.data
@@ -29,8 +28,6 @@ class DateRangeViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
     val view = injected[DateRangeView]
-
-    implicit val request = FakeRequest()
 
     def localDateMapping(error: String) =
       text.verifying(error, _.nonEmpty).transform[LocalDate](LocalDate.parse, _.toString)

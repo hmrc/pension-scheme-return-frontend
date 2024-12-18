@@ -50,7 +50,7 @@ import scala.concurrent.{ExecutionContext, Future}
 $! Generic imports end!$
 
 import config.Constants
-import forms.mappings.errors.MoneyFormErrorProvider
+import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrorValue
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import viewmodels.DisplayMessage._
@@ -62,7 +62,7 @@ class $className;format="cap"$Controller @Inject()(
     saveService: SaveService,
     @Named("non-sipp") navigator: Navigator,
     identifyAndRequireData: IdentifyAndRequireData,
-    formProvider: MoneyFormErrorProvider,
+    formProvider: MoneyFormProvider,
     val controllerComponents: MessagesControllerComponents,
     view: MoneyView,
 )(implicit ec: ExecutionContext) extends PSRController {
@@ -105,7 +105,7 @@ class $className;format="cap"$Controller @Inject()(
 }
 
 object $className;format="cap"$Controller {
-  def form(formProvider: MoneyFormErrorProvider): Form[Money] = formProvider(
+  def form(formProvider: MoneyFormProvider): Form[Money] = formProvider(
     MoneyFormErrorValue(
       requiredKey = "$className;format="decap"$.error.required",
       nonNumericKey = "$className;format="decap"$.error.invalid",

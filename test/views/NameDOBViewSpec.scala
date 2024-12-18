@@ -16,7 +16,6 @@
 
 package views
 
-import play.api.test.FakeRequest
 import views.html.NameDOBView
 import forms.NameDOBFormProvider
 import viewmodels.models.NameDOBViewModel
@@ -26,8 +25,6 @@ class NameDOBViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
     val view = injected[NameDOBView]
-
-    implicit val request = FakeRequest()
 
     val form = injected[NameDOBFormProvider].apply(
       "memberDetails.firstName.error.required",

@@ -16,7 +16,6 @@
 
 package views
 
-import play.api.test.FakeRequest
 import views.html.ContentTablePageView
 import viewmodels.models.ContentTablePageViewModel
 
@@ -24,8 +23,6 @@ class ContentTablePageViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
     val view = injected[ContentTablePageView]
-
-    implicit val request = FakeRequest()
 
     val viewModelGen = formPageViewModelGen[ContentTablePageViewModel]
 

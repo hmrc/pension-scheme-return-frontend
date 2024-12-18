@@ -37,42 +37,69 @@
           @govukErrorSummary(ErrorSummaryViewModel(form))
          }
 
-        @if(viewmodel.page.legend.nonEmpty) {
+        @if(viewmodel.page.legend.nonEmpty || viewmodel.description.nonEmpty) {
           <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
-        }
-
-        @if(viewmodel.page.hint.nonEmpty) {
-            <div class="govuk-hint">@viewmodel.page.hint.map(renderMessage)</div>
         }
 
         @viewmodel.description.map(renderMessage)
 
-        @govukRadios(
-            RadiosViewModel(
-                field = form("value"),
-                viewmodel.page.items.map {
-                    case row: RadioListRowDivider => RadioItem(divider = Some(messages(row.dividerText)))
-                    case row: RadioListRowViewModel =>
-                        RadioItem(
-                            content = Text(row.content.toMessage),
-                            value = row.value,
-                            hint = row.hint.map(h => Hint(content = Text(h.toMessage))),
-                            conditionalHtml = row.conditional.map{
-                                case RadioItemConditional(FieldType.Textarea, hint) => textArea("conditional", hint, row)
-                                case RadioItemConditional(FieldType.ConditionalTextarea(prefix), hint) => textArea(s"$prefix-conditional", hint, row)
-                                case RadioItemConditional(FieldType.Input, hint) => input("conditional", hint.get)
-                                case RadioItemConditional(FieldType.ConditionalInput(prefix), hint) => input(s"$prefix-conditional", hint.get)
-                            }
+        @if(viewmodel.description.isEmpty) {
+            @govukRadios(
+                RadiosViewModel(
+                    field = form("value"),
+                    viewmodel.page.items.map {
+                        case row: RadioListRowDivider => RadioItem(divider = Some(messages(row.dividerText)))
+                        case row: RadioListRowViewModel =>
+                            RadioItem(
+                                content = Text(row.content.toMessage),
+                                value = row.value,
+                                hint = row.hint.map(h => Hint(content = Text(h.toMessage))),
+                                conditionalHtml = row.conditional.map{
+                                    case RadioItemConditional(FieldType.Textarea, hint) => textArea("conditional", hint, row)
+                                    case RadioItemConditional(FieldType.ConditionalTextarea(prefix), hint) => textArea(s"$prefix-conditional", hint, row)
+                                    case RadioItemConditional(FieldType.Input, hint) => input("conditional", hint.get)
+                                    case RadioItemConditional(FieldType.ConditionalInput(prefix), hint) => input(s"$prefix-conditional", hint.get)
+                                }
+                            )
+                    },
+                    legend = viewmodel.page.legend
+                        .map(legend => LegendViewModel(legend.toMessage)
+                        .withSize(LegendSize.Medium))
+                        .getOrElse(LegendViewModel(renderMessage(viewmodel.heading))
+                        .asPageHeading(LegendSize.Large)
                         )
-                },
-                legend = viewmodel.page.legend
-                    .map(legend => LegendViewModel(legend.toMessage)
-                    .withSize(LegendSize.Medium))
-                    .getOrElse(LegendViewModel(renderMessage(viewmodel.heading))
-                    .asPageHeading(LegendSize.Large)
-                    )
+                )
+                .withHint(viewmodel.page.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
             )
-        )
+        } else {
+            @govukRadios(
+                RadiosViewModel(
+                    field = form("value"),
+                    viewmodel.page.items.map {
+                        case row: RadioListRowDivider => RadioItem(divider = Some(messages(row.dividerText)))
+                        case row: RadioListRowViewModel =>
+                            RadioItem(
+                                content = Text(row.content.toMessage),
+                                value = row.value,
+                                hint = row.hint.map(h => Hint(content = Text(h.toMessage))),
+                                conditionalHtml = row.conditional.map{
+                                    case RadioItemConditional(FieldType.Textarea, hint) => textArea("conditional", hint, row)
+                                    case RadioItemConditional(FieldType.ConditionalTextarea(prefix), hint) => textArea(s"$prefix-conditional", hint, row)
+                                    case RadioItemConditional(FieldType.Input, hint) => input("conditional", hint.get)
+                                    case RadioItemConditional(FieldType.ConditionalInput(prefix), hint) => input(s"$prefix-conditional", hint.get)
+                                }
+                            )
+                    },
+                    legend = viewmodel.page.legend
+                        .map(legend => LegendViewModel(legend.toMessage)
+                        .withSize(LegendSize.Medium))
+                        .getOrElse(LegendViewModel(renderMessage(viewmodel.heading))
+                        .withCssClass("govuk-visually-hidden")
+                        )
+                )
+                .withHint(viewmodel.page.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
+            )
+        }
 
         @govukButton(
             ButtonViewModel(renderMessage(viewmodel.buttonText))

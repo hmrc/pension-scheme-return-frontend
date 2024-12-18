@@ -89,7 +89,7 @@
                             otherRowBases.collect {
                                 case aRow: TableElem =>
                                     (aRow.messageKey, aRow.hiddenText, aRow.url) match {
-                                        case (Some(key), Some(hidden), Some(link)) => TableRow(HtmlContent(s"<a href='${link}'>${renderMessage(key)}<span class='govuk-visually-hidden'>${hidden.toMessage}</span></a>"))
+                                        case (Some(key), Some(hidden), Some(link)) => TableRow(HtmlContent(s"<a class='govuk-link' href='${link}'>${renderMessage(key)}<span class='govuk-visually-hidden'>${hidden.toMessage}</span></a>"))
                                         case (_, _, _) => TableRow(HtmlContent(renderMessage(aRow.text)))
                                     }
                                 case aRow: TableElemDoubleLink =>
@@ -99,18 +99,20 @@
                                                 s"""
                                                 | <ul class=\"govuk-summary-list__actions-list\">
                                                 |   <li class=\"govuk-summary-list__actions-list-item\">
-                                                |     <a href='${link1}'>${renderMessage(key1)}<span class='govuk-visually-hidden'>${hidden1.toMessage}</span></a>
+                                                |     <a class='govuk-link' href='${link1}'>${renderMessage(key1)}<span class='govuk-visually-hidden'>${hidden1.toMessage}</span></a>
                                                 |   </li>
                                                 |   <li class=\"govuk-summary-list__actions-list-item\">
-                                                |      <a href='${link2}'>${renderMessage(key2)}<span class='govuk-visually-hidden'>${hidden2.toMessage}</span></a>
+                                                |      <a class='govuk-link' href='${link2}'>${renderMessage(key2)}<span class='govuk-visually-hidden'>${hidden2.toMessage}</span></a>
                                                 |    </li></ul>""".stripMargin))
                                         case (Some(key1), Some(hidden1), Some(link1), None, None, None) =>
-                                            TableRow(HtmlContent(s"<a href='${link1}'>${renderMessage(key1)}<span class='govuk-visually-hidden'>${hidden1.toMessage}</span></a>"))
+                                            TableRow(HtmlContent(s"<a class='govuk-link' href='${link1}'>${renderMessage(key1)}<span class='govuk-visually-hidden'>${hidden1.toMessage}</span></a>"))
                                         case (_, _, _, _, _, _) => TableRow(HtmlContent(""))
                                     }
                             }
                         )
                     )
+                    .withCaption("site.selectAMember".toMessage)
+                    .withCaptionClasses("govuk-table__caption--m")
                 )
             }
             @viewModel.page.paginatedViewModel.map{ paginatedViewModel =>

@@ -369,7 +369,8 @@ object BasicDetailsCheckYourAnswersController {
                 "basicDetailsCheckYourAnswersController.schemeDetails.taxYear",
                 taxYear.show
               ).withChangeAction(
-                  controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, CheckMode).url
+                  controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, CheckMode).url,
+                  hidden = "basicDetailsCheckYourAnswersController.schemeDetails.taxYear.hidden"
                 )
                 .withOneHalfWidth()
             )
@@ -379,7 +380,8 @@ object BasicDetailsCheckYourAnswersController {
                 "basicDetailsCheckYourAnswersController.schemeDetails.taxYear",
                 whichTaxYearPage.get.show
               ).withChangeAction(
-                  controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, CheckMode).url
+                  controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, CheckMode).url,
+                  hidden = "basicDetailsCheckYourAnswersController.schemeDetails.taxYear.hidden"
                 )
                 .withOneHalfWidth()
             ) ++

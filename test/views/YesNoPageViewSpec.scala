@@ -16,7 +16,6 @@
 
 package views
 
-import play.api.test.FakeRequest
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
 import viewmodels.models.YesNoPageViewModel
@@ -24,8 +23,6 @@ import viewmodels.models.YesNoPageViewModel
 class YesNoPageViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
-    implicit val request = FakeRequest()
-
     val view = injected[YesNoPageView]
 
     val viewModelGen = formPageViewModelGen[YesNoPageViewModel]

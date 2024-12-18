@@ -18,7 +18,6 @@ package controllers.nonsipp.memberpensionpayments
 
 import play.api.test.FakeRequest
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
-import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import views.html.TwoColumnsTripleAction
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import models._
@@ -63,19 +62,39 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec with Me
     .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
     .unsafeSet(PensionPaymentsReceivedPage(srn), true)
 
+  val userAnswersWithOnePayment: UserAnswers = userAnswers
+    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(1)), money)
+    .unsafeSet(PensionPaymentsReceivedPage(srn), true)
+
+  private val testMemberList: List[(Max300, NameDOB, Option[Money])] = List(
+    (refineMV[Max300.Refined](1), memberDetails, Some(money))
+  )
+  private val testMemberListNoPayment: List[(Max300, NameDOB, Option[Money])] = List(
+    (refineMV[Max300.Refined](1), memberDetails, None)
+  )
+  private val memberDetails2: NameDOB = NameDOB(
+    "testFirstNameSecond",
+    "testLastNameSecond",
+    LocalDate.of(1991, 6, 15)
+  )
+  private val testMemberListTwoMembers: List[(Max300, NameDOB, Option[Money])] = List(
+    (refineMV[Max300.Refined](1), memberDetails, Some(money)),
+    (refineMV[Max300.Refined](2), memberDetails2, Some(money))
+  )
+
   "MemberPensionPaymentsListController" - {
 
     "viewModel should show 'Pension payments' when there are 0 payments" in {
       val userAnswersWithNoPayments = userAnswers
         .unsafeSet(PensionPaymentsReceivedPage(srn), false)
 
-      val memberList: List[Option[NameDOB]] = List.empty
-
       val result = MemberPensionPaymentsListController.viewModel(
         srn,
         page = 1,
         ViewOnlyMode,
-        memberList,
+        memberList = List.empty,
         userAnswersWithNoPayments,
         viewOnlyUpdated = false,
         schemeName = schemeName,
@@ -88,21 +107,12 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec with Me
     }
 
     "viewModel should show 1 pension payment when there is 1 payment" in {
-      val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
-
-      val userAnswersWithOnePayment = userAnswers
-        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails1)
-        .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
-        .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(1)), money)
-        .unsafeSet(PensionPaymentsReceivedPage(srn), true)
-
-      val memberList: List[Option[NameDOB]] = List(Some(memberDetails1))
 
       val result = MemberPensionPaymentsListController.viewModel(
         srn,
         page = 1,
         ViewOnlyMode,
-        memberList,
+        testMemberList,
         userAnswersWithOnePayment,
         viewOnlyUpdated = false,
         schemeName = schemeName,
@@ -128,13 +138,11 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec with Me
         .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(2)), money)
         .unsafeSet(PensionPaymentsReceivedPage(srn), true)
 
-      val memberList: List[Option[NameDOB]] = List(Some(memberDetails1), Some(memberDetails2))
-
       val result = MemberPensionPaymentsListController.viewModel(
         srn,
         page = 1,
         ViewOnlyMode,
-        memberList,
+        testMemberListTwoMembers,
         userAnswersWithTwoPayments,
         viewOnlyUpdated = false,
         schemeName = schemeName,
@@ -149,14 +157,12 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec with Me
     }
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
       injected[TwoColumnsTripleAction].apply(
         MemberPensionPaymentsListController.viewModel(
           srn,
           page = 1,
           NormalMode,
-          memberList,
+          testMemberListNoPayment,
           userAnswers,
           viewOnlyUpdated = false,
           schemeName = schemeName,
@@ -186,14 +192,12 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec with Me
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
-          val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
           injected[TwoColumnsTripleAction].apply(
             MemberPensionPaymentsListController.viewModel(
               srn,
               page,
               mode = ViewOnlyMode,
-              memberList,
+              testMemberListNoPayment,
               currentUserAnswers,
               viewOnlyUpdated = false,
               optYear = Some(yearString),
@@ -214,14 +218,12 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec with Me
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
-          val memberList: List[Option[NameDOB]] = userAnswers.membersOptionList(srn)
-
           injected[TwoColumnsTripleAction].apply(
             MemberPensionPaymentsListController.viewModel(
               srn,
               page,
               mode = ViewOnlyMode,
-              memberList,
+              testMemberList,
               updatedUserAnswers,
               viewOnlyUpdated = true,
               optYear = Some(yearString),

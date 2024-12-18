@@ -317,7 +317,9 @@ object MoneyBorrowedCYAController {
               controllers.nonsipp.moneyborrowed.routes.ValueOfSchemeAssetsWhenMoneyBorrowedController
                 .onSubmit(srn, index, mode)
                 .url
-            ).withVisuallyHiddenContent("moneyBorrowedCheckYourAnswers.section.schemeAssets.hidden")
+            ).withVisuallyHiddenContent(
+              ("moneyBorrowedCheckYourAnswers.section.schemeAssets.hidden", whenBorrowed.show)
+            )
           ),
           CheckYourAnswersRowViewModel(
             Message("moneyBorrowedCheckYourAnswers.section.schemeBorrowed", schemeName),

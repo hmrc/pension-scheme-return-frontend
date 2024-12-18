@@ -16,7 +16,6 @@
 
 package views
 
-import play.api.test.FakeRequest
 import forms.mappings.Mappings
 import views.html.TextAreaView
 import play.api.data
@@ -27,8 +26,6 @@ class TextAreaViewSpec extends ViewSpec with Mappings {
 
   runningApplication { implicit app =>
     val view = injected[TextAreaView]
-
-    implicit val request = FakeRequest()
 
     val viewModelGen = formPageViewModelGen[TextAreaViewModel]
 

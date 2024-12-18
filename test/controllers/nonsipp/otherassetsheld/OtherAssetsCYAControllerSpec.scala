@@ -116,6 +116,10 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
             )
           )
         }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
+          .after({
+            verify(mockSaveService, times(1)).save(any())(any(), any())
+            reset(mockPsrSubmissionService)
+          })
           .withName(s"render correct ${mode.toString} view")
       )
 
@@ -198,7 +202,11 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
               compilationOrSubmissionDate = Some(submissionDateTwo)
             )
           )
-      }.withName("OnPageLoadViewOnly renders ok with no changed flag")
+      }.after({
+          verify(mockSaveService, never()).save(any())(any(), any())
+          reset(mockPsrSubmissionService)
+        })
+        .withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
     act.like(
       redirectToPage(

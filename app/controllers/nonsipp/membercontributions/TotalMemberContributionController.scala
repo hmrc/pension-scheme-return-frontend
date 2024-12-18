@@ -19,13 +19,12 @@ package controllers.nonsipp.membercontributions
 import services.SaveService
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.slf4j.LoggerFactory
-import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
 import controllers.actions._
 import navigation.Navigator
 import forms.MoneyFormProvider
-import models.{Mode, Money, NameDOB}
+import models.{Mode, Money}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
@@ -77,36 +76,29 @@ class TotalMemberContributionController @Inject()(
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val optionList: List[Option[NameDOB]] = request.userAnswers.membersOptionList(srn)
-
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => {
-            Future.successful(
-              optionList(index.value - 1)
-                .map(_.fullName)
-                .getOrRecoverJourney
-                .map(
-                  memberName =>
-                    BadRequest(
-                      view(formWithErrors, viewModel(srn, index, memberName, form, mode))
-                    )
+      request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => {
+              Future.successful(
+                BadRequest(
+                  view(formWithErrors, viewModel(srn, index, memberName.fullName, form, mode))
                 )
-                .merge
-            )
-          },
-          value =>
-            for {
-              updatedAnswers <- Future
-                .fromTry(
-                  request.userAnswers.transformAndSet(TotalMemberContributionPage(srn, index), value)
-                )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(TotalMemberContributionPage(srn, index), mode, updatedAnswers)
-            )
-        )
+              )
+            },
+            value =>
+              for {
+                updatedAnswers <- Future
+                  .fromTry(
+                    request.userAnswers.transformAndSet(TotalMemberContributionPage(srn, index), value)
+                  )
+                _ <- saveService.save(updatedAnswers)
+              } yield Redirect(
+                navigator.nextPage(TotalMemberContributionPage(srn, index), mode, updatedAnswers)
+              )
+          )
+      }
     }
 }
 

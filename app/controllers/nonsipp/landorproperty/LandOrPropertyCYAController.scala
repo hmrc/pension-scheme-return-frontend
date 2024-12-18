@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.landorproperty
 
-import services.PsrSubmissionService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
@@ -36,6 +36,7 @@ import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
@@ -50,7 +51,8 @@ class LandOrPropertyCYAController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView,
-  psrSubmissionService: PsrSubmissionService
+  psrSubmissionService: PsrSubmissionService,
+  saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -193,16 +195,25 @@ class LandOrPropertyCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      psrSubmissionService
-        .submitPsrDetails(
-          srn,
-          fallbackCall =
-            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, mode)
-        )
-        .map {
-          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          case Some(_) => Redirect(navigator.nextPage(LandOrPropertyCYAPage(srn), NormalMode, request.userAnswers))
-        }
+      for {
+        updatedAnswers <- request.userAnswers
+          .setWhen(request.userAnswers.get(LandOrPropertyHeldPage(srn)).isEmpty)(LandOrPropertyHeldPage(srn), true)
+          .mapK[Future]
+        _ <- saveService.save(updatedAnswers)
+        result <- psrSubmissionService
+          .submitPsrDetailsWithUA(
+            srn,
+            updatedAnswers,
+            fallbackCall =
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, mode)
+          )
+      } yield result.getOrRecoverJourney(
+        _ =>
+          Redirect(
+            navigator
+              .nextPage(LandOrPropertyCYAPage(srn), NormalMode, updatedAnswers)
+          )
+      )
     }
 
   def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -476,7 +487,9 @@ object LandOrPropertyCYAController {
             SummaryAction(
               "site.change",
               routes.LandRegistryTitleNumberController.onPageLoad(srn, index, mode).url + "#registryTitleQuestion"
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section1.landRegistryTitleNumber.hidden")
+            ).withVisuallyHiddenContent(
+              ("landOrPropertyCYA.section1.landRegistryTitleNumber.hidden", address.addressLine1)
+            )
           ),
           landRegistryTitleNumber.value match {
             case Right(titleNumber) =>
@@ -487,7 +500,9 @@ object LandOrPropertyCYAController {
                 SummaryAction(
                   "site.change",
                   routes.LandRegistryTitleNumberController.onPageLoad(srn, index, mode).url + "#registryTitleValue"
-                ).withVisuallyHiddenContent("landOrPropertyCYA.section1.landRegistryTitleNumber.yes.hidden")
+                ).withVisuallyHiddenContent(
+                  ("landOrPropertyCYA.section1.landRegistryTitleNumber.yes.hidden", address.addressLine1)
+                )
               )
             case Left(reason) =>
               CheckYourAnswersRowViewModel(
@@ -497,7 +512,9 @@ object LandOrPropertyCYAController {
                 SummaryAction(
                   "site.change",
                   routes.LandRegistryTitleNumberController.onPageLoad(srn, index, mode).url + "#registryTitleValue"
-                ).withVisuallyHiddenContent("landOrPropertyCYA.section1.landRegistryTitleNumber.no.hidden")
+                ).withVisuallyHiddenContent(
+                  ("landOrPropertyCYA.section1.landRegistryTitleNumber.no.hidden", address.addressLine1)
+                )
               )
           }
         )
@@ -609,7 +626,7 @@ object LandOrPropertyCYAController {
                 controllers.nonsipp.common.routes.IdentityTypeController
                   .onPageLoad(srn, index, mode, IdentitySubject.LandOrPropertySeller)
                   .url
-              ).withVisuallyHiddenContent("landOrPropertyCYA.section3.whoReceivedLand.hidden")
+              ).withVisuallyHiddenContent(("landOrPropertyCYA.section3.whoReceivedLand.hidden", address))
             ),
           CheckYourAnswersRowViewModel("landOrPropertyCYA.section3.recipientName", recipientName)
             .withAction(
@@ -636,7 +653,9 @@ object LandOrPropertyCYAController {
             SummaryAction(
               "site.change",
               routes.LandOrPropertySellerConnectedPartyController.onPageLoad(srn, index, mode).url
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section3.landOrPropertySellerConnectedPartyInfo.hidden")
+            ).withVisuallyHiddenContent(
+              ("landOrPropertyCYA.section3.landOrPropertySellerConnectedPartyInfo.hidden", recipientName)
+            )
           )
       )
     )
@@ -664,7 +683,9 @@ object LandOrPropertyCYAController {
             SummaryAction(
               "site.change",
               routes.WhyDoesSchemeHoldLandPropertyController.onPageLoad(srn, index, mode).url + "#holdLandProperty"
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section2.holdLandProperty.hidden")
+            ).withVisuallyHiddenContent(
+              Message("landOrPropertyCYA.section2.holdLandProperty.hidden", schemeName, address)
+            )
           )
         )
           ++
@@ -678,7 +699,7 @@ object LandOrPropertyCYAController {
                     SummaryAction(
                       "site.change",
                       routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, mode).url + "#landOrPropertyAcquire"
-                    ).withVisuallyHiddenContent("landOrPropertyCYA.section2.landOrPropertyAcquire.hidden")
+                    ).withVisuallyHiddenContent(("landOrPropertyCYA.section2.landOrPropertyAcquire.hidden", address))
                   )
               )
             ).flatten ++
@@ -690,7 +711,7 @@ object LandOrPropertyCYAController {
               SummaryAction(
                 "site.change",
                 routes.LandOrPropertyTotalCostController.onPageLoad(srn, index, mode).url
-              ).withVisuallyHiddenContent("landOrPropertyCYA.section2.landOrPropertyTotalCost.hidden")
+              ).withVisuallyHiddenContent(("landOrPropertyCYA.section2.landOrPropertyTotalCost.hidden", address))
             )
           ) ++
           List(
@@ -703,7 +724,9 @@ object LandOrPropertyCYAController {
                   SummaryAction(
                     "site.change",
                     routes.LandPropertyIndependentValuationController.onPageLoad(srn, index, mode).url
-                  ).withVisuallyHiddenContent("landOrPropertyCYA.section2.landPropertyIndependentValuation.hidden")
+                  ).withVisuallyHiddenContent(
+                    ("landOrPropertyCYA.section2.landPropertyIndependentValuation.hidden", address)
+                  )
                 )
             )
           ).flatten
@@ -730,7 +753,7 @@ object LandOrPropertyCYAController {
             SummaryAction(
               "site.change",
               routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, mode).url
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyResidential.hidden")
+            ).withVisuallyHiddenContent(("landOrPropertyCYA.section4.landOrPropertyResidential.hidden", address))
           ),
           CheckYourAnswersRowViewModel(
             Message("landOrPropertyCYA.section4.propertyLease", address),
@@ -739,7 +762,7 @@ object LandOrPropertyCYAController {
             SummaryAction(
               "site.change",
               routes.IsLandPropertyLeasedController.onPageLoad(srn, index, mode).url
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyLease.hidden")
+            ).withVisuallyHiddenContent(("landOrPropertyCYA.section4.landOrPropertyLease.hidden", address))
           ),
           CheckYourAnswersRowViewModel(
             Message("landOrPropertyCYA.section4.propertyTotalIncome", address),
@@ -748,7 +771,7 @@ object LandOrPropertyCYAController {
             SummaryAction(
               "site.change",
               routes.LandOrPropertyTotalIncomeController.onPageLoad(srn, index, mode).url + "#landOrPropertyTotalIncome"
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section4.landOrPropertyTotalIncome.hidden")
+            ).withVisuallyHiddenContent(("landOrPropertyCYA.section4.landOrPropertyTotalIncome.hidden", address))
           )
         )
       )
@@ -775,7 +798,7 @@ object LandOrPropertyCYAController {
             SummaryAction(
               "site.change",
               routes.LandOrPropertyLeaseDetailsController.onPageLoad(srn, index, mode).url + "#leaseName"
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section5.assetsValue.hidden")
+            ).withVisuallyHiddenContent("landOrPropertyCYA.section5.leaseName.hidden")
           ),
           CheckYourAnswersRowViewModel(
             Message("landOrPropertyCYA.section5.leaseValue", leaseValue.displayAs),
@@ -800,7 +823,7 @@ object LandOrPropertyCYAController {
             SummaryAction(
               "site.change",
               routes.IsLesseeConnectedPartyController.onPageLoad(srn, index, mode).url
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section5.leaseConnected.hidden")
+            ).withVisuallyHiddenContent(("landOrPropertyCYA.section5.leaseConnected.hidden", leaseName.show))
           )
         )
       )

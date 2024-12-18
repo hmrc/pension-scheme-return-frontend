@@ -35,7 +35,10 @@
   @formHelper(action = viewModel.onSubmit, Symbol("autocomplete") -> "off") {
 
     @if(form.hasErrors) {
-      @govukErrorSummary(ErrorSummaryViewModel(form))
+      @govukErrorSummary(ErrorSummaryViewModel(
+        form,
+        errorLinkOverrides = errorLinkOverrideHelper
+      ))
     }
 
       <h1 class="govuk-heading-l govuk-!-margin-bottom-3">@renderMessage(viewModel.heading)</h1>
@@ -90,7 +93,7 @@
         .withId(s"value.${index + 1}")
         .asNumeric()
         .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
-        .withWidth(width.fold[InputWidth](InputWidth.Fixed10)(identity))
+        .withWidth(width.getOrElse(InputWidth.Fixed4))
     )
 }
 
@@ -153,4 +156,11 @@
             autoSelect = true
         )
     )).withFormField(form(s"value.${index + 1}")))
+}
+
+@errorLinkOverrideHelper = @{
+  viewModel.page.fields.zipWithIndex.collect {
+    case (field @ QuestionField(_, _, _, _, FieldType.Date), index) =>
+      s"value.${index + 1}" -> s"value.${index + 1}.day"
+  }.toMap
 }

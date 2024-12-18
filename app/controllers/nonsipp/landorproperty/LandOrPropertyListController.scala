@@ -24,8 +24,8 @@ import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPro
 import cats.implicits.toShow
 import config.Constants.maxLandOrProperties
 import controllers.actions._
+import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
-import play.api.i18n.MessagesApi
 import config.RefinedTypes.Max5000
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.{getCompletedOrUpdatedTaskListStatus, getLandOrPropertyTaskListStatusAndLink}
@@ -35,10 +35,10 @@ import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import play.api.Logger
 import navigation.Navigator
-import utils.nonsipp.CheckStatusUtils
-import forms.YesNoPageFormProvider
 import utils.DateTimeUtils.localDateTimeShow
 import models._
+import utils.nonsipp.check.LandOrPropertyCheckStatusUtils
+import play.api.i18n.MessagesApi
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
@@ -212,7 +212,7 @@ class LandOrPropertyListController @Inject()(
         .map(LandOrPropertyAddressLookupPages(srn))
         .refine[Max5000.Refined]
         .map(_.partition {
-          case (index, _) => CheckStatusUtils.checkLandOrPropertyRecord(request.userAnswers, srn, index)
+          case (index, _) => LandOrPropertyCheckStatusUtils.checkLandOrPropertyRecord(request.userAnswers, srn, index)
         })
     } else {
       val noAddressesToCheck = Map.empty[Max5000, Address]

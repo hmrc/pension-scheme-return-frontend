@@ -16,7 +16,6 @@
 
 package views
 
-import play.api.test.FakeRequest
 import views.html.ContentPageView
 import viewmodels.models.ContentPageViewModel
 
@@ -24,8 +23,6 @@ class ContentPageViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
     val view = injected[ContentPageView]
-
-    implicit val request = FakeRequest()
 
     val viewModelGen = formPageViewModelGen[ContentPageViewModel]
 
