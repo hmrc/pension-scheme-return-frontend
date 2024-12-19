@@ -136,11 +136,11 @@
 
 @select(index: Int, field: QuestionField) = {
     @govukSelect(Select(
-        id = s"value_${index + 1}",
+        id = s"value.${index + 1}",
         name = s"value.${index + 1}",
         classes = s"${field.width.fold[InputWidth](InputWidth.Fixed10)(identity).toString} location-autocomplete",
-        attributes = Map("aria-labelledby" -> s"value_${index + 1}", "data-all-countries" -> ""),
-        label = Label(forAttr = Some(s"value_${index + 1}-select"), content = HtmlContent(renderMessage(field.label)), classes = LegendSize.Small.toString),
+        attributes = Map("aria-labelledby" -> s"value.${index + 1}", "data-all-countries" -> ""),
+        label = Label(forAttr = Some(s"value.${index + 1}-select"), content = HtmlContent(renderMessage(field.label)), classes = LegendSize.Small.toString),
         items = Seq(SelectItem(value = Some(""))) ++
                 field.selectSource.map(selectInput =>
                     SelectItem(
