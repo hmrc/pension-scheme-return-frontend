@@ -294,8 +294,7 @@ class DateMappingsSpec
         val result = form.bind(data)
 
         result.errors must contain allElementsOf List(
-          FormError("value.day", "error.invalid.characters"),
-          FormError("value.month", "error.invalid.characters")
+          FormError("value.day", "error.invalid.characters")
         )
     }
   }
@@ -313,8 +312,7 @@ class DateMappingsSpec
         val result = form.bind(data)
 
         result.errors must contain allElementsOf List(
-          FormError("value.day", "error.invalid.characters"),
-          FormError("value.year", "error.invalid.characters")
+          FormError("value.day", "error.invalid.characters")
         )
     }
   }
@@ -332,8 +330,7 @@ class DateMappingsSpec
         val result = form.bind(data)
 
         result.errors must contain allElementsOf List(
-          FormError("value.month", "error.invalid.characters"),
-          FormError("value.year", "error.invalid.characters")
+          FormError("value.month", "error.invalid.characters")
         )
     }
   }
@@ -351,9 +348,7 @@ class DateMappingsSpec
         val result = form.bind(data)
 
         result.errors must contain allElementsOf List(
-          FormError("value.day", "error.invalid.characters"),
-          FormError("value.month", "error.invalid.characters"),
-          FormError("value.year", "error.invalid.characters")
+          FormError("value.day", "error.invalid.characters")
         )
     }
   }
@@ -405,6 +400,29 @@ class DateMappingsSpec
 
       result.errors must contain only FormError("value", "error.afterEndDate")
     }
+  }
+
+  "must fail to bind with only a missing year if there are multiple errors (prioritization)" in {
+
+    val data = Map(
+      "value.day" -> "xx",
+      "value.month" -> "42"
+    )
+
+    val result = form.bind(data)
+    result.errors must contain only FormError("value.year", "error.required.year")
+  }
+
+  "must fail to bind with only an invalid day if there are multiple errors (prioritization)" in {
+
+    val data = Map(
+      "value.day" -> "xx",
+      "value.month" -> "42",
+      "value.year" -> "2008"
+    )
+
+    val result = form.bind(data)
+    result.errors must contain only FormError("value.day", "error.invalid.characters")
   }
 
   "must unbind a date" in {
