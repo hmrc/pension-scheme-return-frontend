@@ -31,7 +31,7 @@
     @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
 
         @if(form.hasErrors) {
-          @govukErrorSummary(ErrorSummaryViewModel(form))
+          @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> viewmodel.page.rows.head.index.toString)))
         }
 
         <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>

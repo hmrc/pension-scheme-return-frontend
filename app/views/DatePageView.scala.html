@@ -29,7 +29,7 @@
     @formHelper(action = viewModel.onSubmit, Symbol("autocomplete") -> "off") {
 
         @if(form.hasErrors) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
+            @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value.day")))
         }
 
         @if(viewModel.page.legend.nonEmpty) {
