@@ -410,10 +410,10 @@ noNINO.upload.error.length = Reason member does not have a National Insurance nu
 
 valueOfAssets.title = Value of the pension scheme’s assets minus liabilities
 valueOfAssets.heading = Value of the pension scheme’s assets minus liabilities
-valueOfAssets.paragraph = These assets or liabilities must be excluded from the calculation:
+valueOfAssets.paragraph0 = Assets include cash.
+valueOfAssets.paragraph1 = These liabilities must be excluded from the calculation:
 valueOfAssets.bullet1 = income drawdowns not yet paid
 valueOfAssets.bullet2 = crystallised benefits not yet paid
-valueOfAssets.bullet3 = alternatively secured pensions not yet paid
 valueOfAssets.start.label = Value on {0}, in pounds and pence
 valueOfAssets.start.error.required = Enter the total value of the pension scheme’s assets minus liabilities, on {0}
 valueOfAssets.start.error.nonNumeric = Total value of the pension scheme’s assets minus liabilities, on {0} must be an amount of money, like 123.45 or 156
@@ -945,7 +945,7 @@ feesCommissionsWagesSalaries.paragraph4 = For example, a member transfers a prop
 feesCommissionsWagesSalaries.paragraph5 = You must tell us about this fee of £18,000 as it is more than 10% of the transaction value.
 feesCommissionsWagesSalaries.label = How much did the scheme pay in total of fees or commissions over 10%?
 feesCommissionsWagesSalaries.hint = Add together any fees or commissions that are over 10% of any transaction value and enter a total amount. If no fees or commissions were over 10%, enter 0.
-feesCommissionsWagesSalaries.error.required = Enter the amount the scheme paid in total of fees or commissions over 10% during the period of this return, in pounds and pence, or enter 0
+feesCommissionsWagesSalaries.error.required = Enter the amount the scheme paid in total of fees or commissions over 10% during the period of this return, or enter 0
 feesCommissionsWagesSalaries.error.invalid = The amount the scheme paid in total of fees or commissions over 10% must be an amount of money, like 123.45 or 156
 feesCommissionsWagesSalaries.error.tooLarge = The amount the scheme paid in total of fees or commissions over 10% must be 999999999.99 or less
 
