@@ -23,9 +23,10 @@ import models.SchemeId.Srn
 import eu.timepit.refined.refineV
 import pages.nonsipp.shares.Paths.shares
 import pages.nonsipp.sharesdisposal.SharesDisposalPage
-import play.api.libs.json._
 import models.UserAnswers
 import pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction
+import play.api.Logger
+import play.api.libs.json._
 
 import scala.util.{Success, Try}
 
@@ -34,16 +35,19 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class SharesPrePopulationProcessor @Inject() {
 
+  private val logger = Logger(getClass)
+
   def clean(baseUA: UserAnswers, currentUA: UserAnswers)(srn: Srn): Try[UserAnswers] = {
 
     val baseUaJson = baseUA.data.decryptedValue
 
-    val totalSharesNowHeldOptMap =
+    val totalSharesNowHeldOptMap: Option[Map[String, Map[String, Int]]] =
       (baseUaJson \ "shares" \ "shareTransactions" \ "disposedSharesTransaction" \ "totalSharesNowHeld")
         .asOpt[Map[String, Map[String, Int]]]
 
-    val transformedResult = baseUaJson
-      .transform(shares.json.pickBranch)
+    val sharesJson: JsResult[JsObject] = baseUaJson.transform(shares.json.pickBranch)
+
+    val transformedResult: Try[UserAnswers] = sharesJson
       .flatMap(_.transform(SharesRecordVersionPage(srn).path.prune(_)))
       .flatMap(_.transform(DidSchemeHoldAnySharesPage(srn).path.prune(_)))
       .flatMap(_.transform(SharesDisposalPage(srn).path.prune(_)))
@@ -54,7 +58,7 @@ class SharesPrePopulationProcessor @Inject() {
       case _ => Try(currentUA)
     }
 
-    totalSharesNowHeldOptMap.fold(transformedResult) { totalSharesNowHeldMap =>
+    val result: Try[UserAnswers] = totalSharesNowHeldOptMap.fold(transformedResult) { totalSharesNowHeldMap =>
       totalSharesNowHeldMap.foldLeft(transformedResult)((uaResult, totalSharesNowHeldEntry) => {
         val isFullyDisposed = totalSharesNowHeldEntry._2.exists(_._2 == 0)
         if (isFullyDisposed) {
@@ -68,5 +72,10 @@ class SharesPrePopulationProcessor @Inject() {
       })
     }
 
+//    // we can still use this on localhost if needed:
+//    val newJson: JsResult[JsObject] = result.get.data.decryptedValue.transform(shares.json.pickBranch)
+//    logger.info(Diff(sharesJson, newJson).mkString(" - "))
+
+    result
   }
 }
