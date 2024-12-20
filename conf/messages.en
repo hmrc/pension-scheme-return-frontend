@@ -1336,8 +1336,8 @@ whatYouWillNeedLoans.loansFor5 = the total amount of the loan outstanding at the
 whatYouWillNeedLoans.paragraph7 = Details of any security given on the loan.
 whatYouWillNeedLoans.paragraph8 = Amount of any outstanding arrears on the loan at the end of the period of this return.
 
-basicDetailsCheckYourAnswers.title = Check your answers: basic details
-basicDetailsCheckYourAnswers.heading = Check your answers: basic details
+basicDetailsCheckYourAnswersController.schemeDetails.normal.title = Check your answers: basic details
+basicDetailsCheckYourAnswersController.schemeDetails.normal.heading = Check your answers: basic details
 basicDetailsCheckYourAnswersController.schemeDetails.heading = Scheme details
 basicDetailsCheckYourAnswersController.schemeDetails.schemeName = Scheme name
 basicDetailsCheckYourAnswersController.schemeDetails.pstr = Pension Scheme Tax Reference (PSTR)
