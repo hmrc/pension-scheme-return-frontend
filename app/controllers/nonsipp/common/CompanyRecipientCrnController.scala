@@ -140,7 +140,11 @@ object CompanyRecipientCrnController {
       Message(s"${subject.key}.companyRecipientCrn.heading", companyName),
       ConditionalYesNoPageViewModel(
         yes = YesNoViewModel
-          .Conditional(Message(s"${subject.key}.companyRecipientCrn.yes.conditional", companyName), FieldType.Input),
+          .Conditional(
+            Message(s"${subject.key}.companyRecipientCrn.yes.conditional", companyName),
+            Some(Message(s"${subject.key}.companyRecipientCrn.yes.conditional.hint")),
+            FieldType.Input
+          ),
         no = YesNoViewModel
           .Conditional(Message(s"${subject.key}.companyRecipientCrn.no.conditional", companyName), FieldType.Textarea)
       ).withHint(s"${subject.key}.companyRecipientCrn.hint"),
