@@ -303,7 +303,7 @@ class OverviewController @Inject()(
         case PsrReportType.Sipp.name =>
           version.toIntOption match {
             case None =>
-              logger.error(s"Could not parse version [$version] to int")
+              logger.error(s"Could not parse version [$version] to int, for report type: $reportType")
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             case Some(versionInt) =>
               val path = if (versionInt == 1) {
