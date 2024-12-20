@@ -213,12 +213,12 @@ object LoansCYAController {
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,
       title = mode.fold(
-        normal = "checkYourAnswers.title",
+        normal = "loanCheckYourAnswers.normal.title",
         check = "loanCheckYourAnswers.change.title",
         viewOnly = "loanCheckYourAnswers.viewOnly.title"
       ),
       heading = mode.fold(
-        normal = "checkYourAnswers.heading",
+        normal = "loanCheckYourAnswers.normal.heading",
         check = Message("loanCheckYourAnswers.change.heading", amountOfTheLoan.loanAmount.displayAs, recipientName),
         viewOnly = Message("loanCheckYourAnswers.viewOnly.heading", amountOfTheLoan.loanAmount.displayAs, recipientName)
       ),

@@ -179,7 +179,7 @@ object TransfersOutCYAController {
     val heading: InlineMessage =
       mode
         .fold(
-          normal = "checkYourAnswers.heading",
+          normal = "transfersOutCYAController.normal.heading",
           check = Message("transfersOutCYAController.heading.check", memberName),
           viewOnly = "transfersOutCYAController.viewOnly.heading"
         )
@@ -188,7 +188,7 @@ object TransfersOutCYAController {
       mode = mode,
       title = mode
         .fold(
-          normal = "checkYourAnswers.title",
+          normal = "transfersOutCYAController.normal.title",
           check = "transfersOutCYAController.title.check",
           viewOnly = "transfersOutCYAController.viewOnly.title"
         ),

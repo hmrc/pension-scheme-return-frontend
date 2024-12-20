@@ -152,17 +152,17 @@ object MemberContributionsCYAController {
       mode = mode,
       title = mode
         .fold(
-          normal = "MemberContributionCYA.title",
-          check = "MemberContributionCYA.change.title",
-          viewOnly = "MemberContributionCYA.viewOnly.title"
+          normal = "memberContributionCYA.title",
+          check = "memberContributionCYA.change.title",
+          viewOnly = "memberContributionCYA.viewOnly.title"
         ),
       heading = mode.fold(
-        normal = "MemberContributionCYA.heading",
+        normal = "memberContributionCYA.heading",
         check = Message(
-          "MemberContributionCYA.change.heading",
+          "memberContributionCYA.change.heading",
           memberName
         ),
-        viewOnly = "MemberContributionCYA.viewOnly.heading"
+        viewOnly = "memberContributionCYA.viewOnly.heading"
       ),
       description = None,
       page = CheckYourAnswersViewModel(
@@ -187,8 +187,8 @@ object MemberContributionsCYAController {
             updated = viewOnlyUpdated,
             link = None,
             submittedText = Some(Message("")),
-            title = "MemberContributionCYA.viewOnly.title",
-            heading = Message("MemberContributionCYA.viewOnly.heading", memberName),
+            title = "memberContributionCYA.viewOnly.title",
+            heading = Message("memberContributionCYA.viewOnly.heading", memberName),
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
@@ -217,19 +217,19 @@ object MemberContributionsCYAController {
         None,
         List(
           CheckYourAnswersRowViewModel(
-            Message("MemberContributionCYA.section.memberName.header"),
+            Message("memberContributionCYA.section.memberName.header"),
             Message(memberName)
           ),
           CheckYourAnswersRowViewModel(
-            Message("MemberContributionCYA.section.memberName", memberName),
-            Message("MemberContributionCYA.section.amount", contributions.displayAs)
+            Message("memberContributionCYA.section.memberName", memberName),
+            Message("memberContributionCYA.section.amount", contributions.displayAs)
           ).withAction(
             SummaryAction(
               "site.change",
               controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
                 .onSubmit(srn, index, mode)
                 .url
-            ).withVisuallyHiddenContent(Message("MemberContributionCYA.section.hide", memberName))
+            ).withVisuallyHiddenContent(Message("memberContributionCYA.section.hide", memberName))
           )
         )
       )

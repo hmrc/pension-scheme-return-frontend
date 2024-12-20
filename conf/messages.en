@@ -119,9 +119,7 @@ index.heading = pension-scheme-return-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
 
 checkYourAnswers.title = Check your answers
-changeYourAnswers.title = Change your answers
 checkYourAnswers.heading = Check your answers
-changeYourAnswers.heading = Change your answers
 
 journeyRecovery.title = Sorry there is a problem with the service
 journeyRecovery.heading = Sorry, there is a problem with the service
@@ -794,8 +792,8 @@ sharesDisposal.totalShares.error.decimal = Number of shares held after this disp
 sharesDisposal.totalShares.error.invalid.characters = Number of shares held after this disposal must be a number that is 0 or more, like 100
 sharesDisposal.totalShares.error.tooLarge = Number of shares held after this disposal must be 9,999,999 or fewer
 
-sharesDisposal.cya.title = Check your answers
-sharesDisposal.cya.heading = Check your answers
+sharesDisposal.cya.title = Check your answers: disposal of shares
+sharesDisposal.cya.heading = Check your answers: disposal of shares
 sharesDisposal.cya.baseRow1.key = Which shares were disposed of?
 sharesDisposal.cya.baseRow1.value.withDate = {0} in {1} {2} on {3}
 sharesDisposal.cya.baseRow1.value = {0} in {1} {2}
@@ -904,6 +902,8 @@ pcls.MemberList.viewOnly.withValue = {0} pension commencement lump sum
 pcls.MemberList.viewOnly.link = View previous version of pension commencement lump sum (opens in new tab)
 pcls.MemberList.view.none = Did any member receive a pension commencement lump sum during the period of this return?
 
+pclsCYA.normal.title = Check your answers: PCLS
+pclsCYA.normal.heading = Check your answers: PCLS
 pclsCYA.change.title.check = Change details of PCLS for this member
 pclsCYA.heading.check = Change details of PCLS for {0}
 pclsCYA.rows.membersName = Member’s name
@@ -1024,8 +1024,8 @@ surrenderedBenefits.when.error.date.after = Date the member surrendered their pe
 surrenderedBenefits.when.error.invalid.date = Date the member surrendered their pension benefits must be a real date
 surrenderedBenefits.when.error.invalid.characters = Date the member surrendered their pension benefits must only include numbers 0 to 9
 
-surrenderedBenefits.cya.title = Check your answers
-surrenderedBenefits.cya.heading = Check your answers
+surrenderedBenefits.cya.title = Check your answers: surrendered benefits
+surrenderedBenefits.cya.heading = Check your answers: surrendered benefits
 surrenderedBenefits.cya.section.memberName =  Member’s name
 surrenderedBenefits.cya.section.amount = Total amount surrendered by {0}
 surrenderedBenefits.cya.section.amount.hidden = the total amount surrendered by {0}
@@ -1234,6 +1234,10 @@ removeTotalValueQuotedShares.title = Are you sure you want to remove the quoted 
 removeTotalValueQuotedShares.heading = Are you sure you want to remove the quoted shares and third party managed funds of £{0}?
 removeTotalValueQuotedShares.error.required = Select yes if you are sure you want to remove the quoted shares and third party managed funds
 
+totalValueQuotedSharesCYA.normal.title = Check your answers: quoted shares and managed funds
+totalValueQuotedSharesCYA.normal.heading = Check your answers: quotes shares and managed funds
+totalValueQuotedSharesCYA.title.change = Change details of quoted shares and managed funds
+totalValueQuotedSharesCYA.heading.change = Change details of quoted shares and third party managed funds
 totalValueQuotedSharesCYA.title.view = View details of quoted shares and managed funds
 totalValueQuotedSharesCYA.heading.view = Quoted shares and third party managed funds
 totalValueQuotedSharesCYA.section.totalCost = Total value of all quoted shares and third party managed funds held by {0} on {1}
@@ -1332,6 +1336,8 @@ whatYouWillNeedLoans.loansFor5 = the total amount of the loan outstanding at the
 whatYouWillNeedLoans.paragraph7 = Details of any security given on the loan.
 whatYouWillNeedLoans.paragraph8 = Amount of any outstanding arrears on the loan at the end of the period of this return.
 
+basicDetailsCheckYourAnswersController.schemeDetails.normal.title = Check your answers: basic details
+basicDetailsCheckYourAnswersController.schemeDetails.normal.heading = Check your answers: basic details
 basicDetailsCheckYourAnswersController.schemeDetails.heading = Scheme details
 basicDetailsCheckYourAnswersController.schemeDetails.schemeName = Scheme name
 basicDetailsCheckYourAnswersController.schemeDetails.pstr = Pension Scheme Tax Reference (PSTR)
@@ -1532,6 +1538,8 @@ areRepaymentsInstalments.equalInstallments.title = Are the loan repayments in eq
 areRepaymentsInstalments.equalInstallments.heading = Are the loan repayments in equal annual instalments?
 areRepaymentsInstalments.equalInstallments.error.required = Select yes if the loan repayments are in equal annual instalments
 
+loanCheckYourAnswers.normal.title = Check your answers: loans
+loanCheckYourAnswers.normal.heading = Check your answers: loans
 loanCheckYourAnswers.section1.heading = Recipient details
 loanCheckYourAnswers.section1.whoReceivedLoan = Who received the loan?
 loanCheckYourAnswers.section1.whoReceivedLoan.hidden = who received the loan
@@ -1644,8 +1652,8 @@ removeLoan.title = Are you sure you want to remove this loan?
 removeLoan.heading = Are you sure you want to remove the loan of £{0} to {1}?
 removeLoan.error.required = Select yes if you are sure you want to remove this loan
 
-financialDetailsCheckYourAnswersController.title = Check your answers
-financialDetailsCheckYourAnswersController.heading = Check your answers
+financialDetailsCheckYourAnswersController.title = Check your answers: financial details
+financialDetailsCheckYourAnswersController.heading = Check your answers: financial details
 financialDetailsCheckYourAnswersController.viewOnly.title = Financial details
 financialDetailsCheckYourAnswersController.viewOnly.heading = Financial details
 financialDetailsCheckYourAnswersController.viewOnly.link = View previous version of financial details (opens in new tab)
@@ -1936,8 +1944,8 @@ landOrPropertyStillHeld.title = Is any part of the land or property still held b
 landOrPropertyStillHeld.heading = Is any part of {0} still held by {1}?
 landOrPropertyStillHeld.error.required = Select yes if any part of the land or property is still held by the scheme
 
-checkYourAnswers.title = Check your answers
-checkYourAnswers.heading = Check your answers
+landOrPropertyCYA.normal.title = Check your answers: land or property
+landOrPropertyCYA.normal.heading = Check your answers: land or property
 landOrPropertyCYA.section1.heading = Location of the land or property
 landOrPropertyCYA.section1.propertyInUk = Is this land or property in the UK?
 landOrPropertyCYA.section1.landOrPropertyInUk.hidden = if the land or property is in the UK
@@ -2134,8 +2142,8 @@ disposalIndependentValuation.heading = Was the sale of {0} supported by an indep
 disposalIndependentValuation.error.required = Select yes if the sale of the land or property was supported by an independent valuation
 
 
-checkYourAnswers.title = Check your answers
-checkYourAnswers.heading = Check your answers
+landPropertyDisposalCYA.normal.title = Check your answers: disposal of land or property
+landPropertyDisposalCYA.normal.heading = Check your answers: disposal of land or property
 landPropertyDisposalCYA.section1.propertyInUk =  Which land or property was disposed of?
 landPropertyDisposalCYA.section1.landOrPropertyInUk.hidden = which land or property was disposed of
 landPropertyDisposalCYA.section1.propertyDisposed = How was {0} disposed of?
@@ -2285,8 +2293,8 @@ valueOfSchemeAssetsWhenMoneyBorrowed.error.invalid = Total value of the scheme�
 valueOfSchemeAssetsWhenMoneyBorrowed.error.tooLarge = Total value of the scheme’s assets must be 999999999.99 or less
 valueOfSchemeAssetsWhenMoneyBorrowed.error.tooSmall = Total value of the scheme’s assets must be -999999999.99 or more
 
-moneyBorrowedCheckYourAnswers.title = Check your answers
-moneyBorrowedCheckYourAnswers.heading = Check your answers
+moneyBorrowedCheckYourAnswers.title = Check your answers: money borrowed
+moneyBorrowedCheckYourAnswers.heading = Check your answers: money borrowed
 moneyBorrowedCheckYourAnswers.section.lenderName =  Name of lender
 moneyBorrowedCheckYourAnswers.section.lenderName.hidden = the name of the lender
 moneyBorrowedCheckYourAnswers.section.lenderConnectedParty = Is {0} a connected party?
@@ -2413,10 +2421,10 @@ unallocatedEmployerAmount.error.invalid = Amount of unallocated employer contrib
 unallocatedEmployerAmount.error.tooLarge = Amount of unallocated employer contributions must be 999999999.99 or less
 unallocatedEmployerAmount.error.tooSmall = Amount of unallocated employer contributions must be 0.01 or more
 
-unallocatedEmployerCYA.title = Check your answers
-unallocatedEmployerCYA.change.title = Check your answers
-unallocatedEmployerCYA.heading = Check your answers
-unallocatedEmployerCYA.change.heading = Check your answers
+unallocatedEmployerCYA.title = Check your answers: unallocated employer contributions
+unallocatedEmployerCYA.change.title = Check your answers: unallocated employer contributions
+unallocatedEmployerCYA.heading = Check your answers: unallocated employer contributions
+unallocatedEmployerCYA.change.heading = Check your answers: unallocated employer contributions
 unallocatedEmployerCYA.viewOnly.title = Unallocated employer contributions
 unallocatedEmployerCYA.viewOnly.heading = Unallocated employer contributions
 unallocatedEmployerCYA.viewOnly.link =  View previous version of unallocated employer contributions (opens in new tab)
@@ -2582,21 +2590,23 @@ ReportContribution.MemberList.viewOnly.plural = {0} member contributions
 ReportContribution.MemberList.viewOnly.link = View previous version of member contributions (opens in new tab)
 ReportContribution.MemberList.view.none = Were member contributions made by or for any member during the period of this return?
 
-MemberContributionCYA.title = Check your answers
-MemberContributionCYA.change.title = Change details of member contributions
-MemberContributionCYA.heading = Check your answers
-MemberContributionCYA.change.heading = Change details of member contributions for {0}
-MemberContributionCYA.section.memberName.header = Member’s name
-MemberContributionCYA.section.memberName = Total member contribution for {0}
-MemberContributionCYA.section.amount = £ {0}
-MemberContributionCYA.section.hide = total member contribution for {0}
-MemberContributionCYA.viewOnly.title = Member contributions for this member
-MemberContributionCYA.viewOnly.heading = Member contributions for {0}
+memberContributionCYA.title = Check your answers: member contributions
+memberContributionCYA.change.title = Change details of member contributions
+memberContributionCYA.heading =Check your answers: member contributions
+memberContributionCYA.change.heading = Change details of member contributions for {0}
+memberContributionCYA.section.memberName.header = Member’s name
+memberContributionCYA.section.memberName = Total member contribution for {0}
+memberContributionCYA.section.amount = £ {0}
+memberContributionCYA.section.hide = total member contribution for {0}
+memberContributionCYA.viewOnly.title = Member contributions for this member
+memberContributionCYA.viewOnly.heading = Member contributions for {0}
 
 removeMemberContributions.title = Are you sure you want to remove the contribution for this member?
 removeMemberContributions.heading = Are you sure you want to remove the contribution of £{0} for {1}?
 removeMemberContributions.error.required = Select yes if you are sure you want to remove the contribution for this member
 
+employerContributionsCYA.title.normal = Check your answers: employer contributions
+employerContributionsCYA.heading.normal = Check your answers: employer contributions
 employerContributionsCYA.section.heading = Employer {0}
 employerContributionsCYA.row.memberName = Member’s name
 employerContributionsCYA.row.employerName = Employer’s name
@@ -2686,6 +2696,8 @@ removeTransferIn.title = Are you sure you want to remove this transfer for this 
 removeTransferIn.heading = Are you sure you want to remove the transfer from {0} for {1}?
 removeTransferIn.error.required = Select yes if you are sure you want to remove this transfer for this member
 
+transfersInCYAController.normal.title = Check your answers: transfers in
+transfersInCYAController.normal.heading = Check your answers: transfers in
 transfersInCYAController.title.check = Change details of transfers in for this member
 transfersInCYAController.heading.check = Change details of transfers in for {0}
 transfersInCYAController.section.heading = Transfer {0}
@@ -2772,6 +2784,8 @@ reportAnotherTransferOut.heading = Do you need to report another transfer out fo
 reportAnotherTransferOut.hint = You must tell us about all transfers out for this member during the period of this return.
 reportAnotherTransferOut.error.required = Select yes if you need to report another transfer out for this member
 
+transfersOutCYAController.normal.title = Check your answers: transfers out
+transfersOutCYAController.normal.heading = Check your answers: transfers out
 transfersOutCYAController.title.check = Change details of transfers out for this member
 transfersOutCYAController.heading.check = Change details of transfers out for {0}
 transfersOutCYAController.section.heading = Transfer {0}
@@ -2835,17 +2849,17 @@ totalAmountPensionPayments.error.invalid = Gross amount of pension payments must
 totalAmountPensionPayments.error.tooSmall = Gross amount of pension payments must be 0.01 or more
 totalAmountPensionPayments.error.tooLarge = Gross amount of pension payments must be 999999999.99 or less
 
-MemberPensionPaymentsCYA.title = Check your answers
-MemberPensionPaymentsCYA.change.title = Change details of pension payments for this member
-MemberPensionPaymentsCYA.heading = Check your answers
-MemberPensionPaymentsCYA.change.heading = Change details of pension payments for {0}
-MemberPensionPaymentsCYA.section.memberName.header = Member’s name
-MemberPensionPaymentsCYA.section.memberName = Gross amount of pension payments received by {0}
-MemberPensionPaymentsCYA.section.amount = £ {0}
-MemberPensionPaymentsCYA.section.hide = Gross amount of pension payments received by {0}
-MemberPensionPaymentsCYA.viewOnly.title = Pension payments for this member
-MemberPensionPaymentsCYA.viewOnly.heading = Pension payments for {0}
-MemberPensionPaymentsCYA.viewOnly.link = View previous version of member contribution (opens in new tab)
+memberPensionPaymentsCYA.title = Check your answers: pension payments
+memberPensionPaymentsCYA.change.title = Change details of pension payments for this member
+memberPensionPaymentsCYA.heading = Check your answers: pension payments
+memberPensionPaymentsCYA.change.heading = Change details of pension payments for {0}
+memberPensionPaymentsCYA.section.memberName.header = Member’s name
+memberPensionPaymentsCYA.section.memberName = Gross amount of pension payments received by {0}
+memberPensionPaymentsCYA.section.amount = £ {0}
+memberPensionPaymentsCYA.section.hide = Gross amount of pension payments received by {0}
+memberPensionPaymentsCYA.viewOnly.title = Pension payments for this member
+memberPensionPaymentsCYA.viewOnly.heading = Pension payments for {0}
+memberPensionPaymentsCYA.viewOnly.link = View previous version of member contribution (opens in new tab)
 
 removePensionPayments.title = Are you sure you want to remove the pension payments for this member?
 removePensionPayments.heading = Are you sure you want to remove the pension payments of £{0} for {1}?
@@ -2981,9 +2995,9 @@ companyBuyerCrn.no.conditional.error.required = Enter the reason you cannot prov
 companyBuyerCrn.no.conditional.error.invalid = The reason you cannot provide the buyer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 companyBuyerCrn.no.conditional.error.length = The reason you cannot provide the buyer’s CRN must be 160 characters or fewer
 
-checkYourAnswers.title = Check your answers
+sharesCYA.normal.title = Check your answers: shares
 sharesCYA.change.title = Change details of this share transaction
-checkYourAnswers.heading = Check your answers
+sharesCYA.normal.heading= Check your answers: shares
 sharesCYA.change.heading = Change details of the share transaction for {0}
 sharesCYA.section1.heading = Type of shares
 sharesCYA.section1.typeOfShare = Which type of shares were held in this transaction?
@@ -3167,8 +3181,8 @@ bonds.incomeFromBonds.error.required = Enter the total income from these bonds i
 bonds.incomeFromBonds.error.invalid = Total income from these bonds in the period of this return must be an amount of money that is 0 or more, like 123 or 123.45
 bonds.incomeFromBonds.error.tooLarge = Total income from these bonds in the period of this return must be 999999999.99 or less
 
-bonds.checkYourAnswers.title = Check your answers
-bonds.checkYourAnswers.heading = Check your answers
+bonds.checkYourAnswers.title = Check your answers: bonds
+bonds.checkYourAnswers.heading = Check your answers: bonds
 bonds.checkYourAnswers.section.nameOfBonds = Name of bonds
 bonds.checkYourAnswers.section.nameOfBonds.hidden = name of bonds
 bonds.checkYourAnswers.section.whyDoesSchemeHoldBonds = Why does {0} hold these bonds?
@@ -3416,8 +3430,8 @@ partnershipNameOfOtherAssetsSeller.error.required = Enter the seller’s partner
 partnershipNameOfOtherAssetsSeller.error.tooLong = Seller’s partnership name must be 160 characters or fewer
 partnershipNameOfOtherAssetsSeller.error.invalid = Seller’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 
-otherAssets.cya.title = Check your answers
-otherAssets.cya.heading = Check your answers
+otherAssets.cya.title = Check your answers: other assets
+otherAssets.cya.heading = Check your answers: other assets
 otherAssets.cya.section1.heading = Details of the transaction
 otherAssets.cya.section1.baseRow1.key = Description of the asset
 otherAssets.cya.section1.baseRow1.hidden = description of the asset
@@ -3486,8 +3500,8 @@ bondsDisposal.bondsStillHeld.error.decimal = Number of bonds from the original t
 bondsDisposal.bondsStillHeld.error.invalid.characters = Number of bonds from the original transaction held after this disposal must be a number that is 0 or more, like 100
 bondsDisposal.bondsStillHeld.error.tooLarge = Number of bonds from the original transaction held after this disposal must be 9,999,999 or fewer
 
-bondsDisposalCYA.title = Check your answers
-bondsDisposalCYA.heading = Check your answers
+bondsDisposalCYA.title = Check your answer: disposal of bonds
+bondsDisposalCYA.heading = Check your answers: disposal of bonds
 bondsDisposal.cya.baseRow1.key= Which bonds were disposed of?
 bondsDisposal.cya.baseRow1.value = {0} {1} with value of £{2}
 bondsDisposal.cya.baseRow2.key = How were the bonds disposed of?
@@ -3728,6 +3742,9 @@ assetDisposalCYA.identityType.pageContent1 = A UK company
 assetDisposalCYA.identityType.pageContent2 = A UK partnership
 assetDisposalCYA.identityType.pageContent3 = Other
 assetDisposalCYA.inset.maximumReached = You cannot report another disposal of this asset as you have reached the maximum of disposing it 50 times. If you need to remove a disposal, you can do this on the next page.
+
+assetDisposalCYA.normal.title = Check your answers: disposal of other assets
+assetDisposalCYA.normal.heading = Check your answers: disposal of other assets
 
 assetDisposalCYA.change.title = Change details of asset disposal
 assetDisposalCYA.change.heading = Change details of asset disposal

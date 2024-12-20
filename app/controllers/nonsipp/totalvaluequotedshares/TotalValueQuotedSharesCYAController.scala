@@ -178,8 +178,8 @@ object TotalValueQuotedSharesCYAController {
     showBackLink: Boolean
   ): FormPageViewModel[CheckYourAnswersViewModel] = {
     val (title, heading) = mode.fold(
-      normal = ("checkYourAnswers.title", "checkYourAnswers.heading"),
-      check = ("checkYourAnswers.title", "checkYourAnswers.heading"),
+      normal = ("totalValueQuotedSharesCYA.normal.title", "totalValueQuotedSharesCYA.normal.heading"),
+      check = ("totalValueQuotedSharesCYA.title.change", "totalValueQuotedSharesCYA.heading.change"),
       viewOnly = ("totalValueQuotedSharesCYA.title.view", "totalValueQuotedSharesCYA.heading.view")
     )
 

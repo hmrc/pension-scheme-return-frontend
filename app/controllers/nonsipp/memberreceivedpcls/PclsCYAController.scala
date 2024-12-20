@@ -145,12 +145,12 @@ object PclsCYAController {
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,
       title = mode.fold(
-        normal = "checkYourAnswers.title",
+        normal = "pclsCYA.normal.title",
         check = Message("pclsCYA.change.title.check", memberName),
         viewOnly = "pclsCYA.viewOnly.title"
       ),
       heading = mode.fold(
-        normal = "checkYourAnswers.heading",
+        normal = "pclsCYA.normal.heading",
         check = Message("pclsCYA.heading.check", memberName),
         viewOnly = "pclsCYA.viewOnly.heading"
       ),

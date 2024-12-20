@@ -266,12 +266,12 @@ object AssetDisposalCYAController {
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = parameters.mode,
       title = parameters.mode.fold(
-        normal = "checkYourAnswers.title",
+        normal = "assetDisposalCYA.normal.title",
         check = "assetDisposalCYA.change.title",
         viewOnly = "assetDisposalCYA.viewOnly.title"
       ),
       heading = parameters.mode.fold(
-        normal = "checkYourAnswers.heading",
+        normal = "assetDisposalCYA.normal.heading",
         check = Message("assetDisposalCYA.change.heading"),
         viewOnly = Message("assetDisposalCYA.viewOnly.heading", parameters.whatIsOtherAsset)
       ),

@@ -283,12 +283,12 @@ object LandPropertyDisposalCYAController {
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,
       title = parameters.mode.fold(
-        normal = "checkYourAnswers.title",
+        normal = "landPropertyDisposalCYA.normal.title",
         check = "landPropertyDisposalCYA.change.title",
         viewOnly = "landPropertyDisposalCYA.viewOnly.title"
       ),
       heading = parameters.mode.fold(
-        normal = "checkYourAnswers.heading",
+        normal = "landPropertyDisposalCYA.normal.heading",
         check = Message("landPropertyDisposalCYA.change.heading", parameters.addressLookUpPage.addressLine1),
         viewOnly = "landPropertyDisposalCYA.viewOnly.heading"
       ),
