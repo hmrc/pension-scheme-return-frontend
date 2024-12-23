@@ -74,6 +74,7 @@ object WhatYouWillNeedReceivedTransferController {
             "WhatYouWillNeed.ReceivedTransfer.tellUs5",
             "WhatYouWillNeed.ReceivedTransfer.tellUs6",
             "WhatYouWillNeed.ReceivedTransfer.tellUs7"
-          )
+          ) ++
+          ParagraphMessage("WhatYouWillNeed.ReceivedTransfer.paragraph2")
       )
 }

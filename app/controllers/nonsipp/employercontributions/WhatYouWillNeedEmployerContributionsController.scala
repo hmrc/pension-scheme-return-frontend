@@ -71,6 +71,7 @@ object WhatYouWillNeedEmployerContributionsController {
             "whatYouWillNeedEmployerContributions.tellUs2",
             "whatYouWillNeedEmployerContributions.tellUs3",
             "whatYouWillNeedEmployerContributions.tellUs4"
-          )
+          ) ++
+          ParagraphMessage("whatYouWillNeedEmployerContributions.paragraph2")
       )
 }
