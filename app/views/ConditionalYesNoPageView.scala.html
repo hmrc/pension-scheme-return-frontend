@@ -56,14 +56,14 @@
         yes = viewModel.page.yes,
         no = viewModel.page.no,
         whenYes = {
-          case (message, FieldType.Input) => input("value.yes", message, "value-hint")
-          case (message, FieldType.Textarea) => textArea("value.yes", message, "value-hint")
-          case (message, FieldType.Currency) => currency("value.yes", message, "value-hint")
+          case (message, FieldType.Input) => input("value.yes", message, viewModel.page.yes.hint)
+          case (message, FieldType.Textarea) => textArea("value.yes", message, viewModel.page.yes.hint)
+          case (message, FieldType.Currency) => currency("value.yes", message, viewModel.page.yes.hint)
         },
         whenNo = {
-          case (message, FieldType.Input) => input("value.no", message, "value-hint")
-          case (message, FieldType.Textarea) => textArea("value.no", message, "value-hint")
-          case (message, FieldType.Currency) => currency("value.no", message, "value-hint")
+          case (message, FieldType.Input) => input("value.no", message, viewModel.page.no.hint)
+          case (message, FieldType.Textarea) => textArea("value.no", message, viewModel.page.no.hint)
+          case (message, FieldType.Currency) => currency("value.no", message, viewModel.page.no.hint)
         },
         legend = viewModel.page.legend,
         heading = viewModel.heading
@@ -80,26 +80,25 @@
   }
 }
 
-@input(key: String, message: DisplayMessage, hintId: String) = @{
+@input(key: String, message: DisplayMessage, hint: Option[DisplayMessage]) = @{
   govukInput(
     InputViewModel(form(key),LabelViewModel(renderMessage(message)))
-            .describedBy(viewModel.page.hint.map(_ => hintId))
+            .withHint(hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
             .withId(key)
   )
 }
 
-@textArea(key: String, message: DisplayMessage, hintId: String) = @{
+@textArea(key: String, message: DisplayMessage, hint: Option[DisplayMessage]) = @{
   govukTextarea(
     TextareaViewModel(key, form(key).value)
           .withLabel(renderMessage(message))
-          .withHint(viewModel.page.yes.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
-          .describedBy(viewModel.page.hint.map(_ => hintId))
+          .withHint(hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
           .withRows(5)
           .withError(form(key).errors.headOption)
   )
 }
 
-@currency(key: String, message: DisplayMessage, hintId: String) = @{
+@currency(key: String, message: DisplayMessage, hint: Option[DisplayMessage]) = @{
   govukInput(
     InputViewModel(
       field = form(key),
@@ -108,6 +107,6 @@
     .withId(key)
     .withWidth(InputWidth.Fixed10)
     .withPrefix(PrefixOrSuffix(content = Text("£")))
-    .describedBy(viewModel.page.hint.map(_ => hintId))
+    .withHint(hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
   )
 }
