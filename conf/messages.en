@@ -461,6 +461,7 @@ memberContributions.paragraph = This includes:
 memberContributions.listItem1 = regular contributions and any additional contributions made by a member to their own pension
 memberContributions.listItem2 = contributions made on behalf of a member by another person, for example a relative
 memberContributions.error.required = Select yes if member contributions were made by or for any member during the period of this return
+memberContributions.paragraph1 = The data you input for member contributions will only be saved once you have completed the section.
 
 employerContributions.title = Were employer contributions made for any member during the period of this return?
 employerContributions.heading = Were employer contributions made for any member during the period of this return?
@@ -977,6 +978,7 @@ surrenderedBenefits.whatYouWillNeed.paragraph1 = For each member who surrendered
 surrenderedBenefits.whatYouWillNeed.tellUs1 = the total amount surrendered
 surrenderedBenefits.whatYouWillNeed.tellUs2 = the date the member surrendered their benefits
 surrenderedBenefits.whatYouWillNeed.tellUs3 = why the member surrendered their benefits
+surrenderedBenefits.whatYouWillNeed.paragraph2 = The data you input for surrendered benefits will only be saved once you have completed the section.
 
 surrenderedBenefits.whyDidMemberSurrenderBenefits.title = Why did the member surrender their pension benefits?
 surrenderedBenefits.whyDidMemberSurrenderBenefits.heading = Why did {0} surrender their pension benefits of £{2}?
@@ -2323,6 +2325,7 @@ whatYouWillNeedEmployerContributions.tellUs1 = the name of the employer
 whatYouWillNeedEmployerContributions.tellUs2 = if the employer is a UK company, UK partnership or other
 whatYouWillNeedEmployerContributions.tellUs3 = the employer’s Company Registration Number, Unique Taxpayer Reference, or a description of the employer – whichever applies
 whatYouWillNeedEmployerContributions.tellUs4 = the total contribution made for the member by the employer
+whatYouWillNeedEmployerContributions.paragraph2 = The data you input for employer contributions will only be saved once you have completed the section.
 
 employerName.title = What is the employer’s name?
 employerName.heading = What is the employer’s name?
@@ -2509,12 +2512,14 @@ WhatYouWillNeed.ReceivedTransfer.tellUs4 = the transferring scheme’s Pension S
 WhatYouWillNeed.ReceivedTransfer.tellUs5 = the total value of the transfer
 WhatYouWillNeed.ReceivedTransfer.tellUs6 = the date the transfer was received
 WhatYouWillNeed.ReceivedTransfer.tellUs7 = if the transfer included an asset
+WhatYouWillNeed.ReceivedTransfer.paragraph2 = The data you input for transfers in will only be saved once you have completed the section.
 
 WhatYouWillNeed.PensionCommencementLumpSum.title = Pension commencement lump sum (PCLS) details for members of the scheme
 WhatYouWillNeed.PensionCommencementLumpSum.heading = Pension commencement lump sum (PCLS) details for members of {0}
 WhatYouWillNeed.PensionCommencementLumpSum.paragraph1 = For each member who received a PCLS, you need to tell us:
 WhatYouWillNeed.PensionCommencementLumpSum.bullet1 = the total amount of the PCLS
 WhatYouWillNeed.PensionCommencementLumpSum.bullet2 = the relevant pension in respect of this PCLS
+WhatYouWillNeed.PensionCommencementLumpSum.paragraph2 = The data you input for PCLS will only be saved once you have completed the section.
 
 transferIn.MemberList.title = Select a member to add transfers in
 transferIn.MemberList.title.plural = Select a member to add transfers in
@@ -2735,6 +2740,7 @@ WhatYouWillNeed.TransferOut.tellUs2 = the name of the receiving scheme
 WhatYouWillNeed.TransferOut.tellUs3 = if the receiving scheme is a registered pension scheme, qualifying recognised overseas pension scheme (QROPS) or other
 WhatYouWillNeed.TransferOut.tellUs4 = the receiving scheme’s Pension Scheme Tax Reference (PSTR), QROPS reference number, or a description of the receiving scheme – whichever applies
 WhatYouWillNeed.TransferOut.tellUs5 = the date the transfer was made
+WhatYouWillNeed.TransferOut.paragraph2 = The data you input for transfers out will only be saved once you have completed the section.
 
 transferOut.memberList.title = Select a member to add transfers out
 transferOut.memberList.title.plural = Select a member to add transfers out
@@ -3500,7 +3506,7 @@ bondsDisposal.bondsStillHeld.error.decimal = Number of bonds from the original t
 bondsDisposal.bondsStillHeld.error.invalid.characters = Number of bonds from the original transaction held after this disposal must be a number that is 0 or more, like 100
 bondsDisposal.bondsStillHeld.error.tooLarge = Number of bonds from the original transaction held after this disposal must be 9,999,999 or fewer
 
-bondsDisposalCYA.title = Check your answer: disposal of bonds
+bondsDisposalCYA.title = Check your answers: disposal of bonds
 bondsDisposalCYA.heading = Check your answers: disposal of bonds
 bondsDisposal.cya.baseRow1.key= Which bonds were disposed of?
 bondsDisposal.cya.baseRow1.value = {0} {1} with value of £{2}

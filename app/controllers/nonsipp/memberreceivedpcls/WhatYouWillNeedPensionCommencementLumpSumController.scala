@@ -66,6 +66,7 @@ object WhatYouWillNeedPensionCommencementLumpSumController {
             ListType.Bullet,
             "WhatYouWillNeed.PensionCommencementLumpSum.bullet1",
             "WhatYouWillNeed.PensionCommencementLumpSum.bullet2"
-          )
+          ) ++
+          ParagraphMessage("WhatYouWillNeed.PensionCommencementLumpSum.paragraph2")
       )
 }

@@ -70,6 +70,7 @@ object WhatYouWillNeedSurrenderedBenefitsController {
             "surrenderedBenefits.whatYouWillNeed.tellUs1",
             "surrenderedBenefits.whatYouWillNeed.tellUs2",
             "surrenderedBenefits.whatYouWillNeed.tellUs3"
-          )
+          ) ++
+          ParagraphMessage("surrenderedBenefits.whatYouWillNeed.paragraph2")
       )
 }
