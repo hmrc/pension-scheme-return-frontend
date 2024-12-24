@@ -17,15 +17,17 @@
 package prepop
 
 import utils.BaseSpec
+import com.softwaremill.diffx.scalatest.DiffShouldMatcher
 import models.UserAnswers.SensitiveJsObject
 import controllers.TestValues
 import prepop.SharesPrePopulationProcessorSpec._
 import utils.UserAnswersUtils.UserAnswersOps
 import play.api.libs.json._
+import com.softwaremill.diffx.generic.AutoDerivation
 
 import scala.util.Success
 
-class SharesPrePopulationProcessorSpec extends BaseSpec with TestValues {
+class SharesPrePopulationProcessorSpec extends BaseSpec with TestValues with DiffShouldMatcher with AutoDerivation {
 
   private val processor = new SharesPrePopulationProcessor()
 
@@ -38,7 +40,7 @@ class SharesPrePopulationProcessorSpec extends BaseSpec with TestValues {
           baseUA = emptyUserAnswers.copy(data = SensitiveJsObject(baseReturnWithDisposalsJsValue.as[JsObject])),
           currentUA = currentUa
         )(srn)
-        result mustBe Success(
+        result shouldMatchTo Success(
           currentUa.copy(data = SensitiveJsObject(cleanResultAfterDisposalsRemovedJsValue.as[JsObject]))
         )
       }
@@ -49,7 +51,7 @@ class SharesPrePopulationProcessorSpec extends BaseSpec with TestValues {
           baseUA = emptyUserAnswers.copy(data = SensitiveJsObject(baseReturnWithoutDisposalsJsValue.as[JsObject])),
           currentUA = currentUa
         )(srn)
-        result mustBe Success(
+        result shouldMatchTo Success(
           currentUa.copy(data = SensitiveJsObject(cleanResultJsValue.as[JsObject]))
         )
       }
@@ -386,8 +388,7 @@ object SharesPrePopulationProcessorSpec {
                  |          }
                  |        }
                  |      }
-                 |    },
-                 |    "didSchemeDisposeAnyShares" : true
+                 |    }
                  |  }
                  |}
                  |""".stripMargin)

@@ -196,6 +196,7 @@ class SharesCYAController @Inject()(
         updatedAnswers <- Future
           .fromTry(
             request.userAnswers
+              .set(DidSchemeHoldAnySharesPage(srn), true)
               .set(SharesCompleted(srn, index), SectionCompleted)
           )
         _ <- saveService.save(updatedAnswers)
