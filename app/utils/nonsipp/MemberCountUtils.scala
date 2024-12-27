@@ -55,7 +55,7 @@ object MemberCountUtils {
         userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
       )
     )
-    lazy val sharesExist = !noDataStatuses.contains(getSharesTaskListStatusAndLink(userAnswers, srn)._1)
+    lazy val sharesExist = !noDataStatuses.contains(getSharesTaskListStatusAndLink(userAnswers, srn, isPrePop)._1)
     lazy val landOrPropertyExist =
       !noDataStatuses.contains(getLandOrPropertyTaskListStatusAndLink(userAnswers, srn, isPrePop)._1)
     lazy val bondsExist = !noDataStatuses.contains(getBondsTaskListStatusAndLink(userAnswers, srn)._1)

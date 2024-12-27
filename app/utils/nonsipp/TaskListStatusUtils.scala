@@ -42,7 +42,7 @@ import eu.timepit.refined.refineV
 import viewmodels.models.TaskListStatus._
 import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import pages.nonsipp.common.IdentityTypes
-import utils.nonsipp.check.LandOrPropertyCheckStatusUtils
+import utils.nonsipp.check.{LandOrPropertyCheckStatusUtils, SharesCheckStatusUtils}
 import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutSectionCompleted}
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
 import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsDisposalProgress}
@@ -377,36 +377,48 @@ object TaskListStatusUtils {
     }
   }
 
-  def getSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val wereShares = userAnswers.get(DidSchemeHoldAnySharesPage(srn))
-    val numRecorded = userAnswers.get(SharesCompleted.all(srn)).getOrElse(Map.empty).size
+  def getSharesTaskListStatusAndLink(
+    userAnswers: UserAnswers,
+    srn: Srn,
+    isPrePop: Boolean
+  ): (TaskListStatus, String) =
+    if (isPrePop && SharesCheckStatusUtils.checkSharesSection(userAnswers, srn)) {
+      (
+        Check,
+        controllers.nonsipp.shares.routes.SharesListController
+          .onPageLoad(srn, 1, NormalMode)
+          .url
+      )
+    } else {
+      val wereShares = userAnswers.get(DidSchemeHoldAnySharesPage(srn))
+      val numRecorded = userAnswers.get(SharesCompleted.all(srn)).getOrElse(Map.empty).size
 
-    val firstQuestionPageUrl =
-      controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController
-        .onPageLoad(srn, NormalMode)
-        .url
+      val firstQuestionPageUrl =
+        controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController
+          .onPageLoad(srn, NormalMode)
+          .url
 
-    val listPageUrl =
-      controllers.nonsipp.shares.routes.SharesListController
-        .onPageLoad(srn, 1, NormalMode)
-        .url
+      val listPageUrl =
+        controllers.nonsipp.shares.routes.SharesListController
+          .onPageLoad(srn, 1, NormalMode)
+          .url
 
-    val firstPages = userAnswers.get(TypeOfSharesHeldPages(srn))
-    val lastPages = userAnswers.map(SharesCompleted.all(srn))
-    val incompleteIndex: Int = getIncompleteIndex(firstPages, Some(lastPages))
+      val firstPages = userAnswers.get(TypeOfSharesHeldPages(srn))
+      val lastPages = userAnswers.map(SharesCompleted.all(srn))
+      val incompleteIndex: Int = getIncompleteIndex(firstPages, Some(lastPages))
 
-    val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
-      _ => firstQuestionPageUrl,
-      index => controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, index, NormalMode).url
-    )
+      val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+        _ => firstQuestionPageUrl,
+        index => controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, index, NormalMode).url
+      )
 
-    (wereShares, numRecorded) match {
-      case (None, _) => (NotStarted, firstQuestionPageUrl)
-      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
-      case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
-      case (Some(true), _) => (Recorded(numRecorded, "shares"), listPageUrl)
+      (wereShares, numRecorded) match {
+        case (None, _) => (NotStarted, firstQuestionPageUrl)
+        case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+        case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
+        case (Some(true), _) => (Recorded(numRecorded, "shares"), listPageUrl)
+      }
     }
-  }
 
   def getSharesDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val sharesDisposalsMade = userAnswers.get(SharesDisposalPage(srn))
@@ -428,8 +440,6 @@ object TaskListStatusUtils {
     }
   }
 
-  // if pre pop - check if any are in check state - if not resume regular status
-  // if any need checked - if some are done it's recorded if none then it's something else, stick to recorded for now
   def getLandOrPropertyTaskListStatusAndLink(
     userAnswers: UserAnswers,
     srn: Srn,
