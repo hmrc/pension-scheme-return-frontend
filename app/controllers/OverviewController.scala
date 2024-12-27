@@ -23,13 +23,14 @@ import play.api.mvc._
 import config.{Constants, FrontendAppConfig}
 import cats.implicits.toShow
 import controllers.actions._
-import pages.nonsipp.WhichTaxYearPage
 import uk.gov.hmrc.time.TaxYear
 import viewmodels.DisplayMessage.Message
 import views.html.OverviewView
 import models.SchemeId.Srn
 import config.Constants.UNCHANGED_SESSION_PREFIX
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions}
+import pages.nonsipp.WhichTaxYearPage
+import play.api.Logger
 import utils.nonsipp.SchemeDetailNavigationUtils
 import models.backend.responses._
 import utils.DateTimeUtils.localDateShow
@@ -62,6 +63,8 @@ class OverviewController @Inject()(
     extends PSRController
     with I18nSupport
     with SchemeDetailNavigationUtils {
+
+  private val logger = Logger(classOf[OverviewController])
 
   private val allDates = OverviewController.options(taxYearService.current)
 
@@ -298,16 +301,29 @@ class OverviewController @Inject()(
     identifyAndRequireData(srn, taxYear, version).async { implicit request =>
       reportType match {
         case PsrReportType.Sipp.name =>
-          val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}${config.urls.sippContinueJourney}"
-          Future.successful {
-            val result = Redirect(sippUrl)
-              .addingToSession(Constants.TAX_YEAR -> taxYear)
-              .addingToSession(Constants.VERSION -> version)
+          version.toIntOption match {
+            case None =>
+              logger.error(s"Could not parse version [$version] to int, for report type: $reportType")
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            case Some(versionInt) =>
+              val path = if (versionInt == 1) {
+                config.urls.sippContinueJourney //Standard journey - undeclared changes made
+              } else {
+                config.urls.sippViewAndChange
+              }
 
-            fbNumber
-              .map(fb => result.addingToSession(Constants.FB_NUMBER -> fb))
-              .getOrElse(result)
+              val sippUrl = s"${config.urls.sippBaseUrl}/${srn.value}$path"
+              Future.successful {
+                val result = Redirect(sippUrl)
+                  .addingToSession(Constants.TAX_YEAR -> taxYear)
+                  .addingToSession(Constants.VERSION -> version)
+
+                fbNumber
+                  .map(fb => result.addingToSession(Constants.FB_NUMBER -> fb))
+                  .getOrElse(result)
+              }
           }
+
         case _ =>
           Future.successful(
             Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
