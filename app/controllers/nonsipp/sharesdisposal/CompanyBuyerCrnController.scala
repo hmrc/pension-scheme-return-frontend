@@ -131,7 +131,7 @@ object CompanyBuyerCrnController {
         yes = YesNoViewModel
           .Conditional(
             Message("companyBuyerCrn.yes.conditional", companyName),
-            Some(Message("companyBuyerCrn.yes.conditional")),
+            Some(Message("companyBuyerCrn.yes.conditional.hint")),
             FieldType.Input
           ),
         no = YesNoViewModel
