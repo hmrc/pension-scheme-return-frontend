@@ -23,7 +23,7 @@ import views.html.MultipleQuestionView
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models._
-import pages.nonsipp.loansmadeoroutstanding.AmountOfTheLoanPage
+import pages.nonsipp.loansmadeoroutstanding.{AmountOfTheLoanPage, AreRepaymentsInstalmentsPage}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{reset, when}
@@ -52,6 +52,9 @@ class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
 
   val partialUserAnswers: UserAnswers =
     defaultUserAnswers.unsafeSet(AmountOfTheLoanPage(srn, index), partialAmountOfTheLoan)
+
+  val prePopUserAnswers: UserAnswers =
+    defaultUserAnswers.unsafeSet(AreRepaymentsInstalmentsPage(srn, index), true)
 
   "AmountOfTheLoanController" - {
 
@@ -90,6 +93,20 @@ class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
       saveAndContinue(
         onSubmit,
         "value.1" -> money.value.toString,
+        "value.2" -> money.value.toString,
+        "value.3" -> money.value.toString
+      )
+    )
+
+    act.like(
+      redirectToPageWithPrePopSession(
+        call = onSubmit,
+        page = controllers.nonsipp.loansmadeoroutstanding.routes.InterestOnLoanController
+          .onPageLoad(srn, index, NormalMode),
+        userAnswers = prePopUserAnswers,
+        previousUserAnswers = defaultUserAnswers,
+        mockSaveService = None,
+        form = "value.1" -> money.value.toString,
         "value.2" -> money.value.toString,
         "value.3" -> money.value.toString
       )
