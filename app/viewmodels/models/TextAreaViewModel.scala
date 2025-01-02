@@ -16,12 +16,17 @@
 
 package viewmodels.models
 
+import config.Constants
 import viewmodels.DisplayMessage.Message
 
 case class TextAreaViewModel(
   rows: Int = 5,
-  hint: Option[Message] = None
+  hint: Option[Message] = None,
+  maxLength: Int = Constants.maxTextAreaLength
 ) {
   def withHint(message: Message): TextAreaViewModel =
     copy(hint = Some(message))
+
+  def withMaxLength(maxLength: Int): TextAreaViewModel =
+    copy(maxLength = maxLength)
 }

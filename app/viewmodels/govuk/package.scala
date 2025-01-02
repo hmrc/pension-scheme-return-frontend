@@ -35,7 +35,7 @@ package object govuk {
       with TagFluency
       with TableFluency
       with ListWithActionsFluency
-      with TextAreaFluency
+      with CharacterCountFluency
       with PaginationFluency
       with PanelFluency
       with DetailsFluency

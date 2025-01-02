@@ -17,17 +17,16 @@
 package forms
 
 import forms.mappings.Mappings
+import config.Constants.{maxInputLength, maxTextAreaLength}
 import uk.gov.hmrc.domain.Nino
 import play.api.data.Form
 
 import javax.inject.Inject
 
-class TextFormProvider @Inject()() {
+class TextFormProvider @Inject() {
 
   protected[forms] val nameRegex = "^[a-zA-Z\\-' ]+$"
   protected[forms] val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
-  protected[forms] val textAreaMaxLength = 160
-  protected[forms] val textAreaShorterMaxLength = 35
   protected[forms] val psaIdRegex = "^(A[0-9]{7})$"
   protected[forms] val psaIdMaxLength = 8
 
@@ -47,7 +46,7 @@ class TextFormProvider @Inject()() {
     formKey -> Mappings.validatedText(
       requiredKey,
       List((textAreaRegex, invalidCharactersKey)),
-      textAreaMaxLength,
+      maxTextAreaLength,
       tooLongKey,
       args: _*
     )
@@ -62,7 +61,7 @@ class TextFormProvider @Inject()() {
     formKey -> Mappings.validatedText(
       requiredKey,
       List((textAreaRegex, invalidCharactersKey)),
-      textAreaShorterMaxLength,
+      maxInputLength,
       tooLongKey,
       args: _*
     )
@@ -88,7 +87,7 @@ class TextFormProvider @Inject()() {
     formKey -> Mappings.validatedText(
       requiredKey,
       List((nameRegex, invalidCharactersKey)),
-      textAreaMaxLength,
+      maxTextAreaLength,
       tooLongKey,
       args: _*
     )
@@ -103,7 +102,7 @@ class TextFormProvider @Inject()() {
     formKey -> Mappings.validatedText(
       requiredKey,
       List((textAreaRegex, invalidCharactersKey)),
-      textAreaMaxLength,
+      maxTextAreaLength,
       tooLongKey,
       args: _*
     )
