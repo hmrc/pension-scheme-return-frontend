@@ -26,7 +26,7 @@
 
 @layout(pageTitle = title(form, viewModel.title.toMessage), refresh = viewModel.refresh) {
 
-    @formHelper(action = viewModel.onSubmit, Symbol("autocomplete") -> "off") {
+    @formHelper(action = viewModel.onSubmit) {
 
         @if(form.hasErrors) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value.day")))
