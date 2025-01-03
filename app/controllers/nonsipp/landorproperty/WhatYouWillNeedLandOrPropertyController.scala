@@ -67,6 +67,7 @@ object WhatYouWillNeedLandOrPropertyController {
         ParagraphMessage("whatYouWillNeedLandOrProperty.paragraph1") ++
           ParagraphMessage("whatYouWillNeedLandOrProperty.paragraph2") ++
           ParagraphMessage("whatYouWillNeedLandOrProperty.paragraph3") ++
+          ParagraphMessage("whatYouWillNeedLandOrProperty.paragraph4") ++
           ListMessage(
             ListType.Bullet,
             "whatYouWillNeedLandOrProperty.info1",
@@ -76,7 +77,8 @@ object WhatYouWillNeedLandOrPropertyController {
             "whatYouWillNeedLandOrProperty.info5",
             "whatYouWillNeedLandOrProperty.info6"
           ) ++
-          ParagraphMessage("whatYouWillNeedLandOrProperty.paragraph4") ++
+          Heading2("whatYouWillNeedLandOrProperty.heading.paragraph5") ++
+          ParagraphMessage("whatYouWillNeedLandOrProperty.paragraph5") ++
           ListMessage(
             ListType.Bullet,
             "whatYouWillNeedLandOrProperty.isLeasedInfo1",
@@ -84,13 +86,22 @@ object WhatYouWillNeedLandOrPropertyController {
             "whatYouWillNeedLandOrProperty.isLeasedInfo3",
             "whatYouWillNeedLandOrProperty.isLeasedInfo4"
           ) ++
-          ParagraphMessage("whatYouWillNeedLandOrProperty.paragraph5") ++
+          Heading2("whatYouWillNeedLandOrProperty.heading.paragraph6") ++
+          ParagraphMessage("whatYouWillNeedLandOrProperty.paragraph6") ++
+          ListMessage(
+            ListType.Bullet,
+            "whatYouWillNeedLandOrProperty.isMultiple1",
+            "whatYouWillNeedLandOrProperty.isMultiple2"
+          ) ++
+          Heading2("whatYouWillNeedLandOrProperty.heading.paragraph7") ++
+          ParagraphMessage("whatYouWillNeedLandOrProperty.paragraph7") ++
           ListMessage(
             ListType.Bullet,
             "whatYouWillNeedLandOrProperty.isAcquisitionOrContributionInfo1",
             "whatYouWillNeedLandOrProperty.isAcquisitionOrContributionInfo2"
           ) ++
-          ParagraphMessage("whatYouWillNeedLandOrProperty.paragraph6") ++
+          Heading2("whatYouWillNeedLandOrProperty.heading.paragraph8") ++
+          ParagraphMessage("whatYouWillNeedLandOrProperty.paragraph8") ++
           ListMessage(
             ListType.Bullet,
             "whatYouWillNeedLandOrProperty.isAcquisitionInfo1",
