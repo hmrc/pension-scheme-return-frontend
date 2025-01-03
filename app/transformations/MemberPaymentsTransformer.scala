@@ -156,29 +156,30 @@ class MemberPaymentsTransformer @Inject()(
       // Omit memberPSRVersion if member has changed
       // Check for empty member payment sections before comparing members
       // (this is because we send empty records in certain sections for members)
-      //
-      // Note: This will be changing soon when we re-design statuses
-      val memberDetailsWithCorrectVersion: List[MemberDetails] = memberDetailsWithCorrectState.map {
-        case (index, currentMemberDetail) =>
-          initialMemberDetails.get(index) match {
-            case None =>
-              currentMemberDetail.copy(memberPSRVersion = None)
-            case Some(initialMemberDetail) =>
-              val normalisedInitialMember = normalise(initialMemberDetail)
-              val normalisedCurrentMember = normalise(currentMemberDetail)
-              val same = normalisedInitialMember == normalisedCurrentMember
-              if (!same) {
-                logger.info(s"member $index has changed, removing memberPSRVersion")
+      val memberDetailsWithCorrectVersion: List[MemberDetails] = memberDetailsWithCorrectState.toSeq
+        .sortBy(_._1.value)(Ordering[Int])
+        .map {
+          case (index, currentMemberDetail) =>
+            initialMemberDetails.get(index) match {
+              case None =>
+                currentMemberDetail.copy(memberPSRVersion = None)
+              case Some(initialMemberDetail) =>
+                val normalisedInitialMember = normalise(initialMemberDetail)
+                val normalisedCurrentMember = normalise(currentMemberDetail)
+                val same = normalisedInitialMember == normalisedCurrentMember
+                if (!same) {
+                  logger.info(s"member $index has changed, removing memberPSRVersion")
 //                // we can still use this on localhost if needed:
 //                if (logger.isDebugEnabled) {
 //                  logger.debug(Diff(normalisedInitialMember, normalisedCurrentMember).mkString(" - "))
 //                }
-              }
-              currentMemberDetail.copy(
-                memberPSRVersion = if (same) currentMemberDetail.memberPSRVersion else None
-              )
-          }
-      }.toList
+                }
+                currentMemberDetail.copy(
+                  memberPSRVersion = if (same) currentMemberDetail.memberPSRVersion else None
+                )
+            }
+        }
+        .toList
 
       (memberDetailsWithCorrectVersion, softDeletedMembers) match {
         case (Nil, Nil) => None
