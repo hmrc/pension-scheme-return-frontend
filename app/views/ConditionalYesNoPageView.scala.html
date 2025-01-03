@@ -14,15 +14,18 @@
  * limitations under the License.
  *@
 
+@import viewmodels.govuk.characterCount.{CharacterCountViewModel, FluentCharacterCount}
+@import config.Constants
+
 @this(
   layout: templates.Layout,
   formHelper: FormWithCSRF,
   govukErrorSummary: GovukErrorSummary,
   govukRadios: GovukRadios,
   govukInput: GovukInput,
-  govukTextarea: GovukTextarea,
+  hmrcCharacterCount: HmrcCharacterCount,
   govukDetails: GovukDetails,
-  govukButton: GovukButton,
+  govukButton: GovukButton
 )
 
 @(form: Form[_], viewModel: FormPageViewModel[ConditionalYesNoPageViewModel])(implicit request: Request[_], messages: Messages)
@@ -89,12 +92,13 @@
 }
 
 @textArea(key: String, message: DisplayMessage, hint: Option[DisplayMessage]) = @{
-  govukTextarea(
-    TextareaViewModel(key, form(key).value)
+    hmrcCharacterCount(
+        CharacterCountViewModel(form(key))
           .withLabel(renderMessage(message))
           .withHint(hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
           .withRows(5)
           .withError(form(key).errors.headOption)
+          .withMaxLength(Constants.maxTextAreaLength)
   )
 }
 

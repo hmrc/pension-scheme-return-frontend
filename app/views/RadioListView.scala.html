@@ -16,6 +16,8 @@
 
 @import viewmodels.models.RadioListViewModel
 @import viewmodels.LegendSize
+@import viewmodels.govuk.characterCount.{CharacterCountViewModel, FluentCharacterCount}
+@import config.Constants
 
 @this(
     layout: templates.Layout,
@@ -23,7 +25,7 @@
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
     govukButton: GovukButton,
-    govukTextarea: GovukTextarea,
+    hmrcCharacterCount: HmrcCharacterCount,
     govukInput: GovukInput
 )
 
@@ -108,11 +110,12 @@
 }
 
 @textArea(key: String, label: Option[DisplayMessage], row: RadioListRowViewModel) = @{
-    govukTextarea(
-        TextareaViewModel(key, form(key).value)
+    hmrcCharacterCount(
+        CharacterCountViewModel(form(key))
             .withLabel(label.map(l => renderMessage(l)))
             .withRows(5)
             .withError(form(key).errors.headOption)
+            .withMaxLength(Constants.maxTextAreaLength)
     )
 }
 

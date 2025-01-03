@@ -14,37 +14,34 @@
  * limitations under the License.
  *@
 
+@import viewmodels.govuk.characterCount.{CharacterCountViewModel, FluentCharacterCount}
+
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
         govukButton: GovukButton,
-        govukTextarea: GovukTextarea
+        hmrcCharacterCount: HmrcCharacterCount
 )
 
-@(form: Form[String], viewmodel: FormPageViewModel[TextAreaViewModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[String], viewModel: FormPageViewModel[TextAreaViewModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, viewmodel.title.toMessage)) {
+@layout(pageTitle = title(form, viewModel.title.toMessage)) {
 
-    @formHelper(action = viewmodel.onSubmit) {
+    @formHelper(action = viewModel.onSubmit) {
 
         @if(form.hasErrors) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
         @defining(
-            if(viewmodel.page.hint) {
-                TextareaViewModel("value", form("value").value)
-                .withLabelAsHeading(renderMessage(viewmodel.heading))
-                .withRows(viewmodel.page.rows)
-                .withHint(HintViewModel(renderMessage(viewmodel.page.hint.get)))
-            } else {
-                TextareaViewModel("value", form("value").value)
-                .withLabelAsHeading(renderMessage(viewmodel.heading))
-                .withRows(viewmodel.page.rows)
-            }
+            CharacterCountViewModel(form("value"))
+            .withLabelAsHeading(renderMessage(viewModel.heading))
+            .withRows(viewModel.page.rows)
+            .withHint(viewModel.page.hint.map(x => HintViewModel(renderMessage(x))))
+            .withMaxLength(viewModel.page.maxLength)
         ) { component =>
-            @govukTextarea(
+            @hmrcCharacterCount(
                 form("value").errors.headOption.fold(component)(error =>
                     component.withError(messages(error.message, error.args: _*))
                 )
@@ -52,7 +49,7 @@
         }
 
         @govukButton(
-            ButtonViewModel(renderMessage(viewmodel.buttonText))
+            ButtonViewModel(renderMessage(viewModel.buttonText))
         )
     }
 }
