@@ -42,10 +42,11 @@ import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
+import play.api.Logger
 import play.api.data.Form
+import utils.nonsipp.check.BondsCheckStatusUtils
 
 import scala.concurrent.{ExecutionContext, Future}
-
 import javax.inject.Named
 
 class BondsListController @Inject()(
@@ -58,6 +59,8 @@ class BondsListController @Inject()(
   saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
+
+  private implicit val logger = Logger(getClass)
 
   val form: Form[Boolean] = BondsListController.form(formProvider)
 
@@ -119,7 +122,8 @@ class BondsListController @Inject()(
               data,
               request.schemeDetails.schemeName,
               viewOnlyViewModel,
-              showBackLink = showBackLink
+              showBackLink = showBackLink,
+              isPrePop = isPrePopulation
             )
           )
         )
@@ -149,7 +153,15 @@ class BondsListController @Inject()(
                   BadRequest(
                     view(
                       errors,
-                      viewModel(srn, page, mode, data, request.schemeDetails.schemeName, showBackLink = true)
+                      viewModel(
+                        srn,
+                        page,
+                        mode,
+                        data,
+                        request.schemeDetails.schemeName,
+                        showBackLink = true,
+                        isPrePop = isPrePopulation
+                      )
                     )
                   )
                 }
@@ -203,18 +215,40 @@ class BondsListController @Inject()(
   }
 
   private def bondsData(srn: Srn, indexes: List[Max5000])(
-    implicit req: DataRequest[_]
-  ): Either[Result, List[BondsListController.BondsData]] =
-    indexes
-      .sortBy(x => x.value)
-      .map { index =>
-        for {
-          nameOfBonds <- requiredPage(NameOfBondsPage(srn, index))
-          acquisitionType <- requiredPage(WhyDoesSchemeHoldBondsPage(srn, index))
-          costOfBonds <- requiredPage(CostOfBondsPage(srn, index))
-        } yield BondsListController.BondsData(index, nameOfBonds, acquisitionType, costOfBonds)
-      }
-      .sequence
+    implicit request: DataRequest[_],
+    logger: Logger
+  ): Either[Result, List[BondsData]] = {
+    // if return has been pre-populated, partition bonds by those that need to be checked
+    def buildBonds(index: Max5000): Either[Result, BondsData] =
+      for {
+        nameOfBonds <- requiredPage(NameOfBondsPage(srn, index))
+        acquisitionType <- requiredPage(WhyDoesSchemeHoldBondsPage(srn, index))
+        costOfBonds <- requiredPage(CostOfBondsPage(srn, index))
+      } yield BondsData(index, nameOfBonds, acquisitionType, costOfBonds)
+
+    if (isPrePopulation) {
+      for {
+        indexes <- request.userAnswers
+          .map(TypeOfSharesHeldPages(srn))
+          .refine[Max5000.Refined]
+          .map(_.keys.toList)
+          .getOrRecoverJourney
+        shares <- indexes.traverse(buildBonds)
+      } yield shares.partition(
+        shares => BondsCheckStatusUtils.checkBondsRecord(request.userAnswers, srn, shares.index)
+      )
+    } else {
+      val noBondsToCheck = List.empty[BondsData]
+      for {
+        indexes <- request.userAnswers
+          .map(TypeOfSharesHeldPages(srn))
+          .refine[Max5000.Refined]
+          .map(_.keys.toList)
+          .getOrRecoverJourney
+        shares <- indexes.traverse(buildBonds)
+      } yield (noBondsToCheck, shares)
+    }
+  }
 }
 
 object BondsListController {
@@ -283,7 +317,8 @@ object BondsListController {
     data: List[BondsData],
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
-    showBackLink: Boolean
+    showBackLink: Boolean,
+    isPrePop: Boolean
   ): FormPageViewModel[ListViewModel] = {
     val lengthOfData = data.length
 
