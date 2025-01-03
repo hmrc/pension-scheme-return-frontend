@@ -28,7 +28,7 @@
 
 @layout(pageTitle = title(form, viewmodel.title.toMessage), notificationBanner = viewmodel.optNotificationBanner) {
 
-  @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
+  @formHelper(action = viewmodel.onSubmit) {
 
     @if(form.hasErrors) {
       @govukErrorSummary(ErrorSummaryViewModel(form))
