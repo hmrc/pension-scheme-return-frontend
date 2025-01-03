@@ -224,6 +224,34 @@ trait ControllerBehaviours {
       }
     }
 
+  def redirectToPageWithPrePopSession(
+    call: => Call,
+    page: => Call,
+    userAnswers: UserAnswers,
+    previousUserAnswers: UserAnswers,
+    mockSaveService: Option[SaveService],
+    form: (String, String)*
+  ): BehaviourTest =
+    s"redirect to page with form $form when isPrePopulation = true".hasBehaviour {
+      val appBuilder =
+        applicationBuilder(
+          userAnswers = Some(userAnswers),
+          previousUserAnswers = Some(previousUserAnswers),
+          saveService = mockSaveService
+        )
+
+      running(_ => appBuilder) { app =>
+        val request = FakeRequest(call)
+          .withFormUrlEncodedBody(form: _*)
+          .withSession((PREPOPULATION_FLAG, "true"))
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual page.url
+      }
+    }
+
   def saveAndContinue(
     call: => Call,
     userAnswers: UserAnswers,

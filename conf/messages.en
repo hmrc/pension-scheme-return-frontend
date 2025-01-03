@@ -1658,6 +1658,17 @@ removeLoan.title = Are you sure you want to remove this loan?
 removeLoan.heading = Are you sure you want to remove the loan of £{0} to {1}?
 removeLoan.error.required = Select yes if you are sure you want to remove this loan
 
+loansCheckAndUpdate.title = Check and update the loans information
+loansCheckAndUpdate.heading = Check and update the loans information
+loansCheckAndUpdate.paragraph = You need to add data to this loan.
+loansCheckAndUpdate.table.one = Recipient’s name
+loansCheckAndUpdate.table.two = Date of the loan
+loansCheckAndUpdate.table.three = Total loan amount
+loansCheckAndUpdate.bullet.paragraph = Missing data could include:
+loansCheckAndUpdate.bullet.one = Capital Repayment details
+loansCheckAndUpdate.bullet.two = any outstanding arrears details
+loansCheckAndUpdate.button = Add missing data
+
 financialDetailsCheckYourAnswersController.title = Check your answers: financial details
 financialDetailsCheckYourAnswersController.heading = Check your answers: financial details
 financialDetailsCheckYourAnswersController.viewOnly.title = Financial details

@@ -16,11 +16,12 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import models.ConditionalYesNo.{ConditionalYes, _}
 import views.html.MultipleQuestionView
 import eu.timepit.refined.refineMV
-import models.{NormalMode, UserAnswers}
+import models._
 import controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.partialAnswersForm
-import pages.nonsipp.loansmadeoroutstanding.InterestOnLoanPage
+import pages.nonsipp.loansmadeoroutstanding.{InterestOnLoanPage, SecurityGivenForLoanPage}
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
 
@@ -28,9 +29,13 @@ class InterestOnLoanControllerSpec extends ControllerBaseSpec {
 
   val maxAllowedAmount = 999999999.99
   private val index = refineMV[OneTo5000](1)
+  private val conditionalYesSecurity: ConditionalYes[Security] = ConditionalYesNo.yes(security)
 
   val partialUserAnswers: UserAnswers =
     defaultUserAnswers.unsafeSet(InterestOnLoanPage(srn, index), partialInterestOnLoan)
+
+  val prePopUserAnswers: UserAnswers =
+    defaultUserAnswers.unsafeSet(SecurityGivenForLoanPage(srn, index), conditionalYesSecurity)
 
   "InterestOnLoanController" - {
 
@@ -64,6 +69,20 @@ class InterestOnLoanControllerSpec extends ControllerBaseSpec {
       saveAndContinue(
         onSubmit,
         "value.1" -> money.value.toString,
+        "value.2" -> percentage.value.toString,
+        "value.3" -> money.value.toString
+      )
+    )
+
+    act.like(
+      redirectToPageWithPrePopSession(
+        call = onSubmit,
+        page = controllers.nonsipp.loansmadeoroutstanding.routes.OutstandingArrearsOnLoanController
+          .onPageLoad(srn, index, NormalMode),
+        userAnswers = prePopUserAnswers,
+        previousUserAnswers = defaultUserAnswers,
+        mockSaveService = None,
+        form = "value.1" -> money.value.toString,
         "value.2" -> percentage.value.toString,
         "value.3" -> money.value.toString
       )
