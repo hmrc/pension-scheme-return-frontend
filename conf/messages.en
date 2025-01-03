@@ -3022,6 +3022,20 @@ sharesList.inset = You cannot add another share transaction as you have entered 
 sharesList.error.required = Select yes to add another share, or no to return to task list
 sharesList.pagination.label = Showing {0} - {1} of {2} shares
 
+sharesCheckAndUpdate.title = Check and update the shares in a sponsoring employer, acquired from a connected party, or unquoted shares information
+sharesCheckAndUpdate.heading = Check and update the shares in a sponsoring employer, acquired from a connected party, or unquoted shares information
+sharesCheckAndUpdate.paragraph = You need to add data to this share.
+sharesCheckAndUpdate.table.one = Type of shares held
+sharesCheckAndUpdate.table.two = Class of shares
+sharesCheckAndUpdate.table.three = Total cost of shares
+sharesCheckAndUpdate.bullet.paragraph = Missing data could include:
+sharesCheckAndUpdate.bullet.one = why the shares are held
+sharesCheckAndUpdate.bullet.two = who shares were acquired from
+sharesCheckAndUpdate.bullet.three = sellers name
+sharesCheckAndUpdate.button = Add missing data
+sharesCheckAndUpdate.SponsoringEmployer = Sponsoring Employer
+sharesCheckAndUpdate.Unquoted = Unquoted
+sharesCheckAndUpdate.ConnectedParty = Connected Party
 
 companyNameOfSharesBuyer.title = What is the buyer’s company name?
 companyNameOfSharesBuyer.heading = What is the buyer’s company name?

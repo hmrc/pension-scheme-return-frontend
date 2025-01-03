@@ -145,3 +145,6 @@ GET         /:srn/remove-shares/:index                                          
 POST        /:srn/remove-shares/:index                                             controllers.nonsipp.shares.RemoveSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-remove-shares/:index                                      controllers.nonsipp.shares.RemoveSharesController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-remove-shares/:index                                      controllers.nonsipp.shares.RemoveSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/check-update-shares-information/:index                           controllers.nonsipp.shares.SharesCheckAndUpdateController.onPageLoad(srn: Srn, index: Max5000)
+GET         /:srn/submit-check-update-shares-information/:index                    controllers.nonsipp.shares.SharesCheckAndUpdateController.onSubmit(srn: Srn, index: Max5000)

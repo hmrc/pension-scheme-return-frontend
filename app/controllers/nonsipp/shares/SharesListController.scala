@@ -289,7 +289,7 @@ object SharesListController {
               case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
                 ListRow.view(
                   sharesMessage,
-                  controllers.nonsipp.shares.routes.SharesCYAController
+                  routes.SharesCYAController
                     .onPageLoadViewOnly(srn, index, year, current, previous)
                     .url,
                   Message("site.view.param", sharesMessage)
@@ -297,14 +297,13 @@ object SharesListController {
               case _ if check =>
                 ListRow.check(
                   sharesMessage,
-                  controllers.routes.UnauthorisedController.onPageLoad().url,
-                  Message("site.check.param", sharesMessage)
+                  routes.SharesCheckAndUpdateController.onPageLoad(srn, index).url,
+                  Message("sharesList.row.check.hiddenText", sharesMessage)
                 )
               case _ =>
                 ListRow(
                   sharesMessage,
-                  changeUrl =
-                    controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode).url,
+                  changeUrl = routes.SharesCYAController.onPageLoad(srn, index, CheckMode).url,
                   changeHiddenText = Message("site.change.param", sharesMessage),
                   removeUrl = routes.RemoveSharesController.onPageLoad(srn, index, mode).url,
                   removeHiddenText = Message("site.remove.param", sharesMessage)
