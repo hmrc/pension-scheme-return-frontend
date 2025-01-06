@@ -1,4 +1,5 @@
 @import 'accessible-autocomplete.min.css';
+$psr-mobile-breakpoint: 640px;
 
 .js-visible {
   display: none !important;
@@ -32,6 +33,12 @@ a[href="none"] {
   &.govuk-link {
     color: inherit;       // Ensure text color is inherited
     text-decoration: none; // Remove underline
+  }
+}
+
+@media (max-width: $psr-mobile-breakpoint) {
+  .psr-scrollable-pane {
+    overflow-x: scroll;
   }
 }
 
