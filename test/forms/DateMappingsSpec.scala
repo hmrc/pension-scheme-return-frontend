@@ -435,4 +435,25 @@ class DateMappingsSpec
       filledForm("value.year").value.value mustEqual date.getYear.toString
     }
   }
+
+  "must bind valid month data with short and full month names" in {
+
+    val validMonths = Table(
+      ("day", "month", "year", "expectedMonthValue"),
+      ("01", "Jan", "2020", 1),
+      ("01", "January", "2020", 1),
+      ("15", "Feb", "2021", 2),
+      ("15", "February", "2021", 2)
+    )
+
+    forAll(validMonths) { (day, month, year, expectedMonthValue) =>
+      val data = Map("value.day" -> day, "value.month" -> month, "value.year" -> year)
+
+      val result = form.bind(data)
+
+      result.value.value.getDayOfMonth mustEqual day.toInt
+      result.value.value.getMonthValue mustEqual expectedMonthValue
+      result.value.value.getYear mustEqual year.toInt
+    }
+  }
 }
