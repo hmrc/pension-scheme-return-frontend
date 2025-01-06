@@ -29,7 +29,6 @@ import pages.nonsipp.loansmadeoroutstanding._
 
 object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
 
-  // scalastyle:off
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ LoansMadeOrOutstandingPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
@@ -129,7 +128,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       (
         for {
           indexes <- userAnswers
-            .map(IdentityTypes(srn, IdentitySubject.LoanRecipient))
+            .map(LoanCompleted.all(srn))
             .keys
             .toList
             .traverse(_.toIntOption)
@@ -149,7 +148,6 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
         controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
       }
   }
-  // scalastyle:on
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
     _ =>

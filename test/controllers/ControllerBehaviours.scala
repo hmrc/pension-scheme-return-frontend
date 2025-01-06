@@ -232,7 +232,7 @@ trait ControllerBehaviours {
     mockSaveService: Option[SaveService],
     form: (String, String)*
   ): BehaviourTest =
-    s"redirect to page with form $form when isPrePopulation = true".hasBehaviour {
+    s"redirect to page with form $form with PrePop session".hasBehaviour {
       val appBuilder =
         applicationBuilder(
           userAnswers = Some(userAnswers),

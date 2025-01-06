@@ -26,6 +26,7 @@ import repositories.SessionRepository
 import models._
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
+import viewmodels.models.SectionCompleted
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 import play.api.i18n.I18nSupport
@@ -76,6 +77,7 @@ class LoanDetailsMongoController @Inject()(
             .flatMap(_.remove(SecurityGivenForLoanPage(srn, index)))
             .flatMap(_.remove(ArrearsPrevYears(srn, index)))
             .flatMap(_.remove(OutstandingArrearsOnLoanPage(srn, index)))
+            .flatMap(_.remove(LoanCompleted(srn, index)))
       }
     } yield updatedUserAnswers
 
@@ -124,6 +126,9 @@ class LoanDetailsMongoController @Inject()(
         index =>
           OutstandingArrearsOnLoanPage(srn, index) -> ConditionalYesNo.yes[Unit, Money](Money(1234.00, "1,234.00"))
       )
+      loanCompleted = indexes.map(
+        index => LoanCompleted(srn, index) -> SectionCompleted
+      )
 
       ua1 <- schemeHadLoans.foldLeft(Try(userAnswers)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua2 <- identityTypes.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
@@ -141,6 +146,6 @@ class LoanDetailsMongoController @Inject()(
       ua12 <- outstandingArrearsOnLoan.foldLeft(Try(ua11)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
-    } yield ua12
-
+      ua13 <- loanCompleted.foldLeft(Try(ua12)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+    } yield ua13
 }

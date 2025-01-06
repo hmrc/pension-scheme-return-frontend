@@ -26,6 +26,7 @@ import generators.ModelGenerators.allowedAccessRequestGen
 import models._
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
+import viewmodels.models.SectionCompleted
 import org.scalatest.matchers.must.Matchers
 import models.ConditionalYesNo._
 import models.requests.psr._
@@ -101,6 +102,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), interestOnLoan)
           .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -151,6 +153,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), interestOnLoan)
           .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -204,6 +207,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), interestOnLoan)
           .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -256,6 +260,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), interestOnLoan)
           .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -309,6 +314,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), interestOnLoan)
           .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -362,6 +368,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), interestOnLoan)
           .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -415,6 +422,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), interestOnLoan)
           .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), false)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.no[Unit, Money](()))
+          .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -528,6 +536,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswers.get(InterestOnLoanPage(srn, refineMV(1))) mustBe None
           userAnswers.get(SecurityGivenForLoanPage(srn, refineMV(1))) mustBe None
           userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))) mustBe None
+          userAnswers.get(LoanCompleted(srn, refineMV(1))) mustBe None
         }
       )
     }
@@ -560,6 +569,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswers.get(InterestOnLoanPage(srn, refineMV(1))) mustBe Some(interestOnLoan)
           userAnswers.get(SecurityGivenForLoanPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes(security))
           userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes(money))
+          userAnswers.get(LoanCompleted(srn, refineMV(1))) mustBe Some(SectionCompleted)
         }
       )
     }

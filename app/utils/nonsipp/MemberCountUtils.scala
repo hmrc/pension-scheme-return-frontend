@@ -46,7 +46,7 @@ object MemberCountUtils {
       .get(memberDetails)
       .getOrElse(JsObject.empty)
       .as[JsObject] != JsObject.empty
-    lazy val loansExist = !noDataStatuses.contains(getLoansTaskListStatusAndLink(userAnswers, srn)._1)
+    lazy val loansExist = !noDataStatuses.contains(getLoansTaskListStatusAndLink(userAnswers, srn, isPrePop)._1)
     lazy val borrowingsExist = !noDataStatuses.contains(getBorrowingTaskListStatusAndLink(userAnswers, srn)._1)
     lazy val financialDetailsExist = !noDataStatuses.contains(
       getFinancialDetailsTaskListStatus(
