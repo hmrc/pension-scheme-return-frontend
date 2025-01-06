@@ -35,7 +35,7 @@
                 </span>
             </li>
         } else if(item.status == NotStarted) {
-            <li class="govuk-task-list__item govuk-task-list__item--with-link">
+            <li class="govuk-task-list__item">
                 <span class="govuk-task-list__name-and-hint">
                     @renderMessage(item.link.withAttr("aria-describedby", id).withAttr("class", "govuk-task-list__link"))
                 </span>
@@ -46,7 +46,7 @@
                 </span>
             </li>
         } else if(item.status == InProgress) {
-            <li class="govuk-task-list__item govuk-task-list__item--with-link">
+            <li class="govuk-task-list__item">
                 <span class="govuk-task-list__name-and-hint">
                     @renderMessage(item.link.withAttr("aria-describedby", id).withAttr("class", "govuk-task-list__link"))
                 </span>
@@ -57,7 +57,7 @@
                 </span>
             </li>
         } else if(item.status == Updated) {
-            <li class="govuk-task-list__item govuk-task-list__item--with-link">
+            <li class="govuk-task-list__item">
                 <span class="govuk-task-list__name-and-hint">
                     @renderMessage(item.link.withAttr("aria-describedby", id).withAttr("class", "govuk-task-list__link"))
                 </span>
@@ -68,7 +68,7 @@
                 </span>
             </li>
         } else {
-            <li class="govuk-task-list__item govuk-task-list__item--with-link">
+            <li class="govuk-task-list__item">
                 <span class="govuk-task-list__name-and-hint">
                     @renderMessage(item.link.withAttr("aria-describedby", id).withAttr("class", "govuk-task-list__link"))
                 </span>
