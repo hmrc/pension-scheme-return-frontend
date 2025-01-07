@@ -456,4 +456,24 @@ class DateMappingsSpec
       result.value.value.getYear mustEqual year.toInt
     }
   }
+
+  "must fail to bind invalid month names" in {
+
+    val invalidMonths = Table(
+      ("day", "month", "year", "expectedError"),
+      ("01", "Febru", "2020", "error.invalid.characters"),
+      ("01", "Februaryys", "2020", "error.invalid.characters"),
+      ("15", "AnyText", "2021", "error.invalid.characters")
+    )
+
+    forAll(invalidMonths) { (day, month, year, expectedError) =>
+      val data = Map("value.day" -> day, "value.month" -> month, "value.year" -> year)
+
+      val result = form.bind(data)
+
+      result.errors must have size 1
+      result.errors.head.key mustEqual "value.month"
+      result.errors.head.message mustEqual expectedError
+    }
+  }
 }
