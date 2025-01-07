@@ -208,8 +208,6 @@ class LoansTransformer @Inject() extends Transformer {
     }
   }
 
-  //todo remove!!!
-  //noinspection ScalaStyle
   def transformFromEtmp(
     userAnswers: UserAnswers,
     srn: Srn,

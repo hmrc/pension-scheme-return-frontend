@@ -27,7 +27,7 @@ import navigation.Navigator
 import forms.MultipleQuestionFormProvider
 import models.{Mode, Money, Percentage}
 import controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController._
-import pages.nonsipp.loansmadeoroutstanding.{InterestOnLoanPage, SecurityGivenForLoanPage}
+import pages.nonsipp.loansmadeoroutstanding.{InterestOnLoanPage, OutstandingArrearsOnLoanPage, SecurityGivenForLoanPage}
 import play.api.data.Form
 import forms.mappings.errors.{MoneyFormErrors, PercentageFormErrors}
 import forms.mappings.Mappings
@@ -98,15 +98,19 @@ class InterestOnLoanController @Inject()(
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.transformAndSet(InterestOnLoanPage(srn, index), value))
               _ <- saveService.save(updatedAnswers)
-            } yield
-              if (isPrePopulation && request.userAnswers.get(SecurityGivenForLoanPage(srn, index)).isDefined) {
+            } yield (
+              isPrePopulation,
+              request.userAnswers.get(SecurityGivenForLoanPage(srn, index)),
+              request.userAnswers.get(OutstandingArrearsOnLoanPage(srn, index))
+            ) match {
+              case (true, Some(_), None) =>
                 Redirect(
                   controllers.nonsipp.loansmadeoroutstanding.routes.OutstandingArrearsOnLoanController
                     .onPageLoad(srn, index, mode)
                 )
-              } else {
+              case _ =>
                 Redirect(navigator.nextPage(InterestOnLoanPage(srn, index), mode, updatedAnswers))
-              }
+            }
         )
   }
 }
