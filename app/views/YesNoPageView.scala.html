@@ -57,7 +57,7 @@
                         .asPageHeading(LegendSize.Large))),
             yes = viewModel.page.yes.map(renderMessage(_)),
             no = viewModel.page.no.map(renderMessage(_))
-          )
+          ).withHint(viewModel.page.hint.map(hint => HintViewModel(Text(renderMessage(hint).body))))
         )
     } else {
         @govukRadios(
@@ -70,7 +70,7 @@
                         .withCssClass("govuk-visually-hidden"))),
             yes = viewModel.page.yes.map(renderMessage(_)),
             no = viewModel.page.no.map(renderMessage(_))
-          )
+          ).withHint(viewModel.page.hint.map(hint => HintViewModel(Text(renderMessage(hint).body))))
         )
     }
 
