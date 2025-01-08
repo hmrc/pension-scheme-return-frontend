@@ -26,6 +26,7 @@ import navigation.{Navigator, NavigatorBehaviours}
 import models._
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
+import viewmodels.models.SectionCompleted
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
 
@@ -298,7 +299,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
             srn =>
               defaultUserAnswers
                 .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
-                .unsafeSet(IndividualRecipientNamePage(srn, refineMV(1)), individualName)
+                .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
           )
           .withName("go to who received the loan at index 2")
       )
@@ -314,7 +315,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
             srn =>
               defaultUserAnswers
                 .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
-                .unsafeSet(IndividualRecipientNamePage(srn, refineMV(2)), individualName)
+                .unsafeSet(LoanCompleted(srn, refineMV(2)), SectionCompleted)
           )
           .withName("go to who received the loan at index 3")
       )

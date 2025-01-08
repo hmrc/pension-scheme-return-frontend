@@ -205,9 +205,12 @@ trait TestValues {
   val index1of300: Max300 = refineMV(1)
   val index1of5000: Max5000 = refineMV(1)
   val index2of5000: Max5000 = refineMV(2)
+  val index3of5000: Max5000 = refineMV(3)
   val conditionalYesNoNino: ConditionalYesNo[String, Nino] = ConditionalYesNo.yes(nino)
   val conditionalYesNoCrn: ConditionalYesNo[String, Crn] = ConditionalYesNo.yes(crn)
   val conditionalYesNoUtr: ConditionalYesNo[String, Utr] = ConditionalYesNo.yes(utr)
+  val conditionalYesNoMoney: ConditionalYesNo[Unit, Money] = ConditionalYesNo.yes[Unit, Money](money)
+  val conditionalYesNoSecurity: ConditionalYesNo[Unit, Security] = ConditionalYesNo.yes[Unit, Security](security)
 
   val address: Address = Address(
     "test-id",

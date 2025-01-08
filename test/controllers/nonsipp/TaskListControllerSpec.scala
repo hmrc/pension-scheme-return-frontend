@@ -17,7 +17,6 @@
 package controllers.nonsipp
 
 import services.PsrVersionsService
-import models.ConditionalYesNo._
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
 import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, OtherAssetsHeldPage, WhatIsOtherAssetPage}
 import controllers.ControllerBaseSpec
@@ -659,11 +658,9 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
           defaultUserAnswers
             .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
             .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
-            .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
-            .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+            .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
             .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
-            .unsafeSet(ArrearsPrevYears(srn, refineMV(2)), true)
-            .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(2)), ConditionalYesNo.yes[Unit, Money](money))
+            .unsafeSet(LoanCompleted(srn, refineMV(2)), SectionCompleted)
 
         testViewModel(
           userAnswersWithLoans,

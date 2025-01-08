@@ -18,7 +18,6 @@ package utils.nonsipp
 
 import pages.nonsipp.employercontributions.{EmployerContributionsCompleted, EmployerContributionsPage}
 import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalPage, OtherAssetsDisposalProgress}
-import models.ConditionalYesNo._
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
 import config.RefinedTypes.{OneTo300, OneTo5000}
@@ -42,7 +41,7 @@ import eu.timepit.refined.refineV
 import viewmodels.models.TaskListStatus._
 import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import pages.nonsipp.common.IdentityTypes
-import utils.nonsipp.check.{LandOrPropertyCheckStatusUtils, SharesCheckStatusUtils}
+import utils.nonsipp.check._
 import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutSectionCompleted}
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
 import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsDisposalProgress}
@@ -312,39 +311,51 @@ object TaskListStatusUtils {
     }
   }
 
-  def getLoansTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val wereLoans = userAnswers.get(LoansMadeOrOutstandingPage(srn))
-    val numRecorded = userAnswers.get(OutstandingArrearsOnLoanPages(srn)).getOrElse(Map.empty).size
-
-    val firstQuestionPageUrl =
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
-        .onPageLoad(srn, NormalMode)
-        .url
-
-    val listPageUrl =
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
-        .onPageLoad(srn, 1, NormalMode)
-        .url
-
-    val firstPages = userAnswers.get(IdentityTypes(srn, IdentitySubject.LoanRecipient))
-    val lastPages = userAnswers.get(OutstandingArrearsOnLoanPages(srn))
-    val incompleteIndex: Int = getIncompleteIndex(firstPages, lastPages)
-
-    val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
-      _ => firstQuestionPageUrl,
-      index =>
-        controllers.nonsipp.common.routes.IdentityTypeController
-          .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
+  def getLoansTaskListStatusAndLink(
+    userAnswers: UserAnswers,
+    srn: Srn,
+    isPrePop: Boolean
+  ): (TaskListStatus, String) =
+    if (isPrePop && LoansCheckStatusUtils.checkLoansSection(userAnswers, srn)) {
+      (
+        Check,
+        controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
+          .onPageLoad(srn, 1, NormalMode)
           .url
-    )
+      )
+    } else {
+      val wereLoans = userAnswers.get(LoansMadeOrOutstandingPage(srn))
+      val numRecorded = userAnswers.get(LoanCompleted.all(srn)).getOrElse(Map.empty).size
 
-    (wereLoans, numRecorded) match {
-      case (None, _) => (NotStarted, firstQuestionPageUrl)
-      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
-      case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
-      case (Some(true), _) => (Recorded(numRecorded, "loans"), listPageUrl)
+      val firstQuestionPageUrl =
+        controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
+          .onPageLoad(srn, NormalMode)
+          .url
+
+      val listPageUrl =
+        controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
+          .onPageLoad(srn, 1, NormalMode)
+          .url
+
+      val firstPages = userAnswers.get(IdentityTypes(srn, IdentitySubject.LoanRecipient))
+      val lastPages = userAnswers.get(LoanCompleted.all(srn))
+      val incompleteIndex: Int = getIncompleteIndex(firstPages, lastPages)
+
+      val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+        _ => firstQuestionPageUrl,
+        index =>
+          controllers.nonsipp.common.routes.IdentityTypeController
+            .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
+            .url
+      )
+
+      (wereLoans, numRecorded) match {
+        case (None, _) => (NotStarted, firstQuestionPageUrl)
+        case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+        case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
+        case (Some(true), _) => (Recorded(numRecorded, "loans"), listPageUrl)
+      }
     }
-  }
 
   def getBorrowingTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereBorrowings = userAnswers.get(MoneyBorrowedPage(srn))
