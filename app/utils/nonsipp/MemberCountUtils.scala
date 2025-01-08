@@ -46,7 +46,7 @@ object MemberCountUtils {
       .get(memberDetails)
       .getOrElse(JsObject.empty)
       .as[JsObject] != JsObject.empty
-    lazy val loansExist = !noDataStatuses.contains(getLoansTaskListStatusAndLink(userAnswers, srn)._1)
+    lazy val loansExist = !noDataStatuses.contains(getLoansTaskListStatusAndLink(userAnswers, srn, isPrePop)._1)
     lazy val borrowingsExist = !noDataStatuses.contains(getBorrowingTaskListStatusAndLink(userAnswers, srn)._1)
     lazy val financialDetailsExist = !noDataStatuses.contains(
       getFinancialDetailsTaskListStatus(
@@ -55,7 +55,7 @@ object MemberCountUtils {
         userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
       )
     )
-    lazy val sharesExist = !noDataStatuses.contains(getSharesTaskListStatusAndLink(userAnswers, srn)._1)
+    lazy val sharesExist = !noDataStatuses.contains(getSharesTaskListStatusAndLink(userAnswers, srn, isPrePop)._1)
     lazy val landOrPropertyExist =
       !noDataStatuses.contains(getLandOrPropertyTaskListStatusAndLink(userAnswers, srn, isPrePop)._1)
     lazy val bondsExist = !noDataStatuses.contains(getBondsTaskListStatusAndLink(userAnswers, srn)._1)

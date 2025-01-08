@@ -14,16 +14,18 @@
  * limitations under the License.
  *@
 
+@import config.Constants
 @import viewmodels.InputWidth.Fixed20
+@import viewmodels.govuk.characterCount.{CharacterCountViewModel, FluentCharacterCount}
 
 @this(
-layout: templates.Layout,
-formHelper: FormWithCSRF,
-govukErrorSummary: GovukErrorSummary,
-govukInput: GovukInput,
-govukDateInput: GovukDateInput,
-govukTextarea: GovukTextarea,
-govukButton: GovukButton
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukInput: GovukInput,
+        govukDateInput: GovukDateInput,
+        hmrcCharacterCount: HmrcCharacterCount,
+        govukButton: GovukButton
 )
 
 @(form: Form[RecipientDetails], viewModel: FormPageViewModel[RecipientDetailsViewModel])(implicit request: Request[_], messages: Messages)
@@ -32,34 +34,34 @@ govukButton: GovukButton
 
     @formHelper(action = viewModel.onSubmit, Symbol("autoComplete") -> "off") {
 
-      @if(form.errors.nonEmpty) {
-        @govukErrorSummary(ErrorSummaryViewModel(form))
-      }
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
 
-       <h1 class="govuk-heading-l">@renderMessage(viewModel.heading)</h1>
+        <h1 class="govuk-heading-l">@renderMessage(viewModel.heading)</h1>
 
-      @govukInput(
-        InputViewModel(
-          field = form("name"),
-          label = LabelViewModel(renderMessage(viewModel.page.name))
-        )
-        .withWidth(Fixed20)
-      )
-
-      @defining(
-           TextareaViewModel("description", form("description").value)
-                .withLabel(renderMessage(viewModel.page.description))
-      ) { component =>
-         @govukTextarea(
-            form("description").errors.headOption.fold(component)(error =>
-              component.withError(messages(error.message, error.args: _*))
+        @govukInput(
+            InputViewModel(
+                field = form("name"),
+                label = LabelViewModel(renderMessage(viewModel.page.name))
             )
+            .withWidth(Fixed20)
         )
-      }
 
+        @defining(
+            CharacterCountViewModel(form("description"))
+            .withLabel(renderMessage(viewModel.page.description))
+            .withMaxLength(Constants.maxOtherDescriptionLength)
+        ) { component =>
+            @hmrcCharacterCount(
+                form("description").errors.headOption.fold(component)(error =>
+                    component.withError(messages(error.message, error.args: _*))
+                )
+            )
+        }
 
-      @govukButton(
+        @govukButton(
             ButtonViewModel(renderMessage(viewModel.buttonText))
-      )
+        )
     }
 }

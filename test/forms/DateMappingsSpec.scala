@@ -294,8 +294,7 @@ class DateMappingsSpec
         val result = form.bind(data)
 
         result.errors must contain allElementsOf List(
-          FormError("value.day", "error.invalid.characters"),
-          FormError("value.month", "error.invalid.characters")
+          FormError("value.day", "error.invalid.characters")
         )
     }
   }
@@ -313,8 +312,7 @@ class DateMappingsSpec
         val result = form.bind(data)
 
         result.errors must contain allElementsOf List(
-          FormError("value.day", "error.invalid.characters"),
-          FormError("value.year", "error.invalid.characters")
+          FormError("value.day", "error.invalid.characters")
         )
     }
   }
@@ -332,8 +330,7 @@ class DateMappingsSpec
         val result = form.bind(data)
 
         result.errors must contain allElementsOf List(
-          FormError("value.month", "error.invalid.characters"),
-          FormError("value.year", "error.invalid.characters")
+          FormError("value.month", "error.invalid.characters")
         )
     }
   }
@@ -351,9 +348,7 @@ class DateMappingsSpec
         val result = form.bind(data)
 
         result.errors must contain allElementsOf List(
-          FormError("value.day", "error.invalid.characters"),
-          FormError("value.month", "error.invalid.characters"),
-          FormError("value.year", "error.invalid.characters")
+          FormError("value.day", "error.invalid.characters")
         )
     }
   }
@@ -407,6 +402,29 @@ class DateMappingsSpec
     }
   }
 
+  "must fail to bind with only a missing year if there are multiple errors (prioritization)" in {
+
+    val data = Map(
+      "value.day" -> "xx",
+      "value.month" -> "42"
+    )
+
+    val result = form.bind(data)
+    result.errors must contain only FormError("value.year", "error.required.year")
+  }
+
+  "must fail to bind with only an invalid day if there are multiple errors (prioritization)" in {
+
+    val data = Map(
+      "value.day" -> "xx",
+      "value.month" -> "42",
+      "value.year" -> "2008"
+    )
+
+    val result = form.bind(data)
+    result.errors must contain only FormError("value.day", "error.invalid.characters")
+  }
+
   "must unbind a date" in {
 
     forAll(validData -> "valid date") { date =>
@@ -415,6 +433,47 @@ class DateMappingsSpec
       filledForm("value.day").value.value mustEqual date.getDayOfMonth.toString
       filledForm("value.month").value.value mustEqual date.getMonthValue.toString
       filledForm("value.year").value.value mustEqual date.getYear.toString
+    }
+  }
+
+  "must bind valid month data with short and full month names" in {
+
+    val validMonths = Table(
+      ("day", "month", "year", "expectedMonthValue"),
+      ("01", "Jan", "2020", 1),
+      ("01", "January", "2020", 1),
+      ("15", "Feb", "2021", 2),
+      ("15", "February", "2021", 2)
+    )
+
+    forAll(validMonths) { (day, month, year, expectedMonthValue) =>
+      val data = Map("value.day" -> day, "value.month" -> month, "value.year" -> year)
+
+      val result = form.bind(data)
+
+      result.value.value.getDayOfMonth mustEqual day.toInt
+      result.value.value.getMonthValue mustEqual expectedMonthValue
+      result.value.value.getYear mustEqual year.toInt
+    }
+  }
+
+  "must fail to bind invalid month names" in {
+
+    val invalidMonths = Table(
+      ("day", "month", "year", "expectedError"),
+      ("01", "Febru", "2020", "error.invalid.characters"),
+      ("01", "Februaryys", "2020", "error.invalid.characters"),
+      ("15", "AnyText", "2021", "error.invalid.characters")
+    )
+
+    forAll(invalidMonths) { (day, month, year, expectedError) =>
+      val data = Map("value.day" -> day, "value.month" -> month, "value.year" -> year)
+
+      val result = form.bind(data)
+
+      result.errors must have size 1
+      result.errors.head.key mustEqual "value.month"
+      result.errors.head.message mustEqual expectedError
     }
   }
 }

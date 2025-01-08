@@ -28,10 +28,10 @@
 
 @layout(pageTitle = title(form, viewmodel.title.toMessage)) {
 
-    @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
+    @formHelper(action = viewmodel.onSubmit) {
 
         @if(form.hasErrors) {
-          @govukErrorSummary(ErrorSummaryViewModel(form))
+          @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> viewmodel.page.rows.headOption.fold("value")(_.index.toString))))
         }
 
         <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>

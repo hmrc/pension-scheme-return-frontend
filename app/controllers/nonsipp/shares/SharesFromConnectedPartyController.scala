@@ -106,27 +106,47 @@ class SharesFromConnectedPartyController @Inject()(
             .bindFromRequest()
             .fold(
               formWithErrors =>
-                recipientName(srn, index)
-                  .map { recipientName =>
-                    Future.successful(
-                      BadRequest(
-                        view(
-                          formWithErrors,
-                          SharesFromConnectedPartyController
-                            .viewModel(
-                              srn,
-                              index,
-                              recipientName,
-                              companyName,
-                              schemeHoldShare,
-                              config.urls.incomeTaxAct,
-                              mode
-                            )
-                        )
+                if (!schemeHoldShare.name.equals("01")) {
+                  Future.successful(
+                    BadRequest(
+                      view(
+                        formWithErrors,
+                        SharesFromConnectedPartyController
+                          .viewModel(
+                            srn,
+                            index,
+                            "",
+                            companyName,
+                            schemeHoldShare,
+                            config.urls.incomeTaxAct,
+                            mode
+                          )
                       )
                     )
-                  }
-                  .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))),
+                  )
+                } else {
+                  recipientName(srn, index)
+                    .map { recipientName =>
+                      Future.successful(
+                        BadRequest(
+                          view(
+                            formWithErrors,
+                            SharesFromConnectedPartyController
+                              .viewModel(
+                                srn,
+                                index,
+                                recipientName,
+                                companyName,
+                                schemeHoldShare,
+                                config.urls.incomeTaxAct,
+                                mode
+                              )
+                          )
+                        )
+                      )
+                    }
+                    .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+                },
               value =>
                 for {
                   updatedAnswers <- Future
@@ -195,8 +215,7 @@ object SharesFromConnectedPartyController {
           )
       )
     } else {
-      schemeHoldShare.name.equals("02")
-      schemeHoldShare.name.equals("03")
+
       FormPageViewModel(
         Message("sharesFromConnectedParty.title1"),
         Message("sharesFromConnectedParty.heading1", companyName),

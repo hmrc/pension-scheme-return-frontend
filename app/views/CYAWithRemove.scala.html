@@ -68,7 +68,7 @@
             )
         }
 
-        @formHelper(action = if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.onSubmit else viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
+        @formHelper(action = if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.onSubmit else viewmodel.onSubmit) {
             @govukButton(
                 if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty)
                     ButtonViewModel(renderMessage(viewmodel.optViewOnlyDetails.get.buttonText))

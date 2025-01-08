@@ -69,9 +69,23 @@ class MemberPaymentsTransformerSpec
     )
 
   private val index = refineMV[Max300.Refined](1)
+  private val index2 = refineMV[Max300.Refined](2)
+  private val index3 = refineMV[Max300.Refined](3)
   private val employerContribsIndex = refineMV[Max50.Refined](1)
   private val transfersInIndex = refineMV[Max5.Refined](1)
   private val transfersOutIndex = refineMV[Max5.Refined](1)
+
+  private val memberDetailsIndexTwo: NameDOB = NameDOB(
+    "testFirstNameIndexTwo",
+    "testLastNameIndexTwo",
+    LocalDate.of(1992, 12, 12)
+  )
+
+  private val memberDetailsIndexThree: NameDOB = NameDOB(
+    "testFirstNameIndexThree",
+    "testLastNameIndexThree",
+    LocalDate.of(1992, 12, 12)
+  )
 
   // Test data: all sections of Member Payments have payments made
   private val activeMemberAllSections = MemberDetails(
@@ -190,6 +204,7 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(MemberDetailsCompletedPage(srn, index), SectionCompleted)
     .unsafeSet(MemberPsrVersionPage(srn, index), "001")
     .unsafeSet(MemberStatus(srn, index), MemberState.New)
+
     // employer contributions
     .unsafeSet(EmployerContributionsPage(srn), true)
     .unsafeSet(EmployerNamePage(srn, index, employerContribsIndex), employerName)
@@ -235,6 +250,20 @@ class MemberPaymentsTransformerSpec
     // soft deleted
     .unsafeSet(SoftDeletedMembers(srn), List(softDeletedMemberAllSections))
 
+  private val userAnswersAllSectionsReverseOrder = userAnswersAllSections
+    .unsafeSet(MemberDetailsPage(srn, index3), memberDetailsIndexThree)
+    .unsafeSet(DoesMemberHaveNinoPage(srn, index3), false)
+    .unsafeSet(NoNINOPage(srn, index3), noninoReason)
+    .unsafeSet(MemberDetailsCompletedPage(srn, index3), SectionCompleted)
+    .unsafeSet(MemberPsrVersionPage(srn, index3), "001")
+    .unsafeSet(MemberStatus(srn, index3), MemberState.New)
+    .unsafeSet(MemberDetailsPage(srn, index2), memberDetailsIndexTwo)
+    .unsafeSet(DoesMemberHaveNinoPage(srn, index2), false)
+    .unsafeSet(NoNINOPage(srn, index2), noninoReason)
+    .unsafeSet(MemberDetailsCompletedPage(srn, index2), SectionCompleted)
+    .unsafeSet(MemberPsrVersionPage(srn, index2), "001")
+    .unsafeSet(MemberStatus(srn, index2), MemberState.New)
+
   // Test data: no sections of Member Payments have payments made
   private val activeMemberNoSections = MemberDetails(
     state = MemberState.New,
@@ -255,6 +284,24 @@ class MemberPaymentsTransformerSpec
     pensionAmountReceived = None
   )
 
+  private val activeMemberNoSectionsIndex2 = MemberDetails(
+    state = MemberState.New,
+    memberPSRVersion = Some("001"),
+    personalDetails = MemberPersonalDetails(
+      firstName = memberDetails.firstName,
+      lastName = memberDetails.lastName,
+      nino = Some(nino.value),
+      reasonNoNINO = None,
+      dateOfBirth = memberDetails.dob
+    ),
+    employerContributions = List.empty,
+    transfersIn = List.empty,
+    totalContributions = None,
+    memberLumpSumReceived = None,
+    transfersOut = List.empty,
+    benefitsSurrendered = None,
+    pensionAmountReceived = None
+  )
   private val deletedMemberNoSections = activeMemberNoSections.copy(state = MemberState.Deleted)
 
   private val memberPaymentsNoSections = MemberPayments(
@@ -395,6 +442,17 @@ class MemberPaymentsTransformerSpec
 
       val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswersWithNinoSpaces, userAnswersAllSections)
       result.get.memberDetails.head.personalDetails.nino.value shouldMatchTo ninoWithSpaces.value.replace(" ", "")
+    }
+
+    "should return members in sorted order" in {
+      val result = memberPaymentsTransformer.transformToEtmp(
+        srn,
+        userAnswersAllSectionsReverseOrder,
+        userAnswersAllSectionsReverseOrder
+      )
+      result.get.memberDetails(0).personalDetails.firstName shouldMatchTo memberDetails.firstName
+      result.get.memberDetails(1).personalDetails.firstName shouldMatchTo memberDetailsIndexTwo.firstName
+      result.get.memberDetails(2).personalDetails.firstName shouldMatchTo memberDetailsIndexThree.firstName
     }
 
     "Member state" - {

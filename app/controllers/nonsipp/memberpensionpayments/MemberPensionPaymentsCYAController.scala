@@ -153,17 +153,17 @@ object MemberPensionPaymentsCYAController {
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,
       title = mode.fold(
-        normal = "MemberPensionPaymentsCYA.title",
-        check = "MemberPensionPaymentsCYA.change.title",
-        viewOnly = "MemberPensionPaymentsCYA.viewOnly.title"
+        normal = "memberPensionPaymentsCYA.title",
+        check = "memberPensionPaymentsCYA.change.title",
+        viewOnly = "memberPensionPaymentsCYA.viewOnly.title"
       ),
       heading = mode.fold(
-        normal = "MemberPensionPaymentsCYA.heading",
+        normal = "memberPensionPaymentsCYA.heading",
         check = Message(
-          "MemberPensionPaymentsCYA.change.heading",
+          "memberPensionPaymentsCYA.change.heading",
           memberName
         ),
-        viewOnly = Message("MemberPensionPaymentsCYA.viewOnly.heading", memberName)
+        viewOnly = Message("memberPensionPaymentsCYA.viewOnly.heading", memberName)
       ),
       description = None,
       page = CheckYourAnswersViewModel(
@@ -188,8 +188,8 @@ object MemberPensionPaymentsCYAController {
             updated = viewOnlyUpdated,
             link = None,
             submittedText = Some(Message("")),
-            title = "MemberPensionPaymentsCYA.viewOnly.title",
-            heading = Message("MemberPensionPaymentsCYA.viewOnly.heading", memberName),
+            title = "memberPensionPaymentsCYA.viewOnly.title",
+            heading = Message("memberPensionPaymentsCYA.viewOnly.heading", memberName),
             buttonText = "site.continue",
             onSubmit = (optYear, optCurrentVersion, optPreviousVersion) match {
               case (Some(year), Some(currentVersion), Some(previousVersion)) =>
@@ -219,19 +219,19 @@ object MemberPensionPaymentsCYAController {
         None,
         List(
           CheckYourAnswersRowViewModel(
-            Message("MemberPensionPaymentsCYA.section.memberName.header"),
+            Message("memberPensionPaymentsCYA.section.memberName.header"),
             Message(memberName)
           ),
           CheckYourAnswersRowViewModel(
-            Message("MemberPensionPaymentsCYA.section.memberName", memberName),
-            Message("MemberPensionPaymentsCYA.section.amount", pensionPayments.displayAs)
+            Message("memberPensionPaymentsCYA.section.memberName", memberName),
+            Message("memberPensionPaymentsCYA.section.amount", pensionPayments.displayAs)
           ).withAction(
             SummaryAction(
               "site.change",
               controllers.nonsipp.memberpensionpayments.routes.TotalAmountPensionPaymentsController
                 .onSubmit(srn, index, mode)
                 .url
-            ).withVisuallyHiddenContent(Message("MemberPensionPaymentsCYA.section.hide", memberName))
+            ).withVisuallyHiddenContent(Message("memberPensionPaymentsCYA.section.hide", memberName))
           )
         )
       )

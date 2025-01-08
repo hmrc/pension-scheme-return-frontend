@@ -48,8 +48,8 @@ object TaskListUtils {
       schemeDetailsSection(srn, schemeName, userAnswers, pensionSchemeId),
       membersSection(srn, schemeName, userAnswers),
       memberPaymentsSection(srn, userAnswers),
-      loansSection(srn, schemeName, userAnswers),
-      sharesSection(srn, userAnswers),
+      loansSection(srn, schemeName, userAnswers, isPrePop),
+      sharesSection(srn, userAnswers, isPrePop),
       landOrPropertySection(srn, userAnswers, isPrePop),
       bondsSection(srn, userAnswers),
       otherAssetsSection(srn, userAnswers)
@@ -368,9 +368,14 @@ object TaskListUtils {
     )
   }
 
-  private def loansSection(srn: Srn, schemeName: String, userAnswers: UserAnswers): TaskListSectionViewModel = {
+  private def loansSection(
+    srn: Srn,
+    schemeName: String,
+    userAnswers: UserAnswers,
+    isPrePop: Boolean
+  ): TaskListSectionViewModel = {
     val prefix = s"nonsipp.tasklist.loans"
-    val (loansStatus, loansLink) = getLoansTaskListStatusAndLink(userAnswers, srn)
+    val (loansStatus, loansLink) = getLoansTaskListStatusAndLink(userAnswers, srn, isPrePop)
     val (borrowingStatus, borrowingLink) = getBorrowingTaskListStatusAndLink(userAnswers, srn)
 
     TaskListSectionViewModel(
@@ -392,9 +397,9 @@ object TaskListUtils {
     )
   }
 
-  private def sharesSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
+  private def sharesSection(srn: Srn, userAnswers: UserAnswers, isPrePop: Boolean): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.shares"
-    val (sharesStatus, sharesLink) = getSharesTaskListStatusAndLink(userAnswers, srn)
+    val (sharesStatus, sharesLink) = getSharesTaskListStatusAndLink(userAnswers, srn, isPrePop)
     val (sharesDisposalsStatus, sharesDisposalsLinkUrl) =
       TaskListStatusUtils.getSharesDisposalsTaskListStatusWithLink(userAnswers, srn)
 

@@ -18,7 +18,6 @@ package controllers.nonsipp.shares
 
 import pages.nonsipp.shares._
 import controllers.nonsipp.shares.SharesFromConnectedPartyController._
-import models.SchemeHoldShare.Acquisition
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
@@ -42,10 +41,17 @@ class SharesFromConnectedPartyControllerSpec extends ControllerBaseSpec {
       .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
       .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition)
       .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index), localDate)
-      .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), Acquisition)
       .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
+      .unsafeSet(SharesCompanyCrnPage(srn, index), conditionalYesNoCrn)
       .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
       .unsafeSet(CompanyNameOfSharesSellerPage(srn, index), companyName)
+
+    val contributionUserAnswers = defaultUserAnswers
+      .unsafeSet(SharesCompleted(srn, index), SectionCompleted)
+      .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
+      .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Contribution)
+      .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index), localDate)
+      .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
 
     act.like(renderView(onPageLoad, acquisitionUserAnswers) { implicit app => implicit request =>
       injected[YesNoPageView]
@@ -97,7 +103,8 @@ class SharesFromConnectedPartyControllerSpec extends ControllerBaseSpec {
 
     act.like(saveAndContinue(onSubmit, acquisitionUserAnswers, "value" -> "true"))
 
-    act.like(invalidForm(onSubmit, acquisitionUserAnswers))
+    act.like(invalidForm(onSubmit, acquisitionUserAnswers).withName("Error renders for acquisition"))
+    act.like(invalidForm(onSubmit, contributionUserAnswers).withName("Error renders for contribution"))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

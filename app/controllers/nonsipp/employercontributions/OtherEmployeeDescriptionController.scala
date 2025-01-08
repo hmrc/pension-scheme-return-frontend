@@ -18,6 +18,7 @@ package controllers.nonsipp.employercontributions
 
 import viewmodels.implicits._
 import play.api.mvc._
+import config.Constants.maxInputLength
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -103,7 +104,7 @@ object OtherEmployeeDescriptionController {
       title = "otherEmployeeDescription.title",
       heading = Message("otherEmployeeDescription.heading", employerName),
       description = None,
-      page = TextAreaViewModel(),
+      page = TextAreaViewModel().withMaxLength(maxInputLength),
       refresh = None,
       buttonText = "site.saveAndContinue",
       details = None,

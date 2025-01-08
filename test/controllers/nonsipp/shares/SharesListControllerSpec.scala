@@ -34,7 +34,9 @@ import play.api.inject
 
 class SharesListControllerSpec extends ControllerBaseSpec {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val indexOne = refineMV[Max5000.Refined](1)
+  private val indexTwo = refineMV[Max5000.Refined](2)
+
   private val page = 1
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -71,11 +73,26 @@ class SharesListControllerSpec extends ControllerBaseSpec {
   private val userAnswers =
     defaultUserAnswers
       .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
-      .unsafeSet(SharesCompleted(srn, index), SectionCompleted)
-      .unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
-      .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
-      .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition)
-      .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index), localDate)
+      .unsafeSet(SharesCompleted(srn, indexOne), SectionCompleted)
+      .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, indexOne), SchemeHoldShare.Transfer)
+      .unsafeSet(TypeOfSharesHeldPage(srn, indexOne), TypeOfShares.ConnectedParty)
+      .unsafeSet(CompanyNameRelatedSharesPage(srn, indexOne), companyName)
+      .unsafeSet(SharesCompanyCrnPage(srn, indexOne), ConditionalYesNo.yes[String, Crn](crn))
+      .unsafeSet(ClassOfSharesPage(srn, indexOne), classOfShares)
+      .unsafeSet(HowManySharesPage(srn, indexOne), totalShares)
+      .unsafeSet(CostOfSharesPage(srn, indexOne), money)
+      .unsafeSet(SharesIndependentValuationPage(srn, indexOne), true)
+      .unsafeSet(SharesTotalIncomePage(srn, indexOne), money)
+
+  private val userAnswersToCheck = userAnswers
+    .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, indexTwo), SchemeHoldShare.Transfer)
+    .unsafeSet(TypeOfSharesHeldPage(srn, indexTwo), TypeOfShares.ConnectedParty)
+    .unsafeSet(CompanyNameRelatedSharesPage(srn, indexTwo), companyName)
+    .unsafeSet(SharesCompanyCrnPage(srn, indexTwo), ConditionalYesNo.yes[String, Crn](crn))
+    .unsafeSet(ClassOfSharesPage(srn, indexTwo), classOfShares)
+    .unsafeSet(HowManySharesPage(srn, indexTwo), totalShares)
+    .unsafeSet(CostOfSharesPage(srn, indexTwo), money)
+    .unsafeSet(SharesIndependentValuationPage(srn, indexTwo), true)
 
   private val noUserAnswers =
     defaultUserAnswers
@@ -83,14 +100,33 @@ class SharesListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(FbVersionPage(srn), "002")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
 
-  private val shareData = SharesData(
-    index,
-    typeOfShares = TypeOfShares.Unquoted,
-    companyName = companyName,
-    acquisitionType = SchemeHoldShare.Acquisition,
-    acquisitionDate = Some(localDate)
+  private val sharesData = List(
+    SharesData(
+      indexOne,
+      typeOfShares = TypeOfShares.ConnectedParty,
+      companyName = companyName,
+      acquisitionType = SchemeHoldShare.Transfer,
+      acquisitionDate = None
+    )
   )
-  private val sharesData = List(shareData)
+  private val changedSharesData = List(
+    SharesData(
+      indexOne,
+      typeOfShares = TypeOfShares.ConnectedParty,
+      companyName = "changed",
+      acquisitionType = SchemeHoldShare.Transfer,
+      acquisitionDate = None
+    )
+  )
+  private val shareToCheckData = List(
+    SharesData(
+      indexTwo,
+      typeOfShares = TypeOfShares.ConnectedParty,
+      companyName = companyName,
+      acquisitionType = SchemeHoldShare.Transfer,
+      acquisitionDate = None
+    )
+  )
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     inject.bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -102,7 +138,33 @@ class SharesListControllerSpec extends ControllerBaseSpec {
       injected[ListView]
         .apply(
           form(injected[YesNoPageFormProvider]),
-          viewModel(srn, page, NormalMode, sharesData, schemeName, showBackLink = true)
+          viewModel(
+            srn,
+            page,
+            NormalMode,
+            sharesData,
+            sharesToCheck = Nil,
+            schemeName,
+            showBackLink = true,
+            isPrePop = false
+          )
+        )
+    })
+
+    act.like(renderViewWithPrePopSession(onPageLoad, userAnswersToCheck) { implicit app => implicit request =>
+      injected[ListView]
+        .apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(
+            srn,
+            page,
+            NormalMode,
+            sharesData,
+            shareToCheckData,
+            schemeName,
+            showBackLink = true,
+            isPrePop = true
+          )
         )
     })
 
@@ -111,7 +173,16 @@ class SharesListControllerSpec extends ControllerBaseSpec {
         injected[ListView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, page, NormalMode, sharesData, schemeName, showBackLink = true)
+            viewModel(
+              srn,
+              page,
+              NormalMode,
+              sharesData,
+              sharesToCheck = Nil,
+              schemeName,
+              showBackLink = true,
+              isPrePop = false
+            )
           )
       }
     )
@@ -166,16 +237,18 @@ class SharesListControllerSpec extends ControllerBaseSpec {
                 page,
                 mode = ViewOnlyMode,
                 sharesData,
+                sharesToCheck = Nil,
                 schemeName,
                 Some(viewOnlyViewModel),
-                showBackLink = true
+                showBackLink = true,
+                isPrePop = false
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
 
     val updatedUserAnswers = currentUserAnswers
-      .unsafeSet(CompanyNameRelatedSharesPage(srn, index), "changed")
+      .unsafeSet(CompanyNameRelatedSharesPage(srn, indexOne), "changed")
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -187,10 +260,12 @@ class SharesListControllerSpec extends ControllerBaseSpec {
                 srn,
                 page,
                 mode = ViewOnlyMode,
-                List(shareData.copy(companyName = "changed")),
+                changedSharesData,
+                sharesToCheck = Nil,
                 schemeName,
                 viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-                showBackLink = true
+                showBackLink = true,
+                isPrePop = false
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -206,10 +281,12 @@ class SharesListControllerSpec extends ControllerBaseSpec {
                 srn,
                 page,
                 mode = ViewOnlyMode,
-                List(),
+                shares = Nil,
+                sharesToCheck = Nil,
                 schemeName,
                 viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-                showBackLink = true
+                showBackLink = true,
+                isPrePop = false
               )
             )
       }.withName("OnPageLoadViewOnly renders ok with no shares")
@@ -240,6 +317,7 @@ class SharesListControllerSpec extends ControllerBaseSpec {
               page,
               mode = ViewOnlyMode,
               sharesData,
+              sharesToCheck = Nil,
               schemeName,
               viewOnlyViewModel = Some(
                 viewOnlyViewModel.copy(
@@ -247,7 +325,8 @@ class SharesListControllerSpec extends ControllerBaseSpec {
                   previousVersion = (submissionNumberOne - 1).max(0)
                 )
               ),
-              showBackLink = false
+              showBackLink = false,
+              isPrePop = false
             )
           )
       }.withName("OnPreviousViewOnly renders the view correctly")

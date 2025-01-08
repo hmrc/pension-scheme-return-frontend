@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import services.{PsrSubmissionService, SchemeDateService}
+import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import viewmodels.implicits._
 import models.ConditionalYesNo._
 import play.api.mvc._
@@ -49,6 +49,7 @@ class LoansCYAController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
+  saveService: SaveService,
   schemeDateService: SchemeDateService,
   psrSubmissionService: PsrSubmissionService,
   view: CheckYourAnswersView
@@ -162,16 +163,24 @@ class LoansCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      psrSubmissionService
-        .submitPsrDetails(
-          srn,
-          fallbackCall =
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, index, mode)
+      for {
+        updatedAnswers <- Future.fromTry(
+          request.userAnswers
+            .set(LoansMadeOrOutstandingPage(srn), true)
+            .set(LoanCompleted(srn, index), SectionCompleted)
         )
-        .map {
-          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          case Some(_) => Redirect(navigator.nextPage(LoansCYAPage(srn), NormalMode, request.userAnswers))
-        }
+        _ <- saveService.save(updatedAnswers)
+        redirectTo <- psrSubmissionService
+          .submitPsrDetails(
+            srn,
+            fallbackCall =
+              controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, index, mode)
+          )
+          .map {
+            case None => controllers.routes.JourneyRecoveryController.onPageLoad()
+            case Some(_) => navigator.nextPage(LoansCYAPage(srn), NormalMode, request.userAnswers)
+          }
+      } yield Redirect(redirectTo)
     }
 
   def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -213,12 +222,12 @@ object LoansCYAController {
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,
       title = mode.fold(
-        normal = "checkYourAnswers.title",
+        normal = "loanCheckYourAnswers.normal.title",
         check = "loanCheckYourAnswers.change.title",
         viewOnly = "loanCheckYourAnswers.viewOnly.title"
       ),
       heading = mode.fold(
-        normal = "checkYourAnswers.heading",
+        normal = "loanCheckYourAnswers.normal.heading",
         check = Message("loanCheckYourAnswers.change.heading", amountOfTheLoan.loanAmount.displayAs, recipientName),
         viewOnly = Message("loanCheckYourAnswers.viewOnly.heading", amountOfTheLoan.loanAmount.displayAs, recipientName)
       ),
@@ -711,5 +720,4 @@ object LoansCYAController {
       )
     )
   }
-
 }

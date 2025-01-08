@@ -28,7 +28,7 @@
 
     @layout(pageTitle = paginatedTitle(viewmodel.page.paginatedViewModel, form, if(viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.title.toMessage else viewmodel.title.toMessage),showBackLink = viewmodel.showBackLink) {
 
-        @formHelper(action = if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.onSubmit else viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
+        @formHelper(action = if(viewmodel.mode == ViewOnlyMode && viewmodel.optViewOnlyDetails.nonEmpty) viewmodel.optViewOnlyDetails.get.onSubmit else viewmodel.onSubmit) {
 
             @if(form.hasErrors) {
                 @govukErrorSummary(ErrorSummaryViewModel(form))

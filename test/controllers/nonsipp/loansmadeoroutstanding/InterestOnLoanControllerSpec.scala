@@ -16,38 +16,41 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import views.html.MultipleQuestionView
-import eu.timepit.refined.refineMV
-import models.{NormalMode, UserAnswers}
-import controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.partialAnswersForm
-import pages.nonsipp.loansmadeoroutstanding.InterestOnLoanPage
-import config.RefinedTypes.OneTo5000
+import models.ConditionalYesNo._
 import controllers.ControllerBaseSpec
+import views.html.MultipleQuestionView
+import config.Constants.maxCurrencyValue
+import models._
+import controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.partialAnswersForm
+import pages.nonsipp.loansmadeoroutstanding._
 
 class InterestOnLoanControllerSpec extends ControllerBaseSpec {
 
-  val maxAllowedAmount = 999999999.99
-  private val index = refineMV[OneTo5000](1)
+  private val partialUserAnswers: UserAnswers = defaultUserAnswers
+    .unsafeSet(InterestOnLoanPage(srn, index1of5000), partialInterestOnLoan)
 
-  val partialUserAnswers: UserAnswers =
-    defaultUserAnswers.unsafeSet(InterestOnLoanPage(srn, index), partialInterestOnLoan)
+  private val prePopUserAnswersMissing: UserAnswers = defaultUserAnswers
+    .unsafeSet(SecurityGivenForLoanPage(srn, index1of5000), conditionalYesNoSecurity)
+
+  private val prePopUserAnswersCompleted: UserAnswers = defaultUserAnswers
+    .unsafeSet(SecurityGivenForLoanPage(srn, index1of5000), conditionalYesNoSecurity)
+    .unsafeSet(ArrearsPrevYears(srn, index1of5000), true)
+    .unsafeSet(OutstandingArrearsOnLoanPage(srn, index1of5000), conditionalYesNoMoney)
 
   "InterestOnLoanController" - {
 
-    val schemeName = defaultSchemeDetails.schemeName
-
     val form = InterestOnLoanController.form()
-    lazy val viewModel = InterestOnLoanController.viewModel(srn, index, NormalMode, schemeName, _)
+    lazy val viewModel = InterestOnLoanController.viewModel(srn, index1of5000, NormalMode, schemeName, _)
 
-    lazy val onPageLoad = routes.InterestOnLoanController.onPageLoad(srn, index, NormalMode)
-    lazy val onSubmit = routes.InterestOnLoanController.onSubmit(srn, index, NormalMode)
+    lazy val onPageLoad = routes.InterestOnLoanController.onPageLoad(srn, index1of5000, NormalMode)
+    lazy val onSubmit = routes.InterestOnLoanController.onSubmit(srn, index1of5000, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[MultipleQuestionView]
       view(InterestOnLoanController.form(), viewModel(InterestOnLoanController.form()))
     })
 
-    act.like(renderPrePopView(onPageLoad, InterestOnLoanPage(srn, index), interestOnLoan) {
+    act.like(renderPrePopView(onPageLoad, InterestOnLoanPage(srn, index1of5000), interestOnLoan) {
       implicit app => implicit request =>
         val view = injected[MultipleQuestionView]
         view(form.fill((money, percentage, money)), viewModel(form))
@@ -69,10 +72,52 @@ class InterestOnLoanControllerSpec extends ControllerBaseSpec {
       )
     )
 
+    act.like(
+      redirectToPageWithPrePopSession(
+        call = onSubmit,
+        page = controllers.nonsipp.loansmadeoroutstanding.routes.OutstandingArrearsOnLoanController
+          .onPageLoad(srn, index1of5000, NormalMode),
+        userAnswers = prePopUserAnswersMissing,
+        previousUserAnswers = defaultUserAnswers,
+        mockSaveService = None,
+        form = "value.1" -> money.value.toString,
+        "value.2" -> percentage.value.toString,
+        "value.3" -> money.value.toString
+      ).withName("Skip next page when SecurityGivenForLoan is present and OutstandingArrearsOnLoan is empty (PrePop)")
+    )
+
+    act.like(
+      redirectToPageWithPrePopSession(
+        call = onSubmit,
+        page = controllers.nonsipp.loansmadeoroutstanding.routes.SecurityGivenForLoanController
+          .onPageLoad(srn, index1of5000, NormalMode),
+        userAnswers = prePopUserAnswersCompleted,
+        previousUserAnswers = defaultUserAnswers,
+        mockSaveService = None,
+        form = "value.1" -> money.value.toString,
+        "value.2" -> percentage.value.toString,
+        "value.3" -> money.value.toString
+      ).withName("Don't skip next page when OutstandingArrearsOnLoan is present (PrePop)")
+    )
+
+    act.like(
+      redirectToPageWithPrePopSession(
+        call = onSubmit,
+        page = controllers.nonsipp.loansmadeoroutstanding.routes.SecurityGivenForLoanController
+          .onPageLoad(srn, index1of5000, NormalMode),
+        userAnswers = defaultUserAnswers,
+        previousUserAnswers = defaultUserAnswers,
+        mockSaveService = None,
+        form = "value.1" -> money.value.toString,
+        "value.2" -> percentage.value.toString,
+        "value.3" -> money.value.toString
+      ).withName("Don't skip next page when SecurityGivenForLoan is empty (PrePop)")
+    )
+
     act.like(invalidForm(onSubmit))
 
     act.like(
-      invalidForm(onSubmit, "value" -> (maxAllowedAmount + 0.001).toString)
+      invalidForm(onSubmit, "value" -> (maxCurrencyValue + 0.001).toString)
         .withName("fail to submit when amount entered is greater than maximum allowed amount")
     )
 

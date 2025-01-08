@@ -30,7 +30,6 @@ import pages.nonsipp.sharesdisposal._
 import utils.UserAnswersUtils.UserAnswersOps
 import pages.nonsipp.membersurrenderedbenefits._
 import models._
-import models.SponsoringOrConnectedParty.Sponsoring
 import pages.nonsipp.otherassetsdisposal.{AnyPartAssetStillHeldPage, HowWasAssetDisposedOfPage, OtherAssetsDisposalPage}
 import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.bonds._
@@ -132,6 +131,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     .unsafeSet(SecurityGivenForLoanPage(srn, index1of5000), ConditionalYesNo.yes[Unit, Security](security))
     .unsafeSet(ArrearsPrevYears(srn, index1of5000), true)
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, index1of5000), ConditionalYesNo.yes[Unit, Money](money))
+    .unsafeSet(LoanCompleted(srn, index1of5000), SectionCompleted)
     // (S4) Money Borrowed
     .unsafeSet(MoneyBorrowedPage(srn), true)
     .unsafeSet(LenderNamePage(srn, index1of5000), lenderName)
@@ -260,7 +260,9 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
     "should be Not Started" - {
       "when default data" in {
-        val (status, link) = TaskListStatusUtils.getLoansTaskListStatusAndLink(defaultUserAnswers, srn)
+        val (status, link) =
+          TaskListStatusUtils.getLoansTaskListStatusAndLink(defaultUserAnswers, srn, isPrePop = false)
+
         status mustBe NotStarted
         link mustBe firstQuestionPageUrl
       }
@@ -270,7 +272,10 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when only LoansMadeOrOutstandingPage true is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
-        val (status, link) = TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn)
+
+        val (status, link) =
+          TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
+
         status mustBe InProgress
         link mustBe firstQuestionPageUrl
       }
@@ -280,7 +285,9 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
           .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.Individual))
 
-        val (status, link) = TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn)
+        val (status, link) =
+          TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
+
         status mustBe InProgress
         link mustBe secondQuestionPageUrl(index1of5000)
       }
@@ -290,7 +297,10 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when only LoansMadeOrOutstandingPage false is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LoansMadeOrOutstandingPage(srn), false)
-        val (status, link) = TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn)
+
+        val (status, link) =
+          TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
+
         status mustBe Recorded(0, "")
         link mustBe firstQuestionPageUrl
       }
@@ -300,15 +310,14 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
           // First loan:
           .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
-          .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1)), Sponsoring)
-          .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
-          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(LoanCompleted(srn, index1of5000), SectionCompleted)
           // Second loan:
           .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
-          .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(2)), true)
-          .unsafeSet(ArrearsPrevYears(srn, refineMV(2)), true)
-          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(2)), ConditionalYesNo.yes[Unit, Money](money))
-        val (status, link) = TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn)
+          .unsafeSet(LoanCompleted(srn, index2of5000), SectionCompleted)
+
+        val (status, link) =
+          TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
+
         status mustBe Recorded(2, "loans")
         link mustBe listPageUrl
       }
@@ -316,12 +325,15 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when LoansMadeOrOutstandingPage true and more first pages than last pages is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+          // First loan:
           .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+          .unsafeSet(LoanCompleted(srn, index1of5000), SectionCompleted)
+          // Second loan:
           .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
-          .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
-          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
 
-        val (status, link) = TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn)
+        val (status, link) =
+          TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
+
         status mustBe Recorded(1, "loans")
         link mustBe listPageUrl
       }
@@ -525,7 +537,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
     "should be Not Started" - {
       "when default data" in {
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(defaultUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(defaultUserAnswers, srn, isPrePop = false)
         result mustBe (NotStarted, firstQuestionPageUrl)
       }
     }
@@ -534,7 +546,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when only DidSchemeHoldAnyShares false is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), false)
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(0, ""), firstQuestionPageUrl)
       }
 
@@ -543,7 +555,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
           .unsafeSet(TypeOfSharesHeldPage(srn, index1of5000), TypeOfShares.ConnectedParty)
           .unsafeSet(SharesCompleted(srn, index1of5000), SectionCompleted)
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "shares"), listPageUrl)
       }
 
@@ -556,7 +568,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
           .unsafeSet(SharesCompleted(srn, refineMV(2)), SectionCompleted)
 
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "shares"), listPageUrl)
       }
 
@@ -569,7 +581,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           // second share:
           .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
 
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "shares"), listPageUrl)
       }
     }
@@ -578,7 +590,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when only DidSchemeHoldAnyShares true is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, firstQuestionPageUrl)
       }
 
@@ -586,7 +598,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
           .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), TypeOfShares.Unquoted)
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, secondQuestionPageUrl(index1of5000))
       }
 
@@ -597,7 +609,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           // second share:
           .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
 
-        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, secondQuestionPageUrl(index2of5000))
       }
     }

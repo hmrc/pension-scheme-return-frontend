@@ -120,6 +120,10 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
         }
     }
 
+  implicit class FutureEitherOps[A](f: Future[Either[A, A]])(implicit ec: ExecutionContext) {
+    def merge: Future[A] = f.map(_.merge)
+  }
+
   implicit class EitherOps[A](maybe: Either[String, A]) {
     def getOrRecoverJourney(implicit logger: Logger): Either[Result, A] =
       maybe.leftMap { errMsg =>

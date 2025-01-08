@@ -182,7 +182,7 @@ object TransfersInCYAController {
   ): FormPageViewModel[CheckYourAnswersViewModel] = {
     val heading: InlineMessage =
       mode.fold(
-        normal = "checkYourAnswers.heading",
+        normal = "transfersInCYAController.normal.heading",
         check = Message("transfersInCYAController.heading.check", memberName),
         viewOnly = "transfersInCYAController.viewOnly.heading"
       )
@@ -191,7 +191,7 @@ object TransfersInCYAController {
       mode = mode,
       title = mode
         .fold(
-          normal = "checkYourAnswers.title",
+          normal = "transfersInCYAController.normal.title",
           check = "transfersInCYAController.title.check",
           viewOnly = "transfersInCYAController.viewOnly.title"
         ),

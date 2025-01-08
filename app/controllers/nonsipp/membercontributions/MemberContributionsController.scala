@@ -106,6 +106,7 @@ object MemberContributionsController {
       onSubmit = routes.MemberContributionsController.onSubmit(srn, mode)
     ).withDescription(
       ParagraphMessage("memberContributions.paragraph") ++
-        ListMessage(ListType.Bullet, "memberContributions.listItem1", "memberContributions.listItem2")
+        ListMessage(ListType.Bullet, "memberContributions.listItem1", "memberContributions.listItem2") ++
+        ParagraphMessage("memberContributions.paragraph1")
     )
 }

@@ -196,6 +196,7 @@ class SharesCYAController @Inject()(
         updatedAnswers <- Future
           .fromTry(
             request.userAnswers
+              .set(DidSchemeHoldAnySharesPage(srn), true)
               .set(SharesCompleted(srn, index), SectionCompleted)
           )
         _ <- saveService.save(updatedAnswers)
@@ -255,12 +256,12 @@ object SharesCYAController {
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,
       title = mode.fold(
-        normal = "checkYourAnswers.title",
+        normal = "sharesCYA.normal.title",
         check = "sharesCYA.change.title",
         viewOnly = "sharesCYA.viewOnly.title"
       ),
       heading = mode.fold(
-        normal = "checkYourAnswers.heading",
+        normal = "sharesCYA.normal.heading",
         check = Message("sharesCYA.change.heading", companyNameRelatedShares),
         viewOnly = Message("sharesCYA.viewOnly.heading", companyNameRelatedShares)
       ),

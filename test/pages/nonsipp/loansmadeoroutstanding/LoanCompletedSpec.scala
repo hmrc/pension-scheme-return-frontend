@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp.loansmadeoroutstanding
 
-import config.Constants
-import viewmodels.DisplayMessage.Message
+import config.RefinedTypes.OneTo5000
+import eu.timepit.refined.refineMV
+import viewmodels.models.SectionCompleted
+import pages.behaviours.PageBehaviours
 
-case class TextAreaViewModel(
-  rows: Int = 5,
-  hint: Option[Message] = None,
-  maxLength: Int = Constants.maxTextAreaLength
-) {
-  def withHint(message: Message): TextAreaViewModel =
-    copy(hint = Some(message))
+class LoanCompletedSpec extends PageBehaviours {
 
-  def withMaxLength(maxLength: Int): TextAreaViewModel =
-    copy(maxLength = maxLength)
+  "LoanCompleted" - {
+    val srn = srnGen.sample.value
+    val index = refineMV[OneTo5000](1)
+
+    beRetrievable[SectionCompleted](LoanCompleted(srn, index))
+
+    beSettable[SectionCompleted](LoanCompleted(srn, index))
+
+    beRemovable[SectionCompleted](LoanCompleted(srn, index))
+  }
 }

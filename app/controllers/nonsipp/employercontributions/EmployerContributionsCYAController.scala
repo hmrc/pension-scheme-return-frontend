@@ -232,12 +232,12 @@ object EmployerContributionsCYAController {
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,
       title = mode.fold(
-        "checkYourAnswers.title",
+        "employerContributionsCYA.title.normal",
         "employerContributionsCYA.title.change",
         "employerContributionsCYA.title.viewOnly"
       ),
       heading = mode.fold(
-        "checkYourAnswers.heading",
+        "employerContributionsCYA.heading.normal",
         Message("employerContributionsCYA.heading.change", membersName),
         Message("employerContributionsCYA.heading.viewOnly", membersName)
       ),

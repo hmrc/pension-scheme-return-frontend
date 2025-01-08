@@ -18,25 +18,21 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import services.SchemeDateService
 import controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.partialAnswersForm
+import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.MultipleQuestionView
-import eu.timepit.refined.refineMV
+import config.Constants.maxCurrencyValue
 import forms.MoneyFormProvider
 import models._
-import pages.nonsipp.loansmadeoroutstanding.AmountOfTheLoanPage
+import pages.nonsipp.loansmadeoroutstanding.{AmountOfTheLoanPage, AreRepaymentsInstalmentsPage, InterestOnLoanPage}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{reset, when}
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
 
 class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
 
-  private val index = refineMV[OneTo5000](1)
-
   val schemeDatePeriod: DateRange = dateRangeGen.sample.value
   val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
-  val maxAllowedAmount = 999999999.99
 
   override val additionalBindings: List[GuiceableModule] = List(
     bind[SchemeDateService].toInstance(mockSchemeDateService)
@@ -50,25 +46,34 @@ class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
   def setSchemeDate(date: Option[DateRange]): Unit =
     when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(date)
 
-  val partialUserAnswers: UserAnswers =
-    defaultUserAnswers.unsafeSet(AmountOfTheLoanPage(srn, index), partialAmountOfTheLoan)
+  val partialUserAnswers: UserAnswers = defaultUserAnswers
+    .unsafeSet(AmountOfTheLoanPage(srn, index1of5000), partialAmountOfTheLoan)
+
+  val prePopUserAnswersMissing: UserAnswers = defaultUserAnswers
+    .unsafeSet(AreRepaymentsInstalmentsPage(srn, index1of5000), true)
+    .unsafeSet(InterestOnLoanPage(srn, index1of5000), partialInterestOnLoan)
+
+  val prePopUserAnswersCompleted: UserAnswers = defaultUserAnswers
+    .unsafeSet(AreRepaymentsInstalmentsPage(srn, index1of5000), true)
+    .unsafeSet(InterestOnLoanPage(srn, index1of5000), interestOnLoan)
 
   "AmountOfTheLoanController" - {
 
     val schemeName = defaultSchemeDetails.schemeName
 
     val form = AmountOfTheLoanController.form(new MoneyFormProvider(), schemeDatePeriod)
-    lazy val viewModel = AmountOfTheLoanController.viewModel(srn, index, NormalMode, schemeName, schemeDatePeriod, _)
+    lazy val viewModel =
+      AmountOfTheLoanController.viewModel(srn, index1of5000, NormalMode, schemeName, schemeDatePeriod, _)
 
-    lazy val onPageLoad = routes.AmountOfTheLoanController.onPageLoad(srn, index, NormalMode)
-    lazy val onSubmit = routes.AmountOfTheLoanController.onSubmit(srn, index, NormalMode)
+    lazy val onPageLoad = routes.AmountOfTheLoanController.onPageLoad(srn, index1of5000, NormalMode)
+    lazy val onSubmit = routes.AmountOfTheLoanController.onSubmit(srn, index1of5000, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[MultipleQuestionView]
       view(form, viewModel(form))
     })
 
-    act.like(renderPrePopView(onPageLoad, AmountOfTheLoanPage(srn, index), amountOfTheLoan) {
+    act.like(renderPrePopView(onPageLoad, AmountOfTheLoanPage(srn, index1of5000), amountOfTheLoan) {
       implicit app => implicit request =>
         val view = injected[MultipleQuestionView]
         view(form.fill((money, money, money)), viewModel(form))
@@ -95,10 +100,66 @@ class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
       )
     )
 
+    act.like(
+      redirectToPageWithPrePopSession(
+        call = onSubmit,
+        page = controllers.nonsipp.loansmadeoroutstanding.routes.InterestOnLoanController
+          .onPageLoad(srn, index1of5000, NormalMode),
+        userAnswers = prePopUserAnswersMissing,
+        previousUserAnswers = defaultUserAnswers,
+        mockSaveService = None,
+        form = "value.1" -> money.value.toString,
+        "value.2" -> money.value.toString,
+        "value.3" -> money.value.toString
+      )
+    )
+
+    act.like(
+      redirectToPageWithPrePopSession(
+        call = onSubmit,
+        page = controllers.nonsipp.loansmadeoroutstanding.routes.InterestOnLoanController
+          .onPageLoad(srn, index1of5000, NormalMode),
+        userAnswers = prePopUserAnswersMissing,
+        previousUserAnswers = defaultUserAnswers,
+        mockSaveService = None,
+        form = "value.1" -> money.value.toString,
+        "value.2" -> money.value.toString,
+        "value.3" -> money.value.toString
+      ).withName("Skip next page when AreRepaymentsInstalments is present and optIntReceivedCY is empty (PrePop)")
+    )
+
+    act.like(
+      redirectToPageWithPrePopSession(
+        call = onSubmit,
+        page = controllers.nonsipp.loansmadeoroutstanding.routes.AreRepaymentsInstalmentsController
+          .onPageLoad(srn, index1of5000, NormalMode),
+        userAnswers = prePopUserAnswersCompleted,
+        previousUserAnswers = defaultUserAnswers,
+        mockSaveService = None,
+        form = "value.1" -> money.value.toString,
+        "value.2" -> money.value.toString,
+        "value.3" -> money.value.toString
+      ).withName("Don't skip next page when optIntReceivedCY is present (PrePop)")
+    )
+
+    act.like(
+      redirectToPageWithPrePopSession(
+        call = onSubmit,
+        page = controllers.nonsipp.loansmadeoroutstanding.routes.AreRepaymentsInstalmentsController
+          .onPageLoad(srn, index1of5000, NormalMode),
+        userAnswers = defaultUserAnswers,
+        previousUserAnswers = defaultUserAnswers,
+        mockSaveService = None,
+        form = "value.1" -> money.value.toString,
+        "value.2" -> percentage.value.toString,
+        "value.3" -> money.value.toString
+      ).withName("Don't skip next page when AreRepaymentsInstalments is empty (PrePop)")
+    )
+
     act.like(invalidForm(onSubmit))
 
     act.like(
-      invalidForm(onSubmit, "value" -> (maxAllowedAmount + 0.001).toString)
+      invalidForm(onSubmit, "value" -> (maxCurrencyValue + 0.001).toString)
         .withName("fail to submit when amount entered is greater than maximum allowed amount")
     )
 

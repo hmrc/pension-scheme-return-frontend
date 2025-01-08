@@ -96,8 +96,6 @@ object Constants {
   val minBondsHeld = 0
   val maxBonds = 9999999
 
-  val unallocatedContributionMin = 0.01
-  val minSurrenderedBenefitAmount = 1
   val maxSurrenderedBenefitAmount = 999999999.99
   val minTotalConsiderationAmount = 0.01
   val maxTotalConsiderationAmount = 999999999.99
@@ -117,11 +115,9 @@ object Constants {
   val maxInputLength = 35
   val maxTextAreaLength = 160
   val maxOtherDescriptionLength = 35
-  val maxTitleNumberLength = 35
   val maxNotRelevant = 9999999
 
   val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
-  val titleNumberRegex = """^[a-zA-Z]{2,3}[0-9]+$"""
   val inputRegexQROPS = """^(Q[0-9]{6})$"""
   val inputRegexPSTR = """^([0-9]{8}[A-Z]{2})$"""
 

@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.Constants.maxInputLength
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.TextFormProvider
@@ -134,7 +135,7 @@ object WhyDidMemberSurrenderBenefitsController {
     FormPageViewModel(
       "surrenderedBenefits.whyDidMemberSurrenderBenefits.title",
       Message("surrenderedBenefits.whyDidMemberSurrenderBenefits.heading", schemeName, lenderName, amount),
-      TextAreaViewModel(),
+      TextAreaViewModel().withMaxLength(maxInputLength),
       controllers.nonsipp.membersurrenderedbenefits.routes.WhyDidMemberSurrenderBenefitsController
         .onSubmit(srn, index, mode)
     )

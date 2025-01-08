@@ -66,7 +66,8 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           InterestOnLoanPage(srn, index),
           ArrearsPrevYears(srn, index),
           OutstandingArrearsOnLoanPage(srn, index),
-          SecurityGivenForLoanPage(srn, index)
+          SecurityGivenForLoanPage(srn, index),
+          LoanCompleted(srn, index)
         )
         if (isLastRecord) list :+ LoansMadeOrOutstandingPage(srn) else list
       case _ =>
@@ -146,5 +147,11 @@ case class IdentityTypes(srn: Srn, identitySubject: IdentitySubject) extends Que
       pages.nonsipp.otherassetsheld.Paths.otherAssetsTransactions \ "acquiredFromType" \ "sellerIdentityType" \ toString
     case IdentitySubject.Unknown => JsPath \ "unknown" \ toString
   }
+  override def toString: String = "identityTypes"
+}
+
+case class LoanIdentityTypePages(srn: Srn) extends QuestionPage[Map[String, IdentityType]] {
+  override def path: JsPath =
+    loansmadeoroutstanding.Paths.loanTransactions \ "recipientIdentityType" \ toString
   override def toString: String = "identityTypes"
 }

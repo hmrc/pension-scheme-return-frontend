@@ -35,7 +35,7 @@ import utils.nonsipp.PrePopulationUtils.isPrePopulation
 import config.Constants.maxCurrencyValue
 import utils.DateTimeUtils.localDateShow
 import models.{DateRange, Mode, Money}
-import pages.nonsipp.loansmadeoroutstanding.AmountOfTheLoanPage
+import pages.nonsipp.loansmadeoroutstanding.{AmountOfTheLoanPage, AreRepaymentsInstalmentsPage, InterestOnLoanPage}
 import cats.{Id, Monad}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -108,7 +108,19 @@ class AmountOfTheLoanController @Inject()(
                 updatedAnswers <- Future
                   .fromTry(request.userAnswers.transformAndSet(AmountOfTheLoanPage(srn, index), value))
                 _ <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(AmountOfTheLoanPage(srn, index), mode, updatedAnswers))
+              } yield (
+                isPrePopulation,
+                request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)),
+                request.userAnswers.get(InterestOnLoanPage(srn, index))
+              ) match {
+                case (true, Some(_), Some(interestDetails)) if interestDetails.hasMissingAnswer =>
+                  Redirect(
+                    controllers.nonsipp.loansmadeoroutstanding.routes.InterestOnLoanController
+                      .onPageLoad(srn, index, mode)
+                  )
+                case _ =>
+                  Redirect(navigator.nextPage(AmountOfTheLoanPage(srn, index), mode, updatedAnswers))
+              }
           )
       }
   }

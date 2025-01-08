@@ -72,6 +72,7 @@ object WhatYouWillNeedTransferOutController {
             "WhatYouWillNeed.TransferOut.tellUs3",
             "WhatYouWillNeed.TransferOut.tellUs4",
             "WhatYouWillNeed.TransferOut.tellUs5"
-          )
+          ) ++
+          ParagraphMessage("WhatYouWillNeed.TransferOut.paragraph2")
       )
 }

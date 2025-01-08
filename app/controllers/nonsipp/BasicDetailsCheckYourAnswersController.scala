@@ -239,8 +239,8 @@ object BasicDetailsCheckYourAnswersController {
   )(implicit messages: Messages): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       mode = mode,
-      title = "checkYourAnswers.title",
-      heading = "checkYourAnswers.heading",
+      title = "basicDetailsCheckYourAnswersController.schemeDetails.normal.title",
+      heading = "basicDetailsCheckYourAnswersController.schemeDetails.normal.heading",
       description = Some(ParagraphMessage("basicDetailsCheckYourAnswers.paragraph")),
       page = CheckYourAnswersViewModel(
         sections(

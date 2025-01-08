@@ -73,7 +73,7 @@ trait ControllerBehaviours {
   )(
     view: Application => Request[_] => Html
   ): BehaviourTest =
-    "return OK and the correct view".hasBehaviour {
+    "return OK and the correct view with PrePop session".hasBehaviour {
       val appBuilder = applicationBuilder(
         userAnswers = Some(userAnswers),
         pureUserAnswers = Some(pureUserAnswers),
@@ -216,6 +216,34 @@ trait ControllerBehaviours {
 
       running(_ => appBuilder) { app =>
         val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual page.url
+      }
+    }
+
+  def redirectToPageWithPrePopSession(
+    call: => Call,
+    page: => Call,
+    userAnswers: UserAnswers,
+    previousUserAnswers: UserAnswers,
+    mockSaveService: Option[SaveService],
+    form: (String, String)*
+  ): BehaviourTest =
+    s"redirect to page with form $form with PrePop session".hasBehaviour {
+      val appBuilder =
+        applicationBuilder(
+          userAnswers = Some(userAnswers),
+          previousUserAnswers = Some(previousUserAnswers),
+          saveService = mockSaveService
+        )
+
+      running(_ => appBuilder) { app =>
+        val request = FakeRequest(call)
+          .withFormUrlEncodedBody(form: _*)
+          .withSession((PREPOPULATION_FLAG, "true"))
 
         val result = route(app, request).value
 

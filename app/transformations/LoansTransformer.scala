@@ -25,6 +25,7 @@ import uk.gov.hmrc.domain.Nino
 import models._
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
+import viewmodels.models.SectionCompleted
 import pages.nonsipp.loansmadeoroutstanding.Paths.loans
 import models.ConditionalYesNo._
 import utils.nonsipp.PrePopulationUtils.isPrePopulation
@@ -488,6 +489,9 @@ class LoansTransformer @Inject() extends Transformer {
         .map(
           index => OutstandingArrearsOnLoanPage(srn, index) -> ConditionalYesNo.no[Unit, Money](())
         )
+      loanCompleted = indexes.map(
+        index => LoanCompleted(srn, index) -> SectionCompleted
+      )
 
       ua0 <- optRecordVersion.foldLeft(Try(userAnswers)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
@@ -523,6 +527,7 @@ class LoansTransformer @Inject() extends Transformer {
       ua16 <- noOutstandingArrearsOnLoan.foldLeft(Try(ua15)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
-    } yield ua16
+      ua17 <- loanCompleted.foldLeft(Try(ua16)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+    } yield ua17
   }
 }

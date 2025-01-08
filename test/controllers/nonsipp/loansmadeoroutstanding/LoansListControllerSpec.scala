@@ -19,81 +19,112 @@ package controllers.nonsipp.loansmadeoroutstanding
 import services.PsrSubmissionService
 import org.mockito.Mockito._
 import models.ConditionalYesNo._
+import controllers.ControllerBaseSpec
 import views.html.ListView
+import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
+import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
-import models._
+import models.{Security, _}
 import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, PartnershipRecipientUtrPage}
 import pages.nonsipp.loansmadeoroutstanding._
-import eu.timepit.refined.api.Refined
+import viewmodels.models.SectionCompleted
+import models.SponsoringOrConnectedParty._
 import org.mockito.ArgumentMatchers.any
-import config.RefinedTypes.{Max5000, OneTo5000}
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
-import eu.timepit.refined.refineMV
-import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
-import uk.gov.hmrc.domain.Nino
 
 class LoansListControllerSpec extends ControllerBaseSpec {
-  private val subject = IdentitySubject.LoanRecipient
 
-  val indexOne: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
-  val indexTwo: Refined[Int, OneTo5000] = refineMV[OneTo5000](2)
-  val indexThree: Refined[Int, OneTo5000] = refineMV[OneTo5000](3)
+  private val loanRecipient = IdentitySubject.LoanRecipient
 
   private val completedUserAnswers = defaultUserAnswers
     .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
-    .unsafeSet(IdentityTypePage(srn, indexOne, subject), IdentityType.UKCompany)
-    .unsafeSet(CompanyRecipientNamePage(srn, indexOne), "recipientName1")
-    .unsafeSet(
-      CompanyRecipientCrnPage(srn, indexOne, IdentitySubject.LoanRecipient),
-      ConditionalYesNo.yes[String, Crn](crnGen.sample.value)
-    )
-    .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, indexOne), SponsoringOrConnectedParty.ConnectedParty)
-    .unsafeSet(DatePeriodLoanPage(srn, indexOne), (localDate, money, loanPeriod))
-    .unsafeSet(AmountOfTheLoanPage(srn, indexOne), amountOfTheLoan)
-    .unsafeSet(AreRepaymentsInstalmentsPage(srn, indexOne), false)
-    .unsafeSet(InterestOnLoanPage(srn, indexOne), interestOnLoan)
-    .unsafeSet(SecurityGivenForLoanPage(srn, indexOne), ConditionalYesNo.yes[Unit, Security](security))
-    .unsafeSet(ArrearsPrevYears(srn, indexOne), true)
-    .unsafeSet(OutstandingArrearsOnLoanPage(srn, indexOne), ConditionalYesNo.yes[Unit, Money](money))
-    .unsafeSet(IdentityTypePage(srn, indexTwo, subject), IdentityType.UKPartnership)
-    .unsafeSet(PartnershipRecipientNamePage(srn, indexTwo), "recipientName2")
-    .unsafeSet(
-      PartnershipRecipientUtrPage(srn, indexTwo, IdentitySubject.LoanRecipient),
-      ConditionalYesNo.yes[String, Utr](utrGen.sample.value)
-    )
-    .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, indexTwo), SponsoringOrConnectedParty.Neither)
-    .unsafeSet(DatePeriodLoanPage(srn, indexTwo), (localDate, money, loanPeriod))
-    .unsafeSet(AmountOfTheLoanPage(srn, indexTwo), amountOfTheLoan)
-    .unsafeSet(AreRepaymentsInstalmentsPage(srn, indexTwo), false)
-    .unsafeSet(InterestOnLoanPage(srn, indexTwo), interestOnLoan)
-    .unsafeSet(SecurityGivenForLoanPage(srn, indexTwo), ConditionalYesNo.no[Unit, Security](()))
-    .unsafeSet(ArrearsPrevYears(srn, indexOne), false)
-    .unsafeSet(OutstandingArrearsOnLoanPage(srn, indexTwo), ConditionalYesNo.no[Unit, Money](()))
-    .unsafeSet(IdentityTypePage(srn, indexThree, subject), IdentityType.Individual)
-    .unsafeSet(IndividualRecipientNamePage(srn, indexThree), "recipientName3")
-    .unsafeSet(IndividualRecipientNinoPage(srn, indexThree), ConditionalYesNo.yes[String, Nino](ninoGen.sample.value))
-    .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, indexThree), false)
-    .unsafeSet(DatePeriodLoanPage(srn, indexThree), (localDate, money, loanPeriod))
-    .unsafeSet(AmountOfTheLoanPage(srn, indexThree), amountOfTheLoan)
-    .unsafeSet(AreRepaymentsInstalmentsPage(srn, indexThree), false)
-    .unsafeSet(InterestOnLoanPage(srn, indexThree), interestOnLoan)
-    .unsafeSet(SecurityGivenForLoanPage(srn, indexThree), ConditionalYesNo.yes[Unit, Security](security))
-    .unsafeSet(ArrearsPrevYears(srn, indexOne), true)
-    .unsafeSet(OutstandingArrearsOnLoanPage(srn, indexThree), ConditionalYesNo.yes[Unit, Money](money))
+    // First loan:
+    .unsafeSet(IdentityTypePage(srn, index1of5000, loanRecipient), IdentityType.UKCompany)
+    .unsafeSet(CompanyRecipientNamePage(srn, index1of5000), "recipientName1")
+    .unsafeSet(CompanyRecipientCrnPage(srn, index1of5000, loanRecipient), conditionalYesNoCrn)
+    .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index1of5000), ConnectedParty)
+    .unsafeSet(DatePeriodLoanPage(srn, index1of5000), (localDate, money, loanPeriod))
+    .unsafeSet(AmountOfTheLoanPage(srn, index1of5000), amountOfTheLoan)
+    .unsafeSet(AreRepaymentsInstalmentsPage(srn, index1of5000), false)
+    .unsafeSet(InterestOnLoanPage(srn, index1of5000), interestOnLoan)
+    .unsafeSet(SecurityGivenForLoanPage(srn, index1of5000), conditionalYesNoSecurity)
+    .unsafeSet(ArrearsPrevYears(srn, index1of5000), true)
+    .unsafeSet(OutstandingArrearsOnLoanPage(srn, index1of5000), conditionalYesNoMoney)
+    .unsafeSet(LoanCompleted(srn, index1of5000), SectionCompleted)
+    // Second loan:
+    .unsafeSet(IdentityTypePage(srn, index2of5000, loanRecipient), IdentityType.UKPartnership)
+    .unsafeSet(PartnershipRecipientNamePage(srn, index2of5000), "recipientName2")
+    .unsafeSet(PartnershipRecipientUtrPage(srn, index2of5000, loanRecipient), conditionalYesNoUtr)
+    .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index2of5000), Neither)
+    .unsafeSet(DatePeriodLoanPage(srn, index2of5000), (localDate, money, loanPeriod))
+    .unsafeSet(AmountOfTheLoanPage(srn, index2of5000), amountOfTheLoan)
+    .unsafeSet(AreRepaymentsInstalmentsPage(srn, index2of5000), false)
+    .unsafeSet(InterestOnLoanPage(srn, index2of5000), interestOnLoan)
+    .unsafeSet(SecurityGivenForLoanPage(srn, index2of5000), ConditionalYesNo.no[Unit, Security](()))
+    .unsafeSet(ArrearsPrevYears(srn, index2of5000), false)
+    .unsafeSet(OutstandingArrearsOnLoanPage(srn, index2of5000), ConditionalYesNo.no[Unit, Money](()))
+    .unsafeSet(LoanCompleted(srn, index2of5000), SectionCompleted)
 
-  private val inProgressUserAnswers = defaultUserAnswers
-    .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
-    .unsafeSet(IdentityTypePage(srn, indexOne, subject), IdentityType.Individual)
-    .unsafeSet(IndividualRecipientNamePage(srn, indexOne), "recipientName3")
-    .unsafeSet(IndividualRecipientNinoPage(srn, indexOne), ConditionalYesNo.yes[String, Nino](ninoGen.sample.value))
-    .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, indexOne), false)
-    .unsafeSet(DatePeriodLoanPage(srn, indexOne), (localDate, money, loanPeriod))
-    .unsafeSet(AmountOfTheLoanPage(srn, indexOne), amountOfTheLoan)
+  private val userAnswersToCheck = completedUserAnswers
+    .unsafeSet(IdentityTypePage(srn, index3of5000, loanRecipient), IdentityType.Individual)
+    .unsafeSet(IndividualRecipientNamePage(srn, index3of5000), "recipientName3")
+    .unsafeSet(IndividualRecipientNinoPage(srn, index3of5000), conditionalYesNoNino)
+    .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, index3of5000), false)
+    .unsafeSet(DatePeriodLoanPage(srn, index3of5000), (localDate, money, loanPeriod))
+    .unsafeSet(AmountOfTheLoanPage(srn, index3of5000), partialAmountOfTheLoan)
+    .unsafeSet(AreRepaymentsInstalmentsPage(srn, index3of5000), false)
+    .unsafeSet(InterestOnLoanPage(srn, index3of5000), partialInterestOnLoan)
+    .unsafeSet(SecurityGivenForLoanPage(srn, index3of5000), conditionalYesNoSecurity)
+    .unsafeSet(LoanCompleted(srn, index3of5000), SectionCompleted)
 
-  private lazy val onPageLoad = routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
-  private lazy val onSubmit = routes.LoansListController.onSubmit(srn, page = 1, NormalMode)
-  private lazy val onLoansMadePageLoad = routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
+  private val page = 1
+
+  private lazy val onPageLoad = routes.LoansListController.onPageLoad(srn, page, NormalMode)
+
+  private lazy val onSubmit = routes.LoansListController.onSubmit(srn, page, NormalMode)
+
+  private lazy val onPageLoadTaskListController = controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+
+  private val loansData: List[LoansData] = List(
+    LoansData(
+      index1of5000,
+      money,
+      "recipientName1"
+    ),
+    LoansData(
+      index2of5000,
+      money,
+      "recipientName2"
+    )
+  )
+
+  private val loansDataToCheck: List[LoansData] = List(
+    LoansData(
+      index3of5000,
+      money,
+      "recipientName3"
+    )
+  )
+
+  private val loansDataChanged: List[LoansData] = List(
+    LoansData(
+      index1of5000,
+      money,
+      "changedRecipientName"
+    ),
+    LoansData(
+      index2of5000,
+      money,
+      "recipientName2"
+    )
+  )
+
+  private val viewOnlyViewModel = ViewOnlyViewModel(
+    viewOnlyUpdated = false,
+    year = yearString,
+    currentVersion = submissionNumberTwo,
+    previousVersion = submissionNumberOne,
+    compilationOrSubmissionDate = Some(submissionDateTwo)
+  )
 
   private lazy val onSubmitViewOnly = routes.LoansListController.onSubmitViewOnly(
     srn,
@@ -101,6 +132,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     submissionNumberTwo,
     submissionNumberOne
   )
+
   private lazy val onPageLoadViewOnly = routes.LoansListController.onPageLoadViewOnly(
     srn,
     1,
@@ -108,6 +140,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     submissionNumberTwo,
     submissionNumberOne
   )
+
   private lazy val onPreviousViewOnly = routes.LoansListController.onPreviousViewOnly(
     srn,
     1,
@@ -115,20 +148,27 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     submissionNumberTwo,
     submissionNumberOne
   )
-  private val page = 1
 
-  private val recipients: List[(Max5000, String, Money)] = List(
-    (indexOne, "recipientName1", money),
-    (indexTwo, "recipientName2", money),
-    (indexThree, "recipientName3", money)
-  )
+  private lazy val onPageLoadViewOnlyTaskListController = controllers.nonsipp.routes.ViewOnlyTaskListController
+    .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
 
-  private val mockPsrSubmissionService = mock[PsrSubmissionService]
+  private val currentUserAnswers = completedUserAnswers
+    .unsafeSet(FbVersionPage(srn), "002")
+    .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
+  private val previousUserAnswers = currentUserAnswers
+    .unsafeSet(FbVersionPage(srn), "001")
+    .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
+
+  private val updatedUserAnswers = currentUserAnswers
+    .unsafeSet(CompanyRecipientNamePage(srn, index1of5000), "changedRecipientName")
 
   private val noLoansUserAnswers = defaultUserAnswers
     .unsafeSet(LoansMadeOrOutstandingPage(srn), false)
     .unsafeSet(FbVersionPage(srn), "002")
     .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   "LoansListController" - {
 
@@ -136,42 +176,47 @@ class LoansListControllerSpec extends ControllerBaseSpec {
       injected[ListView].apply(
         form(new YesNoPageFormProvider()),
         viewModel(
-          srn,
-          1,
-          NormalMode,
-          recipients,
-          schemeName,
-          showBackLink = true
+          srn = srn,
+          page = page,
+          mode = NormalMode,
+          loans = loansData,
+          loansToCheck = Nil,
+          schemeName = schemeName,
+          viewOnlyViewModel = None,
+          showBackLink = true,
+          isPrePop = false
         )
       )
     }.withName("Completed Journey"))
 
-    act.like(
-      redirectToPage(
-        onPageLoad,
-        controllers.nonsipp.common.routes.IdentityTypeController
-          .onPageLoad(srn, indexOne, NormalMode, IdentitySubject.LoanRecipient),
-        inProgressUserAnswers
-      ).withName("Incomplete Journey")
-    )
+    act.like(renderViewWithPrePopSession(onPageLoad, userAnswersToCheck) { implicit app => implicit request =>
+      injected[ListView].apply(
+        form(new YesNoPageFormProvider()),
+        viewModel(
+          srn = srn,
+          page = page,
+          mode = NormalMode,
+          loans = loansData,
+          loansToCheck = loansDataToCheck,
+          schemeName = schemeName,
+          viewOnlyViewModel = None,
+          showBackLink = true,
+          isPrePop = true
+        )
+      )
+    }.withName("PrePop Journey"))
 
     act.like(
       redirectToPage(
         onPageLoad,
-        onLoansMadePageLoad,
+        onPageLoadTaskListController,
         defaultUserAnswers
-      ).withName("Not Started Journey")
-    )
-
-    act.like(
-      redirectToPage(
-        onPageLoad,
-        onLoansMadePageLoad,
-        noLoansUserAnswers
-      ).withName("No loans added redirects to yes-no page")
+      ).withName("Redirect to Task List when 0 Loans completed and not in ViewOnly mode")
     )
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
+
+    act.like(redirectNextPage(onSubmit, "value" -> "false"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
@@ -179,21 +224,6 @@ class LoansListControllerSpec extends ControllerBaseSpec {
   }
 
   "LoansListController in view only mode" - {
-    val currentUserAnswers = completedUserAnswers
-      .unsafeSet(FbVersionPage(srn), "002")
-      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
-
-    val previousUserAnswers = currentUserAnswers
-      .unsafeSet(FbVersionPage(srn), "001")
-      .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateOne)
-
-    val viewOnlyViewModel = ViewOnlyViewModel(
-      viewOnlyUpdated = false,
-      year = yearString,
-      currentVersion = submissionNumberTwo,
-      previousVersion = submissionNumberOne,
-      compilationOrSubmissionDate = Some(submissionDateTwo)
-    )
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -201,20 +231,19 @@ class LoansListControllerSpec extends ControllerBaseSpec {
           injected[ListView].apply(
             form(injected[YesNoPageFormProvider]),
             viewModel(
-              srn,
-              page,
+              srn = srn,
+              page = page,
               mode = ViewOnlyMode,
-              recipients,
-              schemeName,
-              Some(viewOnlyViewModel),
-              showBackLink = true
+              loans = loansData,
+              loansToCheck = Nil,
+              schemeName = schemeName,
+              viewOnlyViewModel = Some(viewOnlyViewModel),
+              showBackLink = true,
+              isPrePop = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
-
-    val updatedUserAnswers = currentUserAnswers
-      .unsafeSet(AreRepaymentsInstalmentsPage(srn, indexOne), true)
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
@@ -222,13 +251,15 @@ class LoansListControllerSpec extends ControllerBaseSpec {
           injected[ListView].apply(
             form(injected[YesNoPageFormProvider]),
             viewModel(
-              srn,
-              page,
+              srn = srn,
+              page = page,
               mode = ViewOnlyMode,
-              recipients,
-              schemeName,
+              loans = loansDataChanged,
+              loansToCheck = Nil,
+              schemeName = schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-              showBackLink = true
+              showBackLink = true,
+              isPrePop = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -240,13 +271,15 @@ class LoansListControllerSpec extends ControllerBaseSpec {
           injected[ListView].apply(
             form(new YesNoPageFormProvider()),
             viewModel(
-              srn,
-              page,
+              srn = srn,
+              page = page,
               mode = ViewOnlyMode,
-              List(),
-              schemeName,
+              loans = List(),
+              loansToCheck = Nil,
+              schemeName = schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-              showBackLink = true
+              showBackLink = true,
+              isPrePop = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no loans")
@@ -255,13 +288,40 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmitViewOnly,
-        controllers.nonsipp.routes.ViewOnlyTaskListController
-          .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
+        onPageLoadViewOnlyTaskListController
       ).after(
           verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
         )
         .withName("Submit redirects to view only tasklist")
     )
 
+    act.like(
+      renderView(
+        onPreviousViewOnly,
+        userAnswers = currentUserAnswers,
+        optPreviousAnswers = Some(previousUserAnswers)
+      ) { implicit app => implicit request =>
+        injected[ListView]
+          .apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              loansData,
+              Nil,
+              schemeName,
+              viewOnlyViewModel = Some(
+                viewOnlyViewModel.copy(
+                  currentVersion = (submissionNumberTwo - 1).max(0),
+                  previousVersion = (submissionNumberOne - 1).max(0)
+                )
+              ),
+              showBackLink = false,
+              isPrePop = false
+            )
+          )
+      }.withName("OnPreviousViewOnly renders the view correctly")
+    )
   }
 }

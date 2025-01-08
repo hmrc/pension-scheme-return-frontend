@@ -18,6 +18,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import services.SaveService
 import viewmodels.implicits._
+import models.ConditionalYesNo._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
 import config.RefinedTypes.Max5000
@@ -26,7 +27,7 @@ import navigation.Navigator
 import forms.MultipleQuestionFormProvider
 import models.{Mode, Money, Percentage}
 import controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController._
-import pages.nonsipp.loansmadeoroutstanding.InterestOnLoanPage
+import pages.nonsipp.loansmadeoroutstanding.{InterestOnLoanPage, OutstandingArrearsOnLoanPage, SecurityGivenForLoanPage}
 import play.api.data.Form
 import forms.mappings.errors.{MoneyFormErrors, PercentageFormErrors}
 import forms.mappings.Mappings
@@ -97,7 +98,19 @@ class InterestOnLoanController @Inject()(
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.transformAndSet(InterestOnLoanPage(srn, index), value))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(InterestOnLoanPage(srn, index), mode, updatedAnswers))
+            } yield (
+              isPrePopulation,
+              request.userAnswers.get(SecurityGivenForLoanPage(srn, index)),
+              request.userAnswers.get(OutstandingArrearsOnLoanPage(srn, index))
+            ) match {
+              case (true, Some(_), None) =>
+                Redirect(
+                  controllers.nonsipp.loansmadeoroutstanding.routes.OutstandingArrearsOnLoanController
+                    .onPageLoad(srn, index, mode)
+                )
+              case _ =>
+                Redirect(navigator.nextPage(InterestOnLoanPage(srn, index), mode, updatedAnswers))
+            }
         )
   }
 }

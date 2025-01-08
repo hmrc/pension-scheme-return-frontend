@@ -24,7 +24,7 @@ import forms.mappings.errors.{DateFormErrors, IntFormErrors}
 
 import scala.util.{Failure, Success, Try}
 
-import java.time.LocalDate
+import java.time.{LocalDate, Month}
 
 private[mappings] class LocalDateFormatter(
   dateFormErrors: DateFormErrors,
@@ -44,7 +44,7 @@ private[mappings] class LocalDateFormatter(
 
   private def formatDate(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
 
-    def int(required: String, max: Int) = intFormatter(
+    def int(required: String, max: Int): Formatter[Int] = intFormatter(
       IntFormErrors(
         requiredKey = required,
         wholeNumberKey = dateFormErrors.invalidCharacters,
@@ -63,7 +63,9 @@ private[mappings] class LocalDateFormatter(
 
     val validated = (
       int(dateFormErrors.requiredDay, 31).bind(s"$key.day", data).toValidated,
-      int(dateFormErrors.requiredMonth, 12).bind(s"$key.month", data).toValidated,
+      MonthFormatter(dateFormErrors.requiredMonth, dateFormErrors.invalidCharacters, args)
+        .bind(s"$key.month", data)
+        .toValidated,
       int(dateFormErrors.requiredYear, 9999).bind(s"$key.year", data).toValidated
     ).tupled.toEither
 
@@ -92,10 +94,28 @@ private[mappings] class LocalDateFormatter(
           )
         )
       case _ =>
-        formatDate(key, data).left.map {
-          _.map(_.copy(args = args))
+        formatDate(key, data).left.map { errors =>
+          prioritizeError(errors.map(_.copy(args = args)))
         }
     }
+  }
+
+  private def prioritizeError(allErrors: Seq[FormError]): Seq[FormError] = {
+    val priorityMapping: Map[String, Int] = Map(
+      "required" -> 0,
+      "invalid" -> 1
+    )
+
+    allErrors
+      .sortBy { error =>
+        priorityMapping
+          .collectFirst {
+            case (key, priority) if error.message.contains(key) => priority
+          }
+          .getOrElse(2) // Default priority for errors not matching "required" or "invalid"
+      }
+      .headOption
+      .toSeq
   }
 
   override def unbind(key: String, value: LocalDate): Map[String, String] =
@@ -104,4 +124,38 @@ private[mappings] class LocalDateFormatter(
       s"$key.month" -> value.getMonthValue.toString,
       s"$key.year" -> value.getYear.toString
     )
+}
+
+private object MonthFormatter extends Formatters {
+
+  def apply(requiredKey: String, invalidKey: String, args: Seq[String] = Seq.empty): Formatter[Int] =
+    new Formatter[Int] {
+
+      private val MinMonth = 1
+      private val MaxMonth = 12
+      private val MonthAbbreviationLength = 3
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Int] =
+        data.get(key).map(_.trim).filter(_.nonEmpty) match {
+
+          case None => Left(List(FormError(key, requiredKey, args)))
+          case Some(value) =>
+            val normalizedString = value.toUpperCase
+
+            normalizedString.toIntOption match {
+              case Some(number) if number >= MinMonth && number <= MaxMonth => Right(number)
+              case _ =>
+                Month.values.toList
+                  .find(
+                    m =>
+                      m.toString.toUpperCase == normalizedString ||
+                        m.toString.take(MonthAbbreviationLength).toUpperCase == normalizedString
+                  )
+                  .map(_.getValue)
+                  .toRight(List(FormError(key, invalidKey, args)))
+            }
+        }
+
+      override def unbind(key: String, value: Int): Map[String, String] = Map(key -> value.toString)
+    }
 }

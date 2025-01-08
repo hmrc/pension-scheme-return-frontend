@@ -29,7 +29,7 @@
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
-    @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
+    @formHelper(action = viewmodel.onSubmit) {
 
         @if(viewmodel.description.nonEmpty) {
             <span class="govuk-caption-xl">@renderMessage(viewmodel.description.get)</span>

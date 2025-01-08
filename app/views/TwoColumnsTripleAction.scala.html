@@ -29,7 +29,7 @@
 
 @layout(pageTitle = paginatedTitleNoForm(viewModel.page.paginatedViewModel, if(viewModel.mode == ViewOnlyMode && viewModel.optViewOnlyDetails.nonEmpty) viewModel.optViewOnlyDetails.get.title.toMessage else viewModel.title.toMessage), showBackLink = viewModel.showBackLink) {
 
-    @formHelper(action = if(viewModel.mode == ViewOnlyMode && viewModel.optViewOnlyDetails.nonEmpty) viewModel.optViewOnlyDetails.get.onSubmit else viewModel.onSubmit, Symbol("autocomplete") -> "off") {
+    @formHelper(action = if(viewModel.mode == ViewOnlyMode && viewModel.optViewOnlyDetails.nonEmpty) viewModel.optViewOnlyDetails.get.onSubmit else viewModel.onSubmit) {
 
         @if(viewModel.mode == NormalMode || viewModel.mode == CheckMode) {
             <h1 class="govuk-heading-l">@renderMessage(viewModel.heading)</h1>

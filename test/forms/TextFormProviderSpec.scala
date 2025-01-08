@@ -18,6 +18,7 @@ package forms
 
 import forms.behaviours.FieldBehaviours
 import org.scalacheck.Gen._
+import config.Constants.maxTextAreaLength
 import org.scalacheck.Gen
 import uk.gov.hmrc.domain.Nino
 import play.api.data.Form
@@ -46,7 +47,7 @@ class TextFormProviderSpec extends FieldBehaviours {
     behave.like(fieldThatBindsValidData(form, "value", nonEmptyAlphaString))
     behave.like(mandatoryField(form, "value", "required"))
     behave.like(invalidField(form, "value", "invalid", invalidTextGen))
-    behave.like(textTooLongField(form, "value", "tooLong", formProvider.textAreaMaxLength))
+    behave.like(textTooLongField(form, "value", "tooLong", maxTextAreaLength))
     behave.like(trimmedField(form, "value", "     untrimmed value  "))
 
     "allow punctuation" - {
@@ -91,7 +92,7 @@ class TextFormProviderSpec extends FieldBehaviours {
     behave.like(fieldThatBindsValidData(form, "value", nonEmptyAlphaString))
     behave.like(mandatoryField(form, "value", "required"))
     behave.like(invalidField(form, "value", "invalid", invalidTextGen))
-    behave.like(textTooLongField(form, "value", "tooLong", formProvider.textAreaMaxLength))
+    behave.like(textTooLongField(form, "value", "tooLong", maxTextAreaLength))
     behave.like(trimmedField(form, "value", "     untrimmed value  "))
 
     "specific test value example" - {
