@@ -68,9 +68,9 @@ class RemoveBondsControllerSpec extends ControllerBaseSpec {
 
     act.like(
       saveAndContinue(onSubmit, userAnswers, "value" -> "true")
-        .before(MockPsrSubmissionService.submitPsrDetails())
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )

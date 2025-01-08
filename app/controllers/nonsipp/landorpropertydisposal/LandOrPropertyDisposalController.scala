@@ -73,8 +73,9 @@ class LandOrPropertyDisposalController @Inject()(
               Future.successful(Redirect(navigator.nextPage(LandOrPropertyDisposalPage(srn), mode, updatedAnswers)))
             } else {
               psrSubmissionService
-                .submitPsrDetails(
+                .submitPsrDetailsWithUA(
                   srn,
+                  updatedAnswers,
                   fallbackCall = controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalController
                     .onPageLoad(srn, mode)
                 )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))

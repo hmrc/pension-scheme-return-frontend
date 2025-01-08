@@ -74,8 +74,9 @@ class BondsDisposalController @Inject()(
               )
             } else {
               psrSubmissionService
-                .submitPsrDetails(
+                .submitPsrDetailsWithUA(
                   srn,
+                  updatedAnswers,
                   fallbackCall = controllers.nonsipp.bondsdisposal.routes.BondsDisposalController.onPageLoad(srn, mode)
                 )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                 .map {

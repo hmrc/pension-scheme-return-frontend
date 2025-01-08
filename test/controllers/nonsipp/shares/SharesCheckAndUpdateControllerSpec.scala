@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.shares
 
-import config.RefinedTypes.OneTo5000
-import controllers.ControllerBaseSpec
-import eu.timepit.refined.api.Refined
+import controllers.nonsipp.shares.SharesCheckAndUpdateController._
+import pages.nonsipp.shares.{ClassOfSharesPage, CostOfSharesPage, TypeOfSharesHeldPage}
+import views.html.ContentTablePageView
 import eu.timepit.refined.refineMV
 import models.NormalMode
-import views.html.ContentTablePageView
-import SharesCheckAndUpdateController._
-import pages.nonsipp.shares.{ClassOfSharesPage, CostOfSharesPage, TypeOfSharesHeldPage}
+import eu.timepit.refined.api.Refined
+import config.RefinedTypes.OneTo5000
+import controllers.ControllerBaseSpec
 
 class SharesCheckAndUpdateControllerSpec extends ControllerBaseSpec {
 

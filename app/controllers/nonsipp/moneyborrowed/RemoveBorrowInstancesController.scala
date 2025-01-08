@@ -101,8 +101,9 @@ class RemoveBorrowInstancesController @Inject()(
                   .fromTry(removeAllMoneyBorrowedPages(srn, index, request.userAnswers))
                 _ <- saveService.save(updatedAnswers)
                 redirectTo <- psrSubmissionService
-                  .submitPsrDetails(
+                  .submitPsrDetailsWithUA(
                     srn,
+                    updatedAnswers,
                     fallbackCall =
                       controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, 1, mode)
                   )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))

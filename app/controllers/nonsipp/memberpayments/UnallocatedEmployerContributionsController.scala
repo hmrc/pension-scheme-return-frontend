@@ -74,8 +74,9 @@ class UnallocatedEmployerContributionsController @Inject()(
               )
             } else {
               psrSubmissionService
-                .submitPsrDetails(
+                .submitPsrDetailsWithUA(
                   srn,
+                  updatedAnswers,
                   fallbackCall = controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
                     .onPageLoad(srn, mode)
                 )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
