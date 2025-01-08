@@ -201,8 +201,9 @@ class SharesCYAController @Inject()(
           )
         _ <- saveService.save(updatedAnswers)
         redirectTo <- psrSubmissionService
-          .submitPsrDetails(
+          .submitPsrDetailsWithUA(
             srn,
+            updatedAnswers,
             fallbackCall = controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, mode)
           )
           .map {

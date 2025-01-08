@@ -121,8 +121,9 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       psrSubmissionService
-        .submitPsrDetails(
+        .submitPsrDetailsWithUA(
           srn,
+          request.userAnswers,
           fallbackCall =
             controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn, index, mode)
         )

@@ -211,8 +211,9 @@ class OtherAssetsCYAController @Inject()(
         )
         _ <- saveService.save(updatedUserAnswers)
         redirectTo <- psrSubmissionService
-          .submitPsrDetails(
+          .submitPsrDetailsWithUA(
             srn,
+            updatedUserAnswers,
             fallbackCall =
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad(srn, index, mode)
           )

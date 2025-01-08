@@ -171,8 +171,9 @@ class LoansCYAController @Inject()(
         )
         _ <- saveService.save(updatedAnswers)
         redirectTo <- psrSubmissionService
-          .submitPsrDetails(
+          .submitPsrDetailsWithUA(
             srn,
+            updatedAnswers,
             fallbackCall =
               controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, index, mode)
           )
