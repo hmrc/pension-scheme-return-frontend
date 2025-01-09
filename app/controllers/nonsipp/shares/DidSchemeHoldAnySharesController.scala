@@ -81,8 +81,9 @@ class DidSchemeHoldAnySharesController @Inject()(
                 Future.successful(Redirect(navigator.nextPage(DidSchemeHoldAnySharesPage(srn), mode, updatedAnswers)))
               } else {
                 psrSubmissionService
-                  .submitPsrDetails(
+                  .submitPsrDetailsWithUA(
                     srn,
+                    updatedAnswers,
                     fallbackCall =
                       controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController.onPageLoad(srn, mode)
                   )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))

@@ -114,8 +114,9 @@ class RemoveLoanController @Inject()(
                   .fromTry(request.userAnswers.remove(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)))
                 _ <- saveService.save(updatedAnswers)
                 redirectTo <- psrSubmissionService
-                  .submitPsrDetails(
+                  .submitPsrDetailsWithUA(
                     srn,
+                    updatedAnswers,
                     fallbackCall =
                       controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, 1, mode)
                   )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))

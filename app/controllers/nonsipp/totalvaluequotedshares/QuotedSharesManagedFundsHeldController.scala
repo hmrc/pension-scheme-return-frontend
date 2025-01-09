@@ -84,8 +84,9 @@ class QuotedSharesManagedFundsHeldController @Inject()(
               )
             } else {
               psrSubmissionService
-                .submitPsrDetails(
+                .submitPsrDetailsWithUA(
                   srn,
+                  updatedAnswers,
                   fallbackCall =
                     controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController.onPageLoad(srn, mode)
                 )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))

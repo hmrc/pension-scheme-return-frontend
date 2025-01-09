@@ -84,8 +84,9 @@ class RemovePropertyController @Inject()(
                   .fromTry(request.userAnswers.remove(LandPropertyInUKPage(srn, index)))
                 _ <- saveService.save(updatedAnswers)
                 redirectTo <- psrSubmissionService
-                  .submitPsrDetails(
+                  .submitPsrDetailsWithUA(
                     srn,
+                    updatedAnswers,
                     fallbackCall =
                       controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, 1, mode)
                   )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))

@@ -73,8 +73,9 @@ class LoansMadeOrOutstandingController @Inject()(
               Future.successful(Redirect(navigator.nextPage(LoansMadeOrOutstandingPage(srn), mode, updatedAnswers)))
             } else {
               psrSubmissionService
-                .submitPsrDetails(
+                .submitPsrDetailsWithUA(
                   srn,
+                  updatedAnswers,
                   fallbackCall = controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
                     .onPageLoad(srn, mode)
                 )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))

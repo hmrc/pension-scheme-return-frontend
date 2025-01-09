@@ -67,17 +67,17 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
-        .before(MockPsrSubmissionService.submitPsrDetails())
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
-        .before(MockPsrSubmissionService.submitPsrDetails())
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after({
-          verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )
@@ -88,9 +88,9 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
 
     act.like(
       saveAndContinue(onSubmit, "value" -> "true")
-        .before(MockPsrSubmissionService.submitPsrDetails())
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )

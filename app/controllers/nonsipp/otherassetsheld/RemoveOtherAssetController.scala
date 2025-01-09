@@ -94,8 +94,9 @@ class RemoveOtherAssetController @Inject()(
                 removedUserAnswers <- Future.fromTry(request.userAnswers.remove(WhatIsOtherAssetPage(srn, index)))
                 _ <- saveService.save(removedUserAnswers)
                 redirectTo <- psrSubmissionService
-                  .submitPsrDetails(
+                  .submitPsrDetailsWithUA(
                     srn,
+                    removedUserAnswers,
                     fallbackCall =
                       controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onPageLoad(srn, 1, mode)
                   )(
