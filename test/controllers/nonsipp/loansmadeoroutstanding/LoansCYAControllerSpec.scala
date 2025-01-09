@@ -119,9 +119,9 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
 
       act.like(
         redirectNextPage(onSubmit(mode))
-          .before(MockPsrSubmissionService.submitPsrDetails())
+          .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
           .after({
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
           .withName(s"redirect to next page when in ${mode.toString} mode")
@@ -210,7 +210,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
         )
         .withName("Submit redirects to loans list page")
     )

@@ -219,8 +219,9 @@ class LandPropertyDisposalCYAController @Inject()(
         )
         _ <- saveService.save(updatedUserAnswers)
         redirectTo <- psrSubmissionService
-          .submitPsrDetails(
+          .submitPsrDetailsWithUA(
             srn,
+            updatedUserAnswers,
             fallbackCall = controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
               .onPageLoad(srn, index, disposalIndex, mode)
           )(implicitly, implicitly, request = DataRequest(request.request, updatedUserAnswers))

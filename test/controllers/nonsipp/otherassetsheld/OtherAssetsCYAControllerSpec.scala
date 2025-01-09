@@ -127,10 +127,10 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
         redirectNextPage(onSubmit(mode))
           .before({
             when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
-            MockPsrSubmissionService.submitPsrDetails()
+            MockPsrSubmissionService.submitPsrDetailsWithUA()
           })
           .after({
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any(), any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
             verify(mockSaveService, times(2)).save(any())(any(), any())
             reset(mockPsrSubmissionService)
             reset(mockSaveService)
@@ -214,7 +214,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+          verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
         )
         .withName("Submit redirects to other assets list page")
     )
