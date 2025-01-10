@@ -29,6 +29,7 @@ import models.HowDisposed.{Other, Sold}
 import com.google.inject.Singleton
 import config.RefinedTypes.{Max5000, OneTo50, OneTo5000}
 import models.SchemeHoldBond.{Acquisition, Transfer}
+import utils.nonsipp.PrePopulationUtils.isPrePopulation
 import models.requests.psr.{BondDisposed, BondTransactions, Bonds}
 import models.UserAnswers.implicits.UserAnswersTryOps
 
@@ -41,23 +42,34 @@ class BondsTransformer @Inject() extends Transformer {
 
   def transformToEtmp(srn: Srn, optUnregulatedOrConnectedBondsHeld: Option[Boolean], initialUA: UserAnswers)(
     implicit request: DataRequest[_]
-  ): Option[Bonds] = optUnregulatedOrConnectedBondsHeld.map { bondsWereAdded =>
-    val bondsDisposal = request.userAnswers.get(BondsDisposalPage(srn)).getOrElse(false)
-    Bonds(
-      recordVersion = Option.when(request.userAnswers.get(bonds) == initialUA.get(bonds))(
-        request.userAnswers.get(BondsRecordVersionPage(srn)).get
-      ),
-      bondsWereAdded = bondsWereAdded,
-      bondsWereDisposed = bondsDisposal,
-      bondTransactions = bondTransactionsTransformToEtmp(srn, bondsDisposal)
-    )
-  }
+  ): Option[Bonds] =
+    if (optUnregulatedOrConnectedBondsHeld.nonEmpty || request.userAnswers.map(NameOfBondsPages(srn)).toList.nonEmpty) {
+      val optBondsDisposal = request.userAnswers.get(BondsDisposalPage(srn))
+      val disposal =
+        if (isPrePopulation && optBondsDisposal.isEmpty) {
+          None // allow None only in pre-population
+        } else {
+          Option(optBondsDisposal.getOrElse(false))
+        }
 
+      Some(
+        Bonds(
+          recordVersion = Option.when(request.userAnswers.get(bonds) == initialUA.get(bonds))(
+            request.userAnswers.get(BondsRecordVersionPage(srn)).get
+          ),
+          optBondsWereAdded = optUnregulatedOrConnectedBondsHeld,
+          optBondsWereDisposed = disposal,
+          bondTransactions = bondTransactionsTransformToEtmp(srn, disposal.getOrElse(false))
+        )
+      )
+    } else {
+      None
+    }
   private def bondTransactionsTransformToEtmp(srn: Srn, bondsDisposal: Boolean)(
     implicit request: DataRequest[_]
   ): List[BondTransactions] =
     request.userAnswers
-      .map(IncomeFromBondsPages(srn))
+      .map(BondsCompleted.all(srn))
       .keys
       .toList
       .flatMap { key =>
@@ -69,7 +81,6 @@ class BondsTransformer @Inject() extends Transformer {
               methodOfHolding <- request.userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, index))
               costOfBonds <- request.userAnswers.get(CostOfBondsPage(srn, index))
               bondsUnregulated <- request.userAnswers.get(AreBondsUnregulatedPage(srn, index))
-              totalIncomeOrReceipts <- request.userAnswers.get(IncomeFromBondsPage(srn, index))
             } yield {
               val dateOfAcqOrContrib = Option.when(methodOfHolding != Transfer)(
                 request.userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, index)).get
@@ -77,6 +88,8 @@ class BondsTransformer @Inject() extends Transformer {
               val connectedPartyStatus = Option.when(methodOfHolding == Acquisition)(
                 request.userAnswers.get(BondsFromConnectedPartyPage(srn, index)).get
               )
+              val optTotalIncomeOrReceipts = request.userAnswers.get(IncomeFromBondsPage(srn, index))
+
               BondTransactions(
                 nameOfBonds = nameOfBonds,
                 methodOfHolding = methodOfHolding,
@@ -84,7 +97,7 @@ class BondsTransformer @Inject() extends Transformer {
                 costOfBonds = costOfBonds.value,
                 optConnectedPartyStatus = connectedPartyStatus,
                 bondsUnregulated = bondsUnregulated,
-                totalIncomeOrReceipts = totalIncomeOrReceipts.value,
+                optTotalIncomeOrReceipts = optTotalIncomeOrReceipts.map(_.value),
                 optBondsDisposed = Option
                   .when(bondsDisposal)(buildOptBondsDisposed(srn, index))
               )
@@ -161,9 +174,10 @@ class BondsTransformer @Inject() extends Transformer {
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, bond: Bonds): Try[UserAnswers] = {
     val bondTransactions = bond.bondTransactions
-    val userAnswersOfBondsHeld = userAnswers
-      .set(UnregulatedOrConnectedBondsHeldPage(srn), bond.bondsWereAdded)
-      .set(BondsListPage(srn), bond.bondTransactions.nonEmpty)
+    val userAnswersOfBondsHeld = bond.optBondsWereAdded match {
+      case Some(value) => userAnswers.set(UnregulatedOrConnectedBondsHeldPage(srn), value)
+      case None => Try(userAnswers)
+    }
 
     val userAnswersWithRecordVersion =
       bond.recordVersion.fold(userAnswersOfBondsHeld)(userAnswersOfBondsHeld.set(BondsRecordVersionPage(srn), _))
@@ -178,7 +192,9 @@ class BondsTransformer @Inject() extends Transformer {
           val methodOfHolding = WhyDoesSchemeHoldBondsPage(srn, index) -> bondTransaction.methodOfHolding
           val costOfBonds = CostOfBondsPage(srn, index) -> Money(bondTransaction.costOfBonds)
           val bondsUnregulated = AreBondsUnregulatedPage(srn, index) -> bondTransaction.bondsUnregulated
-          val totalIncomeOrReceipts = IncomeFromBondsPage(srn, index) -> Money(bondTransaction.totalIncomeOrReceipts)
+
+          val optTotalIncomeOrReceipts = bondTransaction.optTotalIncomeOrReceipts
+            .map(t => IncomeFromBondsPage(srn, index) -> Money(t))
 
           val optDateOfAcqOrContrib = bondTransaction.optDateOfAcqOrContrib.map(
             date => WhenDidSchemeAcquireBondsPage(srn, index) -> date
@@ -194,7 +210,7 @@ class BondsTransformer @Inject() extends Transformer {
             ua2 <- ua1.set(methodOfHolding._1, methodOfHolding._2)
             ua3 <- ua2.set(costOfBonds._1, costOfBonds._2)
             ua4 <- ua3.set(bondsUnregulated._1, bondsUnregulated._2)
-            ua5 <- ua4.set(totalIncomeOrReceipts._1, totalIncomeOrReceipts._2)
+            ua5 <- optTotalIncomeOrReceipts.map(t => ua4.set(t._1, t._2)).getOrElse(Try(ua4))
             ua6 <- optDateOfAcqOrContrib.map(t => ua5.set(t._1, t._2)).getOrElse(Try(ua5))
             ua7 <- optConnectedPartyStatus.map(t => ua6.set(t._1, t._2)).getOrElse(Try(ua6))
             ua8 <- ua7.set(bondsCompleted._1, bondsCompleted._2)
@@ -204,7 +220,7 @@ class BondsTransformer @Inject() extends Transformer {
               srn,
               ua8,
               bondTransaction.optBondsDisposed,
-              bond.bondsWereDisposed
+              bond.optBondsWereDisposed
             )
           }
           triedUA.flatten
@@ -217,9 +233,13 @@ class BondsTransformer @Inject() extends Transformer {
     srn: Srn,
     userAnswers: UserAnswers,
     optBondsDisposed: Option[Seq[BondDisposed]],
-    bondsWereDisposed: Boolean
+    optBondsWereDisposed: Option[Boolean]
   ): Try[UserAnswers] = {
-    val initialUserAnswersOfDisposal = userAnswers.set(BondsDisposalPage(srn), bondsWereDisposed)
+    val initialUserAnswersOfDisposal = Option
+      .when(optBondsWereDisposed.nonEmpty)(
+        userAnswers.set(BondsDisposalPage(srn), optBondsWereDisposed.get)
+      )
+      .getOrElse(Try(userAnswers))
     optBondsDisposed
       .map(bondsDisposed => {
         val initialUserAnswersOfDisposalWithCompleted =

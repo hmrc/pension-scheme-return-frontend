@@ -61,7 +61,12 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           DataRequest(allowedAccessRequest, userAnswers)
         )
       result mustBe Some(
-        Bonds(recordVersion = None, bondsWereAdded = false, bondsWereDisposed = false, bondTransactions = Seq.empty)
+        Bonds(
+          recordVersion = None,
+          optBondsWereAdded = Some(false),
+          optBondsWereDisposed = Some(false),
+          bondTransactions = Seq.empty
+        )
       )
     }
 
@@ -77,6 +82,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(IncomeFromBondsPage(srn, refineMV(1)), money)
           .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, refineMV(1)), localDate)
           .unsafeSet(BondsFromConnectedPartyPage(srn, refineMV(1)), false)
+          .unsafeSet(BondsCompleted(srn, refineMV(1)), SectionCompleted)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -84,8 +90,8 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         result mustBe Some(
           Bonds(
             recordVersion = Some("001"),
-            bondsWereAdded = true,
-            bondsWereDisposed = false,
+            optBondsWereAdded = Some(true),
+            optBondsWereDisposed = Some(false),
             bondTransactions = List(
               BondTransactions(
                 nameOfBonds = "nameOfBonds",
@@ -94,7 +100,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
                 costOfBonds = money.value,
                 optConnectedPartyStatus = Some(false),
                 bondsUnregulated = true,
-                totalIncomeOrReceipts = money.value,
+                optTotalIncomeOrReceipts = Some(money.value),
                 optBondsDisposed = None
               )
             )
@@ -122,6 +128,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(IsBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1)), false)
           .unsafeSet(HowWereBondsDisposedOfPage(srn, refineMV(1), refineMV(2)), Other("OtherMethod"))
           .unsafeSet(BondsStillHeldPage(srn, refineMV(1), refineMV(2)), 2)
+          .unsafeSet(BondsCompleted(srn, refineMV(1)), SectionCompleted)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -129,8 +136,8 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         result mustBe Some(
           Bonds(
             recordVersion = Some("001"),
-            bondsWereAdded = true,
-            bondsWereDisposed = true,
+            optBondsWereAdded = Some(true),
+            optBondsWereDisposed = Some(true),
             bondTransactions = List(
               BondTransactions(
                 nameOfBonds = "nameOfBonds",
@@ -139,7 +146,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
                 costOfBonds = money.value,
                 optConnectedPartyStatus = Some(false),
                 bondsUnregulated = true,
-                totalIncomeOrReceipts = money.value,
+                optTotalIncomeOrReceipts = Some(money.value),
                 optBondsDisposed = Some(
                   Seq(
                     BondDisposed(
@@ -178,8 +185,8 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         srn,
         Bonds(
           recordVersion = Some("001"),
-          bondsWereAdded = false,
-          bondsWereDisposed = false,
+          optBondsWereAdded = Some(false),
+          optBondsWereDisposed = Some(false),
           bondTransactions = Seq.empty
         )
       )
@@ -199,8 +206,8 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         srn,
         Bonds(
           recordVersion = Some("001"),
-          bondsWereAdded = true,
-          bondsWereDisposed = true,
+          optBondsWereAdded = Some(true),
+          optBondsWereDisposed = Some(true),
           bondTransactions = Seq(
             BondTransactions(
               nameOfBonds = "nameOfBonds",
@@ -209,7 +216,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
               costOfBonds = money.value,
               optConnectedPartyStatus = Some(true),
               bondsUnregulated = false,
-              totalIncomeOrReceipts = money.value,
+              optTotalIncomeOrReceipts = Some(money.value),
               optBondsDisposed = Some(
                 Seq(
                   BondDisposed(

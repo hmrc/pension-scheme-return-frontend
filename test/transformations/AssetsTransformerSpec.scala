@@ -218,7 +218,14 @@ object AssetsTransformerSpec {
   val assetsWithBonds: Assets = Assets(
     optLandOrProperty = None,
     optBorrowing = None,
-    optBonds = Some(Bonds(Some("001"), bondsWereAdded = true, bondsWereDisposed = true, bondTransactions = Seq.empty)),
+    optBonds = Some(
+      Bonds(
+        Some("001"),
+        optBondsWereAdded = Some(true),
+        optBondsWereDisposed = Some(true),
+        bondTransactions = Seq.empty
+      )
+    ),
     optOtherAssets = None
   )
 

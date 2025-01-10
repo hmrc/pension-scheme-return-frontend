@@ -390,7 +390,14 @@ object PsrRetrievalServiceSpec {
       )
     ),
     optBorrowing = Some(Borrowing(Some("001"), moneyWasBorrowed = true, moneyBorrowed = Seq.empty)),
-    optBonds = Some(Bonds(Some("001"), bondsWereAdded = true, bondsWereDisposed = true, bondTransactions = Seq.empty)),
+    optBonds = Some(
+      Bonds(
+        Some("001"),
+        optBondsWereAdded = Some(true),
+        optBondsWereDisposed = Some(true),
+        bondTransactions = Seq.empty
+      )
+    ),
     optOtherAssets = Some(
       OtherAssets(
         Some("001"),
