@@ -18,14 +18,14 @@
 
 @(rows: Seq[OverviewSummary], colOne: String, colTwo: String, colThree: String, caption: String)(implicit messages: Messages)
 
-<div class="psr-scrollable-pane">
+<div class="psr-scrollable-pane" role="region" aria-label="@{caption} - table" tabindex="0">
     <table class="govuk-table">
         <caption class="govuk-table__caption govuk-table__caption--m">@caption</caption>
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
                 <th scope="col" class="govuk-table__header">@colOne</th>
                 <th scope="col" class="govuk-table__header">@colTwo</th>
-                <th scope="col" class="govuk-table__header"><span class="govuk-visually-hidden">@colThree</span></th>
+                <th scope="col" class="govuk-table__header" style="position: relative"><span class="govuk-visually-hidden">@colThree</span></th>
             </tr>
         </thead>
         <tbody class="govuk-table__body">
@@ -36,7 +36,7 @@
                 @summaryListRow.actions.map { actions =>
                     <td class="govuk-table__cell govuk-table__cell--numeric whitespace-nowrap">
                             @actions.items.map { item =>
-                                    <a class="govuk-link" href="@item.href">
+                                    <a class="govuk-link" href="@item.href" style="position: relative">
                                         @item.content.asHtml<span class="govuk-visually-hidden">@renderMessage(summaryListRow.key)</span>
                                     </a>
                             }
