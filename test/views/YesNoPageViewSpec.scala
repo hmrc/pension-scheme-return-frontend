@@ -16,6 +16,7 @@
 
 package views
 
+import org.jsoup.Jsoup
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
 import viewmodels.models.YesNoPageViewModel
@@ -94,6 +95,32 @@ class YesNoPageViewSpec extends ViewSpec {
         forAll(viewModelGen) { viewmodel =>
           val invalidForm = yesNoForm.bind(Map("value" -> ""))
           errorMessage(view(invalidForm, viewmodel)).text() must include(requiredKey)
+        }
+      }
+
+      "have a hint text when provided" in {
+
+        forAll(viewModelGen) { viewModel =>
+          whenever(viewModel.page.hint.nonEmpty) {
+            val html = view(yesNoForm, viewModel).toString
+            val document = Jsoup.parse(html)
+
+            val hint = document.select(".govuk-hint").text
+
+            hint mustBe renderMessage(viewModel.page.hint.value).body
+          }
+        }
+      }
+
+      "not have a hint text when not provided" in {
+
+        forAll(viewModelGen) { viewModel =>
+          val noHintViewModel = viewModel.copy(page = viewModel.page.copy(hint = None))
+
+          val html = view(yesNoForm, noHintViewModel).toString
+          val document = Jsoup.parse(html)
+
+          document.select(".govuk-hint") mustBe empty
         }
       }
     }
