@@ -79,6 +79,7 @@
                 caption = messages("overview.previous.compiled.table.caption")
             )
         }
+        <br>
         @if(seqOfPreviousReturns.exists(_.submitted)) {
             @components.OverviewTableThreeColumns(
                 seqOfPreviousReturns.filter(_.submitted),
