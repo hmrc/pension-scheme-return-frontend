@@ -25,6 +25,8 @@ import pages.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanPage
 import controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController._
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
+import org.jsoup.Jsoup
+import play.api.test.FakeRequest
 
 class SecurityGivenForLoanControllerSpec extends ControllerBaseSpec {
 
@@ -59,5 +61,22 @@ class SecurityGivenForLoanControllerSpec extends ControllerBaseSpec {
 
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+
+    "Should render conditional text area with correct id" in {
+      val application = applicationBuilder().build()
+      running(application) {
+
+        val request = FakeRequest(GET, onPageLoad.url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val html = contentAsString(result)
+        val document = Jsoup.parse(html)
+        val textArea = document.select("textarea")
+        textArea.attr("id") mustEqual  "value.yes"
+      }
+    }
   }
 }

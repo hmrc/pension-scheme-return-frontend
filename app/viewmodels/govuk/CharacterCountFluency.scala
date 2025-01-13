@@ -36,7 +36,7 @@ trait CharacterCountFluency {
       field: Field
     )(implicit messages: Messages): CharacterCount =
       CharacterCount(
-        id = field.id,
+        id = field.name,
         name = field.name,
         value = field.value,
         errorMessage = errorMessage(field)
