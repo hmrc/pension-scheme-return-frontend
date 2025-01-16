@@ -134,7 +134,7 @@ journeyRecovery.guidance4 = We will fix the problem as soon as possible.
 
 signedOut.title = For your security, we signed you out
 signedOut.heading = For your security, we signed you out
-signedOut.guidance = We have saved your answers up until your latest 'Check your answers' page.
+signedOut.guidance = We have saved your answers up until your latest ''Check your answers'' page.
 
 unauthorised.title = You cannot access this service with this account
 unauthorised.heading = You cannot access this service with this account
