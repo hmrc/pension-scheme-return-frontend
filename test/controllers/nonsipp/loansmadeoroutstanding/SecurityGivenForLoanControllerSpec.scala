@@ -75,7 +75,7 @@ class SecurityGivenForLoanControllerSpec extends ControllerBaseSpec {
         val html = contentAsString(result)
         val document = Jsoup.parse(html)
         val textArea = document.select("textarea")
-        textArea.attr("id") mustEqual  "value.yes"
+        textArea.attr("id") mustEqual "value.yes"
       }
     }
   }
