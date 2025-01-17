@@ -19,14 +19,17 @@ package pages.nonsipp.bonds
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models.UserAnswers
+import pages.nonsipp.bondsdisposal._
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.Max5000
+import config.RefinedTypes.{Max50, Max5000}
 import controllers.TestValues
 
 class NameOfBondsPageSpec extends PageBehaviours with TestValues {
 
   private val index = refineMV[Max5000.Refined](1)
   private val index2 = refineMV[Max5000.Refined](2)
+  private val disposalIndex1 = refineMV[Max50.Refined](1)
+  private val disposalIndex2 = refineMV[Max50.Refined](2)
 
   "NameOfBondsPage" - {
 
@@ -45,7 +48,7 @@ class NameOfBondsPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(IncomeFromBondsPage(srn, index), money)
         .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
 
-    s"remove index" in {
+    "remove index" in {
       val result =
         NameOfBondsPage(srn, index).cleanup(None, userAnswers).toOption.value
       result.get(IncomeFromBondsPage(srn, index)) mustBe None
@@ -63,12 +66,25 @@ class NameOfBondsPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(IncomeFromBondsPage(srn, index2), money)
         .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
 
-    s"remove index" in {
+    "remove index" in {
       val result =
         NameOfBondsPage(srn, index).cleanup(None, userAnswers).toOption.value
       result.get(IncomeFromBondsPage(srn, index)) mustBe None
       result.get(IncomeFromBondsPage(srn, index2)) must not be None
       result.get(UnregulatedOrConnectedBondsHeldPage(srn)) must not be None
+    }
+
+    "remove disposal" in {
+      val result =
+        NameOfBondsPage(srn, index).cleanup(None, userAnswers).toOption.value
+      result.get(IncomeFromBondsPage(srn, index)) mustBe None
+      result.get(BondsDisposalPage(srn)) mustBe None
+      result.get(HowWereBondsDisposedOfPage(srn, index, disposalIndex1)) mustBe None
+      result.get(HowWereBondsDisposedOfPage(srn, index, disposalIndex2)) mustBe None
+      result.get(BondsStillHeldPage(srn, index, disposalIndex1)) mustBe None
+      result.get(BondsStillHeldPage(srn, index, disposalIndex2)) mustBe None
+      result.get(BondsDisposalProgress(srn, index, disposalIndex1)) mustBe None
+      result.get(BondsDisposalProgress(srn, index, disposalIndex2)) mustBe None
     }
   }
 }

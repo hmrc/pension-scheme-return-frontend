@@ -336,18 +336,18 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
     def setWhen[A: Writes](bool: Boolean)(page: Settable[A], value: A): Try[UserAnswers] =
       userAnswers.flatMap(_.setWhen(bool)(page, value))
     def compose(c: List[UserAnswers.Compose]): Try[UserAnswers] = userAnswers.flatMap(_.compose(c))
-    def remove[A](page: Removable[A]): Try[UserAnswers] = userAnswers.flatMap(_.removePages(List(page)))
+    def remove[A](page: Removable[A]): Try[UserAnswers] = userAnswers.flatMap(_.removeOnlyMultiplePages(List(page)))
 
-    def remove(pages: List[Removable[_]]): Try[UserAnswers] = userAnswers.flatMap(_.removePages(pages))
+    def remove(pages: List[Removable[_]]): Try[UserAnswers] = userAnswers.flatMap(_.removeOnlyMultiplePages(pages))
 
     def softRemove[A: Reads: Writes](page: Gettable[A] with Settable[A] with Removable[A]): Try[UserAnswers] =
       userAnswers.flatMap(_.softRemove(page))
 
     def removeWhen(bool: Boolean)(page: Removable[_]*): Try[UserAnswers] =
-      userAnswers.flatMap(_.removeWhen(bool)(page: _*))
+      userAnswers.flatMap(_.removeOnlyWhen(bool)(page: _*))
 
     def removeWhen(bool: UserAnswers => Boolean)(page: Removable[_]*): Try[UserAnswers] =
-      userAnswers.flatMap(ua => ua.removeWhen(bool(ua))(page: _*))
+      userAnswers.flatMap(ua => ua.removeOnlyWhen(bool(ua))(page: _*))
 
     def when(
       get: UserAnswers => Option[Boolean]

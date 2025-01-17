@@ -33,11 +33,14 @@ case class DoesMemberHaveNinoPage(srn: Srn, index: Max300) extends QuestionPage[
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     value match {
-      case Some(true) => userAnswers.removePages(List(NoNINOPage(srn, index), MemberDetailsCompletedPage(srn, index)))
+      case Some(true) =>
+        userAnswers.removeOnlyMultiplePages(List(NoNINOPage(srn, index), MemberDetailsCompletedPage(srn, index)))
       case Some(false) =>
-        userAnswers.removePages(List(MemberDetailsNinoPage(srn, index), MemberDetailsCompletedPage(srn, index)))
+        userAnswers.removeOnlyMultiplePages(
+          List(MemberDetailsNinoPage(srn, index), MemberDetailsCompletedPage(srn, index))
+        )
       case None =>
-        userAnswers.removePages(
+        userAnswers.removeOnlyMultiplePages(
           List(NoNINOPage(srn, index), MemberDetailsNinoPage(srn, index), MemberDetailsCompletedPage(srn, index))
         )
     }

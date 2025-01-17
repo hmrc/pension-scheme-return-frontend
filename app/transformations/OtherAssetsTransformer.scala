@@ -565,7 +565,11 @@ class OtherAssetsTransformer @Inject() extends Transformer {
     userAnswers: UserAnswers,
     optOtherAssetDisposed: Option[Seq[OtherAssetDisposed]]
   ): Try[UserAnswers] = {
-    val initialUserAnswersOfDisposal = userAnswers.set(OtherAssetsDisposalPage(srn), optOtherAssetDisposed.isDefined)
+    val initialUserAnswersOfDisposal = Option
+      .when(optOtherAssetDisposed.nonEmpty)(
+        userAnswers.set(OtherAssetsDisposalPage(srn), optOtherAssetDisposed.isDefined)
+      )
+      .getOrElse(Try(userAnswers))
 
     optOtherAssetDisposed
       .map(

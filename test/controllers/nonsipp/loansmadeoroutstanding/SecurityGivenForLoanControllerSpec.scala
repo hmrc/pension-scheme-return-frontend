@@ -16,7 +16,9 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import play.api.test.FakeRequest
 import models.ConditionalYesNo._
+import org.jsoup.Jsoup
 import views.html.ConditionalYesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
@@ -25,8 +27,6 @@ import pages.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanPage
 import controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController._
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
-import org.jsoup.Jsoup
-import play.api.test.FakeRequest
 
 class SecurityGivenForLoanControllerSpec extends ControllerBaseSpec {
 

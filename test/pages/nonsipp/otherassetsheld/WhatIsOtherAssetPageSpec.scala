@@ -16,17 +16,21 @@
 
 package pages.nonsipp.otherassetsheld
 
+import pages.nonsipp.otherassetsdisposal._
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
-import models.UserAnswers
+import models.{HowDisposed, UserAnswers}
+import viewmodels.models.SectionJourneyStatus
 import pages.behaviours.PageBehaviours
-import config.RefinedTypes.Max5000
+import config.RefinedTypes.{Max50, Max5000}
 import controllers.TestValues
 
 class WhatIsOtherAssetPageSpec extends PageBehaviours with TestValues {
 
   private val index = refineMV[Max5000.Refined](1)
   private val index2 = refineMV[Max5000.Refined](2)
+  private val disposalIndex1 = refineMV[Max50.Refined](1)
+  private val disposalIndex2 = refineMV[Max50.Refined](2)
 
   "WhatIsOtherAssetPage" - {
 
@@ -46,7 +50,7 @@ class WhatIsOtherAssetPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(OtherAssetsHeldPage(srn), true)
         .unsafeSet(OtherAssetsListPage(srn), true)
 
-    s"remove index" in {
+    "remove index" in {
       val result =
         WhatIsOtherAssetPage(srn, index).cleanup(None, userAnswers).toOption.value
       result.get(IncomeFromAssetPage(srn, index)) mustBe None
@@ -65,14 +69,35 @@ class WhatIsOtherAssetPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(IncomeFromAssetPage(srn, index2), money)
         .unsafeSet(OtherAssetsHeldPage(srn), true)
         .unsafeSet(OtherAssetsListPage(srn), true)
+        // Disposal details:
+        .unsafeSet(OtherAssetsDisposalPage(srn), true)
+        .unsafeSet(HowWasAssetDisposedOfPage(srn, index, disposalIndex1), HowDisposed.Transferred)
+        .unsafeSet(HowWasAssetDisposedOfPage(srn, index, disposalIndex2), HowDisposed.Other(otherDetails))
+        .unsafeSet(AnyPartAssetStillHeldPage(srn, index, disposalIndex1), true)
+        .unsafeSet(AnyPartAssetStillHeldPage(srn, index, disposalIndex2), false)
+        .unsafeSet(OtherAssetsDisposalProgress(srn, index, disposalIndex1), SectionJourneyStatus.Completed)
+        .unsafeSet(OtherAssetsDisposalProgress(srn, index, disposalIndex2), SectionJourneyStatus.Completed)
 
-    s"remove index" in {
+    "remove index" in {
       val result =
         WhatIsOtherAssetPage(srn, index).cleanup(None, userAnswers).toOption.value
       result.get(IncomeFromAssetPage(srn, index)) mustBe None
       result.get(IncomeFromAssetPage(srn, index2)) must not be None
       result.get(OtherAssetsHeldPage(srn)) must not be None
       result.get(OtherAssetsListPage(srn)) must not be None
+    }
+
+    "remove disposal" in {
+      val result =
+        WhatIsOtherAssetPage(srn, index).cleanup(None, userAnswers).toOption.value
+      result.get(IncomeFromAssetPage(srn, index)) mustBe None
+      result.get(OtherAssetsDisposalPage(srn)) mustBe None
+      result.get(HowWasAssetDisposedOfPage(srn, index, disposalIndex1)) mustBe None
+      result.get(HowWasAssetDisposedOfPage(srn, index, disposalIndex2)) mustBe None
+      result.get(AnyPartAssetStillHeldPage(srn, index, disposalIndex1)) mustBe None
+      result.get(AnyPartAssetStillHeldPage(srn, index, disposalIndex2)) mustBe None
+      result.get(OtherAssetsDisposalProgress(srn, index, disposalIndex1)) mustBe None
+      result.get(OtherAssetsDisposalProgress(srn, index, disposalIndex2)) mustBe None
     }
   }
 }

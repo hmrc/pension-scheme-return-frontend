@@ -81,7 +81,7 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
 
       result.get(HowManyDisposalSharesPage(srn, shareIndexOne, indexOne)) must be(empty)
       result.get(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexOne)) must be(empty)
-
+      result.get(SharesDisposalProgress(srn, shareIndexOne, indexOne)) must be(empty)
     }
 
     "cleanup other fields when removing a disposal but there are disposals of the same share" in {
@@ -109,11 +109,13 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
       result.get(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexOne)) must be(empty)
       result.get(HowManyDisposalSharesPage(srn, shareIndexOne, indexOne)) must be(empty)
       result.get(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexOne)) must be(empty)
+      result.get(SharesDisposalProgress(srn, shareIndexOne, indexOne)) must be(empty)
       // Disposal 2
       result.get(HowWereSharesDisposedPage(srn, shareIndexOne, indexTwo)) must not be empty
       result.get(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexTwo)) must not be empty
       result.get(HowManyDisposalSharesPage(srn, shareIndexOne, indexTwo)) must not be empty
       result.get(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexTwo)) must not be empty
+      result.get(SharesDisposalProgress(srn, shareIndexOne, indexTwo)) must not be (empty)
     }
 
     "cleanup other fields when removing a disposal but there are disposals for other shares" in {
@@ -133,6 +135,7 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
       result.get(HowWereSharesDisposedPage(srn, shareIndexTwo, indexOne)) must not be empty
       result.get(WhenWereSharesRedeemedPage(srn, shareIndexTwo, indexOne)) must not be empty
       result.get(SharesDisposalPage(srn)) must not be empty
+      result.get(SharesDisposalProgress(srn, shareIndexTwo, indexOne)) must not be (empty)
     }
 
     "cleanup relevant fields when changing the answer on this page in CheckMode" in {
@@ -157,6 +160,7 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
       userAnswers.get(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexOne)) must not be empty
       userAnswers.get(HowManySharesRedeemedPage(srn, shareIndexOne, indexOne)) must not be empty
       userAnswers.get(TotalConsiderationSharesRedeemedPage(srn, shareIndexOne, indexOne)) must not be empty
+      userAnswers.get(SharesDisposalProgress(srn, shareIndexOne, indexOne)) must not be (empty)
     }
   }
 }

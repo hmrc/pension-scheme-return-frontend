@@ -82,7 +82,8 @@ case class HowWereSharesDisposedPage(
       TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex),
       WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex), // has it's own cleanup
       IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex),
-      IndependentValuationPage(srn, shareIndex, disposalIndex)
+      IndependentValuationPage(srn, shareIndex, disposalIndex),
+      SharesDisposalProgress(srn, shareIndex, disposalIndex)
     )
 
     (removeExtraPages, isLastRecord) match {

@@ -20,10 +20,12 @@ import utils.RefinedUtils.RefinedIntOps
 import utils.PageUtils.removePages
 import queries.Removable
 import pages.QuestionPage
-import config.RefinedTypes.Max5000
+import config.RefinedTypes.{Max5000, OneTo50}
 import models.SchemeId.Srn
+import eu.timepit.refined.refineV
 import play.api.libs.json.JsPath
 import models.UserAnswers
+import pages.nonsipp.bondsdisposal.{HowWereBondsDisposedOfPage, HowWereBondsDisposedOfPagesForEachBond}
 
 import scala.util.Try
 
@@ -40,7 +42,7 @@ case class NameOfBondsPage(srn: Srn, index: Max5000) extends QuestionPage[String
         val completedPages = userAnswers.map(IncomeFromBondsPages(srn))
         removePages(
           userAnswers,
-          pages(srn, index, completedPages.size == 1)
+          pages(srn, index, completedPages.size == 1) ++ dependantPages(srn, userAnswers)
         )
       case _ => Try(userAnswers)
     }
@@ -59,6 +61,16 @@ case class NameOfBondsPage(srn: Srn, index: Max5000) extends QuestionPage[String
     if (isLastRecord) list :+ UnregulatedOrConnectedBondsHeldPage(srn) else list
   }
 
+  private def dependantPages(srn: Srn, userAnswers: UserAnswers): List[Removable[_]] =
+    userAnswers
+      .map(HowWereBondsDisposedOfPagesForEachBond(srn, index))
+      .keys
+      .toList
+      .flatMap(
+        key =>
+          refineV[OneTo50](key.toInt + 1)
+            .fold(_ => Nil, ind => List(HowWereBondsDisposedOfPage(srn, index, ind)))
+      )
 }
 
 case class NameOfBondsPages(srn: Srn) extends QuestionPage[Map[String, String]] {
