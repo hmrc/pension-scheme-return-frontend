@@ -140,7 +140,7 @@ private object MonthFormatter extends Formatters {
 
           case None => Left(List(FormError(key, requiredKey, args)))
           case Some(value) =>
-            val normalizedString = value.toUpperCase
+            val normalizedString = value.toUpperCase.replaceAll("\\s+", "")
 
             normalizedString.toIntOption match {
               case Some(number) if number >= MinMonth && number <= MaxMonth => Right(number)

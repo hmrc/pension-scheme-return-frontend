@@ -443,7 +443,9 @@ class DateMappingsSpec
       ("01", "Jan", "2020", 1),
       ("01", "January", "2020", 1),
       ("15", "Feb", "2021", 2),
-      ("15", "February", "2021", 2)
+      ("15", "February", "2021", 2),
+      ("20", " D e c e m b e r ", "2021", 12),
+      ("20", " Dec ", "2021", 12)
     )
 
     forAll(validMonths) { (day, month, year, expectedMonthValue) =>
