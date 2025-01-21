@@ -71,6 +71,7 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   val emailSendForce: Boolean = config.getOptional[Boolean]("email.force").getOrElse(false)
   val fileReturnTemplateId: String = config.get[String]("email.fileReturnTemplateId")
   val allowedStartDateRange: LocalDate = LocalDate.parse(config.get[String]("schemeStartDate"))
+  val earliestPsrPeriodStartDate: LocalDate = LocalDate.parse(config.get[String]("earliestPsrPeriodStartDate"))
 
   def eventReportingEmailCallback(
     psaOrPsp: String,

@@ -25,14 +25,18 @@ import eu.timepit.refined.refineMV
 import pages.nonsipp.WhichTaxYearPage
 import models.backend.responses.PsrReportType
 import models.CheckMode
+import uk.gov.hmrc.time.TaxYear
+import org.scalatest.Inspectors.forAll
 import viewmodels.OverviewSummary
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import pages.nonsipp.memberdetails.DoesMemberHaveNinoPage
 import org.mockito.Mockito._
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
 
 import scala.concurrent.Future
+
+import java.time.LocalDate
 
 class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
@@ -60,12 +64,14 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
   private implicit val mockPsrOverviewService: PsrOverviewService = mock[PsrOverviewService]
   private implicit val mockPsrVersionsService: PsrVersionsService = mock[PsrVersionsService]
   private implicit val mockPrePopulationService: PrePopulationService = mock[PrePopulationService]
+  private implicit val mockTaxYearService: TaxYearService = mock[TaxYearService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrRetrievalService].toInstance(mockPsrRetrievalService),
     bind[PsrOverviewService].toInstance(mockPsrOverviewService),
     bind[PsrVersionsService].toInstance(mockPsrVersionsService),
-    bind[PrePopulationService].toInstance(mockPrePopulationService)
+    bind[PrePopulationService].toInstance(mockPrePopulationService),
+    bind[TaxYearService].toInstance(mockTaxYearService)
   )
 
   override protected def beforeEach(): Unit = {
@@ -73,12 +79,55 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
     reset(mockPsrOverviewService)
     reset(mockPsrVersionsService)
     reset(mockPrePopulationService)
+    reset(mockTaxYearService)
   }
 
   "OverviewController" - {
 
+    val dates = List(
+      (2021, 2021, 2022),
+      (2022, 2021, 2023),
+      (2026, 2021, 2027),
+      (2027, 2021, 2028),
+      (2030, 2024, 2031)
+    )
+
+    s"onPageLoads uses passes correct date range to the overview service based on the current year" in runningApplication {
+      implicit app =>
+        forAll(dates) {
+          case (currentPeriodStartYear: Int, earliestStartYear: Int, latestStartYear: Int) =>
+            when(mockTaxYearService.current).thenReturn(TaxYear(currentPeriodStartYear))
+            when(mockPsrOverviewService.getOverview(any(), any(), any(), any())(any(), any(), any())).thenReturn(
+              Future.successful(None)
+            )
+            when(mockPsrVersionsService.getVersionsForYears(any(), any(), any())(any(), any(), any())).thenReturn(
+              Future.successful(Seq())
+            )
+
+            val request = FakeRequest(GET, onPageLoad)
+            route(app, request)
+
+            verify(mockPsrOverviewService, times(1)).getOverview(
+              any(),
+              eqTo(s"$earliestStartYear-04-06"),
+              eqTo(s"$latestStartYear-04-06"),
+              any()
+            )(any(), any(), any())
+
+            val allYears = Seq.range(latestStartYear - 1, earliestStartYear - 1, -1).map(x => s"$x-04-06")
+            verify(mockPsrVersionsService, times(1)).getVersionsForYears(
+              any(),
+              eqTo(allYears),
+              any()
+            )(any(), any(), any())
+        }
+
+        true
+    }
+
     "onPageLoads returns OK and the correct view - when empty responses returned" in runningApplication {
       implicit app =>
+        when(mockTaxYearService.current).thenReturn(TaxYear(LocalDate.now().getYear))
         when(mockPsrOverviewService.getOverview(any(), any(), any(), any())(any(), any(), any())).thenReturn(
           Future.successful(Some(Seq()))
         )
@@ -106,6 +155,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
     "onPageLoads returns OK and expected content - when submitted responses returned" in runningApplication {
       implicit app =>
+        when(mockTaxYearService.current).thenReturn(TaxYear(LocalDate.now().getYear))
         when(mockPsrOverviewService.getOverview(any(), any(), any(), any())(any(), any(), any())).thenReturn(
           Future.successful(Some(overviewResponse))
         )
@@ -135,6 +185,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
     "onPageLoads returns OK and expected content - when in progress responses returned" in runningApplication {
       implicit app =>
+        when(mockTaxYearService.current).thenReturn(TaxYear(LocalDate.now().getYear))
         when(mockPsrOverviewService.getOverview(any(), any(), any(), any())(any(), any(), any())).thenReturn(
           Future.successful(Some(overviewResponse))
         )

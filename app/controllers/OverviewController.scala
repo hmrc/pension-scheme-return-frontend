@@ -66,7 +66,7 @@ class OverviewController @Inject()(
 
   private val logger = Logger(classOf[OverviewController])
 
-  private val allDates = OverviewController.options(taxYearService.current)
+  private def allDates = OverviewController.options(taxYearService.current, config.earliestPsrPeriodStartDate)
 
   private def outstandingData(
     srn: Srn,
@@ -231,19 +231,25 @@ class OverviewController @Inject()(
       }
     }
 
-  def onPageLoad(srn: Srn): Action[AnyContent] =
+  def onPageLoad(srn: Srn): Action[AnyContent] = {
+    logger.debug(s"attempting to authenticate")
     identify.andThen(allowAccess(srn)).async { implicit request =>
+      logger.debug("authenticated successfully")
       val toDate = formatDateForApi(allDates.head._2.from)
       val fromDate = formatDateForApi(allDates.last._2.from)
+      logger.debug(s"retrieving PSR overview from ETMP from $fromDate to $toDate")
       for {
         overviewResponse <- psrOverviewService.getOverview(request.schemeDetails.pstr, fromDate, toDate, srn)
+        versionDates = allDates.drop(1).map(dates => dates._2.from.toString)
+        _ = logger.debug(s"retrieving PSR versions from ETMP for dates: $versionDates")
         versionsForYearsResponse <- psrVersionsService
-          .getVersionsForYears(request.schemeDetails.pstr, allDates.drop(1).map(dates => dates._2.from.toString), srn)
+          .getVersionsForYears(request.schemeDetails.pstr, versionDates, srn)
         outstanding = outstandingData(srn, overviewResponse, versionsForYearsResponse)
         previous = previousData(srn, versionsForYearsResponse, overviewResponse, outstanding)
       } yield Ok(view(outstanding, previous, request.schemeDetails.schemeName))
         .addingToSession((Constants.SRN, srn.value))
     }
+  }
 
   def onSelectStart(
     srn: Srn,
@@ -362,9 +368,11 @@ class OverviewController @Inject()(
 
 object OverviewController {
 
-  def options(startingTaxYear: TaxYear): List[(String, DateRange)] = {
+  def options(startingTaxYear: TaxYear, schemeStartDate: LocalDate): List[(String, DateRange)] = {
 
-    val taxYears = startingTaxYear.next +: List.iterate(startingTaxYear, 7)(_.previous)
+    val taxYears = startingTaxYear.next +: List
+      .iterate(startingTaxYear, 7)(_.previous)
+      .takeWhile(_.startYear >= schemeStartDate.getYear)
 
     val taxYearRanges = taxYears.map(DateRange.from).map(r => (r.toString, r))
 
