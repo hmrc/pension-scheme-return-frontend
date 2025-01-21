@@ -18,7 +18,6 @@ package controllers.nonsipp.schemedesignatory
 
 import services.SaveService
 import pages.nonsipp.schemedesignatory.ActiveBankAccountPage
-import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.actions._
 import navigation.Navigator
@@ -55,14 +54,14 @@ class ActiveBankAccountController @Inject()(
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val schemeName = request.schemeDetails.schemeName
     val preparedForm = request.userAnswers.fillForm(ActiveBankAccountPage(srn), form(schemeName))
-    Ok(view(preparedForm, viewModel(srn, schemeName, mode)))
+    Ok(view(preparedForm, viewModel(srn, mode)))
   }
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val schemeName = request.schemeDetails.schemeName
     form(request.schemeDetails.schemeName)
       .bindFromRequest()
       .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, schemeName, mode)))),
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, mode)))),
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ActiveBankAccountPage(srn), value))
@@ -79,10 +78,10 @@ object ActiveBankAccountController {
     List(memberName)
   )
 
-  def viewModel(srn: Srn, memberName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
+  def viewModel(srn: Srn, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
       Message("activeAccountDetails.title"),
-      Message("activeAccountDetails.heading", memberName),
+      Message("activeAccountDetails.heading"),
       routes.ActiveBankAccountController.onSubmit(srn, mode)
     )
 }

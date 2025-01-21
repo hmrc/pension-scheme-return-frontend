@@ -34,13 +34,13 @@ class ActiveBankAccountControllerSpec extends ControllerBaseSpec {
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[YesNoPageView].apply(
         form(injected[YesNoPageFormProvider], defaultSchemeDetails.schemeName),
-        viewModel(srn, defaultSchemeDetails.schemeName, NormalMode)
+        viewModel(srn, NormalMode)
       )
     })
 
     act.like(renderPrePopView(onPageLoad, ActiveBankAccountPage(srn), true) { implicit app => implicit request =>
       val preparedForm = form(injected[YesNoPageFormProvider], defaultSchemeDetails.schemeName).fill(true)
-      injected[YesNoPageView].apply(preparedForm, viewModel(srn, defaultSchemeDetails.schemeName, NormalMode))
+      injected[YesNoPageView].apply(preparedForm, viewModel(srn, NormalMode))
     })
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
