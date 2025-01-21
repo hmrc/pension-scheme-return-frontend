@@ -42,12 +42,6 @@ GET         /:srn/what-you-will-need-next-page                                  
 GET         /:srn/check-update-information-provided                                                            controllers.CheckUpdateInformationController.onPageLoad(srn: Srn)
 GET         /:srn/check-update-information-provided-next-page                                                  controllers.CheckUpdateInformationController.onSubmit(srn: Srn)
 
-GET         /:srn/which-tax-year                                                                               controllers.nonsipp.WhichTaxYearController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/which-tax-year                                                                               controllers.nonsipp.WhichTaxYearController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-
-GET         /:srn/change-which-tax-year                                                                        controllers.nonsipp.WhichTaxYearController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-which-tax-year                                                                        controllers.nonsipp.WhichTaxYearController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
 GET         /:srn/check-dates                                                                                  controllers.nonsipp.CheckReturnDatesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/check-dates                                                                                  controllers.nonsipp.CheckReturnDatesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
