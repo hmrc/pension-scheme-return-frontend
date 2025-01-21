@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.otherassetsdisposal._
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.ListUtils.ListOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import cats.implicits._
@@ -271,25 +272,23 @@ class ReportedOtherAssetsDisposalListController @Inject()(
 
   private def getCompletedDisposals(
     srn: Srn
-  )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
-    request.userAnswers
-      .map(OtherAssetsDisposalProgress.all(srn))
-      .map {
-        case (key, secondaryMap) =>
-          key -> secondaryMap.filter { case (_, status) => status.completed }
-      }
-      .toList
-      .sortBy(_._1)
-      .traverse {
-        case (key, sectionCompleted) =>
-          for {
-            otherAssetsIndex <- refineStringIndex[Max5000.Refined](key).getOrRecoverJourney
-            disposalIndexes <- sectionCompleted.keys.toList
-              .map(refineStringIndex[Max50.Refined])
-              .traverse(_.getOrRecoverJourney)
-          } yield (otherAssetsIndex, disposalIndexes)
-      }
-      .map(_.toMap)
+  )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] = {
+    val all = request.userAnswers
+      .map(OtherAssetsCompleted.all(srn))
+    Right(
+      all.keys.toList
+        .refine[Max5000.Refined]
+        .map { index =>
+          index -> request.userAnswers
+            .map(OtherAssetsDisposalProgress.all(srn, index))
+            .keys
+            .toList
+            .refine[Max50.Refined]
+        }
+        .toMap
+    )
+  }
+
 }
 
 object ReportedOtherAssetsDisposalListController {

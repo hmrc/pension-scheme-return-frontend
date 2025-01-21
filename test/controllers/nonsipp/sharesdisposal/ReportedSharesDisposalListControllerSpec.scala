@@ -138,6 +138,11 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
     inject.bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
+  private val disposalsWithIndexesNoDisposals: List[((Max5000, List[Max50]), SectionCompleted)] = List(
+    ((shareIndexOne, List.empty), SectionCompleted),
+    ((shareIndexTwo, List.empty), SectionCompleted)
+  )
+
   "ReportedSharesDisposalListController" - {
 
     act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
@@ -266,7 +271,7 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
             srn,
             page,
             mode = ViewOnlyMode,
-            List.empty,
+            disposalsWithIndexesNoDisposals,
             numberOfDisposals = 0,
             maxPossibleNumberOfDisposals,
             noDisposalsUserAnswers,
