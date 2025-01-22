@@ -651,7 +651,7 @@ object AssetDisposalCYAController {
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(
-          "assetDisposalCYA.section1.anyPartAssetStillHeld.hidden"
+          Message("assetDisposalCYA.section1.anyPartAssetStillHeld.hidden", schemeName)
         )
       )
     )
@@ -689,7 +689,7 @@ object AssetDisposalCYAController {
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(
-          "assetDisposalCYA.section1.anyPartAssetStillHeld.hidden"
+          Message("assetDisposalCYA.section1.anyPartAssetStillHeld.hidden", schemeName)
         )
       )
     )

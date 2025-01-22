@@ -638,7 +638,7 @@ object LandPropertyDisposalCYAController {
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(
-          ("landPropertyDisposalCYA.section1.DisposalIndependentValuationInfo.hidden", recipientName)
+          ("landPropertyDisposalCYA.section1.DisposalIndependentValuationInfo.hidden", addressLookUpPage.addressLine1)
         )
       ) :+
       CheckYourAnswersRowViewModel(
@@ -655,7 +655,7 @@ object LandPropertyDisposalCYAController {
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(
-          ("landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden", recipientName)
+          ("landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden", addressLookUpPage.addressLine1)
         )
       )
   }
