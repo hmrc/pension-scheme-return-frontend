@@ -231,10 +231,8 @@ class OverviewController @Inject()(
       }
     }
 
-  def onPageLoad(srn: Srn): Action[AnyContent] = {
-    logger.debug(s"attempting to authenticate")
+  def onPageLoad(srn: Srn): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).async { implicit request =>
-      logger.debug("authenticated successfully")
       val toDate = formatDateForApi(allDates.head._2.from)
       val fromDate = formatDateForApi(allDates.last._2.from)
       logger.debug(s"retrieving PSR overview from ETMP from $fromDate to $toDate")
@@ -249,7 +247,6 @@ class OverviewController @Inject()(
       } yield Ok(view(outstanding, previous, request.schemeDetails.schemeName))
         .addingToSession((Constants.SRN, srn.value))
     }
-  }
 
   def onSelectStart(
     srn: Srn,

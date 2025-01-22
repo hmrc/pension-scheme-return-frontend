@@ -92,10 +92,10 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
       (2030, 2024, 2031)
     )
 
-    s"onPageLoads uses passes correct date range to the overview service based on the current year" in runningApplication {
-      implicit app =>
-        forAll(dates) {
-          case (currentPeriodStartYear: Int, earliestStartYear: Int, latestStartYear: Int) =>
+    forAll(dates) {
+      case (currentPeriodStartYear: Int, earliestStartYear: Int, latestStartYear: Int) =>
+        s"onPageLoads uses passes correct date range to the overview service when the current year is $currentPeriodStartYear" in runningApplication {
+          implicit app =>
             when(mockTaxYearService.current).thenReturn(TaxYear(currentPeriodStartYear))
             when(mockPsrOverviewService.getOverview(any(), any(), any(), any())(any(), any(), any())).thenReturn(
               Future.successful(None)
@@ -105,24 +105,26 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
             )
 
             val request = FakeRequest(GET, onPageLoad)
-            route(app, request)
-
-            verify(mockPsrOverviewService, times(1)).getOverview(
-              any(),
-              eqTo(s"$earliestStartYear-04-06"),
-              eqTo(s"$latestStartYear-04-06"),
-              any()
-            )(any(), any(), any())
 
             val allYears = Seq.range(latestStartYear - 1, earliestStartYear - 1, -1).map(x => s"$x-04-06")
-            verify(mockPsrVersionsService, times(1)).getVersionsForYears(
-              any(),
-              eqTo(allYears),
-              any()
-            )(any(), any(), any())
-        }
 
-        true
+            whenReady(route(app, request).value) { result =>
+              verify(mockPsrOverviewService, times(1)).getOverview(
+                any(),
+                eqTo(s"$earliestStartYear-04-06"),
+                eqTo(s"$latestStartYear-04-06"),
+                any()
+              )(any(), any(), any())
+
+              verify(mockPsrVersionsService, times(1)).getVersionsForYears(
+                any(),
+                eqTo(allYears),
+                any()
+              )(any(), any(), any())
+
+              result
+            }
+        }
     }
 
     "onPageLoads returns OK and the correct view - when empty responses returned" in runningApplication {
