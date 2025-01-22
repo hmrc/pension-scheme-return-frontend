@@ -216,47 +216,49 @@ object EmployerContributionsMemberListController {
             }
           ),
           TableElemDoubleLink(
-            // Change link
-            (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-              case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                TableElem.view(
-                  controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                    .onPageLoadViewOnly(
-                      srn,
-                      memberWithEmployerContributions.memberIndex,
-                      page = 1,
-                      year = year,
-                      current = currentVersion,
-                      previous = previousVersion
-                    ),
+            (
+              // Change link
+              (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                  TableElem.view(
+                    controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                      .onPageLoadViewOnly(
+                        srn,
+                        memberWithEmployerContributions.memberIndex,
+                        page = 1,
+                        year = year,
+                        current = currentVersion,
+                        previous = previousVersion
+                      ),
+                    Message(
+                      "employerContributions.MemberList.remove.hidden.text",
+                      memberWithEmployerContributions.employerFullName
+                    )
+                  )
+                case _ =>
+                  TableElem.change(
+                    controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                      .onSubmit(srn, memberWithEmployerContributions.memberIndex, page = 1, CheckMode),
+                    Message(
+                      "employerContributions.MemberList.change.hidden.text",
+                      memberWithEmployerContributions.employerFullName
+                    )
+                  )
+              },
+              // Remove link
+              if (mode == ViewOnlyMode) {
+                TableElem.empty
+              } else {
+                TableElem.remove(
+                  controllers.nonsipp.employercontributions.routes.WhichEmployerContributionRemoveController
+                    .onSubmit(srn, memberWithEmployerContributions.memberIndex),
                   Message(
                     "employerContributions.MemberList.remove.hidden.text",
                     memberWithEmployerContributions.employerFullName
                   )
                 )
-              case _ =>
-                TableElem.change(
-                  controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                    .onSubmit(srn, memberWithEmployerContributions.memberIndex, page = 1, CheckMode),
-                  Message(
-                    "employerContributions.MemberList.change.hidden.text",
-                    memberWithEmployerContributions.employerFullName
-                  )
-                )
-            },
-            // Remove link
-            if (mode == ViewOnlyMode) {
-              TableElem.empty
-            } else {
-              TableElem.remove(
-                controllers.nonsipp.employercontributions.routes.WhichEmployerContributionRemoveController
-                  .onSubmit(srn, memberWithEmployerContributions.memberIndex),
-                Message(
-                  "employerContributions.MemberList.remove.hidden.text",
-                  memberWithEmployerContributions.employerFullName
-                )
-              )
-            }
+              }
+            )
           )
         )
       }

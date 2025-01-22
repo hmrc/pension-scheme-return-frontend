@@ -22,7 +22,6 @@ import com.google.inject.Inject
 import utils.ListUtils.ListOps
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import cats.implicits.{toShow, toTraverseOps, _}
-import _root_.config.Constants
 import _root_.config.Constants.maxLoans
 import forms.YesNoPageFormProvider
 import pages.nonsipp.loansmadeoroutstanding._
@@ -30,6 +29,8 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.ListView
 import models.SchemeId.Srn
+import _root_.config.Constants
+import utils.nonsipp.PrePopulationUtils.isPrePopulation
 import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
 import controllers.actions._
 import pages.nonsipp.CompilationOrSubmissionDatePage
@@ -140,6 +141,10 @@ class LoansListController @Inject()(
     implicit request =>
       loansToTraverse(srn).traverse {
         case (loansToCheck, loans) =>
+          // We are only fetching the progressUrl from the loans which doesn't need checking
+          val getInProgressUrl = loans
+            .collectFirst { case LoansData(_, _, _, SectionJourneyStatus.InProgress(url)) => url }
+
           if (loansToCheck.size + loans.size >= Constants.maxLoans) {
             Future.successful(
               Redirect(
@@ -161,7 +166,19 @@ class LoansListController @Inject()(
                   )
                 },
                 answer =>
-                  Future.successful(Redirect(navigator.nextPage(LoansListPage(srn, answer), mode, request.userAnswers)))
+                  if (answer) {
+                    getInProgressUrl match {
+                      case Some(url) => Future.successful(Redirect(url))
+                      case _ =>
+                        Future.successful(
+                          Redirect(navigator.nextPage(LoansListPage(srn, answer), mode, request.userAnswers))
+                        )
+                    }
+                  } else {
+                    Future.successful(
+                      Redirect(navigator.nextPage(LoansListPage(srn, answer), mode, request.userAnswers))
+                    )
+                  }
               )
           }
       }.merge
@@ -206,22 +223,60 @@ class LoansListController @Inject()(
     implicit request: DataRequest[_],
     logger: Logger
   ): Either[Result, (List[LoansData], List[LoansData])] = {
-    // if return has been pre-populated, partition shares by those that need to be checked
-    def buildLoans(index: Max5000): Either[Result, LoansData] =
-      for {
-        loanAmountDetails <- requiredPage(AmountOfTheLoanPage(srn, index))
-        loanRecipientType <- requiredPage(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
-        recipientName <- loanRecipientType match {
-          case IdentityType.Individual =>
-            requiredPage(IndividualRecipientNamePage(srn, index))
-          case IdentityType.UKCompany =>
-            requiredPage(CompanyRecipientNamePage(srn, index))
-          case IdentityType.UKPartnership =>
-            requiredPage(PartnershipRecipientNamePage(srn, index))
-          case IdentityType.Other =>
-            requiredPage(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient)).map(_.name)
-        }
-      } yield LoansData(index, loanAmountDetails.loanAmount, recipientName)
+
+    def loanProgress(index: Max5000): SectionJourneyStatus =
+      request.userAnswers
+        .get(LoansProgress(srn, index))
+        .getOrElse(SectionJourneyStatus.Completed)
+
+    def buildLoans(index: Max5000): LoansData = {
+      val loanAmountDetails = request.userAnswers.get(AmountOfTheLoanPage(srn, index))
+      val loanRecipientType = request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
+      val progress = loanProgress(index)
+
+      val recipientName = loanRecipientType.flatMap {
+        case IdentityType.Individual =>
+          request.userAnswers.get(IndividualRecipientNamePage(srn, index))
+        case IdentityType.UKCompany =>
+          request.userAnswers.get(CompanyRecipientNamePage(srn, index))
+        case IdentityType.UKPartnership =>
+          request.userAnswers.get(PartnershipRecipientNamePage(srn, index))
+        case IdentityType.Other =>
+          request.userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient)).map(_.name)
+      }
+
+      (loanAmountDetails, recipientName) match {
+
+        case (Some(amountDetails), Some(name)) =>
+          LoansData(
+            index = index,
+            loanAmount = amountDetails.loanAmount,
+            recipientName = name,
+            progress = progress
+          )
+
+        case _ =>
+          val amount = loanAmountDetails.map(_.loanAmount).getOrElse(Money.zero)
+          val name = recipientName.getOrElse("")
+
+          val storedProgress: SectionJourneyStatus = progress match {
+            case inProgress @ SectionJourneyStatus.InProgress(_) => inProgress
+            case _ =>
+              SectionJourneyStatus.InProgress(
+                controllers.nonsipp.common.routes.IdentityTypeController
+                  .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
+                  .url
+              )
+          }
+
+          LoansData(
+            index = index,
+            loanAmount = amount,
+            recipientName = name,
+            progress = storedProgress
+          )
+      }
+    }
 
     if (isPrePopulation) {
       for {
@@ -230,7 +285,7 @@ class LoansListController @Inject()(
           .refine[Max5000.Refined]
           .map(_.keys.toList)
           .getOrRecoverJourney
-        loans <- indexes.traverse(buildLoans)
+        loans = indexes.map(buildLoans)
       } yield loans.partition(
         loans => LoansCheckStatusUtils.checkLoansRecord(request.userAnswers, srn, loans.index)
       )
@@ -242,7 +297,7 @@ class LoansListController @Inject()(
           .refine[Max5000.Refined]
           .map(_.keys.toList)
           .getOrRecoverJourney
-        loans <- indexes.traverse(buildLoans)
+        loans = indexes.map(buildLoans)
       } yield (noLoansToCheck, loans)
     }
   }
@@ -261,7 +316,7 @@ object LoansListController {
     viewOnlyViewModel: Option[ViewOnlyViewModel],
     schemeName: String,
     check: Boolean = false
-  ): List[ListRow] =
+  )(implicit request: DataRequest[AnyContent]): List[ListRow] =
     (loansList, mode) match {
       case (Nil, mode) if mode.isViewOnlyMode =>
         List(
@@ -273,29 +328,38 @@ object LoansListController {
       case (Nil, mode) if !mode.isViewOnlyMode =>
         List()
       case (list, _) =>
-        list.map {
-          case LoansData(index, loanAmount, recipientName) =>
+        list.flatMap {
+          case LoansData(index, loanAmount, recipientName, loansProgress) =>
+            val validLoan = loanAmount.value > 0 && recipientName.nonEmpty
             (mode, viewOnlyViewModel) match {
               case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
-                ListRow.view(
-                  text = Message("loansList.row", loanAmount.displayAs, recipientName),
-                  url = routes.LoansCYAController.onPageLoadViewOnly(srn, index, year, current, previous).url,
-                  hiddenText = Message("loansList.row.view.hidden", loanAmount.displayAs, recipientName)
+                Some(
+                  ListRow.view(
+                    text = Message("loansList.row", loanAmount.displayAs, recipientName),
+                    url = routes.LoansCYAController.onPageLoadViewOnly(srn, index, year, current, previous).url,
+                    hiddenText = Message("loansList.row.view.hidden", loanAmount.displayAs, recipientName)
+                  )
                 )
               case _ if check =>
-                ListRow.check(
-                  text = Message("loansList.row", loanAmount.displayAs, recipientName),
-                  url = routes.LoansCheckAndUpdateController.onPageLoad(srn, index).url,
-                  hiddenText =
-                    Message("site.check.param", Message("loansList.row", loanAmount.displayAs, recipientName))
+                Some(
+                  ListRow.check(
+                    text = Message("loansList.row", loanAmount.displayAs, recipientName),
+                    url = routes.LoansCheckAndUpdateController.onPageLoad(srn, index).url,
+                    hiddenText =
+                      Message("site.check.param", Message("loansList.row", loanAmount.displayAs, recipientName))
+                  )
                 )
+              case _ if isPrePopulation && !validLoan || loansProgress.inProgress => None
+              case _ if loansProgress.inProgress && !isPrePopulation => None
               case _ =>
-                ListRow(
-                  text = Message("loansList.row", loanAmount.displayAs, recipientName),
-                  changeUrl = routes.LoansCYAController.onPageLoad(srn, index, CheckMode).url,
-                  changeHiddenText = Message("loansList.row.change.hidden", loanAmount.displayAs, recipientName),
-                  removeUrl = routes.RemoveLoanController.onPageLoad(srn, index, mode).url,
-                  removeHiddenText = Message("loansList.row.remove.hidden", loanAmount.displayAs, recipientName)
+                Some(
+                  ListRow(
+                    text = Message("loansList.row", loanAmount.displayAs, recipientName),
+                    changeUrl = routes.LoansCYAController.onPageLoad(srn, index, CheckMode).url,
+                    changeHiddenText = Message("loansList.row.change.hidden", loanAmount.displayAs, recipientName),
+                    removeUrl = routes.RemoveLoanController.onPageLoad(srn, index, mode).url,
+                    removeHiddenText = Message("loansList.row.remove.hidden", loanAmount.displayAs, recipientName)
+                  )
                 )
             }
         }
@@ -305,13 +369,15 @@ object LoansListController {
     srn: Srn,
     page: Int,
     mode: Mode,
-    loans: List[LoansData],
+    loansNotToCheck: List[LoansData],
     loansToCheck: List[LoansData],
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean,
     isPrePop: Boolean
-  ): FormPageViewModel[ListViewModel] = {
+  )(implicit request: DataRequest[AnyContent]): FormPageViewModel[ListViewModel] = {
+
+    val loans = loansNotToCheck.filter(_.progress.completed)
 
     val loansSize = if (isPrePop) loans.length + loansToCheck.length else loans.length
 
@@ -462,6 +528,7 @@ object LoansListController {
   case class LoansData(
     index: Max5000,
     loanAmount: Money,
-    recipientName: String
+    recipientName: String,
+    progress: SectionJourneyStatus
   )
 }

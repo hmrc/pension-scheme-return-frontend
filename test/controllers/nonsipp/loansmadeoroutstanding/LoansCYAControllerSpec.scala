@@ -25,7 +25,7 @@ import pages.nonsipp.FbVersionPage
 import models._
 import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
 import pages.nonsipp.loansmadeoroutstanding._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
@@ -86,6 +86,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(ArrearsPrevYears(srn, index), true)
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.yes[Unit, Money](money))
     .unsafeSet(LoanCompleted(srn, index), SectionCompleted)
+    .unsafeSet(LoansProgress(srn, index), SectionJourneyStatus.Completed)
 
   "LoansCYAController" - {
     List(NormalMode, CheckMode).foreach { mode =>
@@ -157,6 +158,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
       .unsafeSet(ArrearsPrevYears(srn, index), false)
       .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.no[Unit, Money](()))
       .unsafeSet(LoanCompleted(srn, index), SectionCompleted)
+      .unsafeSet(LoansProgress(srn, index), SectionJourneyStatus.Completed)
 
     val previousUserAnswers = currentUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")
@@ -172,6 +174,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
       .unsafeSet(ArrearsPrevYears(srn, index), true)
       .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.yes[Unit, Money](money))
       .unsafeSet(LoanCompleted(srn, index), SectionCompleted)
+      .unsafeSet(LoansProgress(srn, index), SectionJourneyStatus.Completed)
 
     act.like(
       renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {

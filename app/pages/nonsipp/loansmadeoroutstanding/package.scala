@@ -21,6 +21,7 @@ import play.api.libs.json._
 package object loansmadeoroutstanding {
   object Paths {
     val loans: JsPath = __ \ "loans"
+    val loansProgress: JsPath = __ \ "loansProgress"
     val loanTransactions: JsPath = loans \ "loanTransactions"
   }
 }

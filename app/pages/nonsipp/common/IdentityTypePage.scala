@@ -67,7 +67,8 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           ArrearsPrevYears(srn, index),
           OutstandingArrearsOnLoanPage(srn, index),
           SecurityGivenForLoanPage(srn, index),
-          LoanCompleted(srn, index)
+          LoanCompleted(srn, index),
+          LoansProgress(srn, index)
         )
         if (isLastRecord) list :+ LoansMadeOrOutstandingPage(srn) else list
       case _ =>

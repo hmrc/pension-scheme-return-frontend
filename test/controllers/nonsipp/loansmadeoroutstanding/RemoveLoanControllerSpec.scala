@@ -23,6 +23,7 @@ import eu.timepit.refined.refineMV
 import models.{IdentitySubject, IdentityType, NormalMode}
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
+import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
@@ -48,6 +49,7 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
     .unsafeSet(IdentityTypePage(srn, refineMV(3), IdentitySubject.LoanRecipient), IdentityType.Individual)
     .unsafeSet(IndividualRecipientNamePage(srn, refineMV(3)), "recipientName3")
     .unsafeSet(AmountOfTheLoanPage(srn, refineMV(3)), amountOfTheLoan)
+    .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -71,14 +73,17 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
         .after({
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
+          defaultUserAnswers.get(LoansProgress(srn, index)) mustBe None
         })
     )
+
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after({
           verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
+          filledUserAnswers.get(LoansProgress(srn, index)) mustBe Some(SectionJourneyStatus.Completed)
         })
     )
 
@@ -92,6 +97,7 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
         .after({
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
+          defaultUserAnswers.get(LoansProgress(srn, index)) mustBe None
         })
     )
 

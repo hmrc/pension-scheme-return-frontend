@@ -27,7 +27,6 @@ import cats.implicits.toShow
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
-import viewmodels.models._
 import forms.mappings.errors.MoneyFormErrors
 import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
@@ -35,10 +34,12 @@ import utils.nonsipp.PrePopulationUtils.isPrePopulation
 import config.Constants.maxCurrencyValue
 import utils.DateTimeUtils.localDateShow
 import models._
-import pages.nonsipp.loansmadeoroutstanding.{ArrearsPrevYears, OutstandingArrearsOnLoanPage}
+import pages.nonsipp.loansmadeoroutstanding.{ArrearsPrevYears, LoansProgress, OutstandingArrearsOnLoanPage}
 import cats.{Id, Monad}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
+import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
 
@@ -85,11 +86,17 @@ class OutstandingArrearsOnLoanController @Inject()(
             formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, period)))),
             value =>
               for {
-                yesNoAnswer <- Future.fromTry(request.userAnswers.set(ArrearsPrevYears(srn, index), value.isRight))
-                updatedAnswers <- Future
-                  .fromTry(yesNoAnswer.set(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo(value)))
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(OutstandingArrearsOnLoanPage(srn, index), mode, updatedAnswers))
+                yesNoAnswer <- request.userAnswers.set(ArrearsPrevYears(srn, index), value.isRight).mapK
+                updatedAnswers <- yesNoAnswer
+                  .set(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo(value))
+                  .mapK
+                answersWithProgress <- updatedAnswers
+                  .set(LoansProgress(srn, index), SectionJourneyStatus.Completed)
+                  .mapK
+                nextPage = navigator.nextPage(OutstandingArrearsOnLoanPage(srn, index), mode, answersWithProgress)
+                updatedProgressAnswers <- saveProgress(srn, index, answersWithProgress, nextPage)
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(nextPage)
           )
       }
   }

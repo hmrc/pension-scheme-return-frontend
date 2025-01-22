@@ -26,7 +26,7 @@ import navigation.{Navigator, NavigatorBehaviours}
 import models._
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
 
@@ -300,10 +300,12 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
               defaultUserAnswers
                 .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
                 .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
+                .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
           )
           .withName("go to who received the loan at index 2")
       )
     }
+
     "One record at index 2" - {
       act.like(
         normalmode
@@ -316,10 +318,12 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
               defaultUserAnswers
                 .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
                 .unsafeSet(LoanCompleted(srn, refineMV(2)), SectionCompleted)
+                .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
           )
           .withName("go to who received the loan at index 3")
       )
     }
+
     "No existing loan records" - {
       act.like(
         normalmode

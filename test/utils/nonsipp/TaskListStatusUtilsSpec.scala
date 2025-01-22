@@ -61,7 +61,7 @@ import pages.nonsipp.membertransferout._
 import pages.nonsipp.moneyborrowed._
 import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsStillHeldPage, HowWereBondsDisposedOfPage}
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
-import viewmodels.models.{MemberState, SectionCompleted}
+import viewmodels.models.{MemberState, SectionCompleted, SectionJourneyStatus}
 
 class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
@@ -254,8 +254,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         .url
 
     def secondQuestionPageUrl(index: Max5000): String =
-      controllers.nonsipp.common.routes.IdentityTypeController
-        .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
+      controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController
+        .onPageLoad(srn, index, NormalMode)
         .url
 
     "should be Not Started" - {
@@ -284,6 +284,10 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
           .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.Individual))
+          .unsafeSet(
+            LoansProgress(srn, index1of5000),
+            SectionJourneyStatus.InProgress(secondQuestionPageUrl(index1of5000))
+          )
 
         val (status, link) =
           TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
@@ -314,6 +318,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           // Second loan:
           .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
           .unsafeSet(LoanCompleted(srn, index2of5000), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
         val (status, link) =
           TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
@@ -330,6 +335,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(LoanCompleted(srn, index1of5000), SectionCompleted)
           // Second loan:
           .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
+          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
         val (status, link) =
           TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)

@@ -37,6 +37,7 @@ import controllers.nonsipp.common.PartnershipRecipientUtrController._
 import pages.nonsipp.landorproperty.PartnershipSellerNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -78,12 +79,13 @@ class PartnershipRecipientUtrController @Inject()(
               .successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, subject, request.userAnswers)))),
           value =>
             for {
-              updatedAnswers <- Future
-                .fromTry(
-                  request.userAnswers.set(PartnershipRecipientUtrPage(srn, index, subject), ConditionalYesNo(value))
-                )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(PartnershipRecipientUtrPage(srn, index, subject), mode, updatedAnswers))
+              updatedAnswers <- request.userAnswers
+                .set(PartnershipRecipientUtrPage(srn, index, subject), ConditionalYesNo(value))
+                .mapK
+              nextPage = navigator.nextPage(PartnershipRecipientUtrPage(srn, index, subject), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage, subject)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

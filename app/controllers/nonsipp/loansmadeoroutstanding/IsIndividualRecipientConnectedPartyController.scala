@@ -33,6 +33,7 @@ import views.html.YesNoPageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
@@ -81,12 +82,11 @@ class IsIndividualRecipientConnectedPartyController @Inject()(
             },
           success =>
             for {
-              userAnswers <- Future
-                .fromTry(request.userAnswers.set(IsIndividualRecipientConnectedPartyPage(srn, index), success))
-              _ <- saveService.save(userAnswers)
-            } yield {
-              Redirect(navigator.nextPage(IsIndividualRecipientConnectedPartyPage(srn, index), mode, userAnswers))
-            }
+              userAnswers <- request.userAnswers.set(IsIndividualRecipientConnectedPartyPage(srn, index), success).mapK
+              nextPage = navigator.nextPage(IsIndividualRecipientConnectedPartyPage(srn, index), mode, userAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, userAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
   }
 }

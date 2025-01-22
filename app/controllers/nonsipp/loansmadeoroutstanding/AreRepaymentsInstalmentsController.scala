@@ -30,6 +30,7 @@ import navigation.Navigator
 import controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.viewModel
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
@@ -65,9 +66,11 @@ class AreRepaymentsInstalmentsController @Inject()(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(AreRepaymentsInstalmentsPage(srn, index), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(AreRepaymentsInstalmentsPage(srn, index), mode, updatedAnswers))
+              updatedAnswers <- request.userAnswers.set(AreRepaymentsInstalmentsPage(srn, index), value).mapK
+              nextPage = navigator.nextPage(AreRepaymentsInstalmentsPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
   }
 }

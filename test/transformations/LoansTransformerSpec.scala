@@ -26,7 +26,7 @@ import generators.ModelGenerators.allowedAccessRequestGen
 import models._
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import org.scalatest.matchers.must.Matchers
 import models.ConditionalYesNo._
 import models.requests.psr._
@@ -103,6 +103,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
           .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -154,6 +155,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
           .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -208,6 +210,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
           .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -261,6 +264,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
           .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -315,6 +319,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
           .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -369,6 +374,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
           .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -423,6 +429,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(ArrearsPrevYears(srn, refineMV(1)), false)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.no[Unit, Money](()))
           .unsafeSet(LoanCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -472,6 +479,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), partialAmountOfTheLoan)
           .unsafeSet(SecurityGivenForLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Security](security))
           .unsafeSet(InterestOnLoanPage(srn, refineMV(1)), partialInterestOnLoan)
+          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
 
@@ -537,6 +545,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswers.get(SecurityGivenForLoanPage(srn, refineMV(1))) mustBe None
           userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))) mustBe None
           userAnswers.get(LoanCompleted(srn, refineMV(1))) mustBe None
+          userAnswers.get(LoansProgress(srn, refineMV(1))) mustBe None
         }
       )
     }
@@ -570,6 +579,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswers.get(SecurityGivenForLoanPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes(security))
           userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes(money))
           userAnswers.get(LoanCompleted(srn, refineMV(1))) mustBe Some(SectionCompleted)
+          userAnswers.get(LoansProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
         }
       )
     }
@@ -779,6 +789,24 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswers.get(AreRepaymentsInstalmentsPage(srn, refineMV(1))) mustBe Some(false)
           userAnswers.get(InterestOnLoanPage(srn, refineMV(1))) mustBe Some(partialInterestOnLoan)
           userAnswers.get(SecurityGivenForLoanPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes(security))
+        }
+      )
+    }
+
+    "when loan progress is set correctly" in {
+      val userAnswers = emptyUserAnswers
+
+      val loansData = loans(
+        name = individualRecipientName,
+        recipientIdentityType = RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None)
+      )
+
+      val result = transformer.transformFromEtmp(userAnswers, allowedAccessRequest.srn, loansData)
+
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(LoansProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
         }
       )
     }

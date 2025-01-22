@@ -19,17 +19,20 @@ package controllers.nonsipp.loansmadeoroutstanding
 import services.PsrSubmissionService
 import org.mockito.Mockito._
 import models.ConditionalYesNo._
+import play.api.mvc.{AnyContent, Session}
 import controllers.ControllerBaseSpec
 import views.html.ListView
+import config.Constants.PREPOPULATION_FLAG
 import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models.{Security, _}
 import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, PartnershipRecipientUtrPage}
 import pages.nonsipp.loansmadeoroutstanding._
-import viewmodels.models.SectionCompleted
-import models.SponsoringOrConnectedParty._
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import org.mockito.ArgumentMatchers.any
+import models.SponsoringOrConnectedParty._
+import models.requests.DataRequest
 
 class LoansListControllerSpec extends ControllerBaseSpec {
 
@@ -50,6 +53,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(ArrearsPrevYears(srn, index1of5000), true)
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, index1of5000), conditionalYesNoMoney)
     .unsafeSet(LoanCompleted(srn, index1of5000), SectionCompleted)
+    .unsafeSet(LoansProgress(srn, index1of5000), SectionJourneyStatus.Completed)
     // Second loan:
     .unsafeSet(IdentityTypePage(srn, index2of5000, loanRecipient), IdentityType.UKPartnership)
     .unsafeSet(PartnershipRecipientNamePage(srn, index2of5000), "recipientName2")
@@ -63,6 +67,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(ArrearsPrevYears(srn, index2of5000), false)
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, index2of5000), ConditionalYesNo.no[Unit, Money](()))
     .unsafeSet(LoanCompleted(srn, index2of5000), SectionCompleted)
+    .unsafeSet(LoansProgress(srn, index1of5000), SectionJourneyStatus.Completed)
 
   private val userAnswersToCheck = completedUserAnswers
     .unsafeSet(IdentityTypePage(srn, index3of5000, loanRecipient), IdentityType.Individual)
@@ -75,6 +80,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(InterestOnLoanPage(srn, index3of5000), partialInterestOnLoan)
     .unsafeSet(SecurityGivenForLoanPage(srn, index3of5000), conditionalYesNoSecurity)
     .unsafeSet(LoanCompleted(srn, index3of5000), SectionCompleted)
+    .unsafeSet(LoansProgress(srn, index1of5000), SectionJourneyStatus.Completed)
 
   private val page = 1
 
@@ -88,12 +94,14 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     LoansData(
       index1of5000,
       money,
-      "recipientName1"
+      "recipientName1",
+      SectionJourneyStatus.Completed
     ),
     LoansData(
       index2of5000,
       money,
-      "recipientName2"
+      "recipientName2",
+      SectionJourneyStatus.Completed
     )
   )
 
@@ -101,7 +109,8 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     LoansData(
       index3of5000,
       money,
-      "recipientName3"
+      "recipientName3",
+      SectionJourneyStatus.Completed
     )
   )
 
@@ -109,12 +118,14 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     LoansData(
       index1of5000,
       money,
-      "changedRecipientName"
+      "changedRecipientName",
+      SectionJourneyStatus.Completed
     ),
     LoansData(
       index2of5000,
       money,
-      "recipientName2"
+      "recipientName2",
+      SectionJourneyStatus.Completed
     )
   )
 
@@ -170,6 +181,10 @@ class LoansListControllerSpec extends ControllerBaseSpec {
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
+  private val mockReq = mock[DataRequest[AnyContent]]
+
+  when(mockReq.session).thenReturn(Session(Map(PREPOPULATION_FLAG -> "true")))
+
   "LoansListController" - {
 
     act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
@@ -179,13 +194,13 @@ class LoansListControllerSpec extends ControllerBaseSpec {
           srn = srn,
           page = page,
           mode = NormalMode,
-          loans = loansData,
+          loansNotToCheck = loansData,
           loansToCheck = Nil,
           schemeName = schemeName,
           viewOnlyViewModel = None,
           showBackLink = true,
           isPrePop = false
-        )
+        )(mockReq)
       )
     }.withName("Completed Journey"))
 
@@ -196,13 +211,13 @@ class LoansListControllerSpec extends ControllerBaseSpec {
           srn = srn,
           page = page,
           mode = NormalMode,
-          loans = loansData,
+          loansNotToCheck = loansData,
           loansToCheck = loansDataToCheck,
           schemeName = schemeName,
           viewOnlyViewModel = None,
           showBackLink = true,
           isPrePop = true
-        )
+        )(mockReq)
       )
     }.withName("PrePop Journey"))
 
@@ -234,13 +249,13 @@ class LoansListControllerSpec extends ControllerBaseSpec {
               srn = srn,
               page = page,
               mode = ViewOnlyMode,
-              loans = loansData,
+              loansNotToCheck = loansData,
               loansToCheck = Nil,
               schemeName = schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel),
               showBackLink = true,
               isPrePop = false
-            )
+            )(mockReq)
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
     )
@@ -254,13 +269,13 @@ class LoansListControllerSpec extends ControllerBaseSpec {
               srn = srn,
               page = page,
               mode = ViewOnlyMode,
-              loans = loansDataChanged,
+              loansNotToCheck = loansDataChanged,
               loansToCheck = Nil,
               schemeName = schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
               showBackLink = true,
               isPrePop = false
-            )
+            )(mockReq)
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
     )
@@ -274,13 +289,13 @@ class LoansListControllerSpec extends ControllerBaseSpec {
               srn = srn,
               page = page,
               mode = ViewOnlyMode,
-              loans = List(),
+              loansNotToCheck = List(),
               loansToCheck = Nil,
               schemeName = schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
               showBackLink = true,
               isPrePop = false
-            )
+            )(mockReq)
           )
       }.withName("OnPageLoadViewOnly renders ok with no loans")
     )
@@ -319,7 +334,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
               ),
               showBackLink = false,
               isPrePop = false
-            )
+            )(mockReq)
           )
       }.withName("OnPreviousViewOnly renders the view correctly")
     )

@@ -31,6 +31,7 @@ import views.html.RadioListView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 import models.requests.DataRequest
@@ -88,9 +89,13 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
               .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))),
           success =>
             for {
-              userAnswers <- Future
-                .fromTry(request.userAnswers.set(RecipientSponsoringEmployerConnectedPartyPage(srn, index), success))
-              _ <- saveService.save(userAnswers)
+              userAnswers <- request.userAnswers
+                .set(RecipientSponsoringEmployerConnectedPartyPage(srn, index), success)
+                .mapK
+              nextPage = navigator
+                .nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn, index), mode, userAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, userAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
             } yield {
               Redirect(navigator.nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn, index), mode, userAnswers))
             }

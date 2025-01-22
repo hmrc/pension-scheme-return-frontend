@@ -25,7 +25,7 @@ import uk.gov.hmrc.domain.Nino
 import models._
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import pages.nonsipp.loansmadeoroutstanding.Paths.loans
 import models.ConditionalYesNo._
 import utils.nonsipp.PrePopulationUtils.isPrePopulation
@@ -62,140 +62,152 @@ class LoansTransformer @Inject() extends Transformer {
                 key.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
                   case None => None
                   case Some(index) =>
-                    val optRecipientIdentityDetails: OptionalRecipientDetails = identityType match {
-                      case IdentityType.Individual =>
-                        (
-                          request.userAnswers.get(IndividualRecipientNamePage(srn, index)),
-                          request.userAnswers.get(IndividualRecipientNinoPage(srn, index)).map(_.value),
-                          request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index))
-                        ).mapN {
-                          case (name, Left(noNinoReason), connectedParty) =>
-                            (
-                              name,
-                              RecipientIdentityType(IdentityType.Individual, None, Some(noNinoReason), None),
-                              connectedParty,
-                              None
-                            )
-                          case (name, Right(nino), connectedParty) =>
-                            (
-                              name,
-                              RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None),
-                              connectedParty,
-                              None
-                            )
-                        }
-                      case IdentityType.UKCompany =>
-                        val recipientSponsoringEmployer =
-                          request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index))
-                        (
-                          request.userAnswers.get(CompanyRecipientNamePage(srn, index)),
-                          request.userAnswers
-                            .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
-                            .map(_.value)
-                        ).mapN {
-                          case (name, Left(noCrnReason)) =>
-                            (
-                              name,
-                              RecipientIdentityType(IdentityType.UKCompany, None, Some(noCrnReason), None),
-                              recipientSponsoringEmployer.contains(ConnectedParty),
-                              recipientSponsoringEmployer.map(_.name)
-                            )
-                          case (name, Right(crn)) =>
-                            (
-                              name,
-                              RecipientIdentityType(IdentityType.UKCompany, Some(crn.value), None, None),
-                              recipientSponsoringEmployer.contains(ConnectedParty),
-                              recipientSponsoringEmployer.map(_.name)
-                            )
-                        }
-                      case IdentityType.UKPartnership =>
-                        val recipientSponsoringEmployer =
-                          request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index))
-                        (
-                          request.userAnswers.get(PartnershipRecipientNamePage(srn, index)),
-                          request.userAnswers
-                            .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
-                            .map(_.value)
-                        ).mapN {
-                          case (name, Left(noUtrReason)) =>
-                            (
-                              name,
-                              RecipientIdentityType(IdentityType.UKPartnership, None, Some(noUtrReason), None),
-                              recipientSponsoringEmployer.contains(ConnectedParty),
-                              recipientSponsoringEmployer.map(_.name)
-                            )
-                          case (name, Right(utr)) =>
-                            (
-                              name,
-                              RecipientIdentityType(
-                                IdentityType.UKPartnership,
-                                Some(utr.value.filterNot(_.isWhitespace)),
-                                None,
-                                None
-                              ),
-                              recipientSponsoringEmployer.contains(ConnectedParty),
-                              recipientSponsoringEmployer.map(_.name)
-                            )
-                        }
-                      case IdentityType.Other =>
-                        val recipientSponsoringEmployer =
-                          request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index))
-                        request.userAnswers
-                          .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient))
-                          .map(
-                            other =>
+                    val loanProgress = request.userAnswers.get(LoansProgress(srn, index))
+                    if (loanProgress.contains(SectionJourneyStatus.Completed)) {
+
+                      val optRecipientIdentityDetails: OptionalRecipientDetails = identityType match {
+                        case IdentityType.Individual =>
+                          (
+                            request.userAnswers.get(IndividualRecipientNamePage(srn, index)),
+                            request.userAnswers.get(IndividualRecipientNinoPage(srn, index)).map(_.value),
+                            request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index))
+                          ).mapN {
+                            case (name, Left(noNinoReason), connectedParty) =>
                               (
-                                other.name,
-                                RecipientIdentityType(IdentityType.Other, None, None, Some(other.description)),
+                                name,
+                                RecipientIdentityType(IdentityType.Individual, None, Some(noNinoReason), None),
+                                connectedParty,
+                                None
+                              )
+                            case (name, Right(nino), connectedParty) =>
+                              (
+                                name,
+                                RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None),
+                                connectedParty,
+                                None
+                              )
+                          }
+                        case IdentityType.UKCompany =>
+                          val recipientSponsoringEmployer =
+                            request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index))
+                          (
+                            request.userAnswers.get(CompanyRecipientNamePage(srn, index)),
+                            request.userAnswers
+                              .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
+                              .map(_.value)
+                          ).mapN {
+                            case (name, Left(noCrnReason)) =>
+                              (
+                                name,
+                                RecipientIdentityType(IdentityType.UKCompany, None, Some(noCrnReason), None),
                                 recipientSponsoringEmployer.contains(ConnectedParty),
                                 recipientSponsoringEmployer.map(_.name)
                               )
-                          )
-                    }
-
-                    for {
-                      recipientIdentityDetails <- optRecipientIdentityDetails
-                      (recipientName, recipientIdentityType, connectedParty, optRecipientSponsoringEmployer) = recipientIdentityDetails
-                      equalInstallments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index))
-                      datePeriodLoanDetails <- request.userAnswers.get(DatePeriodLoanPage(srn, index))
-                      amountOfTheLoan <- request.userAnswers.get(AmountOfTheLoanPage(srn, index))
-                      (loanAmount, optCapRepaymentCY, optAmountOutstanding) = amountOfTheLoan.asTuple
-                      optSecurity <- request.userAnswers.get(SecurityGivenForLoanPage(srn, index)).map(_.value.toOption)
-                      interestOnLoan <- request.userAnswers.get(InterestOnLoanPage(srn, index))
-                      (loanInterestAmount, loanInterestRate, optIntReceivedCY) = interestOnLoan.asTuple
-                      optArrearsPrevYears = request.userAnswers.get(ArrearsPrevYears(srn, index))
-                      optOutstandingArrearsOnLoan = if (optArrearsPrevYears.isEmpty) {
-                        None
-                      } else {
-                        request.userAnswers
-                          .get(OutstandingArrearsOnLoanPage(srn, index))
-                          .map(_.value)
-                          .get
-                          .map(_.value)
-                          .toOption
+                            case (name, Right(crn)) =>
+                              (
+                                name,
+                                RecipientIdentityType(IdentityType.UKCompany, Some(crn.value), None, None),
+                                recipientSponsoringEmployer.contains(ConnectedParty),
+                                recipientSponsoringEmployer.map(_.name)
+                              )
+                          }
+                        case IdentityType.UKPartnership =>
+                          val recipientSponsoringEmployer =
+                            request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index))
+                          (
+                            request.userAnswers.get(PartnershipRecipientNamePage(srn, index)),
+                            request.userAnswers
+                              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
+                              .map(_.value)
+                          ).mapN {
+                            case (name, Left(noUtrReason)) =>
+                              (
+                                name,
+                                RecipientIdentityType(IdentityType.UKPartnership, None, Some(noUtrReason), None),
+                                recipientSponsoringEmployer.contains(ConnectedParty),
+                                recipientSponsoringEmployer.map(_.name)
+                              )
+                            case (name, Right(utr)) =>
+                              (
+                                name,
+                                RecipientIdentityType(
+                                  IdentityType.UKPartnership,
+                                  Some(utr.value.filterNot(_.isWhitespace)),
+                                  None,
+                                  None
+                                ),
+                                recipientSponsoringEmployer.contains(ConnectedParty),
+                                recipientSponsoringEmployer.map(_.name)
+                              )
+                          }
+                        case IdentityType.Other =>
+                          val recipientSponsoringEmployer =
+                            request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index))
+                          request.userAnswers
+                            .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient))
+                            .map(
+                              other =>
+                                (
+                                  other.name,
+                                  RecipientIdentityType(IdentityType.Other, None, None, Some(other.description)),
+                                  recipientSponsoringEmployer.contains(ConnectedParty),
+                                  recipientSponsoringEmployer.map(_.name)
+                                )
+                            )
                       }
-                    } yield {
-                      LoanTransactions(
-                        recipientIdentityType,
-                        recipientName,
-                        connectedParty,
-                        optRecipientSponsoringEmployer,
-                        LoanPeriod(datePeriodLoanDetails._1, datePeriodLoanDetails._2.value, datePeriodLoanDetails._3),
-                        LoanAmountDetails(
-                          loanAmount.value,
-                          optCapRepaymentCY.map(_.value),
-                          optAmountOutstanding.map(_.value)
-                        ),
-                        equalInstallments,
-                        LoanInterestDetails(
-                          loanInterestAmount.value,
-                          loanInterestRate.value,
-                          optIntReceivedCY.map(_.value)
-                        ),
-                        optSecurity.map(_.security),
-                        optArrearsPrevYears,
-                        optOutstandingArrearsOnLoan
-                      )
+
+                      for {
+                        recipientIdentityDetails <- optRecipientIdentityDetails
+                        (recipientName, recipientIdentityType, connectedParty, optRecipientSponsoringEmployer) = recipientIdentityDetails
+                        equalInstallments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index))
+                        datePeriodLoanDetails <- request.userAnswers.get(DatePeriodLoanPage(srn, index))
+                        amountOfTheLoan <- request.userAnswers.get(AmountOfTheLoanPage(srn, index))
+                        (loanAmount, optCapRepaymentCY, optAmountOutstanding) = amountOfTheLoan.asTuple
+                        optSecurity <- request.userAnswers
+                          .get(SecurityGivenForLoanPage(srn, index))
+                          .map(_.value.toOption)
+                        interestOnLoan <- request.userAnswers.get(InterestOnLoanPage(srn, index))
+                        (loanInterestAmount, loanInterestRate, optIntReceivedCY) = interestOnLoan.asTuple
+                        optArrearsPrevYears = request.userAnswers.get(ArrearsPrevYears(srn, index))
+                        optOutstandingArrearsOnLoan = if (optArrearsPrevYears.isEmpty) {
+                          None
+                        } else {
+                          request.userAnswers
+                            .get(OutstandingArrearsOnLoanPage(srn, index))
+                            .map(_.value)
+                            .get
+                            .map(_.value)
+                            .toOption
+                        }
+                      } yield {
+                        LoanTransactions(
+                          recipientIdentityType,
+                          recipientName,
+                          connectedParty,
+                          optRecipientSponsoringEmployer,
+                          LoanPeriod(
+                            datePeriodLoanDetails._1,
+                            datePeriodLoanDetails._2.value,
+                            datePeriodLoanDetails._3
+                          ),
+                          LoanAmountDetails(
+                            loanAmount.value,
+                            optCapRepaymentCY.map(_.value),
+                            optAmountOutstanding.map(_.value)
+                          ),
+                          equalInstallments,
+                          LoanInterestDetails(
+                            loanInterestAmount.value,
+                            loanInterestRate.value,
+                            optIntReceivedCY.map(_.value)
+                          ),
+                          optSecurity.map(_.security),
+                          optArrearsPrevYears,
+                          optOutstandingArrearsOnLoan
+                        )
+                      }
+                    } else {
+                      None
                     }
                 }
             }
@@ -493,6 +505,10 @@ class LoansTransformer @Inject() extends Transformer {
         index => LoanCompleted(srn, index) -> SectionCompleted
       )
 
+      loanProgress = indexes.map(
+        index => LoansProgress(srn, index) -> SectionJourneyStatus.Completed
+      )
+
       ua0 <- optRecordVersion.foldLeft(Try(userAnswers)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
@@ -528,6 +544,7 @@ class LoansTransformer @Inject() extends Transformer {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
       ua17 <- loanCompleted.foldLeft(Try(ua16)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-    } yield ua17
+      ua18 <- loanProgress.foldLeft(Try(ua17)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+    } yield ua18
   }
 }
