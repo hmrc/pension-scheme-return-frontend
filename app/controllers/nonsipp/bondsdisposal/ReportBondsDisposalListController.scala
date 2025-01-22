@@ -20,16 +20,17 @@ import services.SaveService
 import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage}
 import viewmodels.implicits._
 import play.api.mvc._
-import cats.implicits._
-import config.Constants.{maxBondsTransactions, maxDisposalPerBond}
-import controllers.actions.IdentifyAndRequireData
-import viewmodels.models.TaskListStatus.Updated
-import models.HowDisposed.HowDisposed
-import com.google.inject.Inject
-import config.RefinedTypes.{Max50, Max5000}
+import utils.ListUtils.ListOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
-import config.Constants
+import cats.implicits._
+import _root_.config.Constants
+import controllers.actions.IdentifyAndRequireData
+import _root_.config.Constants.{maxBondsTransactions, maxDisposalPerBond}
+import viewmodels.models.TaskListStatus.Updated
+import _root_.config.RefinedTypes.{Max50, Max5000}
+import models.HowDisposed.HowDisposed
+import com.google.inject.Inject
 import views.html.ListView
 import models.SchemeId.Srn
 import pages.nonsipp.CompilationOrSubmissionDatePage
@@ -266,27 +267,22 @@ class ReportBondsDisposalListController @Inject()(
   private def getCompletedDisposals(
     srn: Srn
   )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
-    request.userAnswers
-      .map(BondsDisposalProgress.all(srn))
-      .map {
-        case (key, secondaryMap) =>
-          key -> secondaryMap.filter { case (_, status) => status.completed }
-      }
-      .toList
-      .traverse {
-        case (key, sectionCompleted) =>
-          for {
-            bondsIndex <- refineStringIndex[Max5000.Refined](key).getOrRecoverJourney
-            disposalIndexes <- sectionCompleted.keys.toList
-              .map(refineStringIndex[Max50.Refined])
-              .traverse(_.getOrRecoverJourney)
-          } yield (bondsIndex, disposalIndexes)
-      }
-      .map(_.toMap)
-      .leftMap { result =>
-        logger.warn("couldn't build indexes from completed bonds disposal progress page")
-        result
-      }
+    Right(
+      request.userAnswers
+        .map(BondsCompleted.all(srn))
+        .keys
+        .toList
+        .refine[Max5000.Refined]
+        .map { index =>
+          index -> request.userAnswers
+            .map(BondsDisposalProgress.all(srn, index))
+            .filter(_._2.completed)
+            .keys
+            .toList
+            .refine[Max50.Refined]
+        }
+        .toMap
+    )
 
   private def getBondsDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(
     implicit request: DataRequest[_]

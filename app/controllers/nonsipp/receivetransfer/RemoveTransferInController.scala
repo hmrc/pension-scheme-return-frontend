@@ -91,7 +91,7 @@ class RemoveTransferInController @Inject()(
                 updatedAnswers <- Future
                   .fromTry(
                     request.userAnswers
-                      .removePages(
+                      .removeOnlyMultiplePages(
                         transferInPages(srn, memberIndex, index)
                       )
                       .set(MemberStatus(srn, memberIndex), MemberState.Changed)

@@ -129,6 +129,11 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
   private val maximumDisposalsReached = numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset ||
     numberOfDisposals >= maxPossibleNumberOfDisposals || allAssetsFullyDisposed
 
+  private val otherAssetsDisposalsWithIndexesNoDisposals: List[((Max5000, List[Max50]), SectionCompleted)] = List(
+    ((otherAssetIndexOne, List.empty), SectionCompleted),
+    ((otherAssetIndexTwo, List.empty), SectionCompleted)
+  )
+
   "ReportedOtherAssetsDisposalListController" - {
 
     act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
@@ -256,7 +261,7 @@ class ReportedOtherAssetsDisposalListControllerSpec extends ControllerBaseSpec {
             srn,
             mode = ViewOnlyMode,
             page,
-            List.empty,
+            otherAssetsDisposalsWithIndexesNoDisposals,
             numberOfDisposals = 0,
             maxPossibleNumberOfDisposals,
             noDisposalsUserAnswers,

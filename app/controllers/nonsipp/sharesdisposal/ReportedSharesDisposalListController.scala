@@ -19,11 +19,14 @@ package controllers.nonsipp.sharesdisposal
 import services.SaveService
 import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController._
 import viewmodels.implicits._
+import utils.ListUtils.ListOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import cats.implicits._
+import _root_.config.Constants
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal._
+import _root_.config.Constants.{maxDisposalsPerShare, maxSharesTransactions}
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import pages.nonsipp.shares._
@@ -33,8 +36,6 @@ import com.google.inject.Inject
 import views.html.ListView
 import models.TypeOfShares._
 import models.SchemeId.Srn
-import _root_.config.Constants
-import config.Constants.{maxDisposalsPerShare, maxSharesTransactions}
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import models.HowSharesDisposed._
@@ -282,25 +283,22 @@ class ReportedSharesDisposalListController @Inject()(
 
   private def getCompletedDisposals(
     srn: Srn
-  )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
-    request.userAnswers
-      .map(SharesDisposalProgress.all(srn))
-      .map {
-        case (key, secondaryMap) =>
-          key -> secondaryMap.filter { case (_, status) => status.completed }
-      }
-      .toList
-      .sortBy(_._1)
-      .traverse {
-        case (key, sectionCompleted) =>
-          for {
-            sharesIndex <- refineStringIndex[Max5000.Refined](key).getOrRecoverJourney
-            disposalIndexes <- sectionCompleted.keys.toList
-              .map(refineStringIndex[Max50.Refined])
-              .traverse(_.getOrRecoverJourney)
-          } yield (sharesIndex, disposalIndexes)
-      }
-      .map(_.toMap)
+  )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] = {
+    val all = request.userAnswers
+      .map(SharesCompleted.all(srn))
+    Right(
+      all.keys.toList
+        .refine[Max5000.Refined]
+        .map { index =>
+          index -> request.userAnswers
+            .map(SharesDisposalProgress.all(srn, index))
+            .keys
+            .toList
+            .refine[Max50.Refined]
+        }
+        .toMap
+    )
+  }
 }
 
 object ReportedSharesDisposalListController {

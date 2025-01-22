@@ -99,7 +99,7 @@ class RemoveTransferOutController @Inject()(
                 updatedAnswers <- Future
                   .fromTry(
                     request.userAnswers
-                      .removePages(transferOutPages(srn, memberIndex, index))
+                      .removeOnlyMultiplePages(transferOutPages(srn, memberIndex, index))
                       .set(MemberStatus(srn, memberIndex), MemberState.Changed)
                   )
                 _ <- saveService.save(updatedAnswers)

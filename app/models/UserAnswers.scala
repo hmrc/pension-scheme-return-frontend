@@ -93,6 +93,11 @@ final case class UserAnswers(
 
   def compose(c: List[UserAnswers.Compose]): Try[UserAnswers] = c.foldLeft(Try(this))((ua, next) => next(ua))
 
+  /**
+   * Calls cleanup and then removes the page
+   * @param page Page to remove
+   * @return
+   */
   def remove(page: Removable[_]): Try[UserAnswers] =
     page
       .cleanup(None, self)
@@ -101,20 +106,50 @@ final case class UserAnswers(
         _ => removeOnly(page)
       )
 
-  // Don't trigger cleanup
-  def removePages(pages: List[Removable[_]]): Try[UserAnswers] =
+  /**
+   * Removes multiple pages without cleanup
+   * @param pages List of pages to remove
+   * @return
+   */
+  def removeOnlyMultiplePages(pages: List[Removable[_]]): Try[UserAnswers] =
     pages.foldLeft(Try(this))((ua, page) => ua.transform(_.removeOnly(page), _ => removeOnly(page)))
 
-  def remove(pages: List[Removable[_]]): Try[UserAnswers] =
+  /**
+   * Removes multiple pages without cleanup
+   * @param pages
+   * @return
+   */
+  def removeOnly(pages: List[Removable[_]]): Try[UserAnswers] =
     pages.foldLeft(Try(this))((ua, page) => ua.flatMap(_.removeOnly(page)))
+
+  /**
+   * Removes multiple pages with cleanup. For each page calls cleanup and then removes the page.
+   *
+   * @param pages
+   * @return
+   */
+  def remove(pages: List[Removable[_]]): Try[UserAnswers] =
+    pages.foldLeft(Try(this))((ua, page) => ua.flatMap(_.remove(page)))
 
   def setWhen[A](bool: Boolean)(page: Settable[A], value: => A)(implicit writes: Writes[A]): Try[UserAnswers] =
     if (bool) setOnly(page, value) else Try(this)
 
-  def removeWhen(bool: Boolean)(page: Removable[_]*): Try[UserAnswers] =
+  /**
+   * Removes without cleanup if condition is true
+   * @param bool condition
+   * @param page page to remove
+   * @return
+   */
+  def removeOnlyWhen(bool: Boolean)(page: Removable[_]*): Try[UserAnswers] =
     if (bool) page.foldLeft(Try(this))((ua, next) => ua.flatMap(_.removeOnly(next))) else Try(this)
 
-  def removeWhen(bool: UserAnswers => Boolean)(page: Removable[_]*): Try[UserAnswers] =
+  /**
+   * Removes without cleanup if condition is true
+   * @param bool condition as function
+   * @param page page to remove
+   * @return
+   */
+  def removeOnlyWhen(bool: UserAnswers => Boolean)(page: Removable[_]*): Try[UserAnswers] =
     if (bool(this)) page.foldLeft(Try(this))((ua, next) => ua.flatMap(_.removeOnly(next))) else Try(this)
 
   def when(

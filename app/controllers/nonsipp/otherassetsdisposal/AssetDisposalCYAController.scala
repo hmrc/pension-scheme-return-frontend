@@ -596,7 +596,7 @@ object AssetDisposalCYAController {
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(
-          "assetDisposalCYA.section1.assetDisposalBuyerConnectedParty.hidden"
+          Message("assetDisposalCYA.section1.assetDisposalBuyerConnectedParty.hidden", recipientName)
         )
       ) :+
       CheckYourAnswersRowViewModel(
@@ -609,7 +609,7 @@ object AssetDisposalCYAController {
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(
-          "assetDisposalCYA.section1.DisposalIndependentValuationInfo.hidden"
+          "assetDisposalCYA.section1.DisposalIndependentValuation.hidden"
         )
       ) :+
       CheckYourAnswersRowViewModel(
@@ -625,7 +625,7 @@ object AssetDisposalCYAController {
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(
-          "assetDisposalCYA.section1.anyPartAssetStillHeld.hidden"
+          Message("assetDisposalCYA.section1.anyPartAssetStillHeld.hidden", schemeName)
         )
       )
   }

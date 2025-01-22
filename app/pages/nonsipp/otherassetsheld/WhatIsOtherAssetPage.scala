@@ -18,10 +18,12 @@ package pages.nonsipp.otherassetsheld
 
 import utils.RefinedUtils.RefinedIntOps
 import utils.PageUtils.removePages
+import pages.nonsipp.otherassetsdisposal.{HowWasAssetDisposedOfPage, HowWasAssetDisposedOfPagesForEachAsset}
 import queries.Removable
 import pages.QuestionPage
-import config.RefinedTypes.Max5000
+import config.RefinedTypes.{Max5000, OneTo50}
 import models.SchemeId.Srn
+import eu.timepit.refined.refineV
 import play.api.libs.json.JsPath
 import models.UserAnswers
 
@@ -40,7 +42,7 @@ case class WhatIsOtherAssetPage(srn: Srn, index: Max5000) extends QuestionPage[S
         val completedPages = userAnswers.map(IncomeFromAssetPages(srn))
         removePages(
           userAnswers,
-          pages(srn, index, completedPages.size == 1)
+          pages(srn, index, completedPages.size == 1) ++ dependantPages(srn, userAnswers)
         )
       case _ => Try(userAnswers)
     }
@@ -56,6 +58,17 @@ case class WhatIsOtherAssetPage(srn: Srn, index: Max5000) extends QuestionPage[S
     )
     if (isLastRecord) list :+ OtherAssetsHeldPage(srn) :+ OtherAssetsListPage(srn) else list
   }
+
+  private def dependantPages(srn: Srn, userAnswers: UserAnswers): List[Removable[_]] =
+    userAnswers
+      .map(HowWasAssetDisposedOfPagesForEachAsset(srn, index))
+      .keys
+      .toList
+      .flatMap(
+        key =>
+          refineV[OneTo50](key.toInt + 1)
+            .fold(_ => Nil, ind => List(HowWasAssetDisposedOfPage(srn, index, ind)))
+      )
 }
 
 case class WhatIsOtherAssetPages(srn: Srn) extends QuestionPage[Map[String, String]] {

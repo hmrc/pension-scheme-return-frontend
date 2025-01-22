@@ -103,7 +103,7 @@ class RemoveSurrenderedBenefitsController @Inject()(
                 updatedAnswers <- Future
                   .fromTry(
                     request.userAnswers
-                      .removePages(
+                      .removeOnlyMultiplePages(
                         surrenderBenefitsPages(srn, index)
                       )
                       .set(MemberStatus(srn, index), MemberState.Changed)

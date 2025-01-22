@@ -247,8 +247,8 @@ trait SoftDelete { _: PSRController =>
             ua.employerContributionsCompleted(srn, index)
               .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(employerContributionsPages(secondaryIndex)))
               .when(_.get(EmployerContributionsPage(srn)))(
-                ifTrue = _.removeWhen(!EmployerContributionsProgress.exist(srn, _))(EmployerContributionsPage(srn)),
-                ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(EmployerContributionsPage(srn))
+                ifTrue = _.removeOnlyWhen(!EmployerContributionsProgress.exist(srn, _))(EmployerContributionsPage(srn)),
+                ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(EmployerContributionsPage(srn))
               )
           }
           .flatMap(
@@ -256,8 +256,9 @@ trait SoftDelete { _: PSRController =>
               ua.transfersInSectionCompleted(srn, index)
                 .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(transfersInPages(secondaryIndex)))
                 .when(_.get(DidSchemeReceiveTransferPage(srn)))(
-                  ifTrue = _.removeWhen(!TransfersInSectionCompleted.exists(srn, _))(DidSchemeReceiveTransferPage(srn)),
-                  ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(DidSchemeReceiveTransferPage(srn))
+                  ifTrue =
+                    _.removeOnlyWhen(!TransfersInSectionCompleted.exists(srn, _))(DidSchemeReceiveTransferPage(srn)),
+                  ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(DidSchemeReceiveTransferPage(srn))
                 )
           )
           .flatMap(
@@ -265,50 +266,50 @@ trait SoftDelete { _: PSRController =>
               ua.transfersOutSectionCompleted(srn, index)
                 .foldLeft(Try(ua))((acc, secondaryIndex) => acc.remove(transfersOutPages(secondaryIndex)))
                 .when(_.get(SchemeTransferOutPage(srn)))(
-                  ifTrue = _.removeWhen(!TransfersOutSectionCompleted.exists(srn, _))(SchemeTransferOutPage(srn)),
-                  ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(SchemeTransferOutPage(srn))
+                  ifTrue = _.removeOnlyWhen(!TransfersOutSectionCompleted.exists(srn, _))(SchemeTransferOutPage(srn)),
+                  ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(SchemeTransferOutPage(srn))
                 )
           )
           .flatMap { ua =>
-            ua.remove(surrenderedBenefitsPages)
+            ua.removeOnly(surrenderedBenefitsPages)
               .when(_.get(SurrenderedBenefitsPage(srn)))(
-                ifTrue = _.removeWhen(_.surrenderedBenefitsCompleted(srn).isEmpty)(SurrenderedBenefitsPage(srn)),
-                ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(SurrenderedBenefitsPage(srn))
+                ifTrue = _.removeOnlyWhen(_.surrenderedBenefitsCompleted(srn).isEmpty)(SurrenderedBenefitsPage(srn)),
+                ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(SurrenderedBenefitsPage(srn))
               )
           }
           .flatMap { ua =>
-            ua.remove(memberCommencementLumpSumPages)
+            ua.removeOnly(memberCommencementLumpSumPages)
               .when(_.get(PensionCommencementLumpSumPage(srn)))(
-                ifTrue = _.removeWhen(_.map(PensionCommencementLumpSumAmountPage.all(srn)).isEmpty)(
+                ifTrue = _.removeOnlyWhen(_.map(PensionCommencementLumpSumAmountPage.all(srn)).isEmpty)(
                   PensionCommencementLumpSumPage(srn)
                 ),
-                ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(
+                ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(
                   PensionCommencementLumpSumPage(srn)
                 )
               )
           }
           .flatMap { ua =>
-            ua.remove(memberPensionPaymentsPages)
+            ua.removeOnly(memberPensionPaymentsPages)
               .when(_.get(PensionPaymentsReceivedPage(srn)))(
-                ifTrue = _.removeWhen(_.map(TotalAmountPensionPaymentsPage.all(srn)).isEmpty)(
+                ifTrue = _.removeOnlyWhen(_.map(TotalAmountPensionPaymentsPage.all(srn)).isEmpty)(
                   PensionPaymentsReceivedPage(srn)
                 ),
-                ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(PensionPaymentsReceivedPage(srn))
+                ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(PensionPaymentsReceivedPage(srn))
               )
           }
           .flatMap { ua =>
-            ua.remove(memberContributionsPages)
+            ua.removeOnly(memberContributionsPages)
               .when(_.get(MemberContributionsPage(srn)))(
-                ifTrue = _.removeWhen(_.map(AllTotalMemberContributionPages(srn)).isEmpty)(
+                ifTrue = _.removeOnlyWhen(_.map(AllTotalMemberContributionPages(srn)).isEmpty)(
                   MemberContributionsPage(srn)
                 ),
-                ifFalse = _.removeWhen(_.membersDetails(srn).isEmpty)(
+                ifFalse = _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(
                   MemberContributionsPage(srn)
                 )
               )
           }
           .flatMap {
-            _.removeWhen(_.membersDetails(srn).isEmpty)(
+            _.removeOnlyWhen(_.membersDetails(srn).isEmpty)(
               UnallocatedEmployerContributionsPage(srn),
               UnallocatedEmployerAmountPage(srn)
             )
