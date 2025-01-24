@@ -254,6 +254,8 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
             }
           )
 
+          val landOrPropertyCompleted = LandOrPropertyCompleted(srn, index) -> SectionCompleted
+
           val triedUA = for {
             ua0 <- ua
             ua1 <- ua0.set(landOrPropertyInUK._1, landOrPropertyInUK._2)
@@ -263,14 +265,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
             ua5 <- ua4.set(totalCostOfLandOrProperty._1, totalCostOfLandOrProperty._2)
             ua6 <- optIsLandOrPropertyResidential.map(t => ua5.set(t._1, t._2)).getOrElse(Try(ua5))
             ua7 <- optLandOrPropertyLeased.map(t => ua6.set(t._1, t._2)).getOrElse(Try(ua6))
-            ua8 <- optTotalIncomeOrReceipts
-              .map(
-                t =>
-                  ua7
-                    .set(t._1, t._2)
-                    .set(LandOrPropertyCompleted(srn, index), SectionCompleted)
-              )
-              .getOrElse(ua7.set(LandOrPropertyCompleted(srn, index), SectionCompleted)) // we need to store data in ETMP even if in case of pre-population TotalIncomeOrReceipts is missing
+            ua8 <- optTotalIncomeOrReceipts.map(t =>ua7.set(t._1, t._2)).getOrElse(Try(ua7))
             ua9 <- optDateOfAcquisitionOrContribution.map(t => ua8.set(t._1, t._2)).getOrElse(Try(ua8))
             ua10 <- optIndepValuationSupport.map(t => ua9.set(t._1, t._2)).getOrElse(Try(ua9))
             ua11 <- optReceivedLandType.map(t => ua10.set(t._1, t._2)).getOrElse(Try(ua10))
@@ -300,11 +295,12 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
               .getOrElse(Try(ua18))
 
             ua21 <- optSellerConnectedParty.map(t => ua20.set(t._1, t._2)).getOrElse(Try(ua20))
+            ua22 <- ua21.set(landOrPropertyCompleted._1, landOrPropertyCompleted._2)
           } yield {
             buildOptDisposedTransactionUA(
               index,
               srn,
-              ua21,
+              ua22,
               landOrPropertyTransactions(index.value - 1).optDisposedPropertyTransaction,
               landOrProperty.optDisposeAnyLandOrProperty
             )

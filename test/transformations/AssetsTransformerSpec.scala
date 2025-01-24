@@ -236,8 +236,8 @@ object AssetsTransformerSpec {
     optOtherAssets = Some(
       OtherAssets(
         Some("001"),
-        otherAssetsWereHeld = true,
-        otherAssetsWereDisposed = true,
+        optOtherAssetsWereHeld = Some(true),
+        optOtherAssetsWereDisposed = Some(true),
         otherAssetTransactions = Seq.empty
       )
     )

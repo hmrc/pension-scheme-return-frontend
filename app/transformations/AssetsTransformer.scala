@@ -48,12 +48,19 @@ class AssetsTransformer @Inject()(
     val optMoneyWasBorrowed = request.userAnswers.get(MoneyBorrowedPage(srn))
     val optUnregulatedOrConnectedBondsHeld = request.userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
     val optOtherAssetsHeld = request.userAnswers.get(OtherAssetsHeldPage(srn))
+    val optOtherAssetsHeldOrList = Option.when(
+      optOtherAssetsHeld.nonEmpty || request.userAnswers.map(OtherAssetsCompleted.all(srn)).toList.nonEmpty
+    )(true)
 
     Option.when(
-      List(optLandOrPropertyHeldOrList, optMoneyWasBorrowed, optUnregulatedOrConnectedBondsHeld, optOtherAssetsHeld)
-        .exists(
-          _.isDefined
-        )
+      List(
+        optLandOrPropertyHeldOrList,
+        optMoneyWasBorrowed,
+        optUnregulatedOrConnectedBondsHeld,
+        optOtherAssetsHeldOrList
+      ).exists(
+        _.isDefined
+      )
     )(
       Assets(
         optLandOrProperty = landOrPropertyTransformer.transformToEtmp(srn, optLandOrPropertyHeld, initialUA),

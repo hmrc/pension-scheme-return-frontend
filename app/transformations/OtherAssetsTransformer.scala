@@ -29,6 +29,7 @@ import eu.timepit.refined.api.Refined
 import pages.nonsipp.otherassetsheld._
 import models.HowDisposed.{HowDisposed, Other, Sold}
 import com.google.inject.Singleton
+import utils.nonsipp.PrePopulationUtils.isPrePopulation
 import models.requests.psr.{OtherAssetDisposed, OtherAssetTransaction, OtherAssets}
 import models.UserAnswers.implicits.UserAnswersTryOps
 import pages.nonsipp.otherassetsheld.Paths.otherAssets
@@ -47,19 +48,25 @@ class OtherAssetsTransformer @Inject() extends Transformer {
   def transformToEtmp(srn: Srn, optOtherAssetsHeld: Option[Boolean], initialUA: UserAnswers)(
     implicit request: DataRequest[_]
   ): Option[OtherAssets] =
-    optOtherAssetsHeld.map { otherAssetsHeld =>
-      val otherAssetsDisposal = request.userAnswers.get(OtherAssetsDisposalPage(srn)).getOrElse(false)
+    Option.when(optOtherAssetsHeld.nonEmpty || request.userAnswers.map(OtherAssetsCompleted.all(srn)).toList.nonEmpty) {
+      val optDisposeAnyOtherAsset = request.userAnswers.get(OtherAssetsDisposalPage(srn))
+      val dispose =
+        if (isPrePopulation && optDisposeAnyOtherAsset.isEmpty) {
+          None // allow None only in pre-population
+        } else {
+          Option(optDisposeAnyOtherAsset.getOrElse(false))
+        }
       OtherAssets(
         recordVersion = Option.when(request.userAnswers.get(otherAssets) == initialUA.get(otherAssets))(
           request.userAnswers.get(OtherAssetsRecordVersionPage(srn)).get
         ),
-        otherAssetsWereHeld = otherAssetsHeld,
-        otherAssetsWereDisposed = otherAssetsDisposal,
-        otherAssetTransactions = otherAssetTransactionsTransformToEtmp(srn, otherAssetsDisposal)
+        optOtherAssetsWereHeld = optOtherAssetsHeld,
+        optOtherAssetsWereDisposed = dispose,
+        otherAssetTransactions = otherAssetTransactionsTransformToEtmp(srn, optDisposeAnyOtherAsset)
       )
     }
 
-  private def otherAssetTransactionsTransformToEtmp(srn: Srn, otherAssetDisposed: Boolean)(
+  private def otherAssetTransactionsTransformToEtmp(srn: Srn, optDisposeAnyOtherAssets: Option[Boolean])(
     implicit request: DataRequest[_]
   ): List[OtherAssetTransaction] =
     request.userAnswers
@@ -74,12 +81,12 @@ class OtherAssetsTransformer @Inject() extends Transformer {
               assetDescription <- request.userAnswers.get(WhatIsOtherAssetPage(srn, index))
               methodOfHolding <- request.userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index))
               costOfAsset <- request.userAnswers.get(CostOfOtherAssetPage(srn, index))
-              movableSchedule29A <- request.userAnswers.get(IsAssetTangibleMoveablePropertyPage(srn, index))
-              totalIncomeOrReceipts <- request.userAnswers.get(IncomeFromAssetPage(srn, index))
             } yield {
 
               val optNoneTransferRelatedDetails = buildOptNoneTransferRelatedDetails(methodOfHolding, srn, index)
               val optAcquisitionRelatedDetails = buildOptAcquisitionRelatedDetails(methodOfHolding, srn, index)
+              val optMovableSchedule29A = request.userAnswers.get(IsAssetTangibleMoveablePropertyPage(srn, index))
+              val optTotalIncomeOrReceipts = request.userAnswers.get(IncomeFromAssetPage(srn, index))
 
               OtherAssetTransaction(
                 assetDescription = assetDescription,
@@ -90,9 +97,10 @@ class OtherAssetsTransformer @Inject() extends Transformer {
                 optPropertyAcquiredFrom = optAcquisitionRelatedDetails.map(_._3),
                 optConnectedStatus = optAcquisitionRelatedDetails.map(_._2),
                 optIndepValuationSupport = optNoneTransferRelatedDetails.map(_._1),
-                movableSchedule29A = movableSchedule29A,
-                totalIncomeOrReceipts = totalIncomeOrReceipts.value,
-                optOtherAssetDisposed = Option.when(otherAssetDisposed)(buildOptOtherAssetsDisposed(srn, index))
+                optMovableSchedule29A = optMovableSchedule29A,
+                optTotalIncomeOrReceipts = optTotalIncomeOrReceipts.map(_.value),
+                optOtherAssetDisposed =
+                  Option.when(optDisposeAnyOtherAssets.getOrElse(false))(buildOptOtherAssetsDisposed(srn, index))
               )
             }
         }
@@ -426,9 +434,13 @@ class OtherAssetsTransformer @Inject() extends Transformer {
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, otherAssets: OtherAssets): Try[UserAnswers] = {
     val otherAssetTransactions = otherAssets.otherAssetTransactions
-    val userAnswersOfOtherAssetsHeld = userAnswers
-      .set(OtherAssetsHeldPage(srn), otherAssets.otherAssetsWereHeld)
-      .set(OtherAssetsListPage(srn), otherAssets.otherAssetTransactions.nonEmpty)
+    val userAnswersOfOtherAssetsHeld = otherAssets.optOtherAssetsWereHeld match {
+      case Some(value) =>
+        userAnswers
+          .set(OtherAssetsHeldPage(srn), value)
+          .set(OtherAssetsListPage(srn), otherAssets.otherAssetTransactions.nonEmpty)
+      case None => Try(userAnswers)
+    }
     val userAnswersWithRecordVersion =
       otherAssets.recordVersion.fold(userAnswersOfOtherAssetsHeld)(
         userAnswersOfOtherAssetsHeld.set(OtherAssetsRecordVersionPage(srn), _)
@@ -443,9 +455,11 @@ class OtherAssetsTransformer @Inject() extends Transformer {
           val assetDescription = WhatIsOtherAssetPage(srn, index) -> otherAssetTransaction.assetDescription
           val methodOfHolding = WhyDoesSchemeHoldAssetsPage(srn, index) -> otherAssetTransaction.methodOfHolding
           val costOfAsset = CostOfOtherAssetPage(srn, index) -> Money(otherAssetTransaction.costOfAsset)
-          val movableSchedule29A = IsAssetTangibleMoveablePropertyPage(srn, index) -> otherAssetTransaction.movableSchedule29A
-          val totalIncomeOrReceipts = IncomeFromAssetPage(srn, index) -> Money(
-            otherAssetTransaction.totalIncomeOrReceipts
+          val optMovableSchedule29A = otherAssetTransaction.optMovableSchedule29A.map(
+            movableSchedule29A => IsAssetTangibleMoveablePropertyPage(srn, index) -> movableSchedule29A
+          )
+          val optTotalIncomeOrReceipts = otherAssetTransaction.optTotalIncomeOrReceipts.map(
+            totalIncomeOrReceipts => IncomeFromAssetPage(srn, index) -> Money(totalIncomeOrReceipts)
           )
 
           val optDateOfAcqOrContrib = otherAssetTransaction.optDateOfAcqOrContrib.map(
@@ -532,8 +546,8 @@ class OtherAssetsTransformer @Inject() extends Transformer {
             ua1 <- ua0.set(assetDescription._1, assetDescription._2)
             ua2 <- ua1.set(methodOfHolding._1, methodOfHolding._2)
             ua3 <- ua2.set(costOfAsset._1, costOfAsset._2)
-            ua4 <- ua3.set(movableSchedule29A._1, movableSchedule29A._2)
-            ua5 <- ua4.set(totalIncomeOrReceipts._1, totalIncomeOrReceipts._2)
+            ua4 <- optMovableSchedule29A.map(t => ua3.set(t._1, t._2)).getOrElse(Try(ua3))
+            ua5 <- optTotalIncomeOrReceipts.map(t =>ua4.set(t._1, t._2)).getOrElse(Try(ua4))
             ua6 <- optDateOfAcqOrContrib.map(t => ua5.set(t._1, t._2)).getOrElse(Try(ua5))
             ua7 <- optIndepValuationSupport.map(t => ua6.set(t._1, t._2)).getOrElse(Try(ua6))
             ua8 <- optConnectedStatus.map(t => ua7.set(t._1, t._2)).getOrElse(Try(ua7))

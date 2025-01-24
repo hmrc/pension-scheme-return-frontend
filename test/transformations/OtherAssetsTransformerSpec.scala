@@ -75,8 +75,8 @@ class OtherAssetsTransformerSpec
       result mustBe Some(
         OtherAssets(
           recordVersion = None,
-          otherAssetsWereHeld = false,
-          otherAssetsWereDisposed = false,
+          optOtherAssetsWereHeld = Some(false),
+          optOtherAssetsWereDisposed = Some(false),
           otherAssetTransactions = Seq.empty
         )
       )
@@ -126,8 +126,8 @@ class OtherAssetsTransformerSpec
         result shouldMatchTo Some(
           OtherAssets(
             recordVersion = Some("001"),
-            otherAssetsWereHeld = true,
-            otherAssetsWereDisposed = false,
+            optOtherAssetsWereHeld = Some(true),
+            optOtherAssetsWereDisposed = Some(false),
             otherAssetTransactions = Seq(
               OtherAssetTransaction(
                 assetDescription = "assetDescription",
@@ -145,8 +145,8 @@ class OtherAssetsTransformerSpec
                 ),
                 optConnectedStatus = Some(true),
                 optIndepValuationSupport = Some(false),
-                movableSchedule29A = true,
-                totalIncomeOrReceipts = money.value,
+                optMovableSchedule29A = Some(true),
+                optTotalIncomeOrReceipts = Some(money.value),
                 optOtherAssetDisposed = None
               ),
               OtherAssetTransaction(
@@ -158,8 +158,8 @@ class OtherAssetsTransformerSpec
                 optPropertyAcquiredFrom = None,
                 optConnectedStatus = None,
                 optIndepValuationSupport = Some(true),
-                movableSchedule29A = false,
-                totalIncomeOrReceipts = money.value,
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
                 optOtherAssetDisposed = None
               ),
               OtherAssetTransaction(
@@ -171,8 +171,8 @@ class OtherAssetsTransformerSpec
                 optPropertyAcquiredFrom = None,
                 optConnectedStatus = None,
                 optIndepValuationSupport = None,
-                movableSchedule29A = false,
-                totalIncomeOrReceipts = money.value,
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
                 optOtherAssetDisposed = None
               )
             )
@@ -242,8 +242,8 @@ class OtherAssetsTransformerSpec
         result shouldMatchTo Some(
           OtherAssets(
             recordVersion = Some("001"),
-            otherAssetsWereHeld = true,
-            otherAssetsWereDisposed = true,
+            optOtherAssetsWereHeld = Some(true),
+            optOtherAssetsWereDisposed = Some(true),
             otherAssetTransactions = Seq(
               OtherAssetTransaction(
                 assetDescription = "assetDescription",
@@ -261,8 +261,8 @@ class OtherAssetsTransformerSpec
                 ),
                 optConnectedStatus = Some(true),
                 optIndepValuationSupport = Some(false),
-                movableSchedule29A = true,
-                totalIncomeOrReceipts = money.value,
+                optMovableSchedule29A = Some(true),
+                optTotalIncomeOrReceipts = Some(money.value),
                 optOtherAssetDisposed = Some(
                   Seq(
                     OtherAssetDisposed(
@@ -295,8 +295,8 @@ class OtherAssetsTransformerSpec
                 optPropertyAcquiredFrom = None,
                 optConnectedStatus = None,
                 optIndepValuationSupport = Some(true),
-                movableSchedule29A = false,
-                totalIncomeOrReceipts = money.value,
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
                 optOtherAssetDisposed = Some(
                   Seq(
                     OtherAssetDisposed(
@@ -322,8 +322,8 @@ class OtherAssetsTransformerSpec
                 optPropertyAcquiredFrom = None,
                 optConnectedStatus = None,
                 optIndepValuationSupport = None,
-                movableSchedule29A = false,
-                totalIncomeOrReceipts = money.value,
+                optMovableSchedule29A = Some(false),
+                optTotalIncomeOrReceipts = Some(money.value),
                 optOtherAssetDisposed = Some(
                   Seq(
                     OtherAssetDisposed(
@@ -355,8 +355,8 @@ class OtherAssetsTransformerSpec
         srn,
         OtherAssets(
           recordVersion = Some("001"),
-          otherAssetsWereHeld = false,
-          otherAssetsWereDisposed = false,
+          optOtherAssetsWereHeld = Some(false),
+          optOtherAssetsWereDisposed = Some(false),
           otherAssetTransactions = List.empty
         )
       )
@@ -376,8 +376,8 @@ class OtherAssetsTransformerSpec
         srn,
         OtherAssets(
           recordVersion = Some("001"),
-          otherAssetsWereHeld = true,
-          otherAssetsWereDisposed = true,
+          optOtherAssetsWereHeld = Some(true),
+          optOtherAssetsWereDisposed = Some(true),
           otherAssetTransactions = Seq(
             OtherAssetTransaction(
               assetDescription = "assetDescription",
@@ -395,8 +395,8 @@ class OtherAssetsTransformerSpec
               ),
               optConnectedStatus = Some(true),
               optIndepValuationSupport = Some(false),
-              movableSchedule29A = true,
-              totalIncomeOrReceipts = money.value,
+              optMovableSchedule29A = Some(true),
+              optTotalIncomeOrReceipts = Some(money.value),
               optOtherAssetDisposed = Some(
                 Seq(
                   OtherAssetDisposed(
@@ -429,8 +429,8 @@ class OtherAssetsTransformerSpec
               optPropertyAcquiredFrom = None,
               optConnectedStatus = None,
               optIndepValuationSupport = Some(true),
-              movableSchedule29A = false,
-              totalIncomeOrReceipts = money.value,
+              optMovableSchedule29A = Some(false),
+              optTotalIncomeOrReceipts = Some(money.value),
               optOtherAssetDisposed = Some(
                 Seq(
                   OtherAssetDisposed(
@@ -456,8 +456,8 @@ class OtherAssetsTransformerSpec
               optPropertyAcquiredFrom = None,
               optConnectedStatus = None,
               optIndepValuationSupport = None,
-              movableSchedule29A = true,
-              totalIncomeOrReceipts = money.value,
+              optMovableSchedule29A = Some(true),
+              optTotalIncomeOrReceipts = Some(money.value),
               optOtherAssetDisposed = Some(
                 Seq(
                   OtherAssetDisposed(
