@@ -399,7 +399,7 @@ object BasicDetailsCheckYourAnswersController {
               )
         })
         :+ CheckYourAnswersRowViewModel(
-          Message("basicDetailsCheckYourAnswersController.schemeDetails.bankAccount", schemeDetails.schemeName),
+          Message("basicDetailsCheckYourAnswersController.schemeDetails.bankAccount"),
           if (activeBankAccount: Boolean) "site.yes" else "site.no"
         ).withChangeAction(
             controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, CheckMode).url,
@@ -409,10 +409,7 @@ object BasicDetailsCheckYourAnswersController {
         :?+ whyNoBankAccount.map(
           reason =>
             CheckYourAnswersRowViewModel(
-              Message(
-                "basicDetailsCheckYourAnswersController.schemeDetails.whyNoBankAccount",
-                schemeDetails.schemeName
-              ),
+              Message("basicDetailsCheckYourAnswersController.schemeDetails.whyNoBankAccount"),
               reason
             ).withChangeAction(
                 controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, CheckMode).url,
