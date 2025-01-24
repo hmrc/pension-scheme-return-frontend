@@ -323,7 +323,7 @@ memberDetailsNino.upload.error.invalid = Member’s National Insurance number mu
 memberDetailsNino.upload.error.duplicate = National Insurance number is already in use and cannot be duplicated
 
 noNINO.upload.upload.error.length = Reason member does not have a National Insurance number must be 160 characters or fewer
-noNINO.upload.upload.error.invalid = Reason member does not have a National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+noNINO.upload.upload.error.invalid = Reason member does not have a National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 memberDetails.firstName.upload.error.required = Enter the member’s first name
 memberDetails.firstName.upload.error.invalid = Member’s first name must only include letters a to z, hyphens, apostrophes and spaces
@@ -404,7 +404,7 @@ noNINO.heading = Why does {0} not have a National Insurance number?
 noNINO.error.required = Enter the reason {0} does not have a National Insurance number
 noNINO.error.length = The reason {0} does not have a National Insurance number must be 160 characters or fewer
 noNINO.error.invalid = The reason {0} does not have a National Insurance number must only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
-noNINO.upload.error.invalid = Reason member does not have a National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+noNINO.upload.error.invalid = Reason member does not have a National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 noNINO.upload.error.length = Reason member does not have a National Insurance number must be 160 characters or fewer
 
 valueOfAssets.title = Value of the pension scheme’s assets minus liabilities
@@ -480,7 +480,7 @@ whyNoBankAccount.title = Why did the scheme not have a bank account during the p
 whyNoBankAccount.heading = Why did {0} not have a bank account during the period of this return?
 whyNoBankAccount.error.required = Enter the reason the scheme did not have a bank account during the period of this return
 whyNoBankAccount.error.length = The reason the scheme did not have a bank account must be 160 characters or fewer
-whyNoBankAccount.error.invalid = The reason the scheme did not have a bank account must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+whyNoBankAccount.error.invalid = The reason the scheme did not have a bank account must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 landOrPropertyHeld.title = Did the scheme hold any land or property during the period of this return?
 landOrPropertyHeld.heading = Did {0} hold any land or property during the period of this return?
@@ -533,7 +533,7 @@ shares.companyName.heading.type.01 = shares in a sponsoring employer
 shares.companyName.heading.type.02 = unquoted shares
 shares.companyName.heading.type.03 = shares acquired from a connected party
 shares.companyName.error.required = Enter the company name of these shares
-shares.companyName.error.invalid.characters = Company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+shares.companyName.error.invalid.characters = Company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 shares.companyName.error.length = Company name must be 160 characters or fewer
 
 typeOfShares.title = Which type of shares were held in this transaction?
@@ -581,7 +581,7 @@ sharesSeller.companyRecipientCrn.yes.conditional.error.length = CRN must be 8 ch
 sharesSeller.companyRecipientCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
 sharesSeller.companyRecipientCrn.no.conditional = Tell us why you cannot provide {0}’s CRN
 sharesSeller.companyRecipientCrn.no.conditional.error.required = Enter the reason you cannot provide the company’s CRN
-sharesSeller.companyRecipientCrn.no.conditional.error.invalid = The reason you cannot provide the company’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+sharesSeller.companyRecipientCrn.no.conditional.error.invalid = The reason you cannot provide the company’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 sharesSeller.companyRecipientCrn.no.conditional.error.length = The reason you cannot provide the company’s CRN must be 160 characters or fewer
 sharesSeller.companyRecipientCrn.error.required = Select yes if you know the company’s Company Registration Number (CRN)
 
@@ -595,14 +595,14 @@ otherAssetSeller.companyRecipientCrn.yes.conditional.error.length = CRN must be 
 otherAssetSeller.companyRecipientCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
 otherAssetSeller.companyRecipientCrn.no.conditional = Tell us why you cannot provide {0}’s CRN
 otherAssetSeller.companyRecipientCrn.no.conditional.error.required = Enter the reason you cannot provide the seller’s CRN
-otherAssetSeller.companyRecipientCrn.no.conditional.error.invalid = The reason you cannot provide the seller’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+otherAssetSeller.companyRecipientCrn.no.conditional.error.invalid = The reason you cannot provide the seller’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 otherAssetSeller.companyRecipientCrn.no.conditional.error.length = The reason you cannot provide the seller’s CRN must be 160 characters or fewer
 otherAssetSeller.companyRecipientCrn.error.required = Select yes if you know the seller’s Company Registration Number (CRN)
 
 shares.classOfShares.title = What is the class of the shares held in this company?
 shares.classOfShares.heading = What is the class of the shares held in {0}?
 shares.classOfShares.error.required = Enter the class of the shares held in this company
-shares.classOfShares.error.invalid.characters = The class of the shares held in this company must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+shares.classOfShares.error.invalid.characters = The class of the shares held in this company must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 shares.classOfShares.error.length = The class of the shares held in this company must be 160 characters or fewer
 
 shares.costOfShares.title = What was the total cost of the shares in this company, in pounds and pence?
@@ -647,17 +647,17 @@ sharesDisposal.otherBuyerDetails.heading = Buyer’s details for shares in {0}
 sharesDisposal.otherBuyerDetails.name = Buyer’s name
 sharesDisposal.otherBuyerDetails.description = Brief description of buyer
 sharesDisposal.otherBuyerDetails.name.error.required = Enter the buyer’s name
-sharesDisposal.otherBuyerDetails.name.error.invalid = Buyer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+sharesDisposal.otherBuyerDetails.name.error.invalid = Buyer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 sharesDisposal.otherBuyerDetails.name.error.length = Buyer’s name must be 160 characters or fewer
 sharesDisposal.otherBuyerDetails.description.error.required = Enter a brief description of the buyer
-sharesDisposal.otherBuyerDetails.description.error.invalid = The description of the buyer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+sharesDisposal.otherBuyerDetails.description.error.invalid = The description of the buyer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 sharesDisposal.otherBuyerDetails.description.error.length = The description of the buyer must be 35 characters or fewer
 
 sharesDisposal.partnershipBuyerName.title = What is the buyer’s partnership name?
 sharesDisposal.partnershipBuyerName.heading = What is the buyer’s partnership name?
 sharesDisposal.partnershipBuyerName.error.required = Enter the buyer’s partnership name
 sharesDisposal.partnershipBuyerName.error.length = Buyer’s partnership name must be 160 characters or fewer
-sharesDisposal.partnershipBuyerName.error.invalid.characters = Buyer’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+sharesDisposal.partnershipBuyerName.error.invalid.characters = Buyer’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 sharesDisposal.partnershipBuyerUtr.title = Do you know the buyer’s Unique Taxpayer Reference (UTR)?
 sharesDisposal.partnershipBuyerUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
@@ -667,7 +667,7 @@ sharesDisposal.partnershipBuyerUtr.yes.conditional.error.length = Enter a Unique
 sharesDisposal.partnershipBuyerUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
 sharesDisposal.partnershipBuyerUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
 sharesDisposal.partnershipBuyerUtr.no.conditional.error.required = Enter the reason you cannot provide the buyer’s UTR
-sharesDisposal.partnershipBuyerUtr.no.conditional.error.invalid = The reason you cannot provide the buyer’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+sharesDisposal.partnershipBuyerUtr.no.conditional.error.invalid = The reason you cannot provide the buyer’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 sharesDisposal.partnershipBuyerUtr.no.conditional.error.length = The reason you cannot provide the buyer’s UTR must be 160 characters or fewer
 sharesDisposal.partnershipBuyerUtr.error.required = Select yes if you know the buyer’s Unique Taxpayer Reference (UTR)
 
@@ -725,7 +725,7 @@ sharesDisposal.howWereSharesDisposed.option4 = Other
 sharesDisposal.howWereSharesDisposed.option4.label = Provide details of the disposal
 sharesDisposal.howWereSharesDisposed.error.required = Select how the shares were disposed of
 sharesDisposal.howWereSharesDisposed.conditional.error.required = Enter details of the disposal
-sharesDisposal.howWereSharesDisposed.conditional.error.invalid = Details of the disposal must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+sharesDisposal.howWereSharesDisposed.conditional.error.invalid = Details of the disposal must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 sharesDisposal.howWereSharesDisposed.conditional.error.length = Details of the disposal must be 160 characters or fewer
 
 sharesDisposal.whenWereSharesSold.title = When were the shares in this company sold?
@@ -989,7 +989,7 @@ surrenderedBenefits.whatYouWillNeed.paragraph2 = The data you input for surrende
 surrenderedBenefits.whyDidMemberSurrenderBenefits.title = Why did the member surrender their pension benefits?
 surrenderedBenefits.whyDidMemberSurrenderBenefits.heading = Why did {0} surrender their pension benefits of £{2}?
 surrenderedBenefits.whyDidMemberSurrenderBenefits.error.required = Enter the reason the member surrendered these benefits
-surrenderedBenefits.whyDidMemberSurrenderBenefits.error.invalid = The reason the member surrendered these benefits must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+surrenderedBenefits.whyDidMemberSurrenderBenefits.error.invalid = The reason the member surrendered these benefits must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 surrenderedBenefits.whyDidMemberSurrenderBenefits.error.length = The reason the member surrendered these benefits must be 35 characters or fewer
 
 surrenderedBenefits.memberList.title = Select a member to add surrendered benefits
@@ -1305,10 +1305,10 @@ loanRecipient.otherRecipientDetails.heading = Recipient’s details
 loanRecipient.otherRecipientDetails.name = Recipient’s name
 loanRecipient.otherRecipientDetails.description = Brief description of recipient
 loanRecipient.otherRecipientDetails.name.error.required = Enter the recipient’s name
-loanRecipient.otherRecipientDetails.name.error.invalid = Recipient’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+loanRecipient.otherRecipientDetails.name.error.invalid = Recipient’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 loanRecipient.otherRecipientDetails.name.error.length =  Recipient’s name must be 160 characters or fewer
 loanRecipient.otherRecipientDetails.description.error.required = Enter a brief description of the recipient
-loanRecipient.otherRecipientDetails.description.error.invalid = The brief description of the recipient must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+loanRecipient.otherRecipientDetails.description.error.invalid = The brief description of the recipient must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 loanRecipient.otherRecipientDetails.description.error.length = The brief description of the recipient must be 35 characters or fewer
 
 fileUploadTooManyErrors.title = There is a problem with your member details file
@@ -1381,7 +1381,7 @@ individualRecipientName.error.invalid.characters = Recipient’s name must only 
 companyRecipientName.title = What is the recipient’s company name?
 companyRecipientName.heading = What is the recipient’s company name?
 companyRecipientName.error.required = Enter the recipient’s company name
-companyRecipientName.error.invalid.characters = Recipient’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+companyRecipientName.error.invalid.characters = Recipient’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 companyRecipientName.error.length = Recipient’s company name must be 160 characters or fewer
 
 isIndividualRecipientConnectedParty.title= Is the recipient a connected party?
@@ -1405,7 +1405,7 @@ individualRecipientNino.yes.conditional.error.required = Enter the recipient’s
 individualRecipientNino.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
 individualRecipientNino.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
 individualRecipientNino.no.conditional.error.required = Enter the reason you cannot provide the recipient’s National Insurance number
-individualRecipientNino.no.conditional.error.invalid = The reason you cannot provide the recipient’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+individualRecipientNino.no.conditional.error.invalid = The reason you cannot provide the recipient’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 individualRecipientNino.no.conditional.error.length = The reason you cannot provide the recipient’s National Insurance number must be 160 characters or fewer
 individualRecipientNino.error.required = Select yes if you know the recipient’s National Insurance number
 
@@ -1419,7 +1419,7 @@ loanRecipient.companyRecipientCrn.yes.conditional.error.length = CRN must be 8 c
 loanRecipient.companyRecipientCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
 loanRecipient.companyRecipientCrn.no.conditional = Tell us why you cannot provide {0}’s CRN
 loanRecipient.companyRecipientCrn.no.conditional.error.required = Enter the reason you cannot provide the recipient’s CRN
-loanRecipient.companyRecipientCrn.no.conditional.error.invalid = The reason you cannot provide the recipient’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+loanRecipient.companyRecipientCrn.no.conditional.error.invalid = The reason you cannot provide the recipient’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 loanRecipient.companyRecipientCrn.no.conditional.error.length = The reason you cannot provide the recipient’s CRN must be 160 characters or fewer
 loanRecipient.companyRecipientCrn.error.required = Select yes if you know the recipient’s Company Registration Number (CRN)
 
@@ -1427,7 +1427,7 @@ partnershipRecipientName.title = What is the recipient’s partnership name?
 partnershipRecipientName.heading = What is the recipient’s partnership name?
 partnershipRecipientName.error.required = Enter the recipient’s partnership name
 partnershipRecipientName.error.length = Recipient’s partnership name must be 160 characters or fewer
-partnershipRecipientName.error.invalid.characters = Recipient’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+partnershipRecipientName.error.invalid.characters = Recipient’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 fileUploadTooManyRows.title = Your member details file has too many rows
 fileUploadTooManyRows.heading = Your member details file has too many rows
@@ -1441,7 +1441,7 @@ loanRecipient.partnershipRecipientUtr.yes.conditional.error.required = Enter the
 loanRecipient.partnershipRecipientUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
 loanRecipient.partnershipRecipientUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
 loanRecipient.partnershipRecipientUtr.no.conditional.error.required = Enter the reason you cannot provide the recipient’s UTR
-loanRecipient.partnershipRecipientUtr.no.conditional.error.invalid = The reason you cannot provide the recipient’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+loanRecipient.partnershipRecipientUtr.no.conditional.error.invalid = The reason you cannot provide the recipient’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 loanRecipient.partnershipRecipientUtr.no.conditional.error.length = The reason you cannot provide the recipient’s UTR must be 160 characters or fewer
 loanRecipient.partnershipRecipientUtr.error.required = Select yes if you know the recipient’s Unique Taxpayer Reference (UTR)
 
@@ -1452,7 +1452,7 @@ landOrPropertySeller.partnershipRecipientUtr.yes.conditional.error.required = En
 landOrPropertySeller.partnershipRecipientUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
 landOrPropertySeller.partnershipRecipientUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
 landOrPropertySeller.partnershipRecipientUtr.no.conditional.error.required = Enter the reason you cannot provide the seller’s UTR
-landOrPropertySeller.partnershipRecipientUtr.no.conditional.error.invalid = The reason you cannot provide the seller’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+landOrPropertySeller.partnershipRecipientUtr.no.conditional.error.invalid = The reason you cannot provide the seller’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 landOrPropertySeller.partnershipRecipientUtr.no.conditional.error.length = The reason you cannot provide the seller’s UTR must be 160 characters or fewer
 landOrPropertySeller.partnershipRecipientUtr.error.required = Select yes if you know the seller’s Unique Taxpayer Reference (UTR)
 
@@ -1463,7 +1463,7 @@ sharesSeller.partnershipRecipientUtr.yes.conditional.error.required = Enter the 
 sharesSeller.partnershipRecipientUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
 sharesSeller.partnershipRecipientUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
 sharesSeller.partnershipRecipientUtr.no.conditional.error.required = Enter the reason you cannot provide the seller’s UTR
-sharesSeller.partnershipRecipientUtr.no.conditional.error.invalid = The reason you cannot provide the seller’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+sharesSeller.partnershipRecipientUtr.no.conditional.error.invalid = The reason you cannot provide the seller’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 sharesSeller.partnershipRecipientUtr.no.conditional.error.length = The reason you cannot provide the seller’s UTR must be 160 characters or fewer
 sharesSeller.partnershipRecipientUtr.error.required = Select yes if you know the seller’s Unique Taxpayer Reference (UTR)
 
@@ -1474,7 +1474,7 @@ otherAssetSeller.partnershipRecipientUtr.yes.conditional.error.required = Enter 
 otherAssetSeller.partnershipRecipientUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
 otherAssetSeller.partnershipRecipientUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
 otherAssetSeller.partnershipRecipientUtr.no.conditional.error.required = Enter the reason you cannot provide the seller’s UTR
-otherAssetSeller.partnershipRecipientUtr.no.conditional.error.invalid = The reason you cannot provide the seller’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+otherAssetSeller.partnershipRecipientUtr.no.conditional.error.invalid = The reason you cannot provide the seller’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 otherAssetSeller.partnershipRecipientUtr.no.conditional.error.length = The reason you cannot provide the seller’s UTR must be 160 characters or fewer
 otherAssetSeller.partnershipRecipientUtr.error.required = Select yes if you know the seller’s Unique Taxpayer Reference (UTR)
 
@@ -1631,7 +1631,7 @@ securityGivenForLoan.securityGiven.yes.conditional = Provide details of the secu
 securityGivenForLoan.securityGiven.yes.hint = You can enter a maximum of 160 characters.
 securityGivenForLoan.securityGiven.error.required = Select yes if security has been given for this loan
 securityGivenForLoan.securityGiven.yes.conditional.error.required = Enter details of the security
-securityGivenForLoan.securityGiven.yes.conditional.error.invalid = Details of the security must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hashes (#), hyphens, speech marks and spaces
+securityGivenForLoan.securityGiven.yes.conditional.error.invalid = Details of the security must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hashes (#), hyphens, speech marks, ampersands, brackets and spaces
 securityGivenForLoan.securityGiven.yes.conditional.error.length = Details of the security must be 160 characters or fewer
 
 loansList.title = You have added {0} loan
@@ -1802,7 +1802,7 @@ landOrPropertyLeaseDetails.field3.label.hint = If multiple lessees, enter the ea
 companySellerName.title = What is the seller’s company name?
 companySellerName.heading = What is the seller’s company name?
 companySellerName.error.required = Enter the seller’s company name
-companySellerName.error.invalid = Seller’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+companySellerName.error.invalid = Seller’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 companySellerName.error.tooLong = Seller’s company name must be 160 characters or fewer
 
 landPropertyIndividualSellersName.title = What is the seller’s name?
@@ -1830,7 +1830,7 @@ individualSellerNi.yes.conditional = What is {0}’s National Insurance number?
 individualSellerNi.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
 individualSellerNi.error.required = Select yes if you know the seller’s National Insurance number
 individualSellerNi.no.conditional.error.required = Enter the reason you cannot provide the seller’s National Insurance number
-individualSellerNi.no.conditional.error.invalid = The reason you cannot provide the seller’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+individualSellerNi.no.conditional.error.invalid = The reason you cannot provide the seller’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 individualSellerNi.no.conditional.error.length = The reason you cannot provide the seller’s National Insurance number must be 160 characters or fewer
 individualSellerNi.yes.conditional.error.required = Enter the seller’s National Insurance number
 individualSellerNi.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
@@ -1845,7 +1845,7 @@ landRegistryTitleNumber.yes.conditional.error.invalid = The title number must on
 landRegistryTitleNumber.yes.conditional.error.length = The title number must be 35 characters or fewer
 landRegistryTitleNumber.no.conditional = Tell us why {0} does not have a title number
 landRegistryTitleNumber.no.conditional.error.required = Enter the reason this land or property does not have a title number
-landRegistryTitleNumber.no.conditional.error.invalid = The reason this land or property does not have a title number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
+landRegistryTitleNumber.no.conditional.error.invalid = The reason this land or property does not have a title number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes,speech marks, ampersands, brackets and spaces
 landRegistryTitleNumber.no.conditional.error.length = The reason this land or property does not have a title number must be 160 characters or fewer
 
 landOrPropertySeller.companyRecipientCrn.title = Do you know the seller’s Company Registration Number (CRN)?
@@ -1858,7 +1858,7 @@ landOrPropertySeller.companyRecipientCrn.yes.conditional.error.length = CRN must
 landOrPropertySeller.companyRecipientCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
 landOrPropertySeller.companyRecipientCrn.no.conditional = Tell us why you cannot provide {0}’s CRN
 landOrPropertySeller.companyRecipientCrn.no.conditional.error.required = Enter the reason you cannot provide the seller’s CRN
-landOrPropertySeller.companyRecipientCrn.no.conditional.error.invalid = The reason you cannot provide the seller’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+landOrPropertySeller.companyRecipientCrn.no.conditional.error.invalid = The reason you cannot provide the seller’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 landOrPropertySeller.companyRecipientCrn.no.conditional.error.length = The reason you cannot provide the seller’s CRN must be 160 characters or fewer
 landOrPropertySeller.companyRecipientCrn.error.required = Select yes if you know the seller’s Company Registration Number (CRN)
 
@@ -1867,10 +1867,10 @@ landOrPropertySeller.otherRecipientDetails.heading = Seller’s details for {0}
 landOrPropertySeller.otherRecipientDetails.name = Seller’s name
 landOrPropertySeller.otherRecipientDetails.description = Brief description of seller
 landOrPropertySeller.otherRecipientDetails.name.error.required = Enter the seller’s name
-landOrPropertySeller.otherRecipientDetails.name.error.invalid = Seller’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+landOrPropertySeller.otherRecipientDetails.name.error.invalid = Seller’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 landOrPropertySeller.otherRecipientDetails.name.error.length = Seller’s name must be 160 characters or fewer
 landOrPropertySeller.otherRecipientDetails.description.error.required = Enter a brief description of the seller
-landOrPropertySeller.otherRecipientDetails.description.error.invalid = The description of the seller must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+landOrPropertySeller.otherRecipientDetails.description.error.invalid = The description of the seller must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 landOrPropertySeller.otherRecipientDetails.description.error.length = The description of the seller must be 35 characters or fewer
 
 sharesSeller.otherRecipientDetails.title = Seller’s details
@@ -1878,10 +1878,10 @@ sharesSeller.otherRecipientDetails.heading = Seller’s details for shares in {0
 sharesSeller.otherRecipientDetails.name = Seller’s name
 sharesSeller.otherRecipientDetails.description = Brief description of seller
 sharesSeller.otherRecipientDetails.name.error.required = Enter the seller’s name
-sharesSeller.otherRecipientDetails.name.error.invalid = Seller’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+sharesSeller.otherRecipientDetails.name.error.invalid = Seller’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 sharesSeller.otherRecipientDetails.name.error.length = Seller’s name must be 160 characters or fewer
 sharesSeller.otherRecipientDetails.description.error.required = Enter a brief description of the seller
-sharesSeller.otherRecipientDetails.description.error.invalid = The description of the seller must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+sharesSeller.otherRecipientDetails.description.error.invalid = The description of the seller must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 sharesSeller.otherRecipientDetails.description.error.length = The description of the seller must be 35 characters or fewer
 
 otherAssetSeller.otherRecipientDetails.title = Seller’s details
@@ -1889,16 +1889,16 @@ otherAssetSeller.otherRecipientDetails.heading = Seller’s details
 otherAssetSeller.otherRecipientDetails.name = Seller’s name
 otherAssetSeller.otherRecipientDetails.description = Brief description of seller
 otherAssetSeller.otherRecipientDetails.name.error.required = Enter the seller’s name
-otherAssetSeller.otherRecipientDetails.name.error.invalid = Seller’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+otherAssetSeller.otherRecipientDetails.name.error.invalid = Seller’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 otherAssetSeller.otherRecipientDetails.name.error.length = Seller’s name must be 160 characters or fewer
 otherAssetSeller.otherRecipientDetails.description.error.required = Enter a brief description of the seller
-otherAssetSeller.otherRecipientDetails.description.error.invalid = The description of the seller must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+otherAssetSeller.otherRecipientDetails.description.error.invalid = The description of the seller must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 otherAssetSeller.otherRecipientDetails.description.error.length = The description of the seller must be 35 characters or fewer
 
 partnershipSellerName.title = What is the seller’s partnership name?
 partnershipSellerName.heading = What is the seller’s partnership name?
 partnershipSellerName.error.required = Enter the seller’s partnership name
-partnershipSellerName.error.invalid = Seller’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+partnershipSellerName.error.invalid = Seller’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 partnershipSellerName.error.tooLong = Seller’s partnership name must be 160 characters or fewer
 
 whatYouWillNeedLandPropertyDisposal.title = Land or property disposed of by the scheme
@@ -2082,7 +2082,7 @@ whoPurchasedLandOrProperty.error.required = Select who purchased the land or pro
 companyBuyerName.title = What is the buyer’s company name?
 companyBuyerName.heading = What is the buyer’s company name?
 companyBuyerName.error.required = Enter the buyer’s company name
-companyBuyerName.error.invalid = Buyer’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+companyBuyerName.error.invalid = Buyer’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 companyBuyerName.error.tooLong = Buyer’s company name must be 160 characters or fewer
 
 
@@ -2096,7 +2096,7 @@ companyBuyerCrn.yes.conditional.error.length = CRN must be 8 characters
 companyBuyerCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
 companyBuyerCrn.no.conditional = Tell us why you cannot provide {0}’s CRN
 companyBuyerCrn.no.conditional.error.required = Enter the reason you cannot provide the buyer’s CRN
-companyBuyerCrn.no.conditional.error.invalid = The reason you cannot provide the buyer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
+companyBuyerCrn.no.conditional.error.invalid = The reason you cannot provide the buyer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes,speech marks, ampersands, brackets and spaces
 companyBuyerCrn.no.conditional.error.length = The reason you cannot provide the buyer’s CRN must be 160 characters or fewer
 companyBuyerCrn.error.required = Select yes if you know the buyer’s Company Registration Number (CRN)
 
@@ -2113,10 +2113,10 @@ otherBuyerDetails.heading = Buyer’s details for {0}
 otherBuyerDetails.name = Buyer’s name
 otherBuyerDetails.description = Brief description of buyer
 otherBuyerDetails.name.error.required = Enter the  buyer’s name
-otherBuyerDetails.name.error.invalid = Buyer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+otherBuyerDetails.name.error.invalid = Buyer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 otherBuyerDetails.name.error.length =  Buyer’s name must be 160 characters or fewer
 otherBuyerDetails.description.error.required = Enter a brief description of the buyer
-otherBuyerDetails.description.error.invalid = The brief description of the buyer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+otherBuyerDetails.description.error.invalid = The brief description of the buyer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 otherBuyerDetails.description.error.length = The description of the buyer must be 35 characters or fewer
 
 partnershipBuyerUtr.title = Do you know the buyer’s Unique Taxpayer Reference (UTR)?
@@ -2128,7 +2128,7 @@ partnershipBuyerUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Refe
 
 partnershipBuyerUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
 partnershipBuyerUtr.no.conditional.error.required = Enter the reason you cannot provide the buyer’s UTR
-partnershipBuyerUtr.no.conditional.error.invalid = The reason you cannot provide the buyer’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+partnershipBuyerUtr.no.conditional.error.invalid = The reason you cannot provide the buyer’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 partnershipBuyerUtr.no.conditional.error.length = The reason you cannot provide the buyer’s UTR must be 160 characters or fewer
 partnershipBuyerUtr.error.required = Select yes if you know the buyer’s Unique Taxpayer Reference (UTR)
 
@@ -2136,7 +2136,7 @@ partnershipBuyerName.title = What is the buyer’s partnership name?
 partnershipBuyerName.heading = What is the buyer’s partnership name?
 partnershipBuyerName.error.required = Enter the buyer’s partnership name
 partnershipBuyerName.error.tooLong = Buyer’s partnership name must be 160 characters or fewer
-partnershipBuyerName.error.invalid = Buyer’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+partnershipBuyerName.error.invalid = Buyer’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 
 individualBuyerNinoNumber.title = Do you know the buyer’s National Insurance number?
@@ -2146,7 +2146,7 @@ individualBuyerNinoNumber.yes.conditional = What is {0}’s National Insurance n
 individualBuyerNinoNumber.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
 individualBuyerNinoNumber.error.required = Select yes if you know the buyer’s National Insurance number
 individualBuyerNinoNumber.no.conditional.error.required = Enter the reason you cannot provide the buyer’s National Insurance number
-individualBuyerNinoNumber.no.conditional.error.invalid = The reason you cannot provide the buyer’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+individualBuyerNinoNumber.no.conditional.error.invalid = The reason you cannot provide the buyer’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 individualBuyerNinoNumber.no.conditional.error.length = The reason you cannot provide the buyer’s National Insurance number must be 160 characters or fewer
 individualBuyerNinoNumber.yes.conditional.error.required = Enter the buyer’s National Insurance number
 individualBuyerNinoNumber.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
@@ -2159,7 +2159,7 @@ howWasDisposed.option3 = Other
 howWasDisposed.option3.label = Provide details of the disposal
 howWasDisposed.error.required = Select how the land or property was disposed of
 howWasDisposed.conditional.error.required = Enter details of the disposal
-howWasDisposed.conditional.error.invalid = Details of the disposal must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+howWasDisposed.conditional.error.invalid = Details of the disposal must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 howWasDisposed.conditional.error.length = Details of the disposal must be 160 characters or fewer
 
 totalProceedsSaleLandProperty.title = What were the total proceeds from the sale of the land or property, in pounds and pence?
@@ -2278,7 +2278,7 @@ lenderName.title = What is the name of the lender?
 lenderName.heading = What is the name of the lender?
 lenderName.error.required = Enter the name of the lender
 lenderName.error.tooLong = Lender’s name must be 160 characters or fewer
-lenderName.error.invalid = Lender’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+lenderName.error.invalid = Lender’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 isLenderConnectedParty.title = Is the lender a connected party?
 isLenderConnectedParty.heading = Connected party
@@ -2322,7 +2322,7 @@ moneyBorrowed.WhenBorrowed.error.after = Date the scheme borrowed this money mus
 moneyBorrowed.WhyBorrowed.title = Why did the scheme borrow this money from the lender?
 moneyBorrowed.WhyBorrowed.heading = Why did {0} borrow £{2} from {1}?
 moneyBorrowed.WhyBorrowed.error.required = Enter the reason why the scheme borrowed this money
-moneyBorrowed.WhyBorrowed.error.invalid = The reason the scheme borrowed this money must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+moneyBorrowed.WhyBorrowed.error.invalid = The reason the scheme borrowed this money must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 moneyBorrowed.WhyBorrowed.error.length = The reason the scheme borrowed this money must be 160 characters or fewer
 
 valueOfSchemeAssetsWhenMoneyBorrowed.title = What was the total value of the scheme’s assets on the date this money was borrowed, in pounds and pence?
@@ -2367,7 +2367,7 @@ whatYouWillNeedEmployerContributions.paragraph2 = The data you input for employe
 employerName.title = What is the employer’s name?
 employerName.heading = What is the employer’s name?
 employerName.error.required = Enter the employer’s name
-employerName.error.invalid = Employer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+employerName.error.invalid = Employer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 employerName.error.tooLong = Employer’s name must be 160 characters or fewer
 
 employerTypeOfBusiness.title = What type of business is the employer?
@@ -2407,7 +2407,7 @@ otherEmployeeDescription.title = Provide a brief description of the employer
 otherEmployeeDescription.heading = Provide a brief description of {0}
 otherEmployeeDescription.error.required = Provide a brief description of the employer
 otherEmployeeDescription.error.length = The brief description of the employer must be 35 characters or fewer
-otherEmployeeDescription.error.invalid = The brief description of employer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+otherEmployeeDescription.error.invalid = The brief description of employer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 partnershipEmployerUtr.title = Do you know the employer’s Unique Taxpayer Reference (UTR)?
 partnershipEmployerUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
@@ -2417,7 +2417,7 @@ partnershipEmployerUtr.error.required = Select yes if you know the employer’s 
 partnershipEmployerUtr.yes.conditional.error.required = Enter the employer’s UTR
 partnershipEmployerUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
 partnershipEmployerUtr.no.conditional.error.required = Enter the reason you cannot provide the employer’s UTR
-partnershipEmployerUtr.no.conditional.error.invalid = The reason you cannot provide the employer’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+partnershipEmployerUtr.no.conditional.error.invalid = The reason you cannot provide the employer’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 partnershipEmployerUtr.no.conditional.error.length = The reason you cannot provide the employer’s UTR must be 160 characters or fewer
 
 removeBorrowInstances.title = Are you sure you want to remove this instance of borrowing?
@@ -2451,7 +2451,7 @@ employerCompanyCRN.yes.conditional.error.length = CRN must be 8 characters
 employerCompanyCRN.yes.conditional.error.invalid = CRN must only include letters and numbers
 employerCompanyCRN.no.conditional = Tell us why you cannot provide {0}’s CRN
 employerCompanyCRN.no.conditional.error.required = Enter the reason you cannot provide the employer’s CRN
-employerCompanyCRN.no.conditional.error.invalid = The reason you cannot provide the employer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+employerCompanyCRN.no.conditional.error.invalid = The reason you cannot provide the employer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 employerCompanyCRN.no.conditional.error.length = The reason you cannot provide the employer’s CRN must be 160 characters or fewer
 employerCompanyCRN.error.required = Select yes if you know the employer’s Company Registration Number (CRN)
 
@@ -2489,7 +2489,7 @@ landOrPropertyPostcodeLookup.postcode.error.notFound = Postcode not found. Try a
 landOrPropertyPostcodeLookup.postcode.error.invalid.characters = Land or property postcode must only include letters a to z and numbers 0 to 9
 landOrPropertyPostcodeLookup.postcode.error.invalid.format = Enter the postcode of the land or property in the right format, like AB1 1AB
 landOrPropertyPostcodeLookup.filter.error.required = Enter the postcode of the land or property
-landOrPropertyPostcodeLookup.filter.error.invalid = Property name or number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+landOrPropertyPostcodeLookup.filter.error.invalid = Property name or number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 landOrPropertyPostcodeLookup.filter.error.max = Property name or number must be 35 characters or fewer
 
 landPropertyAddressResults.title = What is the address of the land or property?
@@ -2502,17 +2502,17 @@ landPropertyAddressManual.title = What is the address of the land or property?
 landPropertyAddressManual.heading = What is the address of the land or property?
 landPropertyAddressManual.field1.label = Address line 1
 landPropertyAddressManual.field1.error.required = Enter the first line of the address
-landPropertyAddressManual.field1.error.invalid = First line of address must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+landPropertyAddressManual.field1.error.invalid = First line of address must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 landPropertyAddressManual.field1.error.max = First line of the address must be 35 characters or fewer
 landPropertyAddressManual.field2.label = Address line 2 (optional)
-landPropertyAddressManual.field2.error.invalid = Second line of address must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+landPropertyAddressManual.field2.error.invalid = Second line of address must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 landPropertyAddressManual.field2.error.max = Second line of the address must be 35 characters or fewer
 landPropertyAddressManual.field3.label = Address line 3 (optional)
-landPropertyAddressManual.field3.error.invalid = Third line of address must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+landPropertyAddressManual.field3.error.invalid = Third line of address must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 landPropertyAddressManual.field3.error.max = Third line of the address must be 35 characters or fewer
 landPropertyAddressManual.field4.label = Town or city
 landPropertyAddressManual.field4.error.required = Enter a town or city
-landPropertyAddressManual.field4.error.invalid = Town or city must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+landPropertyAddressManual.field4.error.invalid = Town or city must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 landPropertyAddressManual.field4.error.max = Town or city must be 35 characters or fewer
 landPropertyAddressManual.field5.label.uk = Postcode (optional)
 landPropertyAddressManual.field5.label = Postal code (optional)
@@ -2521,7 +2521,7 @@ landPropertyAddressManual.field5.error.format = Enter a postcode in the right fo
 landPropertyAddressManual.field5.error.max = Enter a postcode in the right format, like AB1 1AB
 landPropertyAddressManual.field6.label = Country
 landPropertyAddressManual.field6.error.required = Enter a country
-landPropertyAddressManual.field6.error.invalid = Country must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+landPropertyAddressManual.field6.error.invalid = Country must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 totalMemberContribution.title = What was the total member contribution made by or for this member, in pounds and pence?
 totalMemberContribution.heading = What was the total member contribution made by or for {0}, in pounds and pence?
@@ -2680,7 +2680,7 @@ transferringSchemeName.title = What is the transferring scheme’s name?
 transferringSchemeName.heading = What is the transferring scheme’s name?
 transferringSchemeName.error.required = Enter the transferring scheme’s name
 transferringSchemeName.error.tooLong = Transferring scheme’s name must be 160 characters or fewer
-transferringSchemeName.error.invalid = Transferring scheme’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+transferringSchemeName.error.invalid = Transferring scheme’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 reportAnotherTransferIn.title = Do you need to report another transfer in for this member?
 reportAnotherTransferIn.heading = Do you need to report another transfer in for {0}?
@@ -2723,7 +2723,7 @@ transferring.conditional.QROPS.error.required =  Enter the transferring scheme�
 transferring.conditional.QROPS.error.invalid = Enter a QROPS reference number that starts with ‘Q’ then 6 numbers, like Q123456
 transferring.conditional.QROPS.error.length = QROPS reference number must be 7 characters
 transferring.conditional.Other.error.required = Enter a brief description of the transferring scheme
-transferring.conditional.Other.error.invalid = The description of the transferring scheme must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
+transferring.conditional.Other.error.invalid = The description of the transferring scheme must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes,speech marks, ampersands, brackets and spaces
 transferring.conditional.Other.error.length = The description of the transferring scheme must be 160 characters or fewer
 
 didTransferIncludeAsset.title = Did this transfer for this member include an asset?
@@ -2805,7 +2805,7 @@ transferOut.memberList.view.none = Did {0} make a transfer out for any member du
 TransferOut.receivingSchemeName.title = What is the receiving scheme’s name?
 TransferOut.receivingSchemeName.heading = What is the receiving scheme’s name?
 TransferOut.receivingSchemeName.error.required = Enter the receiving scheme’s name
-TransferOut.receivingSchemeName.error.invalid = Receiving scheme’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+TransferOut.receivingSchemeName.error.invalid = Receiving scheme’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 TransferOut.receivingSchemeName.error.tooLong = Receiving scheme’s name must be 160 characters or fewer
 
 transferOut.pensionType.title = What type of scheme is the receiving scheme?
@@ -2924,7 +2924,7 @@ sharesCompanyCrn.yes.conditional.error.required = Enter the company’s CRN
 sharesCompanyCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
 sharesCompanyCrn.yes.conditional.error.length = CRN must be 8 characters
 sharesCompanyCrn.no.conditional.error.required = Enter the reason you cannot provide the company’s CRN
-sharesCompanyCrn.no.conditional.error.invalid = The reason you cannot provide the company’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+sharesCompanyCrn.no.conditional.error.invalid = The reason you cannot provide the company’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 sharesCompanyCrn.no.conditional.error.length = The reason you cannot provide the company’s CRN must be 160 characters or fewer
 
 individualNameOfSharesSeller.title = What is the seller’s name?
@@ -2942,20 +2942,20 @@ sharesIndividualSellerNINumber.error.required = Select yes if you know the selle
 sharesIndividualSellerNINumber.yes.conditional.error.required = Enter the seller’s National Insurance number
 sharesIndividualSellerNINumber.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
 sharesIndividualSellerNINumber.no.conditional.error.required = Enter the reason you cannot provide the seller’s National Insurance number
-sharesIndividualSellerNINumber.no.conditional.error.invalid = The reason you cannot provide the seller’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+sharesIndividualSellerNINumber.no.conditional.error.invalid = The reason you cannot provide the seller’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 sharesIndividualSellerNINumber.no.conditional.error.length = The reason you cannot provide the seller’s National Insurance number must be 160 characters or fewer
 
 companyNameOfSharesSeller.title = What is the seller’s company name?
 companyNameOfSharesSeller.heading = What is the seller’s company name?
 companyNameOfSharesSeller.error.required = Enter the seller’s company name
 companyNameOfSharesSeller.error.tooLong = Seller’s company name must be 160 characters or fewer
-companyNameOfSharesSeller.error.invalid = Seller’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+companyNameOfSharesSeller.error.invalid = Seller’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 partnershipNameOfSharesSeller.title = What is the seller’s partnership name?
 partnershipNameOfSharesSeller.heading = What is the seller’s partnership name?
 partnershipNameOfSharesSeller.error.required = Enter the seller’s partnership name
 partnershipNameOfSharesSeller.error.tooLong = Seller’s partnership name must be 160 characters or fewer
-partnershipNameOfSharesSeller.error.invalid = Seller’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+partnershipNameOfSharesSeller.error.invalid = Seller’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 sharesFromConnectedParty.acquisitionTitle = Are shares from a connected party?
 sharesFromConnectedParty.acquisitionHeading = Connected party
@@ -3049,7 +3049,7 @@ sharesCheckAndUpdate.ConnectedParty = Connected Party
 companyNameOfSharesBuyer.title = What is the buyer’s company name?
 companyNameOfSharesBuyer.heading = What is the buyer’s company name?
 companyNameOfSharesBuyer.error.required = Enter the buyer’s company name
-companyNameOfSharesBuyer.error.invalid = Buyer’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+companyNameOfSharesBuyer.error.invalid = Buyer’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 companyNameOfSharesBuyer.error.tooLong = Buyer’s company name must be 160 characters or fewer
 
 companyBuyerCrn.title = Do you know the buyer’s Company Registration Number (CRN)?
@@ -3063,7 +3063,7 @@ companyBuyerCrn.yes.conditional.error.required = Enter the buyer’s CRN
 companyBuyerCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
 companyBuyerCrn.yes.conditional.error.length = CRN must be 8 characters
 companyBuyerCrn.no.conditional.error.required = Enter the reason you cannot provide the buyer’s CRN
-companyBuyerCrn.no.conditional.error.invalid = The reason you cannot provide the buyer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+companyBuyerCrn.no.conditional.error.invalid = The reason you cannot provide the buyer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 companyBuyerCrn.no.conditional.error.length = The reason you cannot provide the buyer’s CRN must be 160 characters or fewer
 
 sharesCYA.normal.title = Check your answers: shares
@@ -3198,7 +3198,7 @@ bonds.nameOfBonds.title = What is the name of the bonds acquired in this transac
 bonds.nameOfBonds.heading = What is the name of the bonds acquired in this transaction?
 bonds.nameOfBonds.error.required = Enter the name of the bonds acquired in this transaction
 bonds.nameOfBonds.error.length = The name of the bonds acquired in this transaction must be 160 characters or fewer
-bonds.nameOfBonds.error.invalid = The name of the bonds acquired in this transaction must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+bonds.nameOfBonds.error.invalid = The name of the bonds acquired in this transaction must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 whyDoesSchemeHoldBonds.title = Why does the scheme hold these bonds?
 whyDoesSchemeHoldBonds.heading = Why does {0} hold these bonds?
@@ -3374,7 +3374,7 @@ otherAssets.whatIsOtherAsset.heading = What is the asset?
 otherAssets.whatIsOtherAsset.hint = Provide a short description of the asset. You can enter a maximum of 160 characters.
 otherAssets.whatIsOtherAsset.error.required = Enter a description of the asset
 otherAssets.whatIsOtherAsset.error.length = Description of the asset must be 160 characters or fewer
-otherAssets.whatIsOtherAsset.error.invalid = Description of the asset must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+otherAssets.whatIsOtherAsset.error.invalid = Description of the asset must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 howWereBondsDisposedOf.title = How were the bonds disposed of?
 howWereBondsDisposedOf.heading = How were these bonds disposed of?
@@ -3384,7 +3384,7 @@ howWereBondsDisposedOf.option3 = Other
 howWereBondsDisposedOf.option3.label = Provide details of the disposal
 howWereBondsDisposedOf.error.required = Select how the bonds were disposed of
 howWereBondsDisposedOf.conditional.error.required = Enter details of the disposal
-howWereBondsDisposedOf.conditional.error.invalid = Details of the disposal must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+howWereBondsDisposedOf.conditional.error.invalid = Details of the disposal must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 howWereBondsDisposedOf.conditional.error.length = Details of the disposal must be 160 characters or fewer
 
 otherAssets.tangibleMoveableProperty.title = Is the asset tangible moveable property?
@@ -3430,7 +3430,7 @@ otherAssets.otherAssetIndividualSellerNINumber.error.required = Select yes if yo
 otherAssets.otherAssetIndividualSellerNINumber.yes.conditional.error.required = Enter the seller’s National Insurance number
 otherAssets.otherAssetIndividualSellerNINumber.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
 otherAssets.otherAssetIndividualSellerNINumber.no.conditional.error.required = Enter the reason you cannot provide the seller’s National Insurance number
-otherAssets.otherAssetIndividualSellerNINumber.no.conditional.error.invalid = The reason you cannot provide the seller’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+otherAssets.otherAssetIndividualSellerNINumber.no.conditional.error.invalid = The reason you cannot provide the seller’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 otherAssets.otherAssetIndividualSellerNINumber.no.conditional.error.length = The reason you cannot provide the seller’s National Insurance number must be 160 characters or fewer
 
 otherAssets.sellerConnectedParty.title = Is the seller a connected party?
@@ -3496,13 +3496,13 @@ companyNameOfOtherAssetsSeller.title = What is the seller’s company name?
 companyNameOfOtherAssetsSeller.heading = What is the seller’s company name?
 companyNameOfOtherAssetsSeller.error.required = Enter the seller’s company name
 companyNameOfOtherAssetsSeller.error.tooLong = Seller’s company name must be 160 characters or fewer
-companyNameOfOtherAssetsSeller.error.invalid = Seller’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+companyNameOfOtherAssetsSeller.error.invalid = Seller’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 partnershipNameOfOtherAssetsSeller.title = What is the seller’s partnership name?
 partnershipNameOfOtherAssetsSeller.heading = What is the seller’s partnership name?
 partnershipNameOfOtherAssetsSeller.error.required = Enter the seller’s partnership name
 partnershipNameOfOtherAssetsSeller.error.tooLong = Seller’s partnership name must be 160 characters or fewer
-partnershipNameOfOtherAssetsSeller.error.invalid = Seller’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+partnershipNameOfOtherAssetsSeller.error.invalid = Seller’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 otherAssets.cya.title = Check your answers: other assets
 otherAssets.cya.heading = Check your answers: other assets
@@ -3644,7 +3644,7 @@ otherAssetsDisposal.partnershipBuyerName.title = What is the buyer’s partnersh
 otherAssetsDisposal.partnershipBuyerName.heading = What is the buyer’s partnership name?
 otherAssetsDisposal.partnershipBuyerName.error.required = Enter the buyer’s partnership name
 otherAssetsDisposal.partnershipBuyerName.error.length = Buyer’s partnership name must be 160 characters or fewer
-otherAssetsDisposal.partnershipBuyerName.error.invalid.characters = Buyer’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+otherAssetsDisposal.partnershipBuyerName.error.invalid.characters = Buyer’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 otherAssetsDisposal.partnershipBuyerUtr.title = Do you know the buyer’s Unique Taxpayer Reference (UTR)?
 otherAssetsDisposal.partnershipBuyerUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
@@ -3654,7 +3654,7 @@ otherAssetsDisposal.partnershipBuyerUtr.yes.conditional.error.length = Enter a U
 otherAssetsDisposal.partnershipBuyerUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
 otherAssetsDisposal.partnershipBuyerUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
 otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.required = Enter the reason you cannot provide the buyer’s UTR
-otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.invalid = The reason you cannot provide the buyer’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.invalid = The reason you cannot provide the buyer’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.length = The reason you cannot provide the buyer’s UTR must be 160 characters or fewer
 otherAssetsDisposal.partnershipBuyerUtr.error.required = Select yes if you know the buyer’s Unique Taxpayer Reference (UTR)
 
@@ -3663,10 +3663,10 @@ otherAssetsDisposal.otherBuyerDetails.heading = Buyer’s details
 otherAssetsDisposal.otherBuyerDetails.name = Buyer’s name
 otherAssetsDisposal.otherBuyerDetails.description = Brief description of buyer
 otherAssetsDisposal.otherBuyerDetails.name.error.required = Enter the buyer’s name
-otherAssetsDisposal.otherBuyerDetails.name.error.invalid = Buyer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+otherAssetsDisposal.otherBuyerDetails.name.error.invalid = Buyer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 otherAssetsDisposal.otherBuyerDetails.name.error.length = Buyer’s name must be 160 characters or fewer
 otherAssetsDisposal.otherBuyerDetails.description.error.required = Enter a brief description of the buyer
-otherAssetsDisposal.otherBuyerDetails.description.error.invalid = The description of the buyer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+otherAssetsDisposal.otherBuyerDetails.description.error.invalid = The description of the buyer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 otherAssetsDisposal.otherBuyerDetails.description.error.length = The description of the buyer must be 35 characters or fewer
 
 otherAssetsDisposal.whatYouWillNeed.title = Other assets disposed of by the scheme
@@ -3700,7 +3700,7 @@ howWasAssetDisposedOf.option2 = Transferred out to another scheme
 howWasAssetDisposedOf.option3 = Other
 howWasAssetDisposedOf.option3.label = Provide details of the disposal
 howWasAssetDisposedOf.conditional.error.required = Enter details of the disposal
-howWasAssetDisposedOf.conditional.error.invalid = Details of the disposal must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+howWasAssetDisposedOf.conditional.error.invalid = Details of the disposal must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 howWasAssetDisposedOf.conditional.error.length =  Details of the disposal must be 160 characters or fewer
 howWasAssetDisposedOf.error.required = Select how the asset was disposed of
 
@@ -3744,7 +3744,7 @@ assetIndividualBuyerNiNumber.hint = This number will only be used to check if th
 assetIndividualBuyerNiNumber.yes.conditional = What is {0}’s National Insurance number?
 assetIndividualBuyerNiNumber.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
 assetIndividualBuyerNiNumber.no.conditional.error.required = Enter the reason you cannot provide the buyer’s National Insurance number
-assetIndividualBuyerNiNumber.no.conditional.error.invalid = The reason you cannot provide the buyer’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+assetIndividualBuyerNiNumber.no.conditional.error.invalid = The reason you cannot provide the buyer’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 assetIndividualBuyerNiNumber.no.conditional.error.length = The reason you cannot provide the buyer’s National Insurance number must be 160 characters or fewer
 assetIndividualBuyerNiNumber.error.required = Select yes if you know the buyer’s National Insurance number
 assetIndividualBuyerNiNumber.yes.conditional.error.required = Enter the buyer’s National Insurance number
@@ -3754,7 +3754,7 @@ companyNameOfAssetBuyer.title = What is the buyer’s company name?
 companyNameOfAssetBuyer.heading = What is the buyer’s company name?
 companyNameOfAssetBuyer.error.required = Enter the buyer’s company name
 companyNameOfAssetBuyer.error.tooLong = Buyer’s company name must be 160 characters or fewer
-companyNameOfAssetBuyer.error.invalid = Buyer’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+companyNameOfAssetBuyer.error.invalid = Buyer’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 assetCompanyBuyerCrn.title = Do you know the buyer’s Company Registration Number (CRN)?
 assetCompanyBuyerCrn.heading = Do you know {0}’s Company Registration Number (CRN)?
@@ -3766,7 +3766,7 @@ assetCompanyBuyerCrn.yes.conditional.error.length = CRN must be 8 characters
 assetCompanyBuyerCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
 assetCompanyBuyerCrn.no.conditional = Tell us why you cannot provide {0}’s CRN
 assetCompanyBuyerCrn.no.conditional.error.required = Enter the reason you cannot provide the buyer’s CRN
-assetCompanyBuyerCrn.no.conditional.error.invalid =  The reason you cannot provide the buyer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+assetCompanyBuyerCrn.no.conditional.error.invalid =  The reason you cannot provide the buyer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 assetCompanyBuyerCrn.no.conditional.error.length = The reason you cannot provide the buyer’s CRN must be 160 characters or fewer
 assetCompanyBuyerCrn.error.required = Select yes if you know the buyer’s Company Registration Number (CRN)
 
