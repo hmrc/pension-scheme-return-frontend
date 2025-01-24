@@ -20,7 +20,6 @@ import play.api.test.FakeRequest
 import org.scalatest.matchers.must.Matchers
 import play.api.mvc.AnyContentAsEmpty
 import models.HowDisposed.{Other, Sold, Transferred}
-import models.requests.psr._
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalatest.OptionValues
@@ -32,11 +31,20 @@ import pages.nonsipp.bonds._
 import org.scalatest.freespec.AnyFreeSpec
 import controllers.TestValues
 import models.SchemeHoldBond.{Acquisition, Contribution}
+import models.requests.psr._
+import config.Constants.PREPOPULATION_FLAG
 
 class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
-  val allowedAccessRequest
-    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  private val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+  ).sample.value
+
+  private val allowedAccessRequestPrePopulation: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+      .withSession((PREPOPULATION_FLAG, "true"))
+  ).sample.value
+
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
   private val transformer = new BondsTransformer
@@ -175,6 +183,23 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         )
       }
     }
+
+    "should return disposals None when BondsDisposalPage is None and it is pre-population " in {
+      val userAnswers = emptyUserAnswers
+        .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
+
+      val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
+
+      val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+      result mustBe Some(
+        Bonds(
+          recordVersion = None,
+          optBondsWereAdded = Some(true),
+          optBondsWereDisposed = None,
+          bondTransactions = Seq.empty // tests don't need to check these transactions in detail
+        )
+      )
+    }
   }
 
   "BondsTransformer - From Etmp" - {
@@ -278,6 +303,5 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         }
       )
     }
-
   }
 }

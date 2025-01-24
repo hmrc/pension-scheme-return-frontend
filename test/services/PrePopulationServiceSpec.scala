@@ -41,12 +41,15 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     mock[SharesPrePopulationProcessor]
   lazy val mockLoansPrePopulationProcessor: LoansPrePopulationProcessor =
     mock[LoansPrePopulationProcessor]
+  lazy val mockBondsPrePopulationProcessor: BondsPrePopulationProcessor =
+    mock[BondsPrePopulationProcessor]
 
   private val service = new PrePopulationService(
     mockLandOrPropertyPrePopulationProcessor,
     mockMemberPrePopulationProcessor,
     mockSharesPrePopulationProcessor,
-    mockLoansPrePopulationProcessor
+    mockLoansPrePopulationProcessor,
+    mockBondsPrePopulationProcessor
   )
 
   override def beforeEach(): Unit = {
@@ -54,6 +57,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     reset(mockMemberPrePopulationProcessor)
     reset(mockSharesPrePopulationProcessor)
     reset(mockLoansPrePopulationProcessor)
+    reset(mockBondsPrePopulationProcessor)
   }
 
   "PrePopulationService" - {
@@ -105,6 +109,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
         val memberUa = lopUa.unsafeSet(__ \ "member", JsString("dummy-member-data"))
         val sharesUa = memberUa.unsafeSet(__ \ "shares", JsString("dummy-shares-data"))
         val loansUa = sharesUa.unsafeSet(__ \ "loans", JsString("dummy-loans-data"))
+        val bondsUa = loansUa.unsafeSet(__ \ "bonds", JsString("dummy-bonds-data"))
 
         when(
           mockLandOrPropertyPrePopulationProcessor
@@ -122,6 +127,10 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
           mockLoansPrePopulationProcessor
             .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(sharesUa))(ArgumentMatchers.eq(srn))
         ).thenReturn(Success(loansUa))
+        when(
+          mockBondsPrePopulationProcessor
+            .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(loansUa))(ArgumentMatchers.eq(srn))
+        ).thenReturn(Success(bondsUa))
 
         val result = service.buildPrePopulatedUserAnswers(baseReturnUA, currentUa)(srn)
         result.isSuccess mustBe true
@@ -131,7 +140,8 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
               |  "lop": "dummy-lop-data",
               |  "member": "dummy-member-data",
               |  "shares": "dummy-shares-data",
-              |  "loans": "dummy-loans-data"
+              |  "loans": "dummy-loans-data",
+              |  "bonds": "dummy-bonds-data"
               |}
               |""".stripMargin).as[JsObject]
 
@@ -139,6 +149,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
         verify(mockMemberPrePopulationProcessor, times(1)).clean(any(), any())(any())
         verify(mockSharesPrePopulationProcessor, times(1)).clean(any(), any())(any())
         verify(mockLoansPrePopulationProcessor, times(1)).clean(any(), any())(any())
+        verify(mockBondsPrePopulationProcessor, times(1)).clean(any(), any())(any())
       }
     }
   }

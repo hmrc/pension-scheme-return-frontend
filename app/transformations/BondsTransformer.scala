@@ -54,9 +54,11 @@ class BondsTransformer @Inject() extends Transformer {
 
       Some(
         Bonds(
-          recordVersion = Option.when(request.userAnswers.get(bonds) == initialUA.get(bonds))(
-            request.userAnswers.get(BondsRecordVersionPage(srn)).get
-          ),
+          recordVersion = Option
+            .when(request.userAnswers.get(bonds) == initialUA.get(bonds))(
+              request.userAnswers.get(BondsRecordVersionPage(srn))
+            )
+            .flatten,
           optBondsWereAdded = optUnregulatedOrConnectedBondsHeld,
           optBondsWereDisposed = disposal,
           bondTransactions = bondTransactionsTransformToEtmp(srn, disposal.getOrElse(false))
