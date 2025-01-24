@@ -39,7 +39,7 @@ class BondsPrePopulationProcessor @Inject() {
     val baseUaJson: JsObject = baseUA.data.decryptedValue
 
     val totalBondsNowHeldOptMap: Option[Map[String, Map[String, Int]]] =
-      (baseUaJson \ "bonds" \ "bondTransactions" \ "bondsDisposed" \ "totalNowHeld")
+      (baseUaJson \ "assets" \ "bonds" \ "bondTransactions" \ "bondsDisposed" \ "totalNowHeld")
         .asOpt[Map[String, Map[String, Int]]]
 
     val transformedResult: Try[UserAnswers] = baseUaJson
