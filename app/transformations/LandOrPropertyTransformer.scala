@@ -265,7 +265,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
             ua5 <- ua4.set(totalCostOfLandOrProperty._1, totalCostOfLandOrProperty._2)
             ua6 <- optIsLandOrPropertyResidential.map(t => ua5.set(t._1, t._2)).getOrElse(Try(ua5))
             ua7 <- optLandOrPropertyLeased.map(t => ua6.set(t._1, t._2)).getOrElse(Try(ua6))
-            ua8 <- optTotalIncomeOrReceipts.map(t =>ua7.set(t._1, t._2)).getOrElse(Try(ua7))
+            ua8 <- optTotalIncomeOrReceipts.map(t => ua7.set(t._1, t._2)).getOrElse(Try(ua7))
             ua9 <- optDateOfAcquisitionOrContribution.map(t => ua8.set(t._1, t._2)).getOrElse(Try(ua8))
             ua10 <- optIndepValuationSupport.map(t => ua9.set(t._1, t._2)).getOrElse(Try(ua9))
             ua11 <- optReceivedLandType.map(t => ua10.set(t._1, t._2)).getOrElse(Try(ua10))

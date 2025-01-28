@@ -20,7 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.otherassetsheld.IsAssetTangibleMoveablePropertyPage
+import pages.nonsipp.otherassetsheld._
 import config.FrontendAppConfig
 import controllers.actions._
 import navigation.Navigator
@@ -84,9 +84,20 @@ class IsAssetTangibleMoveablePropertyController @Inject()(
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(IsAssetTangibleMoveablePropertyPage(srn, index), value))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(IsAssetTangibleMoveablePropertyPage(srn, index), mode, updatedAnswers)
-            )
+            } yield (
+              isPrePopulation,
+              request.userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index)),
+              request.userAnswers.get(CostOfOtherAssetPage(srn, index)),
+              request.userAnswers.get(IncomeFromAssetPage(srn, index))
+            ) match {
+              case (true, Some(_), Some(_), None) =>
+                Redirect(
+                  controllers.nonsipp.otherassetsheld.routes.IncomeFromAssetController
+                    .onPageLoad(srn, index, mode)
+                )
+              case _ =>
+                Redirect(navigator.nextPage(IsAssetTangibleMoveablePropertyPage(srn, index), mode, updatedAnswers))
+            }
         )
   }
 }
