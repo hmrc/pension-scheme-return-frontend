@@ -35,6 +35,7 @@ import play.api.inject
 class BondsListControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
+  private val indexTwo = refineMV[Max5000.Refined](2)
   private val page = 1
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -67,18 +68,43 @@ class BondsListControllerSpec extends ControllerBaseSpec {
 
   private val userAnswers =
     defaultUserAnswers
+      .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
       .unsafeSet(BondsCompleted(srn, index), SectionCompleted)
       .unsafeSet(NameOfBondsPage(srn, index), "Name")
       .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, index), SchemeHoldBond.Acquisition)
+      .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, index), localDate)
       .unsafeSet(CostOfBondsPage(srn, index), money)
+      .unsafeSet(BondsFromConnectedPartyPage(srn, index), true)
+      .unsafeSet(AreBondsUnregulatedPage(srn, index), true)
+      .unsafeSet(IncomeFromBondsPage(srn, index), money)
 
-  private val bondData = BondsData(
-    index,
-    nameOfBonds = "Name",
-    acquisitionType = SchemeHoldBond.Acquisition,
-    costOfBonds = money
+  private val userAnswersCheck =
+    userAnswers
+      .unsafeSet(BondsCompleted(srn, indexTwo), SectionCompleted)
+      .unsafeSet(NameOfBondsPage(srn, indexTwo), "NameTwo")
+      .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, indexTwo), SchemeHoldBond.Acquisition)
+      .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, indexTwo), localDate)
+      .unsafeSet(CostOfBondsPage(srn, indexTwo), money)
+      .unsafeSet(BondsFromConnectedPartyPage(srn, indexTwo), true)
+      .unsafeSet(AreBondsUnregulatedPage(srn, indexTwo), true)
+
+  private val bondsData = List(
+    BondsData(
+      index,
+      nameOfBonds = "Name",
+      acquisitionType = SchemeHoldBond.Acquisition,
+      costOfBonds = money
+    )
   )
-  private val bondsData = List(bondData)
+
+  private val bondsDataToCheck = List(
+    BondsData(
+      indexTwo,
+      nameOfBonds = "NameTwo",
+      acquisitionType = SchemeHoldBond.Acquisition,
+      costOfBonds = money
+    )
+  )
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     inject.bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -90,16 +116,33 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       injected[ListView]
         .apply(
           form(injected[YesNoPageFormProvider]),
-          viewModel(srn, page, NormalMode, bondsData, schemeName, showBackLink = true)
+          viewModel(srn, page, NormalMode, bondsData, Nil, schemeName, showBackLink = true, isPrePop = false)
         )
     })
+
+    act.like(renderViewWithPrePopSession(onPageLoad, userAnswersCheck) { implicit app => implicit request =>
+      injected[ListView]
+        .apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(
+            srn,
+            page,
+            NormalMode,
+            bondsData,
+            bondsDataToCheck,
+            schemeName,
+            showBackLink = true,
+            isPrePop = true
+          )
+        )
+    }.updateName(_ + " - PrePop"))
 
     act.like(
       renderPrePopView(onPageLoad, BondsListPage(srn), true, userAnswers) { implicit app => implicit request =>
         injected[ListView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, page, NormalMode, bondsData, schemeName, showBackLink = true)
+            viewModel(srn, page, NormalMode, bondsData, Nil, schemeName, showBackLink = true, isPrePop = false)
           )
       }
     )
@@ -152,9 +195,11 @@ class BondsListControllerSpec extends ControllerBaseSpec {
               page,
               mode = ViewOnlyMode,
               bondsData,
+              Nil,
               schemeName,
               Some(viewOnlyViewModel),
-              showBackLink = true
+              showBackLink = true,
+              isPrePop = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with no changed flag")
@@ -172,10 +217,12 @@ class BondsListControllerSpec extends ControllerBaseSpec {
               srn,
               page,
               mode = ViewOnlyMode,
-              List(bondData.copy(nameOfBonds = "Name")),
+              bondsData,
+              Nil,
               schemeName,
               viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
-              showBackLink = true
+              showBackLink = true,
+              isPrePop = false
             )
           )
       }.withName("OnPageLoadViewOnly renders ok with changed flag")
@@ -205,6 +252,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
             1,
             mode = ViewOnlyMode,
             bondsData,
+            Nil,
             schemeName,
             Some(
               viewOnlyViewModel.copy(
@@ -212,7 +260,8 @@ class BondsListControllerSpec extends ControllerBaseSpec {
                 previousVersion = (submissionNumberOne - 1).max(0)
               )
             ),
-            showBackLink = false
+            showBackLink = false,
+            isPrePop = false
           )
         )
       }.withName("Submit previous view only renders the controller with parameters for the previous submission")

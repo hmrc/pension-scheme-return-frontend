@@ -23,25 +23,30 @@ import play.api.mvc._
 import com.google.inject.Inject
 import utils.ListUtils._
 import cats.implicits.{catsSyntaxApplicativeId, toShow, toTraverseOps}
-import _root_.config.Constants
-import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import config.RefinedTypes.Max5000
 import controllers.PSRController
 import controllers.nonsipp.bonds.BondsListController._
-import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import utils.nonsipp.TaskListStatusUtils.{getBondsTaskListStatusAndLink, getCompletedOrUpdatedTaskListStatus}
 import views.html.ListView
 import models.SchemeId.Srn
+import _root_.config.Constants
+import config.Constants.maxBondsTransactions
+import controllers.actions.IdentifyAndRequireData
+import eu.timepit.refined.refineMV
 import pages.nonsipp.CompilationOrSubmissionDatePage
+import play.api.Logger
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
 import models._
+import utils.nonsipp.check.BondsCheckStatusUtils
 import play.api.i18n.MessagesApi
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
+import utils.MapUtils.UserAnswersMapOps
 import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -58,6 +63,8 @@ class BondsListController @Inject()(
   saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
+
+  private implicit val logger = Logger(getClass)
 
   val form: Form[Boolean] = BondsListController.form(formProvider)
 
@@ -103,29 +110,35 @@ class BondsListController @Inject()(
   )(
     implicit request: DataRequest[AnyContent]
   ): Result = {
-    val indexes: List[Max5000] = request.userAnswers.map(BondsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+    val (status, incompleteBondsUrl) =
+      getBondsTaskListStatusAndLink(request.userAnswers, srn, isPrePopulation)
 
-    if (indexes.nonEmpty || mode.isViewOnlyMode) {
-      bondsData(srn, indexes).map { data =>
-        val filledForm =
-          request.userAnswers.get(BondsListPage(srn)).fold(form)(form.fill)
-        Ok(
-          view(
-            filledForm,
-            BondsListController.viewModel(
-              srn,
-              page,
-              mode,
-              data,
-              request.schemeDetails.schemeName,
-              viewOnlyViewModel,
-              showBackLink = showBackLink
+    if (status == TaskListStatus.NotStarted) {
+      Redirect(routes.NameOfBondsController.onPageLoad(srn, refineMV(1), NormalMode))
+    } else if (status == TaskListStatus.InProgress) {
+      Redirect(incompleteBondsUrl)
+    } else {
+      bondsData(srn).map {
+        case (bondsToCheck, bonds) =>
+          val filledForm =
+            request.userAnswers.get(BondsListPage(srn)).fold(form)(form.fill)
+          Ok(
+            view(
+              filledForm,
+              viewModel(
+                srn,
+                page,
+                mode,
+                bonds,
+                bondsToCheck,
+                request.schemeDetails.schemeName,
+                viewOnlyViewModel,
+                showBackLink = showBackLink,
+                isPrePop = isPrePopulation
+              )
             )
           )
-        )
       }.merge
-    } else {
-      Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
     }
   }
 
@@ -144,14 +157,24 @@ class BondsListController @Inject()(
           .bindFromRequest()
           .fold(
             errors => {
-              bondsData(srn, indexes)
-                .map { data =>
-                  BadRequest(
-                    view(
-                      errors,
-                      viewModel(srn, page, mode, data, request.schemeDetails.schemeName, showBackLink = true)
+              bondsData(srn)
+                .map {
+                  case (bondsToCheck, bonds) =>
+                    BadRequest(
+                      view(
+                        errors,
+                        viewModel(
+                          srn,
+                          page,
+                          mode,
+                          bonds,
+                          bondsToCheck,
+                          request.schemeDetails.schemeName,
+                          showBackLink = true,
+                          isPrePop = isPrePopulation
+                        )
+                      )
                     )
-                  )
                 }
                 .merge
                 .pure[Future]
@@ -202,19 +225,41 @@ class BondsListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
   }
 
-  private def bondsData(srn: Srn, indexes: List[Max5000])(
-    implicit req: DataRequest[_]
-  ): Either[Result, List[BondsListController.BondsData]] =
-    indexes
-      .sortBy(x => x.value)
-      .map { index =>
-        for {
-          nameOfBonds <- requiredPage(NameOfBondsPage(srn, index))
-          acquisitionType <- requiredPage(WhyDoesSchemeHoldBondsPage(srn, index))
-          costOfBonds <- requiredPage(CostOfBondsPage(srn, index))
-        } yield BondsListController.BondsData(index, nameOfBonds, acquisitionType, costOfBonds)
-      }
-      .sequence
+  private def bondsData(srn: Srn)(
+    implicit request: DataRequest[_],
+    logger: Logger
+  ): Either[Result, (List[BondsData], List[BondsData])] = {
+    // if return has been pre-populated, partition bonds by those that need to be checked
+    def buildBonds(index: Max5000): Either[Result, BondsData] =
+      for {
+        nameOfBonds <- requiredPage(NameOfBondsPage(srn, index))
+        acquisitionType <- requiredPage(WhyDoesSchemeHoldBondsPage(srn, index))
+        costOfBonds <- requiredPage(CostOfBondsPage(srn, index))
+      } yield BondsData(index, nameOfBonds, acquisitionType, costOfBonds)
+
+    if (isPrePopulation) {
+      for {
+        indexes <- request.userAnswers
+          .map(NameOfBondsPages(srn))
+          .refine[Max5000.Refined]
+          .map(_.keys.toList)
+          .getOrRecoverJourney
+        shares <- indexes.traverse(buildBonds)
+      } yield shares.partition(
+        shares => BondsCheckStatusUtils.checkBondsRecord(request.userAnswers, srn, shares.index)
+      )
+    } else {
+      val noBondsToCheck = List.empty[BondsData]
+      for {
+        indexes <- request.userAnswers
+          .map(NameOfBondsPages(srn))
+          .refine[Max5000.Refined]
+          .map(_.keys.toList)
+          .getOrRecoverJourney
+        shares <- indexes.traverse(buildBonds)
+      } yield (noBondsToCheck, shares)
+    }
+  }
 }
 
 object BondsListController {
@@ -226,11 +271,12 @@ object BondsListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    memberList: List[BondsData],
+    bondsList: List[BondsData],
     viewOnlyViewModel: Option[ViewOnlyViewModel],
-    schemeName: String
+    schemeName: String,
+    check: Boolean = false
   ): List[ListRow] =
-    (memberList, mode) match {
+    (bondsList, mode) match {
       case (Nil, mode) if mode.isViewOnlyMode =>
         List(
           ListRow.viewNoLink(
@@ -260,6 +306,12 @@ object BondsListController {
                     .url,
                   Message("bondsList.row.view.hiddenText", bondsMessage)
                 )
+              case _ if check =>
+                ListRow.check(
+                  bondsMessage,
+                  controllers.routes.UnauthorisedController.onPageLoad().url,
+                  Message("bondsList.row.check.hiddenText", bondsMessage)
+                )
               case _ =>
                 ListRow(
                   bondsMessage,
@@ -280,33 +332,46 @@ object BondsListController {
     srn: Srn,
     page: Int,
     mode: Mode,
-    data: List[BondsData],
+    bonds: List[BondsData],
+    bondsToCheck: List[BondsData],
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
-    showBackLink: Boolean
+    showBackLink: Boolean,
+    isPrePop: Boolean
   ): FormPageViewModel[ListViewModel] = {
-    val lengthOfData = data.length
+    val bondsSize = if (isPrePop) bonds.length + bondsToCheck.size else bonds.length
 
-    val (title, heading) = ((mode, lengthOfData) match {
-      case (ViewOnlyMode, numberOfLoans) if numberOfLoans == 0 =>
+    val (title, heading) = (mode match {
+      // View only
+      case ViewOnlyMode if bondsSize == 0 =>
         ("bondsList.view.title", "bondsList.view.heading.none")
-      case (ViewOnlyMode, lengthOfData) if lengthOfData > 1 =>
+      case ViewOnlyMode if bondsSize > 1 =>
         ("bondsList.view.title.plural", "bondsList.view.heading.plural")
-      case (ViewOnlyMode, _) =>
+      case ViewOnlyMode =>
         ("bondsList.view.title", "bondsList.view.heading")
-      case (_, lengthOfData) if lengthOfData > 1 =>
+      // Pre-pop
+      case _ if isPrePop && bonds.nonEmpty =>
+        ("bondsList.title.prepop.check", "bondsList.heading.prepop.check")
+      case _ if isPrePop && bondsSize > 1 =>
+        ("bondsList.title.prepop.plural", "bondsList.heading.prepop.plural")
+      case _ if isPrePop =>
+        ("bondsList.title.prepop", "bondsList.heading.prepop")
+      // Normal
+      case _ if bondsSize > 1 =>
         ("bondsList.title.plural", "bondsList.heading.plural")
       case _ =>
         ("bondsList.title", "bondsList.heading")
     }) match {
       case (title, heading) =>
-        (Message(title, lengthOfData), Message(heading, lengthOfData))
+        (Message(title, bondsSize), Message(heading, bondsSize))
     }
 
+    val currentPage = if ((page - 1) * Constants.pageSize >= bondsSize) 1 else page
+
     val pagination = Pagination(
-      currentPage = page,
+      currentPage = currentPage,
       pageSize = Constants.pageSize,
-      totalSize = data.size,
+      totalSize = bondsSize,
       call = viewOnlyViewModel match {
         case Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _)) =>
           controllers.nonsipp.bonds.routes.BondsListController
@@ -317,10 +382,43 @@ object BondsListController {
     )
 
     val conditionalInsetText: DisplayMessage = {
-      if (data.size >= Constants.maxBondsTransactions) {
+      if (bondsSize >= Constants.maxBondsTransactions) {
         ParagraphMessage("bondsList.inset")
       } else {
         Message("")
+      }
+    }
+
+    val sections: List[ListSection] = if (isPrePop) {
+      Option
+        .when(bondsToCheck.nonEmpty)(
+          ListSection(
+            heading = Some("bondsList.section.check"),
+            rows(srn, mode, bondsToCheck, viewOnlyViewModel, schemeName, check = true)
+          )
+        )
+        .toList ++
+        Option
+          .when(bonds.nonEmpty)(
+            ListSection(
+              heading = Some("bondsList.section.added"),
+              rows(srn, mode, bonds, viewOnlyViewModel, schemeName)
+            )
+          )
+          .toList
+    } else {
+      List(
+        ListSection(rows(srn, mode, bonds, viewOnlyViewModel, schemeName))
+      )
+    }
+
+    val paragraph = Option.when(bondsSize < maxBondsTransactions) {
+      if (bondsToCheck.nonEmpty) {
+        ParagraphMessage("bondsList.description.prepop.check")
+      } else if (isPrePop) {
+        ParagraphMessage("bondsList.description.prepop")
+      } else {
+        ParagraphMessage("bondsList.description")
       }
     }
 
@@ -328,13 +426,13 @@ object BondsListController {
       mode = mode,
       title = title,
       heading = heading,
-      description = Some(ParagraphMessage("bondsList.description")),
+      description = paragraph,
       page = ListViewModel(
         inset = conditionalInsetText,
-        sections = List(ListSection(rows(srn, mode, data, viewOnlyViewModel, schemeName))),
-        radioText = Message("bondsList.radios"),
-        showRadios = data.size < Constants.maxBondsTransactions,
-        showInsetWithRadios = !(data.length < Constants.maxBondsTransactions),
+        sections = sections,
+        radioText = Message(if (isPrePop) "bondsList.radios.prepop" else "bondsList.radios"),
+        showRadios = bondsSize < Constants.maxBondsTransactions,
+        showInsetWithRadios = !(bondsSize < Constants.maxBondsTransactions),
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

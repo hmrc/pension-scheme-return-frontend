@@ -144,7 +144,9 @@ trait ControllerBehaviours {
       val result = route(app, request).value
       val expectedView = view(app)(request)
 
-      status(result) shouldMatchTo OK
+      withClue(if (status(result) == SEE_OTHER) s"Expected 200 but got 303 to ${redirectLocation(result)}") {
+        status(result) mustEqual OK
+      }
       val x = contentAsString(result)
       val y = expectedView.body
       x shouldMatchTo y
