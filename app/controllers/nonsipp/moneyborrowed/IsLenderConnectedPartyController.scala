@@ -33,6 +33,7 @@ import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import pages.nonsipp.moneyborrowed.{IsLenderConnectedPartyPage, LenderNamePage}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
@@ -81,11 +82,12 @@ class IsLenderConnectedPartyController @Inject()(
             },
           success =>
             for {
-              userAnswers <- Future
-                .fromTry(request.userAnswers.set(IsLenderConnectedPartyPage(srn, index), success))
-              _ <- saveService.save(userAnswers)
+              updatedAnswers <- request.userAnswers.set(IsLenderConnectedPartyPage(srn, index), success).mapK
+              nextPage = navigator.nextPage(IsLenderConnectedPartyPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
             } yield {
-              Redirect(navigator.nextPage(IsLenderConnectedPartyPage(srn, index), mode, userAnswers))
+              Redirect(nextPage)
             }
         )
     }

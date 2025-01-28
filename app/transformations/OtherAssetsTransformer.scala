@@ -547,7 +547,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
             ua2 <- ua1.set(methodOfHolding._1, methodOfHolding._2)
             ua3 <- ua2.set(costOfAsset._1, costOfAsset._2)
             ua4 <- optMovableSchedule29A.map(t => ua3.set(t._1, t._2)).getOrElse(Try(ua3))
-            ua5 <- optTotalIncomeOrReceipts.map(t =>ua4.set(t._1, t._2)).getOrElse(Try(ua4))
+            ua5 <- optTotalIncomeOrReceipts.map(t => ua4.set(t._1, t._2)).getOrElse(Try(ua4))
             ua6 <- optDateOfAcqOrContrib.map(t => ua5.set(t._1, t._2)).getOrElse(Try(ua5))
             ua7 <- optIndepValuationSupport.map(t => ua6.set(t._1, t._2)).getOrElse(Try(ua6))
             ua8 <- optConnectedStatus.map(t => ua7.set(t._1, t._2)).getOrElse(Try(ua7))
