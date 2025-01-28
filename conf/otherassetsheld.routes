@@ -92,3 +92,6 @@ GET         /:srn/remove-asset/:index                                           
 POST        /:srn/remove-asset/:index                                                    controllers.nonsipp.otherassetsheld.RemoveOtherAssetController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-remove-asset/:index                                             controllers.nonsipp.otherassetsheld.RemoveOtherAssetController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-remove-asset/:index                                             controllers.nonsipp.otherassetsheld.RemoveOtherAssetController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/check-update-other-assets-information/:index                           controllers.nonsipp.otherassetsheld.OtherAssetsCheckAndUpdateController.onPageLoad(srn: Srn, index: Max5000)
+GET         /:srn/submit-check-update-other-assets-information/:index                    controllers.nonsipp.otherassetsheld.OtherAssetsCheckAndUpdateController.onSubmit(srn: Srn, index: Max5000)

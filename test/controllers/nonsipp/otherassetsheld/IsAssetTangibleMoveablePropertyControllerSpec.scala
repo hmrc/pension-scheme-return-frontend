@@ -16,14 +16,15 @@
 
 package controllers.nonsipp.otherassetsheld
 
-import pages.nonsipp.otherassetsheld.IsAssetTangibleMoveablePropertyPage
+import pages.nonsipp.otherassetsheld._
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.NormalMode
 import controllers.nonsipp.otherassetsheld.IsAssetTangibleMoveablePropertyController._
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
+import models.{NormalMode, UserAnswers}
+import models.SchemeHoldAsset.Transfer
 
 class IsAssetTangibleMoveablePropertyControllerSpec extends ControllerBaseSpec {
 
@@ -31,6 +32,15 @@ class IsAssetTangibleMoveablePropertyControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.IsAssetTangibleMoveablePropertyController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.IsAssetTangibleMoveablePropertyController.onSubmit(srn, index, NormalMode)
   private val incomeTaxAct = "https://www.gov.uk/hmrc-internal-manuals/pensions-tax-manual/ptm125100#IDAUURQB"
+
+  private val prePopUserAnswersMissing: UserAnswers = defaultUserAnswers
+    .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index1of5000), Transfer)
+    .unsafeSet(CostOfOtherAssetPage(srn, index1of5000), money)
+
+  private val prePopUserAnswersCompleted: UserAnswers = defaultUserAnswers
+    .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index1of5000), Transfer)
+    .unsafeSet(CostOfOtherAssetPage(srn, index1of5000), money)
+    .unsafeSet(IncomeFromAssetPage(srn, index1of5000), money)
 
   "IsAssetTangibleMoveablePropertyControllerSpec" - {
 
@@ -52,6 +62,42 @@ class IsAssetTangibleMoveablePropertyControllerSpec extends ControllerBaseSpec {
             viewModel(srn, index, incomeTaxAct, NormalMode)
           )
       }
+    )
+
+    act.like(
+      redirectToPageWithPrePopSession(
+        call = onSubmit,
+        page = controllers.nonsipp.otherassetsheld.routes.IncomeFromAssetController
+          .onPageLoad(srn, index1of5000, NormalMode),
+        userAnswers = prePopUserAnswersMissing,
+        previousUserAnswers = defaultUserAnswers,
+        mockSaveService = None,
+        form = "value" -> "true"
+      ).withName("Skip interim pages when interim answers are present and IncomeFromAsset is empty (PrePop)")
+    )
+
+    act.like(
+      redirectToPageWithPrePopSession(
+        call = onSubmit,
+        page = controllers.nonsipp.otherassetsheld.routes.WhyDoesSchemeHoldAssetsController
+          .onPageLoad(srn, index1of5000, NormalMode),
+        userAnswers = prePopUserAnswersCompleted,
+        previousUserAnswers = defaultUserAnswers,
+        mockSaveService = None,
+        form = "value" -> "true"
+      ).withName("Don't skip interim pages when IncomeFromAsset is present (PrePop)")
+    )
+
+    act.like(
+      redirectToPageWithPrePopSession(
+        call = onSubmit,
+        page = controllers.nonsipp.otherassetsheld.routes.WhyDoesSchemeHoldAssetsController
+          .onPageLoad(srn, index1of5000, NormalMode),
+        userAnswers = defaultUserAnswers,
+        previousUserAnswers = defaultUserAnswers,
+        mockSaveService = None,
+        form = "value" -> "true"
+      ).withName("Don't skip interim pages when interim answers are empty (PrePop)")
     )
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
