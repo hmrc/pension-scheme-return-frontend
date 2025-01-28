@@ -26,21 +26,23 @@ import viewmodels.models.TaskListStatus.Updated
 import eu.timepit.refined.api.Refined
 import config.RefinedTypes.{Max5000, OneTo5000}
 import controllers.PSRController
-import utils.nonsipp.TaskListStatusUtils.{getBorrowingTaskListStatusAndLink, getCompletedOrUpdatedTaskListStatus}
+import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.refineV
 import pages.nonsipp.CompilationOrSubmissionDatePage
+import play.api.Logger
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
 import models._
 import play.api.i18n.{I18nSupport, MessagesApi}
-import pages.nonsipp.moneyborrowed.{BorrowInstancesListPage, BorrowedAmountAndRatePage, LenderNamePages}
+import pages.nonsipp.moneyborrowed._
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models._
 import models.requests.DataRequest
+import utils.MapUtils.UserAnswersMapOps
 import play.api.data.Form
 
 import scala.concurrent.Future
@@ -56,6 +58,8 @@ class BorrowInstancesListController @Inject()(
   formProvider: YesNoPageFormProvider
 ) extends PSRController
     with I18nSupport {
+
+  private implicit val logger = Logger(getClass)
 
   val form: Form[Boolean] = BorrowInstancesListController.form(formProvider)
 
@@ -104,34 +108,35 @@ class BorrowInstancesListController @Inject()(
       if (viewOnlyViewModel.isEmpty && instances.isEmpty) {
         Redirect(controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode))
       } else {
-
-        val (borrowingStatus, incompleteBorrowingUrl) = getBorrowingTaskListStatusAndLink(request.userAnswers, srn)
-
-        if (borrowingStatus == TaskListStatus.NotStarted) {
-          Redirect(controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode))
-        } else if (borrowingStatus == TaskListStatus.InProgress) {
-          Redirect(incompleteBorrowingUrl)
-        } else {
-          borrowDetails(srn)
-            .map(
-              instances =>
-                Ok(
-                  view(
-                    form,
-                    BorrowInstancesListController.viewModel(
-                      srn,
-                      mode,
-                      page,
-                      instances,
-                      request.schemeDetails.schemeName,
-                      viewOnlyViewModel,
-                      showBackLink = showBackLink
+        request.userAnswers
+          .map(MoneyBorrowedProgress.all(srn))
+          .refine[Max5000.Refined]
+          .getOrRecoverJourney
+          .flatMap { journeys =>
+            journeys.collectFirst {
+              case (_, SectionJourneyStatus.InProgress(url)) => Redirect(url)
+            } match {
+              case Some(res) => Right(res)
+              case None =>
+                Right(
+                  Ok(
+                    view(
+                      form,
+                      BorrowInstancesListController.viewModel(
+                        srn,
+                        mode,
+                        page,
+                        instances,
+                        request.schemeDetails.schemeName,
+                        viewOnlyViewModel,
+                        showBackLink = showBackLink
+                      )
                     )
                   )
                 )
-            )
-            .merge
-        }
+            }
+          }
+          .merge
       }
     }.merge
 
