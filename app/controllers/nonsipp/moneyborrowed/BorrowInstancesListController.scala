@@ -23,15 +23,14 @@ import cats.implicits._
 import config.Constants.maxBorrows
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
-import eu.timepit.refined.api.Refined
-import config.RefinedTypes.{Max5000, OneTo5000}
+import config.RefinedTypes.Max5000
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
 import controllers.actions.IdentifyAndRequireData
-import eu.timepit.refined.refineV
+import controllers.nonsipp.moneyborrowed.BorrowInstancesListController.BorrowedMoneyDetails
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import play.api.Logger
 import navigation.Navigator
@@ -103,7 +102,12 @@ class BorrowInstancesListController @Inject()(
     showBackLink: Boolean
   )(
     implicit request: DataRequest[AnyContent]
-  ): Result =
+  ): Result = {
+    // TODO: borrowDetails currently tries to pull pages across a journey to build the list page view model
+    // this is sometimes trying to get a page further in the journey that the user hasn't completed, causing it to fail
+    // fix: separate the MoneyBorrowedProgress.all(srn) call out from borrowDetails
+    // - if any InProgress journeys, redirect there
+    // - otherwise call borrowDetails, which should accept a list of indexes (to reuse the value of MoneyBorrowedProgress.all(srn)) and render the list page
     borrowDetails(srn).map { instances =>
       if (viewOnlyViewModel.isEmpty && instances.isEmpty) {
         Redirect(controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode))
@@ -139,6 +143,7 @@ class BorrowInstancesListController @Inject()(
           .merge
       }
     }.merge
+  }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     borrowDetails(srn).map { instances =>
@@ -199,30 +204,20 @@ class BorrowInstancesListController @Inject()(
 
   private def borrowDetails(
     srn: Srn
-  )(implicit request: DataRequest[_]): Either[Result, List[(Refined[Int, OneTo5000], String, Money)]] = {
-    val fromLenderPages = request.userAnswers
-      .map(LenderNamePages(srn))
-      .map {
-        case (key, value) =>
-          key.toIntOption.flatMap(k => refineV[OneTo5000](k + 1).toOption.map(_ -> value))
+  )(implicit request: DataRequest[_]): Either[Result, List[BorrowedMoneyDetails]] =
+    request.userAnswers
+      .map(MoneyBorrowedProgress.all(srn))
+      .refine[Max5000.Refined]
+      .getOrRecoverJourney
+      .flatMap {
+        _.keys.toList.traverse { index =>
+          for {
+            lenderName <- requiredPage(LenderNamePage(srn, index))
+            borrowed <- requiredPage(BorrowedAmountAndRatePage(srn, index))
+            (amount, _) = borrowed
+          } yield BorrowedMoneyDetails(index, lenderName, amount)
+        }
       }
-      .toList
-      .sortBy(listRow => listRow.map(list => list._1.value))
-
-    for {
-      lendersNames <- fromLenderPages.traverse(_.getOrRecoverJourney)
-
-      borrowingInstanceDetails <- lendersNames.traverse {
-        case (index, lenderName) =>
-          request.userAnswers
-            .get(BorrowedAmountAndRatePage(srn, index))
-            .map(_._1)
-            .getOrRecoverJourney
-            .map((index, lenderName, _))
-      }
-    } yield borrowingInstanceDetails
-
-  }
 }
 
 object BorrowInstancesListController {
@@ -234,7 +229,7 @@ object BorrowInstancesListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    borrowingInstances: List[(Max5000, String, Money)],
+    borrowingInstances: List[BorrowedMoneyDetails],
     viewOnlyViewModel: Option[ViewOnlyViewModel],
     schemeName: String
   ): List[ListRow] =
@@ -250,7 +245,7 @@ object BorrowInstancesListController {
         List()
       case (list, _) =>
         list.flatMap {
-          case (index, lenderName, amount) =>
+          case BorrowedMoneyDetails(index, lenderName, amount) =>
             (mode, viewOnlyViewModel) match {
               case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
                 List(
@@ -284,7 +279,7 @@ object BorrowInstancesListController {
     srn: Srn,
     mode: Mode,
     page: Int,
-    borrowingInstances: List[(Max5000, String, Money)],
+    borrowingInstances: List[BorrowedMoneyDetails],
     schemeName: String,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean
@@ -380,4 +375,6 @@ object BorrowInstancesListController {
       showBackLink = showBackLink
     )
   }
+
+  case class BorrowedMoneyDetails(index: Max5000, lenderName: String, amount: Money)
 }
