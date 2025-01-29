@@ -112,8 +112,8 @@ class BorrowInstancesListController @Inject()(
           .map(MoneyBorrowedProgress.all(srn))
           .refine[Max5000.Refined]
           .getOrRecoverJourney
-          .flatMap { journeys =>
-            journeys.collectFirst {
+          .flatMap { journeyStatusMap =>
+            journeyStatusMap.collectFirst {
               case (_, SectionJourneyStatus.InProgress(url)) => Redirect(url)
             } match {
               case Some(res) => Right(res)

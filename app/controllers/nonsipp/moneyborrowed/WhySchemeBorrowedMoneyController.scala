@@ -30,6 +30,7 @@ import views.html.TextAreaView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, LenderNamePage, WhySchemeBorrowedMoneyPage}
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, TextAreaViewModel}
 
@@ -102,11 +103,12 @@ class WhySchemeBorrowedMoneyController @Inject()(
                 ),
               value =>
                 for {
-                  updatedAnswers <- Future
-                    .fromTry(request.userAnswers.set(WhySchemeBorrowedMoneyPage(srn, index), value))
-                  _ <- saveService.save(updatedAnswers)
+                  updatedAnswers <- request.userAnswers.set(WhySchemeBorrowedMoneyPage(srn, index), value).mapK[Future]
+                  nextPage = navigator.nextPage(WhySchemeBorrowedMoneyPage(srn, index), mode, updatedAnswers)
+                  updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                  _ <- saveService.save(updatedProgressAnswers)
                 } yield Redirect(
-                  navigator.nextPage(WhySchemeBorrowedMoneyPage(srn, index), mode, updatedAnswers)
+                  nextPage
                 )
             )
         }

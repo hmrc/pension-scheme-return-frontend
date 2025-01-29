@@ -39,12 +39,12 @@ package object moneyborrowed {
   }
 
   def saveProgress(
-                    srn: Srn,
-                    index: Max5000,
-                    userAnswers: UserAnswers,
-                    nextPage: Call,
-                    alwaysCompleted: Boolean = false
-                  ): Future[UserAnswers] =
+    srn: Srn,
+    index: Max5000,
+    userAnswers: UserAnswers,
+    nextPage: Call,
+    alwaysCompleted: Boolean = false
+  ): Future[UserAnswers] =
     if (nextPage.isCyaPage) {
       userAnswers
         .set(

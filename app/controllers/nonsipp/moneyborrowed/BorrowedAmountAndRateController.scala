@@ -35,6 +35,7 @@ import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import pages.nonsipp.moneyborrowed.BorrowedAmountAndRatePage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, QuestionField}
 
@@ -85,10 +86,15 @@ class BorrowedAmountAndRateController @Inject()(
           },
           value =>
             for {
-              updatedAnswers <- Future
-                .fromTry(request.userAnswers.transformAndSet(BorrowedAmountAndRatePage(srn, index), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(BorrowedAmountAndRatePage(srn, index), mode, updatedAnswers))
+              updatedAnswers <- request.userAnswers
+                .transformAndSet(BorrowedAmountAndRatePage(srn, index), value)
+                .mapK[Future]
+              nextPage = navigator.nextPage(BorrowedAmountAndRatePage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield {
+              Redirect(nextPage)
+            }
         )
   }
 }
