@@ -95,7 +95,7 @@ class TaskListController @Inject()(
         )
       } yield {
         if (fbVersion < lastVersion) {
-          logger.debug(
+          logger.info(
             s"[TaskListController] fbVersion ($fbVersion) < lastVersion($lastVersion), redirecting to overview page"
           )
           Redirect(controllers.routes.OverviewController.onPageLoad(srn).url)
@@ -123,7 +123,7 @@ class TaskListController @Inject()(
     } yield dates
 
     basicDetails.fold {
-      logger.debug("[TaskListController] Unable to retrieve basic details, redirecting to overview page")
+      logger.info("[TaskListController] Unable to retrieve basic details, redirecting to overview page")
       Future.successful(
         Redirect(
           controllers.routes.JourneyRecoveryController.onPageLoad(
