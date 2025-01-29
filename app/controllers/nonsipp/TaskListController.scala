@@ -35,6 +35,7 @@ import models.SchemeId.Srn
 import cats.implicits.toShow
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import pages.nonsipp._
+import play.api.Logging
 import utils.nonsipp.TaskListUtils._
 import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
 import models._
@@ -52,7 +53,8 @@ class TaskListController @Inject()(
   view: TaskListView,
   psrVersionsService: PsrVersionsService
 )(implicit ec: ExecutionContext)
-    extends PSRController {
+    extends PSRController
+    with Logging {
 
   def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     def isSubmitted(psrVersionsResponse: PsrVersionsResponse): Boolean = (
@@ -93,6 +95,9 @@ class TaskListController @Inject()(
         )
       } yield {
         if (fbVersion < lastVersion) {
+          logger.debug(
+            s"[TaskListController] fbVersion ($fbVersion) < lastVersion($lastVersion), redirecting to overview page"
+          )
           Redirect(controllers.routes.OverviewController.onPageLoad(srn).url)
         } else {
           Ok(view(viewModel, request.schemeDetails.schemeName))
@@ -117,7 +122,8 @@ class TaskListController @Inject()(
       dates <- request.userAnswers.get(WhichTaxYearPage(srn))
     } yield dates
 
-    basicDetails.fold(
+    basicDetails.fold {
+      logger.debug("[TaskListController] Unable to retrieve basic details, redirecting to overview page")
       Future.successful(
         Redirect(
           controllers.routes.JourneyRecoveryController.onPageLoad(
@@ -125,7 +131,7 @@ class TaskListController @Inject()(
           )
         )
       )
-    )(f)
+    }(f)
   }
 }
 
