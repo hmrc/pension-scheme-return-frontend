@@ -58,7 +58,7 @@ object MemberCountUtils {
     lazy val sharesExist = !noDataStatuses.contains(getSharesTaskListStatusAndLink(userAnswers, srn, isPrePop)._1)
     lazy val landOrPropertyExist =
       !noDataStatuses.contains(getLandOrPropertyTaskListStatusAndLink(userAnswers, srn, isPrePop)._1)
-    lazy val bondsExist = !noDataStatuses.contains(getBondsTaskListStatusAndLink(userAnswers, srn)._1)
+    lazy val bondsExist = !noDataStatuses.contains(getBondsTaskListStatusAndLink(userAnswers, srn, isPrePop)._1)
     lazy val otherAssetsExist = !noDataStatuses.contains(getOtherAssetsTaskListStatusAndLink(userAnswers, srn)._1)
 
     val isCurrentlyChanging = currentSchemeMembers.exists(_.totalActiveAndDeferred > 99) && (

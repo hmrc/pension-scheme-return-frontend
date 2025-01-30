@@ -51,7 +51,7 @@ object TaskListUtils {
       loansSection(srn, schemeName, userAnswers, isPrePop),
       sharesSection(srn, userAnswers, isPrePop),
       landOrPropertySection(srn, userAnswers, isPrePop),
-      bondsSection(srn, userAnswers),
+      bondsSection(srn, userAnswers, isPrePop),
       otherAssetsSection(srn, userAnswers)
     )
 
@@ -462,9 +462,9 @@ object TaskListUtils {
     TaskListSectionViewModel(s"$prefix.title", Right(viewModelList), None)
   }
 
-  private def bondsSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
+  private def bondsSection(srn: Srn, userAnswers: UserAnswers, isPrePop: Boolean): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.bonds"
-    val (bondStatus, bondLink) = getBondsTaskListStatusAndLink(userAnswers, srn)
+    val (bondStatus, bondLink) = getBondsTaskListStatusAndLink(userAnswers, srn, isPrePop)
     val (disposalStatus, disposalLink) = getBondsDisposalsTaskListStatusWithLink(userAnswers, srn)
 
     val bondsItem = TaskListItemViewModel(

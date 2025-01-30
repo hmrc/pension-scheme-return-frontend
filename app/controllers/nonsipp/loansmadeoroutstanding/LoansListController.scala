@@ -341,7 +341,7 @@ object LoansListController {
     }
 
     // in view-only mode or with direct url edit page value can be higher than needed
-    val currentPage = if ((page - 1) * Constants.loanPageSize >= loansSize) 1 else page
+    val currentPage = if ((page - 1) * Constants.pageSize >= loansSize) 1 else page
 
     val pagination = Pagination(
       currentPage = currentPage,

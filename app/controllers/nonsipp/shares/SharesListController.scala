@@ -252,12 +252,12 @@ object SharesListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    memberList: List[SharesData],
+    sharesList: List[SharesData],
     viewOnlyViewModel: Option[ViewOnlyViewModel],
     schemeName: String,
     check: Boolean = false
   ): List[ListRow] =
-    (memberList, mode) match {
+    (sharesList, mode) match {
       case (Nil, mode) if mode.isViewOnlyMode =>
         List(
           ListRow.viewNoLink(
@@ -351,8 +351,11 @@ object SharesListController {
         (Message(title, sharesSize), Message(heading, sharesSize))
     }
 
+    // in view-only mode or with direct url edit page value can be higher than needed
+    val currentPage = if ((page - 1) * Constants.pageSize >= sharesSize) 1 else page
+
     val pagination = Pagination(
-      currentPage = page,
+      currentPage = currentPage,
       pageSize = Constants.pageSize,
       totalSize = sharesSize,
       call = viewOnlyViewModel match {

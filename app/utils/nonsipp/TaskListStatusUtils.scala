@@ -519,36 +519,48 @@ object TaskListStatusUtils {
     }
   }
 
-  def getBondsTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val wereBonds = userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
-    val numRecorded = userAnswers.get(BondsCompleted.all(srn)).getOrElse(Map.empty).size
+  def getBondsTaskListStatusAndLink(
+    userAnswers: UserAnswers,
+    srn: Srn,
+    isPrePop: Boolean
+  ): (TaskListStatus, String) =
+    if (isPrePop && BondsCheckStatusUtils.checkBondsSection(userAnswers, srn)) {
+      (
+        Check,
+        controllers.nonsipp.bonds.routes.BondsListController
+          .onPageLoad(srn, 1, NormalMode)
+          .url
+      )
+    } else {
+      val wereBonds = userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
+      val numRecorded = userAnswers.get(BondsCompleted.all(srn)).getOrElse(Map.empty).size
 
-    val firstQuestionPageUrl =
-      controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
-        .onPageLoad(srn, NormalMode)
-        .url
+      val firstQuestionPageUrl =
+        controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
+          .onPageLoad(srn, NormalMode)
+          .url
 
-    val listPageUrl =
-      controllers.nonsipp.bonds.routes.BondsListController
-        .onPageLoad(srn, 1, NormalMode)
-        .url
+      val listPageUrl =
+        controllers.nonsipp.bonds.routes.BondsListController
+          .onPageLoad(srn, 1, NormalMode)
+          .url
 
-    val firstPages = userAnswers.get(NameOfBondsPages(srn))
-    val lastPages = userAnswers.map(BondsCompleted.all(srn))
-    val incompleteIndex: Int = getIncompleteIndex(firstPages, Some(lastPages))
+      val firstPages = userAnswers.get(NameOfBondsPages(srn))
+      val lastPages = userAnswers.map(BondsCompleted.all(srn))
+      val incompleteIndex: Int = getIncompleteIndex(firstPages, Some(lastPages))
 
-    val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
-      _ => firstQuestionPageUrl,
-      index => controllers.nonsipp.bonds.routes.NameOfBondsController.onPageLoad(srn, index, NormalMode).url
-    )
+      val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+        _ => firstQuestionPageUrl,
+        index => controllers.nonsipp.bonds.routes.NameOfBondsController.onPageLoad(srn, index, NormalMode).url
+      )
 
-    (wereBonds, numRecorded) match {
-      case (None, _) => (NotStarted, firstQuestionPageUrl)
-      case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
-      case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
-      case (Some(true), _) => (Recorded(numRecorded, "bonds"), listPageUrl)
+      (wereBonds, numRecorded) match {
+        case (None, _) => (NotStarted, firstQuestionPageUrl)
+        case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
+        case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
+        case (Some(true), _) => (Recorded(numRecorded, "bonds"), listPageUrl)
+      }
     }
-  }
 
   def getBondsDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereBondsDisposals = userAnswers.get(BondsDisposalPage(srn))
