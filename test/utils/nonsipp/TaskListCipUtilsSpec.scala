@@ -31,7 +31,14 @@ import viewmodels.models._
 class TaskListCipUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues with BasicGenerators {
 
   val pensionSchemeId: PensionSchemeId = pensionSchemeIdGen.sample.value
-  val messagesApi: MessagesApi = stubMessagesApi()
+  val messagesApi: MessagesApi = stubMessagesApi(
+    messages = Map(
+      "en" -> Map(
+        "tasklist.numItems" -> "{0} {1}",
+        "entities.plural" -> "entities"
+      )
+    )
+  )
 
   "Transform task list to CIP" - {
     "should transform generated task list" in {
@@ -73,6 +80,16 @@ class TaskListCipUtilsSpec extends AnyFreeSpec with Matchers with OptionValues w
           )
         ),
         TaskListSectionViewModel(
+          title = Message("Section2"),
+          headItem = TaskListItemViewModel(
+            link = LinkMessage(
+              Message("Sub-section 2-1"),
+              "Url 2-1"
+            ),
+            status = TaskListStatus.Recorded(2, "entities")
+          )
+        ),
+        TaskListSectionViewModel(
           title = Message("Declaration incomplete"),
           headItem = TaskListItemViewModel(
             link = LinkMessage(
@@ -92,7 +109,7 @@ class TaskListCipUtilsSpec extends AnyFreeSpec with Matchers with OptionValues w
         )
       )
       val result = TaskListCipUtils.transformTaskListToCipFormat(taskList, messagesApi)
-      result.list.size mustBe 3
+      result.list.size mustBe 4
       result.list(0).subSections.list.size mustBe 3
       result mustBe taskListInAuditEvent
     }

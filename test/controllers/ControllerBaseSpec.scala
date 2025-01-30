@@ -340,6 +340,14 @@ trait TestValues {
         )
       ),
       TaskListCipViewModel(
+        "Section2",
+        ListTaskListLevel2(
+          List(
+            TaskListLevel2("Sub-section 2-1", "2 entities")
+          )
+        )
+      ),
+      TaskListCipViewModel(
         "Declaration incomplete",
         ListTaskListLevel2(
           List(

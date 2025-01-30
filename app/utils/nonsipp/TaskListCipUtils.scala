@@ -73,13 +73,21 @@ object TaskListCipUtils {
                 ListTaskListLevel2(
                   level2.toList
                     .map(
-                      item =>
+                      item => {
+                        val argsTranslated = messagesApi
+                          .translate(
+                            item.status.description.key,
+                            item.status.description.args.map(a => messagesApi(a.key)(Lang.defaultLang))
+                          )(Lang.defaultLang())
+                          .getOrElse(item.status.description.key)
+
                         TaskListLevel2(
                           messagesApi(
                             getCipLabel(item.link.content.key)
                           )(Lang.defaultLang),
-                          messagesApi(item.status.description.key)(Lang.defaultLang())
+                          argsTranslated
                         )
+                      }
                     )
                 )
             )
