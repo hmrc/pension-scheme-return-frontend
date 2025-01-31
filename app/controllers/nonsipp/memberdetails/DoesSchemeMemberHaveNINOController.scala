@@ -31,6 +31,7 @@ import views.html.YesNoPageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import models.requests.DataRequest
@@ -83,12 +84,24 @@ class DoesSchemeMemberHaveNINOController @Inject()(
                 ),
               value =>
                 for {
-                  updatedAnswers <- Future
-                    .fromTry(request.userAnswers.set(DoesMemberHaveNinoPage(srn, index), value))
-                  _ <- saveService.save(updatedAnswers)
-                } yield Redirect(navigator.nextPage(DoesMemberHaveNinoPage(srn, index), mode, updatedAnswers))
+                  updatedAnswers <- request.userAnswers
+                    .set(DoesMemberHaveNinoPage(srn, index), value)
+                    .mapK
+                  nextPage = navigator.nextPage(DoesMemberHaveNinoPage(srn, index), mode, updatedAnswers)
+                  updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                  _ <- saveService.save(updatedProgressAnswers)
+                } yield Redirect(nextPage)
             )
+
+//              value =>
+//                for {
+//                  updatedAnswers <- Future
+//                    .fromTry(request.userAnswers.set(DoesMemberHaveNinoPage(srn, index), value))
+//                  _ <- saveService.save(updatedAnswers)
+//                } yield Redirect(navigator.nextPage(DoesMemberHaveNinoPage(srn, index), mode, updatedAnswers))
+//            )
       )
+
   }
 
   private def withMemberDetails(srn: Srn, index: Max300)(

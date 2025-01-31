@@ -108,6 +108,10 @@
       classes = "govuk-!-margin-top-7 govuk-!-margin-bottom-2"
     ))
   }
+<p style="font-weight: bold;">
+  Controller: @request.attrs.get(play.api.routing.Router.Attrs.HandlerDef).map(_.controller).getOrElse("Unknown") <br>
+  Action: @request.attrs.get(play.api.routing.Router.Attrs.HandlerDef).map(_.method).getOrElse("Unknown")
+</p>
 }
 
 @content = {

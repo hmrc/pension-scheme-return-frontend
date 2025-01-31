@@ -44,7 +44,14 @@ object MemberDetailsNavigator extends JourneyNavigator {
 
     case page @ DoesMemberHaveNinoPage(srn, index) =>
       if (userAnswers.get(page).contains(true)) {
-        routes.MemberDetailsNinoController.onPageLoad(srn, index, NormalMode)
+        (
+          for {
+            map <- userAnswers.get(MemberDetailsManualProgress.all(srn)).getOrRecoverJourney
+            filtered = map.filter { case (_, status) => status.completed }
+//            indexes <- filtered.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+          } yield routes.MemberDetailsNinoController.onPageLoad(srn, index, NormalMode)
+        ).merge
+//        routes.MemberDetailsNinoController.onPageLoad(srn, index, NormalMode)
       } else {
         routes.NoNINOController.onPageLoad(srn, index, NormalMode)
       }

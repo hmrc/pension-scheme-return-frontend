@@ -18,7 +18,7 @@ package controllers.nonsipp.memberdetails
 
 import pages.nonsipp.memberdetails.{MembersDetailsCompletedPages, SchemeMembersListPage}
 import viewmodels.implicits._
-import play.api.mvc._
+import play.api.mvc.{request, _}
 import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import cats.implicits.{catsSyntaxApplicativeId, toShow}
@@ -46,7 +46,6 @@ import models.requests.DataRequest
 import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
-
 import java.time.LocalDateTime
 import javax.inject.Named
 
@@ -151,6 +150,8 @@ class SchemeMembersListController @Inject()(
     identifyAndRequireData(srn).async { implicit request =>
       val membersDetails = request.userAnswers.membersDetails(srn)
       val lengthOfMembersDetails = membersDetails.size
+      val getInProgressUrl = membersDetails
+        .collectFirst { case manualOrUpload.name(_, _, _, SectionJourneyStatus.InProgress(url)) => url }
 
       form(manualOrUpload, lengthOfMembersDetails >= maxSchemeMembers)
         .bindFromRequest()
@@ -179,17 +180,35 @@ class SchemeMembersListController @Inject()(
                 )
               }
           }.merge.pure[Future],
-          value => {
-            if (lengthOfMembersDetails == maxSchemeMembers && value) {
-              Future.successful(Redirect(routes.HowToUploadController.onPageLoad(srn)))
+
+          answer =>
+            if (lengthOfMembersDetails == maxSchemeMembers && answer) {
+              getInProgressUrl match {
+                case Some(url) if !isPrePopulation => Future.successful(Redirect(url))
+                case _ =>
+//                  Future.successful(
+                    Future.successful(Redirect(routes.HowToUploadController.onPageLoad(srn)))
+//                  )
+              }
             } else {
               Future.successful(
                 Redirect(
-                  navigator.nextPage(SchemeMembersListPage(srn, value, manualOrUpload), mode, request.userAnswers)
+                  navigator.nextPage(SchemeMembersListPage(srn, answer, manualOrUpload), mode, request.userAnswers)
                 )
               )
             }
-          }
+
+//          value => {
+//            if (lengthOfMembersDetails == maxSchemeMembers && value) {
+//              Future.successful(Redirect(routes.HowToUploadController.onPageLoad(srn)))
+//            } else {
+//              Future.successful(
+//                Redirect(
+//                  navigator.nextPage(SchemeMembersListPage(srn, value, manualOrUpload), mode, request.userAnswers)
+//                )
+//              )
+//            }
+//          }
         )
     }
 
