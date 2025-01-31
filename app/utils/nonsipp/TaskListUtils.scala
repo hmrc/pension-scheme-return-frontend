@@ -52,7 +52,7 @@ object TaskListUtils {
       sharesSection(srn, userAnswers, isPrePop),
       landOrPropertySection(srn, userAnswers, isPrePop),
       bondsSection(srn, userAnswers, isPrePop),
-      otherAssetsSection(srn, userAnswers)
+      otherAssetsSection(srn, userAnswers, isPrePop)
     )
 
   private def getDeclarationSection(
@@ -493,10 +493,10 @@ object TaskListUtils {
     TaskListSectionViewModel(s"$prefix.title", Right(viewModelList), None)
   }
 
-  private def otherAssetsSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
+  private def otherAssetsSection(srn: Srn, userAnswers: UserAnswers, isPrePop: Boolean): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.otherassets"
     val quotedSharesStatusAndLink = getQuotedSharesTaskListStatusAndLink(userAnswers, srn)
-    val (otherAssetsStatus, otherAssetsLink) = getOtherAssetsTaskListStatusAndLink(userAnswers, srn)
+    val (otherAssetsStatus, otherAssetsLink) = getOtherAssetsTaskListStatusAndLink(userAnswers, srn, isPrePop)
     val (otherAssetsDisposalsStatus, otherAssetsDisposalsLinkUrl) =
       TaskListStatusUtils.getOtherAssetsDisposalTaskListStatusAndLink(userAnswers, srn)
 

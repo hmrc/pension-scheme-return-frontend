@@ -155,7 +155,17 @@ class LoansListController @Inject()(
                     BadRequest(
                       view(
                         errors,
-                        viewModel(srn, page, mode, loans, loansToCheck, "", None, showBackLink = true, isPrePopulation)
+                        viewModel(
+                          srn,
+                          page,
+                          mode,
+                          loans,
+                          loansToCheck,
+                          request.schemeDetails.schemeName,
+                          None,
+                          showBackLink = true,
+                          isPrePopulation
+                        )
                       )
                     )
                   )

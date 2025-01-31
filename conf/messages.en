@@ -3478,18 +3478,28 @@ otherAssets.incomeFromAsset.error.tooLarge = Total income from the asset in the 
 
 otherAssets.list.title = You have added {0} other asset
 otherAssets.list.title.plural = You have added {0} other assets
+otherAssets.list.title.prepop.check = Total of {0} other assets
+otherAssets.list.title.prepop = {0} other asset
+otherAssets.list.title.prepop.plural = {0} other assets
 otherAssets.list.heading = You have added {0} other asset
 otherAssets.list.heading.plural = You have added {0} other assets
+otherAssets.list.heading.prepop.check = Total of {0} other assets
+otherAssets.list.heading.prepop = {0} other asset
+otherAssets.list.heading.prepop.plural = {0} other assets
+otherAssets.list.section.check = Check details added in a previous return
+otherAssets.list.section.added = Updated in this return
 otherAssets.list.row = {0}
 otherAssets.list.row.view.hiddenText = View {0}
 otherAssets.list.row.change.hiddenText = Change {0}
 otherAssets.list.row.remove.hiddenText = Remove {0}
 
+otherAssets.list.description.prepop = You must check all other assets previously added.
 otherAssets.list.description = You must tell us about all other assets the scheme held at any point during the period of this return. This does not include loans, shares held in a sponsoring employer, unquoted shares, unregulated bonds, bonds and shares acquired from a connected party and land or property. If your scheme holds any of these assets, report them in the relevant section of this pension scheme return.
+otherAssets.list.description.disposal = You can report any disposals in the ‘Disposal of other assets’ section.
 otherAssets.list.radios = Do you need to add another asset?
 otherAssets.list.inset = You cannot add another asset as you have entered the maximum of 5,000.
-otherAssets.list.error.required = Select yes if you need to add another asset
-otherAssets.list.pagination.label = Showing {0} - {1} of {2} assets
+otherAssets.list.error.required = Select yes to add other assets, or no to return to task list
+otherAssets.list.pagination.label = Showing {0} - {1} of {2} other assets
 
 otherAssets.list.view.title = View other assets
 otherAssets.list.view.title.plural = View other assets
