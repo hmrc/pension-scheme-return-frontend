@@ -155,7 +155,17 @@ class SharesListController @Inject()(
                   BadRequest(
                     view(
                       errors,
-                      viewModel(srn, page, mode, shares, sharesToCheck, "", None, showBackLink = true, isPrePopulation)
+                      viewModel(
+                        srn,
+                        page,
+                        mode,
+                        shares,
+                        sharesToCheck,
+                        request.schemeDetails.schemeName,
+                        None,
+                        showBackLink = true,
+                        isPrePopulation
+                      )
                     )
                   ).pure[Future]
                 },

@@ -168,7 +168,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(FbVersionPage(srn), "002")
     .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
 
-  private val mockPsrSubmissionService = mock[PsrSubmissionService]
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   "LoansListController" - {
 
@@ -214,9 +214,19 @@ class LoansListControllerSpec extends ControllerBaseSpec {
       ).withName("Redirect to Task List when 0 Loans completed and not in ViewOnly mode")
     )
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
 
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
+        .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
+    )
+
+    act.like(invalidForm(onSubmit, defaultUserAnswers))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
@@ -305,12 +315,12 @@ class LoansListControllerSpec extends ControllerBaseSpec {
           .apply(
             form(injected[YesNoPageFormProvider]),
             viewModel(
-              srn,
-              page,
+              srn = srn,
+              page = page,
               mode = ViewOnlyMode,
-              loansData,
-              Nil,
-              schemeName,
+              loans = loansData,
+              loansToCheck = Nil,
+              schemeName = schemeName,
               viewOnlyViewModel = Some(
                 viewOnlyViewModel.copy(
                   currentVersion = (submissionNumberTwo - 1).max(0),
