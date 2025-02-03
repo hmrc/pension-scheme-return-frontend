@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberdetails
 
 import services.SaveService
-import pages.nonsipp.memberdetails.{MemberDetailsManualProgress, MemberDetailsPage, NoNINOPage}
+import pages.nonsipp.memberdetails.{MemberDetailsPage, NoNINOPage}
 import viewmodels.implicits._
 import play.api.mvc._
 import controllers.actions._
@@ -31,7 +31,7 @@ import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FunctionKUtils._
-import viewmodels.models.{FormPageViewModel, SectionJourneyStatus, TextAreaViewModel}
+import viewmodels.models.{FormPageViewModel, TextAreaViewModel}
 import models.requests.DataRequest
 import play.api.data.Form
 
@@ -78,11 +78,11 @@ class NoNINOController @Inject()(
                   .set(NoNINOPage(srn, index), value)
                   .mapK
 
-                answersWithProgress <- updatedAnswers
-                  .set(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
-                  .mapK
-                nextPage = navigator.nextPage(NoNINOPage(srn, index), mode, answersWithProgress)
-                updatedProgressAnswers <- saveProgress(srn, index, answersWithProgress, nextPage)
+//                answersWithProgress <- updatedAnswers
+//                  .set(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
+//                  .mapK
+                nextPage = navigator.nextPage(NoNINOPage(srn, index), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
 
 //                nextPage = navigator.nextPage(NoNINOPage(srn, index), mode, updatedAnswers)
 //                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)

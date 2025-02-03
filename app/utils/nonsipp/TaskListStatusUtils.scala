@@ -46,7 +46,7 @@ import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutSecti
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
 import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsDisposalProgress}
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
-import viewmodels.models.{SectionCompleted, TaskListStatus}
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus, TaskListStatus}
 
 object TaskListStatusUtils {
 
@@ -115,11 +115,21 @@ object TaskListStatusUtils {
       }
     )
 
+    val getInProgressUrl = userAnswers
+      .map(MemberDetailsManualProgress.all(srn))
+      .collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+      .getOrElse(firstQuestionPageUrl)
+
+    val getInProgressOrListPageUrl = userAnswers
+      .map(MemberDetailsManualProgress.all(srn))
+      .collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+      .getOrElse(listPageUrl)
+
     (membersDetailsPages, numRecorded) match {
       case (None, 0) => (NotStarted, firstQuestionPageUrl)
       case (Some(memberDetails), 0) if memberDetails.isEmpty => (NotStarted, firstQuestionPageUrl) //Last member removed
-      case (Some(_), 0) => (InProgress, inProgressCalculatedUrl)
-      case (Some(_), _) => (Recorded(numRecorded, "members"), listPageUrl)
+      case (Some(_), 0) => (InProgress, getInProgressUrl)
+      case (Some(_), _) => (Recorded(numRecorded, "members"), getInProgressOrListPageUrl)
     }
   }
 

@@ -35,7 +35,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, SectionJourneyStatus, TextInputViewModel}
+import viewmodels.models.{FormPageViewModel, TextInputViewModel}
 import models.requests.DataRequest
 import play.api.data.Form
 
@@ -87,11 +87,11 @@ class MemberDetailsNinoController @Inject()(
                 updatedAnswers <- request.userAnswers
                   .set(MemberDetailsNinoPage(srn, index), value)
                   .mapK
-                answersWithProgress <- updatedAnswers
-                  .set(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
-                  .mapK
-                nextPage = navigator.nextPage(MemberDetailsNinoPage(srn, index), mode, answersWithProgress)
-                updatedProgressAnswers <- saveProgress(srn, index, answersWithProgress, nextPage)
+//                answersWithProgress <- updatedAnswers
+//                  .set(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
+//                  .mapK
+                nextPage = navigator.nextPage(MemberDetailsNinoPage(srn, index), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
 

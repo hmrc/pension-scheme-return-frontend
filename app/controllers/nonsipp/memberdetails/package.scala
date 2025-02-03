@@ -32,19 +32,19 @@ package object memberdetails {
 
     val isCyaPage: Boolean = {
       val pattern =
-        s"^\\/pension-scheme-return\\/[^\\/]+\\/(change|check-answers)-memberdetails\\/(?!.*\\/\\d+\\/\\d+$$).*"
+        s"^\\/pension-scheme-return\\/[^\\/]+\\/(change|check-answers)-member-details\\/(?!.*\\/\\d+\\/\\d+$$).*"
 
       call.url.matches(pattern)
     }
   }
 
   def saveProgress(
-                    srn: Srn,
-                    index: Max300,
-                    userAnswers: UserAnswers,
-                    nextPage: Call,
-                    alwaysCompleted: Boolean = false
-                  ): Future[UserAnswers] =
+    srn: Srn,
+    index: Max300,
+    userAnswers: UserAnswers,
+    nextPage: Call,
+    alwaysCompleted: Boolean = false
+  ): Future[UserAnswers] =
     if (nextPage.isCyaPage) {
       userAnswers
         .set(

@@ -76,7 +76,7 @@ class MemberDetailsController @Inject()(
             ),
           value =>
             for {
-              updatedAnswers <- request.userAnswers.transformAndSet(MemberDetailsPage(srn, index), value).mapK
+              updatedAnswers <- request.userAnswers.set(MemberDetailsPage(srn, index), value).mapK
               nextPage = navigator.nextPage(MemberDetailsPage(srn, index), mode, updatedAnswers)
               updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
