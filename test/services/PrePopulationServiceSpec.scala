@@ -45,6 +45,8 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     mock[BondsPrePopulationProcessor]
   lazy val mockLoansProgressPrePopulationProcessor: LoansProgressPrePopulationProcessor =
     mock[LoansProgressPrePopulationProcessor]
+  lazy val mockOtherAssetsPrePopulationProcessor: OtherAssetsPrePopulationProcessor =
+    mock[OtherAssetsPrePopulationProcessor]
 
   private val service = new PrePopulationService(
     mockLandOrPropertyPrePopulationProcessor,
@@ -52,7 +54,8 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     mockSharesPrePopulationProcessor,
     mockLoansPrePopulationProcessor,
     mockBondsPrePopulationProcessor,
-    mockLoansProgressPrePopulationProcessor
+    mockLoansProgressPrePopulationProcessor,
+    mockOtherAssetsPrePopulationProcessor
   )
 
   override def beforeEach(): Unit = {
@@ -62,6 +65,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     reset(mockLoansPrePopulationProcessor)
     reset(mockBondsPrePopulationProcessor)
     reset(mockLoansProgressPrePopulationProcessor)
+    reset(mockOtherAssetsPrePopulationProcessor)
   }
 
   "PrePopulationService" - {
@@ -115,6 +119,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
         val loansUa = sharesUa.unsafeSet(__ \ "loans", JsString("dummy-loans-data"))
         val bondsUa = loansUa.unsafeSet(__ \ "bonds", JsString("dummy-bonds-data"))
         val loansProgressUa = bondsUa.unsafeSet(__ \ "loansProgress", JsString("dummy-loans-progress-data"))
+        val otherAssetsUa = loansProgressUa.unsafeSet(__ \ "otherAssets", JsString("dummy-other-assets-data"))
 
         when(
           mockLandOrPropertyPrePopulationProcessor
@@ -140,6 +145,10 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
           mockLoansProgressPrePopulationProcessor
             .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(bondsUa))(ArgumentMatchers.eq(srn))
         ).thenReturn(Success(loansProgressUa))
+        when(
+          mockOtherAssetsPrePopulationProcessor
+            .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(loansProgressUa))(ArgumentMatchers.eq(srn))
+        ).thenReturn(Success(otherAssetsUa))
 
         val result = service.buildPrePopulatedUserAnswers(baseReturnUA, currentUa)(srn)
         result.isSuccess mustBe true
@@ -151,8 +160,8 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
               |  "shares": "dummy-shares-data",
               |  "loans": "dummy-loans-data",
               |  "bonds": "dummy-bonds-data",
-              |  "loansProgress": "dummy-loans-progress-data"
-              |
+              |  "loansProgress": "dummy-loans-progress-data",
+              |  "otherAssets": "dummy-other-assets-data"
               |}
               |""".stripMargin).as[JsObject]
 
@@ -162,6 +171,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
         verify(mockLoansPrePopulationProcessor, times(1)).clean(any(), any())(any())
         verify(mockBondsPrePopulationProcessor, times(1)).clean(any(), any())(any())
         verify(mockLoansProgressPrePopulationProcessor, times(1)).clean(any(), any())(any())
+        verify(mockOtherAssetsPrePopulationProcessor, times(1)).clean(any(), any())(any())
       }
     }
   }

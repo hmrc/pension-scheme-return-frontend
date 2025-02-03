@@ -33,7 +33,7 @@ import scala.util.{Success, Try}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class SharesPrePopulationProcessor @Inject() {
+class SharesPrePopulationProcessor @Inject()() {
 
   private val logger = Logger(getClass)
 

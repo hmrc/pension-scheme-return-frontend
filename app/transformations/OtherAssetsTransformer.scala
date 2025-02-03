@@ -57,9 +57,11 @@ class OtherAssetsTransformer @Inject() extends Transformer {
           Option(optDisposeAnyOtherAsset.getOrElse(false))
         }
       OtherAssets(
-        recordVersion = Option.when(request.userAnswers.get(otherAssets) == initialUA.get(otherAssets))(
-          request.userAnswers.get(OtherAssetsRecordVersionPage(srn)).get
-        ),
+        recordVersion = Option
+          .when(request.userAnswers.get(otherAssets) == initialUA.get(otherAssets))(
+            request.userAnswers.get(OtherAssetsRecordVersionPage(srn))
+          )
+          .flatten,
         optOtherAssetsWereHeld = optOtherAssetsHeld,
         optOtherAssetsWereDisposed = dispose,
         otherAssetTransactions = otherAssetTransactionsTransformToEtmp(srn, optDisposeAnyOtherAsset)

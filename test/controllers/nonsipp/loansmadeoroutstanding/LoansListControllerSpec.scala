@@ -333,7 +333,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
               srn = srn,
               page = page,
               mode = ViewOnlyMode,
-              loans = loansData,
+              loansNotToCheck = loansData,
               loansToCheck = Nil,
               schemeName = schemeName,
               viewOnlyViewModel = Some(

@@ -91,7 +91,6 @@ class MemberDetailsNinoController @Inject()(
                 updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
-
           )
       }
   }

@@ -22,7 +22,6 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import models.IdentityType.{Individual, UKCompany}
 import controllers.TestValues
-import models.requests.psr._
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
@@ -32,6 +31,8 @@ import play.api.mvc.AnyContentAsEmpty
 import com.softwaremill.diffx.scalatest.DiffShouldMatcher
 import pages.nonsipp.otherassetsheld._
 import models.HowDisposed.{Other, Sold, Transferred}
+import models.requests.psr._
+import config.Constants.PREPOPULATION_FLAG
 import org.scalatest.OptionValues
 import uk.gov.hmrc.domain.Nino
 import models._
@@ -48,6 +49,10 @@ class OtherAssetsTransformerSpec
 
   val allowedAccessRequest
     : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  private val allowedAccessRequestPrePopulation: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+      .withSession((PREPOPULATION_FLAG, "true"))
+  ).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
   private val transformer = new OtherAssetsTransformer
@@ -350,6 +355,23 @@ class OtherAssetsTransformerSpec
           )
         )
       }
+    }
+
+    "should return disposals None when OtherAssetsDisposalPage is None and it is pre-population " in {
+      val userAnswers = emptyUserAnswers
+        .unsafeSet(OtherAssetsHeldPage(srn), true)
+
+      val request = DataRequest(allowedAccessRequestPrePopulation, userAnswers)
+
+      val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+      result mustBe Some(
+        OtherAssets(
+          recordVersion = None,
+          optOtherAssetsWereHeld = Some(true),
+          optOtherAssetsWereDisposed = None,
+          otherAssetTransactions = Seq.empty
+        )
+      )
     }
   }
 
