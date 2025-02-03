@@ -207,7 +207,9 @@ class OtherAssetsCYAController @Inject()(
     identifyAndRequireData(srn).async { implicit request =>
       for {
         updatedUserAnswers <- Future.fromTry(
-          request.userAnswers.set(OtherAssetsCompleted(srn, index), SectionCompleted)
+          request.userAnswers
+            .set(OtherAssetsHeldPage(srn), true)
+            .set(OtherAssetsCompleted(srn, index), SectionCompleted)
         )
         _ <- saveService.save(updatedUserAnswers)
         redirectTo <- psrSubmissionService
