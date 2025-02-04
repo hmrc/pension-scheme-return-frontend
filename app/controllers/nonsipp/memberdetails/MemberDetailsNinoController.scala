@@ -87,20 +87,11 @@ class MemberDetailsNinoController @Inject()(
                 updatedAnswers <- request.userAnswers
                   .set(MemberDetailsNinoPage(srn, index), value)
                   .mapK
-//                answersWithProgress <- updatedAnswers
-//                  .set(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
-//                  .mapK
                 nextPage = navigator.nextPage(MemberDetailsNinoPage(srn, index), mode, updatedAnswers)
                 updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
 
-//                answer => {
-//              for {
-//                updatedAnswers <- Future.fromTry(request.userAnswers.set(MemberDetailsNinoPage(srn, index), answer))
-//                _ <- saveService.save(updatedAnswers)
-//              } yield Redirect(navigator.nextPage(MemberDetailsNinoPage(srn, index), mode, updatedAnswers))
-//            }
           )
       }
   }

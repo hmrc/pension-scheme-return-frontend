@@ -92,14 +92,6 @@ class DoesSchemeMemberHaveNINOController @Inject()(
                   _ <- saveService.save(updatedProgressAnswers)
                 } yield Redirect(nextPage)
             )
-
-//              value =>
-//                for {
-//                  updatedAnswers <- Future
-//                    .fromTry(request.userAnswers.set(DoesMemberHaveNinoPage(srn, index), value))
-//                  _ <- saveService.save(updatedAnswers)
-//                } yield Redirect(navigator.nextPage(DoesMemberHaveNinoPage(srn, index), mode, updatedAnswers))
-//            )
       )
 
   }

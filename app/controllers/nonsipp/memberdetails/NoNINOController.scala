@@ -77,24 +77,11 @@ class NoNINOController @Inject()(
                 updatedAnswers <- request.userAnswers
                   .set(NoNINOPage(srn, index), value)
                   .mapK
-
-//                answersWithProgress <- updatedAnswers
-//                  .set(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
-//                  .mapK
                 nextPage = navigator.nextPage(NoNINOPage(srn, index), mode, updatedAnswers)
                 updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
-
-//                nextPage = navigator.nextPage(NoNINOPage(srn, index), mode, updatedAnswers)
-//                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
-
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
 
-//            value =>
-//              for {
-//                updatedAnswers <- Future.fromTry(request.userAnswers.set(NoNINOPage(srn, index), value))
-//                _ <- saveService.save(updatedAnswers)
-//              } yield Redirect(navigator.nextPage(NoNINOPage(srn, index), mode, updatedAnswers))
           )
       }
   }

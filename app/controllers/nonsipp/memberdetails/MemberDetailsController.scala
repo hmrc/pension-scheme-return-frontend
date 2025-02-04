@@ -82,12 +82,6 @@ class MemberDetailsController @Inject()(
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
 
-//          answer => {
-//            for {
-//              updatedAnswers <- Future.fromTry(request.userAnswers.set(MemberDetailsPage(srn, index), answer))
-//              _ <- saveService.save(updatedAnswers)
-//            } yield Redirect(navigator.nextPage(MemberDetailsPage(srn, index), mode, updatedAnswers))
-//          }
         )
   }
 
