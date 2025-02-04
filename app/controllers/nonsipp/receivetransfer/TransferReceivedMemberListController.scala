@@ -213,41 +213,43 @@ object TransferReceivedMemberListController {
               }
             ),
             TableElemDoubleLink(
-              (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-                case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                  TableElem.view(
-                    controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
-                      .onPageLoadViewOnly(
-                        srn,
-                        membersWithTransfers.memberIndex,
-                        year,
-                        currentVersion,
-                        previousVersion
-                      ),
-                    hiddenText = membersWithTransfers.transferFullName
-                  )
-                case _ =>
-                  TableElem.change(
-                    controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
-                      .onSubmit(srn, membersWithTransfers.memberIndex, CheckMode),
+              (
+                (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                  case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                    TableElem.view(
+                      controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+                        .onPageLoadViewOnly(
+                          srn,
+                          membersWithTransfers.memberIndex,
+                          year,
+                          currentVersion,
+                          previousVersion
+                        ),
+                      hiddenText = membersWithTransfers.transferFullName
+                    )
+                  case _ =>
+                    TableElem.change(
+                      controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+                        .onSubmit(srn, membersWithTransfers.memberIndex, CheckMode),
+                      Message(
+                        "transferIn.MemberList.change.hidden.text",
+                        membersWithTransfers.transferFullName
+                      )
+                    )
+                },
+                if (mode == ViewOnlyMode) {
+                  TableElem.empty
+                } else {
+                  TableElem.remove(
+                    controllers.nonsipp.receivetransfer.routes.WhichTransferInRemoveController
+                      .onSubmit(srn, membersWithTransfers.memberIndex),
                     Message(
-                      "transferIn.MemberList.change.hidden.text",
+                      "transferIn.MemberList.remove.hidden.text",
                       membersWithTransfers.transferFullName
                     )
                   )
-              },
-              if (mode == ViewOnlyMode) {
-                TableElem.empty
-              } else {
-                TableElem.remove(
-                  controllers.nonsipp.receivetransfer.routes.WhichTransferInRemoveController
-                    .onSubmit(srn, membersWithTransfers.memberIndex),
-                  Message(
-                    "transferIn.MemberList.remove.hidden.text",
-                    membersWithTransfers.transferFullName
-                  )
-                )
-              }
+                }
+              )
             )
           )
         }

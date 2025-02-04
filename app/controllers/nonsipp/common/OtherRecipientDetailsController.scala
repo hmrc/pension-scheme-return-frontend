@@ -34,6 +34,7 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.RecipientDetailsView
 import models.SchemeId.Srn
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, RecipientDetailsViewModel}
 
@@ -80,10 +81,11 @@ class OtherRecipientDetailsController @Inject()(
             ),
           answer => {
             for {
-              updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(OtherRecipientDetailsPage(srn, index, subject), answer))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(OtherRecipientDetailsPage(srn, index, subject), mode, updatedAnswers))
+              updatedAnswers <- request.userAnswers.set(OtherRecipientDetailsPage(srn, index, subject), answer).mapK
+              nextPage = navigator.nextPage(OtherRecipientDetailsPage(srn, index, subject), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage, subject)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
     }

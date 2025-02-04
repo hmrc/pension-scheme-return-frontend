@@ -34,6 +34,7 @@ import navigation.Navigator
 import uk.gov.hmrc.domain.Nino
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -74,10 +75,13 @@ class IndividualRecipientNinoController @Inject()(
             },
           value =>
             for {
-              updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(IndividualRecipientNinoPage(srn, index), ConditionalYesNo(value)))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(IndividualRecipientNinoPage(srn, index), mode, updatedAnswers))
+              updatedAnswers <- request.userAnswers
+                .set(IndividualRecipientNinoPage(srn, index), ConditionalYesNo(value))
+                .mapK
+              nextPage = navigator.nextPage(IndividualRecipientNinoPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
   }
 }

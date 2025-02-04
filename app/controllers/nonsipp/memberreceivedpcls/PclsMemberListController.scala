@@ -180,29 +180,31 @@ object PclsMemberListController {
               "pcls.memberlist.status.some.item"
             ),
             TableElemDoubleLink(
-              (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-                case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                  TableElem.view(
-                    controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
-                      .onPageLoadViewOnly(srn, index, year, currentVersion, previousVersion),
+              (
+                (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                  case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                    TableElem.view(
+                      controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
+                        .onPageLoadViewOnly(srn, index, year, currentVersion, previousVersion),
+                      Message("pcls.memberList.remove.hidden.text", memberName.fullName)
+                    )
+                  case _ =>
+                    TableElem.change(
+                      controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
+                        .onSubmit(srn, index, CheckMode),
+                      Message("pcls.memberList.change.hidden.text", memberName.fullName)
+                    )
+                },
+                if (mode == ViewOnlyMode) {
+                  TableElem.empty
+                } else {
+                  TableElem.remove(
+                    controllers.nonsipp.memberreceivedpcls.routes.RemovePclsController
+                      .onSubmit(srn, index),
                     Message("pcls.memberList.remove.hidden.text", memberName.fullName)
                   )
-                case _ =>
-                  TableElem.change(
-                    controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
-                      .onSubmit(srn, index, CheckMode),
-                    Message("pcls.memberList.change.hidden.text", memberName.fullName)
-                  )
-              },
-              if (mode == ViewOnlyMode) {
-                TableElem.empty
-              } else {
-                TableElem.remove(
-                  controllers.nonsipp.memberreceivedpcls.routes.RemovePclsController
-                    .onSubmit(srn, index),
-                  Message("pcls.memberList.remove.hidden.text", memberName.fullName)
-                )
-              }
+                }
+              )
             )
           )
       }

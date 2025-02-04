@@ -30,6 +30,7 @@ import views.html.TextInputView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, TextInputViewModel}
 
@@ -72,9 +73,10 @@ class PartnershipRecipientNameController @Inject()(
             ),
           answer => {
             for {
-              updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(PartnershipRecipientNamePage(srn, index), answer))
-              _ <- saveService.save(updatedAnswers)
+              updatedAnswers <- request.userAnswers.set(PartnershipRecipientNamePage(srn, index), answer).mapK
+              nextPage = navigator.nextPage(PartnershipRecipientNamePage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(navigator.nextPage(PartnershipRecipientNamePage(srn, index), mode, updatedAnswers))
           }
         )

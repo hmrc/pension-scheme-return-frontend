@@ -187,41 +187,43 @@ object SurrenderedBenefitsMemberListController {
               "surrenderedBenefits.memberList.status.some.item"
             ),
             TableElemDoubleLink(
-              (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-                case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                  TableElem.view(
-                    controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
-                      .onPageLoadViewOnly(
-                        srn,
-                        index,
-                        year = year,
-                        current = currentVersion,
-                        previous = previousVersion
-                      ),
-                    hiddenText = Message("surrenderedBenefits.memberList.add.hidden.text", memberName.fullName)
-                  )
-                case _ =>
-                  TableElem.change(
-                    controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
-                      .onPageLoad(srn, index, CheckMode),
+              (
+                (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                  case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                    TableElem.view(
+                      controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
+                        .onPageLoadViewOnly(
+                          srn,
+                          index,
+                          year = year,
+                          current = currentVersion,
+                          previous = previousVersion
+                        ),
+                      hiddenText = Message("surrenderedBenefits.memberList.add.hidden.text", memberName.fullName)
+                    )
+                  case _ =>
+                    TableElem.change(
+                      controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
+                        .onPageLoad(srn, index, CheckMode),
+                      Message(
+                        "surrenderedBenefits.memberList.change.hidden.text",
+                        memberName.fullName
+                      )
+                    )
+                },
+                if (mode.isViewOnlyMode) {
+                  TableElem.empty
+                } else {
+                  TableElem.remove(
+                    controllers.nonsipp.membersurrenderedbenefits.routes.RemoveSurrenderedBenefitsController
+                      .onSubmit(srn, index),
                     Message(
-                      "surrenderedBenefits.memberList.change.hidden.text",
+                      "surrenderedBenefits.memberList.remove.hidden.text",
                       memberName.fullName
                     )
                   )
-              },
-              if (mode.isViewOnlyMode) {
-                TableElem.empty
-              } else {
-                TableElem.remove(
-                  controllers.nonsipp.membersurrenderedbenefits.routes.RemoveSurrenderedBenefitsController
-                    .onSubmit(srn, index),
-                  Message(
-                    "surrenderedBenefits.memberList.remove.hidden.text",
-                    memberName.fullName
-                  )
-                )
-              }
+                }
+              )
             )
           )
       }

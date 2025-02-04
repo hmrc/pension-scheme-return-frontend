@@ -110,8 +110,10 @@ class RemoveLoanController @Inject()(
           value =>
             if (value) {
               for {
-                updatedAnswers <- Future
-                  .fromTry(request.userAnswers.remove(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)))
+                updatedAnswers <- Future.fromTry(
+                  request.userAnswers
+                    .remove(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
+                )
                 _ <- saveService.save(updatedAnswers)
                 redirectTo <- psrSubmissionService
                   .submitPsrDetailsWithUA(

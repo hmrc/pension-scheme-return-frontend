@@ -38,6 +38,7 @@ import views.html.MultipleQuestionView
 import models.SchemeId.Srn
 import utils.DateTimeUtils.localDateShow
 import models.{Mode, Money}
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, QuestionField}
 
@@ -93,10 +94,11 @@ class DatePeriodLoanController @Inject()(
               },
             value =>
               for {
-                updatedAnswers <- Future
-                  .fromTry(request.userAnswers.transformAndSet(DatePeriodLoanPage(srn, index), value))
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(DatePeriodLoanPage(srn, index), mode, updatedAnswers))
+                updatedAnswers <- request.userAnswers.transformAndSet(DatePeriodLoanPage(srn, index), value).mapK
+                nextPage = navigator.nextPage(DatePeriodLoanPage(srn, index), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(nextPage)
           )
       }
   }

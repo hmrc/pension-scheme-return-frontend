@@ -33,7 +33,8 @@ class PrePopulationService @Inject()(
   memberPrePopulationProcessor: MemberPrePopulationProcessor,
   sharesPrePopulationProcessor: SharesPrePopulationProcessor,
   loanPrePopulationProcessor: LoansPrePopulationProcessor,
-  bondsPrePopulationProcessor: BondsPrePopulationProcessor
+  bondsPrePopulationProcessor: BondsPrePopulationProcessor,
+  loanProgressPrePopulationProcessor: LoansProgressPrePopulationProcessor
 ) {
 
   /**
@@ -67,5 +68,6 @@ class PrePopulationService @Inject()(
       ua2 <- sharesPrePopulationProcessor.clean(baseReturnUA, ua1)(srn)
       ua3 <- loanPrePopulationProcessor.clean(baseReturnUA, ua2)(srn)
       ua4 <- bondsPrePopulationProcessor.clean(baseReturnUA, ua3)(srn)
-    } yield ua4
+      ua5 <- loanProgressPrePopulationProcessor.clean(baseReturnUA, ua4)(srn)
+    } yield ua5
 }

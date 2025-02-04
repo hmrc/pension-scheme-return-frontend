@@ -37,6 +37,7 @@ import controllers.nonsipp.common.IdentityTypeController._
 import pages.nonsipp.common.IdentityTypePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
 
@@ -102,9 +103,11 @@ class IdentityTypeController @Inject()(
             .successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, subject, request.userAnswers)))),
         answer => {
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(IdentityTypePage(srn, index, subject), answer))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(IdentityTypePage(srn, index, subject), mode, updatedAnswers))
+            updatedAnswers <- request.userAnswers.set(IdentityTypePage(srn, index, subject), answer).mapK
+            nextPage = navigator.nextPage(IdentityTypePage(srn, index, subject), mode, updatedAnswers)
+            updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage, subject)
+            _ <- saveService.save(updatedProgressAnswers)
+          } yield Redirect(nextPage)
         }
       )
   }

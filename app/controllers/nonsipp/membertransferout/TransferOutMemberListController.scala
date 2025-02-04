@@ -200,41 +200,43 @@ object TransferOutMemberListController {
                 }
               ),
               TableElemDoubleLink(
-                (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-                  case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                    TableElem.view(
-                      controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
-                        .onPageLoadViewOnly(
-                          srn,
-                          index,
-                          year = year,
-                          current = currentVersion,
-                          previous = previousVersion
-                        ),
-                      memberName.fullName
-                    )
-                  case _ =>
-                    TableElem.change(
-                      controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
-                        .onPageLoad(srn, index, CheckMode),
+                (
+                  (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                    case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                      TableElem.view(
+                        controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
+                          .onPageLoadViewOnly(
+                            srn,
+                            index,
+                            year = year,
+                            current = currentVersion,
+                            previous = previousVersion
+                          ),
+                        memberName.fullName
+                      )
+                    case _ =>
+                      TableElem.change(
+                        controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
+                          .onPageLoad(srn, index, CheckMode),
+                        Message(
+                          "transferOut.memberList.change.hidden.text",
+                          memberName.fullName
+                        )
+                      )
+                  },
+                  if (mode.isViewOnlyMode) {
+                    TableElem.empty
+                  } else {
+                    TableElem.remove(
+                      controllers.nonsipp.membertransferout.routes.WhichTransferOutRemoveController
+                        .onSubmit(srn, index),
                       Message(
-                        "transferOut.memberList.change.hidden.text",
+                        "transferOut.memberList.remove.hidden.text",
                         memberName.fullName
                       )
                     )
-                },
-                if (mode.isViewOnlyMode) {
-                  TableElem.empty
-                } else {
-                  TableElem.remove(
-                    controllers.nonsipp.membertransferout.routes.WhichTransferOutRemoveController
-                      .onSubmit(srn, index),
-                    Message(
-                      "transferOut.memberList.remove.hidden.text",
-                      memberName.fullName
-                    )
-                  )
-                }
+                  }
+                )
               )
             )
           }

@@ -21,7 +21,8 @@ import pages.nonsipp.landorproperty.LandPropertyInUKPage
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models._
-import pages.nonsipp.loansmadeoroutstanding.{DatePeriodLoanPage, LoansMadeOrOutstandingPage}
+import pages.nonsipp.loansmadeoroutstanding.{DatePeriodLoanPage, LoansMadeOrOutstandingPage, LoansProgress}
+import viewmodels.models.SectionJourneyStatus
 import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate
@@ -32,6 +33,10 @@ class IdentityTypePageSpec extends PageBehaviours {
   private val indexThree = refineMV[OneTo5000](3)
 
   private val srn = srnGen.sample.value
+
+  val year = 1989
+  val month = 10
+  val day = 6
 
   "IdentityTypePage" - {
     IdentitySubject.values.foreach { identitySubject =>
@@ -160,6 +165,38 @@ class IdentityTypePageSpec extends PageBehaviours {
             result.get(CompanyRecipientCrnPage(srn, indexOne, IdentitySubject.LoanRecipient)) mustBe None
             result.get(CompanyRecipientCrnPage(srn, indexOne, IdentitySubject.LandOrPropertySeller)) must not be None
             result.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
+          }
+        }
+
+        "cleanup when LoansProgress is part of pagesNotDependentOnIdentitySubject and list size is 1" - {
+          val localDate: LocalDate = LocalDate.of(year, month, day)
+
+          val userAnswers =
+            UserAnswers("id")
+              .unsafeSet(DatePeriodLoanPage(srn, indexOne), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
+              .unsafeSet(IdentityTypePage(srn, indexOne, IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+              .unsafeSet(LoansProgress(srn, indexOne), SectionJourneyStatus.InProgress("/progress/url"))
+
+          "must remove LoansProgress when current answer is None (removal) and existing answers are present" in {
+
+            val result = IdentityTypePage(srn, indexOne, IdentitySubject.LoanRecipient)
+              .cleanup(None, userAnswers)
+              .toOption
+              .value
+
+            result.get(DatePeriodLoanPage(srn, indexOne)) mustBe None
+            result.get(LoansProgress(srn, indexOne)) mustBe None
+          }
+
+          "must retain LoansProgress when current answer is Partnership and existing answer is UKCompany (update)" in {
+
+            val result = IdentityTypePage(srn, indexOne, IdentitySubject.LoanRecipient)
+              .cleanup(Some(IdentityType.UKPartnership), userAnswers)
+              .toOption
+              .value
+
+            result.get(DatePeriodLoanPage(srn, indexOne)) must not be None
+            result.get(LoansProgress(srn, indexOne)) mustBe Some(SectionJourneyStatus.InProgress("/progress/url"))
           }
         }
       }

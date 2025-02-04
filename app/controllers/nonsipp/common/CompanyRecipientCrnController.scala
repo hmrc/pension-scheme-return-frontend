@@ -37,6 +37,7 @@ import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -78,10 +79,13 @@ class CompanyRecipientCrnController @Inject()(
               .successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, subject, request.userAnswers)))),
           value =>
             for {
-              updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(CompanyRecipientCrnPage(srn, index, subject), ConditionalYesNo(value)))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CompanyRecipientCrnPage(srn, index, subject), mode, updatedAnswers))
+              updatedAnswers <- request.userAnswers
+                .set(CompanyRecipientCrnPage(srn, index, subject), ConditionalYesNo(value))
+                .mapK
+              nextPage = navigator.nextPage(CompanyRecipientCrnPage(srn, index, subject), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage, subject)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

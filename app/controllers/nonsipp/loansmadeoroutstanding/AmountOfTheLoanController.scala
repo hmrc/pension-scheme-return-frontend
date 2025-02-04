@@ -39,6 +39,7 @@ import pages.nonsipp.loansmadeoroutstanding.{AmountOfTheLoanPage, AreRepaymentsI
 import cats.{Id, Monad}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, QuestionField}
 import models.requests.DataRequest
@@ -105,9 +106,10 @@ class AmountOfTheLoanController @Inject()(
             },
             value =>
               for {
-                updatedAnswers <- Future
-                  .fromTry(request.userAnswers.transformAndSet(AmountOfTheLoanPage(srn, index), value))
-                _ <- saveService.save(updatedAnswers)
+                updatedAnswers <- request.userAnswers.transformAndSet(AmountOfTheLoanPage(srn, index), value).mapK
+                nextPage = navigator.nextPage(AmountOfTheLoanPage(srn, index), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                _ <- saveService.save(updatedProgressAnswers)
               } yield (
                 isPrePopulation,
                 request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)),

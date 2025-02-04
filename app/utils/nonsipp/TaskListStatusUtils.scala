@@ -46,7 +46,7 @@ import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutSecti
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
 import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsDisposalProgress}
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
-import viewmodels.models.{SectionCompleted, TaskListStatus}
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus, TaskListStatus}
 
 object TaskListStatusUtils {
 
@@ -337,22 +337,15 @@ object TaskListStatusUtils {
           .onPageLoad(srn, 1, NormalMode)
           .url
 
-      val firstPages = userAnswers.get(IdentityTypes(srn, IdentitySubject.LoanRecipient))
-      val lastPages = userAnswers.get(LoanCompleted.all(srn))
-      val incompleteIndex: Int = getIncompleteIndex(firstPages, lastPages)
-
-      val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
-        _ => firstQuestionPageUrl,
-        index =>
-          controllers.nonsipp.common.routes.IdentityTypeController
-            .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
-            .url
-      )
+      val getInProgressUrl = userAnswers
+        .map(LoansProgress.all(srn))
+        .collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+        .getOrElse(firstQuestionPageUrl)
 
       (wereLoans, numRecorded) match {
         case (None, _) => (NotStarted, firstQuestionPageUrl)
         case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
-        case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
+        case (Some(true), 0) => (InProgress, getInProgressUrl)
         case (Some(true), _) => (Recorded(numRecorded, "loans"), listPageUrl)
       }
     }
