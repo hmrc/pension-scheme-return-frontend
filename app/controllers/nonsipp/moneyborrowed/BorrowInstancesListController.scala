@@ -102,7 +102,7 @@ class BorrowInstancesListController @Inject()(
     showBackLink: Boolean
   )(
     implicit request: DataRequest[AnyContent]
-  ): Result = {
+  ): Result =
     // TODO: borrowDetails currently tries to pull pages across a journey to build the list page view model
     // this is sometimes trying to get a page further in the journey that the user hasn't completed, causing it to fail
     // fix: separate the MoneyBorrowedProgress.all(srn) call out from borrowDetails
@@ -143,7 +143,6 @@ class BorrowInstancesListController @Inject()(
           .merge
       }
     }.merge
-  }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     borrowDetails(srn).map { instances =>
@@ -209,13 +208,15 @@ class BorrowInstancesListController @Inject()(
       .map(MoneyBorrowedProgress.all(srn))
       .refine[Max5000.Refined]
       .getOrRecoverJourney
-      .flatMap {
-        _.keys.toList.traverse { index =>
+      .flatMap { status =>
+        status.keys.toList.traverse { index =>
           for {
             lenderName <- requiredPage(LenderNamePage(srn, index))
-            borrowed <- requiredPage(BorrowedAmountAndRatePage(srn, index))
-            (amount, _) = borrowed
-          } yield BorrowedMoneyDetails(index, lenderName, amount)
+            amount = request.userAnswers
+              .get(BorrowedAmountAndRatePage(srn, index))
+              .map(_._1)
+            progress = status.getOrElse(index, SectionJourneyStatus.Completed)
+          } yield BorrowedMoneyDetails(index, lenderName, amount, progress)
         }
       }
 }
@@ -244,8 +245,8 @@ object BorrowInstancesListController {
       case (Nil, mode) if !mode.isViewOnlyMode =>
         List()
       case (list, _) =>
-        list.flatMap {
-          case BorrowedMoneyDetails(index, lenderName, amount) =>
+        list.collect {
+          case BorrowedMoneyDetails(index, lenderName, Some(amount), _) =>
             (mode, viewOnlyViewModel) match {
               case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
                 List(
@@ -272,7 +273,7 @@ object BorrowInstancesListController {
                   )
                 )
             }
-        }
+        }.flatten
     }
 
   def viewModel(
@@ -376,5 +377,10 @@ object BorrowInstancesListController {
     )
   }
 
-  case class BorrowedMoneyDetails(index: Max5000, lenderName: String, amount: Money)
+  case class BorrowedMoneyDetails(
+    index: Max5000,
+    lenderName: String,
+    amount: Option[Money],
+    progress: SectionJourneyStatus
+  )
 }

@@ -25,7 +25,7 @@ import viewmodels.models.SectionJourneyStatus
 
 case class MoneyBorrowedProgress(srn: Srn, index: Max5000) extends QuestionPage[SectionJourneyStatus] {
 
-  override def path: JsPath = Paths.moneyBorrowed \ toString \ index.arrayIndex.toString
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 
   override def toString: String = "moneyBorrowedProgress"
 }
@@ -35,7 +35,7 @@ object MoneyBorrowedProgress {
   def all(srn: Srn): IndexedQuestionPage[SectionJourneyStatus] =
     new IndexedQuestionPage[SectionJourneyStatus] {
 
-      override def path: JsPath = Paths.moneyBorrowed \ toString
+      override def path: JsPath = JsPath \ toString
 
       override def toString: String = "moneyBorrowedProgress"
     }
