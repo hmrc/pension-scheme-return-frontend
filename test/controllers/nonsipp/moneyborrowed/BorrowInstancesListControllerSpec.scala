@@ -78,11 +78,11 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
   private val completeUserAnswers =
     defaultUserAnswers
       .unsafeSet(MoneyBorrowedPage(srn), false)
-      .unsafeSet(LenderNamePages(srn), Map("0" -> "madness"))
+      .unsafeSet(LenderNamePage(srn, index), lenderName)
       .unsafeSet(IsLenderConnectedPartyPage(srn, index), false)
-      .unsafeSet(BorrowedAmountAndRatePage(srn, index), (Money(10000), Percentage(1)))
+      .unsafeSet(BorrowedAmountAndRatePage(srn, index), (money, percentage))
       .unsafeSet(WhenBorrowedPage(srn, index), LocalDate.now())
-      .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index), Money(10000))
+      .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index), money)
       .unsafeSet(WhySchemeBorrowedMoneyPage(srn, index), "Reason")
       .unsafeSet(MoneyBorrowedProgress(srn, index), SectionJourneyStatus.Completed)
 
@@ -150,6 +150,7 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(MoneyBorrowedPage(srn), false)
       .unsafeSet(LenderNamePages(srn), Map("0" -> lenderName))
       .unsafeSet(BorrowedAmountAndRatePage(srn, index), (money, percentage))
+      .unsafeSet(MoneyBorrowedProgress(srn, index), SectionJourneyStatus.Completed)
 
     val previousUserAnswers = currentUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")
