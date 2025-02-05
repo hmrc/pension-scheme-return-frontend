@@ -29,7 +29,6 @@ import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 class WhyDoesSchemeHoldBondsControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
-  private val schemeHoldBonds = schemeHoldBondsGen.sample.value
 
   private lazy val onPageLoad =
     routes.WhyDoesSchemeHoldBondsController.onPageLoad(srn, index, NormalMode)

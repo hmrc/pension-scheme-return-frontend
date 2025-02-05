@@ -3342,6 +3342,21 @@ bondsList.view.link = View previous version of bond transactions (opens in new t
 bondsList.view.none = Did {0} hold any unregulated bonds, or bonds acquired from a connected party?
 bondsList.view.none.value = No
 
+bondsCheckAndUpdate.title = Check and update the unregulated bonds, or bonds acquired from a connected party information
+bondsCheckAndUpdate.heading = Check and update the unregulated bonds, or bonds acquired from a connected party information
+bondsCheckAndUpdate.paragraph = You need to add data to the unregulated bond, or bonds acquired from a connected party.
+bondsCheckAndUpdate.table.one = Name of the bonds
+bondsCheckAndUpdate.table.two = Why bonds are held
+bondsCheckAndUpdate.table.three = Total cost of the bonds
+bondsCheckAndUpdate.bullet.paragraph = Missing data could include:
+bondsCheckAndUpdate.bullet.one = if the bonds were acquired from a connected party
+bondsCheckAndUpdate.bullet.two = if the bonds are on the Financial Conduct (FCA) Official List
+bondsCheckAndUpdate.bullet.three = total income from the bonds
+bondsCheckAndUpdate.button = Add missing data
+bondsCheckAndUpdate.Acquisition = Acquisition
+bondsCheckAndUpdate.Transfer = Transfer
+bondsCheckAndUpdate.Contribution = Contribution
+
 bondsDisposalList.title = Start reporting a bond disposal
 bondsDisposalList.heading = Start reporting a bond disposal
 bondsDisposalList.row = {0} {1} with value of £{2}

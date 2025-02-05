@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.bonds
 
-import services.PsrSubmissionService
+import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.bonds._
 import viewmodels.implicits._
 import play.api.mvc._
@@ -34,6 +34,7 @@ import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
 import models._
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage._
 import viewmodels.models._
 
@@ -48,6 +49,7 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   psrSubmissionService: PsrSubmissionService,
+  saveService: SaveService,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -120,18 +122,21 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      psrSubmissionService
-        .submitPsrDetailsWithUA(
-          srn,
-          request.userAnswers,
-          fallbackCall =
-            controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn, index, mode)
-        )
-        .map {
-          case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          case Some(_) =>
-            Redirect(navigator.nextPage(UnregulatedOrConnectedBondsHeldCYAPage(srn), NormalMode, request.userAnswers))
-        }
+      for {
+        updatedAnswers <- request.userAnswers.set(UnregulatedOrConnectedBondsHeldPage(srn), true).mapK
+        _ <- saveService.save(updatedAnswers)
+        result <- psrSubmissionService
+          .submitPsrDetailsWithUA(
+            srn,
+            request.userAnswers,
+            fallbackCall =
+              controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn, index, mode)
+          )
+      } yield result match {
+        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        case Some(_) =>
+          Redirect(navigator.nextPage(UnregulatedOrConnectedBondsHeldCYAPage(srn), NormalMode, request.userAnswers))
+      }
     }
 
   def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =

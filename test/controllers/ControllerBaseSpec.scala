@@ -186,6 +186,7 @@ trait TestValues {
   val otherDetails = "other details"
   val bondsStillHeld = 5
   val nameOfBonds = "name of bonds"
+  val schemeHoldBonds: SchemeHoldBond = schemeHoldBondsGen.sample.value
   val nameOfAsset = "name of asset"
   val otherAssetDescription = "other asset description"
   val fallbackUrl = "fallbackUrl"
