@@ -403,7 +403,7 @@ noNINO.title = Why does the member not have a National Insurance number?
 noNINO.heading = Why does {0} not have a National Insurance number?
 noNINO.error.required = Enter the reason {0} does not have a National Insurance number
 noNINO.error.length = The reason {0} does not have a National Insurance number must be 160 characters or fewer
-noNINO.error.invalid = The reason {0} does not have a National Insurance number must only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
+noNINO.error.invalid = The reason {0} does not have a National Insurance number must not include new lines and only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
 noNINO.upload.error.invalid = Reason member does not have a National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 noNINO.upload.error.length = Reason member does not have a National Insurance number must be 160 characters or fewer
 
@@ -989,7 +989,7 @@ surrenderedBenefits.whatYouWillNeed.paragraph2 = The data you input for surrende
 surrenderedBenefits.whyDidMemberSurrenderBenefits.title = Why did the member surrender their pension benefits?
 surrenderedBenefits.whyDidMemberSurrenderBenefits.heading = Why did {0} surrender their pension benefits of £{2}?
 surrenderedBenefits.whyDidMemberSurrenderBenefits.error.required = Enter the reason the member surrendered these benefits
-surrenderedBenefits.whyDidMemberSurrenderBenefits.error.invalid = The reason the member surrendered these benefits must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
+surrenderedBenefits.whyDidMemberSurrenderBenefits.error.invalid = The reason the member surrendered these benefits must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 surrenderedBenefits.whyDidMemberSurrenderBenefits.error.length = The reason the member surrendered these benefits must be 35 characters or fewer
 
 surrenderedBenefits.memberList.title = Select a member to add surrendered benefits
@@ -1419,7 +1419,7 @@ loanRecipient.companyRecipientCrn.yes.conditional.error.length = CRN must be 8 c
 loanRecipient.companyRecipientCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
 loanRecipient.companyRecipientCrn.no.conditional = Tell us why you cannot provide {0}’s CRN
 loanRecipient.companyRecipientCrn.no.conditional.error.required = Enter the reason you cannot provide the recipient’s CRN
-loanRecipient.companyRecipientCrn.no.conditional.error.invalid = The reason you cannot provide the recipient’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
+loanRecipient.companyRecipientCrn.no.conditional.error.invalid = The reason you cannot provide the recipient’s CRN must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 loanRecipient.companyRecipientCrn.no.conditional.error.length = The reason you cannot provide the recipient’s CRN must be 160 characters or fewer
 loanRecipient.companyRecipientCrn.error.required = Select yes if you know the recipient’s Company Registration Number (CRN)
 
@@ -2146,7 +2146,7 @@ individualBuyerNinoNumber.yes.conditional = What is {0}’s National Insurance n
 individualBuyerNinoNumber.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
 individualBuyerNinoNumber.error.required = Select yes if you know the buyer’s National Insurance number
 individualBuyerNinoNumber.no.conditional.error.required = Enter the reason you cannot provide the buyer’s National Insurance number
-individualBuyerNinoNumber.no.conditional.error.invalid = The reason you cannot provide the buyer’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
+individualBuyerNinoNumber.no.conditional.error.invalid = The reason you cannot provide the buyer’s National Insurance number must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 individualBuyerNinoNumber.no.conditional.error.length = The reason you cannot provide the buyer’s National Insurance number must be 160 characters or fewer
 individualBuyerNinoNumber.yes.conditional.error.required = Enter the buyer’s National Insurance number
 individualBuyerNinoNumber.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
@@ -2322,7 +2322,7 @@ moneyBorrowed.WhenBorrowed.error.after = Date the scheme borrowed this money mus
 moneyBorrowed.WhyBorrowed.title = Why did the scheme borrow this money from the lender?
 moneyBorrowed.WhyBorrowed.heading = Why did {0} borrow £{2} from {1}?
 moneyBorrowed.WhyBorrowed.error.required = Enter the reason why the scheme borrowed this money
-moneyBorrowed.WhyBorrowed.error.invalid = The reason the scheme borrowed this money must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
+moneyBorrowed.WhyBorrowed.error.invalid = The reason the scheme borrowed this money must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 moneyBorrowed.WhyBorrowed.error.length = The reason the scheme borrowed this money must be 160 characters or fewer
 
 valueOfSchemeAssetsWhenMoneyBorrowed.title = What was the total value of the scheme’s assets on the date this money was borrowed, in pounds and pence?
@@ -2451,7 +2451,7 @@ employerCompanyCRN.yes.conditional.error.length = CRN must be 8 characters
 employerCompanyCRN.yes.conditional.error.invalid = CRN must only include letters and numbers
 employerCompanyCRN.no.conditional = Tell us why you cannot provide {0}’s CRN
 employerCompanyCRN.no.conditional.error.required = Enter the reason you cannot provide the employer’s CRN
-employerCompanyCRN.no.conditional.error.invalid = The reason you cannot provide the employer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
+employerCompanyCRN.no.conditional.error.invalid = The reason you cannot provide the employer’s CRN must not include any new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 employerCompanyCRN.no.conditional.error.length = The reason you cannot provide the employer’s CRN must be 160 characters or fewer
 employerCompanyCRN.error.required = Select yes if you know the employer’s Company Registration Number (CRN)
 
@@ -2723,7 +2723,7 @@ transferring.conditional.QROPS.error.required =  Enter the transferring scheme�
 transferring.conditional.QROPS.error.invalid = Enter a QROPS reference number that starts with ‘Q’ then 6 numbers, like Q123456
 transferring.conditional.QROPS.error.length = QROPS reference number must be 7 characters
 transferring.conditional.Other.error.required = Enter a brief description of the transferring scheme
-transferring.conditional.Other.error.invalid = The description of the transferring scheme must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes,speech marks, ampersands, brackets and spaces
+transferring.conditional.Other.error.invalid = The description of the transferring scheme must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes,speech marks, ampersands, brackets and spaces
 transferring.conditional.Other.error.length = The description of the transferring scheme must be 160 characters or fewer
 
 didTransferIncludeAsset.title = Did this transfer for this member include an asset?
@@ -2924,7 +2924,7 @@ sharesCompanyCrn.yes.conditional.error.required = Enter the company’s CRN
 sharesCompanyCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
 sharesCompanyCrn.yes.conditional.error.length = CRN must be 8 characters
 sharesCompanyCrn.no.conditional.error.required = Enter the reason you cannot provide the company’s CRN
-sharesCompanyCrn.no.conditional.error.invalid = The reason you cannot provide the company’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
+sharesCompanyCrn.no.conditional.error.invalid = The reason you cannot provide the company’s CRN must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 sharesCompanyCrn.no.conditional.error.length = The reason you cannot provide the company’s CRN must be 160 characters or fewer
 
 individualNameOfSharesSeller.title = What is the seller’s name?
@@ -3702,7 +3702,7 @@ otherAssetsDisposal.otherBuyerDetails.name.error.required = Enter the buyer’s 
 otherAssetsDisposal.otherBuyerDetails.name.error.invalid = Buyer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 otherAssetsDisposal.otherBuyerDetails.name.error.length = Buyer’s name must be 160 characters or fewer
 otherAssetsDisposal.otherBuyerDetails.description.error.required = Enter a brief description of the buyer
-otherAssetsDisposal.otherBuyerDetails.description.error.invalid = The description of the buyer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
+otherAssetsDisposal.otherBuyerDetails.description.error.invalid = The description of the buyer must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 otherAssetsDisposal.otherBuyerDetails.description.error.length = The description of the buyer must be 35 characters or fewer
 
 otherAssetsDisposal.whatYouWillNeed.title = Other assets disposed of by the scheme

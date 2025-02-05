@@ -95,7 +95,7 @@ class NoNINOController @Inject()(
 }
 
 object NoNINOController {
-  def form(formProvider: TextFormProvider, memberFullName: String): Form[String] = formProvider.textArea(
+  def form(formProvider: TextFormProvider, memberFullName: String): Form[String] = formProvider.textAreaNoNewline(
     "noNINO.error.required",
     "noNINO.error.length",
     "noNINO.error.invalid",

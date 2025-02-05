@@ -150,7 +150,7 @@ object TransferringSchemeTypeController {
         maxNotRelevant
       )
     } else {
-      InputFormErrors.textArea(
+      InputFormErrors.textAreaNoNewline(
         "transferring.conditional.Other.error.required",
         "transferring.conditional.Other.error.invalid",
         "transferring.conditional.Other.error.length"

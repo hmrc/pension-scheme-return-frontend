@@ -92,7 +92,7 @@ class CompanyRecipientCrnController @Inject()(
 
 object CompanyRecipientCrnController {
 
-  private def inputFormErrors(subjectKey: String) = InputFormErrors.textArea(
+  private def inputFormErrors(subjectKey: String) = InputFormErrors.textAreaNoNewline(
     s"$subjectKey.companyRecipientCrn.no.conditional.error.required",
     s"$subjectKey.companyRecipientCrn.no.conditional.error.invalid",
     s"$subjectKey.companyRecipientCrn.no.conditional.error.length"

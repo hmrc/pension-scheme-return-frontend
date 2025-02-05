@@ -66,6 +66,18 @@ object InputFormErrors {
     args: _*
   )
 
+  def textAreaNoNewline(
+    requiredKey: String,
+    invalidCharactersKey: String,
+    maxError: String,
+    args: Any*
+  ): InputFormErrors = InputFormErrors(
+    requiredKey,
+    List((textAreaNoNewlineRegex, invalidCharactersKey)),
+    (maxTextAreaLength, maxError),
+    args: _*
+  )
+
   def postcode(
     requiredKey: String,
     invalidCharactersKey: String,

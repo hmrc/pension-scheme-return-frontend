@@ -116,7 +116,7 @@ class WhySchemeBorrowedMoneyController @Inject()(
 }
 
 object WhySchemeBorrowedMoneyController {
-  def form(formProvider: TextFormProvider): Form[String] = formProvider.textArea(
+  def form(formProvider: TextFormProvider): Form[String] = formProvider.textAreaNoNewline(
     "moneyBorrowed.WhyBorrowed.error.required",
     "moneyBorrowed.WhyBorrowed.error.length",
     "moneyBorrowed.WhyBorrowed.error.invalid"

@@ -21,7 +21,7 @@ import viewmodels.implicits._
 import forms.mappings.Mappings
 import models.PensionSchemeType.PensionSchemeType
 import config.RefinedTypes.{Max300, Max5}
-import config.Constants.{inputRegexPSTR, inputRegexQROPS, maxNotRelevant}
+import config.Constants._
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -150,7 +150,7 @@ object ReceivingSchemeTypeController {
         maxNotRelevant
       )
     } else {
-      InputFormErrors.textArea(
+      InputFormErrors.textAreaNoNewline(
         "transferring.conditional.Other.error.required",
         "transferring.conditional.Other.error.invalid",
         "transferring.conditional.Other.error.length"

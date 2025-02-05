@@ -118,7 +118,7 @@ class WhyDidMemberSurrenderBenefitsController @Inject()(
 }
 
 object WhyDidMemberSurrenderBenefitsController {
-  def form(formProvider: TextFormProvider): Form[String] = formProvider.textAreaShorter(
+  def form(formProvider: TextFormProvider): Form[String] = formProvider.textAreaShorterNoNewline(
     "surrenderedBenefits.whyDidMemberSurrenderBenefits.error.required",
     "surrenderedBenefits.whyDidMemberSurrenderBenefits.error.length",
     "surrenderedBenefits.whyDidMemberSurrenderBenefits.error.invalid"

@@ -99,7 +99,7 @@ class IndividualBuyerNinoNumberController @Inject()(
 
 object IndividualBuyerNinoNumberController {
 
-  private val noFormErrors = InputFormErrors.textArea(
+  private val noFormErrors = InputFormErrors.textAreaNoNewline(
     "individualBuyerNinoNumber.no.conditional.error.required",
     "individualBuyerNinoNumber.no.conditional.error.invalid",
     "individualBuyerNinoNumber.no.conditional.error.length"

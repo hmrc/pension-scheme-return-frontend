@@ -91,7 +91,7 @@ class EmployerCompanyCrnController @Inject()(
 
 object EmployerCompanyCrnController {
 
-  private val noFormErrors = InputFormErrors.textArea(
+  private val noFormErrors = InputFormErrors.textAreaNoNewline(
     "employerCompanyCRN.no.conditional.error.required",
     "employerCompanyCRN.no.conditional.error.invalid",
     "employerCompanyCRN.no.conditional.error.length"
