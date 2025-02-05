@@ -478,6 +478,7 @@ object PsrSubmissionServiceSpec {
   )
   val optMemberPayments: Option[MemberPayments] = Some(
     MemberPayments(
+      checked = None,
       recordVersion = Some("001"),
       memberDetails = List.empty,
       employerContributionMade = Some(true),

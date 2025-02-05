@@ -102,6 +102,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
             optBondsWereDisposed = Some(false),
             bondTransactions = List(
               BondTransactions(
+                prePopulated = None,
                 nameOfBonds = "nameOfBonds",
                 methodOfHolding = Acquisition,
                 optDateOfAcqOrContrib = Some(localDate),
@@ -148,6 +149,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
             optBondsWereDisposed = Some(true),
             bondTransactions = List(
               BondTransactions(
+                prePopulated = None,
                 nameOfBonds = "nameOfBonds",
                 methodOfHolding = Acquisition,
                 optDateOfAcqOrContrib = Some(localDate),
@@ -235,6 +237,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           optBondsWereDisposed = Some(true),
           bondTransactions = Seq(
             BondTransactions(
+              prePopulated = None,
               nameOfBonds = "nameOfBonds",
               methodOfHolding = Contribution,
               optDateOfAcqOrContrib = Some(localDate),

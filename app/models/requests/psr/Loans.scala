@@ -28,6 +28,7 @@ case class Loans(
 )
 
 case class LoanTransactions(
+  prePopulated: Option[Boolean],
   recipientIdentityType: RecipientIdentityType,
   loanRecipientName: String,
   connectedPartyStatus: Boolean,

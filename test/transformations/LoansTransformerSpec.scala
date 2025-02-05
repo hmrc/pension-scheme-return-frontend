@@ -114,6 +114,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
             optSchemeHadLoans = Some(true),
             loanTransactions = List(
               LoanTransactions(
+                prePopulated = None,
                 recipientIdentityType = RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None),
                 loanRecipientName = "IndividualRecipientName",
                 connectedPartyStatus = true,
@@ -166,6 +167,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
             optSchemeHadLoans = Some(true),
             loanTransactions = List(
               LoanTransactions(
+                prePopulated = None,
                 recipientIdentityType = RecipientIdentityType(IdentityType.Individual, None, Some("noNinoReason"), None),
                 loanRecipientName = "IndividualRecipientName",
                 connectedPartyStatus = false,
@@ -221,6 +223,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
             optSchemeHadLoans = Some(true),
             loanTransactions = List(
               LoanTransactions(
+                prePopulated = None,
                 recipientIdentityType = RecipientIdentityType(IdentityType.UKCompany, Some(crn.value), None, None),
                 loanRecipientName = "CompanyRecipientName",
                 connectedPartyStatus = false,
@@ -275,6 +278,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
             optSchemeHadLoans = Some(true),
             loanTransactions = List(
               LoanTransactions(
+                prePopulated = None,
                 recipientIdentityType = RecipientIdentityType(IdentityType.UKCompany, None, Some("noCrnReason"), None),
                 loanRecipientName = "CompanyRecipientName",
                 connectedPartyStatus = false,
@@ -330,6 +334,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
             optSchemeHadLoans = Some(true),
             loanTransactions = List(
               LoanTransactions(
+                prePopulated = None,
                 recipientIdentityType = RecipientIdentityType(IdentityType.UKPartnership, Some(utr.value), None, None),
                 loanRecipientName = "PartnershipRecipientName",
                 connectedPartyStatus = true,
@@ -385,6 +390,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
             optSchemeHadLoans = Some(true),
             loanTransactions = List(
               LoanTransactions(
+                prePopulated = None,
                 recipientIdentityType =
                   RecipientIdentityType(IdentityType.UKPartnership, None, Some("noUtrReason"), None),
                 loanRecipientName = "PartnershipRecipientName",
@@ -440,6 +446,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
             optSchemeHadLoans = Some(true),
             loanTransactions = List(
               LoanTransactions(
+                prePopulated = None,
                 recipientIdentityType = RecipientIdentityType(IdentityType.Other, None, None, Some("otherDescription")),
                 loanRecipientName = "OtherRecipientDetailsName",
                 connectedPartyStatus = false,
@@ -490,6 +497,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
             optSchemeHadLoans = None,
             loanTransactions = List(
               LoanTransactions(
+                prePopulated = None,
                 recipientIdentityType = RecipientIdentityType(IdentityType.Other, None, None, Some("otherDescription")),
                 loanRecipientName = "OtherRecipientDetailsName",
                 connectedPartyStatus = false,
@@ -826,6 +834,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         optSchemeHadLoans = optSchemeHadLoans,
         Seq(
           LoanTransactions(
+            prePopulated = None,
             recipientIdentityType = recipientIdentityType,
             loanRecipientName = name,
             connectedPartyStatus = true,

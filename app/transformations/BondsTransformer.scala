@@ -93,6 +93,7 @@ class BondsTransformer @Inject() extends Transformer {
               val optTotalIncomeOrReceipts = request.userAnswers.get(IncomeFromBondsPage(srn, index))
 
               BondTransactions(
+                prePopulated = None,
                 nameOfBonds = nameOfBonds,
                 methodOfHolding = methodOfHolding,
                 optDateOfAcqOrContrib = dateOfAcqOrContrib,

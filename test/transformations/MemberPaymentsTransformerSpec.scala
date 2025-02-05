@@ -89,6 +89,7 @@ class MemberPaymentsTransformerSpec
 
   // Test data: all sections of Member Payments have payments made
   private val activeMemberAllSections = MemberDetails(
+    prePopulated = None,
     state = MemberState.New,
     memberPSRVersion = Some("001"),
     personalDetails = MemberPersonalDetails(
@@ -136,6 +137,7 @@ class MemberPaymentsTransformerSpec
   private val deletedMemberAllSections = activeMemberAllSections.copy(state = MemberState.Deleted)
 
   private val memberPaymentsAllSections = MemberPayments(
+    checked = None,
     recordVersion = Some("001"),
     memberDetails = List(
       activeMemberAllSections,
@@ -266,6 +268,7 @@ class MemberPaymentsTransformerSpec
 
   // Test data: no sections of Member Payments have payments made
   private val activeMemberNoSections = MemberDetails(
+    prePopulated = None,
     state = MemberState.New,
     memberPSRVersion = Some("001"),
     personalDetails = MemberPersonalDetails(
@@ -285,6 +288,7 @@ class MemberPaymentsTransformerSpec
   )
 
   private val activeMemberNoSectionsIndex2 = MemberDetails(
+    prePopulated = None,
     state = MemberState.New,
     memberPSRVersion = Some("001"),
     personalDetails = MemberPersonalDetails(
@@ -305,6 +309,7 @@ class MemberPaymentsTransformerSpec
   private val deletedMemberNoSections = activeMemberNoSections.copy(state = MemberState.Deleted)
 
   private val memberPaymentsNoSections = MemberPayments(
+    checked = None,
     recordVersion = Some("001"),
     memberDetails = List(
       activeMemberNoSections,
@@ -322,6 +327,7 @@ class MemberPaymentsTransformerSpec
   )
 
   private val emptyMemberPayments = MemberPayments(
+    checked = None,
     recordVersion = None,
     memberDetails = Nil,
     employerContributionMade = None,

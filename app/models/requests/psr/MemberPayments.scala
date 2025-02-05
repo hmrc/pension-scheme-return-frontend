@@ -24,6 +24,7 @@ import viewmodels.models.MemberState
 import java.time.LocalDate
 
 case class MemberPayments(
+  checked: Option[Boolean],
   recordVersion: Option[String],
   memberDetails: List[MemberDetails],
   employerContributionMade: Option[Boolean],
@@ -38,6 +39,7 @@ case class MemberPayments(
 )
 
 case class MemberDetails(
+  prePopulated: Option[Boolean],
   state: MemberState,
   memberPSRVersion: Option[String],
   personalDetails: MemberPersonalDetails,

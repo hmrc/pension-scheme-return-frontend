@@ -409,6 +409,7 @@ object PsrRetrievalServiceSpec {
   )
 
   val memberPayments: MemberPayments = MemberPayments(
+    checked = None,
     Some("001"),
     memberDetails = List.empty,
     employerContributionMade = Some(true),

@@ -89,6 +89,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
               val optTotalIncomeOrReceipts = request.userAnswers.get(IncomeFromAssetPage(srn, index))
 
               OtherAssetTransaction(
+                prePopulated = None,
                 assetDescription = assetDescription,
                 methodOfHolding = methodOfHolding,
                 optDateOfAcqOrContrib = optNoneTransferRelatedDetails.map(_._2),

@@ -36,6 +36,7 @@ case class LandOrProperty(
 )
 
 case class LandOrPropertyTransactions(
+  prePopulated: Option[Boolean],
   propertyDetails: PropertyDetails,
   heldPropertyTransaction: HeldPropertyTransaction,
   optDisposedPropertyTransaction: Option[Seq[DisposedPropertyTransaction]]
@@ -101,6 +102,7 @@ case class Bonds(
 )
 
 case class BondTransactions(
+  prePopulated: Option[Boolean],
   nameOfBonds: String,
   methodOfHolding: SchemeHoldBond,
   optDateOfAcqOrContrib: Option[LocalDate],
@@ -129,6 +131,7 @@ case class OtherAssets(
 )
 
 case class OtherAssetTransaction(
+  prePopulated: Option[Boolean],
   assetDescription: String,
   methodOfHolding: SchemeHoldAsset,
   optDateOfAcqOrContrib: Option[LocalDate],
