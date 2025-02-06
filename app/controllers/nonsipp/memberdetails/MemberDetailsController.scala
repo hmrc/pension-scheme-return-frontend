@@ -32,6 +32,7 @@ import views.html.NameDOBView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, NameDOBViewModel}
 import models.requests.DataRequest
@@ -73,12 +74,14 @@ class MemberDetailsController @Inject()(
             Future.successful(
               BadRequest(view(formWithErrors, viewModel(srn, index, mode)))
             ),
-          answer => {
+          value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(MemberDetailsPage(srn, index), answer))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(MemberDetailsPage(srn, index), mode, updatedAnswers))
-          }
+              updatedAnswers <- request.userAnswers.set(MemberDetailsPage(srn, index), value).mapK
+              nextPage = navigator.nextPage(MemberDetailsPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
+
         )
   }
 

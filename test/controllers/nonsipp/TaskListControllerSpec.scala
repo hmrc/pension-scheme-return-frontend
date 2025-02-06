@@ -522,6 +522,14 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
         "DoesMemberHaveNinoPage is missing" in {
           val userAnswers = defaultUserAnswers
             .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
+            .unsafeSet(
+              MemberDetailsManualProgress(srn, refineMV(1)),
+              SectionJourneyStatus.InProgress(
+                controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
+                  .onPageLoad(srn, refineMV(1), NormalMode)
+                  .url
+              )
+            )
 
           testViewModel(
             userAnswers,
@@ -540,6 +548,14 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
           val userAnswers = defaultUserAnswers
             .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
             .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
+            .unsafeSet(
+              MemberDetailsManualProgress(srn, refineMV(1)),
+              SectionJourneyStatus.InProgress(
+                controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
+                  .onPageLoad(srn, refineMV(1), NormalMode)
+                  .url
+              )
+            )
 
           testViewModel(
             userAnswers,
@@ -558,6 +574,14 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
           val userAnswers = defaultUserAnswers
             .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
             .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
+            .unsafeSet(
+              MemberDetailsManualProgress(srn, refineMV(1)),
+              SectionJourneyStatus.InProgress(
+                controllers.nonsipp.memberdetails.routes.NoNINOController
+                  .onPageLoad(srn, refineMV(1), NormalMode)
+                  .url
+              )
+            )
 
           testViewModel(
             userAnswers,
@@ -614,6 +638,65 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
               .url
           )
         }
+
+        "with inProgressUrl with one member recorded and one in inProgress" in {
+          val userAnswers = defaultUserAnswers
+          // member Index One
+            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
+            .unsafeSet(NoNINOPage(srn, refineMV(1)), reason)
+            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+            // member Index Two
+            .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(2)), false)
+            .unsafeSet(
+              MemberDetailsManualProgress(srn, refineMV(2)),
+              SectionJourneyStatus.InProgress(
+                controllers.nonsipp.memberdetails.routes.NoNINOController
+                  .onPageLoad(srn, refineMV(2), NormalMode)
+                  .url
+              )
+            )
+
+          testViewModel(
+            userAnswers,
+            1,
+            0,
+            expectedStatus = TaskListStatus.Recorded(1, "members"),
+            expectedTitleKey = "nonsipp.tasklist.members.title",
+            expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.NoNINOController
+              .onPageLoad(srn, refineMV(2), NormalMode)
+              .url
+          )
+        }
+
+        "with listPageUrl with two members recorded and none inProgress" in {
+          val userAnswers = defaultUserAnswers
+          // member Index One
+            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
+            .unsafeSet(NoNINOPage(srn, refineMV(1)), reason)
+            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
+            // member Index Two
+            .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(2)), true)
+            .unsafeSet(MemberDetailsNinoPage(srn, refineMV(2)), nino)
+            .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(2)), SectionCompleted)
+
+          testViewModel(
+            userAnswers,
+            1,
+            0,
+            expectedStatus = TaskListStatus.Recorded(2, "members"),
+            expectedTitleKey = "nonsipp.tasklist.members.title",
+            expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+              .onPageLoad(srn, 1, ManualOrUpload.Manual)
+              .url
+          )
+        }
+
       }
     }
 

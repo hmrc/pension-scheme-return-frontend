@@ -24,13 +24,14 @@ import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
 import models.{Mode, NameDOB}
-import viewmodels.models.{FormPageViewModel, TextAreaViewModel}
 import controllers.nonsipp.memberdetails.NoNINOController._
 import config.RefinedTypes.Max300
 import views.html.TextAreaView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
+import viewmodels.models.{FormPageViewModel, TextAreaViewModel}
 import models.requests.DataRequest
 import play.api.data.Form
 
@@ -73,9 +74,14 @@ class NoNINOController @Inject()(
               Future.successful(BadRequest(view(formWithErrors, viewModel(srn, memberDetails.fullName, index, mode)))),
             value =>
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(NoNINOPage(srn, index), value))
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(NoNINOPage(srn, index), mode, updatedAnswers))
+                updatedAnswers <- request.userAnswers
+                  .set(NoNINOPage(srn, index), value)
+                  .mapK
+                nextPage = navigator.nextPage(NoNINOPage(srn, index), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(nextPage)
+
           )
       }
   }

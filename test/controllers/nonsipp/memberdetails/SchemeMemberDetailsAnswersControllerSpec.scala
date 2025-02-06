@@ -132,6 +132,14 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
       )
 
       act.like(
+        redirectNextPage(onSubmit(mode))
+          .after(
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+          )
+          .withName(s"verify POST and redirect to next page when in $mode mode")
+      )
+
+      act.like(
         redirectToPage(
           onPageLoad(mode),
           controllers.routes.JourneyRecoveryController.onPageLoad(),

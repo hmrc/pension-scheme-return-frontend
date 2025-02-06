@@ -20,7 +20,7 @@ import pages.nonsipp.employercontributions.{EmployerContributionsCompleted, Empl
 import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalPage, OtherAssetsDisposalProgress}
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
-import config.RefinedTypes.{OneTo300, OneTo5000}
+import config.RefinedTypes.OneTo5000
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInSectionCompleted}
@@ -90,36 +90,21 @@ object TaskListStatusUtils {
         .onPageLoad(srn, 1, ManualOrUpload.Manual)
         .url
 
-    val inProgressCalculatedUrl = refineV[OneTo300](getIncompleteMembersIndex(userAnswers, srn)).fold(
-      _ => firstQuestionPageUrl,
-      index => {
-        val doesMemberHaveNino = userAnswers.get(DoesMemberHaveNinoPage(srn, index))
-        val reasonNoNino = userAnswers.get(NoNINOPage(srn, index))
-        if (doesMemberHaveNino.isEmpty) {
-          controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
-            .onPageLoad(srn, index, NormalMode)
-            .url
-        } else if (doesMemberHaveNino.getOrElse(false)) {
-          controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
-            .onPageLoad(srn, index, NormalMode)
-            .url
-        } else if (reasonNoNino.isEmpty) {
-          controllers.nonsipp.memberdetails.routes.NoNINOController
-            .onPageLoad(srn, index, NormalMode)
-            .url
-        } else {
-          controllers.nonsipp.memberdetails.routes.SchemeMemberDetailsAnswersController
-            .onPageLoad(srn, index, NormalMode)
-            .url
-        }
-      }
-    )
+    val getInProgressUrl = userAnswers
+      .map(MemberDetailsManualProgress.all(srn))
+      .collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+      .getOrElse(firstQuestionPageUrl)
+
+    val getInProgressOrListPageUrl = userAnswers
+      .map(MemberDetailsManualProgress.all(srn))
+      .collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+      .getOrElse(listPageUrl)
 
     (membersDetailsPages, numRecorded) match {
       case (None, 0) => (NotStarted, firstQuestionPageUrl)
       case (Some(memberDetails), 0) if memberDetails.isEmpty => (NotStarted, firstQuestionPageUrl) //Last member removed
-      case (Some(_), 0) => (InProgress, inProgressCalculatedUrl)
-      case (Some(_), _) => (Recorded(numRecorded, "members"), listPageUrl)
+      case (Some(_), 0) => (InProgress, getInProgressUrl)
+      case (Some(_), _) => (Recorded(numRecorded, "members"), getInProgressOrListPageUrl)
     }
   }
 

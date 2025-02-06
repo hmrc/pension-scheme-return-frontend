@@ -18,7 +18,7 @@ package controllers.nonsipp.memberdetails
 
 import utils.RefinedUtils.RefinedIntOps
 import services.SaveService
-import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsNinoPages, MemberDetailsPage}
+import pages.nonsipp.memberdetails._
 import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -33,6 +33,7 @@ import navigation.Navigator
 import uk.gov.hmrc.domain.Nino
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, TextInputViewModel}
 import models.requests.DataRequest
@@ -81,12 +82,16 @@ class MemberDetailsNinoController @Inject()(
               Future.successful(
                 BadRequest(view(formWithErrors, viewModel(srn, index, mode, details.fullName)))
               ),
-            answer => {
+            value =>
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(MemberDetailsNinoPage(srn, index), answer))
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(MemberDetailsNinoPage(srn, index), mode, updatedAnswers))
-            }
+                updatedAnswers <- request.userAnswers
+                  .set(MemberDetailsNinoPage(srn, index), value)
+                  .mapK
+                nextPage = navigator.nextPage(MemberDetailsNinoPage(srn, index), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(nextPage)
+
           )
       }
   }

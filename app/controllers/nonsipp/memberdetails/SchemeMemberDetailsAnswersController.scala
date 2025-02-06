@@ -142,16 +142,16 @@ class SchemeMemberDetailsAnswersController @Inject()(
           .setWhen(justAdded)(SafeToHardDelete(srn, index), Flag)
           .set(MemberDetailsCompletedPage(srn, index), SectionCompleted)
           .mapK[Future]
-        _ <- saveService.save(updatedUserAnswers)
+        nextPage = navigator.nextPage(SchemeMemberDetailsAnswersPage(srn), NormalMode, request.userAnswers)
+        updatedProgressAnswers <- saveProgress(srn, index, updatedUserAnswers, nextPage, alwaysCompleted = true)
+        _ <- saveService.save(updatedProgressAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
           srn,
-          updatedUserAnswers,
+          updatedProgressAnswers,
           fallbackCall = controllers.nonsipp.memberdetails.routes.SchemeMemberDetailsAnswersController
             .onPageLoad(srn, index, mode)
         )
-      } yield submissionResult.fold(
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      )(_ => Redirect(navigator.nextPage(SchemeMemberDetailsAnswersPage(srn), NormalMode, request.userAnswers)))
+      } yield submissionResult.getOrRecoverJourney(_ => Redirect(nextPage))
     }
 
   def onSubmitViewOnly(srn: Srn, page: Int, year: String, current: Int, previous: Int): Action[AnyContent] =
