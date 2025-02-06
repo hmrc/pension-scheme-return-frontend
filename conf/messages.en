@@ -403,7 +403,7 @@ noNINO.title = Why does the member not have a National Insurance number?
 noNINO.heading = Why does {0} not have a National Insurance number?
 noNINO.error.required = Enter the reason {0} does not have a National Insurance number
 noNINO.error.length = The reason {0} does not have a National Insurance number must be 160 characters or fewer
-noNINO.error.invalid = The reason {0} does not have a National Insurance number must not include new lines and only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
+noNINO.error.invalid = The reason {0} does not have a National Insurance number must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 noNINO.upload.error.invalid = Reason member does not have a National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 noNINO.upload.error.length = Reason member does not have a National Insurance number must be 160 characters or fewer
 
@@ -2451,7 +2451,7 @@ employerCompanyCRN.yes.conditional.error.length = CRN must be 8 characters
 employerCompanyCRN.yes.conditional.error.invalid = CRN must only include letters and numbers
 employerCompanyCRN.no.conditional = Tell us why you cannot provide {0}’s CRN
 employerCompanyCRN.no.conditional.error.required = Enter the reason you cannot provide the employer’s CRN
-employerCompanyCRN.no.conditional.error.invalid = The reason you cannot provide the employer’s CRN must not include any new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
+employerCompanyCRN.no.conditional.error.invalid = The reason you cannot provide the employer’s CRN must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 employerCompanyCRN.no.conditional.error.length = The reason you cannot provide the employer’s CRN must be 160 characters or fewer
 employerCompanyCRN.error.required = Select yes if you know the employer’s Company Registration Number (CRN)
 
