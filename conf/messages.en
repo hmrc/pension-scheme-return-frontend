@@ -2407,7 +2407,7 @@ otherEmployeeDescription.title = Provide a brief description of the employer
 otherEmployeeDescription.heading = Provide a brief description of {0}
 otherEmployeeDescription.error.required = Provide a brief description of the employer
 otherEmployeeDescription.error.length = The brief description of the employer must be 35 characters or fewer
-otherEmployeeDescription.error.invalid = The brief description of employer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
+otherEmployeeDescription.error.invalid = The brief description of employer must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 partnershipEmployerUtr.title = Do you know the employer’s Unique Taxpayer Reference (UTR)?
 partnershipEmployerUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
