@@ -181,6 +181,7 @@ class LoansTransformer @Inject() extends Transformer {
                         }
                       } yield {
                         LoanTransactions(
+                          prePopulated = None,
                           recipientIdentityType,
                           recipientName,
                           connectedParty,

@@ -123,6 +123,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
             optShareTransactions = Some(
               List(
                 ShareTransaction(
+                  prePopulated = None,
                   typeOfSharesHeld = Unquoted,
                   shareIdentification = ShareIdentification(
                     nameOfSharesCompany = "nameOfSharesCompany",
@@ -190,6 +191,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
             optShareTransactions = Some(
               List(
                 ShareTransaction(
+                  prePopulated = None,
                   typeOfSharesHeld = Unquoted,
                   shareIdentification = ShareIdentification(
                     nameOfSharesCompany = "nameOfSharesCompany",
@@ -250,6 +252,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           optShareTransactions = Some(
             List(
               ShareTransaction(
+                prePopulated = None,
                 typeOfSharesHeld = SponsoringEmployer,
                 shareIdentification = ShareIdentification(
                   nameOfSharesCompany = "nameOfSharesCompany",
@@ -311,6 +314,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
                 )
               ),
               ShareTransaction(
+                prePopulated = None,
                 typeOfSharesHeld = TypeOfShares.Unquoted,
                 shareIdentification = ShareIdentification(
                   nameOfSharesCompany = "nameOfSharesCompany",
@@ -350,6 +354,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
                 )
               ),
               ShareTransaction(
+                prePopulated = None,
                 typeOfSharesHeld = TypeOfShares.ConnectedParty,
                 shareIdentification = ShareIdentification(
                   nameOfSharesCompany = "nameOfSharesCompany",
@@ -492,6 +497,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           optShareTransactions = Some(
             List(
               ShareTransaction(
+                prePopulated = None,
                 typeOfSharesHeld = SponsoringEmployer,
                 shareIdentification = ShareIdentification(
                   nameOfSharesCompany = "nameOfSharesCompany",
@@ -515,6 +521,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
                 optDisposedSharesTransaction = None
               ),
               ShareTransaction(
+                prePopulated = None,
                 typeOfSharesHeld = TypeOfShares.Unquoted,
                 shareIdentification = ShareIdentification(
                   nameOfSharesCompany = "nameOfSharesCompany",
@@ -537,6 +544,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
                 optDisposedSharesTransaction = None
               ),
               ShareTransaction(
+                prePopulated = None,
                 typeOfSharesHeld = TypeOfShares.ConnectedParty,
                 shareIdentification = ShareIdentification(
                   nameOfSharesCompany = "nameOfSharesCompany",

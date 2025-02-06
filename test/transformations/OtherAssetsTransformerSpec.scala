@@ -130,6 +130,7 @@ class OtherAssetsTransformerSpec
             optOtherAssetsWereDisposed = Some(false),
             otherAssetTransactions = Seq(
               OtherAssetTransaction(
+                prePopulated = None,
                 assetDescription = "assetDescription",
                 methodOfHolding = Acquisition,
                 optDateOfAcqOrContrib = Some(localDate),
@@ -150,6 +151,7 @@ class OtherAssetsTransformerSpec
                 optOtherAssetDisposed = None
               ),
               OtherAssetTransaction(
+                prePopulated = None,
                 assetDescription = "assetDescription",
                 methodOfHolding = Contribution,
                 optDateOfAcqOrContrib = Some(localDate),
@@ -163,6 +165,7 @@ class OtherAssetsTransformerSpec
                 optOtherAssetDisposed = None
               ),
               OtherAssetTransaction(
+                prePopulated = None,
                 assetDescription = "assetDescription",
                 methodOfHolding = Transfer,
                 optDateOfAcqOrContrib = None,
@@ -246,6 +249,7 @@ class OtherAssetsTransformerSpec
             optOtherAssetsWereDisposed = Some(true),
             otherAssetTransactions = Seq(
               OtherAssetTransaction(
+                prePopulated = None,
                 assetDescription = "assetDescription",
                 methodOfHolding = Acquisition,
                 optDateOfAcqOrContrib = Some(localDate),
@@ -287,6 +291,7 @@ class OtherAssetsTransformerSpec
                 )
               ),
               OtherAssetTransaction(
+                prePopulated = None,
                 assetDescription = "assetDescription",
                 methodOfHolding = Contribution,
                 optDateOfAcqOrContrib = Some(localDate),
@@ -314,6 +319,7 @@ class OtherAssetsTransformerSpec
                 )
               ),
               OtherAssetTransaction(
+                prePopulated = None,
                 assetDescription = "assetDescription",
                 methodOfHolding = Transfer,
                 optDateOfAcqOrContrib = None,
@@ -380,6 +386,7 @@ class OtherAssetsTransformerSpec
           optOtherAssetsWereDisposed = Some(true),
           otherAssetTransactions = Seq(
             OtherAssetTransaction(
+              prePopulated = None,
               assetDescription = "assetDescription",
               methodOfHolding = Acquisition,
               optDateOfAcqOrContrib = Some(localDate),
@@ -421,6 +428,7 @@ class OtherAssetsTransformerSpec
               )
             ),
             OtherAssetTransaction(
+              prePopulated = None,
               assetDescription = "assetDescription",
               methodOfHolding = Contribution,
               optDateOfAcqOrContrib = Some(localDate),
@@ -448,6 +456,7 @@ class OtherAssetsTransformerSpec
               )
             ),
             OtherAssetTransaction(
+              prePopulated = None,
               assetDescription = "assetDescription",
               methodOfHolding = Transfer,
               optDateOfAcqOrContrib = None,

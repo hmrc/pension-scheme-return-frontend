@@ -40,7 +40,6 @@ import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAm
 import eu.timepit.refined.refineV
 import viewmodels.models.TaskListStatus._
 import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
-import pages.nonsipp.common.IdentityTypes
 import utils.nonsipp.check._
 import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutSectionCompleted}
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}

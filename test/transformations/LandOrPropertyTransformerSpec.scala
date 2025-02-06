@@ -582,6 +582,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
       optDisposeAnyLandOrProperty = Some(true),
       landOrPropertyTransactions = Seq(
         LandOrPropertyTransactions(
+          prePopulated = None,
           propertyDetails = PropertyDetails(
             landOrPropertyInUK = true,
             addressDetails = address,

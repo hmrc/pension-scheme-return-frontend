@@ -116,6 +116,7 @@ class SharesTransformer @Inject() extends Transformer {
                   val optAcquisitionRelatedDetails = buildOptAcquisitionRelatedDetails(schemeHoldShare, srn, index)
 
                   ShareTransaction(
+                    prePopulated = None,
                     typeOfSharesHeld = typeOfSharesHeld,
                     shareIdentification = ShareIdentification(
                       nameOfSharesCompany = nameOfSharesCompany,

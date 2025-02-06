@@ -92,6 +92,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
               val optAcquisitionRelatedDetails = buildOptAcquisitionRelatedDetails(methodOfHolding, srn, index)
 
               LandOrPropertyTransactions(
+                prePopulated = None,
                 propertyDetails = PropertyDetails(
                   landOrPropertyInUK = landOrPropertyInUK,
                   addressDetails = addressDetails,

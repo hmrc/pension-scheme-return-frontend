@@ -73,6 +73,7 @@ class MemberPaymentsTransformer @Inject()(
       val softDeletedMembers: List[MemberDetails] = userAnswers.get(SoftDeletedMembers(srn)).toList.flatten.map {
         softDeletedMember =>
           MemberDetails(
+            prePopulated = None,
             state = MemberState.Deleted,
             memberPSRVersion = softDeletedMember.memberPSRVersion,
             personalDetails = softDeletedMember.memberDetails.copy(
@@ -190,6 +191,7 @@ class MemberPaymentsTransformer @Inject()(
           }
           Some(
             MemberPayments(
+              checked = None,
               recordVersion = Option
                 .when(sameMemberPayments)(
                   userAnswers.get(MemberPaymentsRecordVersionPage(srn))
@@ -233,6 +235,7 @@ class MemberPaymentsTransformer @Inject()(
               .toRight(s"MemberStatus not found for member $index")
           } yield {
             index -> MemberDetails(
+              prePopulated = None,
               state = memberState,
               memberPSRVersion = userAnswers.get(MemberPsrVersionPage(srn, index)),
               personalDetails = buildMemberPersonalDetails(srn, index, memberDetails, userAnswers),
@@ -439,7 +442,7 @@ class MemberPaymentsTransformer @Inject()(
           val (membersWithNoVersions, membersWithVersions): (List[Max300], List[(Max300, String)]) =
             currentMemberDetails.toList.partitionMap {
               case (index, memberDetails) if memberDetails.memberPSRVersion.isEmpty => Left(index)
-              case (index, MemberDetails(_, Some(version), _, _, _, _, _, _, _, _)) => Right(index -> version)
+              case (index, MemberDetails(None, _, Some(version), _, _, _, _, _, _, _, _)) => Right(index -> version)
             }
 
           val versionedMembersWithETMPStatus = membersWithVersions.map {

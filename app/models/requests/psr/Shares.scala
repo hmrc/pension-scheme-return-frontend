@@ -29,6 +29,7 @@ case class Shares(
 )
 
 case class ShareTransaction(
+  prePopulated: Option[Boolean],
   typeOfSharesHeld: TypeOfShares,
   shareIdentification: ShareIdentification,
   heldSharesTransaction: HeldSharesTransaction,
