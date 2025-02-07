@@ -47,6 +47,18 @@ object ListRow {
     check = None
   )
 
+  def apply(
+    text: DisplayMessage,
+    changeUrl: String,
+    changeHiddenText: Message
+  ): ListRow = ListRow(
+    text,
+    change = Some(ListRowLink(changeUrl, changeHiddenText)),
+    remove = None,
+    view = None,
+    check = None
+  )
+
   def view(text: DisplayMessage, url: String, hiddenText: Message): ListRow =
     ListRow(
       text,

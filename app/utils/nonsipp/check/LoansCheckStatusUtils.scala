@@ -16,8 +16,6 @@
 
 package utils.nonsipp.check
 
-import models.ConditionalYesNo._
-import models.IdentityType._
 import config.RefinedTypes.{Max5000, OneTo5000}
 import models.SchemeId.Srn
 import eu.timepit.refined.refineV
@@ -60,8 +58,8 @@ object LoansCheckStatusUtils {
   }
 
   /**
-   * This method determines whether or not a Loans record needs to be checked. A record needs checking if any of the
-   * pre-populated-then-cleared answers are missing & all of the other answers are present.
+   * This method determines whether or not a Loans record needs to be checked. A record only needs to be checked if its
+   * LoanPrePopulated field is false.
    * @param userAnswers the answers provided by the user, from which we get the Loans record
    * @param srn the Scheme Reference Number, used for the .get calls
    * @param recordIndex the index of the record being checked
@@ -71,84 +69,9 @@ object LoansCheckStatusUtils {
     userAnswers: UserAnswers,
     srn: Srn,
     recordIndex: Max5000
-  ): Boolean = {
-    val anyPrePopClearedAnswersMissing: Boolean = (
-      userAnswers.get(AmountOfTheLoanPage(srn, recordIndex)),
-      userAnswers.get(InterestOnLoanPage(srn, recordIndex)),
-      userAnswers.get(ArrearsPrevYears(srn, recordIndex)),
-      userAnswers.get(OutstandingArrearsOnLoanPage(srn, recordIndex))
-    ) match {
-      case (Some(amountOfTheLoan), Some(interestOnLoan), Some(_), Some(_)) =>
-        amountOfTheLoan.hasMissingAnswers || interestOnLoan.hasMissingAnswer
-      case (_, _, _, _) => true
-    }
-
-    lazy val allOtherAnswersPresent: Boolean = (
-      userAnswers.get(IdentityTypePage(srn, recordIndex, LoanRecipient)),
-      userAnswers.get(DatePeriodLoanPage(srn, recordIndex)),
-      userAnswers.get(AmountOfTheLoanPage(srn, recordIndex)),
-      userAnswers.get(AreRepaymentsInstalmentsPage(srn, recordIndex)),
-      userAnswers.get(InterestOnLoanPage(srn, recordIndex)),
-      userAnswers.get(SecurityGivenForLoanPage(srn, recordIndex))
-    ) match {
-      case (Some(identityType), Some(_), Some(amountOfTheLoan), Some(_), Some(interestOnLoan), Some(_)) =>
-        identitySubjectAnswersPresent(userAnswers, srn, recordIndex, identityType)
-      case (_, _, _, _, _, _) =>
-        false
-    }
-
-    anyPrePopClearedAnswersMissing && allOtherAnswersPresent
-  }
-
-  /**
-   * This method determines whether or not all answers are present for a given IdentityType.
-   * @param userAnswers the answers provided by the user
-   * @param srn the Scheme Reference Number, used for the .get calls
-   * @param recordIndex the index of the record being checked
-   * @param identityType relates to the seller involved: Individual, UKCompany, UKPartnership, or Other
-   * @return true if all answers are present, else false
-   */
-  private def identitySubjectAnswersPresent(
-    userAnswers: UserAnswers,
-    srn: Srn,
-    recordIndex: Max5000,
-    identityType: IdentityType
   ): Boolean =
-    identityType match {
-      case Individual =>
-        (
-          userAnswers.get(IndividualRecipientNamePage(srn, recordIndex)),
-          userAnswers.get(IndividualRecipientNinoPage(srn, recordIndex)),
-          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, recordIndex))
-        ) match {
-          case (Some(_), Some(_), Some(_)) => true
-          case (_, _, _) => false
-        }
-      case UKCompany =>
-        (
-          userAnswers.get(CompanyRecipientNamePage(srn, recordIndex)),
-          userAnswers.get(CompanyRecipientCrnPage(srn, recordIndex, LoanRecipient)),
-          userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, recordIndex))
-        ) match {
-          case (Some(_), Some(_), Some(_)) => true
-          case (_, _, _) => false
-        }
-      case UKPartnership =>
-        (
-          userAnswers.get(PartnershipRecipientNamePage(srn, recordIndex)),
-          userAnswers.get(PartnershipRecipientUtrPage(srn, recordIndex, LoanRecipient)),
-          userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, recordIndex))
-        ) match {
-          case (Some(_), Some(_), Some(_)) => true
-          case (_, _, _) => false
-        }
-      case Other =>
-        (
-          userAnswers.get(OtherRecipientDetailsPage(srn, recordIndex, LoanRecipient)),
-          userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, recordIndex))
-        ) match {
-          case (Some(_), Some(_)) => true
-          case (_, _) => false
-        }
+    userAnswers.get(LoanPrePopulated(srn, recordIndex)) match {
+      case Some(checked) => !checked
+      case None => false // non-pre-pop
     }
 }

@@ -163,11 +163,14 @@ class LoansCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      val prePopulated = request.userAnswers.get(LoanPrePopulated(srn, index))
+
       for {
         updatedAnswers <- Future.fromTry(
           request.userAnswers
             .set(LoansMadeOrOutstandingPage(srn), true)
             .set(LoanCompleted(srn, index), SectionCompleted)
+            .setWhen(prePopulated.isDefined)(LoanPrePopulated(srn, index), true)
         )
         _ <- saveService.save(updatedAnswers)
         redirectTo <- psrSubmissionService
