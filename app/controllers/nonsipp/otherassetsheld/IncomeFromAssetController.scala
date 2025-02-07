@@ -20,7 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.otherassetsheld.{IncomeFromAssetPage, OtherAssetsCompleted}
+import pages.nonsipp.otherassetsheld.IncomeFromAssetPage
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
 import controllers.actions._
@@ -36,7 +36,7 @@ import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.{Empty, Message}
-import viewmodels.models.{FormPageViewModel, QuestionField, SectionCompleted}
+import viewmodels.models.{FormPageViewModel, QuestionField}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -86,7 +86,6 @@ class IncomeFromAssetController @Inject()(
                 .fromTry(
                   request.userAnswers
                     .set(IncomeFromAssetPage(srn, index), answer)
-                    .set(OtherAssetsCompleted(srn, index), SectionCompleted)
                 )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(navigator.nextPage(IncomeFromAssetPage(srn, index), mode, updatedAnswers))

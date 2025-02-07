@@ -750,7 +750,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
     "should be Not Started" - {
       "when default data" in {
-        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(defaultUserAnswers, srn)
+        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(defaultUserAnswers, srn, isPrePop = false)
         result mustBe (NotStarted, firstQuestionPageUrl)
       }
     }
@@ -759,7 +759,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when OtherAssetsHeldPage is false" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(OtherAssetsHeldPage(srn), false)
-        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(0, ""), firstQuestionPageUrl)
       }
 
@@ -771,7 +771,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           // second asset:
           .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "asset two")
           .unsafeSet(OtherAssetsCompleted(srn, refineMV(2)), SectionCompleted)
-        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "otherAssets"), listPageUrl)
       }
 
@@ -783,7 +783,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
           // second asset:
           .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "asset two")
-        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "otherAssets"), listPageUrl)
       }
     }
@@ -792,7 +792,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when only OtherAssetsHeldPage is true" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(OtherAssetsHeldPage(srn), true)
-        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, firstQuestionPageUrl)
       }
 
@@ -800,7 +800,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(OtherAssetsHeldPage(srn), true)
           .unsafeSet(WhatIsOtherAssetPage(srn, index1of5000), otherAssetDescription)
-        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, secondQuestionPageUrl(index1of5000))
       }
 
@@ -810,7 +810,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           // nothing for the first asset:
           // second asset:
           .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "asset two")
-        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn)
+        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, secondQuestionPageUrl(index2of5000))
       }
     }

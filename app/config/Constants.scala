@@ -74,6 +74,7 @@ object Constants {
   val sharesDisposalListSize = 10
   val reportedSharesDisposalListSize = 25
   val bondsDisposalListSize = 10
+  val otherAssetsPageSize = 25
   val reportingAssetsDisposalDisposalListSize = 10
   val reportedOtherAssetsDisposalListSize = 25
   val returnsSubmittedPageSize = 5
