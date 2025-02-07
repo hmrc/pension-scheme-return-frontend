@@ -32,7 +32,7 @@ import scala.util.{Success, Try}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class LandOrPropertyPrePopulationProcessor @Inject() {
+class LandOrPropertyPrePopulationProcessor @Inject()() {
 
   def clean(baseUA: UserAnswers, currentUA: UserAnswers)(srn: Srn): Try[UserAnswers] = {
 

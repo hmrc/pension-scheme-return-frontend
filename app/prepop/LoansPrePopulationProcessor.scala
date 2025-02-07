@@ -28,7 +28,7 @@ import scala.util.{Success, Try}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class LoansPrePopulationProcessor @Inject() {
+class LoansPrePopulationProcessor @Inject()() {
 
   def clean(baseUA: UserAnswers, currentUA: UserAnswers)(srn: Srn): Try[UserAnswers] = {
 
