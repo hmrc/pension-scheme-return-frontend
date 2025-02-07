@@ -34,7 +34,7 @@ object Security extends (String => Security) {
   implicit val securityWrite: Writes[Security] = new SimpleObjectWrites[Security](_.value)
   implicit val securityRead: Reads[Security] = new SimpleObjectReads[Security]("security", Security.apply)
 
-  private val validSecurityFormat = """^[a-zA-Z0-9\-'" \t\r\n,.@#/]+$"""
+  private val validSecurityFormat = """^[a-zA-Z0-9\-'" \t,.@#/]+$"""
   private val maxLength = 160
 
   def isValid(security: String): Boolean = security != null && security.matches(validSecurityFormat)

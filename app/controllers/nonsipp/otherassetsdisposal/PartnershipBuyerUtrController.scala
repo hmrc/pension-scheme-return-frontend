@@ -100,7 +100,7 @@ class PartnershipBuyerUtrController @Inject()(
 
 object PartnershipBuyerUtrController {
 
-  private val noFormErrors = InputFormErrors.textArea(
+  private val noFormErrors = InputFormErrors.textAreaNoNewline(
     "otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.required",
     "otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.invalid",
     "otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.length"

@@ -1631,7 +1631,7 @@ securityGivenForLoan.securityGiven.yes.conditional = Provide details of the secu
 securityGivenForLoan.securityGiven.yes.hint = You can enter a maximum of 160 characters.
 securityGivenForLoan.securityGiven.error.required = Select yes if security has been given for this loan
 securityGivenForLoan.securityGiven.yes.conditional.error.required = Enter details of the security
-securityGivenForLoan.securityGiven.yes.conditional.error.invalid = Details of the security must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hashes (#), hyphens, speech marks, ampersands, brackets and spaces
+securityGivenForLoan.securityGiven.yes.conditional.error.invalid = Details of the security must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hashes (#), hyphens, speech marks, ampersands, brackets and spaces
 securityGivenForLoan.securityGiven.yes.conditional.error.length = Details of the security must be 160 characters or fewer
 
 loansList.title = You have added {0} loan
@@ -2096,7 +2096,7 @@ companyBuyerCrn.yes.conditional.error.length = CRN must be 8 characters
 companyBuyerCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
 companyBuyerCrn.no.conditional = Tell us why you cannot provide {0}’s CRN
 companyBuyerCrn.no.conditional.error.required = Enter the reason you cannot provide the buyer’s CRN
-companyBuyerCrn.no.conditional.error.invalid = The reason you cannot provide the buyer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes,speech marks, ampersands, brackets and spaces
+companyBuyerCrn.no.conditional.error.invalid = The reason you cannot provide the buyer’s CRN must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes,speech marks, ampersands, brackets and spaces
 companyBuyerCrn.no.conditional.error.length = The reason you cannot provide the buyer’s CRN must be 160 characters or fewer
 companyBuyerCrn.error.required = Select yes if you know the buyer’s Company Registration Number (CRN)
 
@@ -3063,7 +3063,7 @@ companyBuyerCrn.yes.conditional.error.required = Enter the buyer’s CRN
 companyBuyerCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
 companyBuyerCrn.yes.conditional.error.length = CRN must be 8 characters
 companyBuyerCrn.no.conditional.error.required = Enter the reason you cannot provide the buyer’s CRN
-companyBuyerCrn.no.conditional.error.invalid = The reason you cannot provide the buyer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
+companyBuyerCrn.no.conditional.error.invalid = The reason you cannot provide the buyer’s CRN must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 companyBuyerCrn.no.conditional.error.length = The reason you cannot provide the buyer’s CRN must be 160 characters or fewer
 
 sharesCYA.normal.title = Check your answers: shares
@@ -3386,7 +3386,7 @@ otherAssets.whatIsOtherAsset.heading = What is the asset?
 otherAssets.whatIsOtherAsset.hint = Provide a short description of the asset. You can enter a maximum of 160 characters.
 otherAssets.whatIsOtherAsset.error.required = Enter a description of the asset
 otherAssets.whatIsOtherAsset.error.length = Description of the asset must be 160 characters or fewer
-otherAssets.whatIsOtherAsset.error.invalid = Description of the asset must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
+otherAssets.whatIsOtherAsset.error.invalid = Description of the asset must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 
 howWereBondsDisposedOf.title = How were the bonds disposed of?
 howWereBondsDisposedOf.heading = How were these bonds disposed of?
@@ -3690,7 +3690,7 @@ otherAssetsDisposal.partnershipBuyerUtr.yes.conditional.error.length = Enter a U
 otherAssetsDisposal.partnershipBuyerUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
 otherAssetsDisposal.partnershipBuyerUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
 otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.required = Enter the reason you cannot provide the buyer’s UTR
-otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.invalid = The reason you cannot provide the buyer’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
+otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.invalid = The reason you cannot provide the buyer’s UTR must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.length = The reason you cannot provide the buyer’s UTR must be 160 characters or fewer
 otherAssetsDisposal.partnershipBuyerUtr.error.required = Select yes if you know the buyer’s Unique Taxpayer Reference (UTR)
 
@@ -3802,7 +3802,7 @@ assetCompanyBuyerCrn.yes.conditional.error.length = CRN must be 8 characters
 assetCompanyBuyerCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
 assetCompanyBuyerCrn.no.conditional = Tell us why you cannot provide {0}’s CRN
 assetCompanyBuyerCrn.no.conditional.error.required = Enter the reason you cannot provide the buyer’s CRN
-assetCompanyBuyerCrn.no.conditional.error.invalid =  The reason you cannot provide the buyer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
+assetCompanyBuyerCrn.no.conditional.error.invalid =  The reason you cannot provide the buyer’s CRN must not include new lines and only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks, ampersands, brackets and spaces
 assetCompanyBuyerCrn.no.conditional.error.length = The reason you cannot provide the buyer’s CRN must be 160 characters or fewer
 assetCompanyBuyerCrn.error.required = Select yes if you know the buyer’s Company Registration Number (CRN)
 

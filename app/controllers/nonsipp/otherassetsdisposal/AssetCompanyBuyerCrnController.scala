@@ -101,7 +101,7 @@ class AssetCompanyBuyerCrnController @Inject()(
 
 object AssetCompanyBuyerCrnController {
 
-  private val noFormErrors = InputFormErrors.textArea(
+  private val noFormErrors = InputFormErrors.textAreaNoNewline(
     "assetCompanyBuyerCrn.no.conditional.error.required",
     "assetCompanyBuyerCrn.no.conditional.error.invalid",
     "assetCompanyBuyerCrn.no.conditional.error.length"

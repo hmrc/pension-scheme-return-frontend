@@ -74,7 +74,7 @@ class WhatIsOtherAssetController @Inject()(
 }
 
 object WhatIsOtherAssetController {
-  def form(formProvider: TextFormProvider): Form[String] = formProvider.textArea(
+  def form(formProvider: TextFormProvider): Form[String] = formProvider.textAreaNoNewline(
     "otherAssets.whatIsOtherAsset.error.required",
     "otherAssets.whatIsOtherAsset.error.length",
     "otherAssets.whatIsOtherAsset.error.invalid"
