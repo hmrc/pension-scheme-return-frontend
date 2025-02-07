@@ -67,6 +67,17 @@
                     </strong>
                 </span>
             </li>
+            } else if(item.status == Check) {
+            <li class="govuk-task-list__item govuk-task-list__item--with-link">
+                <span class="govuk-task-list__name-and-hint">
+                    @renderMessage(item.link.withAttr("aria-describedby", id).withAttr("class", "govuk-task-list__link"))
+                </span>
+                <span class="govuk-task-list__status" id="@id">
+                    <strong class="govuk-tag govuk-tag--yellow">
+                        @renderMessage(item.status.description)
+                    </strong>
+                </span>
+            </li>
         } else {
             <li class="govuk-task-list__item govuk-task-list__item--with-link">
                 <span class="govuk-task-list__name-and-hint">

@@ -26,8 +26,6 @@ import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models._
-import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
-import models.IdentitySubject.LandOrPropertySeller
 import viewmodels.models.SectionCompleted
 import eu.timepit.refined.api.Refined
 import org.mockito.ArgumentMatchers.any
@@ -54,6 +52,8 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
   )
 
   private val completedUserAnswers = defaultUserAnswers
+  // LOP 1 - Completed
+    .unsafeSet(LandOrPropertyHeldPage(srn), true)
     .unsafeSet(LandPropertyInUKPage(srn, indexOne), true)
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, indexOne), address1)
     .unsafeSet(LandRegistryTitleNumberPage(srn, indexOne), ConditionalYesNo.yes[String, String]("some-number"))
@@ -61,11 +61,11 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(LandOrPropertyTotalCostPage(srn, indexOne), money)
     .unsafeSet(IsLandOrPropertyResidentialPage(srn, indexOne), true)
     .unsafeSet(IsLandPropertyLeasedPage(srn, indexOne), true)
-    .unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, indexOne), true)
     .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, indexOne), (leaseName, money, localDate))
     .unsafeSet(IsLesseeConnectedPartyPage(srn, indexOne), true)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, indexOne), money)
     .unsafeSet(LandOrPropertyCompleted(srn, indexOne), SectionCompleted)
+    // LOP 2 - Completed then Removed
     .unsafeSet(LandPropertyInUKPage(srn, indexTwo), true)
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, indexTwo), address2)
     .unsafeSet(LandRegistryTitleNumberPage(srn, indexTwo), ConditionalYesNo.yes[String, String]("some-number"))
@@ -73,12 +73,11 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(LandOrPropertyTotalCostPage(srn, indexTwo), money)
     .unsafeSet(IsLandOrPropertyResidentialPage(srn, indexTwo), true)
     .unsafeSet(IsLandPropertyLeasedPage(srn, indexTwo), true)
-    .unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, indexTwo), true)
     .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, indexTwo), (leaseName, money, localDate))
     .unsafeSet(IsLesseeConnectedPartyPage(srn, indexTwo), true)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, indexTwo), money)
+    .unsafeSet(LandOrPropertyCompleted(srn, indexTwo), SectionCompleted)
     .unsafeSet(RemovePropertyPage(srn, indexTwo), true)
-    .unsafeSet(LandOrPropertyHeldPage(srn), true)
 
   private val completedUserAnswersToCheck = completedUserAnswers
     .unsafeSet(LandPropertyInUKPage(srn, indexThree), true)
@@ -86,13 +85,13 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(LandRegistryTitleNumberPage(srn, indexThree), ConditionalYesNo.yes[String, String]("some-number"))
     .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, indexThree), SchemeHoldLandProperty.Transfer)
     .unsafeSet(LandOrPropertyTotalCostPage(srn, indexThree), money)
-    .unsafeSet(IdentityTypePage(srn, indexThree, LandOrPropertySeller), IdentityType.Other)
-    .unsafeSet(OtherRecipientDetailsPage(srn, indexThree, LandOrPropertySeller), otherRecipientDetails)
 
   private val noUserAnswers = defaultUserAnswers
     .unsafeSet(LandOrPropertyHeldPage(srn), false)
     .unsafeSet(FbVersionPage(srn), "002")
     .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
+
+  private val inProgressUserAnswers = defaultUserAnswers.unsafeSet(LandOrPropertyHeldPage(srn), true)
 
   private lazy val onPageLoad = routes.LandOrPropertyListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.LandOrPropertyListController.onSubmit(srn, page = 1, NormalMode)
@@ -137,7 +136,7 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
           isPrePop = false
         )
       )
-    }.withName("Completed Journey"))
+    }.withName("Completed Journey - 1 added record"))
 
     act.like(renderViewWithPrePopSession(onPageLoad, completedUserAnswersToCheck) { implicit app => implicit request =>
       injected[ListView].apply(
@@ -153,14 +152,14 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
           isPrePop = true
         )
       )
-    }.withName("Completed PrePop Journey"))
+    }.withName("PrePop Journey - 1 added record, 1 PrePop record to Check"))
 
     act.like(
       redirectToPage(
         onPageLoad,
         controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode),
-        completedUserAnswers.remove(LandOrPropertyCompleted(srn, indexOne)).get
-      ).withName("Incomplete Journey")
+        inProgressUserAnswers
+      ).withName("In Progress Journey - 0 added records")
     )
 
     act.like(

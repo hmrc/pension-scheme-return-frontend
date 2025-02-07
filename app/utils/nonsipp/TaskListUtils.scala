@@ -421,7 +421,7 @@ object TaskListUtils {
 
     val viewModelList = NonEmptyList
       .fromList(userAnswers.get(SharesCompleted.all(srn)).filter(_.nonEmpty) match {
-        case Some(_) => List(sharesItem, sharesDisposalItem)
+        case Some(_) => List(sharesItem) ++ (if (sharesStatus != Check) List(sharesDisposalItem) else Nil)
         case None => List(sharesItem)
       })
       .get
@@ -454,7 +454,8 @@ object TaskListUtils {
 
     val viewModelList = NonEmptyList
       .fromList(userAnswers.get(LandOrPropertyCompleted.all(srn)).filter(_.nonEmpty) match {
-        case Some(_) => List(landOrPropertyItem, landOrPropertyDisposalItem)
+        case Some(_) =>
+          List(landOrPropertyItem) ++ (if (landOrPropertyStatus._1 != Check) List(landOrPropertyDisposalItem) else Nil)
         case None => List(landOrPropertyItem)
       })
       .get
@@ -485,7 +486,7 @@ object TaskListUtils {
 
     val viewModelList = NonEmptyList
       .fromList(userAnswers.get(BondsCompleted.all(srn)).filter(_.nonEmpty) match {
-        case Some(_) => List(bondsItem, bondsDisposalItem)
+        case Some(_) => List(bondsItem) ++ (if (bondStatus != Check) List(bondsDisposalItem) else Nil)
         case None => List(bondsItem)
       })
       .get
@@ -530,8 +531,11 @@ object TaskListUtils {
           userAnswers.get(OtherAssetsCompleted.all(srn)).filter(_.nonEmpty),
           userAnswers.get(DidSchemeHoldAnySharesPage(srn))
         ) match {
-          case (Some(_), Some(_)) => List(quotedSharesItem, otherAssetsItem, otherAssetsDisposalItem)
-          case (Some(_), _) => List(otherAssetsItem, otherAssetsDisposalItem)
+          case (Some(_), Some(_)) =>
+            List(quotedSharesItem, otherAssetsItem) ++
+              (if (otherAssetsStatus != Check) List(otherAssetsDisposalItem) else Nil)
+          case (Some(_), _) =>
+            List(otherAssetsItem) ++ (if (otherAssetsStatus != Check) List(otherAssetsDisposalItem) else Nil)
           case (_, Some(_)) => List(quotedSharesItem, otherAssetsItem)
           case (_, _) => List(otherAssetsItem)
         }
@@ -544,6 +548,7 @@ object TaskListUtils {
   private def messageKey(prefix: String, suffix: String, status: TaskListStatus): String =
     status match {
       case UnableToStart | NotStarted => s"$prefix.add.$suffix"
+      case Check => s"$prefix.check.$suffix"
       case _ => s"$prefix.change.$suffix"
     }
 
@@ -553,8 +558,9 @@ object TaskListUtils {
     val numSectionsUnableToStart = items.count(_.status == UnableToStart)
     val numSectionsNotStarted = items.count(_.status == NotStarted)
     val numSectionsInProgress = items.count(_.status == InProgress)
+    val numSectionsCheck = items.count(_.status == Check)
     val numSectionsReadyForSubmission =
-      numSectionsTotal - (numSectionsUnableToStart + numSectionsNotStarted + numSectionsInProgress)
+      numSectionsTotal - (numSectionsUnableToStart + numSectionsNotStarted + numSectionsInProgress + numSectionsCheck)
 
     (numSectionsReadyForSubmission, numSectionsTotal)
   }
