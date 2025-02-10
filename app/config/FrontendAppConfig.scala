@@ -18,29 +18,25 @@ package config
 
 import play.api.mvc.RequestHeader
 import com.google.inject.{Inject, Singleton}
-import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl.idFunctor
 import models.SchemeId.Srn
-import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, OnlyRelative, RedirectUrl}
 import play.api.Configuration
 import play.api.i18n.Lang
 
 import java.time.LocalDate
+import java.net.URLEncoder
 
 @Singleton
 class FrontendAppConfig @Inject()(config: Configuration) { self =>
 
+  val host: String = config.get[String]("host")
   val appName: String = config.get[String]("appName")
 
   private val contactFormServiceIdentifier = config.get[String]("contact-frontend.serviceId")
   private val betaFeedbackUrl = config.get[String]("microservice.services.contact-frontend.beta-feedback-url")
   private val reportProblemUrl = config.get[String]("microservice.services.contact-frontend.report-problem-url")
-  private val allowedRedirectUrls: Seq[String] = config.get[Seq[String]]("urls.allowedRedirects")
 
-  def feedbackUrl(implicit request: RequestHeader): String = {
-    val redirectUrlPolicy = AbsoluteWithHostnameFromAllowlist(allowedRedirectUrls.toSet) | OnlyRelative
-    val redirectUrl: String = RedirectUrl(request.uri).get(redirectUrlPolicy).encodedUrl
-    s"$betaFeedbackUrl?service=$contactFormServiceIdentifier&backUrl=$redirectUrl"
-  }
+  def feedbackUrl(implicit request: RequestHeader): String =
+    s"$betaFeedbackUrl?service=$contactFormServiceIdentifier&backUrl=${URLEncoder.encode(host + request.uri, "UTF-8")}"
 
   def reportAProblemUrl: String = s"$reportProblemUrl?service=$contactFormServiceIdentifier"
 
