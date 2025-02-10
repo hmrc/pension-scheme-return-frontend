@@ -98,7 +98,7 @@ object PartnershipBuyerNameController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.name(
     "sharesDisposal.partnershipBuyerName.error.required",
     "sharesDisposal.partnershipBuyerName.error.length",
-    "sharesDisposal.partnershipBuyerName.error.invalid.characters"
+    "error.textarea.invalid"
   )
 
   def viewModel(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): FormPageViewModel[TextInputViewModel] =

@@ -117,7 +117,7 @@ object LandOrPropertyPostcodeLookupController {
 
   private val filterFormErrors = InputFormErrors.input(
     "landOrPropertyPostcodeLookup.error.required",
-    "landOrPropertyPostcodeLookup.filter.error.invalid",
+    "error.textarea.invalid",
     "landOrPropertyPostcodeLookup.filter.error.max"
   )
 

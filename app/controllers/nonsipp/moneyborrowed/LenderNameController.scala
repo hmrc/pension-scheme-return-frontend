@@ -86,7 +86,7 @@ object LenderNameController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.text(
     "lenderName.error.required",
     "lenderName.error.tooLong",
-    "lenderName.error.invalid"
+    "error.textarea.invalid"
   )
 
   def viewModel(

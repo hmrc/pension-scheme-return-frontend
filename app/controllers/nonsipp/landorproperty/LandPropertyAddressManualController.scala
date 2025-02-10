@@ -167,35 +167,35 @@ object LandPropertyAddressManualController {
   private val field1Errors: InputFormErrors =
     InputFormErrors.input(
       "landPropertyAddressManual.field1.error.required",
-      "landPropertyAddressManual.field1.error.invalid",
+      "error.textarea.invalid",
       "landPropertyAddressManual.field1.error.max"
     )
 
   private val field2Errors: InputFormErrors =
     InputFormErrors.input(
       "",
-      "landPropertyAddressManual.field2.error.invalid",
+      "error.textarea.invalid",
       "landPropertyAddressManual.field2.error.max"
     )
 
   private val field3Errors: InputFormErrors =
     InputFormErrors.input(
       "",
-      "landPropertyAddressManual.field3.error.invalid",
+      "error.textarea.invalid",
       "landPropertyAddressManual.field3.error.max"
     )
 
   private val field4Errors: InputFormErrors =
     InputFormErrors.input(
       "landPropertyAddressManual.field4.error.required",
-      "landPropertyAddressManual.field4.error.invalid",
+      "error.textarea.invalid",
       "landPropertyAddressManual.field4.error.max"
     )
 
   private val field5Errors: InputFormErrors =
     InputFormErrors.input(
       "",
-      "landPropertyAddressManual.field5.error.invalid",
+      "error.textarea.invalid",
       "landPropertyAddressManual.field5.error.max"
     )
 
@@ -225,7 +225,7 @@ object LandPropertyAddressManualController {
         Mappings.select(
           countryOptions,
           "landPropertyAddressManual.field6.error.required",
-          "landPropertyAddressManual.field6.error.invalid"
+          "error.textarea.invalid"
         )
       )
 

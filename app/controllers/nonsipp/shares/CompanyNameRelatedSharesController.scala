@@ -94,7 +94,7 @@ object CompanyNameRelatedSharesController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.textArea(
     "shares.companyName.error.required",
     "shares.companyName.error.length",
-    "shares.companyName.error.invalid.characters"
+    "error.textarea.invalid"
   )
 
   def viewModel(

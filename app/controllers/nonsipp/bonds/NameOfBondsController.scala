@@ -76,7 +76,7 @@ object NameOfBondsController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.textArea(
     "bonds.nameOfBonds.error.required",
     "bonds.nameOfBonds.error.length",
-    "bonds.nameOfBonds.error.invalid"
+    "error.textarea.invalid"
   )
 
   def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextAreaViewModel] = FormPageViewModel(

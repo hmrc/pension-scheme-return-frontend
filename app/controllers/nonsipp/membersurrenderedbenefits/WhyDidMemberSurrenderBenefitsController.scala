@@ -121,7 +121,7 @@ object WhyDidMemberSurrenderBenefitsController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.textAreaShorter(
     "surrenderedBenefits.whyDidMemberSurrenderBenefits.error.required",
     "surrenderedBenefits.whyDidMemberSurrenderBenefits.error.length",
-    "surrenderedBenefits.whyDidMemberSurrenderBenefits.error.invalid"
+    "error.textarea.invalid"
   )
 
   def viewModel(

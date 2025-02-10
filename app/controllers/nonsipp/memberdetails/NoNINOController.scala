@@ -98,7 +98,7 @@ object NoNINOController {
   def form(formProvider: TextFormProvider, memberFullName: String): Form[String] = formProvider.textArea(
     "noNINO.error.required",
     "noNINO.error.length",
-    "noNINO.error.invalid",
+    "error.textarea.invalid",
     memberFullName
   )
 

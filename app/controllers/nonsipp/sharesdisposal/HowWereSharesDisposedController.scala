@@ -137,7 +137,7 @@ object HowWereSharesDisposedController {
 
   private val formErrors = InputFormErrors.textArea(
     "sharesDisposal.howWereSharesDisposed.conditional.error.required",
-    "sharesDisposal.howWereSharesDisposed.conditional.error.invalid",
+    "error.textarea.invalid",
     "sharesDisposal.howWereSharesDisposed.conditional.error.length"
   )
 

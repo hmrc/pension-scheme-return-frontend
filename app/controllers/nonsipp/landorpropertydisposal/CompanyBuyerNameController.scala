@@ -86,7 +86,7 @@ object CompanyBuyerNameController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.text(
     "companyBuyerName.error.required",
     "companyBuyerName.error.tooLong",
-    "companyBuyerName.error.invalid"
+    "error.textarea.invalid"
   )
 
   def viewModel(

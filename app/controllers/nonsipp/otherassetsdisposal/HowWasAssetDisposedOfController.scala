@@ -116,7 +116,7 @@ object HowWasAssetDisposedOfController {
 
   private val formErrors = InputFormErrors.textArea(
     "howWasAssetDisposedOf.conditional.error.required",
-    "howWasAssetDisposedOf.conditional.error.invalid",
+    "error.textarea.invalid",
     "howWasAssetDisposedOf.conditional.error.length"
   )
 

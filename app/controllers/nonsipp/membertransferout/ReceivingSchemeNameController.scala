@@ -83,7 +83,7 @@ object ReceivingSchemeNameController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.text(
     "TransferOut.receivingSchemeName.error.required",
     "TransferOut.receivingSchemeName.error.tooLong",
-    "TransferOut.receivingSchemeName.error.invalid"
+    "error.textarea.invalid"
   )
 
   def viewModel(srn: Srn, index: Max300, transferIndex: Max5, mode: Mode): FormPageViewModel[TextInputViewModel] =

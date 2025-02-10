@@ -87,7 +87,7 @@ object CompanyRecipientNameController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.textArea(
     "companyRecipientName.error.required",
     "companyRecipientName.error.length",
-    "companyRecipientName.error.invalid.characters"
+    "error.textarea.invalid"
   )
 
   def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextInputViewModel] =

@@ -101,7 +101,7 @@ object OtherAssetIndividualSellerNINumberController {
 
   private val noFormErrors = InputFormErrors.textArea(
     "otherAssets.otherAssetIndividualSellerNINumber.no.conditional.error.required",
-    "otherAssets.otherAssetIndividualSellerNINumber.no.conditional.error.invalid",
+    "error.textarea.invalid",
     "otherAssets.otherAssetIndividualSellerNINumber.no.conditional.error.length"
   )
 

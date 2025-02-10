@@ -85,7 +85,7 @@ object LandRegistryTitleNumberController {
 
   private val noFormErrors = InputFormErrors.textArea(
     "landRegistryTitleNumber.no.conditional.error.required",
-    "landRegistryTitleNumber.no.conditional.error.invalid",
+    "error.textarea.invalid",
     "landRegistryTitleNumber.no.conditional.error.length"
   )
 

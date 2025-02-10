@@ -77,7 +77,7 @@ object WhyNoBankAccountController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.textArea(
     "whyNoBankAccount.error.required",
     "whyNoBankAccount.error.length",
-    "whyNoBankAccount.error.invalid"
+    "error.textarea.invalid"
   )
 
   def viewModel(srn: Srn, schemeName: String, mode: Mode): FormPageViewModel[TextAreaViewModel] = FormPageViewModel(

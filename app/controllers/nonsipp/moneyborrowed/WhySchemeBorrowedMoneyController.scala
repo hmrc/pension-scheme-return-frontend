@@ -119,7 +119,7 @@ object WhySchemeBorrowedMoneyController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.textArea(
     "moneyBorrowed.WhyBorrowed.error.required",
     "moneyBorrowed.WhyBorrowed.error.length",
-    "moneyBorrowed.WhyBorrowed.error.invalid"
+    "error.textarea.invalid"
   )
 
   def viewModel(

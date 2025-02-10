@@ -131,7 +131,7 @@ object HowWereBondsDisposedOfController {
 
   private val formErrors = InputFormErrors.textArea(
     "howWereBondsDisposedOf.conditional.error.required",
-    "howWereBondsDisposedOf.conditional.error.invalid",
+    "error.textarea.invalid",
     "howWereBondsDisposedOf.conditional.error.length"
   )
 

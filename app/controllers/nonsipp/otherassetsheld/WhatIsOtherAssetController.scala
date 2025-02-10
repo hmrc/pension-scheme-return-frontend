@@ -77,7 +77,7 @@ object WhatIsOtherAssetController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.textArea(
     "otherAssets.whatIsOtherAsset.error.required",
     "otherAssets.whatIsOtherAsset.error.length",
-    "otherAssets.whatIsOtherAsset.error.invalid"
+    "error.textarea.invalid"
   )
 
   def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextAreaViewModel] = FormPageViewModel(
