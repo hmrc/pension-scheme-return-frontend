@@ -69,3 +69,6 @@ GET         /:srn/remove-bonds/:index                                           
 POST        /:srn/remove-bonds/:index                                           controllers.nonsipp.bonds.RemoveBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-remove-bonds/:index                                    controllers.nonsipp.bonds.RemoveBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-remove-bonds/:index                                    controllers.nonsipp.bonds.RemoveBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/check-update-bonds-information/:index                           controllers.nonsipp.bonds.BondsCheckAndUpdateController.onPageLoad(srn: Srn, index: Max5000)
+GET         /:srn/submit-check-update-bonds-information/:index                    controllers.nonsipp.bonds.BondsCheckAndUpdateController.onSubmit(srn: Srn, index: Max5000)

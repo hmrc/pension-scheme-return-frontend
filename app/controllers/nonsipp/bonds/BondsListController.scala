@@ -114,6 +114,7 @@ class BondsListController @Inject()(
       getBondsTaskListStatusAndLink(request.userAnswers, srn, isPrePopulation)
 
     if (status == TaskListStatus.NotStarted) {
+      logger.info("Bonds journey not started, redirecting to NameOfBonds page")
       Redirect(routes.NameOfBondsController.onPageLoad(srn, refineMV(1), NormalMode))
     } else if (status == TaskListStatus.InProgress) {
       Redirect(incompleteBondsUrl)
@@ -309,7 +310,7 @@ object BondsListController {
               case _ if check =>
                 ListRow.check(
                   bondsMessage,
-                  controllers.routes.UnauthorisedController.onPageLoad().url,
+                  routes.BondsCheckAndUpdateController.onPageLoad(srn, index).url,
                   Message("bondsList.row.check.hiddenText", bondsMessage)
                 )
               case _ =>
