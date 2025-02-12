@@ -18,16 +18,17 @@ package prepop
 
 import pages.nonsipp.bonds._
 import pages.nonsipp.bonds.Paths.bonds
-import models.UserAnswers.SensitiveJsObject
-import config.RefinedTypes.OneTo5000
+import config.RefinedTypes.{Max5000, OneTo5000}
 import pages.nonsipp.bondsdisposal.Paths.bondsDisposed
 import models.SchemeId.Srn
 import eu.timepit.refined.refineV
 import play.api.libs.json.{JsObject, JsSuccess}
 import models.UserAnswers
 import pages.nonsipp.bondsdisposal.BondsDisposalPage
+import utils.ListUtils.ListOps
+import models.UserAnswers.SensitiveJsObject
 
-import scala.util.{Success, Try}
+import scala.util.Try
 
 import javax.inject.{Inject, Singleton}
 
@@ -50,7 +51,22 @@ class BondsPrePopulationProcessor @Inject()() {
       .flatMap(_.transform(bondsDisposed.prune(_)))
       .flatMap(_.transform((Paths.bondTransactions \ "totalIncomeOrReceipts").prune(_))) match {
       case JsSuccess(value, _) =>
-        Success(currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue))))
+        val uaWithBondsData = currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue)))
+
+        val updatedUA = uaWithBondsData
+          .get(NameOfBondsPages(srn))
+          .map(_.keys.toList)
+          .toList
+          .flatten
+          .refine[Max5000.Refined]
+          .map(index => BondPrePopulated(srn, index))
+          .foldLeft(Try(uaWithBondsData)) {
+            case (ua, bondsPrePopulated) => {
+              ua.flatMap(_.set(bondsPrePopulated, false))
+            }
+          }
+
+        updatedUA
       case _ => Try(currentUA)
     }
 

@@ -38,7 +38,7 @@ class BondsPrePopulationProcessorSpec extends BaseSpec with TestValues {
           baseUA = emptyUserAnswers.copy(data = SensitiveJsObject(someDisposalsData.as[JsObject])),
           currentUA = currentUa
         )(srn)
-
+        result.get.data.decryptedValue mustBe cleanedSomeDisposalsData.as[JsObject]
         result mustBe Success(
           currentUa.copy(data = SensitiveJsObject(cleanedSomeDisposalsData.as[JsObject]))
         )
@@ -50,7 +50,6 @@ class BondsPrePopulationProcessorSpec extends BaseSpec with TestValues {
           baseUA = emptyUserAnswers.copy(data = SensitiveJsObject(noDisposalsData.as[JsObject])),
           currentUA = currentUa
         )(srn)
-
         result mustBe Success(
           currentUa.copy(data = SensitiveJsObject(cleanedNoDisposalsData.as[JsObject]))
         )
@@ -295,6 +294,7 @@ object BondsPrePopulationProcessorSpec {
                  |  "current": "dummy-current-data",
                  |  "assets": {
                  |    "bonds": {
+                 |    "bondsPrePopulated":{"4":false,"1":false,"0":false,"2":false,"3":false},
                  |      "bondTransactions": {
                  |        "nameOfBonds": {
                  |          "0": "first bonds - no disposals",
@@ -445,6 +445,7 @@ object BondsPrePopulationProcessorSpec {
                  |  "current": "dummy-current-data",
                  |  "assets": {
                  |    "bonds": {
+                 |    "bondsPrePopulated":{"4":false,"1":false,"0":false,"2":false,"3":false},
                  |      "bondTransactions": {
                  |        "nameOfBonds": {
                  |          "0": "first bonds - no disposals",

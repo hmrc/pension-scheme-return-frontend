@@ -83,6 +83,7 @@ class BondsTransformer @Inject() extends Transformer {
               methodOfHolding <- request.userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, index))
               costOfBonds <- request.userAnswers.get(CostOfBondsPage(srn, index))
               bondsUnregulated <- request.userAnswers.get(AreBondsUnregulatedPage(srn, index))
+              prePopulated = request.userAnswers.get(BondPrePopulated(srn, index))
             } yield {
               val dateOfAcqOrContrib = Option.when(methodOfHolding != Transfer)(
                 request.userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, index)).get
@@ -93,7 +94,7 @@ class BondsTransformer @Inject() extends Transformer {
               val optTotalIncomeOrReceipts = request.userAnswers.get(IncomeFromBondsPage(srn, index))
 
               BondTransactions(
-                prePopulated = None,
+                prePopulated = prePopulated,
                 nameOfBonds = nameOfBonds,
                 methodOfHolding = methodOfHolding,
                 optDateOfAcqOrContrib = dateOfAcqOrContrib,
@@ -207,6 +208,16 @@ class BondsTransformer @Inject() extends Transformer {
           )
           val bondsCompleted = BondsCompleted(srn, index) -> SectionCompleted
 
+          val bondsPrePopulated = indexes
+            .filter(
+              index => {
+                bondTransactions(index.value - 1).prePopulated.nonEmpty
+              }
+            )
+            .map(
+              index => BondPrePopulated(srn, index) -> bondTransactions(index.value - 1).prePopulated.get
+            )
+
           val triedUA = for {
             ua0 <- ua
             ua1 <- ua0.set(nameOfBonds._1, nameOfBonds._2)
@@ -217,11 +228,12 @@ class BondsTransformer @Inject() extends Transformer {
             ua6 <- optDateOfAcqOrContrib.map(t => ua5.set(t._1, t._2)).getOrElse(Try(ua5))
             ua7 <- optConnectedPartyStatus.map(t => ua6.set(t._1, t._2)).getOrElse(Try(ua6))
             ua8 <- ua7.set(bondsCompleted._1, bondsCompleted._2)
+            ua9 <- bondsPrePopulated.foldLeft(Try(ua8)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
           } yield {
             buildOptDisposedBondsUA(
               index,
               srn,
-              ua8,
+              ua9,
               bondTransaction.optBondsDisposed,
               bond.optBondsWereDisposed
             )

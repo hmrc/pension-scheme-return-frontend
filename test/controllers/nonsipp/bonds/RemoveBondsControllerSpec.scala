@@ -22,11 +22,11 @@ import views.html.YesNoPageView
 import controllers.nonsipp.bonds.RemoveBondsController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.NormalMode
+import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
-import pages.nonsipp.bonds.NameOfBondsPage
+import pages.nonsipp.bonds.{BondPrePopulated, NameOfBondsPage}
 import config.RefinedTypes.Max5000
 import controllers.ControllerBaseSpec
 
@@ -45,6 +45,9 @@ class RemoveBondsControllerSpec extends ControllerBaseSpec {
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
+
+  val prePopUserAnswersChecked: UserAnswers = userAnswers.unsafeSet(BondPrePopulated(srn, refineMV(1)), true)
+  val prePopUserAnswersNotChecked: UserAnswers = userAnswers.unsafeSet(BondPrePopulated(srn, refineMV(1)), false)
 
   override protected def beforeEach(): Unit =
     reset(mockPsrSubmissionService)
@@ -76,6 +79,16 @@ class RemoveBondsControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+
+    act.like(
+      redirectToPage(onPageLoad, controllers.routes.UnauthorisedController.onPageLoad(), prePopUserAnswersChecked)
+        .updateName(_ + " - Block removing checked Pre-pop bonds")
+    )
+
+    act.like(
+      redirectToPage(onPageLoad, controllers.routes.UnauthorisedController.onPageLoad(), prePopUserAnswersNotChecked)
+        .updateName(_ + " - Block removing unchecked Pre-pop bonds")
+    )
 
   }
 }

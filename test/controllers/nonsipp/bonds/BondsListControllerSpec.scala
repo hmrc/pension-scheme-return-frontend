@@ -36,6 +36,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
   private val indexTwo = refineMV[Max5000.Refined](2)
+  private val indexThree = refineMV[Max5000.Refined](3)
   private val page = 1
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -87,13 +88,39 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(CostOfBondsPage(srn, indexTwo), money)
       .unsafeSet(BondsFromConnectedPartyPage(srn, indexTwo), true)
       .unsafeSet(AreBondsUnregulatedPage(srn, indexTwo), true)
+      .unsafeSet(BondPrePopulated(srn, indexTwo), false)
+      .unsafeSet(BondsCompleted(srn, indexThree), SectionCompleted)
+      .unsafeSet(NameOfBondsPage(srn, indexThree), "NameThree")
+      .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, indexThree), SchemeHoldBond.Acquisition)
+      .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, indexThree), localDate)
+      .unsafeSet(CostOfBondsPage(srn, indexThree), money)
+      .unsafeSet(BondsFromConnectedPartyPage(srn, indexThree), true)
+      .unsafeSet(AreBondsUnregulatedPage(srn, indexThree), true)
 
   private val bondsData = List(
     BondsData(
       index,
       nameOfBonds = "Name",
       acquisitionType = SchemeHoldBond.Acquisition,
-      costOfBonds = money
+      costOfBonds = money,
+      canRemove = true
+    )
+  )
+
+  private val bondsDataHalfChecked: List[BondsData] = List(
+    BondsData(
+      indexTwo,
+      nameOfBonds = "NameTwo",
+      acquisitionType = SchemeHoldBond.Acquisition,
+      costOfBonds = money,
+      canRemove = false
+    ),
+    BondsData(
+      indexThree,
+      nameOfBonds = "NameThree",
+      acquisitionType = SchemeHoldBond.Acquisition,
+      costOfBonds = money,
+      canRemove = true
     )
   )
 
@@ -102,7 +129,8 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       indexTwo,
       nameOfBonds = "NameTwo",
       acquisitionType = SchemeHoldBond.Acquisition,
-      costOfBonds = money
+      costOfBonds = money,
+      canRemove = false
     )
   )
 
@@ -129,7 +157,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
             page,
             NormalMode,
             bondsData,
-            bondsDataToCheck,
+            bondsDataHalfChecked,
             schemeName,
             showBackLink = true,
             isPrePop = true
