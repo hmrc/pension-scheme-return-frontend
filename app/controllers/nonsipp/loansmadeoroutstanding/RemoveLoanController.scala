@@ -56,7 +56,10 @@ class RemoveLoanController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      getResult(srn, index, mode, request.userAnswers.fillForm(RemoveLoanPage(srn, index), form))
+      if (request.userAnswers.get(LoanPrePopulated(srn, index)).isDefined)
+        Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+      else
+        getResult(srn, index, mode, request.userAnswers.fillForm(RemoveLoanPage(srn, index), form))
   }
 
   private def getResult(srn: Srn, index: Max5000, mode: Mode, form: Form[Boolean], error: Boolean = false)(

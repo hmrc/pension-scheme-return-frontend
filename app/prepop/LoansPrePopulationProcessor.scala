@@ -17,18 +17,24 @@
 package prepop
 
 import pages.nonsipp.loansmadeoroutstanding.Paths.loans
-import models.UserAnswers.SensitiveJsObject
+import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
-import play.api.libs.json._
 import models.UserAnswers
+import pages.nonsipp.common.LoanIdentityTypePages
 import pages.nonsipp.loansmadeoroutstanding._
+import utils.ListUtils.ListOps
+import models.UserAnswers.SensitiveJsObject
+import play.api.Logger
+import play.api.libs.json._
 
-import scala.util.{Success, Try}
+import scala.util.Try
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class LoansPrePopulationProcessor @Inject()() {
+
+  private val logger = Logger(getClass)
 
   def clean(baseUA: UserAnswers, currentUA: UserAnswers)(srn: Srn): Try[UserAnswers] = {
 
@@ -48,7 +54,22 @@ class LoansPrePopulationProcessor @Inject()() {
 
     cleanUpOptionalFields(transformedResult, indexesToDelete) match {
       case JsSuccess(value, _) =>
-        Success(currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue))))
+        val uaWithLoansData = currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue)))
+
+        val updatedUA = uaWithLoansData
+          .get(LoanIdentityTypePages(srn))
+          .map(_.keys.toList)
+          .toList
+          .flatten
+          .refine[Max5000.Refined]
+          .map(index => LoanPrePopulated(srn, index))
+          .foldLeft(Try(uaWithLoansData)) {
+            case (ua, loanPrePopulated) => {
+              ua.flatMap(_.set(loanPrePopulated, false))
+            }
+          }
+
+        updatedUA
       case _ => Try(currentUA)
     }
   }
