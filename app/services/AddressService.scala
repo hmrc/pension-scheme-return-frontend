@@ -21,6 +21,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import models.{ALFAddressResponse, Address, LookupAddress}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 import javax.inject.{Inject, Singleton}
 
@@ -30,9 +31,24 @@ class AddressService @Inject()(connector: AddressLookupConnector)(
 ) {
 
   def postcodeLookup(postcode: String, filter: Option[String])(implicit hc: HeaderCarrier): Future[List[Address]] =
-    connector.lookup(postcode, filter).map(_.map(addressFromALFAddress))
+    connector.lookup(postcode, filter).map(_.map(addressFromALFAddress)).map(sortAddresses)
 
-  private def addressFromALFAddress(lookupResponse: ALFAddressResponse): Address =
+  private def sortAddresses(unsorted: List[Address]): List[Address] =
+    unsorted.sortBy(
+      s =>
+        (
+          s.addressLine1NumberPrefix.getOrElse(Int.MaxValue),
+          s.addressLine1WithoutPostfix,
+          s.addressLine1NumberPostfix.getOrElse(Int.MaxValue)
+        )
+    )
+
+  private def addressFromALFAddress(lookupResponse: ALFAddressResponse): Address = {
+    val firstLineSplit = lookupResponse.address.firstLine.split(' ')
+    val firstLinePrefix = Try(firstLineSplit.apply(0).toInt).toOption
+    val firstLinePostfix = Try(firstLineSplit.apply(firstLineSplit.length - 1).toInt).toOption
+    val firstLineWithoutPostfix =
+      firstLinePostfix.fold(lookupResponse.address.firstLine)(_ => firstLineSplit.dropRight(1).mkString(" "))
     Address(
       lookupResponse.id,
       lookupResponse.address.firstLine,
@@ -42,6 +58,10 @@ class AddressService @Inject()(connector: AddressLookupConnector)(
       Some(lookupResponse.address.postcode),
       lookupResponse.address.country.name,
       lookupResponse.address.country.code,
-      LookupAddress
+      LookupAddress,
+      firstLinePrefix,
+      firstLinePostfix,
+      firstLineWithoutPostfix
     )
+  }
 }

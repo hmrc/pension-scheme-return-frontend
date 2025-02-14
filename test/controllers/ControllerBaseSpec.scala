@@ -237,6 +237,16 @@ trait TestValues {
     ManualAddress
   )
 
+  val alfAddressResponse = ALFAddressResponse(
+    "test-id",
+    ALFAddress(
+      List("testAddressLine1", "testAddressLine2", "testAddressLine3"),
+      "testTown",
+      "testPostCode",
+      ALFCountry("GB", "United Kingdom")
+    )
+  )
+
   val postcodeLookup: PostcodeLookup = PostcodeLookup("ZZ1 1ZZ", None)
 
   val individualDetails: IndividualDetails = IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")
