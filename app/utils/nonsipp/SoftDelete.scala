@@ -228,7 +228,7 @@ trait SoftDelete { _: PSRController =>
         transfersOut,
         surrenderedBenefits,
         memberLumpSumReceived,
-        get(TotalMemberContributionPage),
+        get(TotalMemberContributionPage.apply),
         get(TotalAmountPensionPaymentsPage.apply)
       )
     )

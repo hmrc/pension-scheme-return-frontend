@@ -28,7 +28,7 @@ case class TotalAmountPensionPaymentsPage(srn: Srn, index: Max300) extends Quest
   override def path: JsPath =
     Paths.memberDetails \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "pensionAmountReceived"
+  override def toString: String = TotalAmountPensionPaymentsPage.key
 
 }
 
@@ -37,6 +37,8 @@ object TotalAmountPensionPaymentsPage {
 
     override def path: JsPath = Paths.memberDetails \ toString
 
-    override def toString: String = "pensionAmountReceived"
+    override def toString: String = key
   }
+
+  val key = "pensionAmountReceived"
 }
