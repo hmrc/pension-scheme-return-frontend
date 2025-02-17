@@ -98,10 +98,10 @@
                                             TableRow(HtmlContent(
                                                 s"""
                                                 | <ul class=\"govuk-summary-list__actions-list\">
-                                                |   <li class=\"govuk-summary-list__actions-list-item\">
+                                                |   <li class=\"govuk-summary-list__actions-list-item two-column-triple-action__action-list-item\">
                                                 |     <a class='govuk-link' href='${link1}'>${renderMessage(key1)}<span class='govuk-visually-hidden'>${hidden1.toMessage}</span></a>
                                                 |   </li>
-                                                |   <li class=\"govuk-summary-list__actions-list-item\">
+                                                |   <li class=\"govuk-summary-list__actions-list-item two-column-triple-action__action-list-item\">
                                                 |      <a class='govuk-link' href='${link2}'>${renderMessage(key2)}<span class='govuk-visually-hidden'>${hidden2.toMessage}</span></a>
                                                 |    </li></ul>""".stripMargin))
                                         case (Some(key1), Some(hidden1), Some(link1), None, None, None) =>
