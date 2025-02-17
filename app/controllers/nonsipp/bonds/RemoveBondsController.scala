@@ -17,7 +17,7 @@
 package controllers.nonsipp.bonds
 
 import services.{PsrSubmissionService, SaveService}
-import pages.nonsipp.bonds.{NameOfBondsPage, RemoveBondsPage}
+import pages.nonsipp.bonds.{BondPrePopulated, NameOfBondsPage, RemoveBondsPage}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.actions._
@@ -54,21 +54,24 @@ class RemoveBondsController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
-          nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, index)).getOrRedirectToTaskList(srn)
-        } yield {
-          val preparedForm =
-            request.userAnswers.fillForm(RemoveBondsPage(srn, index), form)
-          Ok(
-            view(
-              preparedForm,
-              RemoveBondsController
-                .viewModel(srn, index, nameOfBonds, mode)
+      if (request.userAnswers.get(BondPrePopulated(srn, index)).isDefined)
+        Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+      else
+        (
+          for {
+            nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, index)).getOrRedirectToTaskList(srn)
+          } yield {
+            val preparedForm =
+              request.userAnswers.fillForm(RemoveBondsPage(srn, index), form)
+            Ok(
+              view(
+                preparedForm,
+                RemoveBondsController
+                  .viewModel(srn, index, nameOfBonds, mode)
+              )
             )
-          )
-        }
-      ).merge
+          }
+        ).merge
     }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =

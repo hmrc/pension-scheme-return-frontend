@@ -236,7 +236,8 @@ class BondsListController @Inject()(
         nameOfBonds <- requiredPage(NameOfBondsPage(srn, index))
         acquisitionType <- requiredPage(WhyDoesSchemeHoldBondsPage(srn, index))
         costOfBonds <- requiredPage(CostOfBondsPage(srn, index))
-      } yield BondsData(index, nameOfBonds, acquisitionType, costOfBonds)
+        canRemove = request.userAnswers.get(BondPrePopulated(srn, index)).isEmpty
+      } yield BondsData(index, nameOfBonds, acquisitionType, costOfBonds, canRemove)
 
     if (isPrePopulation) {
       for {
@@ -289,7 +290,7 @@ object BondsListController {
         List()
       case (list, _) =>
         list.map {
-          case BondsData(index, nameOfBonds, acquisition, costOfBonds) =>
+          case BondsData(index, nameOfBonds, acquisition, costOfBonds, canRemove) =>
             val acquisitionType = acquisition match {
               case SchemeHoldBond.Acquisition => "bondsList.acquisition.acquired"
               case SchemeHoldBond.Contribution => "bondsList.acquisition.contributed"
@@ -313,7 +314,7 @@ object BondsListController {
                   routes.BondsCheckAndUpdateController.onPageLoad(srn, index).url,
                   Message("bondsList.row.check.hiddenText", bondsMessage)
                 )
-              case _ =>
+              case _ if canRemove =>
                 ListRow(
                   bondsMessage,
                   changeUrl = controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
@@ -325,6 +326,16 @@ object BondsListController {
                     .url,
                   removeHiddenText = Message("bondsList.row.remove.hiddenText", bondsMessage)
                 )
+
+              case _ =>
+                ListRow(
+                  bondsMessage,
+                  changeUrl = controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                    .onPageLoad(srn, index, CheckMode)
+                    .url,
+                  changeHiddenText = Message("bondsList.row.change.hiddenText", bondsMessage)
+                )
+
             }
         }
     }
@@ -488,7 +499,8 @@ object BondsListController {
     index: Max5000,
     nameOfBonds: String,
     acquisitionType: SchemeHoldBond,
-    costOfBonds: Money
+    costOfBonds: Money,
+    canRemove: Boolean
   )
 
 }

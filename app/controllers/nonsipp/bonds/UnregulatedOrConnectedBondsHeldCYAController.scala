@@ -122,13 +122,17 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      val prePopulated = request.userAnswers.get(BondPrePopulated(srn, index))
       for {
-        updatedAnswers <- request.userAnswers.set(UnregulatedOrConnectedBondsHeldPage(srn), true).mapK
+        updatedAnswers <- request.userAnswers
+          .set(UnregulatedOrConnectedBondsHeldPage(srn), true)
+          .setWhen(prePopulated.isDefined)(BondPrePopulated(srn, index), true)
+          .mapK
         _ <- saveService.save(updatedAnswers)
         result <- psrSubmissionService
           .submitPsrDetailsWithUA(
             srn,
-            request.userAnswers,
+            updatedAnswers,
             fallbackCall =
               controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn, index, mode)
           )

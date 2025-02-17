@@ -56,14 +56,23 @@ object BondsCheckStatusUtils {
   }
 
   /**
-   * This method determines whether or not a Bonds record needs to be checked. A record needs checking if any of the
-   * pre-populated-then-cleared answers are missing & all of the other answers are present.
+   * This method determines whether or not a Bonds record needs to be checked. A record only needs to be checked if its
+   * BondsPrePopulated field is false.
    * @param userAnswers the answers provided by the user, from which we get the Bonds record
    * @param srn the Scheme Reference Number, used for the .get calls
    * @param recordIndex the index of the record being checked
    * @return true if the record requires checking, else false
    */
   def checkBondsRecord(
+    userAnswers: UserAnswers,
+    srn: Srn,
+    recordIndex: Max5000
+  ): Boolean =
+    userAnswers.get(BondPrePopulated(srn, recordIndex)) match {
+      case Some(checked) => !checked
+      case None => checkBondsRecordLegacy(userAnswers, srn, recordIndex) // non-pre-pop
+    }
+  def checkBondsRecordLegacy(
     userAnswers: UserAnswers,
     srn: Srn,
     recordIndex: Max5000

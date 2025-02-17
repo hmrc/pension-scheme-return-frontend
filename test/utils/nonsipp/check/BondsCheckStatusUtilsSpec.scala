@@ -269,4 +269,116 @@ class BondsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
       }
     }
   }
+
+  private val schemeHadBondsTrue =
+    defaultUserAnswers.unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
+
+  private val schemeHadBondsFalse =
+    defaultUserAnswers.unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), false)
+
+  private def addNonPrePopRecord(index: Max5000, userAnswers: UserAnswers): UserAnswers =
+    addBondsBaseAnswers(index, userAnswers)
+      .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, index), SchemeHoldBond.Acquisition)
+
+  private def addUncheckedRecord(index: Max5000, userAnswers: UserAnswers): UserAnswers =
+    addBondsBaseAnswers(index, userAnswers)
+      .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, index), SchemeHoldBond.Contribution)
+      .unsafeSet(BondPrePopulated(srn, index), false)
+
+  private def addCheckedRecord(index: Max5000, userAnswers: UserAnswers): UserAnswers =
+    addBondsBaseAnswers(index, userAnswers)
+      .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, index), SchemeHoldBond.Transfer)
+      .unsafeSet(BondPrePopulated(srn, index), true)
+
+  "checkBondsSectionPre-Pop" - {
+
+    "must be true" - {
+
+      "when schemeHadBonds is None & 1 record is present (unchecked)" in {
+        val userAnswers = addUncheckedRecord(index1of5000, defaultUserAnswers)
+
+        checkBondsSection(userAnswers, srn) mustBe true
+      }
+
+      "when schemeHadLoans is Some(true) & 2 records are present (checked and unchecked)" in {
+        val userAnswers = addCheckedRecord(index1of5000, addUncheckedRecord(index2of5000, schemeHadBondsTrue))
+
+        checkBondsSection(userAnswers, srn) mustBe true
+      }
+
+      "when schemeHadLoans is Some(true) & 2 records are present (unchecked and non-pre-pop)" in {
+        val userAnswers = addUncheckedRecord(index1of5000, addNonPrePopRecord(index2of5000, schemeHadBondsTrue))
+
+        checkBondsSection(userAnswers, srn) mustBe true
+      }
+    }
+
+    "must be false" - {
+
+      "when schemeHadLoans is None & no records are present" in {
+        val userAnswers = defaultUserAnswers
+
+        checkBondsSection(userAnswers, srn) mustBe false
+      }
+
+      "when schemeHadLoans is Some(false) & no records are present" in {
+        val userAnswers = schemeHadBondsFalse
+
+        checkBondsSection(userAnswers, srn) mustBe false
+      }
+
+      "when schemeHadLoans is Some(true) & no records are present" in {
+        val userAnswers = schemeHadBondsTrue
+
+        checkBondsSection(userAnswers, srn) mustBe false
+      }
+
+      "when schemeHadLoans is Some(true) & 1 record is present (checked)" in {
+        val userAnswers = addCheckedRecord(index1of5000, schemeHadBondsTrue)
+
+        checkBondsSection(userAnswers, srn) mustBe false
+      }
+
+      "when schemeHadLoans is Some(true) & 1 record is present (non-pre-pop)" in {
+        val userAnswers = addNonPrePopRecord(index1of5000, schemeHadBondsTrue)
+
+        checkBondsSection(userAnswers, srn) mustBe false
+      }
+
+      "when schemeHadLoans is Some(true) & 2 records are present (checked and non-pre-pop)" in {
+        val userAnswers = addCheckedRecord(index1of5000, addNonPrePopRecord(index2of5000, schemeHadBondsTrue))
+
+        checkBondsSection(userAnswers, srn) mustBe false
+      }
+    }
+  }
+
+  "checkLoansRecord" - {
+
+    "must be true" - {
+
+      "when record is (unchecked)" in {
+        val userAnswers = addUncheckedRecord(index1of5000, defaultUserAnswers)
+
+        checkBondsRecord(userAnswers, srn, index1of5000) mustBe true
+      }
+    }
+
+    "must be false" - {
+
+      "when record is (checked)" in {
+        val userAnswers = addCheckedRecord(index1of5000, defaultUserAnswers)
+
+        checkBondsRecord(userAnswers, srn, index1of5000) mustBe false
+      }
+
+      "when record is (non-pre-pop)" in {
+        val userAnswers = addNonPrePopRecord(index1of5000, defaultUserAnswers)
+
+        checkBondsRecord(userAnswers, srn, index1of5000) mustBe false
+      }
+    }
+
+  }
+
 }
