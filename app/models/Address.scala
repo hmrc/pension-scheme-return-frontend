@@ -56,7 +56,11 @@ case class Address(
   postCode: Option[String],
   country: String,
   countryCode: String,
-  addressType: AddressType
+  addressType: AddressType,
+  street: Option[String] = None,
+  houseNumber: Option[Int] = None,
+  flatNumber: Option[Int] = None,
+  flat: Option[String] = None
 ) {
   val asString: String =
     s"""$addressLine1, ${addressLine2.fold("")(al2 => s"$al2, ")}${addressLine3.fold("")(al3 => s"$al3, ")}$town${postCode
@@ -94,10 +98,27 @@ object Address {
       .and((JsPath \ "postCode").readNullable[String])
       .and((JsPath \ "countryCode").read[String])
       .and((JsPath \ "addressType").readWithDefault(ManualAddress))
+      .and((JsPath \ "street").readNullable[String])
+      .and((JsPath \ "houseNumber").readNullable[Int])
+      .and((JsPath \ "flatNumber").readNullable[Int])
+      .and((JsPath \ "flat").readNullable[String])
 
   implicit val addressReads: Reads[Address] =
     addressReadsBuilder.apply(
-      (id, addressLine1, addressLine2, addressLine3, town, postCode, countryCode, addressType) => {
+      (
+        id,
+        addressLine1,
+        addressLine2,
+        addressLine3,
+        town,
+        postCode,
+        countryCode,
+        addressType,
+        street,
+        houseNumber,
+        flatNumber,
+        flat
+      ) => {
         Address(
           id,
           addressLine1,
@@ -107,7 +128,11 @@ object Address {
           postCode,
           Country.getCountry(countryCode).getOrElse(""),
           countryCode,
-          addressType
+          addressType,
+          street,
+          houseNumber,
+          flatNumber,
+          flat
         )
       }
     )
