@@ -67,7 +67,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(ArrearsPrevYears(srn, index2of5000), false)
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, index2of5000), ConditionalYesNo.no[Unit, Money](()))
     .unsafeSet(LoanCompleted(srn, index2of5000), SectionCompleted)
-    .unsafeSet(LoansProgress(srn, index1of5000), SectionJourneyStatus.Completed)
+    .unsafeSet(LoansProgress(srn, index2of5000), SectionJourneyStatus.Completed)
 
   private val userAnswersToCheck = completedUserAnswers
     .unsafeSet(IdentityTypePage(srn, index3of5000, loanRecipient), IdentityType.Individual)
@@ -81,6 +81,8 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(SecurityGivenForLoanPage(srn, index3of5000), conditionalYesNoSecurity)
     .unsafeSet(LoanCompleted(srn, index3of5000), SectionCompleted)
     .unsafeSet(LoansProgress(srn, index1of5000), SectionJourneyStatus.Completed)
+    .unsafeSet(LoanPrePopulated(srn, index2of5000), true)
+    .unsafeSet(LoanPrePopulated(srn, index3of5000), false)
 
   private val page = 1
 
@@ -95,13 +97,32 @@ class LoansListControllerSpec extends ControllerBaseSpec {
       index1of5000,
       money,
       "recipientName1",
-      SectionJourneyStatus.Completed
+      SectionJourneyStatus.Completed,
+      canRemove = true
     ),
     LoansData(
       index2of5000,
       money,
       "recipientName2",
-      SectionJourneyStatus.Completed
+      SectionJourneyStatus.Completed,
+      canRemove = true
+    )
+  )
+
+  private val loansDataHalfChecked: List[LoansData] = List(
+    LoansData(
+      index1of5000,
+      money,
+      "recipientName1",
+      SectionJourneyStatus.Completed,
+      canRemove = true
+    ),
+    LoansData(
+      index2of5000,
+      money,
+      "recipientName2",
+      SectionJourneyStatus.Completed,
+      canRemove = false
     )
   )
 
@@ -110,7 +131,8 @@ class LoansListControllerSpec extends ControllerBaseSpec {
       index3of5000,
       money,
       "recipientName3",
-      SectionJourneyStatus.Completed
+      SectionJourneyStatus.Completed,
+      canRemove = false
     )
   )
 
@@ -119,13 +141,15 @@ class LoansListControllerSpec extends ControllerBaseSpec {
       index1of5000,
       money,
       "changedRecipientName",
-      SectionJourneyStatus.Completed
+      SectionJourneyStatus.Completed,
+      canRemove = true
     ),
     LoansData(
       index2of5000,
       money,
       "recipientName2",
-      SectionJourneyStatus.Completed
+      SectionJourneyStatus.Completed,
+      canRemove = true
     )
   )
 
@@ -211,7 +235,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
           srn = srn,
           page = page,
           mode = NormalMode,
-          loansNotToCheck = loansData,
+          loansNotToCheck = loansDataHalfChecked,
           loansToCheck = loansDataToCheck,
           schemeName = schemeName,
           viewOnlyViewModel = None,

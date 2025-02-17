@@ -38,6 +38,7 @@ class LoansPrePopulationProcessorSpec extends BaseSpec with TestValues {
           baseUA = emptyUserAnswers.copy(data = SensitiveJsObject(baseReturnJsValue.as[JsObject])),
           currentUA = currentUa
         )(srn)
+        result.get.data.decryptedValue mustBe cleanResultJsValue.as[JsObject]
         result mustBe Success(
           currentUa.copy(data = SensitiveJsObject(cleanResultJsValue.as[JsObject]))
         )
@@ -185,6 +186,10 @@ object LoansPrePopulationProcessorSpec {
         |{
         |  "current": "dummy-current-data",
         |  "loans": {
+        |    "loanPrePopulated": {
+        |      "0": false,
+        |      "1": false
+        |    }, 
         |    "loanTransactions": {
         |      "recipientIdentityType": {
         |        "identityTypes": {

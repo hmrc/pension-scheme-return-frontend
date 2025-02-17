@@ -20,7 +20,7 @@ import services.PsrSubmissionService
 import play.api.inject.bind
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
-import models.{IdentitySubject, IdentityType, NormalMode}
+import models._
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
 import viewmodels.models.SectionJourneyStatus
@@ -50,6 +50,9 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
     .unsafeSet(IndividualRecipientNamePage(srn, refineMV(3)), "recipientName3")
     .unsafeSet(AmountOfTheLoanPage(srn, refineMV(3)), amountOfTheLoan)
     .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+
+  val prePopUserAnswersChecked: UserAnswers = filledUserAnswers.unsafeSet(LoanPrePopulated(srn, refineMV(1)), true)
+  val prePopUserAnswersNotChecked: UserAnswers = filledUserAnswers.unsafeSet(LoanPrePopulated(srn, refineMV(1)), false)
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -104,5 +107,16 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
     act.like(invalidForm(onSubmit, filledUserAnswers))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+
+    act.like(
+      redirectToPage(onPageLoad, controllers.routes.UnauthorisedController.onPageLoad(), prePopUserAnswersChecked)
+        .updateName(_ + " - Block removing checked Prepop loans")
+    )
+
+    act.like(
+      redirectToPage(onPageLoad, controllers.routes.UnauthorisedController.onPageLoad(), prePopUserAnswersNotChecked)
+        .updateName(_ + " - Block removing unchecked Prepop loans")
+    )
+
   }
 }

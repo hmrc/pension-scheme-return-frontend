@@ -167,6 +167,7 @@ class LoansTransformer @Inject() extends Transformer {
                           .get(SecurityGivenForLoanPage(srn, index))
                           .map(_.value.toOption)
                         interestOnLoan <- request.userAnswers.get(InterestOnLoanPage(srn, index))
+                        prePopulated = request.userAnswers.get(LoanPrePopulated(srn, index))
                         (loanInterestAmount, loanInterestRate, optIntReceivedCY) = interestOnLoan.asTuple
                         optArrearsPrevYears = request.userAnswers.get(ArrearsPrevYears(srn, index))
                         optOutstandingArrearsOnLoan = if (optArrearsPrevYears.isEmpty) {
@@ -181,7 +182,7 @@ class LoansTransformer @Inject() extends Transformer {
                         }
                       } yield {
                         LoanTransactions(
-                          prePopulated = None,
+                          prePopulated = prePopulated,
                           recipientIdentityType,
                           recipientName,
                           connectedParty,
@@ -510,6 +511,16 @@ class LoansTransformer @Inject() extends Transformer {
         index => LoansProgress(srn, index) -> SectionJourneyStatus.Completed
       )
 
+      loanPrePopulated = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).prePopulated.nonEmpty
+          }
+        )
+        .map(
+          index => LoanPrePopulated(srn, index) -> loanTransactions(index.value - 1).prePopulated.get
+        )
+
       ua0 <- optRecordVersion.foldLeft(Try(userAnswers)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
@@ -546,6 +557,7 @@ class LoansTransformer @Inject() extends Transformer {
       }
       ua17 <- loanCompleted.foldLeft(Try(ua16)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua18 <- loanProgress.foldLeft(Try(ua17)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-    } yield ua18
+      ua19 <- loanPrePopulated.foldLeft(Try(ua18)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+    } yield ua19
   }
 }

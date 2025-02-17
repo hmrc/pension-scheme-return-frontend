@@ -60,14 +60,24 @@ object LoansCheckStatusUtils {
   }
 
   /**
-   * This method determines whether or not a Loans record needs to be checked. A record needs checking if any of the
-   * pre-populated-then-cleared answers are missing & all of the other answers are present.
+   * This method determines whether or not a Loans record needs to be checked. A record only needs to be checked if its
+   * LoanPrePopulated field is false.
    * @param userAnswers the answers provided by the user, from which we get the Loans record
    * @param srn the Scheme Reference Number, used for the .get calls
    * @param recordIndex the index of the record being checked
    * @return true if the record requires checking, else false
    */
   def checkLoansRecord(
+    userAnswers: UserAnswers,
+    srn: Srn,
+    recordIndex: Max5000
+  ): Boolean =
+    userAnswers.get(LoanPrePopulated(srn, recordIndex)) match {
+      case Some(checked) => !checked
+      case None => checkLoansRecordLegacy(userAnswers, srn, recordIndex) // non-pre-pop
+    }
+
+  def checkLoansRecordLegacy(
     userAnswers: UserAnswers,
     srn: Srn,
     recordIndex: Max5000
@@ -102,9 +112,10 @@ object LoansCheckStatusUtils {
 
   /**
    * This method determines whether or not all answers are present for a given IdentityType.
-   * @param userAnswers the answers provided by the user
-   * @param srn the Scheme Reference Number, used for the .get calls
-   * @param recordIndex the index of the record being checked
+   *
+   * @param userAnswers  the answers provided by the user
+   * @param srn          the Scheme Reference Number, used for the .get calls
+   * @param recordIndex  the index of the record being checked
    * @param identityType relates to the seller involved: Individual, UKCompany, UKPartnership, or Other
    * @return true if all answers are present, else false
    */
@@ -151,4 +162,5 @@ object LoansCheckStatusUtils {
           case (_, _) => false
         }
     }
+
 }

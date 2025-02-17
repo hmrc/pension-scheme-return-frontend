@@ -143,7 +143,7 @@ class LoansListController @Inject()(
         case (loansToCheck, loans) =>
           // We are only fetching the progressUrl from the loans which doesn't need checking
           val getInProgressUrl = loans
-            .collectFirst { case LoansData(_, _, _, SectionJourneyStatus.InProgress(url)) => url }
+            .collectFirst { case LoansData(_, _, _, SectionJourneyStatus.InProgress(url), _) => url }
 
           if (loansToCheck.size + loans.size >= Constants.maxLoans) {
             Future.successful(
@@ -242,6 +242,7 @@ class LoansListController @Inject()(
     def buildLoans(index: Max5000): LoansData = {
       val loanAmountDetails = request.userAnswers.get(AmountOfTheLoanPage(srn, index))
       val loanRecipientType = request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
+      val canRemove = request.userAnswers.get(LoanPrePopulated(srn, index)).isEmpty
       val progress = loanProgress(index)
 
       val recipientName = loanRecipientType.flatMap {
@@ -262,7 +263,8 @@ class LoansListController @Inject()(
             index = index,
             loanAmount = amountDetails.loanAmount,
             recipientName = name,
-            progress = progress
+            progress = progress,
+            canRemove
           )
 
         case _ =>
@@ -283,7 +285,8 @@ class LoansListController @Inject()(
             index = index,
             loanAmount = amount,
             recipientName = name,
-            progress = storedProgress
+            progress = storedProgress,
+            canRemove
           )
       }
     }
@@ -339,7 +342,7 @@ object LoansListController {
         List()
       case (list, _) =>
         list.flatMap {
-          case LoansData(index, loanAmount, recipientName, loansProgress) =>
+          case LoansData(index, loanAmount, recipientName, loansProgress, canRemove) =>
             val validLoan = loanAmount.value > 0 && recipientName.nonEmpty
             (mode, viewOnlyViewModel) match {
               case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
@@ -361,7 +364,7 @@ object LoansListController {
                 )
               case _ if isPrePopulation && !validLoan || loansProgress.inProgress => None
               case _ if loansProgress.inProgress && !isPrePopulation => None
-              case _ =>
+              case _ if canRemove =>
                 Some(
                   ListRow(
                     text = Message("loansList.row", loanAmount.displayAs, recipientName),
@@ -369,6 +372,14 @@ object LoansListController {
                     changeHiddenText = Message("loansList.row.change.hidden", loanAmount.displayAs, recipientName),
                     removeUrl = routes.RemoveLoanController.onPageLoad(srn, index, mode).url,
                     removeHiddenText = Message("loansList.row.remove.hidden", loanAmount.displayAs, recipientName)
+                  )
+                )
+              case _ =>
+                Some(
+                  ListRow(
+                    text = Message("loansList.row", loanAmount.displayAs, recipientName),
+                    changeUrl = routes.LoansCYAController.onPageLoad(srn, index, CheckMode).url,
+                    changeHiddenText = Message("loansList.row.change.hidden", loanAmount.displayAs, recipientName)
                   )
                 )
             }
@@ -539,6 +550,7 @@ object LoansListController {
     index: Max5000,
     loanAmount: Money,
     recipientName: String,
-    progress: SectionJourneyStatus
+    progress: SectionJourneyStatus,
+    canRemove: Boolean
   )
 }
