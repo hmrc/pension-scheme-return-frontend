@@ -16,7 +16,6 @@
 
 package transformations
 
-import pages.nonsipp.memberdetails._
 import com.google.inject.Singleton
 import pages.nonsipp.memberdetails.MembersDetailsPage._
 import config.RefinedTypes.{Max300, Max50}
@@ -27,6 +26,8 @@ import pages.nonsipp.membertransferout.SchemeTransferOutPage
 import models.softdelete.SoftDeletedMember
 import cats.syntax.traverse._
 import pages.nonsipp.employercontributions._
+import utils.Diff
+import pages.nonsipp.memberdetails._
 import pages.nonsipp.membercontributions.{MemberContributionsPage, TotalMemberContributionPage}
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
 import config.RefinedTypes.Max300.Refined
@@ -38,7 +39,9 @@ import models.UserAnswers.implicits._
 import pages.nonsipp.{FbStatus, FbVersionPage}
 import play.api.Logger
 import uk.gov.hmrc.domain.Nino
+import play.api.libs.json._
 import pages.nonsipp.memberpayments._
+import utils.JsonUtils.{JsObjectOps, JsPathOps}
 import viewmodels.models._
 
 import scala.util.{Success, Try}
@@ -157,8 +160,8 @@ class MemberPaymentsTransformer @Inject()(
       // Omit memberPSRVersion if member has changed
       // Check for empty member payment sections before comparing members
       // (this is because we send empty records in certain sections for members)
-      val memberDetailsWithCorrectVersion: List[MemberDetails] = memberDetailsWithCorrectState.toSeq
-        .sortBy(_._1.value)(Ordering[Int])
+      val memberDetailsWithCorrectVersion: List[MemberDetails] = memberDetailsWithCorrectState.toList
+        .sortBy { case (index, _) => index.value }
         .map {
           case (index, currentMemberDetail) =>
             initialMemberDetails.get(index) match {
@@ -180,12 +183,31 @@ class MemberPaymentsTransformer @Inject()(
                 )
             }
         }
-        .toList
 
       (memberDetailsWithCorrectVersion, softDeletedMembers) match {
         case (Nil, Nil) => None
         case _ =>
-          val sameMemberPayments: Boolean = userAnswers.sameAs(initialUA, membersPayments, Omitted.membersPayments: _*)
+          val diff: Map[JsPath, (JsValue, JsValue)] = {
+            (initialUA.get(membersPayments), userAnswers.get(membersPayments)) match {
+              case (Some(a), Some(b)) =>
+                Diff.json(
+                  a.as[JsObject].omit(Omitted.membersPayments: _*),
+                  b.as[JsObject].omit(Omitted.membersPayments: _*)
+                )
+              case _ => Map.empty
+            }
+          }.flatMap {
+            // check diff to make sure when a new value has been added for the journey control fields, it's an actual user input
+            case field @ (path, (JsNull, value)) if path.clean.last == __ \ PensionCommencementLumpSumAmountPage.key =>
+              if (value.as[PensionCommencementLumpSum].isZero) Map.empty else Map(field)
+            case field @ (path, (JsNull, value)) if path.clean.last == __ \ TotalAmountPensionPaymentsPage.key =>
+              if (value.as[Money].isZero) Map.empty else Map(field)
+            case field @ (path, (JsNull, value)) if path.clean.last == __ \ TotalMemberContributionPage.key =>
+              if (value.as[Money].isZero) Map.empty else Map(field)
+            case valid => Map(valid)
+          }
+
+          val sameMemberPayments: Boolean = diff.isEmpty
           if (!sameMemberPayments) {
             logger.info(s"member payments has changed, removing recordVersion")
           }

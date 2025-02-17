@@ -16,6 +16,8 @@
 
 package utils
 
+import play.api.libs.json._
+
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 
@@ -47,5 +49,40 @@ object Diff {
           List(s"Could not compare field '${field.name}': ${ex.getMessage}")
       }
     }
+  }
+
+  def json(obj1: JsValue, obj2: JsValue): Map[JsPath, (JsValue, JsValue)] = (obj1, obj2) match {
+    case (o1: JsObject, o2: JsObject) =>
+      val keys = o1.keys ++ o2.keys
+
+      keys.flatMap { key =>
+        (o1 \ key, o2 \ key) match {
+          case (JsDefined(v1), JsDefined(v2)) if v1 != v2 =>
+            val nestedDiff = json(v1, v2).map { case (p, diff) => (JsPath \ key ++ p) -> diff }
+            if (nestedDiff.nonEmpty) nestedDiff else Map(JsPath \ key -> (v1, v2))
+
+          case (JsDefined(v1), JsUndefined()) => Some(JsPath \ key -> (v1, JsNull))
+          case (JsUndefined(), JsDefined(v2)) => Some(JsPath \ key -> (JsNull, v2))
+          case _ => None
+        }
+      }.toMap
+
+    case (JsArray(arr1), JsArray(arr2)) =>
+      val maxLength = math.max(arr1.length, arr2.length)
+      (0 until maxLength).flatMap { index =>
+        (arr1.lift(index), arr2.lift(index)) match {
+          case (Some(v1), Some(v2)) if v1 != v2 =>
+            val nestedDiff = json(v1, v2).map { case (p, diff) => (JsPath(index) ++ p) -> diff }
+            if (nestedDiff.nonEmpty) nestedDiff else Map(JsPath(index) -> (v1, v2))
+
+          case (Some(v1), None) => Some(JsPath(index) -> (v1, JsNull))
+          case (None, Some(v2)) => Some(JsPath(index) -> (JsNull, v2))
+          case _ => None
+        }
+      }.toMap
+
+    case _ if obj1 != obj2 => Map(JsPath -> (obj1, obj2))
+
+    case _ => Map.empty
   }
 }
