@@ -26,6 +26,28 @@ object JsonUtils {
 
   implicit class JsObjectOps(json: JsObject) {
     def +?(o: Option[JsObject]): JsObject = o.fold(json)(_ ++ json)
+
+    def removeEmptyObjects(): JsObject = json.value.foldLeft(JsObject.empty) {
+      case (obj, (_, JsObject(value))) if value.isEmpty => obj
+      case (obj, (key, newObj)) => obj ++ Json.obj(key -> newObj)
+    }
+
+    def omit(toOmit: String*): JsObject =
+      toOmit.toList.foldLeft(json)((a, toOmit) => a - toOmit)
+  }
+
+  implicit class JsPathOps(path: JsPath) {
+    // Rewrites JsPath removing all index notation nodes
+    def clean: JsPath =
+      JsPath(path.path.collect {
+        case keyNode @ KeyPathNode(key) if !key.forall(_.isDigit) => keyNode
+      })
+
+    // Returns the last node of a JsPath
+    def last: JsPath = path.path.lastOption match {
+      case Some(node) => JsPath(List(node))
+      case None => JsPath(Nil)
+    }
   }
 
   // Creates a Json format for an either value type

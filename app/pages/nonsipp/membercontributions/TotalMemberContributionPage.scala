@@ -28,7 +28,7 @@ case class TotalMemberContributionPage(srn: Srn, index: Max300) extends Question
   override def path: JsPath =
     Paths.memberDetails \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "totalMemberContribution"
+  override def toString: String = TotalMemberContributionPage.key
 
 }
 
@@ -37,6 +37,10 @@ case class AllTotalMemberContributionPages(srn: Srn) extends IndexedQuestionPage
   override def path: JsPath =
     Paths.memberDetails \ toString
 
-  override def toString: String = "totalMemberContribution"
+  override def toString: String = TotalMemberContributionPage.key
 
+}
+
+object TotalMemberContributionPage {
+  val key = "totalMemberContribution"
 }

@@ -22,9 +22,10 @@ import models.UserAnswers.SensitiveJsObject
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive}
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
-import viewmodels.models.Flag
 import play.api.data.Form
 import uk.gov.hmrc.crypto.json.JsonEncryption
+import utils.JsonUtils.JsObjectOps
+import viewmodels.models.Flag
 
 import scala.util.{Failure, Success, Try}
 
@@ -81,14 +82,9 @@ final case class UserAnswers(
     }
   }
 
-  def sameAs(other: UserAnswers, path: JsPath, omit: String*): Boolean = {
-    val removeEmptyObjects: JsValue => JsObject = _.as[JsObject].value.foldLeft(JsObject.empty) {
-      case (obj, (_, JsObject(value))) if value.isEmpty => obj
-      case (obj, (key, newObj)) => obj ++ Json.obj(key -> newObj)
-    }
-
-    val sanitisedObject = omit.foldLeft(removeEmptyObjects)((a, toOmit) => a.andThen(_ - toOmit))
-    this.get(path).map(sanitisedObject) == other.get(path).map(sanitisedObject)
+  def sameAs(other: UserAnswers, path: JsPath, toOmit: String*): Boolean = {
+    val sanitise: JsValue => JsObject = json => json.as[JsObject].removeEmptyObjects().omit(toOmit: _*)
+    this.get(path).map(sanitise) == other.get(path).map(sanitise)
   }
 
   def compose(c: List[UserAnswers.Compose]): Try[UserAnswers] = c.foldLeft(Try(this))((ua, next) => next(ua))
