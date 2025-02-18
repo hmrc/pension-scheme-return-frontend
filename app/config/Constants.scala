@@ -118,7 +118,7 @@ object Constants {
   val maxOtherDescriptionLength = 35
   val maxNotRelevant = 9999999
 
-  val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/&()]+$"""
+  val textAreaRegex = """^[a-zA-Z0-9\-’`'" \t,.@/&()]+$"""
   val inputRegexQROPS = """^(Q[0-9]{6})$"""
   val inputRegexPSTR = """^([0-9]{8}[A-Z]{2})$"""
 

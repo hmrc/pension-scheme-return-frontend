@@ -94,7 +94,7 @@ object ClassOfSharesController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.textArea(
     "shares.classOfShares.error.required",
     "shares.classOfShares.error.length",
-    "shares.classOfShares.error.invalid.characters"
+    "error.textarea.invalid"
   )
 
   def viewModel(

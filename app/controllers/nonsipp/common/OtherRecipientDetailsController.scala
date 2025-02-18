@@ -97,7 +97,7 @@ object OtherRecipientDetailsController {
     s"${subject.key}.otherRecipientDetails.name.error.invalid",
     s"${subject.key}.otherRecipientDetails.name.error.length",
     s"${subject.key}.otherRecipientDetails.description.error.required",
-    s"${subject.key}.otherRecipientDetails.description.error.invalid",
+    "error.textarea.invalid",
     s"${subject.key}.otherRecipientDetails.description.error.length"
   )
 

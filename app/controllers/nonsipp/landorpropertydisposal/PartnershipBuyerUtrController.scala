@@ -103,7 +103,7 @@ object PartnershipBuyerUtrController {
 
   private val noFormErrors = InputFormErrors.textArea(
     "partnershipBuyerUtr.no.conditional.error.required",
-    "partnershipBuyerUtr.no.conditional.error.invalid",
+    "error.textarea.invalid",
     "partnershipBuyerUtr.no.conditional.error.length"
   )
 

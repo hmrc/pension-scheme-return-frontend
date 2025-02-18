@@ -94,7 +94,7 @@ object CompanyRecipientCrnController {
 
   private def inputFormErrors(subjectKey: String) = InputFormErrors.textArea(
     s"$subjectKey.companyRecipientCrn.no.conditional.error.required",
-    s"$subjectKey.companyRecipientCrn.no.conditional.error.invalid",
+    "error.textarea.invalid",
     s"$subjectKey.companyRecipientCrn.no.conditional.error.length"
   )
 

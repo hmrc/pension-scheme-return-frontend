@@ -90,7 +90,7 @@ object OtherEmployeeDescriptionController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.textAreaShorter(
     "otherEmployeeDescription.error.required",
     "otherEmployeeDescription.error.length",
-    "otherEmployeeDescription.error.invalid"
+    "error.textarea.invalid"
   )
 
   def viewModel(

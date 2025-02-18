@@ -152,7 +152,7 @@ object TransferringSchemeTypeController {
     } else {
       InputFormErrors.textArea(
         "transferring.conditional.Other.error.required",
-        "transferring.conditional.Other.error.invalid",
+        "error.textarea.invalid",
         "transferring.conditional.Other.error.length"
       )
     }

@@ -100,10 +100,10 @@ class OtherBuyerDetailsController @Inject()(
 object OtherBuyerDetailsController {
   def form(formProvider: RecipientDetailsFormProvider): Form[RecipientDetails] = formProvider(
     "otherBuyerDetails.name.error.required",
-    "otherBuyerDetails.name.error.invalid",
+    "error.textarea.invalid",
     "otherBuyerDetails.name.error.length",
     "otherBuyerDetails.description.error.required",
-    "otherBuyerDetails.description.error.invalid",
+    "error.textarea.invalid",
     "otherBuyerDetails.description.error.length"
   )
 

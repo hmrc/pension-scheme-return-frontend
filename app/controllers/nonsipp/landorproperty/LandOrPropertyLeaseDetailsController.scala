@@ -108,7 +108,7 @@ object LandOrPropertyLeaseDetailsController {
   private val field1Errors: InputFormErrors =
     InputFormErrors.textArea(
       "landOrPropertyLeaseDetails.field1.error.required",
-      "landOrPropertyLeaseDetails.field1.error.invalid",
+      "error.textarea.invalid",
       "landOrPropertyLeaseDetails.field1.error.length"
     )
 

@@ -55,10 +55,22 @@ class TextFormProviderSpec extends FieldBehaviours {
         fieldThatBindsValidData(
           form,
           "value",
-          "Hi, I'm a test on date 10-12-2010 with email test@email.com \n with a newline and \ttab"
+          "Hi, I'm a test on date 10-12-2010 with email test@email.com (brackets) and a \ttab"
         )
       )
     }
+
+    "disallow newlines" - {
+      behave.like(
+        invalidField(
+          form,
+          "value",
+          "invalid",
+          "Hi, I'm a test \n with a newline and a \r carriage return"
+        )
+      )
+    }
+
   }
 
   ".nino" - {

@@ -94,7 +94,7 @@ object PartnershipRecipientUtrController {
 
   private def noFormErrors(subjectKey: String) = InputFormErrors.textArea(
     s"$subjectKey.partnershipRecipientUtr.no.conditional.error.required",
-    s"$subjectKey.partnershipRecipientUtr.no.conditional.error.invalid",
+    "error.textarea.invalid",
     s"$subjectKey.partnershipRecipientUtr.no.conditional.error.length"
   )
 

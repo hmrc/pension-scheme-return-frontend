@@ -79,7 +79,7 @@ object EmployerNameController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.text(
     "employerName.error.required",
     "employerName.error.tooLong",
-    "employerName.error.invalid"
+    "error.textarea.invalid"
   )
 
   def viewModel(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode): FormPageViewModel[TextInputViewModel] =

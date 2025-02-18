@@ -82,7 +82,7 @@ object PartnershipNameOfSharesSellerController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.text(
     "partnershipNameOfSharesSeller.error.required",
     "partnershipNameOfSharesSeller.error.tooLong",
-    "partnershipNameOfSharesSeller.error.invalid"
+    "error.textarea.invalid"
   )
 
   def viewModel(

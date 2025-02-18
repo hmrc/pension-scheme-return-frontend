@@ -76,7 +76,7 @@ object IndividualNameOfOtherAssetSellerController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.text(
     "otherAssets.individualNameOfOtherAssetSeller.error.required",
     "otherAssets.individualNameOfOtherAssetSeller.error.tooLong",
-    "otherAssets.individualNameOfOtherAssetSeller.error.invalid"
+    "error.textarea.invalid"
   )
 
   def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextInputViewModel] =

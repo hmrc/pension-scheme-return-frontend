@@ -53,7 +53,8 @@ object PensionSchemeType {
       Json.obj("key" -> RegisteredPS.name, "value" -> description.filterNot(_.isWhitespace))
     case QualifyingRecognisedOverseasPS(description) =>
       Json.obj("key" -> QualifyingRecognisedOverseasPS.name, "value" -> description.filterNot(_.isWhitespace))
-    case Other(description) => Json.obj("key" -> Other.name, "value" -> description)
+    case Other(description) =>
+      Json.obj("key" -> Other.name, "value" -> description.replaceAll("\n", " ").replaceAll("\r", " "))
   }
 
   implicit val reads: Reads[PensionSchemeType] =
