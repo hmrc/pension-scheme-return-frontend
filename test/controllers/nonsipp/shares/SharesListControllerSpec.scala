@@ -93,6 +93,10 @@ class SharesListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(HowManySharesPage(srn, indexTwo), totalShares)
     .unsafeSet(CostOfSharesPage(srn, indexTwo), money)
     .unsafeSet(SharesIndependentValuationPage(srn, indexTwo), true)
+    .unsafeSet(SharePrePopulated(srn, indexTwo), false)
+
+  private val userAnswersChecked = userAnswersToCheck
+    .unsafeSet(SharePrePopulated(srn, indexTwo), true)
 
   private val noUserAnswers =
     defaultUserAnswers
@@ -106,7 +110,8 @@ class SharesListControllerSpec extends ControllerBaseSpec {
       typeOfShares = TypeOfShares.ConnectedParty,
       companyName = companyName,
       acquisitionType = SchemeHoldShare.Transfer,
-      acquisitionDate = None
+      acquisitionDate = None,
+      canRemove = true
     )
   )
   private val changedSharesData = List(
@@ -115,7 +120,8 @@ class SharesListControllerSpec extends ControllerBaseSpec {
       typeOfShares = TypeOfShares.ConnectedParty,
       companyName = "changed",
       acquisitionType = SchemeHoldShare.Transfer,
-      acquisitionDate = None
+      acquisitionDate = None,
+      canRemove = true
     )
   )
   private val shareToCheckData = List(
@@ -124,7 +130,19 @@ class SharesListControllerSpec extends ControllerBaseSpec {
       typeOfShares = TypeOfShares.ConnectedParty,
       companyName = companyName,
       acquisitionType = SchemeHoldShare.Transfer,
-      acquisitionDate = None
+      acquisitionDate = None,
+      canRemove = false
+    )
+  )
+
+  private val shareToChecked = List(
+    SharesData(
+      indexTwo,
+      typeOfShares = TypeOfShares.ConnectedParty,
+      companyName = companyName,
+      acquisitionType = SchemeHoldShare.Transfer,
+      acquisitionDate = None,
+      canRemove = false
     )
   )
 
@@ -166,7 +184,24 @@ class SharesListControllerSpec extends ControllerBaseSpec {
             isPrePop = true
           )
         )
-    })
+    }.updateName(_ + " - To Check"))
+
+    act.like(renderViewWithPrePopSession(onPageLoad, userAnswersChecked) { implicit app => implicit request =>
+      injected[ListView]
+        .apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(
+            srn,
+            page,
+            NormalMode,
+            sharesData ++ shareToChecked,
+            Nil,
+            schemeName,
+            showBackLink = true,
+            isPrePop = true
+          )
+        )
+    }.updateName(_ + " - Checked"))
 
     act.like(
       renderPrePopView(onPageLoad, SharesListPage(srn), true, userAnswers) { implicit app => implicit request =>

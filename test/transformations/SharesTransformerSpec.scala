@@ -180,6 +180,18 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           .unsafeSet(SharesIndependentValuationPage(srn, refineMV(1)), true)
           .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, refineMV(1)), localDate)
           .unsafeSet(SharesFromConnectedPartyPage(srn, refineMV(1)), false)
+          .unsafeSet(SharePrePopulated(srn, refineMV(1)), true)
+          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), Unquoted)
+          .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, refineMV(2)), Contribution)
+          .unsafeSet(CompanyNameRelatedSharesPage(srn, refineMV(2)), "nameOfSharesCompany2")
+          .unsafeSet(SharesCompanyCrnPage(srn, refineMV(2)), ConditionalYesNo.no[String, Crn]("CRN-No-Reason"))
+          .unsafeSet(ClassOfSharesPage(srn, refineMV(2)), "classOfShares")
+          .unsafeSet(HowManySharesPage(srn, refineMV(2)), 123)
+          .unsafeSet(CostOfSharesPage(srn, refineMV(2)), money)
+          .unsafeSet(SharesIndependentValuationPage(srn, refineMV(2)), true)
+          .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, refineMV(2)), localDate)
+          .unsafeSet(SharesFromConnectedPartyPage(srn, refineMV(2)), false)
+          .unsafeSet(SharePrePopulated(srn, refineMV(2)), false)
 
         val result = transformer.transformToEtmp(srn = srn, userAnswers)(
           DataRequest(allowedAccessRequestPrePopulation, userAnswers)
@@ -191,10 +203,33 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
             optShareTransactions = Some(
               List(
                 ShareTransaction(
-                  prePopulated = None,
+                  prePopulated = Some(true),
                   typeOfSharesHeld = Unquoted,
                   shareIdentification = ShareIdentification(
                     nameOfSharesCompany = "nameOfSharesCompany",
+                    optCrnNumber = None,
+                    optReasonNoCRN = Some("CRN-No-Reason"),
+                    classOfShares = "classOfShares"
+                  ),
+                  heldSharesTransaction = HeldSharesTransaction(
+                    schemeHoldShare = Contribution,
+                    optDateOfAcqOrContrib = Some(localDate),
+                    totalShares = 123,
+                    optAcquiredFromName = None,
+                    optPropertyAcquiredFrom = None,
+                    optConnectedPartyStatus = Some(false),
+                    costOfShares = money.value,
+                    supportedByIndepValuation = true,
+                    optTotalAssetValue = None,
+                    optTotalDividendsOrReceipts = None
+                  ),
+                  optDisposedSharesTransaction = None
+                ),
+                ShareTransaction(
+                  prePopulated = Some(false),
+                  typeOfSharesHeld = Unquoted,
+                  shareIdentification = ShareIdentification(
+                    nameOfSharesCompany = "nameOfSharesCompany2",
                     optCrnNumber = None,
                     optReasonNoCRN = Some("CRN-No-Reason"),
                     classOfShares = "classOfShares"

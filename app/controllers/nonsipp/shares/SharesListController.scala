@@ -226,7 +226,8 @@ class SharesListController @Inject()(
         companyName <- requiredPage(CompanyNameRelatedSharesPage(srn, index))
         acquisitionType <- requiredPage(WhyDoesSchemeHoldSharesPage(srn, index))
         acquisitionDate = request.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index))
-      } yield SharesData(index, typeOfSharesHeld, companyName, acquisitionType, acquisitionDate)
+        canRemove = request.userAnswers.get(SharePrePopulated(srn, index)).isEmpty
+      } yield SharesData(index, typeOfSharesHeld, companyName, acquisitionType, acquisitionDate, canRemove)
 
     if (isPrePopulation) {
       for {
@@ -279,7 +280,7 @@ object SharesListController {
         List()
       case (list, _) =>
         list.map {
-          case SharesData(index, typeOfShares, companyName, acquisition, acquisitionDate) =>
+          case SharesData(index, typeOfShares, companyName, acquisition, acquisitionDate, canRemove) =>
             val sharesType = typeOfShares match {
               case TypeOfShares.SponsoringEmployer => "sharesList.sharesType.sponsoringEmployer"
               case TypeOfShares.Unquoted => "sharesList.sharesType.unquoted"
@@ -310,13 +311,19 @@ object SharesListController {
                   routes.SharesCheckAndUpdateController.onPageLoad(srn, index).url,
                   Message("site.check.param", sharesMessage)
                 )
-              case _ =>
+              case _ if canRemove =>
                 ListRow(
                   sharesMessage,
                   changeUrl = routes.SharesCYAController.onPageLoad(srn, index, CheckMode).url,
                   changeHiddenText = Message("site.change.param", sharesMessage),
                   removeUrl = routes.RemoveSharesController.onPageLoad(srn, index, mode).url,
                   removeHiddenText = Message("site.remove.param", sharesMessage)
+                )
+              case _ =>
+                ListRow(
+                  sharesMessage,
+                  changeUrl = routes.SharesCYAController.onPageLoad(srn, index, CheckMode).url,
+                  changeHiddenText = Message("site.change.param", sharesMessage)
                 )
             }
         }
@@ -486,6 +493,7 @@ object SharesListController {
     typeOfShares: TypeOfShares,
     companyName: String,
     acquisitionType: SchemeHoldShare,
-    acquisitionDate: Option[LocalDate]
+    acquisitionDate: Option[LocalDate],
+    canRemove: Boolean
   )
 }

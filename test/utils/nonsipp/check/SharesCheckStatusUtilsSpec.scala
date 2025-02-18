@@ -16,7 +16,7 @@
 
 package utils.nonsipp.check
 
-import pages.nonsipp.shares._
+import pages.nonsipp.shares.{SharePrePopulated, _}
 import models.IdentityType._
 import utils.nonsipp.check.SharesCheckStatusUtils.{checkSharesRecord, checkSharesSection}
 import org.scalatest.OptionValues
@@ -103,11 +103,81 @@ class SharesCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with O
       .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index), localDate)
       .unsafeSet(TotalAssetValuePage(srn, index), money)
 
-  private def addSharesPrePopAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
+  private def addSharesPrePopAnswersLegacy(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers
       .unsafeSet(SharesTotalIncomePage(srn, index), money)
 
+  private def addSharesPrePopAnswersChecked(index: Max5000, userAnswers: UserAnswers): UserAnswers =
+    userAnswers
+      .unsafeSet(SharesTotalIncomePage(srn, index), money)
+      .unsafeSet(SharePrePopulated(srn, index), true)
+
+  private def addSharesPrePopAnswersNotChecked(index: Max5000, userAnswers: UserAnswers): UserAnswers =
+    userAnswers
+      .unsafeSet(SharesTotalIncomePage(srn, index), money)
+      .unsafeSet(SharePrePopulated(srn, index), false)
+
   "checkSharesSection" - {
+
+    "must be true when sharePrePopuleted flag is set to false (not checked)" in {
+      val userAnswers =
+        addSharesBaseAnswers(
+          index1of5000,
+          addSharesUnquotedAnswers(
+            index1of5000,
+            addSharesTransferAnswers(
+              index1of5000,
+              addSharesBaseAnswers(
+                index2of5000,
+                addSharesConnectedPartyAnswers(
+                  index2of5000,
+                  addSharesContributionAnswers(
+                    index2of5000,
+                    addSharesPrePopAnswersNotChecked(
+                      index2of5000,
+                      didSchemeHoldAnySharesTrue
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+
+      checkSharesSection(userAnswers, srn) mustBe true
+    }
+
+  }
+
+  "must be false when sharePrePopuleted flag is set to true (checked)" in {
+    val userAnswers =
+      addSharesBaseAnswers(
+        index1of5000,
+        addSharesUnquotedAnswers(
+          index1of5000,
+          addSharesTransferAnswers(
+            index1of5000,
+            addSharesBaseAnswers(
+              index2of5000,
+              addSharesConnectedPartyAnswers(
+                index2of5000,
+                addSharesContributionAnswers(
+                  index2of5000,
+                  addSharesPrePopAnswersChecked(
+                    index2of5000,
+                    didSchemeHoldAnySharesTrue
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+
+    checkSharesSection(userAnswers, srn) mustBe true
+  }
+
+  "checkSharesSection Legacy" - {
 
     "must be true" - {
 
@@ -141,7 +211,7 @@ class SharesCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with O
                     index2of5000,
                     addSharesContributionAnswers(
                       index2of5000,
-                      addSharesPrePopAnswers(
+                      addSharesPrePopAnswersLegacy(
                         index2of5000,
                         didSchemeHoldAnySharesTrue
                       )
@@ -185,7 +255,7 @@ class SharesCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with O
                     index2of5000,
                     addSharesTransferAnswers(
                       index2of5000,
-                      addSharesPrePopAnswers(
+                      addSharesPrePopAnswersLegacy(
                         index2of5000,
                         defaultUserAnswers
                       )
@@ -428,7 +498,7 @@ class SharesCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with O
               index1of5000,
               addSharesIndividualAnswers(
                 index1of5000,
-                addSharesPrePopAnswers(
+                addSharesPrePopAnswersLegacy(
                   index1of5000,
                   didSchemeHoldAnySharesTrue
                 )
