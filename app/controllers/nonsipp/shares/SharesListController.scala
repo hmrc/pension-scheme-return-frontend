@@ -308,7 +308,7 @@ object SharesListController {
                 ListRow.check(
                   sharesMessage,
                   routes.SharesCheckAndUpdateController.onPageLoad(srn, index).url,
-                  Message("sharesList.row.check.hiddenText", sharesMessage)
+                  Message("site.check.param", sharesMessage)
                 )
               case _ =>
                 ListRow(
