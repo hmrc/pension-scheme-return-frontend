@@ -83,6 +83,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
               assetDescription <- request.userAnswers.get(WhatIsOtherAssetPage(srn, index))
               methodOfHolding <- request.userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index))
               costOfAsset <- request.userAnswers.get(CostOfOtherAssetPage(srn, index))
+              prePopulated = request.userAnswers.get(OtherAssetsPrePopulated(srn, index))
             } yield {
 
               val optNoneTransferRelatedDetails = buildOptNoneTransferRelatedDetails(methodOfHolding, srn, index)
@@ -91,7 +92,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
               val optTotalIncomeOrReceipts = request.userAnswers.get(IncomeFromAssetPage(srn, index))
 
               OtherAssetTransaction(
-                prePopulated = None,
+                prePopulated = prePopulated,
                 assetDescription = assetDescription,
                 methodOfHolding = methodOfHolding,
                 optDateOfAcqOrContrib = optNoneTransferRelatedDetails.map(_._2),
@@ -544,6 +545,16 @@ class OtherAssetsTransformer @Inject() extends Transformer {
 
           val otherAssetsCompleted = OtherAssetsCompleted(srn, index) -> SectionCompleted
 
+          val otherAssetsPrePopulated = indexes
+            .filter(
+              index => {
+                otherAssetTransactions(index.value - 1).prePopulated.nonEmpty
+              }
+            )
+            .map(
+              index => OtherAssetsPrePopulated(srn, index) -> otherAssetTransactions(index.value - 1).prePopulated.get
+            )
+
           val triedUA = for {
             ua0 <- ua
             ua1 <- ua0.set(assetDescription._1, assetDescription._2)
@@ -563,11 +574,14 @@ class OtherAssetsTransformer @Inject() extends Transformer {
             ua15 <- optUKPartnershipTuple.map(t => ua14.set(t._2._1, t._2._2)).getOrElse(Try(ua14))
             ua16 <- optOther.map(t => ua15.set(t._1, t._2)).getOrElse(Try(ua15))
             ua17 <- ua16.set(otherAssetsCompleted._1, otherAssetsCompleted._2)
+            ua18 <- otherAssetsPrePopulated.foldLeft(Try(ua17)) {
+              case (ua, (page, value)) => ua.flatMap(_.set(page, value))
+            }
           } yield {
             buildOptDisposedOtherAssetsUA(
               index,
               srn,
-              ua17,
+              ua18,
               otherAssetTransaction.optOtherAssetDisposed
             )
           }

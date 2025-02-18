@@ -29,8 +29,8 @@ import controllers.ControllerBaseSpec
 
 class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionValues {
 
-  private val otherAssetsHeldTrue = defaultUserAnswers.unsafeSet(OtherAssetsHeldPage(srn), true)
-  private val otherAssetsHeldFalse = defaultUserAnswers.unsafeSet(OtherAssetsHeldPage(srn), false)
+  private val otherAssetsHeldTrueLegacy = defaultUserAnswers.unsafeSet(OtherAssetsHeldPage(srn), true)
+  private val otherAssetsHeldFalseLegacy = defaultUserAnswers.unsafeSet(OtherAssetsHeldPage(srn), false)
 
   private def addOtherAssetsBaseAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers
@@ -94,7 +94,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
             index1of5000,
             addOtherAssetsContributionAnswers(
               index1of5000,
-              otherAssetsHeldTrue
+              otherAssetsHeldTrueLegacy
             )
           )
 
@@ -113,7 +113,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
                   index2of5000,
                   addOtherAssetsPrePopAnswers(
                     index2of5000,
-                    otherAssetsHeldTrue
+                    otherAssetsHeldTrueLegacy
                   )
                 )
               )
@@ -162,13 +162,13 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
     "must be false" - {
 
       "when otherAssetsHeld is Some(false)" in {
-        val userAnswers = otherAssetsHeldFalse
+        val userAnswers = otherAssetsHeldFalseLegacy
 
         checkOtherAssetsSection(userAnswers, srn) mustBe false
       }
 
       "when otherAssetsHeld is Some(true) & no records are present" in {
-        val userAnswers = otherAssetsHeldTrue
+        val userAnswers = otherAssetsHeldTrueLegacy
 
         checkOtherAssetsSection(userAnswers, srn) mustBe false
       }
@@ -181,7 +181,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
               index1of5000,
               addOtherAssetsPrePopAnswers(
                 index1of5000,
-                otherAssetsHeldTrue
+                otherAssetsHeldTrueLegacy
               )
             )
           )
@@ -227,7 +227,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
                 index1of5000,
                 addOtherAssetsIndividualAnswers(
                   index1of5000,
-                  otherAssetsHeldTrue
+                  otherAssetsHeldTrueLegacy
                 )
               )
             )
@@ -243,7 +243,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
                 index1of5000,
                 addOtherAssetsUKCompanyAnswers(
                   index1of5000,
-                  otherAssetsHeldTrue
+                  otherAssetsHeldTrueLegacy
                 )
               )
             )
@@ -259,7 +259,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
                 index1of5000,
                 addOtherAssetsUKPartnershipAnswers(
                   index1of5000,
-                  otherAssetsHeldTrue
+                  otherAssetsHeldTrueLegacy
                 )
               )
             )
@@ -275,7 +275,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
                 index1of5000,
                 addOtherAssetsOtherAnswers(
                   index1of5000,
-                  otherAssetsHeldTrue
+                  otherAssetsHeldTrueLegacy
                 )
               )
             )
@@ -289,7 +289,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
               index1of5000,
               addOtherAssetsContributionAnswers(
                 index1of5000,
-                otherAssetsHeldTrue
+                otherAssetsHeldTrueLegacy
               )
             )
 
@@ -302,7 +302,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
               index1of5000,
               addOtherAssetsTransferAnswers(
                 index1of5000,
-                otherAssetsHeldTrue
+                otherAssetsHeldTrueLegacy
               )
             )
 
@@ -316,7 +316,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
             index1of5000,
             addOtherAssetsContributionAnswers(
               index1of5000,
-              otherAssetsHeldTrue
+              otherAssetsHeldTrueLegacy
             )
           ).unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, index1of5000), true)
 
@@ -340,7 +340,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
               index1of5000,
               addOtherAssetsIndividualAnswers(
                 index1of5000,
-                otherAssetsHeldTrue
+                otherAssetsHeldTrueLegacy
               )
             )
           ).unsafeRemove(IdentityTypePage(srn, index1of5000, OtherAssetSeller))
@@ -356,7 +356,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
               index1of5000,
               addOtherAssetsPrePopAnswers(
                 index1of5000,
-                otherAssetsHeldTrue
+                otherAssetsHeldTrueLegacy
               )
             )
           )
@@ -370,7 +370,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
             index1of5000,
             addOtherAssetsAcquisitionAnswers(
               index1of5000,
-              otherAssetsHeldTrue
+              otherAssetsHeldTrueLegacy
             )
           ).unsafeSet(IdentityTypePage(srn, index1of5000, OtherAssetSeller), Individual)
 
@@ -383,7 +383,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
             index1of5000,
             addOtherAssetsAcquisitionAnswers(
               index1of5000,
-              otherAssetsHeldTrue
+              otherAssetsHeldTrueLegacy
             )
           ).unsafeSet(IdentityTypePage(srn, index1of5000, OtherAssetSeller), UKCompany)
 
@@ -396,7 +396,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
             index1of5000,
             addOtherAssetsAcquisitionAnswers(
               index1of5000,
-              otherAssetsHeldTrue
+              otherAssetsHeldTrueLegacy
             )
           ).unsafeSet(IdentityTypePage(srn, index1of5000, OtherAssetSeller), UKPartnership)
 
@@ -409,7 +409,7 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
             index1of5000,
             addOtherAssetsAcquisitionAnswers(
               index1of5000,
-              otherAssetsHeldTrue
+              otherAssetsHeldTrueLegacy
             )
           ).unsafeSet(IdentityTypePage(srn, index1of5000, OtherAssetSeller), Other)
 
@@ -417,4 +417,116 @@ class OtherAssetsCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers w
       }
     }
   }
+
+  private val otherAssetsHeldTrue = defaultUserAnswers.unsafeSet(OtherAssetsHeldPage(srn), true)
+  private val otherAssetsHeldFalse = defaultUserAnswers.unsafeSet(OtherAssetsHeldPage(srn), false)
+
+  private def addNonPrePopRecord(index: Max5000, userAnswers: UserAnswers): UserAnswers =
+    addOtherAssetsBaseAnswers(index, userAnswers)
+      .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index), SchemeHoldAsset.Acquisition)
+      .unsafeSet(IdentityTypePage(srn, index, OtherAssetSeller), Individual)
+
+  private def addUncheckedRecord(index: Max5000, userAnswers: UserAnswers): UserAnswers =
+    addOtherAssetsBaseAnswers(index, userAnswers)
+      .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index), SchemeHoldAsset.Contribution)
+      .unsafeSet(IdentityTypePage(srn, index, OtherAssetSeller), UKCompany)
+      .unsafeSet(OtherAssetsPrePopulated(srn, index), false)
+
+  private def addCheckedRecord(index: Max5000, userAnswers: UserAnswers): UserAnswers =
+    addOtherAssetsBaseAnswers(index, userAnswers)
+      .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index), SchemeHoldAsset.Transfer)
+      .unsafeSet(IdentityTypePage(srn, index, OtherAssetSeller), UKPartnership)
+      .unsafeSet(OtherAssetsPrePopulated(srn, index), true)
+
+  "checkOtherAssetsSectionPre-Pop" - {
+
+    "must be true" - {
+
+      "when schemeHadBonds is None & 1 record is present (unchecked)" in {
+        val userAnswers = addUncheckedRecord(index1of5000, defaultUserAnswers)
+
+        checkOtherAssetsSection(userAnswers, srn) mustBe true
+      }
+
+      "when schemeHadLoans is Some(true) & 2 records are present (checked and unchecked)" in {
+        val userAnswers = addCheckedRecord(index1of5000, addUncheckedRecord(index2of5000, otherAssetsHeldTrue))
+
+        checkOtherAssetsSection(userAnswers, srn) mustBe true
+      }
+
+      "when schemeHadLoans is Some(true) & 2 records are present (unchecked and non-pre-pop)" in {
+        val userAnswers = addUncheckedRecord(index1of5000, addNonPrePopRecord(index2of5000, otherAssetsHeldTrue))
+
+        checkOtherAssetsSection(userAnswers, srn) mustBe true
+      }
+    }
+
+    "must be false" - {
+
+      "when schemeHadLoans is None & no records are present" in {
+        val userAnswers = defaultUserAnswers
+
+        checkOtherAssetsSection(userAnswers, srn) mustBe false
+      }
+
+      "when schemeHadLoans is Some(false) & no records are present" in {
+        val userAnswers = otherAssetsHeldFalse
+
+        checkOtherAssetsSection(userAnswers, srn) mustBe false
+      }
+
+      "when schemeHadLoans is Some(true) & no records are present" in {
+        val userAnswers = otherAssetsHeldTrue
+
+        checkOtherAssetsSection(userAnswers, srn) mustBe false
+      }
+
+      "when schemeHadLoans is Some(true) & 1 record is present (checked)" in {
+        val userAnswers = addCheckedRecord(index1of5000, otherAssetsHeldTrue)
+
+        checkOtherAssetsSection(userAnswers, srn) mustBe false
+      }
+
+      "when schemeHadLoans is Some(true) & 1 record is present (non-pre-pop)" in {
+        val userAnswers = addNonPrePopRecord(index1of5000, otherAssetsHeldTrue)
+
+        checkOtherAssetsSection(userAnswers, srn) mustBe false
+      }
+
+      "when schemeHadLoans is Some(true) & 2 records are present (checked and non-pre-pop)" in {
+        val userAnswers = addCheckedRecord(index1of5000, addNonPrePopRecord(index2of5000, otherAssetsHeldTrue))
+
+        checkOtherAssetsSection(userAnswers, srn) mustBe false
+      }
+    }
+  }
+
+  "checkLoansRecord" - {
+
+    "must be true" - {
+
+      "when record is (unchecked)" in {
+        val userAnswers = addUncheckedRecord(index1of5000, defaultUserAnswers)
+
+        checkOtherAssetsRecord(userAnswers, srn, index1of5000) mustBe true
+      }
+    }
+
+    "must be false" - {
+
+      "when record is (checked)" in {
+        val userAnswers = addCheckedRecord(index1of5000, defaultUserAnswers)
+
+        checkOtherAssetsRecord(userAnswers, srn, index1of5000) mustBe false
+      }
+
+      "when record is (non-pre-pop)" in {
+        val userAnswers = addNonPrePopRecord(index1of5000, defaultUserAnswers)
+
+        checkOtherAssetsRecord(userAnswers, srn, index1of5000) mustBe false
+      }
+    }
+
+  }
+
 }

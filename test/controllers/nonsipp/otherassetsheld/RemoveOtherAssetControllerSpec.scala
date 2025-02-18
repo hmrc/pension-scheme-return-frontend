@@ -17,13 +17,13 @@
 package controllers.nonsipp.otherassetsheld
 
 import services.PsrSubmissionService
-import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
+import pages.nonsipp.otherassetsheld.{OtherAssetsPrePopulated, WhatIsOtherAssetPage}
 import controllers.nonsipp.otherassetsheld.RemoveOtherAssetController._
 import play.api.inject.bind
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.NormalMode
+import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
@@ -45,6 +45,9 @@ class RemoveOtherAssetControllerSpec extends ControllerBaseSpec {
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
+
+  val prePopUserAnswersChecked: UserAnswers = userAnswers.unsafeSet(OtherAssetsPrePopulated(srn, refineMV(1)), true)
+  val prePopUserAnswersNotChecked: UserAnswers = userAnswers.unsafeSet(OtherAssetsPrePopulated(srn, refineMV(1)), false)
 
   override protected def beforeEach(): Unit =
     reset(mockPsrSubmissionService)
@@ -76,6 +79,16 @@ class RemoveOtherAssetControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+
+    act.like(
+      redirectToPage(onPageLoad, controllers.routes.UnauthorisedController.onPageLoad(), prePopUserAnswersChecked)
+        .updateName(_ + " - Block removing checked Pre-pop other assets")
+    )
+
+    act.like(
+      redirectToPage(onPageLoad, controllers.routes.UnauthorisedController.onPageLoad(), prePopUserAnswersNotChecked)
+        .updateName(_ + " - Block removing unchecked Pre-pop other assets")
+    )
 
   }
 }

@@ -19,7 +19,7 @@ package controllers.nonsipp.otherassetsheld
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.otherassetsheld.{RemoveOtherAssetPage, WhatIsOtherAssetPage}
+import pages.nonsipp.otherassetsheld.{OtherAssetsPrePopulated, RemoveOtherAssetPage, WhatIsOtherAssetPage}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -54,21 +54,25 @@ class RemoveOtherAssetController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
-          whatIsOtherAsset <- request.userAnswers.get(WhatIsOtherAssetPage(srn, index)).getOrRedirectToTaskList(srn)
-        } yield {
-          val preparedForm =
-            request.userAnswers.fillForm(RemoveOtherAssetPage(srn, index), form)
-          Ok(
-            view(
-              preparedForm,
-              RemoveOtherAssetController
-                .viewModel(srn, index, whatIsOtherAsset, mode)
+      if (request.userAnswers.get(OtherAssetsPrePopulated(srn, index)).isDefined) {
+        Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+      } else {
+        (
+          for {
+            whatIsOtherAsset <- request.userAnswers.get(WhatIsOtherAssetPage(srn, index)).getOrRedirectToTaskList(srn)
+          } yield {
+            val preparedForm =
+              request.userAnswers.fillForm(RemoveOtherAssetPage(srn, index), form)
+            Ok(
+              view(
+                preparedForm,
+                RemoveOtherAssetController
+                  .viewModel(srn, index, whatIsOtherAsset, mode)
+              )
             )
-          )
-        }
-      ).merge
+          }
+        ).merge
+      }
     }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =

@@ -205,10 +205,12 @@ class OtherAssetsCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      val prePopulated = request.userAnswers.get(OtherAssetsPrePopulated(srn, index))
       for {
         updatedUserAnswers <- Future.fromTry(
           request.userAnswers
             .set(OtherAssetsHeldPage(srn), true)
+            .setWhen(prePopulated.isDefined)(OtherAssetsPrePopulated(srn, index), true)
             .set(OtherAssetsCompleted(srn, index), SectionCompleted)
         )
         _ <- saveService.save(updatedUserAnswers)

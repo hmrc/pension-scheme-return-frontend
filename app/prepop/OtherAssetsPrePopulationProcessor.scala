@@ -18,16 +18,17 @@ package prepop
 
 import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalPage, OtherAssetsDisposalProgress}
 import pages.nonsipp.otherassetsheld._
-import models.UserAnswers.SensitiveJsObject
-import config.RefinedTypes.OneTo5000
+import config.RefinedTypes.{Max5000, OneTo5000}
 import models.SchemeId.Srn
 import pages.nonsipp.otherassetsdisposal.Paths.assetsDisposed
 import eu.timepit.refined.refineV
 import models.UserAnswers
+import utils.ListUtils.ListOps
+import models.UserAnswers.SensitiveJsObject
 import pages.nonsipp.otherassetsheld.Paths.otherAssets
 import play.api.libs.json.{JsObject, JsSuccess}
 
-import scala.util.{Success, Try}
+import scala.util.Try
 
 import javax.inject.{Inject, Singleton}
 
@@ -52,7 +53,23 @@ class OtherAssetsPrePopulationProcessor @Inject()() {
       .flatMap(_.transform((Paths.otherAssetsTransactions \ "movableSchedule29A").prune(_)))
       .flatMap(_.transform((Paths.otherAssetsTransactions \ "totalIncomeOrReceipts").prune(_))) match {
       case JsSuccess(value, _) =>
-        Success(currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue))))
+        val uaWithOtherAssetsData =
+          currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue)))
+
+        val updatedUA = uaWithOtherAssetsData
+          .get(WhatIsOtherAssetPages(srn))
+          .map(_.keys.toList)
+          .toList
+          .flatten
+          .refine[Max5000.Refined]
+          .map(index => OtherAssetsPrePopulated(srn, index))
+          .foldLeft(Try(uaWithOtherAssetsData)) {
+            case (ua, otherAssetsPrePopulated) => {
+              ua.flatMap(_.set(otherAssetsPrePopulated, false))
+            }
+          }
+
+        updatedUA
       case _ => Try(currentUA)
     }
 
