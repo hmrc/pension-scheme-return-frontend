@@ -17,9 +17,8 @@
 package controllers.nonsipp.sharesdisposal
 
 import pages.nonsipp.shares._
-import controllers.nonsipp.sharesdisposal.SharesDisposalListController._
+import controllers.nonsipp.sharesdisposal.SharesDisposalListController.{SharesDisposalData, _}
 import views.html.ListRadiosView
-import controllers.nonsipp.shares.SharesListController.SharesData
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{SchemeHoldShare, TypeOfShares}
@@ -54,22 +53,22 @@ class SharesDisposalListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndexThree), companyName)
       .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, shareIndexThree), SchemeHoldShare.Transfer)
 
-  private val sharesData = List(
-    SharesData(
+  private val sharesDisposalData = List(
+    SharesDisposalData(
       shareIndexOne,
       typeOfShares = TypeOfShares.SponsoringEmployer,
       companyName = companyName,
       acquisitionType = SchemeHoldShare.Acquisition,
       acquisitionDate = Some(localDate)
     ),
-    SharesData(
+    SharesDisposalData(
       shareIndexTwo,
       typeOfShares = TypeOfShares.Unquoted,
       companyName = companyName,
       acquisitionType = SchemeHoldShare.Contribution,
       acquisitionDate = Some(localDate)
     ),
-    SharesData(
+    SharesDisposalData(
       shareIndexThree,
       typeOfShares = TypeOfShares.ConnectedParty,
       companyName = companyName,
@@ -82,7 +81,7 @@ class SharesDisposalListControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[ListRadiosView]
-        .apply(form(injected[RadioListFormProvider]), viewModel(srn, page = 1, sharesData, userAnswers))
+        .apply(form(injected[RadioListFormProvider]), viewModel(srn, page = 1, sharesDisposalData, userAnswers))
     })
 
     act.like(redirectNextPage(onSubmit, "value" -> "1"))

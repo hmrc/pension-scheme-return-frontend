@@ -532,6 +532,11 @@ object SharesPrePopulationProcessorSpec {
         |  "current": "dummy-current-data",
         |  "shares" : {
         |    "shareTransactions" : {
+        |      "sharesPrePopulated": {
+        |        "0":false,
+        |        "1":false,
+        |        "2":false
+        |      },
         |      "typeOfSharesHeld" : {
         |        "0" : "01",
         |        "2" : "03"
@@ -639,6 +644,11 @@ object SharesPrePopulationProcessorSpec {
       |  "current": "dummy-current-data",
       |  "shares" : {
       |    "shareTransactions" : {
+      |      "sharesPrePopulated": {
+      |        "0":false,
+      |        "1":false,
+      |        "2":false
+      |      },
       |      "typeOfSharesHeld" : {
       |        "0" : "01",
       |        "1" : "03",

@@ -19,6 +19,7 @@ package controllers.nonsipp.sharesdisposal
 import viewmodels.implicits._
 import com.google.inject.Inject
 import config.Constants
+import cats.implicits.{toShow, toTraverseOps}
 import pages.nonsipp.sharesdisposal._
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -32,8 +33,6 @@ import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
 import views.html.ListRadiosView
 import models.SchemeId.Srn
-import cats.implicits.{toShow, toTraverseOps}
-import controllers.nonsipp.shares.SharesListController.SharesData
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.refineV
 import utils.DateTimeUtils.localDateShow
@@ -43,6 +42,7 @@ import viewmodels.models._
 import models.requests.DataRequest
 import play.api.data.Form
 
+import java.time.LocalDate
 import javax.inject.Named
 
 class SharesDisposalListController @Inject()(
@@ -61,7 +61,7 @@ class SharesDisposalListController @Inject()(
       val indexes = request.userAnswers.map(SharesCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
 
       if (indexes.nonEmpty) {
-        sharesData(srn, indexes).map { data =>
+        sharesDisposalData(srn, indexes).map { data =>
           Ok(view(form, viewModel(srn, page, data, request.userAnswers)))
         }.merge
       } else {
@@ -76,7 +76,7 @@ class SharesDisposalListController @Inject()(
       .bindFromRequest()
       .fold(
         errors => {
-          sharesData(srn, indexes).map { sharesList =>
+          sharesDisposalData(srn, indexes).map { sharesList =>
             BadRequest(view(errors, viewModel(srn, page, sharesList, request.userAnswers)))
           }.merge
         },
@@ -91,16 +91,16 @@ class SharesDisposalListController @Inject()(
       )
   }
 
-  private def sharesData(srn: Srn, indexes: List[Max5000])(
+  private def sharesDisposalData(srn: Srn, indexes: List[Max5000])(
     implicit req: DataRequest[_]
-  ): Either[Result, List[SharesData]] =
+  ): Either[Result, List[SharesDisposalData]] =
     indexes.map { index =>
       for {
         sharesType <- requiredPage(TypeOfSharesHeldPage(srn, index))
         companyName <- requiredPage(CompanyNameRelatedSharesPage(srn, index))
         acquisitionType <- requiredPage(WhyDoesSchemeHoldSharesPage(srn, index))
         acquisitionDate = req.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index))
-      } yield SharesData(index, sharesType, companyName, acquisitionType, acquisitionDate)
+      } yield SharesDisposalData(index, sharesType, companyName, acquisitionType, acquisitionDate)
     }.sequence
 }
 
@@ -110,10 +110,10 @@ object SharesDisposalListController {
       "sharesDisposal.sharesDisposalList.radios.error.required"
     )
 
-  private def buildRows(srn: Srn, shares: List[SharesData], userAnswers: UserAnswers): List[ListRadiosRow] =
-    shares.flatMap { sharesData =>
+  private def buildRows(srn: Srn, shares: List[SharesDisposalData], userAnswers: UserAnswers): List[ListRadiosRow] =
+    shares.flatMap { sharesDisposalData =>
       val completedDisposalsPerShareKeys = userAnswers
-        .map(SharesDisposalProgress.all(srn, sharesData.index))
+        .map(SharesDisposalProgress.all(srn, sharesDisposalData.index))
         .toList
         .filter(progress => progress._2.completed)
         .map(_._1)
@@ -126,7 +126,9 @@ object SharesDisposalListController {
           .map(_.toIntOption)
           .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
           .flatMap(
-            _.map(disposalIndex => userAnswers.get(HowManyDisposalSharesPage(srn, sharesData.index, disposalIndex)))
+            _.map(
+              disposalIndex => userAnswers.get(HowManyDisposalSharesPage(srn, sharesDisposalData.index, disposalIndex))
+            )
           )
           .exists(optValue => optValue.fold(false)(value => value == 0))
 
@@ -135,17 +137,17 @@ object SharesDisposalListController {
         } else {
           List(
             ListRadiosRow(
-              sharesData.index.value,
-              buildMessage(sharesData)
+              sharesDisposalData.index.value,
+              buildMessage(sharesDisposalData)
             )
           )
         }
       }
     }
 
-  private def buildMessage(sharesData: SharesData): Message =
-    sharesData match {
-      case SharesData(_, typeOfShares, companyName, methodOfAcquisition, dateOfAcquisition) =>
+  private def buildMessage(sharesDisposalData: SharesDisposalData): Message =
+    sharesDisposalData match {
+      case SharesDisposalData(_, typeOfShares, companyName, methodOfAcquisition, dateOfAcquisition) =>
         val sharesType = typeOfShares match {
           case TypeOfShares.SponsoringEmployer => "sharesDisposal.sharesDisposalList.typeOfShares.sponsoringEmployer"
           case TypeOfShares.Unquoted => "sharesDisposal.sharesDisposalList.typeOfShares.unquoted"
@@ -173,7 +175,7 @@ object SharesDisposalListController {
   def viewModel(
     srn: Srn,
     page: Int,
-    sharesList: List[SharesData],
+    sharesList: List[SharesDisposalData],
     userAnswers: UserAnswers
   ): FormPageViewModel[ListRadiosViewModel] = {
 
@@ -216,4 +218,12 @@ object SharesDisposalListController {
       onSubmit = routes.SharesDisposalListController.onSubmit(srn, page)
     )
   }
+
+  case class SharesDisposalData(
+    index: Max5000,
+    typeOfShares: TypeOfShares,
+    companyName: String,
+    acquisitionType: SchemeHoldShare,
+    acquisitionDate: Option[LocalDate]
+  )
 }

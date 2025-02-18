@@ -61,8 +61,8 @@ object SharesCheckStatusUtils {
   }
 
   /**
-   * This method determines whether or not a Shares record needs to be checked. A record needs checking if any of the
-   * pre-populated-then-cleared answers are missing & all of the other answers are present.
+   * This method determines whether or not a Shares record needs to be checked. A record needs checking only if the
+   * sharesPrePopulated flag is set to Some(false)
    *
    * @param userAnswers the answers provided by the user, from which we get the Shares record
    * @param srn         the Scheme Reference Number, used for the .get calls
@@ -70,6 +70,16 @@ object SharesCheckStatusUtils {
    * @return true if the record requires checking, else false
    */
   def checkSharesRecord(
+    userAnswers: UserAnswers,
+    srn: Srn,
+    recordIndex: Max5000
+  ): Boolean =
+    userAnswers.get(SharePrePopulated(srn, recordIndex)) match {
+      case Some(checked) => !checked
+      case None => checkSharesRecordLegacy(userAnswers, srn, recordIndex)
+    }
+
+  def checkSharesRecordLegacy(
     userAnswers: UserAnswers,
     srn: Srn,
     recordIndex: Max5000

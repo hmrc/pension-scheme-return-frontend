@@ -58,18 +58,32 @@ class SharesPrePopulationProcessor @Inject()() {
       case _ => Try(currentUA)
     }
 
-    totalSharesNowHeldOptMap.fold(transformedResult) { totalSharesNowHeldMap =>
-      totalSharesNowHeldMap.foldLeft(transformedResult)((uaResult, totalSharesNowHeldEntry) => {
-        val isFullyDisposed = totalSharesNowHeldEntry._2.exists(_._2 == 0)
-        if (isFullyDisposed) {
-          totalSharesNowHeldEntry._1.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
-            case None => uaResult
-            case Some(index) => uaResult.flatMap(_.remove(sharesPages(srn, index, isLastRecord = true)))
-          }
-        } else {
-          uaResult
-        }
-      })
-    }
+    for {
+      transformedAnswers <- transformedResult
+
+      sharesPagesToRemove = for {
+        totalSharesNowHeldMap <- totalSharesNowHeldOptMap.toList
+        (index, totalSharesNowHeld) <- totalSharesNowHeldMap.toList
+        isFullyDisposed = totalSharesNowHeld.exists(_._2 == 0)
+        refinedIndex <- index.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption).toList
+        sharesPagesToRemove <- if (isFullyDisposed) sharesPages(srn, refinedIndex, isLastRecord = true) else Nil
+      } yield sharesPagesToRemove
+
+      cleanedAnswers <- transformedAnswers.remove(sharesPagesToRemove)
+
+      prePopFlagsToAdd = for {
+        typeOfSharesPages <- transformedAnswers.get(TypeOfSharesHeldPages(srn)).toList
+        index <- typeOfSharesPages.keys
+        refinedIndex <- index.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption).toList
+        prePopFlagsToAdd = SharePrePopulated(srn, refinedIndex)
+      } yield prePopFlagsToAdd
+
+      _ <- Try(logger.warn(prePopFlagsToAdd.toString()))
+      prePopAnswers <- prePopFlagsToAdd.foldLeft(Try(cleanedAnswers)) { (answers, toAdd) =>
+        answers.flatMap(_.set(toAdd, false))
+      }
+      _ <- Try(logger.warn(prePopAnswers.get(SharePrePopulated.all(srn)).toString))
+
+    } yield prePopAnswers
   }
 }

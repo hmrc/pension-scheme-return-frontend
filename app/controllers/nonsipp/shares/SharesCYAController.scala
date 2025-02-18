@@ -192,12 +192,15 @@ class SharesCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      val prePopulated = request.userAnswers.get(SharePrePopulated(srn, index)).isDefined
+
       for {
         updatedAnswers <- Future
           .fromTry(
             request.userAnswers
               .set(DidSchemeHoldAnySharesPage(srn), true)
               .set(SharesCompleted(srn, index), SectionCompleted)
+              .setWhen(prePopulated)(SharePrePopulated(srn, index), true)
           )
         _ <- saveService.save(updatedAnswers)
         redirectTo <- psrSubmissionService

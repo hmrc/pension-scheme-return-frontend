@@ -17,12 +17,12 @@
 package controllers.nonsipp.shares
 
 import services.PsrSubmissionService
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
+import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharePrePopulated}
 import play.api.inject.bind
 import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.NormalMode
+import models.{NormalMode, UserAnswers}
 import controllers.nonsipp.shares.RemoveSharesController._
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
@@ -43,6 +43,9 @@ class RemoveSharesControllerSpec extends ControllerBaseSpec {
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
+
+  val prePopUserAnswersChecked: UserAnswers = userAnswers.unsafeSet(SharePrePopulated(srn, refineMV(1)), true)
+  val prePopUserAnswersNotChecked: UserAnswers = userAnswers.unsafeSet(SharePrePopulated(srn, refineMV(1)), false)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -73,6 +76,16 @@ class RemoveSharesControllerSpec extends ControllerBaseSpec {
     act.like(saveAndContinue(onSubmit, userAnswers, "value" -> "true"))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+
+    act.like(
+      redirectToPage(onPageLoad, controllers.routes.UnauthorisedController.onPageLoad(), prePopUserAnswersChecked)
+        .updateName(_ + " - Block removing checked Prepop shares")
+    )
+
+    act.like(
+      redirectToPage(onPageLoad, controllers.routes.UnauthorisedController.onPageLoad(), prePopUserAnswersNotChecked)
+        .updateName(_ + " - Block removing unchecked Prepop shares")
+    )
 
   }
 }

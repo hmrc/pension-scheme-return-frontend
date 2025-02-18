@@ -56,6 +56,9 @@ class RemoveSharesController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
+      if (request.userAnswers.get(SharePrePopulated(srn, index)).isDefined)
+        Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+      else
       (
         for {
           companyName <- request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRedirectToTaskList(srn)
