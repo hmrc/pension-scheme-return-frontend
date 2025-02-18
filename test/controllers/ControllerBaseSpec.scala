@@ -225,6 +225,16 @@ trait TestValues {
     ManualAddress
   )
 
+  val alfAddressResponse: ALFAddressResponse = ALFAddressResponse(
+    "test-id",
+    ALFAddress(
+      List("testAddressLine1", "testAddressLine2", "testAddressLine3"),
+      "testTown",
+      "testPostCode",
+      ALFCountry("GB", "United Kingdom")
+    )
+  )
+
   val internationalAddress: Address = Address(
     "test-id",
     "testAddressLine1",

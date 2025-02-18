@@ -1,0 +1,910 @@
+[
+  {
+    "id": "GB100071414215",
+    "uprn": 100071414215,
+    "usrn": 2704948,
+    "organisation": "BIRCHFIELD CHILDRENS CENTRE",
+    "address": {
+      "lines": [
+        "1 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5096159,
+      -1.9040328
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071571939",
+    "uprn": 100071571939,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "11 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5096147,
+      -1.9045046
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071439520",
+    "uprn": 100071439520,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "11a",
+        "Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5095878,
+      -1.9046078
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071571945",
+    "uprn": 100071571945,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "19 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.509561,
+      -1.9048878
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100070395907",
+    "uprn": 100070395907,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "23 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5094533,
+      -1.9050648
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100070395909",
+    "uprn": 100070395909,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "25 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5095073,
+      -1.9051384
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100070395911",
+    "uprn": 100070395911,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "27 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5094804,
+      -1.905271
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100070395913",
+    "uprn": 100070395913,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "29 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5094625,
+      -1.9054037
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100070395915",
+    "uprn": 100070395915,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "33 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5094268,
+      -1.9056247
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100070395917",
+    "uprn": 100070395917,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "35 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5093909,
+      -1.9056985
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100070395900",
+    "uprn": 100070395900,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "7 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5096415,
+      -1.9042982
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071439604",
+    "uprn": 100071439604,
+    "parentUprn": 100071571944,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 1",
+        "17 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5095511,
+      -1.9047847
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071439606",
+    "uprn": 100071439606,
+    "parentUprn": 100071571947,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 1",
+        "21 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5095521,
+      -1.9049762
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071280681",
+    "uprn": 100071280681,
+    "parentUprn": 100071571950,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 1",
+        "31 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5094176,
+      -1.9054627
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071439596",
+    "uprn": 100071439596,
+    "parentUprn": 100071571938,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 1",
+        "9 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.50962,
+      -1.9043985
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071280693",
+    "uprn": 100071280693,
+    "parentUprn": 100071571934,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 1, Wilmore House",
+        "15 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5092051,
+      -1.9048219
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071439605",
+    "uprn": 100071439605,
+    "parentUprn": 100071571944,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 2",
+        "17 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5095511,
+      -1.9047847
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071439607",
+    "uprn": 100071439607,
+    "parentUprn": 100071571947,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 2",
+        "21 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5095521,
+      -1.9049762
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071280682",
+    "uprn": 100071280682,
+    "parentUprn": 100071571950,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 2",
+        "31 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5094176,
+      -1.9054627
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071439597",
+    "uprn": 100071439597,
+    "parentUprn": 100071571938,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 2",
+        "9 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.50962,
+      -1.9043985
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071280694",
+    "uprn": 100071280694,
+    "parentUprn": 100071571934,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 2, Wilmore House",
+        "15 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5092528,
+      -1.9044231
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071280683",
+    "uprn": 100071280683,
+    "parentUprn": 100071571950,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 3",
+        "31 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5094176,
+      -1.9054627
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071439598",
+    "uprn": 100071439598,
+    "parentUprn": 100071571938,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 3",
+        "9 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.50962,
+      -1.9043985
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071280695",
+    "uprn": 100071280695,
+    "parentUprn": 100071571934,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 3, Wilmore House",
+        "15 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5092266,
+      -1.9045299
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071280696",
+    "uprn": 100071280696,
+    "parentUprn": 100071571934,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 4, Wilmore House",
+        "15 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5092266,
+      -1.9045299
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071280697",
+    "uprn": 100071280697,
+    "parentUprn": 100071571934,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 5, Wilmore House",
+        "15 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5092205,
+      -1.9046924
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071280698",
+    "uprn": 100071280698,
+    "parentUprn": 100071571934,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 6, Wilmore House",
+        "15 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5092205,
+      -1.9046924
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071280699",
+    "uprn": 100071280699,
+    "parentUprn": 100071571934,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 7, Wilmore House",
+        "15 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5092051,
+      -1.9048219
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  },
+  {
+    "id": "GB100071280700",
+    "uprn": 100071280700,
+    "parentUprn": 100071571934,
+    "usrn": 2704948,
+    "address": {
+      "lines": [
+        "Flat 8, Wilmore House",
+        "15 Haughton Road"
+      ],
+      "town": "Birmingham",
+      "postcode": "B20 3LE",
+      "subdivision": {
+        "code": "GB-ENG",
+        "name": "England"
+      },
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      }
+    },
+    "language": "EN",
+    "localCustodian": {
+      "code": 4605,
+      "name": "BIRMINGHAM"
+    },
+    "location": [
+      52.5092051,
+      -1.9048219
+    ],
+    "administrativeArea": "BIRMINGHAM"
+  }
+]

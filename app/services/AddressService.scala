@@ -21,6 +21,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import models.{ALFAddressResponse, Address, LookupAddress}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 import javax.inject.{Inject, Singleton}
 
@@ -30,9 +31,71 @@ class AddressService @Inject()(connector: AddressLookupConnector)(
 ) {
 
   def postcodeLookup(postcode: String, filter: Option[String])(implicit hc: HeaderCarrier): Future[List[Address]] =
-    connector.lookup(postcode, filter).map(_.map(addressFromALFAddress))
+    connector.lookup(postcode, filter).map(_.map(addressFromALFAddress)).map(sortAddresses)
 
-  private def addressFromALFAddress(lookupResponse: ALFAddressResponse): Address =
+  private def sortAddresses(unsorted: List[Address]): List[Address] =
+    unsorted.sortBy(
+      s =>
+        (
+          s.street.getOrElse(""),
+          s.houseNumber.getOrElse(Int.MaxValue),
+          s.flatNumber.getOrElse(Int.MaxValue),
+          s.flat.getOrElse("")
+        )
+    )
+
+  private def getAddressSortingDetails(
+    firstLine: String,
+    secondLine: Option[String]
+  ): (Option[String], Option[Int], Option[Int], Option[String]) = {
+    val startsWithNumberRegex = """^\d.*[a-zA-Z ]$""".r
+    val numberRegex = """\d+""".r
+    val endsWithNumberRegex = """\d$""".r
+    val containsNumberRegex = """\d""".r
+    val firstLineSplit = firstLine.split(' ')
+    val secondLineSplit = secondLine.getOrElse("").split(' ')
+
+    (firstLine, secondLine) match {
+      case (line1, None) if startsWithNumberRegex.matches(line1) =>
+        //line1 starts with number, line2 not present
+        val houseNumber = numberRegex.findFirstIn(line1).map(toIntOrMaxValue)
+        val street = houseNumber.fold(line1)(_ => firstLineSplit.drop(1).mkString(" "))
+
+        (Some(street), houseNumber, None, None)
+      case (line1, None) if !startsWithNumberRegex.matches(line1) =>
+        //line1 doesn't start with number, line2 not present
+        (Some(line1), None, None, None)
+      case (line1, Some(line2)) if startsWithNumberRegex.matches(line2) =>
+        //line1 present, line2 starts with number
+        val houseNumber = numberRegex.findFirstIn(line2).map(toIntOrMaxValue)
+        val street = houseNumber.fold(line2)(_ => secondLineSplit.drop(1).mkString(" "))
+        val flatNumber = endsWithNumberRegex.findFirstIn(line1).map(toIntOrMaxValue)
+        val flat = flatNumber.fold(line1)(_ => firstLineSplit.dropRight(1).mkString(" "))
+
+        (Some(street), houseNumber, flatNumber, Some(flat))
+      case (line1, Some(line2))
+          if firstLineSplit.length > 1 && startsWithNumberRegex.matches(line1) && !containsNumberRegex.matches(line2) =>
+        //line1 present and ends with number, line2 doesn't contain number
+        val houseNumber = numberRegex.findFirstIn(line1).map(toIntOrMaxValue)
+        val street = houseNumber.fold(line1)(_ => firstLineSplit.drop(1).mkString(" "))
+
+        (Some(street), houseNumber, None, None)
+      case (line1, Some(line2)) if !startsWithNumberRegex.matches(line2) =>
+        //line1 present, line2 doesn't start with number
+        val houseNumber = numberRegex.findFirstIn(line1).map(toIntOrMaxValue)
+        val street = line2
+
+        (Some(street), houseNumber, None, None)
+      case (_, _) =>
+        (None, None, None, None)
+    }
+  }
+
+  private def toIntOrMaxValue(s: String): Int =
+    Try(s.toInt).getOrElse(Int.MaxValue)
+
+  private def addressFromALFAddress(lookupResponse: ALFAddressResponse): Address = {
+    val sortingDetails = getAddressSortingDetails(lookupResponse.address.firstLine, lookupResponse.address.secondLine)
     Address(
       lookupResponse.id,
       lookupResponse.address.firstLine,
@@ -42,6 +105,11 @@ class AddressService @Inject()(connector: AddressLookupConnector)(
       Some(lookupResponse.address.postcode),
       lookupResponse.address.country.name,
       lookupResponse.address.country.code,
-      LookupAddress
+      LookupAddress,
+      sortingDetails._1,
+      sortingDetails._2,
+      sortingDetails._3,
+      sortingDetails._4
     )
+  }
 }
