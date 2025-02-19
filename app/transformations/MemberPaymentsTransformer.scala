@@ -16,6 +16,7 @@
 
 package transformations
 
+import pages.nonsipp.memberdetails._
 import com.google.inject.Singleton
 import pages.nonsipp.memberdetails.MembersDetailsPage._
 import config.RefinedTypes.{Max300, Max50}
@@ -26,8 +27,6 @@ import pages.nonsipp.membertransferout.SchemeTransferOutPage
 import models.softdelete.SoftDeletedMember
 import cats.syntax.traverse._
 import pages.nonsipp.employercontributions._
-import utils.Diff
-import pages.nonsipp.memberdetails._
 import pages.nonsipp.membercontributions.{MemberContributionsPage, TotalMemberContributionPage}
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
 import config.RefinedTypes.Max300.Refined
@@ -41,7 +40,7 @@ import play.api.Logger
 import uk.gov.hmrc.domain.Nino
 import play.api.libs.json._
 import pages.nonsipp.memberpayments._
-import utils.JsonUtils.{JsObjectOps, JsPathOps}
+import utils.JsonUtils.JsPathOps
 import viewmodels.models._
 
 import scala.util.{Success, Try}
@@ -65,160 +64,61 @@ class MemberPaymentsTransformer @Inject()(
     userAnswers: UserAnswers,
     initialUA: UserAnswers,
     previousVersionUA: Option[UserAnswers] = None
-  ): Option[MemberPayments] = {
-
-    for {
+  ): Option[MemberPayments] =
+    (for {
       currentMemberDetails <- buildMemberDetails(srn, userAnswers)
       initialMemberDetails <- buildMemberDetails(srn, initialUA)
       maybePreviousMemberDetails <- previousVersionUA.traverse(buildMemberDetails(srn, _))
+      softDeletedMembers = buildSoftDeletedMembers(srn, userAnswers)
+      memberDetailsWithCorrectState = setMemberDetailsWithCorrectState(
+        userAnswers.get(FbStatus(srn)),
+        initialMemberDetails,
+        currentMemberDetails,
+        maybePreviousMemberDetails
+      )
+      memberDetailsWithCorrectVersion = setMemberDetailsWithCorrectVersion(
+        initialMemberDetails,
+        memberDetailsWithCorrectState
+      )
     } yield {
-
-      val softDeletedMembers: List[MemberDetails] = userAnswers.get(SoftDeletedMembers(srn)).toList.flatten.map {
-        softDeletedMember =>
-          MemberDetails(
-            prePopulated = None,
-            state = MemberState.Deleted,
-            memberPSRVersion = softDeletedMember.memberPSRVersion,
-            personalDetails = softDeletedMember.memberDetails.copy(
-              nino = softDeletedMember.memberDetails.nino.map(_.filterNot(_.isWhitespace))
-            ),
-            employerContributions = softDeletedMember.employerContributions,
-            transfersIn = softDeletedMember.transfersIn,
-            transfersOut = softDeletedMember.transfersOut,
-            totalContributions = softDeletedMember.totalMemberContribution.map(_.value),
-            memberLumpSumReceived = softDeletedMember.memberLumpSumReceived,
-            benefitsSurrendered = softDeletedMember.pensionSurrendered,
-            pensionAmountReceived = softDeletedMember.totalAmountPensionPaymentsPage.map(_.value)
-          )
-      }
-
-      val psrState: Option[PSRStatus] = userAnswers.get(FbStatus(srn))
-
-      /**
-       * if member state is CHANGED, check if the status was set in this session by comparing to initial UserAnswers (ETMP GET snapshot)
-       * if it was, check if there is a previous version of the member. If previous member state exists:
-       * - stay CHANGED
-       * - else change to NEW as the member has not been part of a declaration yet
-       */
-      val memberDetailsWithCorrectState: Map[Max300, MemberDetails] = currentMemberDetails.map {
-        _ -> psrState -> maybePreviousMemberDetails match {
-          // new member created and changed while in interim Submitted state
-          case (((index, currentMemberDetail), Some(Submitted)), None)
-              if currentMemberDetail.state.changed && currentMemberDetail.memberPSRVersion.isEmpty =>
-            logger.info(
-              s"PSR is Submitted - Member $index state is Changed but no member PSR version and no previous version - newly added member, setting to New"
-            )
-            (index, currentMemberDetail.copy(state = MemberState.New))
-          // member created before first submission and changed before first POST since first submission (interim Submitted state)
-          case (((index, currentMemberDetail), Some(Submitted)), None) if currentMemberDetail.state.changed =>
-            logger.info(
-              s"PSR is Submitted - Member $index state is Changed but has a member PSR version and no previous version - existing member, leaving status as Changed"
-            )
-            (index, currentMemberDetail)
-          case (((index, currentMemberDetail), _), _)
-              if currentMemberDetail.state.changed && initialMemberDetails.get(index).exists(_.state.changed) =>
-            logger.info(
-              s"Member $index state is Changed but initial UA shows the same member as Changed - leaving status as Changed"
-            )
-            (index, currentMemberDetail)
-          case (((index, currentMemberDetail), _), Some(previousMemberDetails))
-              if currentMemberDetail.state.changed && previousMemberDetails.contains(index) =>
-            logger.info(
-              s"Member $index state is Changed and previous version member details shows the same member exists - leaving status as Changed"
-            )
-            (index, currentMemberDetail)
-          case (((index, currentMemberDetail), Some(Compiled)), Some(previousMemberDetails))
-              if currentMemberDetail.state.changed && previousMemberDetails.contains(index) =>
-            logger.info(
-              s"PSR is Compiled - Member $index state is Changed and previous version member details shows the same member exists - leaving status as Changed"
-            )
-            (index, currentMemberDetail)
-          case (((index, currentMemberDetail), state), previousMemberDetails) =>
-            logger.info(
-              s"Member $index state has not matched any of the previous statements. member state (${currentMemberDetail.state}), PSR state ($state), previous version member details exists (${previousMemberDetails.nonEmpty}) - setting state to New"
-            )
-            (index, currentMemberDetail.copy(state = MemberState.New))
-        }
-      }
-
-      val normalise: MemberDetails => MemberDetails = (memberDetails: MemberDetails) => {
-        memberDetails.copy(
-          memberLumpSumReceived = if (memberDetails.memberLumpSumReceived.exists(_.isZero)) {
-            None
-          } else {
-            memberDetails.memberLumpSumReceived
-          },
-          pensionAmountReceived =
-            if (memberDetails.pensionAmountReceived.contains(0.0)) None
-            else memberDetails.pensionAmountReceived,
-          totalContributions =
-            if (memberDetails.totalContributions.contains(0.0)) None
-            else memberDetails.totalContributions
-        )
-      }
-
-      // Omit memberPSRVersion if member has changed
-      // Check for empty member payment sections before comparing members
-      // (this is because we send empty records in certain sections for members)
-      val memberDetailsWithCorrectVersion: List[MemberDetails] = memberDetailsWithCorrectState.toList
-        .sortBy { case (index, _) => index.value }
-        .map {
-          case (index, currentMemberDetail) =>
-            initialMemberDetails.get(index) match {
-              case None =>
-                currentMemberDetail.copy(memberPSRVersion = None)
-              case Some(initialMemberDetail) =>
-                val normalisedInitialMember = normalise(initialMemberDetail)
-                val normalisedCurrentMember = normalise(currentMemberDetail)
-                val same = normalisedInitialMember == normalisedCurrentMember
-                if (!same) {
-                  logger.info(s"member $index has changed, removing memberPSRVersion")
-//                // we can still use this on localhost if needed:
-//                if (logger.isDebugEnabled) {
-//                  logger.debug(Diff(normalisedInitialMember, normalisedCurrentMember).mkString(" - "))
-//                }
-                }
-                currentMemberDetail.copy(
-                  memberPSRVersion = if (same) currentMemberDetail.memberPSRVersion else None
-                )
-            }
-        }
-
       (memberDetailsWithCorrectVersion, softDeletedMembers) match {
+        // If no members exist, return None
         case (Nil, Nil) => None
         case _ =>
-          val diff: Map[JsPath, (JsValue, JsValue)] = {
-            (initialUA.get(membersPayments), userAnswers.get(membersPayments)) match {
-              case (Some(a), Some(b)) =>
-                Diff.json(
-                  a.as[JsObject].omit(Omitted.membersPayments: _*),
-                  b.as[JsObject].omit(Omitted.membersPayments: _*)
-                )
-              case _ => Map.empty
+          val diff = initialUA
+            .diff(userAnswers, membersPayments, Omitted.membersPayments: _*)
+            .tapEach(diff => logger.debug(s"difference found between initial UA and current UA: $diff"))
+            .flatMap {
+              // check diff to make sure when a new value has been added for the journey control fields, it's an actual user input
+              case field @ (path, (JsNull, value))
+                  if path.clean.last == __ \ PensionCommencementLumpSumAmountPage.key =>
+                if (value.as[PensionCommencementLumpSum].isZero) Map.empty else Map(field)
+              case field @ (path, (JsNull, value)) if path.clean.last == __ \ TotalAmountPensionPaymentsPage.key =>
+                if (value.as[Money].isZero) Map.empty else Map(field)
+              case field @ (path, (JsNull, value)) if path.clean.last == __ \ TotalMemberContributionPage.key =>
+                if (value.as[Money].isZero) Map.empty else Map(field)
+              case valid => Map(valid)
             }
-          }.flatMap {
-            // check diff to make sure when a new value has been added for the journey control fields, it's an actual user input
-            case field @ (path, (JsNull, value)) if path.clean.last == __ \ PensionCommencementLumpSumAmountPage.key =>
-              if (value.as[PensionCommencementLumpSum].isZero) Map.empty else Map(field)
-            case field @ (path, (JsNull, value)) if path.clean.last == __ \ TotalAmountPensionPaymentsPage.key =>
-              if (value.as[Money].isZero) Map.empty else Map(field)
-            case field @ (path, (JsNull, value)) if path.clean.last == __ \ TotalMemberContributionPage.key =>
-              if (value.as[Money].isZero) Map.empty else Map(field)
-            case valid => Map(valid)
-          }
 
           val sameMemberPayments: Boolean = diff.isEmpty
           if (!sameMemberPayments) {
             logger.info(s"member payments has changed, removing recordVersion")
           }
+
+          val recordVersion = Option
+            .when(sameMemberPayments) {
+              val recordVersion = userAnswers.get(MemberPaymentsRecordVersionPage(srn))
+              if (recordVersion.isEmpty) {
+                logger.info(s"member payments are the same but record version doesn't exist in UserAnswers")
+              }
+              recordVersion
+            }
+            .flatten
+
           Some(
             MemberPayments(
               checked = userAnswers.get(MembersDetailsChecked(srn)),
-              recordVersion = Option
-                .when(sameMemberPayments)(
-                  userAnswers.get(MemberPaymentsRecordVersionPage(srn))
-                )
-                .flatten,
+              recordVersion = recordVersion,
               memberDetails = memberDetailsWithCorrectVersion ++ softDeletedMembers,
               employerContributionMade = userAnswers.get(EmployerContributionsPage(srn)),
               transfersInMade = userAnswers.get(DidSchemeReceiveTransferPage(srn)),
@@ -232,11 +132,10 @@ class MemberPaymentsTransformer @Inject()(
             )
           )
       }
+    }) match {
+      case Left(err) => throw new RuntimeException(s"Error when transforming member payments to ETMP model - $err")
+      case Right(value) => value
     }
-  } match {
-    case Left(error) => throw new RuntimeException(s"error occurred: $error")
-    case Right(value) => value
-  }
 
   private def buildMemberDetails(srn: Srn, userAnswers: UserAnswers): Either[String, Map[Max300, MemberDetails]] = {
 
@@ -273,6 +172,125 @@ class MemberPaymentsTransformer @Inject()(
       }
       .map(_.toMap)
   }
+
+  private def buildSoftDeletedMembers(srn: Srn, userAnswers: UserAnswers): List[MemberDetails] =
+    userAnswers.get(SoftDeletedMembers(srn)).toList.flatten.map { softDeletedMember =>
+      MemberDetails(
+        prePopulated = None,
+        state = MemberState.Deleted,
+        memberPSRVersion = softDeletedMember.memberPSRVersion,
+        personalDetails = softDeletedMember.memberDetails.copy(
+          nino = softDeletedMember.memberDetails.nino.map(_.filterNot(_.isWhitespace))
+        ),
+        employerContributions = softDeletedMember.employerContributions,
+        transfersIn = softDeletedMember.transfersIn,
+        transfersOut = softDeletedMember.transfersOut,
+        totalContributions = softDeletedMember.totalMemberContribution.map(_.value),
+        memberLumpSumReceived = softDeletedMember.memberLumpSumReceived,
+        benefitsSurrendered = softDeletedMember.pensionSurrendered,
+        pensionAmountReceived = softDeletedMember.totalAmountPensionPaymentsPage.map(_.value)
+      )
+    }
+
+  /**
+   * if member state is CHANGED, check if the status was set in this session by comparing to initial UserAnswers (ETMP GET snapshot)
+   * if it was, check if there is a previous version of the member. If previous member state exists:
+   * - stay CHANGED
+   * - else change to NEW as the member has not been part of a declaration yet
+   */
+  private def setMemberDetailsWithCorrectState(
+    psrStatus: Option[PSRStatus],
+    initialMemberDetails: Map[Max300, MemberDetails],
+    currentMemberDetails: Map[Max300, MemberDetails],
+    maybePreviousMemberDetails: Option[Map[Max300, MemberDetails]]
+  ): Map[Max300, MemberDetails] = currentMemberDetails.map {
+    _ -> psrStatus -> maybePreviousMemberDetails match {
+      // new member created and changed while in interim Submitted state
+      case (((index, currentMemberDetail), Some(Submitted)), None)
+          if currentMemberDetail.state.changed && currentMemberDetail.memberPSRVersion.isEmpty =>
+        logger.info(
+          s"PSR is Submitted - Member $index state is Changed but no member PSR version and no previous version - newly added member, setting to New"
+        )
+        (index, currentMemberDetail.copy(state = MemberState.New))
+      // member created before first submission and changed before first POST since first submission (interim Submitted state)
+      case (((index, currentMemberDetail), Some(Submitted)), None) if currentMemberDetail.state.changed =>
+        logger.info(
+          s"PSR is Submitted - Member $index state is Changed but has a member PSR version and no previous version - existing member, leaving status as Changed"
+        )
+        (index, currentMemberDetail)
+      case (((index, currentMemberDetail), _), _)
+          if currentMemberDetail.state.changed && initialMemberDetails.get(index).exists(_.state.changed) =>
+        logger.info(
+          s"Member $index state is Changed but initial UA shows the same member as Changed - leaving status as Changed"
+        )
+        (index, currentMemberDetail)
+      case (((index, currentMemberDetail), _), Some(previousMemberDetails))
+          if currentMemberDetail.state.changed && previousMemberDetails.contains(index) =>
+        logger.info(
+          s"Member $index state is Changed and previous version member details shows the same member exists - leaving status as Changed"
+        )
+        (index, currentMemberDetail)
+      case (((index, currentMemberDetail), Some(Compiled)), Some(previousMemberDetails))
+          if currentMemberDetail.state.changed && previousMemberDetails.contains(index) =>
+        logger.info(
+          s"PSR is Compiled - Member $index state is Changed and previous version member details shows the same member exists - leaving status as Changed"
+        )
+        (index, currentMemberDetail)
+      case (((index, currentMemberDetail), state), previousMemberDetails) =>
+        logger.info(
+          s"Member $index state has not matched any of the previous statements. member state (${currentMemberDetail.state}), PSR state ($state), previous version member details exists (${previousMemberDetails.nonEmpty}) - setting state to New"
+        )
+        (index, currentMemberDetail.copy(state = MemberState.New))
+    }
+  }
+
+  /**
+   * Omit memberPSRVersion if member has changed
+   * Check for empty member payment sections before comparing members
+   * (this is because we send empty records in certain sections for members)
+   */
+  private def setMemberDetailsWithCorrectVersion(
+    initialMemberDetails: Map[Max300, MemberDetails],
+    memberDetails: Map[Max300, MemberDetails]
+  ): List[MemberDetails] =
+    memberDetails.toList
+      .sortBy { case (index, _) => index.value }
+      .map {
+        case (index, currentMemberDetail) =>
+          initialMemberDetails.get(index) match {
+            case None =>
+              currentMemberDetail.copy(memberPSRVersion = None)
+            case Some(initialMemberDetail) =>
+              val normalisedInitialMember = normaliseMemberDetails(initialMemberDetail)
+              val normalisedCurrentMember = normaliseMemberDetails(currentMemberDetail)
+              val same = normalisedInitialMember == normalisedCurrentMember
+              if (!same) {
+                logger.info(s"member $index has changed, removing memberPSRVersion")
+                //                // we can still use this on localhost if needed:
+                //                if (logger.isDebugEnabled) {
+                //                  logger.debug(Diff(normalisedInitialMember, normalisedCurrentMember).mkString(" - "))
+                //                }
+              }
+              currentMemberDetail.copy(
+                memberPSRVersion = if (same) currentMemberDetail.memberPSRVersion else None
+              )
+          }
+      }
+
+  private def normaliseMemberDetails(memberDetails: MemberDetails): MemberDetails =
+    memberDetails.copy(
+      memberLumpSumReceived = if (memberDetails.memberLumpSumReceived.exists(_.isZero)) {
+        None
+      } else {
+        memberDetails.memberLumpSumReceived
+      },
+      pensionAmountReceived =
+        if (memberDetails.pensionAmountReceived.contains(0.0)) None
+        else memberDetails.pensionAmountReceived,
+      totalContributions =
+        if (memberDetails.totalContributions.contains(0.0)) None
+        else memberDetails.totalContributions
+    )
 
   def transformFromEtmp(
     userAnswers: UserAnswers,
