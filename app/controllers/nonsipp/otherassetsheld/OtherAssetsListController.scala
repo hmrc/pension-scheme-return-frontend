@@ -291,7 +291,7 @@ object OtherAssetsListController {
                 ListRow.check(
                   text = otherAssetsMessage,
                   url = routes.OtherAssetsCheckAndUpdateController.onPageLoad(srn, index).url,
-                  hiddenText = Message("site.check.param", Message("loansList.row", otherAssetsMessage))
+                  hiddenText = Message("site.check.param", nameOfOtherAssets)
                 )
               case _ =>
                 ListRow(
