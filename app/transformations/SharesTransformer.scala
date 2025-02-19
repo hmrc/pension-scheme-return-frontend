@@ -97,6 +97,7 @@ class SharesTransformer @Inject() extends Transformer {
                   totalShares <- request.userAnswers.get(HowManySharesPage(srn, index))
                   costOfShares <- request.userAnswers.get(CostOfSharesPage(srn, index))
                   supportedByIndepValuation <- request.userAnswers.get(SharesIndependentValuationPage(srn, index))
+                  prePopulated = request.userAnswers.get(SharePrePopulated(srn, index))
                 } yield {
                   val optDateOfAcqOrContrib = Option.when(schemeHoldShare != Transfer)(
                     request.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)).get
@@ -116,7 +117,7 @@ class SharesTransformer @Inject() extends Transformer {
                   val optAcquisitionRelatedDetails = buildOptAcquisitionRelatedDetails(schemeHoldShare, srn, index)
 
                   ShareTransaction(
-                    prePopulated = None,
+                    prePopulated = prePopulated,
                     typeOfSharesHeld = typeOfSharesHeld,
                     shareIdentification = ShareIdentification(
                       nameOfSharesCompany = nameOfSharesCompany,
@@ -599,11 +600,14 @@ class SharesTransformer @Inject() extends Transformer {
                   .map(t => ua19.set(SharesTotalIncomePage(srn, index), Money(t)))
                   .getOrElse(Try(ua19))
                 ua21 <- ua20.set(SharesCompleted(srn, index), SectionCompleted)
+                ua22 <- shareTransaction.prePopulated
+                  .map(p => ua21.set(SharePrePopulated(srn, index), p))
+                  .getOrElse(Try(ua21))
               } yield {
                 buildOptDisposedShareTransactionUA(
                   index,
                   srn,
-                  ua21,
+                  ua22,
                   shareTransaction.optDisposedSharesTransaction
                 )
               }
