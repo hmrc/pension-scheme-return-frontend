@@ -422,7 +422,7 @@ class MemberPaymentsTransformerSpec
       val userAnswers1 = userAnswersAllSections.remove(MemberStatus(srn, index)).get
       val result =
         intercept[RuntimeException](memberPaymentsTransformer.transformToEtmp(srn, userAnswers1, emptyUserAnswers))
-      result.getMessage shouldMatchTo "error occurred: MemberStatus not found for member 1"
+      result.getMessage shouldMatchTo "Error when transforming member payments to ETMP model - MemberStatus not found for member 1"
     }
 
     "should return member payments with memberPsrVersion when initial UA contains completion status semantics but initial UA and current UA are same" in {
