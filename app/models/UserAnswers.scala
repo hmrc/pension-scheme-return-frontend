@@ -16,7 +16,7 @@
 
 package models
 
-import utils.Transform
+import utils.{Diff, Transform}
 import queries._
 import models.UserAnswers.SensitiveJsObject
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive}
@@ -86,6 +86,34 @@ final case class UserAnswers(
     val sanitise: JsValue => JsObject = json => json.as[JsObject].removeEmptyObjects().omit(toOmit: _*)
     this.get(path).map(sanitise) == other.get(path).map(sanitise)
   }
+
+  /**
+   * Returns a map of changed values between useranswers given a path
+   * optional Ommited paths can be supplied
+   */
+  def diff(
+    other: UserAnswers,
+    path: JsPath,
+    toOmit: String*
+  ): Map[JsPath, (JsValue, JsValue)] =
+    (this.get(path), other.get(path)) match {
+      case (Some(a), Some(b)) =>
+        Diff.json(
+          a.as[JsObject].omit(toOmit: _*),
+          b.as[JsObject].omit(toOmit: _*)
+        )
+      case (Some(a), None) =>
+        Diff.json(
+          a.as[JsObject].omit(toOmit: _*),
+          JsObject.empty
+        )
+      case (None, Some(b)) =>
+        Diff.json(
+          JsObject.empty,
+          b.as[JsObject].omit(toOmit: _*)
+        )
+      case _ => Map.empty
+    }
 
   def compose(c: List[UserAnswers.Compose]): Try[UserAnswers] = c.foldLeft(Try(this))((ua, next) => next(ua))
 
