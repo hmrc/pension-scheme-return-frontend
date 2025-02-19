@@ -31,8 +31,4 @@ object FunctionKUtils {
   implicit val tryToFuture: Try ~> Future = new FunctionK[Try, Future] {
     override def apply[A](fa: Try[A]): Future[A] = Future.fromTry(fa)
   }
-
-  implicit val optionToTry: Option ~> Try = new FunctionK[Option, Try] {
-    override def apply[A](fa: Option[A]): Try[A] = fa.toRight(new Exception("Option was None")).toTry
-  }
 }

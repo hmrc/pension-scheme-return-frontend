@@ -78,11 +78,9 @@ class SharesPrePopulationProcessor @Inject()() {
         prePopFlagsToAdd = SharePrePopulated(srn, refinedIndex)
       } yield prePopFlagsToAdd
 
-      _ <- Try(logger.warn(prePopFlagsToAdd.toString()))
       prePopAnswers <- prePopFlagsToAdd.foldLeft(Try(cleanedAnswers)) { (answers, toAdd) =>
         answers.flatMap(_.set(toAdd, false))
       }
-      _ <- Try(logger.warn(prePopAnswers.get(SharePrePopulated.all(srn)).toString))
 
     } yield prePopAnswers
   }
