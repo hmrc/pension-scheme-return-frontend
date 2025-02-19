@@ -16,6 +16,7 @@
 
 package services
 
+import config.FrontendAppConfig
 import models.SchemeId.Srn
 import prepop._
 import models.backend.responses._
@@ -35,7 +36,8 @@ class PrePopulationService @Inject()(
   loanPrePopulationProcessor: LoansPrePopulationProcessor,
   bondsPrePopulationProcessor: BondsPrePopulationProcessor,
   loanProgressPrePopulationProcessor: LoansProgressPrePopulationProcessor,
-  otherAssetsPrePopulationProcessor: OtherAssetsPrePopulationProcessor
+  otherAssetsPrePopulationProcessor: OtherAssetsPrePopulationProcessor,
+  config: FrontendAppConfig
 ) {
 
   /**
@@ -45,17 +47,21 @@ class PrePopulationService @Inject()(
     versionsForYears: Seq[PsrVersionsForYearsResponse],
     yearFrom: LocalDate
   ): Option[String] =
-    versionsForYears
-      .filter(x => LocalDate.parse(x.startDate) < yearFrom)
-      .sortBy(x => LocalDate.parse(x.startDate))(Ordering[LocalDate].reverse)
-      .find(response => response.data.exists(isSubmitted))
-      .flatMap { response =>
-        response.data
-          .filter(isSubmitted)
-          .sortBy(_.reportVersion)(Ordering[Int].reverse)
-          .headOption
-          .map(_.reportFormBundleNumber)
-      }
+    Option
+      .when(config.prePopulationEnabled)(
+        versionsForYears
+          .filter(x => LocalDate.parse(x.startDate) < yearFrom)
+          .sortBy(x => LocalDate.parse(x.startDate))(Ordering[LocalDate].reverse)
+          .find(response => response.data.exists(isSubmitted))
+          .flatMap { response =>
+            response.data
+              .filter(isSubmitted)
+              .sortBy(_.reportVersion)(Ordering[Int].reverse)
+              .headOption
+              .map(_.reportFormBundleNumber)
+          }
+      )
+      .flatten
 
   private def isSubmitted(psrVersionsResponse: PsrVersionsResponse): Boolean = (
     psrVersionsResponse.reportStatus == ReportStatus.SubmittedAndInProgress
@@ -63,13 +69,17 @@ class PrePopulationService @Inject()(
   )
 
   def buildPrePopulatedUserAnswers(baseReturnUA: UserAnswers, userAnswers: UserAnswers)(srn: Srn): Try[UserAnswers] =
-    for {
-      ua0 <- landOrPropertyPrePopulationProcessor.clean(baseReturnUA, userAnswers)(srn)
-      ua1 <- memberPrePopulationProcessor.clean(baseReturnUA, ua0)(srn)
-      ua2 <- sharesPrePopulationProcessor.clean(baseReturnUA, ua1)(srn)
-      ua3 <- loanPrePopulationProcessor.clean(baseReturnUA, ua2)(srn)
-      ua4 <- bondsPrePopulationProcessor.clean(baseReturnUA, ua3)(srn)
-      ua5 <- loanProgressPrePopulationProcessor.clean(baseReturnUA, ua4)(srn)
-      ua6 <- otherAssetsPrePopulationProcessor.clean(baseReturnUA, ua5)(srn)
-    } yield ua6
+    if (config.prePopulationEnabled) {
+      for {
+        ua0 <- landOrPropertyPrePopulationProcessor.clean(baseReturnUA, userAnswers)(srn)
+        ua1 <- memberPrePopulationProcessor.clean(baseReturnUA, ua0)(srn)
+        ua2 <- sharesPrePopulationProcessor.clean(baseReturnUA, ua1)(srn)
+        ua3 <- loanPrePopulationProcessor.clean(baseReturnUA, ua2)(srn)
+        ua4 <- bondsPrePopulationProcessor.clean(baseReturnUA, ua3)(srn)
+        ua5 <- loanProgressPrePopulationProcessor.clean(baseReturnUA, ua4)(srn)
+        ua6 <- otherAssetsPrePopulationProcessor.clean(baseReturnUA, ua5)(srn)
+      } yield ua6
+    } else {
+      Try(userAnswers)
+    }
 }
