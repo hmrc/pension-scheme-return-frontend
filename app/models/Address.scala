@@ -60,7 +60,8 @@ case class Address(
   street: Option[String] = None,
   houseNumber: Option[Int] = None,
   flatNumber: Option[Int] = None,
-  flat: Option[String] = None
+  flat: Option[String] = None,
+  canRemove: Boolean = true
 ) {
   val asString: String =
     s"""$addressLine1, ${addressLine2.fold("")(al2 => s"$al2, ")}${addressLine3.fold("")(al3 => s"$al3, ")}$town${postCode

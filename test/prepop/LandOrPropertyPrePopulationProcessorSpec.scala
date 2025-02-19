@@ -38,6 +38,7 @@ class LandOrPropertyPrePopulationProcessorSpec extends BaseSpec with TestValues 
           baseUA = emptyUserAnswers.copy(data = SensitiveJsObject(baseReturnWithDisposalsJsValue.as[JsObject])),
           currentUA = currentUa
         )(srn)
+        result.get.data.decryptedValue mustBe cleanResultAfterDisposalsRemovedJsValue.as[JsObject]
         result mustBe Success(
           currentUa.copy(data = SensitiveJsObject(cleanResultAfterDisposalsRemovedJsValue.as[JsObject]))
         )
@@ -49,6 +50,7 @@ class LandOrPropertyPrePopulationProcessorSpec extends BaseSpec with TestValues 
           baseUA = emptyUserAnswers.copy(data = SensitiveJsObject(baseReturnWithoutDisposalsJsValue.as[JsObject])),
           currentUA = currentUa
         )(srn)
+        result.get.data.decryptedValue mustBe cleanResultJsValue.as[JsObject]
         result mustBe Success(
           currentUa.copy(data = SensitiveJsObject(cleanResultJsValue.as[JsObject]))
         )
@@ -579,11 +581,13 @@ object LandOrPropertyPrePopulationProcessorSpec {
         |}
         |""".stripMargin)
 
-  val cleanResultAfterDisposalsRemovedJsValue: JsValue = Json.parse("""
+  val cleanResultAfterDisposalsRemovedJsValue: JsValue =
+    Json.parse("""
       |{
       |  "current": "dummy-current-data",
       |  "assets": {
       |    "landOrProperty": {
+      |      "landOrPropertyPrePopulated":{"2":false},
       |      "landOrPropertyTransactions": {
       |        "propertyDetails": {
       |          "landOrPropertyInUK": {
@@ -659,6 +663,7 @@ object LandOrPropertyPrePopulationProcessorSpec {
       |  "current": "dummy-current-data",
       |  "assets": {
       |    "landOrProperty": {
+      |    "landOrPropertyPrePopulated":{"0":false,"1":false,"2":false},
       |      "landOrPropertyTransactions": {
       |        "propertyDetails": {
       |          "landOrPropertyInUK": {

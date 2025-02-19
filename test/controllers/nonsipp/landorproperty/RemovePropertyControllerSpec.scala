@@ -25,7 +25,7 @@ import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.landorproperty.RemovePropertyController._
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, NormalMode}
+import models.{ConditionalYesNo, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
@@ -50,6 +50,11 @@ class RemovePropertyControllerSpec extends ControllerBaseSpec {
     .unsafeSet(IsLandPropertyLeasedPage(srn, index), false)
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  val prePopUserAnswersChecked: UserAnswers =
+    filledUserAnswers.unsafeSet(LandOrPropertyPrePopulated(srn, refineMV(1)), true)
+  val prePopUserAnswersNotChecked: UserAnswers =
+    filledUserAnswers.unsafeSet(LandOrPropertyPrePopulated(srn, refineMV(1)), false)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
@@ -98,5 +103,16 @@ class RemovePropertyControllerSpec extends ControllerBaseSpec {
     act.like(invalidForm(onSubmit, filledUserAnswers))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+
+    act.like(
+      redirectToPage(onPageLoad, controllers.routes.UnauthorisedController.onPageLoad(), prePopUserAnswersChecked)
+        .updateName(_ + " - Block removing checked Pre-pop landOrProperty")
+    )
+
+    act.like(
+      redirectToPage(onPageLoad, controllers.routes.UnauthorisedController.onPageLoad(), prePopUserAnswersNotChecked)
+        .updateName(_ + " - Block removing unchecked Pre-pop landOrProperty")
+    )
+
   }
 }
