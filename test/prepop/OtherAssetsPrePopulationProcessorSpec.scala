@@ -40,6 +40,7 @@ class OtherAssetsPrePopulationProcessorSpec extends BaseSpec with TestValues {
           currentUA = currentUa
         )(srn)
 
+        result.get.data.decryptedValue mustBe cleanedSomeDisposalsData.as[JsObject]
         result mustBe Success(
           currentUa.copy(data = SensitiveJsObject(cleanedSomeDisposalsData.as[JsObject]))
         )
@@ -203,6 +204,7 @@ object OtherAssetsPrePopulationProcessorSpec {
                  |{
                  |  "assets": {
                  |    "otherAssets": {
+                 |    "otherAssetsPrePopulated":{"0":false,"1":false},
                  |      "otherAssetTransactions": {
                  |        "assetDescription": {
                  |          "1": "100kg Gold bars"
@@ -320,6 +322,7 @@ object OtherAssetsPrePopulationProcessorSpec {
                  |{
                  |  "assets": {
                  |    "otherAssets": {
+                 |    "otherAssetsPrePopulated":{"0":false,"1":false},
                  |      "otherAssetTransactions": {
                  |        "assetDescription": {
                  |          "0": "Bag of matches",

@@ -64,6 +64,14 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index3of5000), Transfer)
     .unsafeSet(CostOfOtherAssetPage(srn, index3of5000), money)
     .unsafeSet(OtherAssetsCompleted(srn, index3of5000), SectionCompleted)
+    .unsafeSet(OtherAssetsPrePopulated(srn, index3of5000), false)
+
+  private val userAnswersChecked = completedUserAnswers
+    .unsafeSet(WhatIsOtherAssetPage(srn, index3of5000), "otherAssetsChecked")
+    .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index3of5000), Transfer)
+    .unsafeSet(CostOfOtherAssetPage(srn, index3of5000), money)
+    .unsafeSet(OtherAssetsCompleted(srn, index3of5000), SectionCompleted)
+    .unsafeSet(OtherAssetsPrePopulated(srn, index3of5000), true)
 
   private val page = 1
 
@@ -76,29 +84,42 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
   private val otherAssetsData: List[OtherAssetsData] = List(
     OtherAssetsData(
       index1of5000,
-      "nameOfOtherAsset1"
+      "nameOfOtherAsset1",
+      true
     ),
     OtherAssetsData(
       index2of5000,
-      "nameOfOtherAsset2"
+      "nameOfOtherAsset2",
+      true
     )
   )
 
   private val otherAssetsDataToCheck: List[OtherAssetsData] = List(
     OtherAssetsData(
       index3of5000,
-      "nameOfOtherAsset3"
+      "nameOfOtherAsset3",
+      false
     )
   )
 
   private val otherAssetsDataChanged: List[OtherAssetsData] = List(
     OtherAssetsData(
       index1of5000,
-      "changedNameOfOtherAsset"
+      "changedNameOfOtherAsset",
+      true
     ),
     OtherAssetsData(
       index2of5000,
-      "nameOfOtherAsset2"
+      "nameOfOtherAsset2",
+      true
+    )
+  )
+
+  private val otherAssetsDataChecked: List[OtherAssetsData] = List(
+    OtherAssetsData(
+      index3of5000,
+      "otherAssetsChecked",
+      false
     )
   )
 
@@ -187,7 +208,24 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
           isPrePop = true
         )
       )
-    }.withName("PrePop Journey"))
+    }.withName("PrePop Journey Not Checked"))
+
+    act.like(renderViewWithPrePopSession(onPageLoad, userAnswersChecked) { implicit app => implicit request =>
+      injected[ListView].apply(
+        form(new YesNoPageFormProvider()),
+        viewModel(
+          srn = srn,
+          page = page,
+          mode = NormalMode,
+          otherAssets = otherAssetsData ++ otherAssetsDataChecked,
+          otherAssetsToCheck = Nil,
+          schemeName = schemeName,
+          viewOnlyViewModel = None,
+          showBackLink = true,
+          isPrePop = true
+        )
+      )
+    }.withName("PrePop Journey Checked"))
 
     act.like(
       renderPrePopView(onPageLoad, OtherAssetsListPage(srn), true, completedUserAnswers) {

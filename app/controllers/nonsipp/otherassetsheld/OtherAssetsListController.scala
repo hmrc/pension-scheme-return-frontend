@@ -225,7 +225,8 @@ class OtherAssetsListController @Inject()(
     def buildOtherAssets(index: Max5000): Either[Result, OtherAssetsData] =
       for {
         nameOfOtherAsset <- requiredPage(WhatIsOtherAssetPage(srn, index))
-      } yield OtherAssetsData(index, nameOfOtherAsset)
+        canRemove = request.userAnswers.get(OtherAssetsPrePopulated(srn, index)).isEmpty
+      } yield OtherAssetsData(index, nameOfOtherAsset, canRemove)
 
     if (isPrePopulation) {
       for {
@@ -278,7 +279,7 @@ object OtherAssetsListController {
         List()
       case (list, _) =>
         list.map {
-          case OtherAssetsData(index, nameOfOtherAssets) =>
+          case OtherAssetsData(index, nameOfOtherAssets, canRemove) =>
             val otherAssetsMessage = Message("otherAssets.list.row", nameOfOtherAssets)
             (mode, viewOnlyViewModel) match {
               case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
@@ -293,13 +294,19 @@ object OtherAssetsListController {
                   url = routes.OtherAssetsCheckAndUpdateController.onPageLoad(srn, index).url,
                   hiddenText = Message("site.check.param", nameOfOtherAssets)
                 )
-              case _ =>
+              case _ if canRemove =>
                 ListRow(
                   text = otherAssetsMessage,
                   changeUrl = routes.OtherAssetsCYAController.onPageLoad(srn, index, CheckMode).url,
                   changeHiddenText = Message("otherAssets.list.row.change.hiddenText", otherAssetsMessage),
                   removeUrl = routes.RemoveOtherAssetController.onPageLoad(srn, index, NormalMode).url,
                   removeHiddenText = Message("otherAssets.list.row.remove.hiddenText", otherAssetsMessage)
+                )
+              case _ =>
+                ListRow(
+                  text = otherAssetsMessage,
+                  changeUrl = routes.OtherAssetsCYAController.onPageLoad(srn, index, CheckMode).url,
+                  changeHiddenText = Message("otherAssets.list.row.change.hiddenText", otherAssetsMessage)
                 )
             }
         }
@@ -465,6 +472,7 @@ object OtherAssetsListController {
 
   case class OtherAssetsData(
     index: Max5000,
-    nameOfOtherAssets: String
+    nameOfOtherAssets: String,
+    canRemove: Boolean
   )
 }
