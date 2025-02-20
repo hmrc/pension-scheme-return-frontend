@@ -43,8 +43,6 @@ class ListViewModelSpec extends AnyFreeSpec with Matchers {
       }
     }
 
-// TODO: PSR-1643 uncomment when fixing pagination for pre pop list pages
-
     "multiple sections" - {
       "don't paginate when they all fit on one page" in {
         val rows = buildRows(20)

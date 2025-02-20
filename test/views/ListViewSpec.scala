@@ -95,55 +95,59 @@ class ListViewSpec extends ViewSpec {
           }
         }
 
-        // TODO uncomment and fix when pagination is fixed for pre-pop list pages
-//        "show pagination elements" - {
-//          "there are 4 rows and page size is 3" in {
-//            paginationTest(4, 1, 3) { html =>
-//              summaryListRows(html).size mustEqual 3
-//              val elems = paginationElements(html)
-//              elems.head.isCurrentPage mustEqual true
-//              elems.map(_.text) mustEqual List("1", "2", "Next")
-//            }
-//          }
-//
-//          "there are 6 rows and page size is 3" in {
-//            paginationTest(6, 1, 3) { html =>
-//              summaryListRows(html).size mustEqual 3
-//              paginationElements(html).map(_.text) mustEqual List("1", "2", "Next")
-//            }
-//          }
-//
-//          "there are 7 rows and page size is 3" in {
-//            paginationTest(7, 1, 3) { html =>
-//              summaryListRows(html).size mustEqual 3
-//              paginationElements(html).map(_.text) mustEqual List("1", "2", "3", "Next")
-//            }
-//          }
-//
-//          "current page is 2, there are 7 rows and page size is 3" in {
-//            paginationTest(7, 2, 3) { html =>
-//              summaryListRows(html).size mustEqual 3
-//              val elems = paginationElements(html)
-//              elems(2).isCurrentPage mustEqual true
-//              elems.map(_.text) mustEqual List("Previous", "1", "2", "3", "Next")
-//            }
-//          }
-//
-//          "current page is 2 (final page), there are 4 rows and page size is 3" in {
-//            paginationTest(4, 2, 3) { html =>
-//              summaryListRows(html).size mustEqual 1
-//              val elems = paginationElements(html)
-//              elems(2).isCurrentPage mustEqual true
-//              elems.map(_.text) mustEqual List("Previous", "1", "2")
-//            }
-//          }
-//        }
+        "show pagination elements" - {
+          "there are 4 rows and page size is 3" in {
+            paginationTest(4, 1, 3) { html =>
+              summaryListRows(html).size mustEqual 3
+              val elems = paginationElements(html)
+              elems.head.isCurrentPage mustEqual true
+              elems.map(_.text) mustEqual List("1", "2", "Next")
+            }
+          }
+
+          "there are 6 rows and page size is 3" in {
+            paginationTest(6, 1, 3) { html =>
+              summaryListRows(html).size mustEqual 3
+              paginationElements(html).map(_.text) mustEqual List("1", "2", "Next")
+            }
+          }
+
+          "there are 7 rows and page size is 3" in {
+            paginationTest(7, 1, 3) { html =>
+              summaryListRows(html).size mustEqual 3
+              paginationElements(html).map(_.text) mustEqual List("1", "2", "3", "Next")
+            }
+          }
+
+          "current page is 2, there are 7 rows and page size is 3" in {
+            paginationTest(7, 2, 3) { html =>
+              summaryListRows(html).size mustEqual 3
+              val elems = paginationElements(html)
+              elems(2).isCurrentPage mustEqual true
+              elems.map(_.text) mustEqual List("Previous", "1", "2", "3", "Next")
+            }
+          }
+
+          "current page is 2 (final page), there are 4 rows and page size is 3" in {
+            paginationTest(4, 2, 3) { html =>
+              summaryListRows(html).size mustEqual 1
+              val elems = paginationElements(html)
+              elems(2).isCurrentPage mustEqual true
+              elems.map(_.text) mustEqual List("Previous", "1", "2")
+            }
+          }
+        }
       }
     }
 
     def paginationTest(rows: Int, currentPage: Int, pageSize: Int)(f: Html => Unit): Unit =
       forAll(viewModelGen(rows = Some(rows))) { viewModel =>
-        val pagination = Pagination(currentPage, pageSize, viewModel.page.sections.size, _ => viewModel.onSubmit)
+        val pagination = Pagination(
+          currentPage,
+          pageSize,
+          viewModel.page.sections.map(_.rows.size).sum,
+          _ => viewModel.onSubmit
+        )
         val paginatedViewModel =
           viewModel.copy(
             page = viewModel.page.copy(paginatedViewModel = Some(PaginatedViewModel(Message("test label"), pagination)))
