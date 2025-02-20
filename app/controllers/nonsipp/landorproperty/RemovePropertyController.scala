@@ -19,7 +19,7 @@ package controllers.nonsipp.landorproperty
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandPropertyInUKPage, RemovePropertyPage}
+import pages.nonsipp.landorproperty._
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -54,14 +54,17 @@ class RemovePropertyController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      (
-        for {
-          address <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRedirectToTaskList(srn)
-        } yield {
-          val preparedForm = request.userAnswers.fillForm(RemovePropertyPage(srn, index), form)
-          Ok(view(preparedForm, RemovePropertyController.viewModel(srn, index, mode, address.addressLine1)))
-        }
-      ).merge
+      if (request.userAnswers.get(LandOrPropertyPrePopulated(srn, index)).isDefined)
+        Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+      else
+        (
+          for {
+            address <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRedirectToTaskList(srn)
+          } yield {
+            val preparedForm = request.userAnswers.fillForm(RemovePropertyPage(srn, index), form)
+            Ok(view(preparedForm, RemovePropertyController.viewModel(srn, index, mode, address.addressLine1)))
+          }
+        ).merge
   }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {

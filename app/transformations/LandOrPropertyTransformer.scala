@@ -86,13 +86,14 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
               methodOfHolding <- request.userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, index))
 
               totalCostOfLandOrProperty <- request.userAnswers.get(LandOrPropertyTotalCostPage(srn, index))
+              prePopulated = request.userAnswers.get(LandOrPropertyPrePopulated(srn, index))
             } yield {
 
               val optNoneTransferRelatedDetails = buildOptNoneTransferRelatedDetails(methodOfHolding, srn, index)
               val optAcquisitionRelatedDetails = buildOptAcquisitionRelatedDetails(methodOfHolding, srn, index)
 
               LandOrPropertyTransactions(
-                prePopulated = None,
+                prePopulated = prePopulated,
                 propertyDetails = PropertyDetails(
                   landOrPropertyInUK = landOrPropertyInUK,
                   addressDetails = addressDetails,
@@ -257,6 +258,17 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
 
           val landOrPropertyCompleted = LandOrPropertyCompleted(srn, index) -> SectionCompleted
 
+          val landOrPropertyPrePopulated = indexes
+            .filter(
+              index => {
+                landOrPropertyTransactions(index.value - 1).prePopulated.nonEmpty
+              }
+            )
+            .map(
+              index =>
+                LandOrPropertyPrePopulated(srn, index) -> landOrPropertyTransactions(index.value - 1).prePopulated.get
+            )
+
           val triedUA = for {
             ua0 <- ua
             ua1 <- ua0.set(landOrPropertyInUK._1, landOrPropertyInUK._2)
@@ -297,11 +309,14 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
 
             ua21 <- optSellerConnectedParty.map(t => ua20.set(t._1, t._2)).getOrElse(Try(ua20))
             ua22 <- ua21.set(landOrPropertyCompleted._1, landOrPropertyCompleted._2)
+            ua23 <- landOrPropertyPrePopulated.foldLeft(Try(ua22)) {
+              case (ua, (page, value)) => ua.flatMap(_.set(page, value))
+            }
           } yield {
             buildOptDisposedTransactionUA(
               index,
               srn,
-              ua22,
+              ua23,
               landOrPropertyTransactions(index.value - 1).optDisposedPropertyTransaction,
               landOrProperty.optDisposeAnyLandOrProperty
             )

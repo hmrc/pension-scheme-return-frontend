@@ -20,7 +20,11 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import controllers.nonsipp.landorproperty.LandOrPropertyListController._
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPropertyListPage}
+import pages.nonsipp.landorproperty.{
+  LandOrPropertyAddressLookupPages,
+  LandOrPropertyListPage,
+  LandOrPropertyPrePopulated
+}
 import cats.implicits.toShow
 import config.Constants.maxLandOrProperties
 import controllers.actions._
@@ -211,6 +215,10 @@ class LandOrPropertyListController @Inject()(
       request.userAnswers
         .map(LandOrPropertyAddressLookupPages(srn))
         .refine[Max5000.Refined]
+        .map(_.map {
+          case (index, address) =>
+            (index, address.copy(canRemove = request.userAnswers.get(LandOrPropertyPrePopulated(srn, index)).isEmpty))
+        })
         .map(_.partition {
           case (index, _) => LandOrPropertyCheckStatusUtils.checkLandOrPropertyRecord(request.userAnswers, srn, index)
         })
@@ -269,7 +277,7 @@ object LandOrPropertyListController {
                     Message("landOrPropertyList.row.check.hiddenText", address.addressLine1)
                   )
                 )
-              case _ =>
+              case _ if address.canRemove =>
                 List(
                   index -> ListRow(
                     address.addressLine1,
@@ -277,6 +285,14 @@ object LandOrPropertyListController {
                     changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1),
                     removeUrl = routes.RemovePropertyController.onPageLoad(srn, index, mode).url,
                     removeHiddenText = Message("landOrPropertyList.row.remove.hiddenText", address.addressLine1)
+                  )
+                )
+              case _ =>
+                List(
+                  index -> ListRow(
+                    address.addressLine1,
+                    changeUrl = routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckMode).url,
+                    changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1)
                   )
                 )
             }

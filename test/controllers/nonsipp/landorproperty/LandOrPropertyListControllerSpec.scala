@@ -40,7 +40,7 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
 
   private val address1 = addressGen.sample.value.copy(addressLine1 = "test 1")
   private val address2 = addressGen.sample.value.copy(addressLine1 = "test 2")
-  private val address3 = addressGen.sample.value.copy(addressLine1 = "test 3")
+  private val address3 = addressGen.sample.value.copy(addressLine1 = "test 3", canRemove = false)
 
   private val addresses = Map(
     indexOne -> address1,
@@ -48,6 +48,12 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
   )
 
   private val addressesToCheck = Map(
+    indexThree -> address3
+  )
+
+  private val addressesChecked = Map(
+    indexOne -> address1,
+    indexTwo -> address2,
     indexThree -> address3
   )
 
@@ -85,6 +91,15 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(LandRegistryTitleNumberPage(srn, indexThree), ConditionalYesNo.yes[String, String]("some-number"))
     .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, indexThree), SchemeHoldLandProperty.Transfer)
     .unsafeSet(LandOrPropertyTotalCostPage(srn, indexThree), money)
+    .unsafeSet(LandOrPropertyPrePopulated(srn, indexThree), false)
+
+  private val completedUserAnswersChecked = completedUserAnswers
+    .unsafeSet(LandPropertyInUKPage(srn, indexThree), true)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, indexThree), address3)
+    .unsafeSet(LandRegistryTitleNumberPage(srn, indexThree), ConditionalYesNo.yes[String, String]("some-number"))
+    .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, indexThree), SchemeHoldLandProperty.Transfer)
+    .unsafeSet(LandOrPropertyTotalCostPage(srn, indexThree), money)
+    .unsafeSet(LandOrPropertyPrePopulated(srn, indexThree), true)
 
   private val noUserAnswers = defaultUserAnswers
     .unsafeSet(LandOrPropertyHeldPage(srn), false)
@@ -153,6 +168,22 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
         )
       )
     }.withName("PrePop Journey - 1 added record, 1 PrePop record to Check"))
+
+    act.like(renderViewWithPrePopSession(onPageLoad, completedUserAnswersChecked) { implicit app => implicit request =>
+      injected[ListView].apply(
+        form(new YesNoPageFormProvider()),
+        viewModel(
+          srn,
+          page = 1,
+          NormalMode,
+          addressesChecked,
+          Map(),
+          schemeName,
+          showBackLink = true,
+          isPrePop = true
+        )
+      )
+    }.withName("PrePop Journey - 1 added record, 1 PrePop record Checked"))
 
     act.like(
       redirectToPage(

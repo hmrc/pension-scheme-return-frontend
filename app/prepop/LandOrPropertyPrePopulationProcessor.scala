@@ -16,14 +16,15 @@
 
 package prepop
 
-import models.UserAnswers.SensitiveJsObject
-import config.RefinedTypes.OneTo5000
+import config.RefinedTypes.{Max5000, OneTo5000}
 import pages.nonsipp.landorpropertydisposal.Paths.disposalPropertyTransaction
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
 import eu.timepit.refined.refineV
 import play.api.libs.json.JsSuccess
 import models.UserAnswers
+import utils.ListUtils.ListOps
+import models.UserAnswers.SensitiveJsObject
 import pages.nonsipp.landorproperty.Paths.landOrProperty
 import models.SchemeId.Srn
 
@@ -56,7 +57,7 @@ class LandOrPropertyPrePopulationProcessor @Inject()() {
       case _ => Try(currentUA)
     }
 
-    portionStillHeldOptMap.fold(transformedResult) { portionStillHeldMap =>
+    val cleanedUA = portionStillHeldOptMap.fold(transformedResult) { portionStillHeldMap =>
       portionStillHeldMap.foldLeft(transformedResult)((uaResult, portionStillHeldEntry) => {
         val isFullyDisposed = portionStillHeldEntry._2.exists(!_._2)
         if (isFullyDisposed) {
@@ -68,6 +69,20 @@ class LandOrPropertyPrePopulationProcessor @Inject()() {
           uaResult
         }
       })
+    }
+    cleanedUA.flatMap { ua =>
+      ua.get(LandOrPropertyAddressLookupPages(srn))
+        .map(_.keys.toList)
+        .toList
+        .flatten
+        .refine[Max5000.Refined]
+        .map(index => LandOrPropertyPrePopulated(srn, index))
+        .foldLeft(Try(ua)) {
+          case (ua, landOrPropertyPrePopulated) => {
+            ua.flatMap(_.set(landOrPropertyPrePopulated, false))
+          }
+        }
+
     }
   }
 }

@@ -195,9 +195,11 @@ class LandOrPropertyCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      val prePopulated = request.userAnswers.get(LandOrPropertyPrePopulated(srn, index))
       for {
         updatedAnswers <- request.userAnswers
           .setWhen(request.userAnswers.get(LandOrPropertyHeldPage(srn)).isEmpty)(LandOrPropertyHeldPage(srn), true)
+          .setWhen(prePopulated.isDefined)(LandOrPropertyPrePopulated(srn, index), true)
           .mapK[Future]
         _ <- saveService.save(updatedAnswers)
         result <- psrSubmissionService
