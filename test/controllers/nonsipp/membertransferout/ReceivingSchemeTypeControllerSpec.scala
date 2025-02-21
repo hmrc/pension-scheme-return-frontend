@@ -53,6 +53,14 @@ class ReceivingSchemeTypeControllerSpec extends ControllerBaseSpec {
 
     act.like(saveAndContinue(onSubmit, "value" -> "registeredPS", "registeredPS-conditional" -> " 872 19363 YN"))
 
+    act.like(
+      invalidForm(
+        onSubmit,
+        "value" -> "other",
+        "other-conditional" -> "This text has 166 characters. It includes 28 spaces which should be counted with the overall length. If this test passes then it means that it is counting whitespace."
+      )
+    )
+
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
