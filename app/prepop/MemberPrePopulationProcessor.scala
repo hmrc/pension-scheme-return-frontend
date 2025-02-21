@@ -16,7 +16,7 @@
 
 package prepop
 
-import pages.nonsipp.memberdetails.{MemberStatus, SafeToHardDelete}
+import pages.nonsipp.memberdetails.{MemberStatus, MembersDetailsChecked, SafeToHardDelete}
 import models.UserAnswers.SensitiveJsObject
 import config.RefinedTypes.OneTo300
 import models.SchemeId.Srn
@@ -53,13 +53,16 @@ class MemberPrePopulationProcessor @Inject()() {
         Success(currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue))))
       case _ => Try(currentUA)
     }
+
+    val transformedResultWithCheckedFlag = transformedResult.flatMap(_.set(MembersDetailsChecked(srn), false))
+
     val memberStatusOptMap =
       (baseUaJson \ "membersPayments" \ "memberDetails" \ "personalDetails" \ MemberStatus.key)
         .asOpt[Map[String, String]]
 
-    memberStatusOptMap.fold(transformedResult)(
+    memberStatusOptMap.fold(transformedResultWithCheckedFlag)(
       memberStatusMap =>
-        memberStatusMap.foldLeft(transformedResult)((uaResult, memberStatusEntry) => {
+        memberStatusMap.foldLeft(transformedResultWithCheckedFlag)((uaResult, memberStatusEntry) => {
           memberStatusEntry._1.toIntOption.flatMap(i => refineV[OneTo300](i + 1).toOption) match {
             case None => uaResult
             case Some(index) => uaResult.flatMap(_.set(SafeToHardDelete(srn, index)))

@@ -99,11 +99,15 @@ object TaskListStatusUtils {
       .collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
       .getOrElse(listPageUrl)
 
-    (membersDetailsPages, numRecorded) match {
-      case (None, 0) => (NotStarted, firstQuestionPageUrl)
-      case (Some(memberDetails), 0) if memberDetails.isEmpty => (NotStarted, firstQuestionPageUrl) //Last member removed
-      case (Some(_), 0) => (InProgress, getInProgressUrl)
-      case (Some(_), _) => (Recorded(numRecorded, "members"), getInProgressOrListPageUrl)
+    val checked = userAnswers.get(MembersDetailsChecked(srn))
+
+    (membersDetailsPages, numRecorded, checked) match {
+      case (_, _, Some(false)) => (Check, listPageUrl)
+      case (None, 0, _) => (NotStarted, firstQuestionPageUrl)
+      case (Some(memberDetails), 0, _) if memberDetails.isEmpty =>
+        (NotStarted, firstQuestionPageUrl) //Last member removed
+      case (Some(_), 0, _) => (InProgress, getInProgressUrl)
+      case (Some(_), _, _) => (Recorded(numRecorded, "members"), getInProgressOrListPageUrl)
     }
   }
 

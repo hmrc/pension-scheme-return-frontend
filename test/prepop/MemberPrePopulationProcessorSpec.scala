@@ -824,6 +824,7 @@ object MemberPrePopulationProcessorSpec {
       |  "current": "dummy-current-data",
       |  "membersPayments": {
       |    "memberDetails": {
+      |      "membersDetailsChecked": false,
       |      "personalDetails": {
       |        "nameDob": {
       |          "0": {

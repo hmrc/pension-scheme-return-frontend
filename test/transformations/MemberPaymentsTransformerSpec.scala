@@ -154,6 +154,14 @@ class MemberPaymentsTransformerSpec
     pensionReceived = Some(true)
   )
 
+  private val memberPaymentsAllSectionsNotChecked = memberPaymentsAllSections.copy(
+    checked = Some(false)
+  )
+
+  private val memberPaymentsAllSectionsChecked = memberPaymentsAllSections.copy(
+    checked = Some(true)
+  )
+
   private val softDeletedMemberAllSections = SoftDeletedMember(
     memberPSRVersion = Some("001"),
     memberDetails = MemberPersonalDetails(
@@ -265,6 +273,12 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(MemberDetailsCompletedPage(srn, index2), SectionCompleted)
     .unsafeSet(MemberPsrVersionPage(srn, index2), "001")
     .unsafeSet(MemberStatus(srn, index2), MemberState.New)
+
+  private val userAnswersAllSectionsNotChecked = userAnswersAllSections
+    .unsafeSet(MembersDetailsChecked(srn), false)
+
+  private val userAnswersAllSectionsChecked = userAnswersAllSections
+    .unsafeSet(MembersDetailsChecked(srn), true)
 
   // Test data: no sections of Member Payments have payments made
   private val activeMemberNoSections = MemberDetails(
@@ -785,6 +799,64 @@ class MemberPaymentsTransformerSpec
           }
         }
       }
+
+      "PSR status pre-pop" - {
+
+        "should set checked to false when MembersDetailsChecked is false" in {
+          val result =
+            memberPaymentsTransformer.transformToEtmp(srn, userAnswersAllSectionsNotChecked, defaultUserAnswers)
+          result.isDefined shouldMatchTo true
+          result.get.checked shouldMatchTo Some(false)
+        }
+
+        "should set MembersDetailsChecked to false when checked is false" in {
+          val result = memberPaymentsTransformer.transformFromEtmp(
+            defaultUserAnswers,
+            None,
+            srn,
+            memberPaymentsAllSectionsNotChecked
+          )
+          result.isSuccess shouldMatchTo true
+          result.map(_.get(MembersDetailsChecked(srn))) shouldMatchTo Try(Some(false))
+        }
+
+        "should set checked to true when MembersDetailsChecked is true" in {
+          val result =
+            memberPaymentsTransformer.transformToEtmp(srn, userAnswersAllSectionsChecked, defaultUserAnswers)
+          result.isDefined shouldMatchTo true
+          result.get.checked shouldMatchTo Some(true)
+        }
+
+        "should set MembersDetailsChecked to true when checked is true" in {
+          val result = memberPaymentsTransformer.transformFromEtmp(
+            defaultUserAnswers,
+            None,
+            srn,
+            memberPaymentsAllSectionsChecked
+          )
+          result.isSuccess shouldMatchTo true
+          result.map(_.get(MembersDetailsChecked(srn))) shouldMatchTo Try(Some(true))
+        }
+
+        "should not set checked when MembersDetailsChecked is not defined" in {
+          val result =
+            memberPaymentsTransformer.transformToEtmp(srn, userAnswersAllSections, defaultUserAnswers)
+          result.isDefined shouldMatchTo true
+          result.get.checked shouldMatchTo None
+        }
+
+        "should not set MembersDetailsChecked when checked is not defined" in {
+          val result = memberPaymentsTransformer.transformFromEtmp(
+            defaultUserAnswers,
+            None,
+            srn,
+            memberPaymentsAllSections
+          )
+          result.isSuccess shouldMatchTo true
+          result.map(_.get(MembersDetailsChecked(srn))) shouldMatchTo Try(None)
+        }
+      }
+
     }
   }
 }
