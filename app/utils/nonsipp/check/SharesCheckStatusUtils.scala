@@ -73,16 +73,6 @@ object SharesCheckStatusUtils {
     userAnswers: UserAnswers,
     srn: Srn,
     recordIndex: Max5000
-  ): Boolean =
-    userAnswers.get(SharePrePopulated(srn, recordIndex)) match {
-      case Some(checked) => !checked
-      case None => checkSharesRecordLegacy(userAnswers, srn, recordIndex)
-    }
-
-  def checkSharesRecordLegacy(
-    userAnswers: UserAnswers,
-    srn: Srn,
-    recordIndex: Max5000
   ): Boolean = {
     val anyPrePopClearedAnswersMissing: Boolean = userAnswers.get(SharesTotalIncomePage(srn, recordIndex)).isEmpty
 

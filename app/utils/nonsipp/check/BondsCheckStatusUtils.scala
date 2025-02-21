@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,12 @@
  */
 
 package utils.nonsipp.check
-
 import pages.nonsipp.bonds._
 import models.SchemeId.Srn
 import eu.timepit.refined.refineV
 import models.UserAnswers
 import config.RefinedTypes.{Max5000, OneTo5000}
 import models.SchemeHoldBond._
-
 object BondsCheckStatusUtils {
 
   /**
@@ -38,7 +36,6 @@ object BondsCheckStatusUtils {
   ): Boolean = {
     val bondsHeld = userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
     val journeysStartedList = userAnswers.get(NameOfBondsPages(srn)).getOrElse(Map.empty).keys.toList
-
     bondsHeld match {
       case Some(false) => false
       case _ =>
@@ -56,23 +53,14 @@ object BondsCheckStatusUtils {
   }
 
   /**
-   * This method determines whether or not a Bonds record needs to be checked. A record only needs to be checked if its
-   * BondsPrePopulated field is false.
+   * This method determines whether or not a Bonds record needs to be checked. A record needs checking if any of the
+   * pre-populated-then-cleared answers are missing & all of the other answers are present.
    * @param userAnswers the answers provided by the user, from which we get the Bonds record
    * @param srn the Scheme Reference Number, used for the .get calls
    * @param recordIndex the index of the record being checked
    * @return true if the record requires checking, else false
    */
   def checkBondsRecord(
-    userAnswers: UserAnswers,
-    srn: Srn,
-    recordIndex: Max5000
-  ): Boolean =
-    userAnswers.get(BondPrePopulated(srn, recordIndex)) match {
-      case Some(checked) => !checked
-      case None => checkBondsRecordLegacy(userAnswers, srn, recordIndex) // non-pre-pop
-    }
-  def checkBondsRecordLegacy(
     userAnswers: UserAnswers,
     srn: Srn,
     recordIndex: Max5000
@@ -99,7 +87,6 @@ object BondsCheckStatusUtils {
       case (_, _, _, _, _, _) =>
         false
     }
-
     anyPrePopClearedAnswersMissing && allOtherAnswersPresent
   }
 }

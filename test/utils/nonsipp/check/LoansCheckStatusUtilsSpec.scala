@@ -17,10 +17,10 @@
 package utils.nonsipp.check
 
 import models.IdentityType._
-import utils.nonsipp.check.LoansCheckStatusUtils.{checkLoansRecord, checkLoansRecordLegacy, checkLoansSection}
+import utils.nonsipp.check.LoansCheckStatusUtils.{checkLoansRecord, checkLoansSection}
 import org.scalatest.OptionValues
 import models._
-import pages.nonsipp.common.{IdentityTypePage, _}
+import pages.nonsipp.common._
 import models.SponsoringOrConnectedParty.{ConnectedParty, Neither, Sponsoring}
 import org.scalatest.matchers.must.Matchers
 import models.ConditionalYesNo._
@@ -31,122 +31,11 @@ import models.IdentitySubject.LoanRecipient
 
 class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with OptionValues {
 
-  private val schemeHadLoansTrue =
-    defaultUserAnswers.unsafeSet(LoansMadeOrOutstandingPage(srn), true)
-
-  private val schemeHadLoansFalse =
-    defaultUserAnswers.unsafeSet(LoansMadeOrOutstandingPage(srn), false)
-
-  private def addNonPrePopRecord(index: Max5000, userAnswers: UserAnswers): UserAnswers =
-    userAnswers
-      .unsafeSet(IdentityTypePage(srn, index, LoanRecipient), Individual)
-
-  private def addUncheckedRecord(index: Max5000, userAnswers: UserAnswers): UserAnswers =
-    userAnswers
-      .unsafeSet(IdentityTypePage(srn, index, LoanRecipient), UKCompany)
-      .unsafeSet(LoanPrePopulated(srn, index), false)
-
-  private def addCheckedRecord(index: Max5000, userAnswers: UserAnswers): UserAnswers =
-    userAnswers
-      .unsafeSet(IdentityTypePage(srn, index, LoanRecipient), UKPartnership)
-      .unsafeSet(LoanPrePopulated(srn, index), true)
-
-  "checkLoansSection" - {
-
-    "must be true" - {
-
-      "when schemeHadLoans is None & 1 record is present (unchecked)" in {
-        val userAnswers = addUncheckedRecord(index1of5000, defaultUserAnswers)
-
-        checkLoansSection(userAnswers, srn) mustBe true
-      }
-
-      "when schemeHadLoans is Some(true) & 2 records are present (checked and unchecked)" in {
-        val userAnswers = addCheckedRecord(index1of5000, addUncheckedRecord(index2of5000, schemeHadLoansTrue))
-
-        checkLoansSection(userAnswers, srn) mustBe true
-      }
-
-      "when schemeHadLoans is Some(true) & 2 records are present (unchecked and non-pre-pop)" in {
-        val userAnswers = addUncheckedRecord(index1of5000, addNonPrePopRecord(index2of5000, schemeHadLoansTrue))
-
-        checkLoansSection(userAnswers, srn) mustBe true
-      }
-    }
-
-    "must be false" - {
-
-      "when schemeHadLoans is None & no records are present" in {
-        val userAnswers = defaultUserAnswers
-
-        checkLoansSection(userAnswers, srn) mustBe false
-      }
-
-      "when schemeHadLoans is Some(false) & no records are present" in {
-        val userAnswers = schemeHadLoansFalse
-
-        checkLoansSection(userAnswers, srn) mustBe false
-      }
-
-      "when schemeHadLoans is Some(true) & no records are present" in {
-        val userAnswers = schemeHadLoansTrue
-
-        checkLoansSection(userAnswers, srn) mustBe false
-      }
-
-      "when schemeHadLoans is Some(true) & 1 record is present (checked)" in {
-        val userAnswers = addCheckedRecord(index1of5000, schemeHadLoansTrue)
-
-        checkLoansSection(userAnswers, srn) mustBe false
-      }
-
-      "when schemeHadLoans is Some(true) & 1 record is present (non-pre-pop)" in {
-        val userAnswers = addNonPrePopRecord(index1of5000, schemeHadLoansTrue)
-
-        checkLoansSection(userAnswers, srn) mustBe false
-      }
-
-      "when schemeHadLoans is Some(true) & 2 records are present (checked and non-pre-pop)" in {
-        val userAnswers = addCheckedRecord(index1of5000, addNonPrePopRecord(index2of5000, schemeHadLoansTrue))
-
-        checkLoansSection(userAnswers, srn) mustBe false
-      }
-    }
-  }
-
-  "checkLoansRecord" - {
-
-    "must be true" - {
-
-      "when record is (unchecked)" in {
-        val userAnswers = addUncheckedRecord(index1of5000, defaultUserAnswers)
-
-        checkLoansRecord(userAnswers, srn, index1of5000) mustBe true
-      }
-    }
-
-    "must be false" - {
-
-      "when record is (checked)" in {
-        val userAnswers = addCheckedRecord(index1of5000, defaultUserAnswers)
-
-        checkLoansRecord(userAnswers, srn, index1of5000) mustBe false
-      }
-
-      "when record is (non-pre-pop)" in {
-        val userAnswers = addNonPrePopRecord(index1of5000, defaultUserAnswers)
-
-        checkLoansRecord(userAnswers, srn, index1of5000) mustBe false
-      }
-    }
-
-  }
-
   private val conditionalYesSecurity: ConditionalYes[Security] = ConditionalYesNo.yes(security)
   private val conditionalYesArrears: ConditionalYes[Money] = ConditionalYesNo.yes(money)
 
-  private val schemeHadLoansTrueLegacy = defaultUserAnswers.unsafeSet(LoansMadeOrOutstandingPage(srn), true)
-  private val schemeHadLoansFalseLegacy = defaultUserAnswers.unsafeSet(LoansMadeOrOutstandingPage(srn), false)
+  private val schemeHadLoansTrue = defaultUserAnswers.unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+  private val schemeHadLoansFalse = defaultUserAnswers.unsafeSet(LoansMadeOrOutstandingPage(srn), false)
 
   private def addLoansBaseAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers
@@ -158,7 +47,6 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
     userAnswers
       .unsafeSet(AmountOfTheLoanPage(srn, index), partialAmountOfTheLoan)
       .unsafeSet(InterestOnLoanPage(srn, index), partialInterestOnLoan)
-
   // Branching on IdentityTypePage
   private def addLoansIndividualAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers
@@ -166,27 +54,23 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
       .unsafeSet(IndividualRecipientNamePage(srn, index), name)
       .unsafeSet(IndividualRecipientNinoPage(srn, index), conditionalYesNoNino)
       .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, index), true)
-
   private def addLoansUKCompanyAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers
       .unsafeSet(IdentityTypePage(srn, index, LoanRecipient), UKCompany)
       .unsafeSet(CompanyRecipientNamePage(srn, index), name)
       .unsafeSet(CompanyRecipientCrnPage(srn, index, LoanRecipient), conditionalYesNoCrn)
       .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), Sponsoring)
-
   private def addLoansUKPartnershipAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers
       .unsafeSet(IdentityTypePage(srn, index, LoanRecipient), UKPartnership)
       .unsafeSet(PartnershipRecipientNamePage(srn, index), name)
       .unsafeSet(PartnershipRecipientUtrPage(srn, index, LoanRecipient), conditionalYesNoUtr)
       .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), ConnectedParty)
-
   private def addLoansOtherAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers
       .unsafeSet(IdentityTypePage(srn, index, LoanRecipient), Other)
       .unsafeSet(OtherRecipientDetailsPage(srn, index, LoanRecipient), otherRecipientDetails)
       .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), Neither)
-
   private def addLoansPrePopAnswers(index: Max5000, userAnswers: UserAnswers): UserAnswers =
     userAnswers
       .unsafeSet(AmountOfTheLoanPage(srn, index), amountOfTheLoan)
@@ -194,7 +78,7 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
       .unsafeSet(ArrearsPrevYears(srn, index), true)
       .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), conditionalYesArrears)
 
-  "checkLoansSectionLegacy" - {
+  "checkLoansSection" - {
 
     "must be true" - {
 
@@ -206,14 +90,13 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
               index1of5000,
               addLoansPartialAnswers(
                 index1of5000,
-                schemeHadLoansTrueLegacy
+                schemeHadLoansTrue
               )
             )
           )
 
         checkLoansSection(userAnswers, srn) mustBe true
       }
-
       "when schemeHadLoans is Some(true) & 2 records are present, 1 of which needs checking" in {
         val userAnswers =
           addLoansBaseAnswers(
@@ -228,7 +111,7 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
                     index2of5000,
                     addLoansPrePopAnswers(
                       index2of5000,
-                      schemeHadLoansTrueLegacy
+                      schemeHadLoansTrue
                     )
                   )
                 )
@@ -238,7 +121,6 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
 
         checkLoansSection(userAnswers, srn) mustBe true
       }
-
       "when schemeHadLoans is None & 1 record is present, which needs checking" in {
         val userAnswers =
           addLoansBaseAnswers(
@@ -251,10 +133,8 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
               )
             )
           )
-
         checkLoansSection(userAnswers, srn) mustBe true
       }
-
       "when schemeHadLoans is None & 2 records are present, 1 of which needs checking" in {
         val userAnswers =
           addLoansBaseAnswers(
@@ -276,21 +156,19 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
               )
             )
           )
-
         checkLoansSection(userAnswers, srn) mustBe true
       }
     }
-
     "must be false" - {
 
       "when schemeHadLoans is Some(false)" in {
-        val userAnswers = schemeHadLoansFalseLegacy
+        val userAnswers = schemeHadLoansFalse
 
         checkLoansSection(userAnswers, srn) mustBe false
       }
 
       "when schemeHadLoans is Some(true) & no records are present" in {
-        val userAnswers = schemeHadLoansTrueLegacy
+        val userAnswers = schemeHadLoansTrue
 
         checkLoansSection(userAnswers, srn) mustBe false
       }
@@ -303,20 +181,17 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
               index1of5000,
               addLoansPrePopAnswers(
                 index1of5000,
-                schemeHadLoansTrueLegacy
+                schemeHadLoansTrue
               )
             )
           )
 
         checkLoansSection(userAnswers, srn) mustBe false
       }
-
       "when schemeHadLoans is None & no records are present" in {
         val userAnswers = defaultUserAnswers
-
         checkLoansSection(userAnswers, srn) mustBe false
       }
-
       "when schemeHadLoans is None & 1 record is present which doesn't need checking" in {
         val userAnswers =
           addLoansBaseAnswers(
@@ -329,16 +204,12 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
               )
             )
           )
-
         checkLoansSection(userAnswers, srn) mustBe false
       }
     }
   }
-
   "checkLoansRecord" - {
-
     "must be true" - {
-
       "when all pre-pop-cleared answers are missing & all other answers are present (Individual)" in {
         val userAnswers =
           addLoansBaseAnswers(
@@ -347,12 +218,12 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
               index1of5000,
               addLoansPartialAnswers(
                 index1of5000,
-                schemeHadLoansTrueLegacy
+                schemeHadLoansTrue
               )
             )
           )
 
-        checkLoansRecordLegacy(userAnswers, srn, index1of5000) mustBe true
+        checkLoansRecord(userAnswers, srn, index1of5000) mustBe true
       }
 
       "when all pre-pop-cleared answers are missing & all other answers are present (UKCompany)" in {
@@ -363,12 +234,12 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
               index1of5000,
               addLoansPartialAnswers(
                 index1of5000,
-                schemeHadLoansTrueLegacy
+                schemeHadLoansTrue
               )
             )
           )
 
-        checkLoansRecordLegacy(userAnswers, srn, index1of5000) mustBe true
+        checkLoansRecord(userAnswers, srn, index1of5000) mustBe true
       }
 
       "when all pre-pop-cleared answers are missing & all other answers are present (UKPartnership)" in {
@@ -379,12 +250,12 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
               index1of5000,
               addLoansPartialAnswers(
                 index1of5000,
-                schemeHadLoansTrueLegacy
+                schemeHadLoansTrue
               )
             )
           )
 
-        checkLoansRecordLegacy(userAnswers, srn, index1of5000) mustBe true
+        checkLoansRecord(userAnswers, srn, index1of5000) mustBe true
       }
 
       "when all pre-pop-cleared answers are missing & all other answers are present (Other)" in {
@@ -395,12 +266,12 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
               index1of5000,
               addLoansPartialAnswers(
                 index1of5000,
-                schemeHadLoansTrueLegacy
+                schemeHadLoansTrue
               )
             )
           )
 
-        checkLoansRecordLegacy(userAnswers, srn, index1of5000) mustBe true
+        checkLoansRecord(userAnswers, srn, index1of5000) mustBe true
       }
 
       "when some pre-pop-cleared answers are present & some are missing" in {
@@ -411,22 +282,21 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
               index1of5000,
               addLoansPrePopAnswers(
                 index1of5000,
-                schemeHadLoansTrueLegacy
+                schemeHadLoansTrue
               )
             )
           ).unsafeRemove(ArrearsPrevYears(srn, index1of5000))
             .unsafeRemove(OutstandingArrearsOnLoanPage(srn, index1of5000))
 
-        checkLoansRecordLegacy(userAnswers, srn, index1of5000) mustBe true
+        checkLoansRecord(userAnswers, srn, index1of5000) mustBe true
       }
     }
 
     "must be false" - {
-
       "when all answers are missing" in {
         val userAnswers = defaultUserAnswers
 
-        checkLoansRecordLegacy(userAnswers, srn, index1of5000) mustBe false
+        checkLoansRecord(userAnswers, srn, index1of5000) mustBe false
       }
 
       "when 1 other answer is missing" in {
@@ -437,12 +307,12 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
               index1of5000,
               addLoansPartialAnswers(
                 index1of5000,
-                schemeHadLoansTrueLegacy
+                schemeHadLoansTrue
               )
             )
           ).unsafeRemove(IdentityTypePage(srn, index1of5000, LoanRecipient))
 
-        checkLoansRecordLegacy(userAnswers, srn, index1of5000) mustBe false
+        checkLoansRecord(userAnswers, srn, index1of5000) mustBe false
       }
 
       "when all pre-pop-cleared answers are present" in {
@@ -453,12 +323,12 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
               index1of5000,
               addLoansPrePopAnswers(
                 index1of5000,
-                schemeHadLoansTrueLegacy
+                schemeHadLoansTrue
               )
             )
           )
 
-        checkLoansRecordLegacy(userAnswers, srn, index1of5000) mustBe false
+        checkLoansRecord(userAnswers, srn, index1of5000) mustBe false
       }
 
       "when Individual answers are missing" in {
@@ -467,11 +337,11 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
             index1of5000,
             addLoansPartialAnswers(
               index1of5000,
-              schemeHadLoansTrueLegacy
+              schemeHadLoansTrue
             )
           ).unsafeSet(IdentityTypePage(srn, index1of5000, LoanRecipient), Individual)
 
-        checkLoansRecordLegacy(userAnswers, srn, index1of5000) mustBe false
+        checkLoansRecord(userAnswers, srn, index1of5000) mustBe false
       }
 
       "when UKCompany answers are missing" in {
@@ -480,11 +350,11 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
             index1of5000,
             addLoansPartialAnswers(
               index1of5000,
-              schemeHadLoansTrueLegacy
+              schemeHadLoansTrue
             )
           ).unsafeSet(IdentityTypePage(srn, index1of5000, LoanRecipient), UKCompany)
 
-        checkLoansRecordLegacy(userAnswers, srn, index1of5000) mustBe false
+        checkLoansRecord(userAnswers, srn, index1of5000) mustBe false
       }
 
       "when UKPartnership answers are missing" in {
@@ -493,11 +363,11 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
             index1of5000,
             addLoansPartialAnswers(
               index1of5000,
-              schemeHadLoansTrueLegacy
+              schemeHadLoansTrue
             )
           ).unsafeSet(IdentityTypePage(srn, index1of5000, LoanRecipient), UKPartnership)
 
-        checkLoansRecordLegacy(userAnswers, srn, index1of5000) mustBe false
+        checkLoansRecord(userAnswers, srn, index1of5000) mustBe false
       }
 
       "when Other answers are missing" in {
@@ -506,13 +376,12 @@ class LoansCheckStatusUtilsSpec extends ControllerBaseSpec with Matchers with Op
             index1of5000,
             addLoansPartialAnswers(
               index1of5000,
-              schemeHadLoansTrueLegacy
+              schemeHadLoansTrue
             )
           ).unsafeSet(IdentityTypePage(srn, index1of5000, LoanRecipient), Other)
 
-        checkLoansRecordLegacy(userAnswers, srn, index1of5000) mustBe false
+        checkLoansRecord(userAnswers, srn, index1of5000) mustBe false
       }
     }
   }
-
 }

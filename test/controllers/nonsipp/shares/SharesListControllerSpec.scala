@@ -186,23 +186,6 @@ class SharesListControllerSpec extends ControllerBaseSpec {
         )
     }.updateName(_ + " - To Check"))
 
-    act.like(renderViewWithPrePopSession(onPageLoad, userAnswersChecked) { implicit app => implicit request =>
-      injected[ListView]
-        .apply(
-          form(injected[YesNoPageFormProvider]),
-          viewModel(
-            srn,
-            page,
-            NormalMode,
-            sharesData ++ shareToChecked,
-            Nil,
-            schemeName,
-            showBackLink = true,
-            isPrePop = true
-          )
-        )
-    }.updateName(_ + " - Checked"))
-
     act.like(
       renderPrePopView(onPageLoad, SharesListPage(srn), true, userAnswers) { implicit app => implicit request =>
         injected[ListView]

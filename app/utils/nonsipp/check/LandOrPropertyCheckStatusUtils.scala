@@ -71,16 +71,6 @@ object LandOrPropertyCheckStatusUtils {
     userAnswers: UserAnswers,
     srn: Srn,
     recordIndex: Max5000
-  ): Boolean =
-    userAnswers.get(LandOrPropertyPrePopulated(srn, recordIndex)) match {
-      case Some(checked) => !checked
-      case None => checkLandOrPropertyRecordLegacy(userAnswers, srn, recordIndex) // non-pre-pop
-    }
-
-  def checkLandOrPropertyRecordLegacy(
-    userAnswers: UserAnswers,
-    srn: Srn,
-    recordIndex: Max5000
   ): Boolean = {
     val anyPrePopClearedAnswersMissing: Boolean = (
       userAnswers.get(IsLandOrPropertyResidentialPage(srn, recordIndex)),

@@ -71,16 +71,6 @@ object LoansCheckStatusUtils {
     userAnswers: UserAnswers,
     srn: Srn,
     recordIndex: Max5000
-  ): Boolean =
-    userAnswers.get(LoanPrePopulated(srn, recordIndex)) match {
-      case Some(checked) => !checked
-      case None => checkLoansRecordLegacy(userAnswers, srn, recordIndex) // non-pre-pop
-    }
-
-  def checkLoansRecordLegacy(
-    userAnswers: UserAnswers,
-    srn: Srn,
-    recordIndex: Max5000
   ): Boolean = {
     val anyPrePopClearedAnswersMissing: Boolean = (
       userAnswers.get(AmountOfTheLoanPage(srn, recordIndex)),

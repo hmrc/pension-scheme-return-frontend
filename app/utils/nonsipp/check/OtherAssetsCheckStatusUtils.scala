@@ -70,15 +70,6 @@ object OtherAssetsCheckStatusUtils {
     userAnswers: UserAnswers,
     srn: Srn,
     recordIndex: Max5000
-  ): Boolean =
-    userAnswers.get(OtherAssetsPrePopulated(srn, recordIndex)) match {
-      case Some(checked) => !checked
-      case None => checkotherAssetsRecordLegacy(userAnswers, srn, recordIndex) // non-pre-pop
-    }
-  def checkotherAssetsRecordLegacy(
-    userAnswers: UserAnswers,
-    srn: Srn,
-    recordIndex: Max5000
   ): Boolean = {
     val anyPrePopClearedAnswersMissing: Boolean = (
       userAnswers.get(IsAssetTangibleMoveablePropertyPage(srn, recordIndex)),
