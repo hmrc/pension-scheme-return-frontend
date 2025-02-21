@@ -28,7 +28,7 @@ import models.UserAnswers.SensitiveJsObject
 import pages.nonsipp.otherassetsheld.Paths.otherAssets
 import play.api.libs.json.{JsObject, JsSuccess}
 
-import scala.util.Try
+import scala.util.{Success, Try}
 
 import javax.inject.{Inject, Singleton}
 
@@ -53,27 +53,11 @@ class OtherAssetsPrePopulationProcessor @Inject()() {
       .flatMap(_.transform((Paths.otherAssetsTransactions \ "movableSchedule29A").prune(_)))
       .flatMap(_.transform((Paths.otherAssetsTransactions \ "totalIncomeOrReceipts").prune(_))) match {
       case JsSuccess(value, _) =>
-        val uaWithOtherAssetsData =
-          currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue)))
-
-        val updatedUA = uaWithOtherAssetsData
-          .get(WhatIsOtherAssetPages(srn))
-          .map(_.keys.toList)
-          .toList
-          .flatten
-          .refine[Max5000.Refined]
-          .map(index => OtherAssetsPrePopulated(srn, index))
-          .foldLeft(Try(uaWithOtherAssetsData)) {
-            case (ua, otherAssetsPrePopulated) => {
-              ua.flatMap(_.set(otherAssetsPrePopulated, false))
-            }
-          }
-
-        updatedUA
+        Success(currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue))))
       case _ => Try(currentUA)
     }
 
-    anyPartAssetStillHeldOptMap.fold(transformedResult) { anyPartStillHeldMap =>
+    val cleanedUA = anyPartAssetStillHeldOptMap.fold(transformedResult) { anyPartStillHeldMap =>
       anyPartStillHeldMap.foldLeft(transformedResult)((uaResult, anyPartStillHeldEntry) => {
         val isFullyDisposed = anyPartStillHeldEntry._2.exists(!_._2)
         if (isFullyDisposed) {
@@ -85,6 +69,20 @@ class OtherAssetsPrePopulationProcessor @Inject()() {
           uaResult
         }
       })
+    }
+
+    cleanedUA.flatMap { ua =>
+      ua.get(WhatIsOtherAssetPages(srn))
+        .map(_.keys.toList)
+        .toList
+        .flatten
+        .refine[Max5000.Refined]
+        .map(index => OtherAssetsPrePopulated(srn, index))
+        .foldLeft(Try(ua)) {
+          case (ua, otherAssetsPrePopulated) => {
+            ua.flatMap(_.set(otherAssetsPrePopulated, false))
+          }
+        }
     }
   }
 }
