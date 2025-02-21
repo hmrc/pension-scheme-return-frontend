@@ -45,7 +45,7 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
     schemeId: SchemeId
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SchemeDetails]] =
     http
-      .get(url"${url("/pensions-scheme/scheme")}")
+      .get(url"${url(s"/pensions-scheme/scheme/:${schemeId.value}")}")
       .transform(
         _.addHttpHeaders(
           "idNumber" -> schemeId.value,
@@ -66,7 +66,7 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
     schemeId: Srn
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SchemeDetails]] =
     http
-      .get(url"${url("/pensions-scheme/psp-scheme")}")
+      .get(url"${url(s"/pensions-scheme/psp-scheme/:${schemeId.value}")}")
       .transform(
         _.addHttpHeaders(
           "pspId" -> pspId.value,
@@ -127,7 +127,7 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
     idType: String
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ListMinimalSchemeDetails]] =
     http
-      .get(url"${url("/pensions-scheme/list-of-schemes")}")
+      .get(url"${url("/pensions-scheme/list-of-schemes-self")}")
       .transform(
         _.addHttpHeaders(
           "idValue" -> idValue,
