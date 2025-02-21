@@ -204,7 +204,7 @@ object OtherAssetsPrePopulationProcessorSpec {
                  |{
                  |  "assets": {
                  |    "otherAssets": {
-                 |    "otherAssetsPrePopulated":{"0":false,"1":false},
+                 |    "otherAssetsPrePopulated":{"1":false},
                  |      "otherAssetTransactions": {
                  |        "assetDescription": {
                  |          "1": "100kg Gold bars"
