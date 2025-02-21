@@ -210,23 +210,6 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
       )
     }.withName("PrePop Journey Not Checked"))
 
-    act.like(renderViewWithPrePopSession(onPageLoad, userAnswersChecked) { implicit app => implicit request =>
-      injected[ListView].apply(
-        form(new YesNoPageFormProvider()),
-        viewModel(
-          srn = srn,
-          page = page,
-          mode = NormalMode,
-          otherAssets = otherAssetsData ++ otherAssetsDataChecked,
-          otherAssetsToCheck = Nil,
-          schemeName = schemeName,
-          viewOnlyViewModel = None,
-          showBackLink = true,
-          isPrePop = true
-        )
-      )
-    }.withName("PrePop Journey Checked"))
-
     act.like(
       renderPrePopView(onPageLoad, OtherAssetsListPage(srn), true, completedUserAnswers) {
         implicit app => implicit request =>

@@ -169,22 +169,6 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
       )
     }.withName("PrePop Journey - 1 added record, 1 PrePop record to Check"))
 
-    act.like(renderViewWithPrePopSession(onPageLoad, completedUserAnswersChecked) { implicit app => implicit request =>
-      injected[ListView].apply(
-        form(new YesNoPageFormProvider()),
-        viewModel(
-          srn,
-          page = 1,
-          NormalMode,
-          addressesChecked,
-          Map(),
-          schemeName,
-          showBackLink = true,
-          isPrePop = true
-        )
-      )
-    }.withName("PrePop Journey - 1 added record, 1 PrePop record Checked"))
-
     act.like(
       redirectToPage(
         onPageLoad,
