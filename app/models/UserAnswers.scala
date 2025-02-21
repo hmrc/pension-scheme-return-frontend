@@ -16,15 +16,16 @@
 
 package models
 
-import utils.Transform
+import utils.{Diff, Transform}
 import queries._
 import models.UserAnswers.SensitiveJsObject
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive}
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
-import viewmodels.models.Flag
 import play.api.data.Form
 import uk.gov.hmrc.crypto.json.JsonEncryption
+import utils.JsonUtils.JsObjectOps
+import viewmodels.models.Flag
 
 import scala.util.{Failure, Success, Try}
 
@@ -81,15 +82,38 @@ final case class UserAnswers(
     }
   }
 
-  def sameAs(other: UserAnswers, path: JsPath, omit: String*): Boolean = {
-    val removeEmptyObjects: JsValue => JsObject = _.as[JsObject].value.foldLeft(JsObject.empty) {
-      case (obj, (_, JsObject(value))) if value.isEmpty => obj
-      case (obj, (key, newObj)) => obj ++ Json.obj(key -> newObj)
-    }
-
-    val sanitisedObject = omit.foldLeft(removeEmptyObjects)((a, toOmit) => a.andThen(_ - toOmit))
-    this.get(path).map(sanitisedObject) == other.get(path).map(sanitisedObject)
+  def sameAs(other: UserAnswers, path: JsPath, toOmit: String*): Boolean = {
+    val sanitise: JsValue => JsObject = json => json.as[JsObject].removeEmptyObjects().omit(toOmit: _*)
+    this.get(path).map(sanitise) == other.get(path).map(sanitise)
   }
+
+  /**
+   * Returns a map of changed values between useranswers given a path
+   * optional Ommited paths can be supplied
+   */
+  def diff(
+    other: UserAnswers,
+    path: JsPath,
+    toOmit: String*
+  ): Map[JsPath, (JsValue, JsValue)] =
+    (this.get(path), other.get(path)) match {
+      case (Some(a), Some(b)) =>
+        Diff.json(
+          a.as[JsObject].omit(toOmit: _*),
+          b.as[JsObject].omit(toOmit: _*)
+        )
+      case (Some(a), None) =>
+        Diff.json(
+          a.as[JsObject].omit(toOmit: _*),
+          JsObject.empty
+        )
+      case (None, Some(b)) =>
+        Diff.json(
+          JsObject.empty,
+          b.as[JsObject].omit(toOmit: _*)
+        )
+      case _ => Map.empty
+    }
 
   def compose(c: List[UserAnswers.Compose]): Try[UserAnswers] = c.foldLeft(Try(this))((ua, next) => next(ua))
 

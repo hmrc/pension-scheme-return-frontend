@@ -408,27 +408,36 @@ class MemberPaymentsTransformerSpec
       val userAnswers1 = userAnswersAllSections.remove(MemberStatus(srn, index)).get
       val result =
         intercept[RuntimeException](memberPaymentsTransformer.transformToEtmp(srn, userAnswers1, emptyUserAnswers))
-      result.getMessage shouldMatchTo "error occurred: MemberStatus not found for member 1"
+      result.getMessage shouldMatchTo "Error when transforming member payments to ETMP model - MemberStatus not found for member 1"
     }
 
     "should return member payments with memberPsrVersion when initial UA contains completion status semantics but initial UA and current UA are same" in {
       val initial = userAnswersAllSections
         .remove(
-          PensionCommencementLumpSumAmountPage(srn, refineMV(1))
+          List(
+            PensionCommencementLumpSumAmountPage(srn, refineMV(1)),
+            TotalAmountPensionPaymentsPage(srn, refineMV(1)),
+            TotalMemberContributionPage(srn, refineMV(1))
+          )
         )
         .get
 
-      val current = userAnswersAllSections.unsafeSet(
-        PensionCommencementLumpSumAmountPage(srn, refineMV(1)),
-        PensionCommencementLumpSum(Money.zero, Money.zero)
-      )
+      val current = userAnswersAllSections
+        .unsafeSet(
+          PensionCommencementLumpSumAmountPage(srn, refineMV(1)),
+          PensionCommencementLumpSum(Money.zero, Money.zero)
+        )
+        .unsafeSet(TotalAmountPensionPaymentsPage(srn, refineMV(1)), Money.zero)
+        .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), Money.zero)
+
       val result = memberPaymentsTransformer.transformToEtmp(srn, current, initial)
       result shouldMatchTo Some(
         memberPaymentsAllSections.copy(
-          recordVersion = None, // todo: this is a bug and should not be removed, there is a ticket to address member payments comparisons at the case class level instead of json
           memberDetails = List(
             activeMemberAllSections.copy(
-              memberLumpSumReceived = Some(MemberLumpSumReceived.zero)
+              memberLumpSumReceived = Some(MemberLumpSumReceived.zero),
+              pensionAmountReceived = Some(Money.zero.value),
+              totalContributions = Some(Money.zero.value)
             ),
             deletedMemberAllSections
           )
