@@ -66,7 +66,19 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
     request.userAnswers.get(page) match {
       case Some(value) => Right(value)
       case None =>
-        logger.error(s"Required page ${page.getClass.getSimpleName} missing")
+        // Check if it's a case class and extract param names and values
+        val params: String = page match {
+          case p: Product =>
+            p.productElementNames
+              .zip(p.productIterator)
+              .map {
+                case (name, value) =>
+                  s"$name: ${value.toString}"
+              }
+              .mkString(", ")
+          case _ => "No parameters available"
+        }
+        logger.error(s"Required page ${page.getClass.getSimpleName}($params) missing")
         Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
