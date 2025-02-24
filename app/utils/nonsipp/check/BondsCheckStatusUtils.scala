@@ -70,36 +70,6 @@ object BondsCheckStatusUtils {
   ): Boolean =
     userAnswers.get(BondPrePopulated(srn, recordIndex)) match {
       case Some(checked) => !checked
-      case None => checkBondsRecordLegacy(userAnswers, srn, recordIndex) // non-pre-pop
+      case None => false // non-pre-pop
     }
-  def checkBondsRecordLegacy(
-    userAnswers: UserAnswers,
-    srn: Srn,
-    recordIndex: Max5000
-  ): Boolean = {
-    val anyPrePopClearedAnswersMissing: Boolean = userAnswers.get(IncomeFromBondsPage(srn, recordIndex)).isEmpty
-
-    lazy val allOtherAnswersPresent: Boolean = (
-      userAnswers.get(NameOfBondsPage(srn, recordIndex)),
-      userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, recordIndex)),
-      userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, recordIndex)), // if Acquisition || Contribution
-      userAnswers.get(CostOfBondsPage(srn, recordIndex)),
-      userAnswers.get(BondsFromConnectedPartyPage(srn, recordIndex)), // if Acquisition
-      userAnswers.get(AreBondsUnregulatedPage(srn, recordIndex))
-    ) match {
-      // Acquisition
-      case (Some(_), Some(Acquisition), Some(_), Some(_), Some(_), Some(_)) =>
-        true
-      // Contribution
-      case (Some(_), Some(Contribution), Some(_), Some(_), None, Some(_)) =>
-        true
-      // Transfer
-      case (Some(_), Some(Transfer), None, Some(_), None, Some(_)) =>
-        true
-      case (_, _, _, _, _, _) =>
-        false
-    }
-
-    anyPrePopClearedAnswersMissing && allOtherAnswersPresent
-  }
 }

@@ -416,11 +416,13 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(LandRegistryTitleNumberPage(srn, index1of5000), ConditionalYesNo.no[String, String](reason))
           .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index1of5000), SchemeHoldLandProperty.Transfer)
           .unsafeSet(LandOrPropertyTotalCostPage(srn, index1of5000), money)
+          .unsafeSet(LandOrPropertyPrePopulated(srn, index1of5000), false)
 
         val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn, isPrePop = true)
         result mustBe (Check, listPageUrl)
       }
     }
+
   }
 
   "Borrowing status" - {
