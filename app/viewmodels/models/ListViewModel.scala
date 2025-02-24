@@ -118,5 +118,8 @@ case class ListViewModel(
   showRadios: Boolean = true,
   paginatedViewModel: Option[PaginatedViewModel] = None,
   yesHintText: Option[Message] = None,
+  noHintText: Option[Message] = None,
+  radioYesMessage: Option[Message] = None,
+  radioNoMessage: Option[Message] = None,
   showInsetWithRadios: Boolean = false
 )
