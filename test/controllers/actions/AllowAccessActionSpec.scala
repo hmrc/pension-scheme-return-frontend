@@ -26,7 +26,6 @@ import models.SchemeId.Srn
 import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
 import models.PensionSchemeId.{PsaId, PspId}
 import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
-import play.api.http.Status.OK
 import models.{MinimalDetails, SchemeDetails}
 import models.requests.IdentifierRequest
 import play.api.mvc.Results.Ok
@@ -36,6 +35,8 @@ import play.api.test.Helpers._
 import org.mockito.Mockito.{reset, when}
 import play.api.Application
 import play.api.libs.json.Json
+import play.api.http.Status.OK
+import uk.gov.hmrc.http.UpstreamErrorResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -71,14 +72,6 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
     when(mockSchemeDetailsConnector.details(meq(pspId), meq(srn))(any(), any()))
       .thenReturn(result)
 
-  def setupCheckAssociation(psaId: PsaId, srn: Srn, result: Future[Boolean]): Unit =
-    when(mockSchemeDetailsConnector.checkAssociation(meq(psaId), meq(srn))(any(), any()))
-      .thenReturn(result)
-
-  def setupCheckAssociation(pspId: PspId, srn: Srn, result: Future[Boolean]): Unit =
-    when(mockSchemeDetailsConnector.checkAssociation(meq(pspId), meq(srn))(any(), any()))
-      .thenReturn(result)
-
   def setupMinimalDetails(loggedInAsPsa: Boolean, result: Future[Either[MinimalDetailsError, MinimalDetails]]): Unit =
     when(mockMinimalDetailsConnector.fetch(meq(loggedInAsPsa))(any(), any()))
       .thenReturn(result)
@@ -89,11 +82,9 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
     // setup green path
     setupSchemeDetails(psaId, srn, Future.successful(Some(schemeDetails)))
-    setupCheckAssociation(psaId, srn, Future.successful(true))
     setupMinimalDetails(loggedInAsPsa = true, Future.successful(Right(minimalDetails)))
 
     setupSchemeDetails(pspId, srn, Future.successful(Some(schemeDetails)))
-    setupCheckAssociation(pspId, srn, Future.successful(true))
     setupMinimalDetails(loggedInAsPsa = false, Future.successful(Right(minimalDetails)))
   }
 
@@ -131,24 +122,6 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
     "redirect to unauthorized page" - {
 
-      "psa check association returns false" in runningApplication { implicit app =>
-        setupCheckAssociation(psaId, srn, Future.successful(false))
-
-        val result = handler(administratorRequest).run(srn)(FakeRequest())
-        val expectedUrl = routes.UnauthorisedController.onPageLoad().url
-
-        redirectLocation(result) mustBe Some(expectedUrl)
-      }
-
-      "psp check association returns false" in runningApplication { implicit app =>
-        setupCheckAssociation(pspId, srn, Future.successful(false))
-
-        val result = handler(practitionerRequest).run(srn)(FakeRequest())
-        val expectedUrl = routes.UnauthorisedController.onPageLoad().url
-
-        redirectLocation(result) mustBe Some(expectedUrl)
-      }
-
       "psa minimal details return not found" in runningApplication { implicit app =>
         setupMinimalDetails(loggedInAsPsa = true, Future.successful(Left(DetailsNotFound)))
 
@@ -178,6 +151,24 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       "psp - scheme details not found" in runningApplication { implicit app =>
         setupSchemeDetails(pspId, srn, Future.successful(None))
+
+        val result = handler(practitionerRequest).run(srn)(FakeRequest())
+        val expectedUrl = routes.UnauthorisedController.onPageLoad().url
+
+        redirectLocation(result) mustBe Some(expectedUrl)
+      }
+
+      "psa - scheme details not associated" in runningApplication { implicit app =>
+        setupSchemeDetails(psaId, srn, Future.failed(UpstreamErrorResponse("test", 403)))
+
+        val result = handler(administratorRequest).run(srn)(FakeRequest())
+        val expectedUrl = routes.UnauthorisedController.onPageLoad().url
+
+        redirectLocation(result) mustBe Some(expectedUrl)
+      }
+
+      "psp - scheme details not associated" in runningApplication { implicit app =>
+        setupSchemeDetails(pspId, srn, Future.failed(UpstreamErrorResponse("test", 403)))
 
         val result = handler(practitionerRequest).run(srn)(FakeRequest())
         val expectedUrl = routes.UnauthorisedController.onPageLoad().url
