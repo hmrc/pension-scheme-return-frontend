@@ -107,7 +107,10 @@
                     RadiosViewModel.yesNo(
                         field = form("value"),
                         fieldset = FieldsetViewModel(LegendViewModel(renderMessage(viewmodel.page.radioText)).withSize(LegendSize.Medium)),
-                        yesHint = viewmodel.page.yesHintText.map(renderMessage)
+                        yes = viewmodel.page.radioYesMessage.map(renderMessage),
+                        no = viewmodel.page.radioNoMessage.map(renderMessage),
+                        yesHint = viewmodel.page.yesHintText.map(renderMessage),
+                        noHint = viewmodel.page.noHintText.map(renderMessage)
                     )
                 )
             }
@@ -117,6 +120,8 @@
                     RadiosViewModel.yesNo(
                         field = form("value"),
                         fieldset = FieldsetViewModel(LegendViewModel(renderMessage(viewmodel.page.radioText)).withSize(LegendSize.Medium)),
+                        yes = viewmodel.page.radioYesMessage.map(renderMessage),
+                        no = viewmodel.page.radioNoMessage.map(renderMessage),
                         yesHint = viewmodel.page.yesHintText.map(renderMessage)
                     )
                 )

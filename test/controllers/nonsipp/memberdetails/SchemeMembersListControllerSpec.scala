@@ -88,6 +88,12 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
     .unsafeSet(MemberContributionsPage(srn), true)
 
+  private val userAnswersToCheck = userAnswers
+    .unsafeSet(MembersDetailsChecked(srn), false)
+
+  private val userAnswersChecked = userAnswers
+    .unsafeSet(MembersDetailsChecked(srn), true)
+
   "SchemeMembersListController" - {
     "incomplete members must be filtered" in {
       val userAnswers = defaultUserAnswers
@@ -321,6 +327,47 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
           (contentAsString(result) must not).include("govuk-back-link")
         }
       }
+
+    }
+
+    "Check scenario" - {
+      act.like(
+        renderViewWithPrePopSession(onPageLoadManual, userAnswersToCheck)(
+          implicit app =>
+            implicit request =>
+              injected[ListView].apply(
+                form(injected[YesNoPageFormProvider], Manual),
+                viewModel(
+                  srn,
+                  1,
+                  Manual,
+                  NormalMode,
+                  List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
+                  viewOnlyUpdated = false,
+                  prePopNotChecked = true
+                )
+              )
+        ).withName("OnPageLoad with checked = Some(false) renders ok with check messsage")
+      )
+
+      act.like(
+        renderViewWithPrePopSession(onPageLoadManual, userAnswersChecked)(
+          implicit app =>
+            implicit request =>
+              injected[ListView].apply(
+                form(injected[YesNoPageFormProvider], Manual),
+                viewModel(
+                  srn,
+                  1,
+                  Manual,
+                  NormalMode,
+                  List((refineMV(1), ((index - 1).toString, memberDetails.fullName))),
+                  viewOnlyUpdated = false,
+                  prePopNotChecked = false
+                )
+              )
+        ).withName("OnPageLoad with checked = Some(false) renders ok with normal radios")
+      )
 
     }
   }

@@ -16,7 +16,8 @@
 
 package controllers.nonsipp.memberdetails
 
-import pages.nonsipp.memberdetails.{MembersDetailsCompletedPages, SchemeMembersListPage}
+import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails.{MembersDetailsChecked, MembersDetailsCompletedPages, SchemeMembersListPage}
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
@@ -56,7 +57,9 @@ class SchemeMembersListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
-  formProvider: YesNoPageFormProvider
+  formProvider: YesNoPageFormProvider,
+  psrSubmissionService: PsrSubmissionService,
+  saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -138,7 +141,10 @@ class SchemeMembersListController @Inject()(
                 optCurrentVersion = request.currentVersion,
                 optPreviousVersion = request.previousVersion,
                 compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
-                showBackLink = showBackLink
+                showBackLink = showBackLink,
+                prePopNotChecked = isPrePopulation && request.userAnswers
+                  .get(MembersDetailsChecked(srn))
+                  .contains(false)
               )
             )
           )
@@ -180,12 +186,33 @@ class SchemeMembersListController @Inject()(
               }
           }.merge.pure[Future],
           value => {
-            if (lengthOfMembersDetails == maxSchemeMembers && value) {
+            val notChecked = isPrePopulation && request.userAnswers.get(MembersDetailsChecked(srn)).contains(false)
+
+            if (notChecked) {
+              for {
+                updatedAnswers <- Future.fromTry(
+                  request.userAnswers
+                    .set(MembersDetailsChecked(srn), true)
+                )
+                _ <- saveService.save(updatedAnswers)
+                _ <- psrSubmissionService
+                  .submitPsrDetailsWithUA(
+                    srn,
+                    updatedAnswers,
+                    fallbackCall = controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+                  )
+              } yield ()
+            }
+
+            // the value that indicates that the section is completed is mapped to 'no' in the UI for the 'check' scenario
+            val completed = if (notChecked) !value else value
+
+            if (lengthOfMembersDetails == maxSchemeMembers && completed) {
               Future.successful(Redirect(routes.HowToUploadController.onPageLoad(srn)))
             } else {
               Future.successful(
                 Redirect(
-                  navigator.nextPage(SchemeMembersListPage(srn, value, manualOrUpload), mode, request.userAnswers)
+                  navigator.nextPage(SchemeMembersListPage(srn, completed, manualOrUpload), mode, request.userAnswers)
                 )
               )
             }
@@ -224,7 +251,8 @@ object SchemeMembersListController {
     optCurrentVersion: Option[Int] = None,
     optPreviousVersion: Option[Int] = None,
     compilationOrSubmissionDate: Option[LocalDateTime] = None,
-    showBackLink: Boolean = true
+    showBackLink: Boolean = true,
+    prePopNotChecked: Boolean = false
   ): FormPageViewModel[ListViewModel] = {
 
     val lengthOfFilteredMembers = filteredMembers.length
@@ -287,12 +315,14 @@ object SchemeMembersListController {
       }
     )
 
-    val radioText = manualOrUpload.fold(
-      upload = "membersUploaded.radio",
-      manual =
+    val radioText = (prePopNotChecked, manualOrUpload) match {
+      case (true, _) => "schemeMembersList.notchecked.radio"
+      case (false, ManualOrUpload.Upload) => "membersUploaded.radio"
+      case (false, ManualOrUpload.Manual) =>
         if (lengthOfFilteredMembers < Constants.maxSchemeMembers) "schemeMembersList.radio" else "membersUploaded.radio"
-    )
-    val yesHintText: Option[Message] = manualOrUpload.fold(
+    }
+
+    val hintText: Option[Message] = manualOrUpload.fold(
       upload = Some(Message("membersUploaded.radio.yes.hint")),
       manual = if (lengthOfFilteredMembers < Constants.maxSchemeMembers) {
         None
@@ -301,11 +331,21 @@ object SchemeMembersListController {
       }
     )
 
+    val yesHintText = if (!prePopNotChecked) hintText else None
+    val noHintText = if (prePopNotChecked) hintText else None
+
+    val radioYesMessage = Option.when(prePopNotChecked)(Message("schemeMembersList.notchecked.option1"))
+    val radioNoMessage = Option.when(prePopNotChecked)(Message("schemeMembersList.notchecked.option2"))
+
+    val description =
+      if (prePopNotChecked) ParagraphMessage("schemeMembersList.paragraph.prepop")
+      else ParagraphMessage("schemeMembersList.paragraph")
+
     FormPageViewModel(
       title = title,
       heading = heading,
       description = Option
-        .when(lengthOfFilteredMembers < Constants.maxSchemeMembers)(ParagraphMessage("schemeMembersList.paragraph")),
+        .when(lengthOfFilteredMembers < Constants.maxSchemeMembers)(description),
       page = ListViewModel(
         inset = "schemeMembersList.inset",
         sections = List(ListSection(rows)),
@@ -322,7 +362,10 @@ object SchemeMembersListController {
             pagination
           )
         ),
-        yesHintText = yesHintText
+        yesHintText = yesHintText,
+        noHintText = noHintText,
+        radioYesMessage = radioYesMessage,
+        radioNoMessage = radioNoMessage
       ),
       refresh = None,
       Message("site.saveAndContinue"),
