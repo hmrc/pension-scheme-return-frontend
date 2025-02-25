@@ -325,12 +325,16 @@ class OverviewController @Inject()(
           }
 
         case _ =>
-          Future.successful(
-            Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
-              .addingToSession(
-                Constants.PREPOPULATION_FLAG -> String.valueOf(lastSubmittedPsrFbInPreviousYears.isDefined)
-              )
-          )
+          val byPassedJourney =
+            Redirect(controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode))
+          val regularJourney = Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
+          isJourneyBypassed(srn).map { res =>
+            val result = if (res.getOrElse(false)) byPassedJourney else regularJourney
+            result.addingToSession(
+              Constants.PREPOPULATION_FLAG -> String.valueOf(lastSubmittedPsrFbInPreviousYears.isDefined)
+            )
+          }
+
       }
     }
 
