@@ -79,7 +79,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(AreBondsUnregulatedPage(srn, index), true)
       .unsafeSet(IncomeFromBondsPage(srn, index), money)
 
-  private val userAnswersCheck =
+  private val userAnswersHalfChecked =
     userAnswers
       .unsafeSet(BondsCompleted(srn, indexTwo), SectionCompleted)
       .unsafeSet(NameOfBondsPage(srn, indexTwo), "NameTwo")
@@ -96,6 +96,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(CostOfBondsPage(srn, indexThree), money)
       .unsafeSet(BondsFromConnectedPartyPage(srn, indexThree), true)
       .unsafeSet(AreBondsUnregulatedPage(srn, indexThree), true)
+      .unsafeSet(BondPrePopulated(srn, indexThree), true)
 
   private val bondsData = List(
     BondsData(
@@ -107,20 +108,13 @@ class BondsListControllerSpec extends ControllerBaseSpec {
     )
   )
 
-  private val bondsDataHalfChecked: List[BondsData] = List(
-    BondsData(
-      indexTwo,
-      nameOfBonds = "NameTwo",
-      acquisitionType = SchemeHoldBond.Acquisition,
-      costOfBonds = money,
-      canRemove = false
-    ),
+  private val bondsDataChecked: List[BondsData] = List(
     BondsData(
       indexThree,
       nameOfBonds = "NameThree",
       acquisitionType = SchemeHoldBond.Acquisition,
       costOfBonds = money,
-      canRemove = true
+      canRemove = false
     )
   )
 
@@ -148,7 +142,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
         )
     })
 
-    act.like(renderViewWithPrePopSession(onPageLoad, userAnswersCheck) { implicit app => implicit request =>
+    act.like(renderViewWithPrePopSession(onPageLoad, userAnswersHalfChecked) { implicit app => implicit request =>
       injected[ListView]
         .apply(
           form(injected[YesNoPageFormProvider]),
@@ -156,8 +150,8 @@ class BondsListControllerSpec extends ControllerBaseSpec {
             srn,
             page,
             NormalMode,
-            bondsData,
-            bondsDataHalfChecked,
+            bondsData ++ bondsDataChecked,
+            bondsDataToCheck,
             schemeName,
             showBackLink = true,
             isPrePop = true
