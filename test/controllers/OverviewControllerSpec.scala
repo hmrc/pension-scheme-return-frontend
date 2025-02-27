@@ -196,6 +196,26 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
       redirectLocation(result).value mustEqual controllers.nonsipp.routes.TaskListController.onPageLoad(srn).url
     }
 
+    "onSelectContinue redirects to the BasicDetailsCYA page when members over threshold" in {
+      when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
+        Future.successful(Seq())
+      )
+      val currentUA = emptyUserAnswers
+        .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
+        .unsafeSet(WhichTaxYearPage(srn), dateRange)
+
+      running(_ => applicationBuilder(userAnswers = Some(currentUA))) { app =>
+        val request = FakeRequest(GET, onSelectViewAndChange)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
+          .onPageLoad(srn, CheckMode)
+          .url
+      }
+    }
+
     "onSelectViewAndChange redirects to the task list page when members empty" in runningApplication { implicit app =>
       val request = FakeRequest(GET, onSelectViewAndChange)
 
