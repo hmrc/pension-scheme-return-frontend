@@ -47,11 +47,19 @@ class ReceivingSchemeTypeControllerSpec extends ControllerBaseSpec {
         )
     })
 
+    act.like(saveAndContinue(onSubmit, "value" -> "registeredPS", "registeredPS-conditional" -> " 872 19363 yN"))
+
+    act.like(
+      saveAndContinue(
+        onSubmit,
+        "value" -> "qualifyingRecognisedOverseasPS",
+        "qualifyingRecognisedOverseasPS-conditional" -> " q 19 7 363 "
+      )
+    )
+
     act.like(redirectNextPage(onSubmit, "value" -> "other", "other-conditional" -> "details"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
-
-    act.like(saveAndContinue(onSubmit, "value" -> "registeredPS", "registeredPS-conditional" -> " 872 19363 YN"))
 
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

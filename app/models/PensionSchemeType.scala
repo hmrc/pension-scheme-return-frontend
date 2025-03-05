@@ -50,11 +50,20 @@ object PensionSchemeType {
 
   implicit val writes: Writes[PensionSchemeType] = {
     case RegisteredPS(description) =>
-      Json.obj("key" -> RegisteredPS.name, "value" -> description.filterNot(_.isWhitespace))
+      Json.obj(
+        "key" -> RegisteredPS.name,
+        "value" -> description.filterNot(_.isWhitespace).toUpperCase
+      )
     case QualifyingRecognisedOverseasPS(description) =>
-      Json.obj("key" -> QualifyingRecognisedOverseasPS.name, "value" -> description.filterNot(_.isWhitespace))
+      Json.obj(
+        "key" -> QualifyingRecognisedOverseasPS.name,
+        "value" -> description.filterNot(_.isWhitespace).toUpperCase
+      )
     case Other(description) =>
-      Json.obj("key" -> Other.name, "value" -> description.replaceAll("\n", " ").replaceAll("\r", " "))
+      Json.obj(
+        "key" -> Other.name,
+        "value" -> description.replaceAll("\n", " ").replaceAll("\r", " ")
+      )
   }
 
   implicit val reads: Reads[PensionSchemeType] =
