@@ -124,7 +124,9 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
         content must include("<td class=\"govuk-table__cell\">first last</td>")
         (content must not).include("<td class=\"govuk-table__cell\">Changes not submitted</td>")
         content must include("<td class=\"govuk-table__cell\">Not started</td>")
-        content must include("<caption class=\"govuk-table__caption govuk-table__caption--m\">Submitted</caption>")
+        content must include(
+          "<caption id=\"with-changes-in-progress\" class=\"govuk-table__caption govuk-table__caption--m\">Submitted</caption>"
+        )
         (content must not).include(
           "<caption class=\"govuk-table__caption govuk-table__caption--m\">Submitted with changes in progress</caption>"
         )
@@ -157,7 +159,7 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
           "<caption class=\"govuk-table__caption govuk-table__caption--m\">Submitted</caption>"
         )
         content must include(
-          "<caption class=\"govuk-table__caption govuk-table__caption--m\">Submitted with changes in progress</caption>"
+          "<caption id=\"with-changes-in-progress\" class=\"govuk-table__caption govuk-table__caption--m\">Submitted with changes in progress</caption>"
         )
         verify(mockPsrOverviewService, times(1)).getOverview(any(), any(), any(), any())(any(), any(), any())
         verify(mockPsrVersionsService, times(1)).getVersionsForYears(any(), any(), any())(any(), any(), any())
