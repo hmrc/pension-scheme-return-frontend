@@ -219,7 +219,7 @@ trait Mappings extends Formatters with Constraints {
         case (mapping, (regex, key)) =>
           mapping.verifying(verify[String](key, _.filterNot(_.isWhitespace).matches(regex), args: _*))
       }
-      .verifying(verify[String](maxLengthErrorKey, _.filterNot(_.isWhitespace).length <= maxLength, args: _*))
+      .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
 
   def validatedPsaId(
     requiredKey: String,

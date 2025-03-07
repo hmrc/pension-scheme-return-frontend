@@ -62,6 +62,14 @@ class TransferringSchemeTypeControllerSpec extends ControllerBaseSpec {
 
     act.like(saveAndContinue(onSubmit, "value" -> "other", "other-conditional" -> "details"))
 
+    act.like(
+      invalidForm(
+        onSubmit,
+        "value" -> "other",
+        "other-conditional" -> "This text has 166 characters. It includes 28 spaces which should be counted with the overall length. If this test passes then it means that it is counting whitespace."
+      )
+    )
+
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
