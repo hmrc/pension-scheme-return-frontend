@@ -119,8 +119,8 @@ object Constants {
   val maxNotRelevant = 9999999
 
   val textAreaRegex = """^[a-zA-Z0-9\-’`'" \t,.@/&()]+$"""
-  val inputRegexQROPS = """^(Q[0-9]{6})$"""
-  val inputRegexPSTR = """^([0-9]{8}[A-Z]{2})$"""
+  val inputRegexQROPS = """^([Qq][0-9]{6})$"""
+  val inputRegexPSTR = """^([0-9]{8}[A-Za-z]{2})$"""
 
   val postcodeCharsRegex = """^[a-zA-Z0-9 ]+$"""
   val postcodeFormatRegex =
