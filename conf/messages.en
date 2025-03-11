@@ -2511,7 +2511,7 @@ WhatYouWillNeed.ReceivedTransfer.tellUs4 = the transferring scheme’s Pension S
 WhatYouWillNeed.ReceivedTransfer.tellUs5 = the total value of the transfer
 WhatYouWillNeed.ReceivedTransfer.tellUs6 = the date the transfer was received
 WhatYouWillNeed.ReceivedTransfer.tellUs7 = if the transfer included an asset
-WhatYouWillNeed.ReceivedTransfer.paragraph2 = The data you input for transfers in will only be saved once you have completed the section.
+WhatYouWillNeed.ReceivedTransfer.paragraph2 = The data you input for transfers in will only be saved once you have completed each member.
 
 WhatYouWillNeed.PensionCommencementLumpSum.title = Pension commencement lump sum (PCLS) details for members of the scheme
 WhatYouWillNeed.PensionCommencementLumpSum.heading = Pension commencement lump sum (PCLS) details for members of {0}
