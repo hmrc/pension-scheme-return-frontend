@@ -29,7 +29,7 @@ import views.html.YesNoPageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import models.requests.DataRequest
 import play.api.data.Form
@@ -98,10 +98,12 @@ object OtherAssetsHeldController {
   def viewModel(srn: Srn, schemeName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
     FormPageViewModel(
       "otherAssetsHeld.title",
-      Message("otherAssetsHeld.heading", schemeName),
+      Message("otherAssetsHeld.heading"),
       YesNoPageViewModel(
-        hint = Some(Message("otherAssetsHeld.hint"))
+        legend = Some(Message("otherAssetsHeld.legend", schemeName))
       ),
       routes.OtherAssetsHeldController.onSubmit(srn, mode)
+    ).withDescription(
+      ParagraphMessage("otherAssetsHeld.paragraph") ++ ParagraphMessage("otherAssetsHeld.paragraph1")
     )
 }

@@ -467,7 +467,7 @@ memberContributions.paragraph = This includes:
 memberContributions.listItem1 = regular contributions and any additional contributions made by a member to their own pension
 memberContributions.listItem2 = contributions made on behalf of a member by another person, for example a relative
 memberContributions.error.required = Select yes if member contributions were made by or for any member during the period of this return
-memberContributions.paragraph1 = The data you input for member contributions will only be saved once you have completed the section.
+memberContributions.paragraph1 = The data you input for member contributions will only be saved once you have completed each member.
 
 employerContributions.title = Were employer contributions made for any member during the period of this return?
 employerContributions.heading = Were employer contributions made for any member during the period of this return?
@@ -881,8 +881,8 @@ sharesDisposal.reportedSharesDisposalList.methodOfDisposal.redeemed = redemption
 sharesDisposal.reportedSharesDisposalList.methodOfDisposal.transferred = transfer out
 sharesDisposal.reportedSharesDisposalList.methodOfDisposal.other = another method
 
-pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum during the period of this return?
-pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum during the period of this return?
+pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum or an uncrystallised funds pension lump sum during the period of this return?
+pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum or an uncrystallised funds pension lump sum during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
 
 pcls.memberlist.title = Select a member to add PCLS
@@ -979,7 +979,7 @@ surrenderedBenefits.whatYouWillNeed.paragraph1 = For each member who surrendered
 surrenderedBenefits.whatYouWillNeed.tellUs1 = the total amount surrendered
 surrenderedBenefits.whatYouWillNeed.tellUs2 = the date the member surrendered their benefits
 surrenderedBenefits.whatYouWillNeed.tellUs3 = why the member surrendered their benefits
-surrenderedBenefits.whatYouWillNeed.paragraph2 = The data you input for surrendered benefits will only be saved once you have completed the section.
+surrenderedBenefits.whatYouWillNeed.paragraph2 = The data you input for surrendered benefits will only be saved once you have completed each member.
 
 surrenderedBenefits.whyDidMemberSurrenderBenefits.title = Why did the member surrender their pension benefits?
 surrenderedBenefits.whyDidMemberSurrenderBenefits.heading = Why did {0} surrender their pension benefits of £{2}?
@@ -1042,9 +1042,11 @@ surrenderedBenefits.change.title = Change details of surrendered benefits for th
 surrenderedBenefits.change.heading = Change details of surrendered benefits for {0}
 
 otherAssetsHeld.title = Did the scheme hold any other assets during the period of this return?
-otherAssetsHeld.heading = Did {0} hold any other assets during the period of this return?
+otherAssetsHeld.heading = Other assets held
+otherAssetsHeld.paragraph = Other assets does not include loans, shares held in a sponsoring employer, unquoted shares, quoted shares, third party managed funds, unregulated bonds, bonds and shares acquired from a connected party, and land or property.
+otherAssetsHeld.paragraph1 = If your scheme holds any of these assets, report them in the relevant section of this pension scheme return.
+otherAssetsHeld.legend = Did {0} hold any other assets during the period of this return?
 otherAssetsHeld.error.required = Select yes if the scheme held any other assets during the period of this return
-otherAssetsHeld.hint = This does not include loans, shares held in a sponsoring employer, unquoted shares, unregulated bonds, bonds and shares acquired from a connected party and land or property. If your scheme holds any of these assets, report them in the relevant section of this pension scheme return.
 
 otherAssetsDisposal.title = Did the scheme dispose of any other assets during the period of this return?
 otherAssetsDisposal.heading = Did {0} dispose of any other assets during the period of this return?
@@ -2331,7 +2333,7 @@ whatYouWillNeedEmployerContributions.tellUs1 = the name of the employer
 whatYouWillNeedEmployerContributions.tellUs2 = if the employer is a UK company, UK partnership or other
 whatYouWillNeedEmployerContributions.tellUs3 = the employer’s Company Registration Number, Unique Taxpayer Reference, or a description of the employer – whichever applies
 whatYouWillNeedEmployerContributions.tellUs4 = the total contribution made for the member by the employer
-whatYouWillNeedEmployerContributions.paragraph2 = The data you input for employer contributions will only be saved once you have completed the section.
+whatYouWillNeedEmployerContributions.paragraph2 = The data you input for employer contributions will only be saved once you have completed each member.
 
 employerName.title = What is the employer’s name?
 employerName.heading = What is the employer’s name?
@@ -2516,7 +2518,7 @@ WhatYouWillNeed.PensionCommencementLumpSum.heading = Pension commencement lump s
 WhatYouWillNeed.PensionCommencementLumpSum.paragraph1 = For each member who received a PCLS, you need to tell us:
 WhatYouWillNeed.PensionCommencementLumpSum.bullet1 = the total amount of the PCLS
 WhatYouWillNeed.PensionCommencementLumpSum.bullet2 = the relevant pension in respect of this PCLS
-WhatYouWillNeed.PensionCommencementLumpSum.paragraph2 = The data you input for PCLS will only be saved once you have completed the section.
+WhatYouWillNeed.PensionCommencementLumpSum.paragraph2 = The data you input for PCLS will only be saved once you have completed each member.
 
 transferIn.MemberList.title = Select a member to add transfers in
 transferIn.MemberList.title.plural = Select a member to add transfers in
@@ -2735,7 +2737,7 @@ WhatYouWillNeed.TransferOut.tellUs2 = the name of the receiving scheme
 WhatYouWillNeed.TransferOut.tellUs3 = if the receiving scheme is a registered pension scheme, qualifying recognised overseas pension scheme (QROPS) or other
 WhatYouWillNeed.TransferOut.tellUs4 = the receiving scheme’s Pension Scheme Tax Reference (PSTR), QROPS reference number, or a description of the receiving scheme – whichever applies
 WhatYouWillNeed.TransferOut.tellUs5 = the date the transfer was made
-WhatYouWillNeed.TransferOut.paragraph2 = The data you input for transfers out will only be saved once you have completed the section.
+WhatYouWillNeed.TransferOut.paragraph2 = The data you input for transfers out will only be saved once you have completed each member.
 
 transferOut.memberList.title = Select a member to add transfers out
 transferOut.memberList.title.plural = Select a member to add transfers out
