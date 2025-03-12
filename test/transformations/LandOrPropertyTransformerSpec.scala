@@ -140,6 +140,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
       val request = DataRequest(allowedAccessRequest, modifiedUserAnswers)
 
       val result = transformer.transformToEtmp(srn, Some(true), modifiedUserAnswers)(request)
+      
       result mustBe Some(
         LandOrProperty(
           recordVersion = None,
@@ -180,6 +181,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
       val request = DataRequest(allowedAccessRequest, modifiedUserAnswers)
 
       val result = transformer.transformToEtmp(srn, Some(true), modifiedUserAnswers)(request)
+
       result mustBe Some(
         LandOrProperty(
           recordVersion = None,
