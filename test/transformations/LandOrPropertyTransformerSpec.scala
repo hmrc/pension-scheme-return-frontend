@@ -47,6 +47,19 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
       .withSession((PREPOPULATION_FLAG, "true"))
   ).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
+  val userAnswers: UserAnswers = emptyUserAnswers
+    .unsafeSet(LandPropertyInUKPage(srn, index1of5000), true)
+    .unsafeSet(LandOrPropertyPostcodeLookupPage(srn, index1of5000), postcodeLookup)
+    .unsafeSet(AddressLookupResultsPage(srn, index1of5000), List(address, address, address))
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, index1of5000), address)
+    .unsafeSet(
+      LandRegistryTitleNumberPage(srn, index1of5000),
+      ConditionalYesNo.yes[String, String]("landRegistryTitleNumber")
+    )
+    .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index1of5000), SchemeHoldLandProperty.Transfer)
+    .unsafeSet(LandOrPropertyTotalCostPage(srn, index1of5000), Money(100000.0))
+    .unsafeSet(IsLandOrPropertyResidentialPage(srn, index1of5000), false)
+    .unsafeSet(LandOrPropertyTotalIncomePage(srn, index1of5000), Money(100000.0))
 
   private val transformer = new LandOrPropertyTransformer()
 
@@ -116,6 +129,87 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
           optLandOrPropertyHeld = Some(true),
           optDisposeAnyLandOrProperty = None,
           landOrPropertyTransactions = Seq.empty // tests don't need to check these transactions in detail
+        )
+      )
+    }
+
+    "should not include lease details when leased is false" in {
+
+      val modifiedUserAnswers = userAnswers.unsafeSet(IsLandPropertyLeasedPage(srn, index1of5000), false)
+
+      val request = DataRequest(allowedAccessRequest, modifiedUserAnswers)
+
+      val result = transformer.transformToEtmp(srn, Some(true), modifiedUserAnswers)(request)
+      result mustBe Some(
+        LandOrProperty(
+          recordVersion = None,
+          optLandOrPropertyHeld = Some(true),
+          optDisposeAnyLandOrProperty = Some(false),
+          landOrPropertyTransactions = List(
+            LandOrPropertyTransactions(
+              prePopulated = None,
+              propertyDetails = PropertyDetails(
+                landOrPropertyInUK = true,
+                addressDetails = address,
+                landRegistryTitleNumberKey = true,
+                landRegistryTitleNumberValue = "landRegistryTitleNumber"
+              ),
+              heldPropertyTransaction = HeldPropertyTransaction(
+                methodOfHolding = SchemeHoldLandProperty.Transfer,
+                dateOfAcquisitionOrContribution = None,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedPartyStatus = None,
+                totalCostOfLandOrProperty = 100000.0,
+                optIndepValuationSupport = None,
+                optIsLandOrPropertyResidential = Some(false),
+                optLeaseDetails = None,
+                optLandOrPropertyLeased = Some(false),
+                optTotalIncomeOrReceipts = Some(100000.0)
+              ),
+              optDisposedPropertyTransaction = None
+            )
+          )
+        )
+      )
+    }
+
+    "should not include lease details when leased is not set" in {
+
+      val modifiedUserAnswers = userAnswers.remove(IsLandPropertyLeasedPage(srn, index1of5000)).get
+      val request = DataRequest(allowedAccessRequest, modifiedUserAnswers)
+
+      val result = transformer.transformToEtmp(srn, Some(true), modifiedUserAnswers)(request)
+      result mustBe Some(
+        LandOrProperty(
+          recordVersion = None,
+          optLandOrPropertyHeld = Some(true),
+          optDisposeAnyLandOrProperty = Some(false),
+          landOrPropertyTransactions = List(
+            LandOrPropertyTransactions(
+              prePopulated = None,
+              propertyDetails = PropertyDetails(
+                landOrPropertyInUK = true,
+                addressDetails = address,
+                landRegistryTitleNumberKey = true,
+                landRegistryTitleNumberValue = "landRegistryTitleNumber"
+              ),
+              heldPropertyTransaction = HeldPropertyTransaction(
+                methodOfHolding = SchemeHoldLandProperty.Transfer,
+                dateOfAcquisitionOrContribution = None,
+                optPropertyAcquiredFromName = None,
+                optPropertyAcquiredFrom = None,
+                optConnectedPartyStatus = None,
+                totalCostOfLandOrProperty = 100000.0,
+                optIndepValuationSupport = None,
+                optIsLandOrPropertyResidential = Some(false),
+                optLeaseDetails = None,
+                optLandOrPropertyLeased = None,
+                optTotalIncomeOrReceipts = Some(100000.0)
+              ),
+              optDisposedPropertyTransaction = None
+            )
+          )
         )
       )
     }
