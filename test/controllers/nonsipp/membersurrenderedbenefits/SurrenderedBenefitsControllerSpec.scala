@@ -35,6 +35,7 @@ class SurrenderedBenefitsControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.SurrenderedBenefitsController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.SurrenderedBenefitsController.onSubmit(srn, NormalMode)
+  private lazy val unauthorisedSurrenders = "https://www.gov.uk/hmrc-internal-manuals/pensions-tax-manual/ptm133300"
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
@@ -51,12 +52,16 @@ class SurrenderedBenefitsControllerSpec extends ControllerBaseSpec {
   "SurrenderedBenefitsController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, schemeName, NormalMode))
+      injected[YesNoPageView]
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, schemeName, unauthorisedSurrenders, NormalMode))
     })
 
     act.like(renderPrePopView(onPageLoad, SurrenderedBenefitsPage(srn), true) { implicit app => implicit request =>
       injected[YesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, NormalMode))
+        .apply(
+          form(injected[YesNoPageFormProvider]).fill(true),
+          viewModel(srn, schemeName, unauthorisedSurrenders, NormalMode)
+        )
     })
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))

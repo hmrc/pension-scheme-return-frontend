@@ -101,6 +101,7 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
     val signOutNoSurveyUrl: String = config.get[String]("urls.signOutNoSurvey")
     val pensionSchemeEnquiry: String = config.get[String]("urls.pensionSchemeEnquiry")
     val incomeTaxAct: String = config.get[String]("urls.incomeTaxAct")
+    val unauthorisedSurrenders: String = config.get[String]("urls.unauthorisedSurrenders")
     val tangibleMoveableProperty: String = config.get[String]("urls.tangibleMoveableProperty")
     val sippBaseUrl: String = config.get[String]("urls.sippBaseUrl")
     val sippStartJourney: String = config.get[String]("urls.sippStartJourney")

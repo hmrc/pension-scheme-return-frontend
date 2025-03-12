@@ -21,6 +21,7 @@ import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsControll
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
+import config.FrontendAppConfig
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -31,7 +32,7 @@ import play.api.data.Form
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import utils.FunctionKUtils._
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -44,6 +45,7 @@ class SurrenderedBenefitsController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
+  config: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView,
   psrSubmissionService: PsrSubmissionService
@@ -54,7 +56,7 @@ class SurrenderedBenefitsController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val preparedForm = request.userAnswers.fillForm(SurrenderedBenefitsPage(srn), form)
-    Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, mode)))
+    Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, config.urls.unauthorisedSurrenders, mode)))
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
@@ -62,7 +64,14 @@ class SurrenderedBenefitsController @Inject()(
       .bindFromRequest()
       .fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
+          Future.successful(
+            BadRequest(
+              view(
+                formWithErrors,
+                viewModel(srn, request.schemeDetails.schemeName, config.urls.unauthorisedSurrenders, mode)
+              )
+            )
+          ),
         value =>
           for {
             updatedAnswers <- request.userAnswers
@@ -90,9 +99,35 @@ object SurrenderedBenefitsController {
     "surrenderedBenefits.error.required"
   )
 
-  def viewModel(srn: Srn, schemeName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
-    "surrenderedBenefits.title",
-    Message("surrenderedBenefits.heading", schemeName),
-    routes.SurrenderedBenefitsController.onSubmit(srn, mode)
-  )
+  def viewModel(
+    srn: Srn,
+    schemeName: String,
+    unauthorisedSurrenders: String,
+    mode: Mode
+  ): FormPageViewModel[YesNoPageViewModel] =
+    FormPageViewModel(
+      "surrenderedBenefits.title",
+      Message("surrenderedBenefits.heading"),
+      YesNoPageViewModel(
+        legend = Some(Message("surrenderedBenefits.heading2", schemeName))
+      ),
+      routes.SurrenderedBenefitsController.onSubmit(srn, mode)
+    ).withDescription(
+      ParagraphMessage("surrenderedBenefits.paragraph1") ++
+        ParagraphMessage("surrenderedBenefits.paragraph2") ++
+        ListMessage(
+          ListType.Bullet,
+          "surrenderedBenefits.listItem1",
+          "surrenderedBenefits.listItem2"
+        ) ++
+        ParagraphMessage(
+          "",
+          LinkMessage(
+            "surrenderedBenefits.paragraph3.link",
+            unauthorisedSurrenders,
+            Map("rel" -> "noreferrer noopener", "target" -> "_blank")
+          )
+        )
+    )
+
 }
