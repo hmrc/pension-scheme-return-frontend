@@ -970,8 +970,14 @@ pensionPaymentsReceived.heading = Did any member receive taxable pension payment
 pensionPaymentsReceived.error.required = Select yes if any member received taxable pension payments from the scheme during the period of this return
 
 surrenderedBenefits.title = Did any member surrender benefits within the scheme during the period of this return?
-surrenderedBenefits.heading = Did any member surrender benefits within {0} during the period of this return?
+surrenderedBenefits.heading = Authorised and unauthorised surrendered pension benefits
 surrenderedBenefits.error.required = Select yes if any member surrendered benefits within the scheme during the period of this return
+surrenderedBenefits.paragraph1 =  If a person who has rights in a pension scheme surrenders their benefits or rights, their main purpose is to reduce their entitlement to the benefits or rights.
+surrenderedBenefits.paragraph2 = Examples include:
+surrenderedBenefits.listItem1 = pension sharing orders
+surrenderedBenefits.listItem2 = death benefits
+surrenderedBenefits.paragraph3.link = More about unauthorised surrenders and a full list of authorised surrenders (opens in new tab).
+surrenderedBenefits.heading2 =  Did any member in {0} make authorised or unauthorised surrenders during the period of this return?
 
 surrenderedBenefits.whatYouWillNeed.title = Surrendered benefits for members of the scheme
 surrenderedBenefits.whatYouWillNeed.heading = Surrendered benefits for members of {0}
