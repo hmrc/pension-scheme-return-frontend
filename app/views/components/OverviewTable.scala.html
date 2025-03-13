@@ -16,10 +16,10 @@
 
 @import viewmodels.OverviewSummary
 
-@(rows: Seq[OverviewSummary], colOne: String, colTwo: String, colThree: String, colFour: String, caption: String)(implicit messages: Messages)
-<div class="psr-scrollable-pane" role="region" aria-labelledby="table-caption" tabindex="0">
+@(rows: Seq[OverviewSummary], colOne: String, colTwo: String, colThree: String, colFour: String, caption: String, captionId: String)(implicit messages: Messages)
+<div class="psr-scrollable-pane" role="region" aria-labelledby="@captionId" tabindex="0">
     <table class="govuk-table">
-        <caption class="govuk-table__caption govuk-table__caption--m" id="table-caption">@caption</caption>
+        <caption class="govuk-table__caption govuk-table__caption--m" id="@captionId">@caption</caption>
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
                 <th scope="col" class="govuk-table__header">@colOne</th>
