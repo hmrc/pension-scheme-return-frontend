@@ -54,16 +54,16 @@ class RemoveMemberDetailsController @Inject()(
     extends PSRController
     with SoftDelete {
 
-  private val form = RemoveMemberDetailsController.form(formProvider)
-
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      withMemberDetails(srn, index)(nameDOB => Ok(view(form, viewModel(srn, index, nameDOB, mode))))
+      withMemberDetails(srn, index)(
+        nameDOB => Ok(view(form(formProvider, nameDOB), viewModel(srn, index, nameDOB, mode)))
+      )
     }
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      form
+      form(formProvider, request.userAnswers.get(MemberDetailsPage(srn, index)).get)
         .bindFromRequest()
         .fold(
           formWithErrors =>
@@ -106,8 +106,9 @@ class RemoveMemberDetailsController @Inject()(
     ).merge
 }
 object RemoveMemberDetailsController {
-  def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
-    "removeMemberDetails.error.required"
+  def form(formProvider: YesNoPageFormProvider, nameDOB: NameDOB): Form[Boolean] = formProvider(
+    requiredKey = "removeMemberDetails.error.required",
+    args = List(nameDOB.fullName)
   )
 
   def viewModel(srn: Srn, index: Max300, nameDOB: NameDOB, mode: Mode): FormPageViewModel[YesNoPageViewModel] =

@@ -63,7 +63,7 @@ class RemoveMemberDetailsControllerSpec extends ControllerBaseSpec {
       val view = injected[YesNoPageView]
 
       view(
-        form(injected[YesNoPageFormProvider]),
+        form(injected[YesNoPageFormProvider], nameDobGen.sample.value),
         viewModel(srn, refineMV(1), memberDetails, NormalMode)
       )
     })
