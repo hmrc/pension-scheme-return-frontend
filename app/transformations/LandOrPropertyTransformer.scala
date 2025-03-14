@@ -647,7 +647,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
     srn: Srn,
     index: Refined[Int, OneTo5000]
   )(implicit request: DataRequest[_]): Option[LeaseDetails] =
-    Option.when(isPrePopulation || landOrPropertyLeased) {
+    Option.when(landOrPropertyLeased) {
       val leaseDetails =
         request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index))
       val leaseConnectedParty = request.userAnswers.get(IsLesseeConnectedPartyPage(srn, index))
