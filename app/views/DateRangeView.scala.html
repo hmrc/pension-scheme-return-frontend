@@ -29,7 +29,12 @@
   @formHelper(action = viewmodel.onSubmit) {
 
     @if(form.hasErrors) {
-      @govukErrorSummary(ErrorSummaryViewModel(form))
+        @govukErrorSummary(
+            ErrorSummaryViewModel(
+                form,
+                errorLinkOverrides = Map("dates.startDate" -> "dates.startDate.day", "dates.endDate" -> "dates.endDate.day")
+            )
+        )
     }
 
     <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
