@@ -23,7 +23,7 @@ import models.NormalMode
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.IsLandPropertyLeasedController._
-import pages.nonsipp.landorproperty.{IsLandPropertyLeasedPage, LandOrPropertyChosenAddressPage}
+import pages.nonsipp.landorproperty.{IsLandPropertyLeasedPage, LandOrPropertyChosenAddressPage, LandPropertyInUKPage}
 
 class IsLandPropertyLeasedControllerSpec extends ControllerBaseSpec {
 
@@ -34,11 +34,16 @@ class IsLandPropertyLeasedControllerSpec extends ControllerBaseSpec {
 
   "LandPropertyInUKController" - {
 
-    val updatedUserAnswers = defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
+    val updatedUserAnswers = defaultUserAnswers
+      .unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
+      .unsafeSet(LandPropertyInUKPage(srn, index), true)
 
     act.like(renderView(onPageLoad, updatedUserAnswers) { implicit app => implicit request =>
       injected[YesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, address.addressLine1, NormalMode))
+        .apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(srn, index, address.addressLine1, NormalMode, updatedUserAnswers)
+        )
     })
 
     act.like(renderPrePopView(onPageLoad, IsLandPropertyLeasedPage(srn, index), true, updatedUserAnswers) {
@@ -46,7 +51,7 @@ class IsLandPropertyLeasedControllerSpec extends ControllerBaseSpec {
         injected[YesNoPageView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, index, address.addressLine1, NormalMode)
+            viewModel(srn, index, address.addressLine1, NormalMode, updatedUserAnswers)
           )
     })
 
