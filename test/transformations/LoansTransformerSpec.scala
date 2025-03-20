@@ -494,7 +494,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         result mustBe Some(
           Loans(
             recordVersion = Some("001"),
-            optSchemeHadLoans = None,
+            optSchemeHadLoans = Some(true),
             loanTransactions = List(
               LoanTransactions(
                 prePopulated = None,

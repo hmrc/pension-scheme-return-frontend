@@ -46,6 +46,13 @@ class LoansTransformer @Inject() extends Transformer {
 
   def transformToEtmp(srn: Srn, initialUA: UserAnswers)(implicit request: DataRequest[_]): Option[Loans] = {
     val optSchemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn))
+    val optSchemeHadLoansOrList = Option.when(
+      optSchemeHadLoans.nonEmpty || request.userAnswers
+        .map(IdentityTypes(srn, IdentitySubject.LoanRecipient))
+        .toList
+        .nonEmpty
+    )(true)
+
     if (optSchemeHadLoans.nonEmpty || isPrePopulation) {
       Some(
         Loans(
@@ -54,7 +61,7 @@ class LoansTransformer @Inject() extends Transformer {
               request.userAnswers.get(LoansRecordVersionPage(srn))
             )
             .flatten,
-          optSchemeHadLoans,
+          optSchemeHadLoansOrList,
           request.userAnswers
             .map(IdentityTypes(srn, IdentitySubject.LoanRecipient))
             .map {

@@ -16,7 +16,7 @@
 
 package transformations
 
-import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
+import pages.nonsipp.bonds.{BondsCompleted, UnregulatedOrConnectedBondsHeldPage}
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty.{LandOrPropertyHeldPage, LandPropertyInUKPages}
 import models.requests.psr._
@@ -47,6 +47,9 @@ class AssetsTransformer @Inject()(
     )(true)
     val optMoneyWasBorrowed = request.userAnswers.get(MoneyBorrowedPage(srn))
     val optUnregulatedOrConnectedBondsHeld = request.userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
+    val optUnregulatedOrConnectedBondsHeldOrList = Option.when(
+      optUnregulatedOrConnectedBondsHeld.nonEmpty || request.userAnswers.map(BondsCompleted.all(srn)).toList.nonEmpty
+    )(true)
     val optOtherAssetsHeld = request.userAnswers.get(OtherAssetsHeldPage(srn))
     val optOtherAssetsHeldOrList = Option.when(
       optOtherAssetsHeld.nonEmpty || request.userAnswers.map(OtherAssetsCompleted.all(srn)).toList.nonEmpty
@@ -56,17 +59,17 @@ class AssetsTransformer @Inject()(
       List(
         optLandOrPropertyHeldOrList,
         optMoneyWasBorrowed,
-        optUnregulatedOrConnectedBondsHeld,
+        optUnregulatedOrConnectedBondsHeldOrList,
         optOtherAssetsHeldOrList
       ).exists(
         _.isDefined
       )
     )(
       Assets(
-        optLandOrProperty = landOrPropertyTransformer.transformToEtmp(srn, optLandOrPropertyHeld, initialUA),
+        optLandOrProperty = landOrPropertyTransformer.transformToEtmp(srn, optLandOrPropertyHeldOrList, initialUA),
         optBorrowing = borrowingTransformer.transformToEtmp(srn, optMoneyWasBorrowed, initialUA),
-        optBonds = bondsTransformer.transformToEtmp(srn, optUnregulatedOrConnectedBondsHeld, initialUA),
-        optOtherAssets = otherAssetsTransformer.transformToEtmp(srn, optOtherAssetsHeld, initialUA)
+        optBonds = bondsTransformer.transformToEtmp(srn, optUnregulatedOrConnectedBondsHeldOrList, initialUA),
+        optOtherAssets = otherAssetsTransformer.transformToEtmp(srn, optOtherAssetsHeldOrList, initialUA)
       )
     )
   }
