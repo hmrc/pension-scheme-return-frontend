@@ -22,7 +22,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
-import models.Mode
+import models.{Mode, UserAnswers}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import config.RefinedTypes.Max5000
@@ -30,7 +30,7 @@ import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import controllers.nonsipp.landorproperty.IsLandPropertyLeasedController._
-import pages.nonsipp.landorproperty.{IsLandPropertyLeasedPage, LandOrPropertyChosenAddressPage}
+import pages.nonsipp.landorproperty.{IsLandPropertyLeasedPage, LandOrPropertyChosenAddressPage, LandPropertyInUKPage}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
@@ -55,7 +55,7 @@ class IsLandPropertyLeasedController @Inject()(
     implicit request =>
       request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
         val preparedForm = request.userAnswers.fillForm(IsLandPropertyLeasedPage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, address.addressLine1, mode)))
+        Ok(view(preparedForm, viewModel(srn, index, address.addressLine1, mode, request.userAnswers)))
       }
   }
 
@@ -66,7 +66,9 @@ class IsLandPropertyLeasedController @Inject()(
         .fold(
           formWithErrors =>
             request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, address.addressLine1, mode))))
+              Future.successful(
+                BadRequest(view(formWithErrors, viewModel(srn, index, address.addressLine1, mode, request.userAnswers)))
+              )
             },
           value =>
             for {
@@ -83,13 +85,28 @@ object IsLandPropertyLeasedController {
     "isLandPropertyLeased.error.required"
   )
 
-  def viewModel(srn: Srn, index: Max5000, addressLine1: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
+  def viewModel(
+    srn: Srn,
+    index: Max5000,
+    addressLine1: String,
+    mode: Mode,
+    userAnswers: UserAnswers
+  ): FormPageViewModel[YesNoPageViewModel] = {
+
+    val isInUK = userAnswers.get(LandPropertyInUKPage(srn, index))
+
+    val hintMessage = isInUK match {
+      case Some(true) => Some(Message("IsLandPropertyLeased.hint.uk"))
+      case Some(false) => Some(Message(""))
+      case None => None
+    }
+
     FormPageViewModel(
       "IsLandPropertyLeased.title",
       Message("IsLandPropertyLeased.heading", addressLine1),
-      YesNoPageViewModel(
-        hint = Some(Message("IsLandPropertyLeased.hint"))
-      ),
+      YesNoPageViewModel(hint = hintMessage),
       routes.IsLandPropertyLeasedController.onSubmit(srn, index, mode)
     )
+  }
+
 }

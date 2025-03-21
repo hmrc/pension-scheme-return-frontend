@@ -1766,7 +1766,7 @@ isLandOrPropertyResidential.error.required = Select yes if any part of the land 
 
 IsLandPropertyLeased.title = Is the land or property leased?
 IsLandPropertyLeased.heading = Is {0} leased?
-IsLandPropertyLeased.hint = This includes leaseholds and tenants.
+IsLandPropertyLeased.hint.uk = This includes leaseholds and tenants.
 isLandPropertyLeased.error.required =  Select yes if the land or property is leased
 
 landPropertyIndependentValuation.title = Was the transaction supported by an independent valuation?
@@ -1911,7 +1911,7 @@ landOrPropertyTotalIncome.title = What was the total income from the land or pro
 landOrPropertyTotalIncome.heading = What was the total income from {0} in the period of this return, in pounds and pence?
 landOrPropertyTotalIncome.hint = This includes income, such as rent, and all other receipts received in respect of this land or property. Also includes VAT.
 landOrPropertyTotalIncome.error.required = Enter the total income from the land or property in the period of this return
-landOrPropertyTotalIncome.error.invalid = Total income from the land or property in the period of this return must be an amount of money, like 123 or 123.45
+landOrPropertyTotalIncome.error.invalid = Total income from the land or property in the period of this return must be an amount of money that is 0 or more, like 123 or 123.45
 landOrPropertyTotalIncome.error.tooLarge = Total income from the land or property in the period of this return must be 999999999.99 or less
 
 
