@@ -32,7 +32,7 @@ import scala.util.Try
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class LoansPrePopulationProcessor @Inject()() {
+class LoansPrePopulationProcessor @Inject()() extends Processor {
 
   private val logger = Logger(getClass)
 
@@ -48,11 +48,12 @@ class LoansPrePopulationProcessor @Inject()() {
     val transformedResult = baseUaJson
       .transform(loans.json.pickBranch)
       .flatMap(_.transform(LoansRecordVersionPage(srn).path.prune(_)))
-      .flatMap(_.transform(LoansMadeOrOutstandingPage(srn).path.prune(_)))
       .flatMap(_.transform(ArrearsPrevYearsMap(srn).path.prune(_)))
       .flatMap(_.transform(OutstandingArrearsOnLoanPages(srn).path.prune(_)))
+    val transformedResult1 =
+      pruneIf(transformedResult, LoansMadeOrOutstandingPage(srn).path, LoanIdentityTypePages(srn).isEmpty)
 
-    cleanUpOptionalFields(transformedResult, indexesToDelete) match {
+    cleanUpOptionalFields(transformedResult1, indexesToDelete) match {
       case JsSuccess(value, _) =>
         val uaWithLoansData = currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue)))
 
