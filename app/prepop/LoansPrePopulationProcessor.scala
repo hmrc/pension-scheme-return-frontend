@@ -22,6 +22,7 @@ import models.SchemeId.Srn
 import models.UserAnswers
 import pages.nonsipp.common.LoanIdentityTypePages
 import pages.nonsipp.loansmadeoroutstanding._
+import utils.JsonUtils.JsResultOps
 import utils.ListUtils.ListOps
 import models.UserAnswers.SensitiveJsObject
 import play.api.Logger
@@ -32,7 +33,7 @@ import scala.util.Try
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class LoansPrePopulationProcessor @Inject()() extends Processor {
+class LoansPrePopulationProcessor @Inject()() {
 
   private val logger = Logger(getClass)
 
@@ -45,15 +46,16 @@ class LoansPrePopulationProcessor @Inject()() extends Processor {
         .asOpt[Map[String, String]]
         .fold(Seq.empty[String])(_.keys.toSeq)
 
+    val isLoansEmpty = !baseUA.get(LoanIdentityTypePages(srn)).exists(_.nonEmpty)
+
     val transformedResult = baseUaJson
       .transform(loans.json.pickBranch)
-      .flatMap(_.transform(LoansRecordVersionPage(srn).path.prune(_)))
-      .flatMap(_.transform(ArrearsPrevYearsMap(srn).path.prune(_)))
-      .flatMap(_.transform(OutstandingArrearsOnLoanPages(srn).path.prune(_)))
-    val transformedResult1 =
-      pruneIf(transformedResult, LoansMadeOrOutstandingPage(srn).path, LoanIdentityTypePages(srn).isEmpty)
+      .prune(LoansRecordVersionPage(srn).path)
+      .pruneIf(LoansMadeOrOutstandingPage(srn).path, isLoansEmpty)
+      .prune(ArrearsPrevYearsMap(srn).path)
+      .prune(OutstandingArrearsOnLoanPages(srn).path)
 
-    cleanUpOptionalFields(transformedResult1, indexesToDelete) match {
+    cleanUpOptionalFields(transformedResult, indexesToDelete) match {
       case JsSuccess(value, _) =>
         val uaWithLoansData = currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue)))
 

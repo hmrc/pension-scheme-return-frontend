@@ -18,7 +18,7 @@ package prepop
 
 import utils.BaseSpec
 import models.UserAnswers.SensitiveJsObject
-import prepop.LoansPrePopulationProcessorSpec.{baseReturnJsValue, cleanResultJsValue}
+import prepop.LoansPrePopulationProcessorSpec._
 import controllers.TestValues
 import utils.UserAnswersUtils.UserAnswersOps
 import play.api.libs.json._
@@ -41,6 +41,18 @@ class LoansPrePopulationProcessorSpec extends BaseSpec with TestValues {
         result.get.data.decryptedValue mustBe cleanResultJsValue.as[JsObject]
         result mustBe Success(
           currentUa.copy(data = SensitiveJsObject(cleanResultJsValue.as[JsObject]))
+        )
+      }
+
+      "should not copy schemeHadLoans from empty loans" in {
+        val currentUa = emptyUserAnswers.unsafeSet(__ \ "current", JsString("dummy-current-data"))
+        val result = processor.clean(
+          baseUA = emptyUserAnswers.copy(data = SensitiveJsObject(baseReturnNoLoansJsValue.as[JsObject])),
+          currentUA = currentUa
+        )(srn)
+        result.get.data.decryptedValue mustBe cleanResultNoLoansJsValue.as[JsObject]
+        result mustBe Success(
+          currentUa.copy(data = SensitiveJsObject(cleanResultNoLoansJsValue.as[JsObject]))
         )
       }
     }
@@ -181,6 +193,15 @@ object LoansPrePopulationProcessorSpec {
         |}
         |""".stripMargin)
 
+  val baseReturnNoLoansJsValue: JsValue =
+    Json.parse("""
+        |{
+        |  "loans": {
+        |    "recordVersion" : "004",
+        |    "schemeHadLoans" : false
+        |  }
+        |}""".stripMargin)
+
   val cleanResultJsValue: JsValue =
     Json.parse("""
         |{
@@ -286,4 +307,10 @@ object LoansPrePopulationProcessorSpec {
         |  }
         |}
         |""".stripMargin)
+
+  val cleanResultNoLoansJsValue: JsValue =
+    Json.parse("""
+        |{
+        |  "current": "dummy-current-data"
+        |}""".stripMargin)
 }

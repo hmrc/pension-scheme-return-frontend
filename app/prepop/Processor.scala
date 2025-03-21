@@ -18,13 +18,12 @@ package prepop
 
 import play.api.libs.json.{JsObject, JsPath, JsResult}
 
-
 trait Processor {
 
   protected def pruneIf(initialJsResult: JsResult[JsObject], path: JsPath, condition: Boolean): JsResult[JsObject] =
-  if (condition) {
-    initialJsResult.flatMap(_.transform(path.prune(_)))
-  } else {
-    initialJsResult
-  }
+    if (condition) {
+      initialJsResult.flatMap(_.transform(path.prune(_)))
+    } else {
+      initialJsResult
+    }
 }
