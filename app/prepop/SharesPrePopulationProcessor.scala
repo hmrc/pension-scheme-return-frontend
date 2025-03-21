@@ -25,6 +25,7 @@ import pages.nonsipp.shares.Paths.shares
 import pages.nonsipp.sharesdisposal.SharesDisposalPage
 import models.UserAnswers
 import pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction
+import utils.JsonUtils.JsResultOps
 import play.api.Logger
 import play.api.libs.json._
 
@@ -48,11 +49,11 @@ class SharesPrePopulationProcessor @Inject()() {
     val sharesJson: JsResult[JsObject] = baseUaJson.transform(shares.json.pickBranch)
 
     val transformedResult: Try[UserAnswers] = sharesJson
-      .flatMap(_.transform(SharesRecordVersionPage(srn).path.prune(_)))
-      .flatMap(_.transform(DidSchemeHoldAnySharesPage(srn).path.prune(_)))
-      .flatMap(_.transform(SharesDisposalPage(srn).path.prune(_)))
-      .flatMap(_.transform(disposedSharesTransaction.prune(_)))
-      .flatMap(_.transform(SharesTotalIncomePages(srn).path.prune(_))) match {
+      .prune(SharesRecordVersionPage(srn).path)
+      .prune(DidSchemeHoldAnySharesPage(srn).path)
+      .prune(SharesDisposalPage(srn).path)
+      .prune(disposedSharesTransaction)
+      .prune(SharesTotalIncomePages(srn).path) match {
       case JsSuccess(value, _) =>
         Success(currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue))))
       case _ => Try(currentUA)

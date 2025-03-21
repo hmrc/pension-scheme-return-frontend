@@ -22,6 +22,7 @@ import models.SchemeId.Srn
 import models.UserAnswers
 import pages.nonsipp.common.LoanIdentityTypePages
 import pages.nonsipp.loansmadeoroutstanding._
+import utils.JsonUtils.JsResultOps
 import utils.ListUtils.ListOps
 import models.UserAnswers.SensitiveJsObject
 import play.api.Logger
@@ -45,12 +46,14 @@ class LoansPrePopulationProcessor @Inject()() {
         .asOpt[Map[String, String]]
         .fold(Seq.empty[String])(_.keys.toSeq)
 
+    val isLoansEmpty = !baseUA.get(LoanIdentityTypePages(srn)).exists(_.nonEmpty)
+
     val transformedResult = baseUaJson
       .transform(loans.json.pickBranch)
-      .flatMap(_.transform(LoansRecordVersionPage(srn).path.prune(_)))
-      .flatMap(_.transform(LoansMadeOrOutstandingPage(srn).path.prune(_)))
-      .flatMap(_.transform(ArrearsPrevYearsMap(srn).path.prune(_)))
-      .flatMap(_.transform(OutstandingArrearsOnLoanPages(srn).path.prune(_)))
+      .prune(LoansRecordVersionPage(srn).path)
+      .pruneIf(LoansMadeOrOutstandingPage(srn).path, isLoansEmpty)
+      .prune(ArrearsPrevYearsMap(srn).path)
+      .prune(OutstandingArrearsOnLoanPages(srn).path)
 
     cleanUpOptionalFields(transformedResult, indexesToDelete) match {
       case JsSuccess(value, _) =>

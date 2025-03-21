@@ -23,6 +23,7 @@ import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
 import eu.timepit.refined.refineV
 import play.api.libs.json.JsSuccess
 import models.UserAnswers
+import utils.JsonUtils.JsResultOps
 import utils.ListUtils.ListOps
 import models.UserAnswers.SensitiveJsObject
 import pages.nonsipp.landorproperty.Paths.landOrProperty
@@ -42,16 +43,18 @@ class LandOrPropertyPrePopulationProcessor @Inject()() {
       (baseUaJson \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "disposedPropertyTransaction" \ "portionStillHeld")
         .asOpt[Map[String, Map[String, Boolean]]]
 
+    val isLandOrPropertyEmpty = !baseUA.get(LandOrPropertyAddressLookupPages(srn)).exists(_.nonEmpty)
+
     val transformedResult = baseUaJson
       .transform(landOrProperty.json.pickBranch)
-      .flatMap(_.transform(LandOrPropertyRecordVersionPage(srn).path.prune(_)))
-      .flatMap(_.transform(LandOrPropertyHeldPage(srn).path.prune(_)))
-      .flatMap(_.transform(LandOrPropertyDisposalPage(srn).path.prune(_)))
-      .flatMap(_.transform(disposalPropertyTransaction.prune(_)))
-      .flatMap(_.transform((Paths.heldPropertyTransactions \ "isLandOrPropertyResidential").prune(_)))
-      .flatMap(_.transform((Paths.heldPropertyTransactions \ "landOrPropertyLeased").prune(_)))
-      .flatMap(_.transform((Paths.heldPropertyTransactions \ "leaseDetails").prune(_)))
-      .flatMap(_.transform((Paths.heldPropertyTransactions \ "totalIncomeOrReceipts").prune(_))) match {
+      .prune(LandOrPropertyRecordVersionPage(srn).path)
+      .pruneIf(LandOrPropertyHeldPage(srn).path, isLandOrPropertyEmpty)
+      .prune(LandOrPropertyDisposalPage(srn).path)
+      .prune(disposalPropertyTransaction)
+      .prune((Paths.heldPropertyTransactions \ "isLandOrPropertyResidential"))
+      .prune((Paths.heldPropertyTransactions \ "landOrPropertyLeased"))
+      .prune((Paths.heldPropertyTransactions \ "leaseDetails"))
+      .prune((Paths.heldPropertyTransactions \ "totalIncomeOrReceipts")) match {
       case JsSuccess(value, _) =>
         Success(currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue))))
       case _ => Try(currentUA)
