@@ -94,9 +94,9 @@ class TaskListController @Inject()(
           isPrePopulation
         )
       } yield {
-        if (fbVersion < lastVersion) {
+        if (fbVersion < lastVersion && noChangesSincePreviousVersion) {
           logger.warn(
-            s"[TaskListController] fbVersion ($fbVersion) < lastVersion($lastVersion), redirecting to overview page"
+            s"[TaskListController] fbVersion ($fbVersion) < lastVersion($lastVersion) and return hasn't just changed, redirecting to overview page"
           )
           Redirect(controllers.routes.OverviewController.onPageLoad(srn).url)
         } else {

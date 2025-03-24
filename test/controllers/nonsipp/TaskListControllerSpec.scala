@@ -75,6 +75,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
       .unsafeSet(FbVersionPage(srn), commonVersion)
     val populatedUserAnswersV2 = populatedUserAnswers.unsafeSet(FbVersionPage(srn), "002")
     val populatedUserAnswersV3 = populatedUserAnswers.unsafeSet(FbVersionPage(srn), "003")
+    val populatedUserAnswersChanged = populatedUserAnswers.unsafeSet(HowMuchCashPage(srn, NormalMode), moneyInPeriod)
 
     lazy val defaultViewModel = TaskListController.viewModel(
       srn,
@@ -204,6 +205,35 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
             )
         )
         .withName("task list redirects to overview page when a historical submission is in user answers")
+    )
+
+    act.like(
+      renderView(onPageLoad, populatedUserAnswersChanged, optPreviousAnswers = Some(populatedUserAnswers)) {
+        implicit app => implicit request =>
+          val view = injected[TaskListView]
+          view(
+            TaskListController.viewModel(
+              srn,
+              schemeName,
+              dateRange.from,
+              dateRange.to,
+              populatedUserAnswersChanged,
+              pensionSchemeId,
+              hasHistory = true,
+              noChangesSincePreviousVersion = false,
+              None,
+              None,
+              isPrePop = false
+            ),
+            schemeName
+          )
+      }.withName("task list renders OK when version a data was just changed and version remains the same")
+        .before(
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+            .thenReturn(
+              Future.successful(versionsResponseInProgress)
+            )
+        )
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
