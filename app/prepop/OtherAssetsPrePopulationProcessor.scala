@@ -23,6 +23,7 @@ import models.SchemeId.Srn
 import pages.nonsipp.otherassetsdisposal.Paths.assetsDisposed
 import eu.timepit.refined.refineV
 import models.UserAnswers
+import utils.JsonUtils.JsResultOps
 import utils.ListUtils.ListOps
 import models.UserAnswers.SensitiveJsObject
 import pages.nonsipp.otherassetsheld.Paths.otherAssets
@@ -43,15 +44,17 @@ class OtherAssetsPrePopulationProcessor @Inject()() {
       (baseUaJson \ "assets" \ "otherAssets" \ "otherAssetTransactions" \ "assetsDisposed" \ "anyPartAssetStillHeld")
         .asOpt[Map[String, Map[String, Boolean]]]
 
+    val isOtherAssetsEmpty = !baseUA.get(WhatIsOtherAssetPages(srn)).exists(_.nonEmpty)
+
     val transformedResult: Try[UserAnswers] = baseUaJson
       .transform(otherAssets.json.pickBranch)
-      .flatMap(_.transform(OtherAssetsRecordVersionPage(srn).path.prune(_)))
-      .flatMap(_.transform(OtherAssetsHeldPage(srn).path.prune(_)))
-      .flatMap(_.transform(OtherAssetsDisposalPage(srn).path.prune(_)))
-      .flatMap(_.transform(assetsDisposed.prune(_)))
-      .flatMap(_.transform(OtherAssetsDisposalProgress.all(srn).path.prune(_)))
-      .flatMap(_.transform((Paths.otherAssetsTransactions \ "movableSchedule29A").prune(_)))
-      .flatMap(_.transform((Paths.otherAssetsTransactions \ "totalIncomeOrReceipts").prune(_))) match {
+      .prune(OtherAssetsRecordVersionPage(srn).path)
+      .pruneIf(OtherAssetsHeldPage(srn).path, isOtherAssetsEmpty)
+      .prune(OtherAssetsDisposalPage(srn).path)
+      .prune(assetsDisposed)
+      .prune(OtherAssetsDisposalProgress.all(srn).path)
+      .prune((Paths.otherAssetsTransactions \ "movableSchedule29A"))
+      .prune((Paths.otherAssetsTransactions \ "totalIncomeOrReceipts")) match {
       case JsSuccess(value, _) =>
         Success(currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue))))
       case _ => Try(currentUA)

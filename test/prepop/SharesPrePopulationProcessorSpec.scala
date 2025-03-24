@@ -17,13 +17,14 @@
 package prepop
 
 import utils.BaseSpec
-import com.softwaremill.diffx.scalatest.DiffShouldMatcher
 import models.UserAnswers.SensitiveJsObject
 import controllers.TestValues
 import prepop.SharesPrePopulationProcessorSpec._
 import utils.UserAnswersUtils.UserAnswersOps
 import play.api.libs.json._
 import com.softwaremill.diffx.generic.AutoDerivation
+import pages.nonsipp.shares._
+import com.softwaremill.diffx.scalatest.DiffShouldMatcher
 
 import scala.util.Success
 
@@ -40,6 +41,7 @@ class SharesPrePopulationProcessorSpec extends BaseSpec with TestValues with Dif
           baseUA = emptyUserAnswers.copy(data = SensitiveJsObject(baseReturnWithDisposalsJsValue.as[JsObject])),
           currentUA = currentUa
         )(srn)
+        result.get.get(DidSchemeHoldAnySharesPage(srn)) shouldMatchTo Some(true)
         result shouldMatchTo Success(
           currentUa.copy(data = SensitiveJsObject(cleanResultAfterDisposalsRemovedJsValue.as[JsObject]))
         )
@@ -65,6 +67,7 @@ object SharesPrePopulationProcessorSpec {
     Json.parse("""
                  |{
                  |  "shares" : {
+                 |    "didSchemeHoldAnyShares": true,
                  |    "recordVersion" : "005",
                  |    "shareTransactions" : {
                  |      "typeOfSharesHeld" : {
@@ -397,6 +400,7 @@ object SharesPrePopulationProcessorSpec {
     Json.parse("""
         |{
         |  "shares" : {
+        |    "didSchemeHoldAnyShares": true,
         |    "shareTransactions" : {
         |      "typeOfSharesHeld" : {
         |        "0" : "01",
@@ -531,10 +535,10 @@ object SharesPrePopulationProcessorSpec {
         |{
         |  "current": "dummy-current-data",
         |  "shares" : {
+        |    "didSchemeHoldAnyShares": true,
         |    "shareTransactions" : {
         |      "sharesPrePopulated": {
         |        "0":false,
-        |        "1":false,
         |        "2":false
         |      },
         |      "typeOfSharesHeld" : {
@@ -643,6 +647,7 @@ object SharesPrePopulationProcessorSpec {
       |{
       |  "current": "dummy-current-data",
       |  "shares" : {
+      |    "didSchemeHoldAnyShares": true,
       |    "shareTransactions" : {
       |      "sharesPrePopulated": {
       |        "0":false,

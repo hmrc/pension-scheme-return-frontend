@@ -25,6 +25,7 @@ import eu.timepit.refined.refineV
 import play.api.libs.json.{JsObject, JsSuccess}
 import models.UserAnswers
 import pages.nonsipp.bondsdisposal.BondsDisposalPage
+import utils.JsonUtils.JsResultOps
 import utils.ListUtils.ListOps
 import models.UserAnswers.SensitiveJsObject
 
@@ -43,13 +44,15 @@ class BondsPrePopulationProcessor @Inject()() {
       (baseUaJson \ "assets" \ "bonds" \ "bondTransactions" \ "bondsDisposed" \ "totalNowHeld")
         .asOpt[Map[String, Map[String, Int]]]
 
+    val isBondsEmpty = !baseUA.get(NameOfBondsPages(srn)).exists(_.nonEmpty)
+
     val transformedResult: Try[UserAnswers] = baseUaJson
       .transform(bonds.json.pickBranch)
-      .flatMap(_.transform(BondsRecordVersionPage(srn).path.prune(_)))
-      .flatMap(_.transform(UnregulatedOrConnectedBondsHeldPage(srn).path.prune(_)))
-      .flatMap(_.transform(BondsDisposalPage(srn).path.prune(_)))
-      .flatMap(_.transform(bondsDisposed.prune(_)))
-      .flatMap(_.transform((Paths.bondTransactions \ "totalIncomeOrReceipts").prune(_))) match {
+      .prune(BondsRecordVersionPage(srn).path)
+      .pruneIf(UnregulatedOrConnectedBondsHeldPage(srn).path, isBondsEmpty)
+      .prune(BondsDisposalPage(srn).path)
+      .prune(bondsDisposed)
+      .prune((Paths.bondTransactions \ "totalIncomeOrReceipts")) match {
       case JsSuccess(value, _) =>
         val uaWithBondsData = currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue)))
 
