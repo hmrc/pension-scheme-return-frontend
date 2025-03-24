@@ -25,6 +25,7 @@ import pages.nonsipp.shares.Paths.shares
 import pages.nonsipp.sharesdisposal.SharesDisposalPage
 import models.UserAnswers
 import pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction
+import utils.JsonUtils.JsResultOps
 import play.api.Logger
 import play.api.libs.json._
 
@@ -46,13 +47,14 @@ class SharesPrePopulationProcessor @Inject()() {
         .asOpt[Map[String, Map[String, Int]]]
 
     val sharesJson: JsResult[JsObject] = baseUaJson.transform(shares.json.pickBranch)
+    val isSharesEmpty = !baseUA.get(TypeOfSharesHeldPages(srn)).exists(_.nonEmpty)
 
     val transformedResult: Try[UserAnswers] = sharesJson
-      .flatMap(_.transform(SharesRecordVersionPage(srn).path.prune(_)))
-      .flatMap(_.transform(DidSchemeHoldAnySharesPage(srn).path.prune(_)))
-      .flatMap(_.transform(SharesDisposalPage(srn).path.prune(_)))
-      .flatMap(_.transform(disposedSharesTransaction.prune(_)))
-      .flatMap(_.transform(SharesTotalIncomePages(srn).path.prune(_))) match {
+      .prune(SharesRecordVersionPage(srn).path)
+      .pruneIf(DidSchemeHoldAnySharesPage(srn).path, isSharesEmpty)
+      .prune(SharesDisposalPage(srn).path)
+      .prune(disposedSharesTransaction)
+      .prune(SharesTotalIncomePages(srn).path) match {
       case JsSuccess(value, _) =>
         Success(currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue))))
       case _ => Try(currentUA)
@@ -66,13 +68,14 @@ class SharesPrePopulationProcessor @Inject()() {
         (index, totalSharesNowHeld) <- totalSharesNowHeldMap.toList
         isFullyDisposed = totalSharesNowHeld.exists(_._2 == 0)
         refinedIndex <- index.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption).toList
-        sharesPagesToRemove <- if (isFullyDisposed) sharesPages(srn, refinedIndex, isLastRecord = true) else Nil
+        sharesPagesToRemove <- if (isFullyDisposed) sharesPages(srn, refinedIndex, isLastRecord = false) else Nil
       } yield sharesPagesToRemove
 
       cleanedAnswers <- transformedAnswers.remove(sharesPagesToRemove)
 
+      // TODO: check if any shares, if not, prune DidSchemeHoldAnySharesPage
       prePopFlagsToAdd = for {
-        typeOfSharesPages <- transformedAnswers.get(TypeOfSharesHeldPages(srn)).toList
+        typeOfSharesPages <- cleanedAnswers.get(TypeOfSharesHeldPages(srn)).toList
         index <- typeOfSharesPages.keys
         refinedIndex <- index.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption).toList
         prePopFlagsToAdd = SharePrePopulated(srn, refinedIndex)

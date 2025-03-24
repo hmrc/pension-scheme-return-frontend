@@ -204,6 +204,7 @@ object OtherAssetsPrePopulationProcessorSpec {
                  |{
                  |  "assets": {
                  |    "otherAssets": {
+                 |    "otherAssetsHeld": true,
                  |    "otherAssetsPrePopulated":{"1":false},
                  |      "otherAssetTransactions": {
                  |        "assetDescription": {
@@ -322,6 +323,7 @@ object OtherAssetsPrePopulationProcessorSpec {
                  |{
                  |  "assets": {
                  |    "otherAssets": {
+                 |    "otherAssetsHeld": true,
                  |    "otherAssetsPrePopulated":{"0":false,"1":false},
                  |      "otherAssetTransactions": {
                  |        "assetDescription": {
