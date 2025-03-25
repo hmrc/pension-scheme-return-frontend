@@ -94,7 +94,7 @@ class TaskListController @Inject()(
           isPrePopulation
         )
       } yield {
-        if (fbVersion < lastVersion && noChangesSincePreviousVersion) {
+        if (fbVersion < lastVersion && hasHistory && noChangesSincePreviousVersion) {
           logger.warn(
             s"[TaskListController] fbVersion ($fbVersion) < lastVersion($lastVersion) and return hasn't just changed, redirecting to overview page"
           )
