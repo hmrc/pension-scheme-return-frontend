@@ -204,7 +204,38 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
               Future.successful(versionsResponseInProgress)
             )
         )
-        .withName("task list redirects to overview page when a historical submission is in user answers")
+        .withName(
+          "task list redirects to overview page when a historical submission with submitted status is in user answers"
+        )
+    )
+
+    act.like(
+      renderView(onPageLoad, populatedUserAnswers, optPreviousAnswers = Some(populatedUserAnswers)) {
+        implicit app => implicit request =>
+          val view = injected[TaskListView]
+          view(
+            TaskListController.viewModel(
+              srn,
+              schemeName,
+              dateRange.from,
+              dateRange.to,
+              populatedUserAnswers,
+              pensionSchemeId,
+              hasHistory = false,
+              noChangesSincePreviousVersion = true,
+              None,
+              None,
+              isPrePop = false
+            ),
+            schemeName
+          )
+      }.withName("task list renders OK when a historical submission with compiled status is in user answers")
+        .before(
+          when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any()))
+            .thenReturn(
+              Future.successful(Seq(compiledVersionsResponse))
+            )
+        )
     )
 
     act.like(
