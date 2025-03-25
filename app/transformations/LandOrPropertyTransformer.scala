@@ -508,16 +508,18 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
     methodOfHolding: SchemeHoldLandProperty,
     srn: Srn,
     index: Refined[Int, OneTo5000]
-  )(implicit request: DataRequest[_]): Option[(Boolean, LocalDate)] = Option.when(methodOfHolding != Transfer) {
-    val landPropertyIndependentValuation =
-      request.userAnswers.get(LandPropertyIndependentValuationPage(srn, index)).get
-    val landOrPropertyAcquire =
-      request.userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, index)).get
-    (
-      landPropertyIndependentValuation,
-      landOrPropertyAcquire
-    )
-  }
+  )(implicit request: DataRequest[_]): Option[(Boolean, LocalDate)] =
+    Option
+      .when(methodOfHolding != Transfer) {
+        for {
+          landPropertyIndependentValuation <- request.userAnswers.get(LandPropertyIndependentValuationPage(srn, index))
+          landOrPropertyAcquire <- request.userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, index))
+        } yield (
+          landPropertyIndependentValuation,
+          landOrPropertyAcquire
+        )
+      }
+      .flatten
 
   private def buildOptAcquisitionRelatedDetails(
     methodOfHolding: SchemeHoldLandProperty,
