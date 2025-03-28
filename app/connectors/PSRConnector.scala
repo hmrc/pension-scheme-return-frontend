@@ -65,6 +65,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
       .post(url"$submitStandardUrl")
       .withBody(Json.toJson(psrSubmission))
       .transform(buildHeaders(_, userName, schemeName, srn, if (request.pensionSchemeId.isPSP) PSP else PSA))
+      .transform(_.withRequestTimeout(appConfig.ifsTimeout))
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -88,6 +89,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
       .post(url"$submitPrePopulatedUrl")
       .withBody(Json.toJson(psrSubmission))
       .transform(buildHeaders(_, userName, schemeName, srn, if (request.pensionSchemeId.isPSP) PSP else PSA))
+      .transform(_.withRequestTimeout(appConfig.ifsTimeout))
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -123,6 +125,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
     http
       .get(url"${getStandardUrl(pstr)}?$queryParams")
       .transform(buildHeaders(_, userName, schemeName, srn, if (request.pensionSchemeId.isPSP) PSP else PSA))
+      .transform(_.withRequestTimeout(appConfig.ifsTimeout))
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -156,6 +159,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
           "requestRole" -> (if (request.pensionSchemeId.isPSP) PSP else PSA)
         )
       )
+      .transform(_.withRequestTimeout(appConfig.ifsTimeout))
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -202,6 +206,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
                             else PSA)
         )
       )
+      .transform(_.withRequestTimeout(appConfig.ifsTimeout))
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -251,6 +256,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
           "requestRole" -> (if (request.pensionSchemeId.isPSP) PSP else PSA)
         )
       )
+      .transform(_.withRequestTimeout(appConfig.ifsTimeout))
       .execute[HttpResponse]
       .map { response =>
         response.status match {
