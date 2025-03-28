@@ -30,8 +30,12 @@ import eu.timepit.refined.refineMV
 import controllers.nonsipp.moneyborrowed.BorrowInstancesListController._
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
+import viewmodels.models.SectionJourneyStatus.Completed
+import viewmodels.models.SectionJourneyStatus
 
 import scala.concurrent.Future
+
+import java.time.LocalDate
 
 class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
 
@@ -71,6 +75,17 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
       submissionNumberOne
     )
 
+  private val completeUserAnswers =
+    defaultUserAnswers
+      .unsafeSet(MoneyBorrowedPage(srn), false)
+      .unsafeSet(LenderNamePage(srn, index), lenderName)
+      .unsafeSet(IsLenderConnectedPartyPage(srn, index), false)
+      .unsafeSet(BorrowedAmountAndRatePage(srn, index), (money, percentage))
+      .unsafeSet(WhenBorrowedPage(srn, index), LocalDate.now())
+      .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index), money)
+      .unsafeSet(WhySchemeBorrowedMoneyPage(srn, index), "Reason")
+      .unsafeSet(MoneyBorrowedProgress(srn, index), SectionJourneyStatus.Completed)
+
   private val userAnswers =
     defaultUserAnswers
       .unsafeSet(MoneyBorrowedPage(srn), false)
@@ -94,7 +109,7 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
 
   "BorrowInstancesListController" - {
 
-    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, completeUserAnswers) { implicit app => implicit request =>
       injected[ListView]
         .apply(
           form(injected[YesNoPageFormProvider]),
@@ -102,12 +117,12 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
             srn,
             NormalMode,
             page = 1,
-            borrowingInstances = List((index, lenderName, money)),
+            borrowingInstances = List(BorrowedMoneyDetails(index, lenderName, Some(money), Completed)),
             schemeName,
             showBackLink = true
           )
         )
-    })
+    }.withName("Render page"))
 
     act.like(
       redirectToPage(
@@ -135,6 +150,7 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(MoneyBorrowedPage(srn), false)
       .unsafeSet(LenderNamePages(srn), Map("0" -> lenderName))
       .unsafeSet(BorrowedAmountAndRatePage(srn, index), (money, percentage))
+      .unsafeSet(MoneyBorrowedProgress(srn, index), SectionJourneyStatus.Completed)
 
     val previousUserAnswers = currentUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")
@@ -159,7 +175,7 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
                 srn,
                 mode = ViewOnlyMode,
                 page = 1,
-                borrowingInstances = List((index, lenderName, money)),
+                borrowingInstances = List(BorrowedMoneyDetails(index, lenderName, Some(money), Completed)),
                 schemeName,
                 Some(viewOnlyViewModel),
                 showBackLink = true
@@ -181,7 +197,7 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
                 srn,
                 mode = ViewOnlyMode,
                 page = 1,
-                borrowingInstances = List((index, lenderName, money)),
+                borrowingInstances = List(BorrowedMoneyDetails(index, lenderName, Some(money), Completed)),
                 schemeName,
                 viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
                 showBackLink = true
@@ -235,7 +251,7 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
               srn,
               mode = ViewOnlyMode,
               page = 1,
-              borrowingInstances = List((index, lenderName, money)),
+              borrowingInstances = List(BorrowedMoneyDetails(index, lenderName, Some(money), Completed)),
               schemeName,
               viewOnlyViewModel = Some(
                 viewOnlyViewModel.copy(
