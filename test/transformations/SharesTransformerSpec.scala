@@ -73,6 +73,19 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
       result mustBe Some(Shares(None, Some(false), None, None))
     }
 
+    "should omit share transaction details when DidSchemeHoldAnySharesPage was 'No'" in {
+      val userAnswers = emptyUserAnswers
+        .unsafeSet(DidSchemeHoldAnySharesPage(srn), false)
+        .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), SponsoringEmployer)
+
+      val initialUserAnswer = emptyUserAnswers
+        .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+
+      val result =
+        transformer.transformToEtmp(srn = srn, initialUserAnswer)(DataRequest(allowedAccessRequest, userAnswers))
+      result mustBe Some(Shares(None, Some(false), None, None))
+    }
+
     "should return recordVersion when there is no change among UAs" - {
 
       "should return Quoted Share when quoted share is in userAnswers" in {

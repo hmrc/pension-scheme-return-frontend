@@ -78,73 +78,81 @@ class SharesTransformer @Inject() extends Transformer {
   private def buildOptShareTransactions(
     srn: Srn,
     sharesDisposal: Boolean
-  )(implicit request: DataRequest[_]): Option[List[ShareTransaction]] =
-    request.userAnswers
-      .get(TypeOfSharesHeldPages(srn))
-      .flatMap { jsValue =>
-        val keys = jsValue.keys.toList
-        Option.when(keys.nonEmpty)(
-          keys.flatMap { key =>
-            key.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
-              case None => None
-              case Some(index) =>
-                for {
-                  typeOfSharesHeld <- request.userAnswers.get(TypeOfSharesHeldPage(srn, index))
-                  schemeHoldShare <- request.userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index))
-                  nameOfSharesCompany <- request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index))
-                  eitherSharesCompanyCrnOrReason <- request.userAnswers.get(SharesCompanyCrnPage(srn, index))
-                  classOfShares <- request.userAnswers.get(ClassOfSharesPage(srn, index))
-                  totalShares <- request.userAnswers.get(HowManySharesPage(srn, index))
-                  costOfShares <- request.userAnswers.get(CostOfSharesPage(srn, index))
-                  supportedByIndepValuation <- request.userAnswers.get(SharesIndependentValuationPage(srn, index))
-                  prePopulated = request.userAnswers.get(SharePrePopulated(srn, index))
-                } yield {
-                  val optDateOfAcqOrContrib = Option.when(schemeHoldShare != Transfer)(
-                    request.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)).get
-                  )
-
-                  val optConnectedPartyStatus = Option.when(typeOfSharesHeld == Unquoted)(
-                    request.userAnswers.get(SharesFromConnectedPartyPage(srn, index)).get
-                  )
-
-                  val optTotalAssetValue =
-                    Option.when((schemeHoldShare == Acquisition) && (typeOfSharesHeld == SponsoringEmployer))(
-                      request.userAnswers.get(TotalAssetValuePage(srn, index)).get
+  )(implicit request: DataRequest[_]): Option[List[ShareTransaction]] = {
+    val optSchemeHadShares = request.userAnswers.get(DidSchemeHoldAnySharesPage(srn))
+    if (optSchemeHadShares.nonEmpty && !optSchemeHadShares.get) {
+      //don't build any share transactions if DidSchemeHoldAnySharesPage was 'No'
+      None
+    } else {
+      //build share transactions if DidSchemeHoldAnySharesPage was 'Yes' or not answered (pre-population)
+      request.userAnswers
+        .get(TypeOfSharesHeldPages(srn))
+        .flatMap { jsValue =>
+          val keys = jsValue.keys.toList
+          Option.when(keys.nonEmpty)(
+            keys.flatMap { key =>
+              key.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
+                case None => None
+                case Some(index) =>
+                  for {
+                    typeOfSharesHeld <- request.userAnswers.get(TypeOfSharesHeldPage(srn, index))
+                    schemeHoldShare <- request.userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index))
+                    nameOfSharesCompany <- request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index))
+                    eitherSharesCompanyCrnOrReason <- request.userAnswers.get(SharesCompanyCrnPage(srn, index))
+                    classOfShares <- request.userAnswers.get(ClassOfSharesPage(srn, index))
+                    totalShares <- request.userAnswers.get(HowManySharesPage(srn, index))
+                    costOfShares <- request.userAnswers.get(CostOfSharesPage(srn, index))
+                    supportedByIndepValuation <- request.userAnswers.get(SharesIndependentValuationPage(srn, index))
+                    prePopulated = request.userAnswers.get(SharePrePopulated(srn, index))
+                  } yield {
+                    val optDateOfAcqOrContrib = Option.when(schemeHoldShare != Transfer)(
+                      request.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)).get
                     )
 
-                  val optTotalDividendsOrReceipts = request.userAnswers.get(SharesTotalIncomePage(srn, index))
+                    val optConnectedPartyStatus = Option.when(typeOfSharesHeld == Unquoted)(
+                      request.userAnswers.get(SharesFromConnectedPartyPage(srn, index)).get
+                    )
 
-                  val optAcquisitionRelatedDetails = buildOptAcquisitionRelatedDetails(schemeHoldShare, srn, index)
+                    val optTotalAssetValue =
+                      Option.when((schemeHoldShare == Acquisition) && (typeOfSharesHeld == SponsoringEmployer))(
+                        request.userAnswers.get(TotalAssetValuePage(srn, index)).get
+                      )
 
-                  ShareTransaction(
-                    prePopulated = prePopulated,
-                    typeOfSharesHeld = typeOfSharesHeld,
-                    shareIdentification = ShareIdentification(
-                      nameOfSharesCompany = nameOfSharesCompany,
-                      optCrnNumber = eitherSharesCompanyCrnOrReason.value.toOption.map(_.crn),
-                      optReasonNoCRN = eitherSharesCompanyCrnOrReason.value.left.toOption,
-                      classOfShares = classOfShares
-                    ),
-                    heldSharesTransaction = HeldSharesTransaction(
-                      schemeHoldShare = schemeHoldShare,
-                      optDateOfAcqOrContrib = optDateOfAcqOrContrib,
-                      totalShares = totalShares,
-                      optAcquiredFromName = optAcquisitionRelatedDetails.map(_._1),
-                      optPropertyAcquiredFrom = optAcquisitionRelatedDetails.map(_._2),
-                      optConnectedPartyStatus = optConnectedPartyStatus,
-                      costOfShares = costOfShares.value,
-                      supportedByIndepValuation = supportedByIndepValuation,
-                      optTotalAssetValue = optTotalAssetValue.map(_.value),
-                      optTotalDividendsOrReceipts = optTotalDividendsOrReceipts.map(_.value)
-                    ),
-                    optDisposedSharesTransaction = Option
-                      .when(sharesDisposal)(buildOptDisposedSharesTransactions(srn, index))
-                  )
-                }
+                    val optTotalDividendsOrReceipts = request.userAnswers.get(SharesTotalIncomePage(srn, index))
+
+                    val optAcquisitionRelatedDetails = buildOptAcquisitionRelatedDetails(schemeHoldShare, srn, index)
+
+                    ShareTransaction(
+                      prePopulated = prePopulated,
+                      typeOfSharesHeld = typeOfSharesHeld,
+                      shareIdentification = ShareIdentification(
+                        nameOfSharesCompany = nameOfSharesCompany,
+                        optCrnNumber = eitherSharesCompanyCrnOrReason.value.toOption.map(_.crn),
+                        optReasonNoCRN = eitherSharesCompanyCrnOrReason.value.left.toOption,
+                        classOfShares = classOfShares
+                      ),
+                      heldSharesTransaction = HeldSharesTransaction(
+                        schemeHoldShare = schemeHoldShare,
+                        optDateOfAcqOrContrib = optDateOfAcqOrContrib,
+                        totalShares = totalShares,
+                        optAcquiredFromName = optAcquisitionRelatedDetails.map(_._1),
+                        optPropertyAcquiredFrom = optAcquisitionRelatedDetails.map(_._2),
+                        optConnectedPartyStatus = optConnectedPartyStatus,
+                        costOfShares = costOfShares.value,
+                        supportedByIndepValuation = supportedByIndepValuation,
+                        optTotalAssetValue = optTotalAssetValue.map(_.value),
+                        optTotalDividendsOrReceipts = optTotalDividendsOrReceipts.map(_.value)
+                      ),
+                      optDisposedSharesTransaction = Option
+                        .when(sharesDisposal)(buildOptDisposedSharesTransactions(srn, index))
+                    )
+                  }
+              }
             }
-          }
-        )
-      }
+          )
+        }
+    }
+  }
 
   private def buildOptAcquisitionRelatedDetails(
     schemeHoldShare: SchemeHoldShare,
