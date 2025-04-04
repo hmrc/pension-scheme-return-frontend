@@ -29,7 +29,7 @@ case class PensionCommencementLumpSumAmountPage(srn: Srn, index: Max300)
 
   override def path: JsPath = memberDetails \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "memberLumpSumReceived"
+  override def toString: String = PensionCommencementLumpSumAmountPage.key
 }
 
 object PensionCommencementLumpSumAmountPage {
@@ -38,6 +38,8 @@ object PensionCommencementLumpSumAmountPage {
 
       override def path: JsPath = memberDetails \ toString
 
-      override def toString: String = "memberLumpSumReceived"
+      override def toString: String = key
     }
+
+  val key = "memberLumpSumReceived"
 }
