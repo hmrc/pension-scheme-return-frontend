@@ -268,6 +268,7 @@ class OverviewController @Inject()(
               Redirect(sippUrl)
                 .addingToSession(Constants.TAX_YEAR -> taxYear)
                 .addingToSession(Constants.VERSION -> version)
+                .removingFromSession(Constants.FB_NUMBER)
             )
           case _ =>
             val yearFrom = LocalDate.parse(taxYear)
