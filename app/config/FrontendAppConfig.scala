@@ -22,9 +22,10 @@ import models.SchemeId.Srn
 import play.api.Configuration
 import play.api.i18n.Lang
 
+import scala.concurrent.duration.Duration
+
 import java.time.LocalDate
 import java.net.URLEncoder
-import scala.concurrent.duration.Duration
 
 @Singleton
 class FrontendAppConfig @Inject()(config: Configuration) { self =>
