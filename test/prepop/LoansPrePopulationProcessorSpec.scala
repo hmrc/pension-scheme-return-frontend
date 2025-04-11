@@ -207,7 +207,6 @@ object LoansPrePopulationProcessorSpec {
         |{
         |  "current": "dummy-current-data",
         |  "loans": {
-        |    "schemeHadLoans":true,
         |    "loanPrePopulated": {
         |      "0": false,
         |      "1": false

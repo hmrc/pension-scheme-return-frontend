@@ -49,7 +49,7 @@ class BondsPrePopulationProcessor @Inject()() {
     val transformedResult: Try[UserAnswers] = baseUaJson
       .transform(bonds.json.pickBranch)
       .prune(BondsRecordVersionPage(srn).path)
-      .pruneIf(UnregulatedOrConnectedBondsHeldPage(srn).path, isBondsEmpty)
+      .prune(UnregulatedOrConnectedBondsHeldPage(srn).path)
       .prune(BondsDisposalPage(srn).path)
       .prune(bondsDisposed)
       .prune((Paths.bondTransactions \ "totalIncomeOrReceipts")) match {

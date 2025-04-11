@@ -21,7 +21,6 @@ import config.RefinedTypes.{Max5000, OneTo5000}
 import models.SchemeId.Srn
 import eu.timepit.refined.refineV
 import models._
-import models.SchemeHoldAsset._
 
 object OtherAssetsCheckStatusUtils {
 

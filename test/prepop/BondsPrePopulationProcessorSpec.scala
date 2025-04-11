@@ -294,7 +294,6 @@ object BondsPrePopulationProcessorSpec {
                  |  "current": "dummy-current-data",
                  |  "assets": {
                  |    "bonds": {
-                 |    "unregulatedOrConnectedBondsHeld": true,
                  |    "bondsPrePopulated":{"4":false,"1":false,"0":false,"2":false,"3":false},
                  |      "bondTransactions": {
                  |        "nameOfBonds": {
@@ -446,7 +445,6 @@ object BondsPrePopulationProcessorSpec {
                  |  "current": "dummy-current-data",
                  |  "assets": {
                  |    "bonds": {
-                 |    "unregulatedOrConnectedBondsHeld": true,
                  |    "bondsPrePopulated":{"4":false,"1":false,"0":false,"2":false,"3":false},
                  |      "bondTransactions": {
                  |        "nameOfBonds": {

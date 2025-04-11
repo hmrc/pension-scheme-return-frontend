@@ -51,7 +51,7 @@ class LoansPrePopulationProcessor @Inject()() {
     val transformedResult = baseUaJson
       .transform(loans.json.pickBranch)
       .prune(LoansRecordVersionPage(srn).path)
-      .pruneIf(LoansMadeOrOutstandingPage(srn).path, isLoansEmpty)
+      .prune(LoansMadeOrOutstandingPage(srn).path)
       .prune(ArrearsPrevYearsMap(srn).path)
       .prune(OutstandingArrearsOnLoanPages(srn).path)
 

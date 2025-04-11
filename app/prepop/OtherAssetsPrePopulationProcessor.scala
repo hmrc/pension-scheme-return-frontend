@@ -49,7 +49,7 @@ class OtherAssetsPrePopulationProcessor @Inject()() {
     val transformedResult: Try[UserAnswers] = baseUaJson
       .transform(otherAssets.json.pickBranch)
       .prune(OtherAssetsRecordVersionPage(srn).path)
-      .pruneIf(OtherAssetsHeldPage(srn).path, isOtherAssetsEmpty)
+      .prune(OtherAssetsHeldPage(srn).path)
       .prune(OtherAssetsDisposalPage(srn).path)
       .prune(assetsDisposed)
       .prune(OtherAssetsDisposalProgress.all(srn).path)

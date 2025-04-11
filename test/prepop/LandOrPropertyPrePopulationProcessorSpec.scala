@@ -587,7 +587,6 @@ object LandOrPropertyPrePopulationProcessorSpec {
       |  "current": "dummy-current-data",
       |  "assets": {
       |    "landOrProperty": {
-      |      "landOrPropertyHeld": true,
       |      "landOrPropertyPrePopulated":{"2":false},
       |      "landOrPropertyTransactions": {
       |        "propertyDetails": {
@@ -664,7 +663,6 @@ object LandOrPropertyPrePopulationProcessorSpec {
       |  "current": "dummy-current-data",
       |  "assets": {
       |    "landOrProperty": {
-      |    "landOrPropertyHeld": true,
       |    "landOrPropertyPrePopulated":{"0":false,"1":false,"2":false},
       |      "landOrPropertyTransactions": {
       |        "propertyDetails": {
