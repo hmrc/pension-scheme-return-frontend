@@ -17,11 +17,10 @@
 package utils.nonsipp.check
 
 import pages.nonsipp.bonds._
+import config.RefinedTypes.{Max5000, OneTo5000}
 import models.SchemeId.Srn
 import eu.timepit.refined.refineV
 import models.UserAnswers
-import config.RefinedTypes.{Max5000, OneTo5000}
-import models.SchemeHoldBond._
 
 object BondsCheckStatusUtils {
 

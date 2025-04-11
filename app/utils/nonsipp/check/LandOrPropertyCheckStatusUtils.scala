@@ -21,7 +21,6 @@ import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineV
 import models._
-import models.IdentitySubject._
 
 object LandOrPropertyCheckStatusUtils {
 

@@ -48,7 +48,7 @@ class LandOrPropertyPrePopulationProcessor @Inject()() {
     val transformedResult = baseUaJson
       .transform(landOrProperty.json.pickBranch)
       .prune(LandOrPropertyRecordVersionPage(srn).path)
-      .pruneIf(LandOrPropertyHeldPage(srn).path, isLandOrPropertyEmpty)
+      .prune(LandOrPropertyHeldPage(srn).path)
       .prune(LandOrPropertyDisposalPage(srn).path)
       .prune(disposalPropertyTransaction)
       .prune((Paths.heldPropertyTransactions \ "isLandOrPropertyResidential"))

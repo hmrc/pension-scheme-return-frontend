@@ -51,7 +51,7 @@ class SharesPrePopulationProcessor @Inject()() {
 
     val transformedResult: Try[UserAnswers] = sharesJson
       .prune(SharesRecordVersionPage(srn).path)
-      .pruneIf(DidSchemeHoldAnySharesPage(srn).path, isSharesEmpty)
+      .prune(DidSchemeHoldAnySharesPage(srn).path)
       .prune(SharesDisposalPage(srn).path)
       .prune(disposedSharesTransaction)
       .prune(SharesTotalIncomePages(srn).path) match {
