@@ -16,13 +16,13 @@
 
 package pages.nonsipp.landorproperty
 
-import config.RefinedTypes.Max5000
-import models.SchemeId.Srn
-import pages.nonsipp.landorproperty.Paths.landOrPropertyProgress
-import pages.{IndexedQuestionPage, QuestionPage}
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import pages.{IndexedQuestionPage, QuestionPage}
+import config.RefinedTypes.Max5000
+import play.api.libs.json.JsPath
 import viewmodels.models.SectionJourneyStatus
+import pages.nonsipp.landorproperty.Paths.landOrPropertyProgress
+import models.SchemeId.Srn
 
 case class LandOrPropertyProgress(srn: Srn, index: Max5000) extends QuestionPage[SectionJourneyStatus] {
 

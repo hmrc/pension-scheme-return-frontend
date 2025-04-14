@@ -74,10 +74,10 @@ class LandPropertyIndividualSellersNameController @Inject()(
             for {
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(LandPropertyIndividualSellersNamePage(srn, index), answer))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(LandPropertyIndividualSellersNamePage(srn, index), mode, updatedAnswers)
-            )
+              nextPage = navigator.nextPage(LandPropertyIndividualSellersNamePage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
   }

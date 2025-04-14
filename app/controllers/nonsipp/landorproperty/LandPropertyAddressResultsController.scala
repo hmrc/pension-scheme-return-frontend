@@ -80,8 +80,10 @@ class LandPropertyAddressResultsController @Inject()(
                 updatedAnswers <- Future
                   .fromTry(request.userAnswers.set(LandOrPropertyChosenAddressPage(srn, index), foundAddress))
                   .liftF
-                _ <- saveService.save(updatedAnswers).liftF
-              } yield Redirect(navigator.nextPage(LandOrPropertyChosenAddressPage(srn, index), mode, updatedAnswers))
+                nextPage = navigator.nextPage(LandOrPropertyChosenAddressPage(srn, index), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage).liftF
+                _ <- saveService.save(updatedProgressAnswers).liftF
+              } yield Redirect(nextPage)
             ).merge
         )
   }

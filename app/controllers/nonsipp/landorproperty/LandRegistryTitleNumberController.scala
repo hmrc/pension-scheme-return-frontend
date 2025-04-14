@@ -75,8 +75,10 @@ class LandRegistryTitleNumberController @Inject()(
             for {
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(LandRegistryTitleNumberPage(srn, index), ConditionalYesNo(value)))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(LandRegistryTitleNumberPage(srn, index), mode, updatedAnswers))
+              nextPage = navigator.nextPage(LandRegistryTitleNumberPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
   }
 }

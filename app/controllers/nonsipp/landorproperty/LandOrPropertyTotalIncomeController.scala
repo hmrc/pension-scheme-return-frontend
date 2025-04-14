@@ -84,8 +84,10 @@ class LandOrPropertyTotalIncomeController @Inject()(
                     .set(LandOrPropertyTotalIncomePage(srn, index), value)
                     .set(LandOrPropertyCompleted(srn, index), SectionCompleted)
                 )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(LandOrPropertyTotalIncomePage(srn, index), mode, updatedAnswers))
+              nextPage = navigator.nextPage(LandOrPropertyTotalIncomePage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
   }
 }

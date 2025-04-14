@@ -19,26 +19,45 @@ package controllers.nonsipp
 import play.api.mvc.Call
 import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
-import models.{IdentitySubject, UserAnswers}
+import pages.nonsipp.landorproperty.LandOrPropertyProgress
+import models.UserAnswers
+import utils.FunctionKUtils._
+import viewmodels.models.SectionJourneyStatus
 
 import scala.concurrent.Future
 
-package object common {
+package object landorproperty {
+
+  implicit class CallOps(call: Call) {
+
+    val isCyaPage: Boolean = {
+      val pattern =
+        s"^\\/pension-scheme-return\\/[^\\/]+\\/(change|check-answers)-land-property\\/(?!.*\\/\\d+\\/\\d+$$).*"
+
+      call.url.matches(pattern)
+    }
+  }
 
   def saveProgress(
     srn: Srn,
     index: Max5000,
     userAnswers: UserAnswers,
     nextPage: Call,
-    subject: IdentitySubject,
     alwaysCompleted: Boolean = false
   ): Future[UserAnswers] =
-    subject match {
-      case IdentitySubject.LoanRecipient =>
-        loansmadeoroutstanding.saveProgress(srn, index, userAnswers, nextPage, alwaysCompleted)
-      case IdentitySubject.LandOrPropertySeller =>
-        landorproperty.saveProgress(srn, index, userAnswers, nextPage, alwaysCompleted)
-
-      case _ => Future.successful(userAnswers)
+    if (nextPage.isCyaPage) {
+      userAnswers
+        .set(
+          LandOrPropertyProgress(srn, index),
+          SectionJourneyStatus.Completed
+        )
+        .mapK[Future]
+    } else {
+      userAnswers
+        .set(
+          LandOrPropertyProgress(srn, index),
+          if (alwaysCompleted) SectionJourneyStatus.Completed else SectionJourneyStatus.InProgress(nextPage)
+        )
+        .mapK[Future]
     }
 }
