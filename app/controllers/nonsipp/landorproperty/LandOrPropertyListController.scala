@@ -20,11 +20,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import controllers.nonsipp.landorproperty.LandOrPropertyListController._
-import pages.nonsipp.landorproperty.{
-  LandOrPropertyAddressLookupPages,
-  LandOrPropertyListPage,
-  LandOrPropertyPrePopulated
-}
+import pages.nonsipp.landorproperty._
 import cats.implicits.toShow
 import config.Constants.maxLandOrProperties
 import controllers.actions._
@@ -209,11 +205,13 @@ class LandOrPropertyListController @Inject()(
 
   private def addresses(
     srn: Srn
-  )(implicit request: DataRequest[_]): Either[String, (Map[Max5000, Address], Map[Max5000, Address])] =
+  )(implicit request: DataRequest[_]): Either[String, (Map[Max5000, Address], Map[Max5000, Address])] = {
+    val completedIndexes = request.userAnswers.map(LandOrPropertyProgress.all(srn)).filter(_._2.completed).keys.toList
     // if return has been pre-populated, partition addresses by those that need to be checked
     if (isPrePopulation) {
       request.userAnswers
         .map(LandOrPropertyAddressLookupPages(srn))
+        .collect { case (index, address) if completedIndexes.contains(index) => (index, address) }
         .refine[Max5000.Refined]
         .map(_.map {
           case (index, address) =>
@@ -226,9 +224,11 @@ class LandOrPropertyListController @Inject()(
       val noAddressesToCheck = Map.empty[Max5000, Address]
       request.userAnswers
         .map(LandOrPropertyAddressLookupPages(srn))
+        .collect { case (index, address) if completedIndexes.contains(index) => (index, address) }
         .refine[Max5000.Refined]
         .map((noAddressesToCheck, _))
     }
+  }
 }
 
 object LandOrPropertyListController {
