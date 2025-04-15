@@ -225,7 +225,10 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
         .unsafeSet(LandPropertyInUKPage(srn, index1of5000), true)
         .unsafeSet(LandOrPropertyPostcodeLookupPage(srn, index1of5000), postcodeLookup)
         .unsafeSet(AddressLookupResultsPage(srn, index1of5000), List(address, address, address))
-        .unsafeSet(LandOrPropertyProgress(srn, index1of5000), SectionJourneyStatus.InProgress(LandRegistryTitleNumberPage(srn, index1of5000)))
+        .unsafeSet(
+          LandOrPropertyProgress(srn, index1of5000),
+          SectionJourneyStatus.InProgress(LandRegistryTitleNumberPage(srn, index1of5000))
+        )
 
       val request = DataRequest(allowedAccessRequest, incompleteUserAnswers)
 
