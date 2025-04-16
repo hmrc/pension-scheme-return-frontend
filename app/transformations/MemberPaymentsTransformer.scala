@@ -325,7 +325,7 @@ class MemberPaymentsTransformer @Inject()(
       ua3_3 <- memberPayments.transfersInMade.fold(Try(ua3_2))(ua3_2.set(DidSchemeReceiveTransferPage(srn), _))
       ua3_4 <- memberPayments.transfersOutMade.fold(Try(ua3_3))(ua3_3.set(SchemeTransferOutPage(srn), _))
       ua3_5 <- memberPayments.surrenderMade.fold(Try(ua3_4))(ua3_4.set(SurrenderedBenefitsPage(srn), _))
-      ua3_6 <- memberPayments.checked.fold(Try(ua3_5))(ua3_4.set(MembersDetailsChecked(srn), _))
+      ua3_6 <- memberPayments.checked.fold(Try(ua3_5))(ua3_5.set(MembersDetailsChecked(srn), _))
 
       // new members can be safely hard deleted - don't run when fetching previous user answers as there is no point
       newMembers <- if (!fetchingPreviousVersion) {
