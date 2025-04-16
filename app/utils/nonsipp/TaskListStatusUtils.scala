@@ -458,22 +458,15 @@ object TaskListStatusUtils {
           .onPageLoad(srn, 1, NormalMode)
           .url
 
-      val firstPages = userAnswers.get(LandPropertyInUKPages(srn))
-      val lastPages = userAnswers.get(LandOrPropertyTotalIncomePages(srn))
-      val incompleteIndex: Int = getIncompleteIndex(firstPages, lastPages)
-
-      val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
-        _ => firstQuestionPageUrl,
-        index =>
-          controllers.nonsipp.landorproperty.routes.LandPropertyInUKController
-            .onPageLoad(srn, index, NormalMode)
-            .url
-      )
+      val inProgressUrl = userAnswers
+        .map(LandOrPropertyProgress.all(srn))
+        .collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+        .getOrElse(firstQuestionPageUrl)
 
       (wereLandOrPropertiesHeld, numRecorded) match {
         case (None, _) => (NotStarted, firstQuestionPageUrl)
         case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
-        case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
+        case (Some(true), 0) => (InProgress, inProgressUrl)
         case (Some(true), _) => (Recorded(numRecorded, "landOrProperties"), listPageUrl)
       }
     }

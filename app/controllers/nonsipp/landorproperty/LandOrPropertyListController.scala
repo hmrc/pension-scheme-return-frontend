@@ -135,40 +135,60 @@ class LandOrPropertyListController @Inject()(
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    addresses(srn).getOrRecoverJourney.map {
-      case (addressesToCheck, addresses) =>
-        if (addressesToCheck.size + addresses.size == maxLandOrProperties) {
-          Redirect(
-            navigator.nextPage(LandOrPropertyListPage(srn, addLandOrProperty = false), mode, request.userAnswers)
-          )
-        } else {
-          form
-            .bindFromRequest()
-            .fold(
-              errors =>
-                BadRequest(
-                  view(
-                    errors,
-                    viewModel(
-                      srn,
-                      page,
-                      mode,
-                      addresses = addresses,
-                      addressesToCheck = addressesToCheck,
-                      request.schemeDetails.schemeName,
-                      None,
-                      showBackLink = true,
-                      isPrePopulation
-                    )
-                  )
-                ),
-              answer =>
-                Redirect(
-                  navigator.nextPage(LandOrPropertyListPage(srn, addLandOrProperty = answer), mode, request.userAnswers)
-                )
+    {
+
+      val inProgressAnswers = request.userAnswers.map(LandOrPropertyProgress.all(srn))
+      val inProgressUrl = inProgressAnswers.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+      addresses(srn).getOrRecoverJourney.map {
+        case (addressesToCheck, addresses) =>
+          if (addressesToCheck.size + addresses.size == maxLandOrProperties) {
+            Redirect(
+              navigator.nextPage(LandOrPropertyListPage(srn, addLandOrProperty = false), mode, request.userAnswers)
             )
-        }
-    }.merge
+          } else {
+            form
+              .bindFromRequest()
+              .fold(
+                errors =>
+                  BadRequest(
+                    view(
+                      errors,
+                      viewModel(
+                        srn,
+                        page,
+                        mode,
+                        addresses = addresses,
+                        addressesToCheck = addressesToCheck,
+                        request.schemeDetails.schemeName,
+                        None,
+                        showBackLink = true,
+                        isPrePopulation
+                      )
+                    )
+                  ),
+                answer =>
+                  if (answer) {
+                    inProgressUrl match {
+                      case Some(url) => Redirect(url)
+                      case _ =>
+                        Redirect(
+                          navigator.nextPage(
+                            LandOrPropertyListPage(srn, addLandOrProperty = answer),
+                            mode,
+                            request.userAnswers
+                          )
+                        )
+                    }
+                  } else {
+                    Redirect(
+                      navigator
+                        .nextPage(LandOrPropertyListPage(srn, addLandOrProperty = answer), mode, request.userAnswers)
+                    )
+                  }
+              )
+          }
+      }.merge
+    }
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
