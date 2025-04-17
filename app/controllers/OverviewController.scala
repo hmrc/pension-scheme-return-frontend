@@ -369,7 +369,7 @@ object OverviewController {
 
   def options(startingTaxYear: TaxYear): List[(String, DateRange)] = {
 
-    val taxYears = startingTaxYear.next +: List.iterate(startingTaxYear, 7)(_.previous)
+    val taxYears = startingTaxYear.next +: List.iterate(startingTaxYear, 8)(_.previous)
 
     val taxYearRanges = taxYears.map(DateRange.from).map(r => (r.toString, r))
 
