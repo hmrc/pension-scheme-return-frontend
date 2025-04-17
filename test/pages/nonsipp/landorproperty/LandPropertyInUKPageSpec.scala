@@ -21,9 +21,9 @@ import pages.nonsipp.landorpropertydisposal.{HowWasPropertyDisposedOfPage, LandO
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models._
+import viewmodels.models.SectionJourneyStatus
 import eu.timepit.refined.api.Refined
 import pages.behaviours.PageBehaviours
-import viewmodels.models.SectionJourneyStatus
 
 import java.time.LocalDate
 

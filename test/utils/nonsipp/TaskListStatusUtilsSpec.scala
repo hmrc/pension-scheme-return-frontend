@@ -389,7 +389,6 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
             SectionJourneyStatus.InProgress(secondQuestionPageUrl(index1of5000))
           )
 
-
         val result =
           TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, secondQuestionPageUrl(index1of5000))
