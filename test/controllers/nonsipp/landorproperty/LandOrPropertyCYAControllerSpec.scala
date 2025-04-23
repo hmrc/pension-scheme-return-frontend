@@ -26,13 +26,13 @@ import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models._
+import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
-import viewmodels.models.SectionJourneyStatus
 
 class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
 
@@ -86,12 +86,13 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
 
   private val incompleteUserAnswers = filledUserAnswers
-    .unsafeSet(LandOrPropertyProgress(srn, index),
-        SectionJourneyStatus.InProgress(
-          controllers.nonsipp.landorproperty.routes.LandRegistryTitleNumberController
-            .onPageLoad(srn, refineMV(1), NormalMode)
-            .url
-        )
+    .unsafeSet(
+      LandOrPropertyProgress(srn, index),
+      SectionJourneyStatus.InProgress(
+        controllers.nonsipp.landorproperty.routes.LandRegistryTitleNumberController
+          .onPageLoad(srn, refineMV(1), NormalMode)
+          .url
+      )
     )
 
   "LandOrPropertyCYAController" - {
@@ -137,22 +138,14 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
       )
 
       act.like(
-          redirectToPage(
-            call = onPageLoad(mode),
-            page =
-              controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, page, mode),
-            userAnswers = incompleteUserAnswers,
-            previousUserAnswers = emptyUserAnswers,
-            mockSaveService = Some(mockSaveService)
-          )
-//            .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-//            .after {
-//              MockSaveService.capture(userAnswersCaptor)
-//              userAnswersCaptor.getValue.get(LandOrPropertyHeldPage(srn)) mustEqual Some(true)
-//            }
-            .withName(s"redirect to list page when in $mode mode and incomplete data")
-        )
-
+        redirectToPage(
+          call = onPageLoad(mode),
+          page = controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, page, mode),
+          userAnswers = incompleteUserAnswers,
+          previousUserAnswers = emptyUserAnswers,
+          mockSaveService = Some(mockSaveService)
+        ).withName(s"redirect to list page when in $mode mode and incomplete data")
+      )
 
       act.like(
         redirectToPage(

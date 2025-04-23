@@ -446,7 +446,7 @@ object TaskListStatusUtils {
       )
     } else {
       val wereLandOrPropertiesHeld = userAnswers.get(LandOrPropertyHeldPage(srn))
-      val numRecorded = userAnswers.get(LandOrPropertyCompleted.all(srn)).getOrElse(Map.empty).size
+      val numRecorded = userAnswers.get(LandOrPropertyProgress.all(srn)).getOrElse(Map.empty).count(_._2.completed)
 
       val firstQuestionPageUrl =
         controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController
