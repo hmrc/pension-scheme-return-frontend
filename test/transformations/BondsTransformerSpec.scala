@@ -33,6 +33,7 @@ import controllers.TestValues
 import models.SchemeHoldBond.{Acquisition, Contribution}
 import models.requests.psr._
 import config.Constants.PREPOPULATION_FLAG
+import pages.nonsipp.FbVersionPage
 
 class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
@@ -48,6 +49,24 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
   private val transformer = new BondsTransformer
+  private val bondsWithoutDisposals = Bonds(
+    recordVersion = Some("001"),
+    optBondsWereAdded = Some(true),
+    optBondsWereDisposed = None,
+    bondTransactions = Seq(
+      BondTransactions(
+        prePopulated = Some(false),
+        nameOfBonds = "nameOfBonds",
+        methodOfHolding = Contribution,
+        optDateOfAcqOrContrib = Some(localDate),
+        costOfBonds = money.value,
+        optConnectedPartyStatus = Some(true),
+        bondsUnregulated = false,
+        optTotalIncomeOrReceipts = None, //not coming back from ETMP
+        optBondsDisposed = None
+      )
+    )
+  )
 
   "BondsTransformer - To Etmp" - {
     "should return None when userAnswer is empty" in {
@@ -303,6 +322,56 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswers.get(BondsStillHeldPage(srn, refineMV(1), refineMV(2))) mustBe Some(2)
           userAnswers.get(HowWereBondsDisposedOfPage(srn, refineMV(1), refineMV(3))) mustBe Some(Other("OtherMethod"))
           userAnswers.get(BondsStillHeldPage(srn, refineMV(1), refineMV(3))) mustBe Some(3)
+        }
+      )
+    }
+
+    "should not default total income to zero when prePopulated entity is not yet checked" in {
+      val userAnswers = emptyUserAnswers
+      val result = transformer.transformFromEtmp(
+        userAnswers,
+        srn,
+        bondsWithoutDisposals
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(IncomeFromBondsPage(srn, refineMV(1))) mustBe None
+        }
+      )
+    }
+
+    "should default total income to zero when prePopulated entity is checked" in {
+      val userAnswers = emptyUserAnswers
+      val result = transformer.transformFromEtmp(
+        userAnswers,
+        srn,
+        bondsWithoutDisposals.copy(
+          bondTransactions = bondsWithoutDisposals.bondTransactions.map(_.copy(prePopulated = Some(true)))
+        )
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(IncomeFromBondsPage(srn, refineMV(1))) mustBe Some(moneyZero)
+        }
+      )
+    }
+
+    "should default total income to zero when the version of the return is more than 1" in {
+      val userAnswers = emptyUserAnswers
+        .unsafeSet(FbVersionPage(srn), "002")
+      val result = transformer.transformFromEtmp(
+        userAnswers,
+        srn,
+        bondsWithoutDisposals.copy(
+          bondTransactions = bondsWithoutDisposals.bondTransactions.map(_.copy(prePopulated = Some(true)))
+        )
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(IncomeFromBondsPage(srn, refineMV(1))) mustBe Some(moneyZero)
         }
       )
     }

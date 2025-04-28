@@ -206,21 +206,11 @@ class BondsTransformer @Inject() extends Transformer {
           val costOfBonds = CostOfBondsPage(srn, index) -> Money(bondTransaction.costOfBonds)
           val bondsUnregulated = AreBondsUnregulatedPage(srn, index) -> bondTransaction.bondsUnregulated
 
-          val isBondPrepopulatedFieldPresent = bondTransaction.prePopulated.isDefined
+          val isBondPrepopulatedFieldDefine = bondTransaction.prePopulated.isDefined
           val isFbVersionGreaterThan1 = userAnswers.get(FbVersionPage(srn)).getOrElse(defaultFbVersion).toInt > 1
           val name = nameOfBonds._2 //just for logging
 
-          val shouldDefaultToZeroIfMissing = (isBondPrepopulatedFieldPresent, isFbVersionGreaterThan1) match {
-            case (false, _) =>
-              logger.info(
-                s"bond index: $index, name: $name - record without prePopulated field - should default to zero if missing"
-              )
-              true
-            case (_, true) =>
-              logger.info(
-                s"bond index: $index, name: $name - return with fbVersion greater than 1 - should default to zero if missing"
-              )
-              true
+          val shouldDefaultToZeroIfMissing = (isBondPrepopulatedFieldDefine, isFbVersionGreaterThan1) match {
             case (true, false) if !bondTransaction.prePopulated.get =>
               logger.info(
                 s"bond index: $index, name: $name - entity with prePopulated field," +
@@ -232,6 +222,16 @@ class BondsTransformer @Inject() extends Transformer {
               logger.info(
                 s"bond index: $index, name: $name - entity with prePopulated field," +
                   s" fbVersion less than 1, already checked - should default to zero if missing"
+              )
+              true
+            case (true, true) =>
+              logger.info(
+                s"bond index: $index, name: $name - return with fbVersion greater than 1 - should default to zero if missing"
+              )
+              true
+            case (false, _) =>
+              logger.info(
+                s"bond index: $index, name: $name - record without prePopulated field - should default to zero if missing"
               )
               true
             case _ =>
