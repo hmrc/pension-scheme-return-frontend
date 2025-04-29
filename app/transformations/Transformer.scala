@@ -45,7 +45,10 @@ trait Transformer {
   protected def buildIndexesForMax50(num: Int): Try[List[Max50]] =
     (1 to num).map(i => refineV[OneTo50](i).leftMap(new Exception(_)).toTry).toList.sequence
 
-  protected def shouldDefaultToZeroIfMissing(
+}
+
+object Transformer {
+  def shouldDefaultToZeroIfMissing(
     userAnswers: UserAnswers,
     srn: Srn,
     index: Max5000,
@@ -79,5 +82,4 @@ trait Transformer {
         true
     }
   }
-
 }

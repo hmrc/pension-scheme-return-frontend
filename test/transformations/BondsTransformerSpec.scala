@@ -22,7 +22,6 @@ import play.api.mvc.AnyContentAsEmpty
 import models.HowDisposed.{Other, Sold, Transferred}
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
-import org.scalatest.OptionValues
 import generators.ModelGenerators.allowedAccessRequestGen
 import pages.nonsipp.bondsdisposal._
 import viewmodels.models.SectionCompleted
@@ -34,6 +33,7 @@ import models.SchemeHoldBond.{Acquisition, Contribution}
 import models.requests.psr._
 import config.Constants.PREPOPULATION_FLAG
 import pages.nonsipp.FbVersionPage
+import org.scalatest.OptionValues
 
 class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
@@ -55,7 +55,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
     optBondsWereDisposed = None,
     bondTransactions = Seq(
       BondTransactions(
-        prePopulated = Some(false),
+        prePopulated = None,
         nameOfBonds = "nameOfBonds",
         methodOfHolding = Contribution,
         optDateOfAcqOrContrib = Some(localDate),
@@ -331,7 +331,14 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
       val result = transformer.transformFromEtmp(
         userAnswers,
         srn,
-        bondsWithoutDisposals
+        bondsWithoutDisposals.copy(
+          bondTransactions = bondsWithoutDisposals.bondTransactions.map(
+            _.copy(
+              prePopulated = Some(false),
+              optTotalIncomeOrReceipts = None
+            )
+          )
+        )
       )
       result.fold(
         ex => fail(ex.getMessage),
@@ -347,7 +354,12 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         userAnswers,
         srn,
         bondsWithoutDisposals.copy(
-          bondTransactions = bondsWithoutDisposals.bondTransactions.map(_.copy(prePopulated = Some(true)))
+          bondTransactions = bondsWithoutDisposals.bondTransactions.map(
+            _.copy(
+              prePopulated = Some(true),
+              optTotalIncomeOrReceipts = None
+            )
+          )
         )
       )
       result.fold(
@@ -365,7 +377,12 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         userAnswers,
         srn,
         bondsWithoutDisposals.copy(
-          bondTransactions = bondsWithoutDisposals.bondTransactions.map(_.copy(prePopulated = Some(true)))
+          bondTransactions = bondsWithoutDisposals.bondTransactions.map(
+            _.copy(
+              prePopulated = Some(true),
+              optTotalIncomeOrReceipts = None
+            )
+          )
         )
       )
       result.fold(

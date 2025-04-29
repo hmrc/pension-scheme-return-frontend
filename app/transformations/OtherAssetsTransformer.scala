@@ -17,6 +17,7 @@
 package transformations
 
 import pages.nonsipp.otherassetsdisposal._
+import transformations.Transformer.shouldDefaultToZeroIfMissing
 import config.RefinedTypes.{Max5000, OneTo50, OneTo5000}
 import models.SchemeId.Srn
 import cats.implicits.catsSyntaxTuple2Semigroupal
@@ -33,6 +34,7 @@ import utils.nonsipp.PrePopulationUtils.isPrePopulation
 import models.requests.psr.{OtherAssetDisposed, OtherAssetTransaction, OtherAssets}
 import models.UserAnswers.implicits.UserAnswersTryOps
 import pages.nonsipp.otherassetsheld.Paths.otherAssets
+import play.api.Logger
 import uk.gov.hmrc.domain.Nino
 import models._
 import models.SchemeHoldAsset.{Acquisition, Transfer}
@@ -44,6 +46,7 @@ import javax.inject.Inject
 
 @Singleton()
 class OtherAssetsTransformer @Inject() extends Transformer {
+  private implicit val logger: Logger = Logger(getClass)
 
   def transformToEtmp(
     srn: Srn,
@@ -467,9 +470,23 @@ class OtherAssetsTransformer @Inject() extends Transformer {
           val optMovableSchedule29A = otherAssetTransaction.optMovableSchedule29A.map(
             movableSchedule29A => IsAssetTangibleMoveablePropertyPage(srn, index) -> movableSchedule29A
           )
-          val optTotalIncomeOrReceipts = otherAssetTransaction.optTotalIncomeOrReceipts.map(
-            totalIncomeOrReceipts => IncomeFromAssetPage(srn, index) -> Money(totalIncomeOrReceipts)
-          )
+          val optTotalIncomeOrReceipts =
+            if (otherAssetTransaction.optTotalIncomeOrReceipts.isEmpty &&
+              shouldDefaultToZeroIfMissing(
+                userAnswers = userAnswers,
+                srn = srn,
+                index = index,
+                transactionPrepopulated = otherAssetTransaction.prePopulated,
+                nameToLog = assetDescription._2
+              )) {
+              logger.info(s"other asset index: $index, name: ${assetDescription._2} - defaulting to zero")
+              Some(IncomeFromAssetPage(srn, index) -> Money(0))
+            } else {
+              logger.info(s"other asset index: $index, name: ${assetDescription._2} - defaulting to zero")
+              otherAssetTransaction.optTotalIncomeOrReceipts.map(
+                totalIncomeOrReceipts => IncomeFromAssetPage(srn, index) -> Money(totalIncomeOrReceipts)
+              )
+            }
 
           val optDateOfAcqOrContrib = otherAssetTransaction.optDateOfAcqOrContrib.map(
             date => WhenDidSchemeAcquireAssetsPage(srn, index) -> date
