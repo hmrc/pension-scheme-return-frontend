@@ -51,6 +51,7 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
           "psaId" -> psaId.value
         )
       )
+      .transform(_.withRequestTimeout(appConfig.ifsTimeout))
       .execute[Option[SchemeDetails]]
       .tapError { t =>
         Future.successful(
@@ -71,6 +72,7 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
           "srn" -> schemeId.value
         )
       )
+      .transform(_.withRequestTimeout(appConfig.ifsTimeout))
       .execute[Option[SchemeDetails]]
       .tapError { t =>
         Future.successful(

@@ -237,7 +237,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
         }
       }
 
-  def getOverview(pstr: String, fromDate: String, toDate: String, srn: Srn)(
+  def getOverview(pstr: String, fromDate: String, toDate: String, srn: Srn, fallBackCall: Call)(
     implicit request: AllowedAccessRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext
@@ -269,7 +269,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
             logger.warn(
               s"getOverview for $pstr and $fromDate - $toDate returned http response ${response.status} - returning empty Seq"
             )
-            None
+            throw GetPsrException(s"${response.body}", fallBackCall.url, AnswersSavedDisplayVersion.NoDisplay)
         }
       }
   }

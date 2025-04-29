@@ -407,12 +407,20 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
         ok(Json.stringify(overviewJson)).withHeader("srn", "S0000000042")
       )
 
-      val result = connector.getOverview(commonPstr, commonStartDate, commonEndDate, Srn(commonSrn).get).futureValue
+      val result = connector
+        .getOverview(
+          commonPstr,
+          commonStartDate,
+          commonEndDate,
+          Srn(commonSrn).get,
+          controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)
+        )
+        .futureValue
 
       result mustBe Some(overviewResponse)
     }
 
-    "return no overview details when 403" in runningApplication { implicit app =>
+    "throw GetPsrException when no overview details" in runningApplication { implicit app =>
       stubGet(
         getOverviewUrl,
         Map(
@@ -422,9 +430,19 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
         forbidden().withBody(Json.stringify(overviewJson)).withHeader("srn", "S0000000042")
       )
 
-      val result = connector.getOverview(commonPstr, commonEndDate, commonStartDate, Srn(commonSrn).get).futureValue
+      val err: TestFailedException = intercept[TestFailedException](
+        connector
+          .getOverview(
+            commonPstr,
+            commonEndDate,
+            commonStartDate,
+            Srn(commonSrn).get,
+            controllers.routes.OverviewController.onPageLoad(Srn(commonSrn).get)
+          )
+          .futureValue
+      )
 
-      result mustBe None
+      err.cause.get mustBe a[GetPsrException]
     }
   }
 }
