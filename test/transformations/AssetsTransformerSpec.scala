@@ -85,10 +85,10 @@ class AssetsTransformerSpec
         .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
         .unsafeSet(OtherAssetsHeldPage(srn), true)
 
-      when(mockLandOrPropertyTransformer.transformToEtmp(any(), any(), any())(any())).thenReturn(None)
+      when(mockLandOrPropertyTransformer.transformToEtmp(any(), any(), any(), any())(any())).thenReturn(None)
       when(mockBorrowingTransformer.transformToEtmp(any(), any(), any())(any())).thenReturn(None)
-      when(mockBondsTransformer.transformToEtmp(any(), any(), any())(any())).thenReturn(None)
-      when(mockOtherAssetsTransformer.transformToEtmp(any(), any(), any())(any())).thenReturn(None)
+      when(mockBondsTransformer.transformToEtmp(any(), any(), any(), any())(any())).thenReturn(None)
+      when(mockOtherAssetsTransformer.transformToEtmp(any(), any(), any(), any())(any())).thenReturn(None)
 
       val result = transformer.transformToEtmp(srn, defaultUserAnswers)(DataRequest(allowedAccessRequest, userAnswers))
       result mustBe Some(Assets(optLandOrProperty = None, optBorrowing = None, optBonds = None, optOtherAssets = None))
@@ -98,11 +98,11 @@ class AssetsTransformerSpec
       val userAnswers = emptyUserAnswers
         .unsafeSet(LandPropertyInUKPage(srn, index), true)
 
-      when(mockLandOrPropertyTransformer.transformToEtmp(any(), any(), any())(any()))
+      when(mockLandOrPropertyTransformer.transformToEtmp(any(), any(), any(), any())(any()))
         .thenReturn(Some(prePopulatedLandOrProperty))
       when(mockBorrowingTransformer.transformToEtmp(any(), any(), any())(any())).thenReturn(None)
-      when(mockBondsTransformer.transformToEtmp(any(), any(), any())(any())).thenReturn(None)
-      when(mockOtherAssetsTransformer.transformToEtmp(any(), any(), any())(any())).thenReturn(None)
+      when(mockBondsTransformer.transformToEtmp(any(), any(), any(), any())(any())).thenReturn(None)
+      when(mockOtherAssetsTransformer.transformToEtmp(any(), any(), any(), any())(any())).thenReturn(None)
 
       val result = transformer.transformToEtmp(srn, defaultUserAnswers)(DataRequest(allowedAccessRequest, userAnswers))
       result must not be None

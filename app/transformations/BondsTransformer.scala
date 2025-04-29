@@ -44,13 +44,18 @@ import javax.inject.Inject
 class BondsTransformer @Inject() extends Transformer {
   private val logger = Logger(getClass)
 
-  def transformToEtmp(srn: Srn, optUnregulatedOrConnectedBondsHeld: Option[Boolean], initialUA: UserAnswers)(
+  def transformToEtmp(
+    srn: Srn,
+    optUnregulatedOrConnectedBondsHeld: Option[Boolean],
+    initialUA: UserAnswers,
+    isSubmitted: Boolean = false
+  )(
     implicit request: DataRequest[_]
   ): Option[Bonds] =
     if (optUnregulatedOrConnectedBondsHeld.nonEmpty || request.userAnswers.map(NameOfBondsPages(srn)).toList.nonEmpty) {
       val optBondsDisposal = request.userAnswers.get(BondsDisposalPage(srn))
       val disposal =
-        if (isPrePopulation && optBondsDisposal.isEmpty) {
+        if (isPrePopulation && optBondsDisposal.isEmpty && !isSubmitted) {
           None // allow None only in pre-population
         } else {
           Option(optBondsDisposal.getOrElse(false))

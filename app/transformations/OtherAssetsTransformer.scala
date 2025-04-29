@@ -45,13 +45,18 @@ import javax.inject.Inject
 @Singleton()
 class OtherAssetsTransformer @Inject() extends Transformer {
 
-  def transformToEtmp(srn: Srn, optOtherAssetsHeld: Option[Boolean], initialUA: UserAnswers)(
+  def transformToEtmp(
+    srn: Srn,
+    optOtherAssetsHeld: Option[Boolean],
+    initialUA: UserAnswers,
+    isSubmitted: Boolean = false
+  )(
     implicit request: DataRequest[_]
   ): Option[OtherAssets] =
     Option.when(optOtherAssetsHeld.nonEmpty || request.userAnswers.map(OtherAssetsCompleted.all(srn)).toList.nonEmpty) {
       val optDisposeAnyOtherAsset = request.userAnswers.get(OtherAssetsDisposalPage(srn))
       val dispose =
-        if (isPrePopulation && optDisposeAnyOtherAsset.isEmpty) {
+        if (isPrePopulation && optDisposeAnyOtherAsset.isEmpty && !isSubmitted) {
           None // allow None only in pre-population
         } else {
           Option(optDisposeAnyOtherAsset.getOrElse(false))

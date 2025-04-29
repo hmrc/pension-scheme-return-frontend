@@ -93,7 +93,7 @@ class PsrSubmissionService @Inject()(
                       minimalRequiredSubmission = minimalRequiredSubmission,
                       checkReturnDates = checkReturnDates,
                       loans = loansTransformer.transformToEtmp(srn, initialUA),
-                      assets = assetsTransformer.transformToEtmp(srn, initialUA),
+                      assets = assetsTransformer.transformToEtmp(srn, initialUA, isSubmitted),
                       membersPayments = memberPaymentsTransformer
                         .transformToEtmp(srn, currentUA, initialUA, request.previousUserAnswers),
                       shares = sharesTransformer.transformToEtmp(srn, initialUA),
