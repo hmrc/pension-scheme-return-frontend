@@ -38,7 +38,7 @@ class AssetsTransformer @Inject()(
   otherAssetsTransformer: OtherAssetsTransformer
 ) extends Transformer {
 
-  def transformToEtmp(srn: Srn, initialUA: UserAnswers)(
+  def transformToEtmp(srn: Srn, initialUA: UserAnswers, isSubmitted: Boolean = false)(
     implicit request: DataRequest[_]
   ): Option[Assets] = {
     val optLandOrPropertyHeld = request.userAnswers.get(LandOrPropertyHeldPage(srn))
@@ -63,10 +63,11 @@ class AssetsTransformer @Inject()(
       )
     )(
       Assets(
-        optLandOrProperty = landOrPropertyTransformer.transformToEtmp(srn, optLandOrPropertyHeld, initialUA),
+        optLandOrProperty =
+          landOrPropertyTransformer.transformToEtmp(srn, optLandOrPropertyHeld, initialUA, isSubmitted),
         optBorrowing = borrowingTransformer.transformToEtmp(srn, optMoneyWasBorrowed, initialUA),
-        optBonds = bondsTransformer.transformToEtmp(srn, optUnregulatedOrConnectedBondsHeld, initialUA),
-        optOtherAssets = otherAssetsTransformer.transformToEtmp(srn, optOtherAssetsHeld, initialUA)
+        optBonds = bondsTransformer.transformToEtmp(srn, optUnregulatedOrConnectedBondsHeld, initialUA, isSubmitted),
+        optOtherAssets = otherAssetsTransformer.transformToEtmp(srn, optOtherAssetsHeld, initialUA, isSubmitted)
       )
     )
   }

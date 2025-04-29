@@ -45,13 +45,18 @@ import javax.inject.Inject
 @Singleton()
 class LandOrPropertyTransformer @Inject() extends Transformer {
 
-  def transformToEtmp(srn: Srn, optLandOrPropertyHeld: Option[Boolean], initialUA: UserAnswers)(
+  def transformToEtmp(
+    srn: Srn,
+    optLandOrPropertyHeld: Option[Boolean],
+    initialUA: UserAnswers,
+    isSubmitted: Boolean = false
+  )(
     implicit request: DataRequest[_]
   ): Option[LandOrProperty] =
     Option.when(optLandOrPropertyHeld.nonEmpty || request.userAnswers.map(LandPropertyInUKPages(srn)).toList.nonEmpty) {
       val optDisposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn))
       val dispose =
-        if (isPrePopulation && optDisposeAnyLandOrProperty.isEmpty) {
+        if (isPrePopulation && optDisposeAnyLandOrProperty.isEmpty && !isSubmitted) {
           None // allow None only in pre-population
         } else {
           Option(optDisposeAnyLandOrProperty.getOrElse(false))

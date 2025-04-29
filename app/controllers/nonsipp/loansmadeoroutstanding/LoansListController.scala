@@ -21,7 +21,7 @@ import play.api.mvc._
 import com.google.inject.Inject
 import utils.ListUtils.ListOps
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
-import cats.implicits.{toShow, toTraverseOps, _}
+import cats.implicits.{toShow, _}
 import _root_.config.Constants.maxLoans
 import forms.YesNoPageFormProvider
 import pages.nonsipp.loansmadeoroutstanding._
