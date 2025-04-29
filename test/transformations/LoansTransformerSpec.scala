@@ -793,9 +793,13 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           userAnswers.get(DatePeriodLoanPage(srn, refineMV(1))) mustBe Some(
             (localDate, Money(Double.MinPositiveValue), Int.MaxValue)
           )
-          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))) mustBe Some(partialAmountOfTheLoan)
+          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))) mustBe Some(
+            AmountOfTheLoan(money, Some(Money(0.0)), Some(Money(0.0)))
+          )
           userAnswers.get(AreRepaymentsInstalmentsPage(srn, refineMV(1))) mustBe Some(false)
-          userAnswers.get(InterestOnLoanPage(srn, refineMV(1))) mustBe Some(partialInterestOnLoan)
+          userAnswers.get(InterestOnLoanPage(srn, refineMV(1))) mustBe Some(
+            InterestOnLoan(money, percentage, Some(Money(0.0)))
+          )
           userAnswers.get(SecurityGivenForLoanPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes(security))
         }
       )

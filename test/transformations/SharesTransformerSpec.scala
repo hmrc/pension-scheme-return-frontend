@@ -627,13 +627,13 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           userAnswers.get(DidSchemeHoldAnySharesPage(srn)) mustBe None
 
           // share-index-1
-          userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe None
+          userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe Some(Money(0.0))
 
           // share-index-2
-          userAnswers.get(SharesTotalIncomePage(srn, refineMV(2))) mustBe None
+          userAnswers.get(SharesTotalIncomePage(srn, refineMV(2))) mustBe Some(Money(0.0))
 
           // share-index-3
-          userAnswers.get(SharesTotalIncomePage(srn, refineMV(3))) mustBe None
+          userAnswers.get(SharesTotalIncomePage(srn, refineMV(3))) mustBe Some(Money(0.0))
         }
       )
     }
