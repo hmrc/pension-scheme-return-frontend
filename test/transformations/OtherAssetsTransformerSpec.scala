@@ -57,6 +57,36 @@ class OtherAssetsTransformerSpec
 
   private val transformer = new OtherAssetsTransformer
 
+  def otherAssetsBlankTotalIncome(prePopulated: Option[Boolean], recordVersion: Option[String]): OtherAssets =
+    OtherAssets(
+      recordVersion = recordVersion,
+      optOtherAssetsWereHeld = Some(true),
+      optOtherAssetsWereDisposed = Some(false),
+      otherAssetTransactions = Seq(
+        OtherAssetTransaction(
+          prePopulated = prePopulated,
+          assetDescription = "assetDescription",
+          methodOfHolding = Acquisition,
+          optDateOfAcqOrContrib = Some(localDate),
+          costOfAsset = money.value,
+          optPropertyAcquiredFromName = Some("PropertyAcquiredFromName"),
+          optPropertyAcquiredFrom = Some(
+            PropertyAcquiredFrom(
+              identityType = IdentityType.Other,
+              idNumber = None,
+              reasonNoIdNumber = None,
+              otherDescription = Some("otherDescription")
+            )
+          ),
+          optConnectedStatus = Some(true),
+          optIndepValuationSupport = Some(false),
+          optMovableSchedule29A = Some(true),
+          optTotalIncomeOrReceipts = None,
+          optOtherAssetDisposed = None
+        )
+      )
+    )
+
   "OtherAssetsTransformer - To Etmp" - {
     "should return None when userAnswer is empty" in {
 
@@ -581,5 +611,46 @@ class OtherAssetsTransformerSpec
       )
     }
 
+    "should not default total income to zero when prePopulated entity is not yet checked" in {
+      val result = transformer.transformFromEtmp(
+        emptyUserAnswers,
+        srn,
+        otherAssetsBlankTotalIncome(prePopulated = Some(false), recordVersion = Some("001"))
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(IncomeFromAssetPage(srn, refineMV(1))) mustBe None
+        }
+      )
+    }
+
+    "should default total income to zero when prePopulated entity is checked" in {
+      val result = transformer.transformFromEtmp(
+        emptyUserAnswers,
+        srn,
+        otherAssetsBlankTotalIncome(prePopulated = Some(true), recordVersion = Some("001"))
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(IncomeFromAssetPage(srn, refineMV(1))) mustBe Some(Money(0))
+        }
+      )
+    }
+
+    "should default total income to zero when the version of the return is more than 1" in {
+      val result = transformer.transformFromEtmp(
+        emptyUserAnswers,
+        srn,
+        otherAssetsBlankTotalIncome(prePopulated = None, recordVersion = Some("002"))
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(IncomeFromAssetPage(srn, refineMV(1))) mustBe Some(Money(0))
+        }
+      )
+    }
   }
 }
