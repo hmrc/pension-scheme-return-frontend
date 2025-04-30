@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
+// loans.loanTransactions.arrearsPrevYears
+
 package transformations
 
 import com.google.inject.Singleton
 import models.IdentityType.reads
+import transformations.Transformer.shouldDefaultToZeroIfMissing
 import config.RefinedTypes.OneTo5000
 import models.SchemeId.Srn
 import cats.implicits.{catsSyntaxTuple2Semigroupal, catsSyntaxTuple3Semigroupal}
-import uk.gov.hmrc.domain.Nino
 import models._
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
@@ -32,6 +34,8 @@ import utils.nonsipp.PrePopulationUtils.isPrePopulation
 import models.requests.psr._
 import models.RecipientDetails.format
 import eu.timepit.refined.refineV
+import play.api.Logger
+import uk.gov.hmrc.domain.Nino
 import models.SponsoringOrConnectedParty.ConnectedParty
 import models.requests.DataRequest
 
@@ -41,6 +45,7 @@ import javax.inject.Inject
 
 @Singleton()
 class LoansTransformer @Inject() extends Transformer {
+  private implicit val logger: Logger = Logger(getClass)
 
   private type OptionalRecipientDetails = Option[(String, RecipientIdentityType, Boolean, Option[String])]
 
@@ -390,7 +395,14 @@ class LoansTransformer @Inject() extends Transformer {
           }
         )
         .map(
-          index =>
+          index => {
+            logger.info(
+              s"loan index: $index, name: ${loanTransactions(index.value - 1).loanRecipientName} optCapRepaymentCY not empty - NOT defaulting to zero"
+            )
+            logger.info(
+              s"loan index: $index, name: ${loanTransactions(index.value - 1).loanRecipientName} optAmountOutstanding not empty -NOT defaulting to zero"
+            )
+
             AmountOfTheLoanPage(srn, index) -> {
               AmountOfTheLoan(
                 Money(loanTransactions(index.value - 1).loanAmountDetails.loanAmount),
@@ -398,6 +410,7 @@ class LoansTransformer @Inject() extends Transformer {
                 Some(Money(loanTransactions(index.value - 1).loanAmountDetails.optAmountOutstanding.get))
               )
             }
+          }
         )
       partialLoanAmount = indexes
         .filter(
@@ -407,14 +420,51 @@ class LoansTransformer @Inject() extends Transformer {
           }
         )
         .map(
-          index =>
+          index => {
+            val loanTransaction = loanTransactions(index.value - 1)
+            val shouldDefaultToZero = shouldDefaultToZeroIfMissing(
+              userAnswers = userAnswers,
+              srn = srn,
+              index = index,
+              transactionPrepopulated = loanTransaction.prePopulated,
+              nameToLog = loanTransaction.loanRecipientName
+            )
+
+            val optCapRepaymentCY =
+              if (shouldDefaultToZero) {
+                logger.info(
+                  s"loan index: $index, name: ${loanTransaction.loanRecipientName} optCapRepaymentCY empty - defaulting to zero"
+                )
+                Some(Money(0))
+              } else {
+                logger.info(
+                  s"loan index: $index, name: ${loanTransaction.loanRecipientName} optCapRepaymentCY empty - NOT defaulting to zero"
+                )
+                loanTransaction.loanAmountDetails.optCapRepaymentCY
+                  .map(t => Money(t))
+              }
+
+            val optAmountOutstanding =
+              if (shouldDefaultToZero) {
+                logger.info(
+                  s"loan index: $index, name: ${loanTransaction.loanRecipientName} optAmountOutstanding empty - defaulting to zero"
+                )
+                Some(Money(0))
+              } else {
+                logger.info(
+                  s"loan index: $index, name: ${loanTransaction.loanRecipientName} optAmountOutstanding empty - NOT defaulting to zero"
+                )
+                loanTransaction.loanAmountDetails.optAmountOutstanding
+                  .map(t => Money(t))
+              }
             AmountOfTheLoanPage(srn, index) -> {
               AmountOfTheLoan(
                 Money(loanTransactions(index.value - 1).loanAmountDetails.loanAmount),
-                None,
-                None
+                optCapRepaymentCY,
+                optAmountOutstanding
               )
             }
+          }
         )
       equalInstallments = indexes.map(
         index => AreRepaymentsInstalmentsPage(srn, index) -> loanTransactions(index.value - 1).equalInstallments
@@ -426,7 +476,10 @@ class LoansTransformer @Inject() extends Transformer {
           }
         )
         .map(
-          index =>
+          index => {
+            logger.info(
+              s"loan index: $index, name: ${loanTransactions(index.value - 1).loanRecipientName} optIntReceivedCY not empty - NOT defaulting to zero"
+            )
             InterestOnLoanPage(srn, index) -> {
               InterestOnLoan(
                 Money(loanTransactions(index.value - 1).loanInterestDetails.loanInterestAmount),
@@ -434,6 +487,7 @@ class LoansTransformer @Inject() extends Transformer {
                 Some(Money(loanTransactions(index.value - 1).loanInterestDetails.optIntReceivedCY.get))
               )
             }
+          }
         )
       partialLoanInterest = indexes
         .filter(
@@ -442,14 +496,37 @@ class LoansTransformer @Inject() extends Transformer {
           }
         )
         .map(
-          index =>
+          index => {
+            val loanTransaction = loanTransactions(index.value - 1)
+            val shouldDefaultToZero = shouldDefaultToZeroIfMissing(
+              userAnswers = userAnswers,
+              srn = srn,
+              index = index,
+              transactionPrepopulated = loanTransaction.prePopulated,
+              nameToLog = loanTransaction.loanRecipientName
+            )
+
+            val optIntReceivedCY =
+              if (shouldDefaultToZero) {
+                logger.info(
+                  s"loan index: $index, name: ${loanTransaction.loanRecipientName} optIntReceivedCY empty - defaulting to zero"
+                )
+                Some(Money(0))
+              } else {
+                logger.info(
+                  s"loan index: $index, name: ${loanTransaction.loanRecipientName} optIntReceivedCY empty - NOT defaulting to zero"
+                )
+                None
+              }
+
             InterestOnLoanPage(srn, index) -> {
               InterestOnLoan(
                 Money(loanTransactions(index.value - 1).loanInterestDetails.loanInterestAmount),
                 Percentage(loanTransactions(index.value - 1).loanInterestDetails.loanInterestRate),
-                None
+                optIntReceivedCY
               )
             }
+          }
         )
       securityGiven = indexes
         .filter(
@@ -490,9 +567,13 @@ class LoansTransformer @Inject() extends Transformer {
           }
         )
         .map(
-          index =>
+          index => {
+            logger.info(
+              s"loan index: $index, name: ${loanTransactions(index.value - 1).loanRecipientName} optOutstandingArrearsOnLoan not empty - NOT defaulting to zero"
+            )
             OutstandingArrearsOnLoanPage(srn, index) -> ConditionalYesNo
               .yes[Unit, Money](Money(loanTransactions(index.value - 1).optOutstandingArrearsOnLoan.get))
+          }
         )
       noOutstandingArrearsOnLoan = indexes
         .filter(
@@ -501,7 +582,31 @@ class LoansTransformer @Inject() extends Transformer {
           }
         )
         .map(
-          index => OutstandingArrearsOnLoanPage(srn, index) -> ConditionalYesNo.no[Unit, Money](())
+          index => {
+            val loanTransaction = loanTransactions(index.value - 1)
+            val shouldDefaultToZero = shouldDefaultToZeroIfMissing(
+              userAnswers = userAnswers,
+              srn = srn,
+              index = index,
+              transactionPrepopulated = loanTransaction.prePopulated,
+              nameToLog = loanTransaction.loanRecipientName
+            )
+
+            val optOutstandingArrearsOnLoan =
+              if (loanTransaction.optArrearsPrevYears.contains(true) && shouldDefaultToZero) {
+                logger.info(
+                  s"loan index: $index, name: ${loanTransaction.loanRecipientName} optOutstandingArrearsOnLoan empty - defaulting to zero"
+                )
+                ConditionalYesNo.yes[Unit, Money](Money(0))
+              } else {
+                logger.info(
+                  s"loan index: $index, name: ${loanTransaction.loanRecipientName} optOutstandingArrearsOnLoan empty - NOT defaulting to zero"
+                )
+                ConditionalYesNo.no[Unit, Money](())
+              }
+
+            OutstandingArrearsOnLoanPage(srn, index) -> optOutstandingArrearsOnLoan
+          }
         )
       loanCompleted = indexes.map(
         index => LoanCompleted(srn, index) -> SectionCompleted

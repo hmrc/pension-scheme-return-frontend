@@ -16,12 +16,10 @@
 
 package transformations
 
-import models.SchemeHoldLandProperty.{Acquisition, Transfer}
 import config.RefinedTypes.{Max5000, OneTo50, OneTo5000}
 import pages.nonsipp.landorproperty._
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import eu.timepit.refined.refineV
-import uk.gov.hmrc.domain.Nino
 import models._
 import pages.nonsipp.common._
 import models.IdentitySubject.LandOrPropertySeller
@@ -30,12 +28,16 @@ import models.requests.DataRequest
 import eu.timepit.refined.api.Refined
 import models.HowDisposed.{HowDisposed, Other, Sold}
 import com.google.inject.Singleton
+import models.SchemeHoldLandProperty.{Acquisition, Transfer}
+import transformations.Transformer.shouldDefaultToZeroIfMissing
 import pages.nonsipp.landorproperty.Paths.landOrProperty
 import models.SchemeId.Srn
 import utils.nonsipp.PrePopulationUtils.isPrePopulation
 import models.requests.psr._
 import pages.nonsipp.landorpropertydisposal._
 import models.UserAnswers.implicits.UserAnswersTryOps
+import play.api.Logger
+import uk.gov.hmrc.domain.Nino
 
 import scala.util.Try
 
@@ -44,6 +46,7 @@ import javax.inject.Inject
 
 @Singleton()
 class LandOrPropertyTransformer @Inject() extends Transformer {
+  private implicit val logger: Logger = Logger(getClass)
 
   def transformToEtmp(
     srn: Srn,
@@ -148,8 +151,9 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
       indexes <- buildIndexesForMax5000(landOrPropertyTransactions.size)
       resultUA <- indexes.foldLeft(userAnswersWithRecordVersion) {
         case (ua, index) =>
-          val propertyDetails = landOrPropertyTransactions(index.value - 1).propertyDetails
-          val heldPropertyTransaction = landOrPropertyTransactions(index.value - 1).heldPropertyTransaction
+          val transaction = landOrPropertyTransactions(index.value - 1)
+          val propertyDetails = transaction.propertyDetails
+          val heldPropertyTransaction = transaction.heldPropertyTransaction
 
           val landOrPropertyInUK = LandPropertyInUKPage(srn, index) -> propertyDetails.landOrPropertyInUK
           val addressDetails = LandOrPropertyChosenAddressPage(srn, index) -> propertyDetails.addressDetails
@@ -165,9 +169,28 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
           val optLandOrPropertyLeased = heldPropertyTransaction.optLandOrPropertyLeased.map(
             isLandOrPropertyLeased => IsLandPropertyLeasedPage(srn, index) -> isLandOrPropertyLeased
           )
-          val optTotalIncomeOrReceipts = heldPropertyTransaction.optTotalIncomeOrReceipts.map(
-            totalIncomeOrReceipts => LandOrPropertyTotalIncomePage(srn, index) -> Money(totalIncomeOrReceipts)
-          )
+          val optTotalIncomeOrReceipts =
+            if (heldPropertyTransaction.optTotalIncomeOrReceipts.isEmpty &&
+              shouldDefaultToZeroIfMissing(
+                userAnswers = userAnswers,
+                srn = srn,
+                index = index,
+                transactionPrepopulated = transaction.prePopulated,
+                nameToLog = addressDetails._2.addressLine1
+              )) {
+              logger.info(
+                s"land or property index: $index, name: ${addressDetails._2.addressLine1} addressLine1 - defaulting to zero"
+              )
+              Some(LandOrPropertyTotalIncomePage(srn, index) -> Money(0))
+            } else {
+              logger.info(
+                s"land or property: $index, name: ${addressDetails._2.addressLine1} addressLine1 - defaulting to zero"
+              )
+              heldPropertyTransaction.optTotalIncomeOrReceipts.map(
+                totalIncomeOrReceipts => LandOrPropertyTotalIncomePage(srn, index) -> Money(totalIncomeOrReceipts)
+              )
+            }
+
           val optDateOfAcquisitionOrContribution = heldPropertyTransaction.dateOfAcquisitionOrContribution.map(
             date => LandOrPropertyWhenDidSchemeAcquirePage(srn, index) -> date
           )
@@ -246,14 +269,36 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
           val optLeaseTuple = heldPropertyTransaction.optLeaseDetails.map(
             leaseDetails => {
               val ldp = LandOrPropertyLeaseDetailsPage(srn, index) ->
-                leaseDetails.optLesseeName.map(
-                  lesseeName =>
-                    (
-                      lesseeName,
-                      Money(leaseDetails.optAnnualLeaseAmount.get.doubleValue), // assume it is present when name is present
-                      leaseDetails.optLeaseGrantDate.get
-                    )
-                )
+                leaseDetails.optLesseeName.map(lesseeName => {
+                  val optAnnualLeaseAmount = leaseDetails.optAnnualLeaseAmount
+
+                  val annualLeaseAmount =
+                    if (optAnnualLeaseAmount.isEmpty &&
+                      shouldDefaultToZeroIfMissing(
+                        userAnswers = userAnswers,
+                        srn = srn,
+                        index = index,
+                        transactionPrepopulated = transaction.prePopulated,
+                        nameToLog = addressDetails._2.addressLine1
+                      )) {
+                      logger.info(
+                        s"land or property index: $index, name: ${addressDetails._2.addressLine1} optAnnualLeaseAmount - defaulting to zero"
+                      )
+                      Money(0)
+                    } else {
+                      logger.info(
+                        s"land or property index: $index, name: ${addressDetails._2.addressLine1} optAnnualLeaseAmount - defaulting to zero"
+                      )
+                      Money(optAnnualLeaseAmount.get)
+                    }
+
+                  (
+                    lesseeName,
+                    annualLeaseAmount, // assume it is present when name is present
+                    leaseDetails.optLeaseGrantDate.get
+                  )
+                })
+
               val leaseConnectedParty = IsLesseeConnectedPartyPage(srn, index) ->
                 leaseDetails.optConnectedPartyStatus
 
@@ -322,7 +367,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
               index,
               srn,
               ua23,
-              landOrPropertyTransactions(index.value - 1).optDisposedPropertyTransaction,
+              transaction.optDisposedPropertyTransaction,
               landOrProperty.optDisposeAnyLandOrProperty
             )
           }

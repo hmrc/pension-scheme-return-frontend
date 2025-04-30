@@ -19,6 +19,7 @@ package transformations
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.shares._
 import com.google.inject.Singleton
+import transformations.Transformer.shouldDefaultToZeroIfMissing
 import config.RefinedTypes.{Max5000, OneTo50, OneTo5000}
 import models.SchemeHoldShare.{Acquisition, Transfer}
 import cats.implicits.catsSyntaxTuple2Semigroupal
@@ -36,6 +37,7 @@ import models.SchemeId.Srn
 import utils.nonsipp.PrePopulationUtils.isPrePopulation
 import models.requests.psr._
 import models.UserAnswers.implicits.UserAnswersTryOps
+import play.api.Logger
 import uk.gov.hmrc.domain.Nino
 import models.HowSharesDisposed._
 
@@ -45,6 +47,7 @@ import javax.inject.Inject
 
 @Singleton()
 class SharesTransformer @Inject() extends Transformer {
+  private implicit val logger: Logger = Logger(getClass)
 
   def transformToEtmp(
     srn: Srn,
@@ -580,6 +583,28 @@ class SharesTransformer @Inject() extends Transformer {
                 totalAssetValue => TotalAssetValuePage(srn, index) -> Money(totalAssetValue)
               )
 
+              val optTotalDividendsOrReceipts =
+                if (heldSharesTransaction.optTotalDividendsOrReceipts.isEmpty &&
+                  shouldDefaultToZeroIfMissing(
+                    userAnswers = userAnswers,
+                    srn = srn,
+                    index = index,
+                    transactionPrepopulated = shareTransaction.prePopulated,
+                    nameToLog = shareTransaction.shareIdentification.nameOfSharesCompany
+                  )) {
+                  logger.info(
+                    s"shares index: $index, name: ${shareTransaction.shareIdentification.nameOfSharesCompany} optTotalDividendsOrReceipts - defaulting to zero"
+                  )
+                  Some(SharesTotalIncomePage(srn, index) -> Money(0))
+                } else {
+                  logger.info(
+                    s"shares index: $index, name: ${shareTransaction.shareIdentification.nameOfSharesCompany} optTotalDividendsOrReceipts - defaulting to zero"
+                  )
+                  heldSharesTransaction.optTotalDividendsOrReceipts.map(
+                    totalDividendsOrReceipts => SharesTotalIncomePage(srn, index) -> Money(totalDividendsOrReceipts)
+                  )
+                }
+
               val triedUA = for {
                 ua0 <- ua
                 ua1 <- ua0.set(TypeOfSharesHeldPage(srn, index), typeOfSharesHeld)
@@ -604,9 +629,7 @@ class SharesTransformer @Inject() extends Transformer {
                   heldSharesTransaction.supportedByIndepValuation
                 )
                 ua19 <- optTotalAssetValue.map(t => ua18.set(t._1, t._2)).getOrElse(Try(ua18))
-                ua20 <- heldSharesTransaction.optTotalDividendsOrReceipts
-                  .map(t => ua19.set(SharesTotalIncomePage(srn, index), Money(t)))
-                  .getOrElse(Try(ua19))
+                ua20 <- optTotalDividendsOrReceipts.map(t => ua19.set(t._1, t._2)).getOrElse(Try(ua19))
                 ua21 <- ua20.set(SharesCompleted(srn, index), SectionCompleted)
                 ua22 <- shareTransaction.prePopulated
                   .map(p => ua21.set(SharePrePopulated(srn, index), p))

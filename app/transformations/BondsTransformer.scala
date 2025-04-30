@@ -18,8 +18,10 @@ package transformations
 
 import pages.nonsipp.bonds._
 import pages.nonsipp.bonds.Paths.bonds
+import transformations.Transformer.shouldDefaultToZeroIfMissing
 import models.SchemeId.Srn
 import eu.timepit.refined.refineV
+import play.api.Logger
 import models.{HowDisposed, Money, UserAnswers}
 import pages.nonsipp.bondsdisposal._
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
@@ -31,10 +33,7 @@ import config.RefinedTypes.{Max5000, OneTo50, OneTo5000}
 import models.SchemeHoldBond.{Acquisition, Transfer}
 import utils.nonsipp.PrePopulationUtils.isPrePopulation
 import models.requests.psr.{BondDisposed, BondTransactions, Bonds}
-import config.Constants.defaultFbVersion
 import models.UserAnswers.implicits.UserAnswersTryOps
-import pages.nonsipp.FbVersionPage
-import play.api.Logger
 
 import scala.util.Try
 
@@ -42,7 +41,7 @@ import javax.inject.Inject
 
 @Singleton()
 class BondsTransformer @Inject() extends Transformer {
-  private val logger = Logger(getClass)
+  private implicit val logger: Logger = Logger(getClass)
 
   def transformToEtmp(
     srn: Srn,
@@ -206,45 +205,19 @@ class BondsTransformer @Inject() extends Transformer {
           val costOfBonds = CostOfBondsPage(srn, index) -> Money(bondTransaction.costOfBonds)
           val bondsUnregulated = AreBondsUnregulatedPage(srn, index) -> bondTransaction.bondsUnregulated
 
-          val isBondPrepopulatedFieldPresent = bondTransaction.prePopulated.isDefined
-          val isFbVersionGreaterThan1 = userAnswers.get(FbVersionPage(srn)).getOrElse(defaultFbVersion).toInt > 1
-          val name = nameOfBonds._2 //just for logging
-
-          val shouldDefaultToZeroIfMissing = (isBondPrepopulatedFieldPresent, isFbVersionGreaterThan1) match {
-            case (false, _) =>
-              logger.info(
-                s"bond index: $index, name: $name - record without prePopulated field - should default to zero if missing"
-              )
-              true
-            case (_, true) =>
-              logger.info(
-                s"bond index: $index, name: $name - return with fbVersion greater than 1 - should default to zero if missing"
-              )
-              true
-            case (true, false) if !bondTransaction.prePopulated.get =>
-              logger.info(
-                s"bond index: $index, name: $name - entity with prePopulated field," +
-                  s" fbVersion less than 1, not yet checked - should NOT default to zero if missing"
-              )
-              false
-            case (true, false) if bondTransaction.prePopulated.get =>
-              //return pre-populated in the past, fbVersion less than 1, already checked, should default to zero
-              logger.info(
-                s"bond index: $index, name: $name - entity with prePopulated field," +
-                  s" fbVersion less than 1, already checked - should default to zero if missing"
-              )
-              true
-            case _ =>
-              logger.info(s"bond index: $index, name: $name - default case - should default to zero if missing")
-              true
-          }
-
           val optTotalIncomeOrReceipts =
-            if (bondTransaction.optTotalIncomeOrReceipts.isEmpty && shouldDefaultToZeroIfMissing) {
-              logger.info(s"bond index: $index, name: $name - defaulting to zero")
+            if (bondTransaction.optTotalIncomeOrReceipts.isEmpty &&
+              shouldDefaultToZeroIfMissing(
+                userAnswers = userAnswers,
+                srn = srn,
+                index = index,
+                transactionPrepopulated = bondTransaction.prePopulated,
+                nameToLog = nameOfBonds._2
+              )) {
+              logger.info(s"bond index: $index, name: ${nameOfBonds._2} - defaulting to zero")
               Some(IncomeFromBondsPage(srn, index) -> Money(0))
             } else {
-              logger.info(s"bond index: $index, name: $name - NOT defaulting to zero")
+              logger.info(s"bond index: $index, name: ${nameOfBonds._2} - NOT defaulting to zero")
               bondTransaction.optTotalIncomeOrReceipts
                 .map(t => IncomeFromBondsPage(srn, index) -> Money(t))
             }

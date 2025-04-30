@@ -17,9 +17,14 @@
 package transformations
 
 import config.RefinedTypes._
+import models.SchemeId.Srn
 import cats.implicits.{toBifunctorOps, toTraverseOps}
+import config.Constants.defaultFbVersion
 import eu.timepit.refined.refineV
+import models.UserAnswers
 import eu.timepit.refined.api.{Refined, Validate}
+import pages.nonsipp.FbVersionPage
+import play.api.Logger
 
 import scala.util.Try
 
@@ -40,4 +45,41 @@ trait Transformer {
   protected def buildIndexesForMax50(num: Int): Try[List[Max50]] =
     (1 to num).map(i => refineV[OneTo50](i).leftMap(new Exception(_)).toTry).toList.sequence
 
+}
+
+object Transformer {
+  def shouldDefaultToZeroIfMissing(
+    userAnswers: UserAnswers,
+    srn: Srn,
+    index: Max5000,
+    transactionPrepopulated: Option[Boolean],
+    nameToLog: String
+  )(implicit logger: Logger): Boolean = {
+    val isFbVersionGreaterThan1 = userAnswers.get(FbVersionPage(srn)).getOrElse(defaultFbVersion).toInt > 1
+    (transactionPrepopulated, isFbVersionGreaterThan1) match {
+      case (Some(false), false) =>
+        logger.info(
+          s"bond index: $index, name: $nameToLog - entity with prePopulated field," +
+            s" fbVersion less than 1, not yet checked - should NOT default to zero if missing"
+        )
+        false
+      case (Some(true), false) =>
+        //return pre-populated in the past, fbVersion less than 1, already checked, should default to zero
+        logger.info(
+          s"bond index: $index, name: $nameToLog - entity with prePopulated field," +
+            s" fbVersion less than 1, already checked - should default to zero if missing"
+        )
+        true
+      case (Some(_), true) =>
+        logger.info(
+          s"bond index: $index, name: $nameToLog - return with fbVersion greater than 1 - should default to zero if missing"
+        )
+        true
+      case (None, _) =>
+        logger.info(
+          s"bond index: $index, name: $nameToLog - record without prePopulated field - should default to zero if missing"
+        )
+        true
+    }
+  }
 }
