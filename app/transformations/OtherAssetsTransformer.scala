@@ -482,7 +482,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
               logger.info(s"other asset index: $index, name: ${assetDescription._2} - defaulting to zero")
               Some(IncomeFromAssetPage(srn, index) -> Money(0))
             } else {
-              logger.info(s"other asset index: $index, name: ${assetDescription._2} - defaulting to zero")
+              logger.info(s"other asset index: $index, name: ${assetDescription._2} - NOT defaulting to zero")
               otherAssetTransaction.optTotalIncomeOrReceipts.map(
                 totalIncomeOrReceipts => IncomeFromAssetPage(srn, index) -> Money(totalIncomeOrReceipts)
               )

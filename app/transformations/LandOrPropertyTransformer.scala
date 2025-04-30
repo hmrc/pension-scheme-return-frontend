@@ -184,7 +184,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
               Some(LandOrPropertyTotalIncomePage(srn, index) -> Money(0))
             } else {
               logger.info(
-                s"land or property: $index, name: ${addressDetails._2.addressLine1} addressLine1 - defaulting to zero"
+                s"land or property: $index, name: ${addressDetails._2.addressLine1} addressLine1 - NOT defaulting to zero"
               )
               heldPropertyTransaction.optTotalIncomeOrReceipts.map(
                 totalIncomeOrReceipts => LandOrPropertyTotalIncomePage(srn, index) -> Money(totalIncomeOrReceipts)
@@ -287,7 +287,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
                       Money(0)
                     } else {
                       logger.info(
-                        s"land or property index: $index, name: ${addressDetails._2.addressLine1} optAnnualLeaseAmount - defaulting to zero"
+                        s"land or property index: $index, name: ${addressDetails._2.addressLine1} optAnnualLeaseAmount - NOT defaulting to zero"
                       )
                       Money(optAnnualLeaseAmount.get)
                     }

@@ -583,27 +583,29 @@ class SharesTransformer @Inject() extends Transformer {
                 totalAssetValue => TotalAssetValuePage(srn, index) -> Money(totalAssetValue)
               )
 
-              val optTotalDividendsOrReceipts =
+              val optTotalDividendsOrReceipts = {
+                val nameOfSharesCompany = shareTransaction.shareIdentification.nameOfSharesCompany
                 if (heldSharesTransaction.optTotalDividendsOrReceipts.isEmpty &&
                   shouldDefaultToZeroIfMissing(
                     userAnswers = userAnswers,
                     srn = srn,
                     index = index,
                     transactionPrepopulated = shareTransaction.prePopulated,
-                    nameToLog = shareTransaction.shareIdentification.nameOfSharesCompany
+                    nameToLog = nameOfSharesCompany
                   )) {
                   logger.info(
-                    s"shares index: $index, name: ${shareTransaction.shareIdentification.nameOfSharesCompany} optTotalDividendsOrReceipts - defaulting to zero"
+                    s"shares index: $index, name: $nameOfSharesCompany optTotalDividendsOrReceipts - defaulting to zero"
                   )
                   Some(SharesTotalIncomePage(srn, index) -> Money(0))
                 } else {
                   logger.info(
-                    s"shares index: $index, name: ${shareTransaction.shareIdentification.nameOfSharesCompany} optTotalDividendsOrReceipts - defaulting to zero"
+                    s"shares index: $index, name: $nameOfSharesCompany optTotalDividendsOrReceipts - NOT defaulting to zero"
                   )
                   heldSharesTransaction.optTotalDividendsOrReceipts.map(
                     totalDividendsOrReceipts => SharesTotalIncomePage(srn, index) -> Money(totalDividendsOrReceipts)
                   )
                 }
+              }
 
               val triedUA = for {
                 ua0 <- ua
