@@ -67,30 +67,28 @@ object WhatYouWillNeedSharesController {
         (ParagraphMessage("shares.whatYouWillNeed.paragraph1") ++
           ParagraphMessage("shares.whatYouWillNeed.paragraph2") ++
           ParagraphMessage("shares.whatYouWillNeed.paragraph3") ++
-          ParagraphMessage("shares.whatYouWillNeed.paragraph4") ++
           ListMessage(
             ListType.Bullet,
-            "shares.whatYouWillNeed.paragraph4.listItem1",
-            "shares.whatYouWillNeed.paragraph4.listItem2",
-            "shares.whatYouWillNeed.paragraph4.listItem3",
-            "shares.whatYouWillNeed.paragraph4.listItem4",
-            "shares.whatYouWillNeed.paragraph4.listItem5",
-            "shares.whatYouWillNeed.paragraph4.listItem6",
-            "shares.whatYouWillNeed.paragraph4.listItem7",
-            "shares.whatYouWillNeed.paragraph4.listItem8",
-            "shares.whatYouWillNeed.paragraph4.listItem9"
+            "shares.whatYouWillNeed.paragraph3.listItem1",
+            "shares.whatYouWillNeed.paragraph3.listItem2",
+            "shares.whatYouWillNeed.paragraph3.listItem3",
+            "shares.whatYouWillNeed.paragraph3.listItem4",
+            "shares.whatYouWillNeed.paragraph3.listItem5",
+            "shares.whatYouWillNeed.paragraph3.listItem6",
+            "shares.whatYouWillNeed.paragraph3.listItem7",
+            "shares.whatYouWillNeed.paragraph3.listItem8",
+            "shares.whatYouWillNeed.paragraph3.listItem9"
           ) ++
+          Heading2("shares.whatYouWillNeed.heading.paragraph4") ++
+          ParagraphMessage("shares.whatYouWillNeed.paragraph4") ++
           Heading2("shares.whatYouWillNeed.heading.paragraph5") ++
           ParagraphMessage("shares.whatYouWillNeed.paragraph5") ++
-          Heading2("shares.whatYouWillNeed.heading.paragraph6") ++
-          ParagraphMessage("shares.whatYouWillNeed.paragraph6") ++
-
           ListMessage(
             ListType.Bullet,
-            "shares.whatYouWillNeed.paragraph6.listItem1",
-            "shares.whatYouWillNeed.paragraph6.listItem2",
-            "shares.whatYouWillNeed.paragraph6.listItem3",
-            "shares.whatYouWillNeed.paragraph6.listItem4"
+            "shares.whatYouWillNeed.paragraph5.listItem1",
+            "shares.whatYouWillNeed.paragraph5.listItem2",
+            "shares.whatYouWillNeed.paragraph5.listItem3",
+            "shares.whatYouWillNeed.paragraph5.listItem4"
           ))
       )
 }
