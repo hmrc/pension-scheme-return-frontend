@@ -406,8 +406,8 @@ class LoansTransformer @Inject() extends Transformer {
             AmountOfTheLoanPage(srn, index) -> {
               AmountOfTheLoan(
                 Money(loanTransactions(index.value - 1).loanAmountDetails.loanAmount),
-                Some(Money(loanTransactions(index.value - 1).loanAmountDetails.optCapRepaymentCY.get)),
-                Some(Money(loanTransactions(index.value - 1).loanAmountDetails.optAmountOutstanding.get))
+                loanTransactions(index.value - 1).loanAmountDetails.optCapRepaymentCY.map(Money(_)),
+                loanTransactions(index.value - 1).loanAmountDetails.optAmountOutstanding.map(Money(_))
               )
             }
           }
@@ -415,7 +415,7 @@ class LoansTransformer @Inject() extends Transformer {
       partialLoanAmount = indexes
         .filter(
           index => {
-            loanTransactions(index.value - 1).loanAmountDetails.optCapRepaymentCY.isEmpty &&
+            loanTransactions(index.value - 1).loanAmountDetails.optCapRepaymentCY.isEmpty ||
               loanTransactions(index.value - 1).loanAmountDetails.optAmountOutstanding.isEmpty
           }
         )
@@ -431,7 +431,7 @@ class LoansTransformer @Inject() extends Transformer {
             )
 
             val optCapRepaymentCY =
-              if (shouldDefaultToZero) {
+              if (loanTransaction.loanAmountDetails.optCapRepaymentCY.isEmpty && shouldDefaultToZero) {
                 logger.info(
                   s"loan index: $index, name: ${loanTransaction.loanRecipientName} optCapRepaymentCY empty - defaulting to zero"
                 )
@@ -445,7 +445,7 @@ class LoansTransformer @Inject() extends Transformer {
               }
 
             val optAmountOutstanding =
-              if (shouldDefaultToZero) {
+              if (loanTransaction.loanAmountDetails.optAmountOutstanding.isEmpty && shouldDefaultToZero) {
                 logger.info(
                   s"loan index: $index, name: ${loanTransaction.loanRecipientName} optAmountOutstanding empty - defaulting to zero"
                 )
