@@ -17,6 +17,7 @@
 package controllers.nonsipp.receivetransfer
 
 import views.html.RadioListView
+import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.receivetransfer.TransferringSchemeTypeController._
 import forms.RadioListFormProvider
@@ -35,6 +36,7 @@ class TransferringSchemeTypeControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit = controllers.nonsipp.receivetransfer.routes.TransferringSchemeTypeController
     .onSubmit(srn, index, secondarylIndex, NormalMode)
   private val userAnswers = defaultUserAnswers
+    .unsafeSet(TransferringSchemeNamePage(srn, index, secondarylIndex), individualName)
 
   "TransferringSchemeTypeController" - {
 
@@ -42,7 +44,7 @@ class TransferringSchemeTypeControllerSpec extends ControllerBaseSpec {
       injected[RadioListView]
         .apply(
           form(injected[RadioListFormProvider]),
-          viewModel(srn, index, secondarylIndex, schemeName, NormalMode)
+          viewModel(srn, index, secondarylIndex, individualName, NormalMode)
         )
     })
 

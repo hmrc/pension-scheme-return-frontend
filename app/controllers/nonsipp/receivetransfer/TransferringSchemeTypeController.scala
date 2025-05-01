@@ -21,7 +21,7 @@ import viewmodels.implicits._
 import forms.mappings.Mappings
 import models.PensionSchemeType._
 import config.RefinedTypes.{Max300, Max5}
-import pages.nonsipp.receivetransfer.TransferringSchemeTypePage
+import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, TransferringSchemeTypePage}
 import config.Constants.{inputRegexPSTR, inputRegexQROPS, maxNotRelevant}
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.receivetransfer.TransferringSchemeTypeController._
@@ -64,7 +64,7 @@ class TransferringSchemeTypeController @Inject()(
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val maybeAnswer = request.userAnswers.get(TransferringSchemeTypePage(srn, index, secondaryIndex))
     val builtForm = maybeAnswer.fold(form(formProvider))(answer => form(formProvider, Some(answer.name)))
-    val schemeName = request.schemeDetails.schemeName
+    val schemeName = request.userAnswers.get(TransferringSchemeNamePage(srn, index, secondaryIndex)).get
     val filledForm = maybeAnswer.fold(builtForm)(builtForm.fill)
 
     Ok(
