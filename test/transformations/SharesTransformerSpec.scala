@@ -52,6 +52,87 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
 
   private val transformer = new SharesTransformer
 
+  def sharesBlankTotalIncome(prePopulated: Option[Boolean], recordVersion: Option[String]): Shares =
+    Shares(
+      recordVersion = recordVersion,
+      optDidSchemeHoldAnyShares = None,
+      optShareTransactions = Some(
+        List(
+          ShareTransaction(
+            prePopulated = prePopulated,
+            typeOfSharesHeld = SponsoringEmployer,
+            shareIdentification = ShareIdentification(
+              nameOfSharesCompany = "nameOfSharesCompany",
+              optCrnNumber = None,
+              optReasonNoCRN = Some("optReasonNoCRN"),
+              classOfShares = "classOfShares"
+            ),
+            heldSharesTransaction = HeldSharesTransaction(
+              schemeHoldShare = SchemeHoldShare.Acquisition,
+              optDateOfAcqOrContrib = Some(localDate),
+              totalShares = totalShares,
+              optAcquiredFromName = Some("optAcquiredFromName"),
+              optPropertyAcquiredFrom =
+                Some(PropertyAcquiredFrom(IdentityType.Individual, None, Some(noninoReason), None)),
+              optConnectedPartyStatus = None,
+              costOfShares = money.value,
+              supportedByIndepValuation = true,
+              optTotalAssetValue = Some(money.value),
+              optTotalDividendsOrReceipts = None
+            ),
+            optDisposedSharesTransaction = None
+          ),
+          ShareTransaction(
+            prePopulated = None,
+            typeOfSharesHeld = TypeOfShares.Unquoted,
+            shareIdentification = ShareIdentification(
+              nameOfSharesCompany = "nameOfSharesCompany",
+              optCrnNumber = None,
+              optReasonNoCRN = Some("optReasonNoCRN"),
+              classOfShares = "classOfShares"
+            ),
+            heldSharesTransaction = HeldSharesTransaction(
+              schemeHoldShare = SchemeHoldShare.Contribution,
+              optDateOfAcqOrContrib = Some(localDate),
+              totalShares = totalShares,
+              optAcquiredFromName = None,
+              optPropertyAcquiredFrom = None,
+              optConnectedPartyStatus = Some(true),
+              costOfShares = money.value,
+              supportedByIndepValuation = true,
+              optTotalAssetValue = None,
+              optTotalDividendsOrReceipts = None
+            ),
+            optDisposedSharesTransaction = None
+          ),
+          ShareTransaction(
+            prePopulated = None,
+            typeOfSharesHeld = TypeOfShares.ConnectedParty,
+            shareIdentification = ShareIdentification(
+              nameOfSharesCompany = "nameOfSharesCompany",
+              optCrnNumber = None,
+              optReasonNoCRN = Some("optReasonNoCRN"),
+              classOfShares = "classOfShares"
+            ),
+            heldSharesTransaction = HeldSharesTransaction(
+              schemeHoldShare = SchemeHoldShare.Transfer,
+              optDateOfAcqOrContrib = None,
+              totalShares = totalShares,
+              optAcquiredFromName = None,
+              optPropertyAcquiredFrom = None,
+              optConnectedPartyStatus = None,
+              costOfShares = money.value,
+              supportedByIndepValuation = false,
+              optTotalAssetValue = None,
+              optTotalDividendsOrReceipts = None
+            ),
+            optDisposedSharesTransaction = None
+          )
+        )
+      ),
+      optTotalValueQuotedShares = None
+    )
+
   "SharesTransformer - To Etmp" - {
 
     "should return None when userAnswer is empty" in {
@@ -634,6 +715,48 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
 
           // share-index-3
           userAnswers.get(SharesTotalIncomePage(srn, refineMV(3))) mustBe Some(Money(0.0))
+        }
+      )
+    }
+
+    "should not default total income to zero when prePopulated entity is not yet checked" in {
+      val result = transformer.transformFromEtmp(
+        emptyUserAnswers,
+        srn,
+        sharesBlankTotalIncome(prePopulated = Some(false), recordVersion = Some("001"))
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe None
+        }
+      )
+    }
+
+    "should default total income to zero when prePopulated entity is checked" in {
+      val result = transformer.transformFromEtmp(
+        emptyUserAnswers,
+        srn,
+        sharesBlankTotalIncome(prePopulated = Some(true), recordVersion = Some("001"))
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe Some(Money(0))
+        }
+      )
+    }
+
+    "should default total income to zero when the version of the return is more than 1" in {
+      val result = transformer.transformFromEtmp(
+        emptyUserAnswers,
+        srn,
+        sharesBlankTotalIncome(prePopulated = None, recordVersion = Some("002"))
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe Some(Money(0))
         }
       )
     }

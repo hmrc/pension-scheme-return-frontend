@@ -59,25 +59,25 @@ object Transformer {
     (transactionPrepopulated, isFbVersionGreaterThan1) match {
       case (Some(false), false) =>
         logger.info(
-          s"bond index: $index, name: $nameToLog - entity with prePopulated field," +
+          s"index: $index, name: $nameToLog - entity with prePopulated field," +
             s" fbVersion less than 1, not yet checked - should NOT default to zero if missing"
         )
         false
       case (Some(true), false) =>
         //return pre-populated in the past, fbVersion less than 1, already checked, should default to zero
         logger.info(
-          s"bond index: $index, name: $nameToLog - entity with prePopulated field," +
+          s"index: $index, name: $nameToLog - entity with prePopulated field," +
             s" fbVersion less than 1, already checked - should default to zero if missing"
         )
         true
       case (Some(_), true) =>
         logger.info(
-          s"bond index: $index, name: $nameToLog - return with fbVersion greater than 1 - should default to zero if missing"
+          s"index: $index, name: $nameToLog - return with fbVersion greater than 1 - should default to zero if missing"
         )
         true
       case (None, _) =>
         logger.info(
-          s"bond index: $index, name: $nameToLog - record without prePopulated field - should default to zero if missing"
+          s"index: $index, name: $nameToLog - record without prePopulated field - should default to zero if missing"
         )
         true
     }

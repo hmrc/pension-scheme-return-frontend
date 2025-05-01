@@ -21,6 +21,7 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.mvc.AnyContentAsEmpty
 import models.HowDisposed.Sold
+import models.IdentityType.Individual
 import models.SchemeHoldLandProperty.Acquisition
 import controllers.TestValues
 import pages.nonsipp.landorproperty._
@@ -669,7 +670,94 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
         }
       )
     }
+
+    "should not default total income to zero when prePopulated entity is not yet checked" in {
+      val result = transformer.transformFromEtmp(
+        emptyUserAnswers,
+        srn,
+        landOrPropertyWithEmptyOptionalValues(prePopulated = Some(false), recordVersion = Some("001"), Some(1))
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(LandOrPropertyTotalIncomePage(srn, refineMV(1))) mustBe None
+        }
+      )
+    }
+
+    "should default total income to zero when prePopulated entity is checked" in {
+      val result = transformer.transformFromEtmp(
+        emptyUserAnswers,
+        srn,
+        landOrPropertyWithEmptyOptionalValues(prePopulated = Some(true), recordVersion = Some("001"))
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(LandOrPropertyTotalIncomePage(srn, refineMV(1))) mustBe Some(Money(0))
+          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, refineMV(1))).map(_._2) mustBe Some(Money(0))
+        }
+      )
+    }
+
+    "should default total income to zero when the version of the return is more than 1" in {
+      val result = transformer.transformFromEtmp(
+        emptyUserAnswers,
+        srn,
+        landOrPropertyWithEmptyOptionalValues(prePopulated = None, recordVersion = Some("002"))
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(LandOrPropertyTotalIncomePage(srn, refineMV(1))) mustBe Some(Money(0))
+          userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, refineMV(1))).map(_._2) mustBe Some(Money(0))
+        }
+      )
+    }
   }
+
+  def landOrPropertyWithEmptyOptionalValues(
+    prePopulated: Option[Boolean],
+    recordVersion: Option[String],
+    leaseAmount: Option[Double] = None
+  ): LandOrProperty =
+    LandOrProperty(
+      recordVersion = recordVersion,
+      optLandOrPropertyHeld = Some(true),
+      optDisposeAnyLandOrProperty = Some(false),
+      landOrPropertyTransactions = Seq(
+        LandOrPropertyTransactions(
+          prePopulated,
+          propertyDetails = PropertyDetails(
+            landOrPropertyInUK = true,
+            addressDetails = address,
+            landRegistryTitleNumberKey = true,
+            landRegistryTitleNumberValue = "landRegistryTitleNumberValue"
+          ),
+          heldPropertyTransaction = HeldPropertyTransaction(
+            methodOfHolding = Acquisition,
+            dateOfAcquisitionOrContribution = Some(localDate),
+            optPropertyAcquiredFromName = Some(name),
+            optPropertyAcquiredFrom = Some(PropertyAcquiredFrom(Individual, None, Some("sdf"), Some("sdf"))),
+            optConnectedPartyStatus = Some(true),
+            totalCostOfLandOrProperty = money.value,
+            optIndepValuationSupport = Some(false),
+            optIsLandOrPropertyResidential = Some(true),
+            optLeaseDetails = Some(
+              LeaseDetails(
+                optLesseeName = Some("lesseeName"),
+                optLeaseGrantDate = Some(localDate),
+                optAnnualLeaseAmount = leaseAmount,
+                optConnectedPartyStatus = Some(false)
+              )
+            ),
+            optLandOrPropertyLeased = Some(true),
+            optTotalIncomeOrReceipts = None
+          ),
+          optDisposedPropertyTransaction = None
+        )
+      )
+    )
 
   def buildLandOrProperty(name: String, propertyAcquiredFrom: PropertyAcquiredFrom): LandOrProperty =
     LandOrProperty(

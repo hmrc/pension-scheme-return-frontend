@@ -19,6 +19,7 @@ package transformations
 import play.api.test.FakeRequest
 import org.scalatest.freespec.AnyFreeSpec
 import play.api.mvc.AnyContentAsEmpty
+import models.IdentityType.Individual
 import controllers.TestValues
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
@@ -822,6 +823,91 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         }
       )
     }
+
+    "should not default total income to zero when prePopulated entity is not yet checked" in {
+      val result = transformer.transformFromEtmp(
+        emptyUserAnswers,
+        srn,
+        loansBlankTotalIncome(prePopulated = Some(false), recordVersion = Some("001"))
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))).flatMap(_.optAmountOutstanding) mustBe None
+          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))).flatMap(_.optCapRepaymentCY) mustBe None
+          userAnswers.get(InterestOnLoanPage(srn, refineMV(1))).flatMap(_.optIntReceivedCY) mustBe None
+          userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))).flatMap(_.value.toOption) mustBe None
+        }
+      )
+    }
+
+    "should default total income to zero when prePopulated entity is checked" in {
+      val result = transformer.transformFromEtmp(
+        emptyUserAnswers,
+        srn,
+        loansBlankTotalIncome(prePopulated = Some(true), recordVersion = Some("001"))
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))).flatMap(_.optAmountOutstanding) mustBe Some(Money(0))
+          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))).flatMap(_.optCapRepaymentCY) mustBe Some(Money(0))
+          userAnswers.get(InterestOnLoanPage(srn, refineMV(1))).flatMap(_.optIntReceivedCY) mustBe Some(Money(0))
+          userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))).flatMap(_.value.toOption) mustBe Some(
+            Money(0)
+          )
+        }
+      )
+    }
+
+    "should default total income to zero when the version of the return is more than 1" in {
+      val result = transformer.transformFromEtmp(
+        emptyUserAnswers,
+        srn,
+        loansBlankTotalIncome(prePopulated = None, recordVersion = Some("002"))
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))).flatMap(_.optAmountOutstanding) mustBe Some(Money(0))
+          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))).flatMap(_.optCapRepaymentCY) mustBe Some(Money(0))
+          userAnswers.get(InterestOnLoanPage(srn, refineMV(1))).flatMap(_.optIntReceivedCY) mustBe Some(Money(0))
+          userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))).flatMap(_.value.toOption) mustBe Some(
+            Money(0)
+          )
+        }
+      )
+    }
+
+    def loansBlankTotalIncome(prePopulated: Option[Boolean], recordVersion: Option[String]): Loans =
+      Loans(
+        recordVersion = Some("001"),
+        optSchemeHadLoans = Some(true),
+        Seq(
+          LoanTransactions(
+            prePopulated,
+            recipientIdentityType = RecipientIdentityType(Individual, None, Some("sdf"), Some("sdf")),
+            loanRecipientName = name,
+            connectedPartyStatus = true,
+            optRecipientSponsoringEmployer = Some("Yes"),
+            datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
+            loanAmountDetails = LoanAmountDetails(
+              amountOfTheLoan.loanAmount.value,
+              None,
+              None
+            ),
+            equalInstallments = false,
+            loanInterestDetails = LoanInterestDetails(
+              interestOnLoan.loanInterestAmount.value,
+              interestOnLoan.loanInterestRate.value,
+              None
+            ),
+            optSecurityGivenDetails = Some(security.value),
+            optArrearsPrevYears = Some(true),
+            optOutstandingArrearsOnLoan = None
+          )
+        )
+      )
 
     def loans(
       name: String,
