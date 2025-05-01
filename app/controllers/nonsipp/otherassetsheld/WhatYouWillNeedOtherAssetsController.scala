@@ -67,30 +67,29 @@ object WhatYouWillNeedOtherAssetsController {
         ParagraphMessage("otherAssets.whatYouWillNeed.paragraph1") ++
           ParagraphMessage("otherAssets.whatYouWillNeed.paragraph2") ++
           ParagraphMessage("otherAssets.whatYouWillNeed.paragraph3") ++
+          ListMessage(
+            ListType.Bullet,
+            "otherAssets.whatYouWillNeed.paragraph3.listItem1",
+            "otherAssets.whatYouWillNeed.paragraph3.listItem2",
+            "otherAssets.whatYouWillNeed.paragraph3.listItem3",
+            "otherAssets.whatYouWillNeed.paragraph3.listItem4",
+            "otherAssets.whatYouWillNeed.paragraph3.listItem5"
+          ) ++
+          Heading2("otherAssets.whatYouWillNeed.heading.paragraph4") ++
           ParagraphMessage("otherAssets.whatYouWillNeed.paragraph4") ++
           ListMessage(
             ListType.Bullet,
             "otherAssets.whatYouWillNeed.paragraph4.listItem1",
-            "otherAssets.whatYouWillNeed.paragraph4.listItem2",
-            "otherAssets.whatYouWillNeed.paragraph4.listItem3",
-            "otherAssets.whatYouWillNeed.paragraph4.listItem4",
-            "otherAssets.whatYouWillNeed.paragraph4.listItem5"
+            "otherAssets.whatYouWillNeed.paragraph4.listItem2"
           ) ++
           Heading2("otherAssets.whatYouWillNeed.heading.paragraph5") ++
           ParagraphMessage("otherAssets.whatYouWillNeed.paragraph5") ++
           ListMessage(
             ListType.Bullet,
             "otherAssets.whatYouWillNeed.paragraph5.listItem1",
-            "otherAssets.whatYouWillNeed.paragraph5.listItem2"
-          ) ++
-          Heading2("otherAssets.whatYouWillNeed.heading.paragraph6") ++
-          ParagraphMessage("otherAssets.whatYouWillNeed.paragraph6") ++
-          ListMessage(
-            ListType.Bullet,
-            "otherAssets.whatYouWillNeed.paragraph6.listItem1",
-            "otherAssets.whatYouWillNeed.paragraph6.listItem2",
-            "otherAssets.whatYouWillNeed.paragraph6.listItem3",
-            "otherAssets.whatYouWillNeed.paragraph6.listItem4"
+            "otherAssets.whatYouWillNeed.paragraph5.listItem2",
+            "otherAssets.whatYouWillNeed.paragraph5.listItem3",
+            "otherAssets.whatYouWillNeed.paragraph5.listItem4"
           )
       )
 }
