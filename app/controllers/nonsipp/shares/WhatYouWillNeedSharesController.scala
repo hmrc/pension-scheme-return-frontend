@@ -26,6 +26,7 @@ import views.html.ContentPageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.HeadingSize
 import viewmodels.DisplayMessage._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 
@@ -79,9 +80,9 @@ object WhatYouWillNeedSharesController {
             "shares.whatYouWillNeed.paragraph3.listItem8",
             "shares.whatYouWillNeed.paragraph3.listItem9"
           ) ++
-          Heading2("shares.whatYouWillNeed.heading.paragraph4") ++
+          Heading2("shares.whatYouWillNeed.heading.paragraph4", HeadingSize.Medium) ++
           ParagraphMessage("shares.whatYouWillNeed.paragraph4") ++
-          Heading2("shares.whatYouWillNeed.heading.paragraph5") ++
+          Heading2("shares.whatYouWillNeed.heading.paragraph5", HeadingSize.Medium) ++
           ParagraphMessage("shares.whatYouWillNeed.paragraph5") ++
           ListMessage(
             ListType.Bullet,

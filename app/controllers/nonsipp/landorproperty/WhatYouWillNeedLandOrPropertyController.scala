@@ -26,6 +26,7 @@ import views.html.ContentPageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.HeadingSize
 import viewmodels.DisplayMessage._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 
@@ -76,7 +77,7 @@ object WhatYouWillNeedLandOrPropertyController {
             "whatYouWillNeedLandOrProperty.info5",
             "whatYouWillNeedLandOrProperty.info6"
           ) ++
-          Heading2("whatYouWillNeedLandOrProperty.heading.paragraph4") ++
+          Heading2("whatYouWillNeedLandOrProperty.heading.paragraph4", HeadingSize.Medium) ++
           ParagraphMessage("whatYouWillNeedLandOrProperty.paragraph4") ++
           ListMessage(
             ListType.Bullet,
@@ -85,21 +86,21 @@ object WhatYouWillNeedLandOrPropertyController {
             "whatYouWillNeedLandOrProperty.isLeasedInfo3",
             "whatYouWillNeedLandOrProperty.isLeasedInfo4"
           ) ++
-          Heading2("whatYouWillNeedLandOrProperty.heading.paragraph5") ++
+          Heading2("whatYouWillNeedLandOrProperty.heading.paragraph5", HeadingSize.Medium) ++
           ParagraphMessage("whatYouWillNeedLandOrProperty.paragraph5") ++
           ListMessage(
             ListType.Bullet,
             "whatYouWillNeedLandOrProperty.isMultiple1",
             "whatYouWillNeedLandOrProperty.isMultiple2"
           ) ++
-          Heading2("whatYouWillNeedLandOrProperty.heading.paragraph6") ++
+          Heading2("whatYouWillNeedLandOrProperty.heading.paragraph6", HeadingSize.Medium) ++
           ParagraphMessage("whatYouWillNeedLandOrProperty.paragraph6") ++
           ListMessage(
             ListType.Bullet,
             "whatYouWillNeedLandOrProperty.isAcquisitionOrContributionInfo1",
             "whatYouWillNeedLandOrProperty.isAcquisitionOrContributionInfo2"
           ) ++
-          Heading2("whatYouWillNeedLandOrProperty.heading.paragraph7") ++
+          Heading2("whatYouWillNeedLandOrProperty.heading.paragraph7", HeadingSize.Medium) ++
           ParagraphMessage("whatYouWillNeedLandOrProperty.paragraph7") ++
           ListMessage(
             ListType.Bullet,

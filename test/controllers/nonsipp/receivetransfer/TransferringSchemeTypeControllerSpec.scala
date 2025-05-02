@@ -17,6 +17,7 @@
 package controllers.nonsipp.receivetransfer
 
 import views.html.RadioListView
+import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.receivetransfer.TransferringSchemeTypeController._
 import forms.RadioListFormProvider
@@ -38,13 +39,24 @@ class TransferringSchemeTypeControllerSpec extends ControllerBaseSpec {
 
   "TransferringSchemeTypeController" - {
 
-    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      injected[RadioListView]
-        .apply(
-          form(injected[RadioListFormProvider]),
-          viewModel(srn, index, secondarylIndex, schemeName, NormalMode)
-        )
-    })
+    act.like(
+      renderView(
+        onPageLoad,
+        userAnswers
+          .unsafeSet(TransferringSchemeNamePage(srn, index, secondarylIndex), transferringSchemeName)
+      ) { implicit app => implicit request =>
+        injected[RadioListView]
+          .apply(
+            form(injected[RadioListFormProvider]),
+            viewModel(srn, index, secondarylIndex, transferringSchemeName, NormalMode)
+          )
+      }.withName("onPageLoad renders page ok")
+    )
+
+    act.like(
+      journeyRecoveryPage(onPageLoad, Some(emptyUserAnswers))
+        .withName("onPageLoad redirect to journey recovery page when transferring scheme name is missing")
+    )
 
     act.like(saveAndContinue(onSubmit, "value" -> "registeredPS", "registeredPS-conditional" -> " 872 19363 yN"))
 

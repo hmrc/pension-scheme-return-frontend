@@ -26,6 +26,7 @@ import views.html.ContentPageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.HeadingSize
 import viewmodels.DisplayMessage._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 
@@ -75,14 +76,14 @@ object WhatYouWillNeedOtherAssetsController {
             "otherAssets.whatYouWillNeed.paragraph3.listItem4",
             "otherAssets.whatYouWillNeed.paragraph3.listItem5"
           ) ++
-          Heading2("otherAssets.whatYouWillNeed.heading.paragraph4") ++
+          Heading2("otherAssets.whatYouWillNeed.heading.paragraph4", HeadingSize.Medium) ++
           ParagraphMessage("otherAssets.whatYouWillNeed.paragraph4") ++
           ListMessage(
             ListType.Bullet,
             "otherAssets.whatYouWillNeed.paragraph4.listItem1",
             "otherAssets.whatYouWillNeed.paragraph4.listItem2"
           ) ++
-          Heading2("otherAssets.whatYouWillNeed.heading.paragraph5") ++
+          Heading2("otherAssets.whatYouWillNeed.heading.paragraph5", HeadingSize.Medium) ++
           ParagraphMessage("otherAssets.whatYouWillNeed.paragraph5") ++
           ListMessage(
             ListType.Bullet,

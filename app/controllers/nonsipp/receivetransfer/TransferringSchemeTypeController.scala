@@ -16,33 +16,32 @@
 
 package controllers.nonsipp.receivetransfer
 
-import services.SaveService
-import viewmodels.implicits._
-import forms.mappings.Mappings
-import models.PensionSchemeType._
-import config.RefinedTypes.{Max300, Max5}
-import pages.nonsipp.receivetransfer.TransferringSchemeTypePage
 import config.Constants.{inputRegexPSTR, inputRegexQROPS, maxNotRelevant}
+import config.RefinedTypes.{Max300, Max5}
+import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.receivetransfer.TransferringSchemeTypeController._
-import navigation.Navigator
 import forms.RadioListFormProvider
-import models.{ConditionalRadioMapper, Mode, PensionSchemeType}
-import play.api.data.Form
+import forms.mappings.Mappings
 import forms.mappings.errors.InputFormErrors
 import models.GenericFormMapper.ConditionalRadioMapper
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import views.html.RadioListView
+import models.PensionSchemeType._
 import models.SchemeId.Srn
+import models.{ConditionalRadioMapper, Mode, PensionSchemeType}
+import navigation.Navigator
+import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, TransferringSchemeTypePage}
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.SaveService
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 import viewmodels.models._
-
-import scala.concurrent.{ExecutionContext, Future}
+import views.html.RadioListView
 
 import javax.inject.{Inject, Named}
+import scala.concurrent.{ExecutionContext, Future}
 
 class TransferringSchemeTypeController @Inject()(
   override val messagesApi: MessagesApi,
@@ -53,7 +52,7 @@ class TransferringSchemeTypeController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: RadioListView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+    extends PSRController
     with I18nSupport {
 
   def onPageLoad(
@@ -64,15 +63,15 @@ class TransferringSchemeTypeController @Inject()(
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val maybeAnswer = request.userAnswers.get(TransferringSchemeTypePage(srn, index, secondaryIndex))
     val builtForm = maybeAnswer.fold(form(formProvider))(answer => form(formProvider, Some(answer.name)))
-    val schemeName = request.schemeDetails.schemeName
     val filledForm = maybeAnswer.fold(builtForm)(builtForm.fill)
-
-    Ok(
-      view(
-        filledForm,
-        TransferringSchemeTypeController.viewModel(srn, index, secondaryIndex, schemeName, mode)
+    request.userAnswers.get(TransferringSchemeNamePage(srn, index, secondaryIndex)).getOrRecoverJourney { schemeName =>
+      Ok(
+        view(
+          filledForm,
+          TransferringSchemeTypeController.viewModel(srn, index, secondaryIndex, schemeName, mode)
+        )
       )
-    )
+    }
   }
 
   def onSubmit(
