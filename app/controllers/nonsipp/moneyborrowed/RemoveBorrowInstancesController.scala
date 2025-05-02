@@ -135,6 +135,7 @@ class RemoveBorrowInstancesController @Inject()(
       .flatMap(_.remove(WhenBorrowedPage(srn, index)))
       .flatMap(_.remove(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index)))
       .flatMap(_.remove(WhySchemeBorrowedMoneyPage(srn, index)))
+      .flatMap(_.remove(MoneyBorrowedProgress(srn, index)))
 
     if (userAnswers.map(LenderNamePages(srn)).size == 1) {
       mustRemovedUa.flatMap(_.remove(MoneyBorrowedPage(srn)))

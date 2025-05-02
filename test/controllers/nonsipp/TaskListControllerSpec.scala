@@ -848,6 +848,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
           defaultUserAnswers
             .unsafeSet(MoneyBorrowedPage(srn), true)
             .unsafeSet(LenderNamePages(srn), Map("0" -> lenderName))
+            .unsafeSet(MoneyBorrowedProgress(srn, index1of5000), SectionJourneyStatus.InProgress("next-url"))
 
         testViewModel(
           userAnswersWithBorrowings,
@@ -856,9 +857,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
           expectedStatus = TaskListStatus.InProgress,
           expectedTitleKey = "nonsipp.tasklist.loans.title",
           expectedLinkContentKey = "nonsipp.tasklist.loans.change.moneyborrowed.title",
-          expectedLinkUrl = controllers.nonsipp.moneyborrowed.routes.LenderNameController
-            .onPageLoad(srn, refineMV(1), NormalMode)
-            .url
+          expectedLinkUrl = "next-url"
         )
       }
 
@@ -868,6 +867,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
             .unsafeSet(MoneyBorrowedPage(srn), true)
             .unsafeSet(LenderNamePage(srn, index1of5000), lenderName)
             .unsafeSet(WhySchemeBorrowedMoneyPage(srn, index1of5000), reason)
+            .unsafeSet(MoneyBorrowedProgress(srn, index1of5000), SectionJourneyStatus.Completed)
 
         testViewModel(
           userAnswersWithBorrowings,

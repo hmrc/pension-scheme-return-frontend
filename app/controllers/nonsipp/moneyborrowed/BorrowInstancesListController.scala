@@ -25,7 +25,7 @@ import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import config.RefinedTypes.Max5000
 import controllers.PSRController
-import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import utils.nonsipp.TaskListStatusUtils.{getBorrowingTaskListStatusAndLink, getCompletedOrUpdatedTaskListStatus}
 import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
@@ -58,7 +58,7 @@ class BorrowInstancesListController @Inject()(
 ) extends PSRController
     with I18nSupport {
 
-  private implicit val logger = Logger(getClass)
+  private implicit val logger: Logger = Logger(getClass)
 
   val form: Form[Boolean] = BorrowInstancesListController.form(formProvider)
 
@@ -103,48 +103,36 @@ class BorrowInstancesListController @Inject()(
   )(
     implicit request: DataRequest[AnyContent]
   ): Result =
-    // TODO: borrowDetails currently tries to pull pages across a journey to build the list page view model
-    // this is sometimes trying to get a page further in the journey that the user hasn't completed, causing it to fail
-    // fix: separate the MoneyBorrowedProgress.all(srn) call out from borrowDetails
-    // - if any InProgress journeys, redirect there
-    // - otherwise call borrowDetails, which should accept a list of indexes (to reuse the value of MoneyBorrowedProgress.all(srn)) and render the list page
     borrowDetails(srn).map { instances =>
-      if (viewOnlyViewModel.isEmpty && instances.isEmpty) {
-        Redirect(controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode))
-      } else {
-        request.userAnswers
-          .map(MoneyBorrowedProgress.all(srn))
-          .refine[Max5000.Refined]
-          .getOrRecoverJourney
-          .flatMap { journeyStatusMap =>
-            journeyStatusMap.collectFirst {
-              case (_, SectionJourneyStatus.InProgress(url)) => Redirect(url)
-            } match {
-              case Some(res) => Right(res)
-              case None =>
-                Right(
-                  Ok(
-                    view(
-                      form,
-                      BorrowInstancesListController.viewModel(
-                        srn,
-                        mode,
-                        page,
-                        instances,
-                        request.schemeDetails.schemeName,
-                        viewOnlyViewModel,
-                        showBackLink = showBackLink
-                      )
-                    )
-                  )
-                )
-            }
-          }
-          .merge
+      val (borrowingStatus, incompleteBorrowingUrl) = getBorrowingTaskListStatusAndLink(request.userAnswers, srn)
+
+      borrowingStatus match {
+        case TaskListStatus.NotStarted | TaskListStatus.Recorded(0, _) if viewOnlyViewModel.isEmpty =>
+          Redirect(controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode))
+        case TaskListStatus.InProgress =>
+          Redirect(incompleteBorrowingUrl)
+        case _ =>
+          Ok(
+            view(
+              form,
+              BorrowInstancesListController.viewModel(
+                srn,
+                mode,
+                page,
+                instances,
+                request.schemeDetails.schemeName,
+                viewOnlyViewModel,
+                showBackLink = showBackLink
+              )
+            )
+          )
       }
     }.merge
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    val inProgressAnswers = request.userAnswers.map(MoneyBorrowedProgress.all(srn))
+    val inProgressUrl = inProgressAnswers.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+
     borrowDetails(srn).map { instances =>
       if (instances.length == maxBorrows) {
         Redirect(navigator.nextPage(BorrowInstancesListPage(srn, addBorrow = false), mode, request.userAnswers))
@@ -157,9 +145,17 @@ class BorrowInstancesListController @Inject()(
           .fold(
             errors => BadRequest(view(errors, viewModel)),
             answer =>
-              Redirect(
-                navigator.nextPage(BorrowInstancesListPage(srn, answer), mode, request.userAnswers)
-              )
+              (answer, inProgressUrl) match {
+                case (true, Some(url)) => Redirect(url)
+                case _ =>
+                  Redirect(
+                    navigator.nextPage(
+                      BorrowInstancesListPage(srn, addBorrow = answer),
+                      mode,
+                      request.userAnswers
+                    )
+                  )
+              }
           )
       }
     }.merge
@@ -206,6 +202,7 @@ class BorrowInstancesListController @Inject()(
   )(implicit request: DataRequest[_]): Either[Result, List[BorrowedMoneyDetails]] =
     request.userAnswers
       .map(MoneyBorrowedProgress.all(srn))
+      .filter(_._2.completed)
       .refine[Max5000.Refined]
       .getOrRecoverJourney
       .flatMap { status =>
@@ -215,8 +212,7 @@ class BorrowInstancesListController @Inject()(
             amount = request.userAnswers
               .get(BorrowedAmountAndRatePage(srn, index))
               .map(_._1)
-            progress = status.getOrElse(index, SectionJourneyStatus.Completed)
-          } yield BorrowedMoneyDetails(index, lenderName, amount, progress)
+          } yield BorrowedMoneyDetails(index, lenderName, amount)
         }
       }
 }
@@ -246,7 +242,7 @@ object BorrowInstancesListController {
         List()
       case (list, _) =>
         list.collect {
-          case BorrowedMoneyDetails(index, lenderName, Some(amount), _) =>
+          case BorrowedMoneyDetails(index, lenderName, Some(amount)) =>
             (mode, viewOnlyViewModel) match {
               case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
                 List(
@@ -380,7 +376,6 @@ object BorrowInstancesListController {
   case class BorrowedMoneyDetails(
     index: Max5000,
     lenderName: String,
-    amount: Option[Money],
-    progress: SectionJourneyStatus
+    amount: Option[Money]
   )
 }

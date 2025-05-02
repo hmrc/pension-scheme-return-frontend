@@ -140,6 +140,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     .unsafeSet(WhenBorrowedPage(srn, index1of5000), localDate)
     .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index1of5000), money)
     .unsafeSet(WhySchemeBorrowedMoneyPage(srn, index1of5000), reason)
+    .unsafeSet(MoneyBorrowedProgress(srn, index1of5000), SectionJourneyStatus.Completed)
     // Section 5 - Shares
     // (S5) Shares
     .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
@@ -460,6 +461,10 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(MoneyBorrowedPage(srn), true)
           .unsafeSet(LenderNamePages(srn), Map("0" -> lenderName))
+          .unsafeSet(
+            MoneyBorrowedProgress(srn, index1of5000),
+            SectionJourneyStatus.InProgress(secondQuestionPageUrl(index1of5000))
+          )
 
         val result = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(customUserAnswers, srn)
         result mustBe (InProgress, secondQuestionPageUrl(index1of5000))
@@ -479,8 +484,10 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(MoneyBorrowedPage(srn), true)
           .unsafeSet(LenderNamePage(srn, refineMV(1)), lenderName)
           .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(1)), reasonBorrowed)
+          .unsafeSet(MoneyBorrowedProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
           .unsafeSet(LenderNamePage(srn, refineMV(2)), lenderName)
           .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(2)), reasonBorrowed)
+          .unsafeSet(MoneyBorrowedProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
 
         val result = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(customUserAnswers, srn)
         result mustBe (Recorded(2, "borrowings"), listPageUrl)
@@ -492,6 +499,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         .unsafeSet(MoneyBorrowedPage(srn), true)
         .unsafeSet(LenderNamePage(srn, refineMV(1)), lenderName)
         .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(1)), reasonBorrowed)
+        .unsafeSet(MoneyBorrowedProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
         .unsafeSet(LenderNamePage(srn, refineMV(2)), lenderName)
 
       val result = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(customUserAnswers, srn)
@@ -505,6 +513,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         // missing here
         .unsafeSet(LenderNamePage(srn, refineMV(2)), lenderName)
         .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(2)), reasonBorrowed)
+        .unsafeSet(MoneyBorrowedProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
 
       val result = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(customUserAnswers, srn)
       result mustBe (Recorded(1, "borrowings"), listPageUrl)
