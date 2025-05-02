@@ -33,5 +33,5 @@ class PsrOverviewService @Inject()(psrConnector: PSRConnector) {
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[Seq[OverviewResponse]]] =
-    psrConnector.getOverview(pstr, fromDate, toDate, srn)
+    psrConnector.getOverview(pstr, fromDate, toDate, srn, controllers.routes.OverviewController.onPageLoad(srn))
 }
