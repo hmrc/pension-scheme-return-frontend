@@ -23,6 +23,7 @@ import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models._
 import pages.nonsipp.moneyborrowed._
+import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
@@ -73,6 +74,20 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index), money)
     .unsafeSet(WhySchemeBorrowedMoneyPage(srn, index), schemeName)
 
+  private val incompleteUserAnswers = defaultUserAnswers
+    .unsafeSet(LenderNamePage(srn, index), lenderName)
+    .unsafeSet(IsLenderConnectedPartyPage(srn, index), true)
+    .unsafeSet(BorrowedAmountAndRatePage(srn, index), (money, percentage))
+    .unsafeSet(WhenBorrowedPage(srn, index), localDate)
+    .unsafeSet(
+      MoneyBorrowedProgress(srn, index),
+      SectionJourneyStatus.InProgress(
+        routes.ValueOfSchemeAssetsWhenMoneyBorrowedController
+          .onPageLoad(srn, index, NormalMode)
+          .url
+      )
+    )
+
   "MoneyBorrowedCYAController" - {
 
     List(NormalMode, CheckMode).foreach { mode =>
@@ -117,6 +132,13 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
           .updateName("onSubmit" + _)
           .withName(s"redirect to journey recovery page on submit when in ${mode.toString} mode")
       )
+
+      redirectToPage(
+        call = onPageLoad(mode),
+        page = routes.ValueOfSchemeAssetsWhenMoneyBorrowedController.onPageLoad(srn, index, mode),
+        userAnswers = incompleteUserAnswers,
+        previousUserAnswers = emptyUserAnswers
+      ).withName(s"redirect to list page when in $mode mode and incomplete data")
     }
   }
 

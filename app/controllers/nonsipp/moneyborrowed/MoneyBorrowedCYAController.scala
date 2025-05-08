@@ -34,6 +34,7 @@ import models._
 import play.api.i18n._
 import pages.nonsipp.moneyborrowed._
 import viewmodels.DisplayMessage._
+import viewmodels.models.SectionJourneyStatus.InProgress
 import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -69,41 +70,48 @@ class MoneyBorrowedCYAController @Inject()(
     }
 
   def onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
-    (
-      for {
-
-        lenderName <- request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney
-        lenderConnectedParty <- request.userAnswers.get(IsLenderConnectedPartyPage(srn, index)).getOrRecoverJourney
-        borrowedAmountAndRate <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney
-        whenBorrowed <- request.userAnswers.get(WhenBorrowedPage(srn, index)).getOrRecoverJourney
-        schemeAssets <- request.userAnswers
-          .get(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index))
-          .getOrRecoverJourney
-        schemeBorrowed <- request.userAnswers.get(WhySchemeBorrowedMoneyPage(srn, index)).getOrRecoverJourney
-
-        schemeName = request.schemeDetails.schemeName
-      } yield Ok(
-        view(
-          viewModel(
-            srn,
-            index,
-            schemeName,
-            lenderName,
-            lenderConnectedParty,
-            borrowedAmountAndRate,
-            whenBorrowed,
-            schemeAssets,
-            schemeBorrowed,
-            mode,
-            viewOnlyUpdated = false, // flag is not displayed on this tier
-            optYear = request.year,
-            optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
-          )
+    request.userAnswers.get(MoneyBorrowedProgress(srn, index)) match {
+      case Some(InProgress(_)) =>
+        Redirect(
+          controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, 1, mode)
         )
-      )
-    ).merge
+      case _ =>
+        (
+          for {
+
+            lenderName <- request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney
+            lenderConnectedParty <- request.userAnswers.get(IsLenderConnectedPartyPage(srn, index)).getOrRecoverJourney
+            borrowedAmountAndRate <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney
+            whenBorrowed <- request.userAnswers.get(WhenBorrowedPage(srn, index)).getOrRecoverJourney
+            schemeAssets <- request.userAnswers
+              .get(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index))
+              .getOrRecoverJourney
+            schemeBorrowed <- request.userAnswers.get(WhySchemeBorrowedMoneyPage(srn, index)).getOrRecoverJourney
+
+            schemeName = request.schemeDetails.schemeName
+          } yield Ok(
+            view(
+              viewModel(
+                srn,
+                index,
+                schemeName,
+                lenderName,
+                lenderConnectedParty,
+                borrowedAmountAndRate,
+                whenBorrowed,
+                schemeAssets,
+                schemeBorrowed,
+                mode,
+                viewOnlyUpdated = false, // flag is not displayed on this tier
+                optYear = request.year,
+                optCurrentVersion = request.currentVersion,
+                optPreviousVersion = request.previousVersion,
+                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+              )
+            )
+          )
+        ).merge
+    }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>

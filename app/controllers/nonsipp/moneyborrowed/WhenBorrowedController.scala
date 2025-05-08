@@ -31,6 +31,7 @@ import views.html.DatePageView
 import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, LenderNamePage, WhenBorrowedPage}
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{DatePageViewModel, FormPageViewModel}
 import models.requests.DataRequest
@@ -112,11 +113,12 @@ class WhenBorrowedController @Inject()(
                   ),
                 value =>
                   for {
-                    updatedAnswers <- Future
-                      .fromTry(request.userAnswers.set(WhenBorrowedPage(srn, index), value))
-                    _ <- saveService.save(updatedAnswers)
+                    updatedAnswers <- request.userAnswers.set(WhenBorrowedPage(srn, index), value).mapK[Future]
+                    nextPage = navigator.nextPage(WhenBorrowedPage(srn, index), mode, updatedAnswers)
+                    updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                    _ <- saveService.save(updatedProgressAnswers)
                   } yield Redirect(
-                    navigator.nextPage(WhenBorrowedPage(srn, index), mode, updatedAnswers)
+                    nextPage
                   )
               )
           }

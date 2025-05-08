@@ -42,7 +42,7 @@ import viewmodels.models.TaskListStatus._
 import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import utils.nonsipp.check._
 import pages.nonsipp.membertransferout.{SchemeTransferOutPage, TransfersOutSectionCompleted}
-import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
+import pages.nonsipp.moneyborrowed.{MoneyBorrowedPage, MoneyBorrowedProgress}
 import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsDisposalProgress}
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus, TaskListStatus}
@@ -340,7 +340,7 @@ object TaskListStatusUtils {
 
   def getBorrowingTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereBorrowings = userAnswers.get(MoneyBorrowedPage(srn))
-    val numRecorded = userAnswers.get(WhySchemeBorrowedMoneyPages(srn)).getOrElse(Map.empty).size
+    val numRecorded = userAnswers.get(MoneyBorrowedProgress.all(srn)).getOrElse(Map.empty).count(_._2.completed)
 
     val firstQuestionPageUrl =
       controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController
@@ -352,19 +352,15 @@ object TaskListStatusUtils {
         .onPageLoad(srn, 1, NormalMode)
         .url
 
-    val firstPages = userAnswers.get(LenderNamePages(srn))
-    val lastPages = userAnswers.get(WhySchemeBorrowedMoneyPages(srn))
-    val incompleteIndex: Int = getIncompleteIndex(firstPages, lastPages)
-
-    val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
-      _ => firstQuestionPageUrl,
-      index => controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, index, NormalMode).url
-    )
+    val inProgressUrl = userAnswers
+      .map(MoneyBorrowedProgress.all(srn))
+      .collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+      .getOrElse(firstQuestionPageUrl)
 
     (wereBorrowings, numRecorded) match {
       case (None, _) => (NotStarted, firstQuestionPageUrl)
       case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
-      case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
+      case (Some(true), 0) => (InProgress, inProgressUrl)
       case (Some(true), _) => (Recorded(numRecorded, "borrowings"), listPageUrl)
     }
   }

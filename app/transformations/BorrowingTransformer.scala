@@ -21,6 +21,7 @@ import config.RefinedTypes.OneTo5000
 import eu.timepit.refined.refineV
 import models.{Money, Percentage, UserAnswers}
 import pages.nonsipp.moneyborrowed._
+import viewmodels.models.SectionJourneyStatus
 import models.requests.DataRequest
 import pages.nonsipp.moneyborrowed.Paths.borrowing
 import models.SchemeId.Srn
@@ -50,34 +51,38 @@ class BorrowingTransformer @Inject() extends Transformer {
 
   private def moneyBorrowedTransformToEtmp(srn: Srn)(implicit request: DataRequest[_]): List[MoneyBorrowed] =
     request.userAnswers
-      .get(LenderNamePages(srn))
+      .get(MoneyBorrowedProgress.all(srn))
       .map { value =>
-        value.keys.toList.flatMap { key =>
-          key.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
-            case None => None
-            case Some(index) =>
-              for {
-                lenderName <- request.userAnswers.get(LenderNamePage(srn, index))
-                isLenderConnectedParty <- request.userAnswers.get(IsLenderConnectedPartyPage(srn, index))
-                borrowedAmountAndRate <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index))
-                whenBorrowed <- request.userAnswers.get(WhenBorrowedPage(srn, index))
-                valueOfSchemeAssetsWhenMoneyBorrowed <- request.userAnswers.get(
-                  ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index)
-                )
-                whySchemeBorrowedMoney <- request.userAnswers.get(WhySchemeBorrowedMoneyPage(srn, index))
-              } yield {
-                MoneyBorrowed(
-                  dateOfBorrow = whenBorrowed,
-                  schemeAssetsValue = valueOfSchemeAssetsWhenMoneyBorrowed.value,
-                  amountBorrowed = borrowedAmountAndRate._1.value,
-                  interestRate = borrowedAmountAndRate._2.value,
-                  borrowingFromName = lenderName,
-                  connectedPartyStatus = isLenderConnectedParty,
-                  reasonForBorrow = whySchemeBorrowedMoney
-                )
-              }
+        value
+          .filter(_._2.completed)
+          .keys
+          .toList
+          .flatMap { key =>
+            key.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
+              case None => None
+              case Some(index) =>
+                for {
+                  lenderName <- request.userAnswers.get(LenderNamePage(srn, index))
+                  isLenderConnectedParty <- request.userAnswers.get(IsLenderConnectedPartyPage(srn, index))
+                  borrowedAmountAndRate <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index))
+                  whenBorrowed <- request.userAnswers.get(WhenBorrowedPage(srn, index))
+                  valueOfSchemeAssetsWhenMoneyBorrowed <- request.userAnswers.get(
+                    ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index)
+                  )
+                  whySchemeBorrowedMoney <- request.userAnswers.get(WhySchemeBorrowedMoneyPage(srn, index))
+                } yield {
+                  MoneyBorrowed(
+                    dateOfBorrow = whenBorrowed,
+                    schemeAssetsValue = valueOfSchemeAssetsWhenMoneyBorrowed.value,
+                    amountBorrowed = borrowedAmountAndRate._1.value,
+                    interestRate = borrowedAmountAndRate._2.value,
+                    borrowingFromName = lenderName,
+                    connectedPartyStatus = isLenderConnectedParty,
+                    reasonForBorrow = whySchemeBorrowedMoney
+                  )
+                }
+            }
           }
-        }
       }
       .getOrElse(List.empty)
 
@@ -115,8 +120,8 @@ class BorrowingTransformer @Inject() extends Transformer {
             ua4 <- ua3.set(whySchemeBorrowedMoney._1, whySchemeBorrowedMoney._2)
             ua5 <- ua4.set(isLenderConnectedParty._1, isLenderConnectedParty._2)
             ua6 <- ua5.set(valueOfSchemeAssetsWhenMoneyBorrowed._1, valueOfSchemeAssetsWhenMoneyBorrowed._2)
-
-          } yield ua6
+            ua7 <- ua6.set(MoneyBorrowedProgress(srn, index), SectionJourneyStatus.Completed)
+          } yield ua7
       }
 
     } yield resultUA

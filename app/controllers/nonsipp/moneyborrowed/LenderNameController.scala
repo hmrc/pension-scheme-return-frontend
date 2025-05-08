@@ -23,7 +23,6 @@ import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
-import viewmodels.models._
 import play.api.data.Form
 import config.RefinedTypes.Max5000
 import controllers.PSRController
@@ -31,6 +30,8 @@ import views.html.TextInputView
 import models.SchemeId.Srn
 import play.api.i18n.MessagesApi
 import pages.nonsipp.moneyborrowed.LenderNamePage
+import utils.FunctionKUtils._
+import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -72,12 +73,11 @@ class LenderNameController @Inject()(
             ),
           value =>
             for {
-              updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(LenderNamePage(srn, index), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(LenderNamePage(srn, index), mode, updatedAnswers)
-            )
+              updatedAnswers <- request.userAnswers.set(LenderNamePage(srn, index), value).mapK[Future]
+              nextPage = navigator.nextPage(LenderNamePage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

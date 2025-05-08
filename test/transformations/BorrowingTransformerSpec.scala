@@ -26,6 +26,7 @@ import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
 import pages.nonsipp.moneyborrowed._
+import viewmodels.models.SectionJourneyStatus
 import models.requests.{AllowedAccessRequest, DataRequest}
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import play.api.libs.json.Json
@@ -92,6 +93,53 @@ class BorrowingTransformerSpec
           .unsafeSet(WhenBorrowedPage(srn, refineMV(1)), localDate)
           .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, refineMV(1)), money)
           .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(1)), "reasonForBorrow")
+          .unsafeSet(MoneyBorrowedProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+
+        val request = DataRequest(allowedAccessRequest, userAnswers)
+
+        val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+        result mustBe Some(
+          Borrowing(
+            recordVersion = Some("001"),
+            moneyWasBorrowed = true,
+            moneyBorrowed = List(
+              MoneyBorrowed(
+                dateOfBorrow = localDate,
+                schemeAssetsValue = money.value,
+                amountBorrowed = money.value,
+                interestRate = percentage.value,
+                borrowingFromName = "borrowingFromName",
+                connectedPartyStatus = true,
+                reasonForBorrow = "reasonForBorrow"
+              )
+            )
+          )
+        )
+      }
+
+      "should not include incomplete record" in {
+        val userAnswers = emptyUserAnswers
+          .unsafeSet(MoneyBorrowedPage(srn), true)
+          .unsafeSet(BorrowingRecordVersionPage(srn), "001")
+          .unsafeSet(LenderNamePage(srn, refineMV(1)), "borrowingFromName")
+          .unsafeSet(IsLenderConnectedPartyPage(srn, refineMV(1)), true)
+          .unsafeSet(BorrowedAmountAndRatePage(srn, refineMV(1)), (money, percentage))
+          .unsafeSet(WhenBorrowedPage(srn, refineMV(1)), localDate)
+          .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, refineMV(1)), money)
+          .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(1)), "reasonForBorrow")
+          .unsafeSet(MoneyBorrowedProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(MoneyBorrowedPage(srn), true)
+          .unsafeSet(BorrowingRecordVersionPage(srn), "001")
+          .unsafeSet(LenderNamePage(srn, refineMV(2)), "borrowingFromName")
+          .unsafeSet(IsLenderConnectedPartyPage(srn, refineMV(2)), true)
+          .unsafeSet(BorrowedAmountAndRatePage(srn, refineMV(2)), (money, percentage))
+          .unsafeSet(WhenBorrowedPage(srn, refineMV(2)), localDate)
+          .unsafeSet(
+            MoneyBorrowedProgress(srn, refineMV(2)),
+            SectionJourneyStatus.InProgress(
+              "someurl"
+            )
+          )
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 

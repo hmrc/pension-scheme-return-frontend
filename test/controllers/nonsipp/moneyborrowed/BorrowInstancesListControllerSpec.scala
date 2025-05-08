@@ -21,21 +21,25 @@ import views.html.ListView
 import forms.YesNoPageFormProvider
 import models._
 import pages.nonsipp.moneyborrowed._
+import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import config.RefinedTypes.Max5000
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
-import controllers.nonsipp.moneyborrowed.BorrowInstancesListController._
+import controllers.nonsipp.moneyborrowed.BorrowInstancesListController.{BorrowedMoneyDetails, _}
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import play.api.inject
 
 import scala.concurrent.Future
 
+import java.time.LocalDate
+
 class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
+  private val indexTwo = refineMV[Max5000.Refined](2)
   private val page = 1
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -71,9 +75,34 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
       submissionNumberOne
     )
 
+  private val completeUserAnswers =
+    defaultUserAnswers
+      .unsafeSet(MoneyBorrowedPage(srn), true)
+      .unsafeSet(LenderNamePage(srn, index), lenderName)
+      .unsafeSet(IsLenderConnectedPartyPage(srn, index), false)
+      .unsafeSet(BorrowedAmountAndRatePage(srn, index), (money, percentage))
+      .unsafeSet(WhenBorrowedPage(srn, index), LocalDate.now())
+      .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index), money)
+      .unsafeSet(WhySchemeBorrowedMoneyPage(srn, index), "Reason")
+      .unsafeSet(MoneyBorrowedProgress(srn, index), SectionJourneyStatus.Completed)
+
+  private val secondIncompleteAnswers =
+    completeUserAnswers
+      .unsafeSet(MoneyBorrowedPage(srn), true)
+      .unsafeSet(LenderNamePage(srn, indexTwo), lenderName)
+      .unsafeSet(IsLenderConnectedPartyPage(srn, indexTwo), false)
+      .unsafeSet(BorrowedAmountAndRatePage(srn, indexTwo), (money, percentage))
+      .unsafeSet(WhenBorrowedPage(srn, indexTwo), LocalDate.now())
+      .unsafeSet(
+        MoneyBorrowedProgress(srn, indexTwo),
+        SectionJourneyStatus.InProgress(
+          routes.ValueOfSchemeAssetsWhenMoneyBorrowedController.onPageLoad(srn, indexTwo, NormalMode).url
+        )
+      )
+
   private val userAnswers =
     defaultUserAnswers
-      .unsafeSet(MoneyBorrowedPage(srn), false)
+      .unsafeSet(MoneyBorrowedPage(srn), true)
       .unsafeSet(LenderNamePages(srn), Map("0" -> lenderName))
       .unsafeSet(BorrowedAmountAndRatePage(srn, index), (money, percentage))
 
@@ -94,7 +123,7 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
 
   "BorrowInstancesListController" - {
 
-    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, completeUserAnswers) { implicit app => implicit request =>
       injected[ListView]
         .apply(
           form(injected[YesNoPageFormProvider]),
@@ -102,12 +131,12 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
             srn,
             NormalMode,
             page = 1,
-            borrowingInstances = List((index, lenderName, money)),
+            borrowingInstances = List(BorrowedMoneyDetails(index, lenderName, Some(money))),
             schemeName,
             showBackLink = true
           )
         )
-    })
+    }.withName("Render page"))
 
     act.like(
       redirectToPage(
@@ -125,6 +154,22 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
     act.like(invalidForm(onSubmit, userAnswers))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+
+    act.like(renderView(onPageLoad, secondIncompleteAnswers) { implicit app => implicit request =>
+      injected[ListView].apply(
+        form(new YesNoPageFormProvider()),
+        viewModel(
+          srn,
+          NormalMode,
+          1,
+          borrowingInstances = List(
+            BorrowedMoneyDetails(index, lenderName, Some(money))
+          ),
+          schemeName,
+          showBackLink = true
+        )
+      )
+    }.withName("Completed Journey - 1 added record and 1 incomplete record"))
   }
 
   "BorrowInstancesListController in view only mode" - {
@@ -132,9 +177,10 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
     val currentUserAnswers = defaultUserAnswers
       .unsafeSet(FbVersionPage(srn), "002")
       .unsafeSet(CompilationOrSubmissionDatePage(srn), submissionDateTwo)
-      .unsafeSet(MoneyBorrowedPage(srn), false)
+      .unsafeSet(MoneyBorrowedPage(srn), true)
       .unsafeSet(LenderNamePages(srn), Map("0" -> lenderName))
       .unsafeSet(BorrowedAmountAndRatePage(srn, index), (money, percentage))
+      .unsafeSet(MoneyBorrowedProgress(srn, index), SectionJourneyStatus.Completed)
 
     val previousUserAnswers = currentUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")
@@ -159,7 +205,7 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
                 srn,
                 mode = ViewOnlyMode,
                 page = 1,
-                borrowingInstances = List((index, lenderName, money)),
+                borrowingInstances = List(BorrowedMoneyDetails(index, lenderName, Some(money))),
                 schemeName,
                 Some(viewOnlyViewModel),
                 showBackLink = true
@@ -181,7 +227,7 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
                 srn,
                 mode = ViewOnlyMode,
                 page = 1,
-                borrowingInstances = List((index, lenderName, money)),
+                borrowingInstances = List(BorrowedMoneyDetails(index, lenderName, Some(money))),
                 schemeName,
                 viewOnlyViewModel = Some(viewOnlyViewModel.copy(viewOnlyUpdated = true)),
                 showBackLink = true
@@ -235,7 +281,7 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
               srn,
               mode = ViewOnlyMode,
               page = 1,
-              borrowingInstances = List((index, lenderName, money)),
+              borrowingInstances = List(BorrowedMoneyDetails(index, lenderName, Some(money))),
               schemeName,
               viewOnlyViewModel = Some(
                 viewOnlyViewModel.copy(
