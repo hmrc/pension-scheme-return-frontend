@@ -66,8 +66,10 @@ class LandPropertyInUKController @Inject()(
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(LandPropertyInUKPage(srn, index), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(LandPropertyInUKPage(srn, index), mode, updatedAnswers))
+              nextPage = navigator.nextPage(LandPropertyInUKPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
   }
 }

@@ -74,8 +74,10 @@ class IsLandPropertyLeasedController @Inject()(
             for {
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(IsLandPropertyLeasedPage(srn, index), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(IsLandPropertyLeasedPage(srn, index), mode, updatedAnswers))
+              nextPage = navigator.nextPage(IsLandPropertyLeasedPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
   }
 }

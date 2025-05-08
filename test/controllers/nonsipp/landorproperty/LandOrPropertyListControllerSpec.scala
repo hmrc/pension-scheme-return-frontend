@@ -26,7 +26,7 @@ import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import eu.timepit.refined.api.Refined
 import org.mockito.ArgumentMatchers.any
 import config.RefinedTypes.OneTo5000
@@ -37,6 +37,7 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
   val indexOne: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
   val indexTwo: Refined[Int, OneTo5000] = refineMV[OneTo5000](2)
   val indexThree: Refined[Int, OneTo5000] = refineMV[OneTo5000](3)
+  val indexFour: Refined[Int, OneTo5000] = refineMV[OneTo5000](4)
 
   private val address1 = addressGen.sample.value.copy(addressLine1 = "test 1")
   private val address2 = addressGen.sample.value.copy(addressLine1 = "test 2")
@@ -71,6 +72,7 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(IsLesseeConnectedPartyPage(srn, indexOne), true)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, indexOne), money)
     .unsafeSet(LandOrPropertyCompleted(srn, indexOne), SectionCompleted)
+    .unsafeSet(LandOrPropertyProgress(srn, indexOne), SectionJourneyStatus.Completed)
     // LOP 2 - Completed then Removed
     .unsafeSet(LandPropertyInUKPage(srn, indexTwo), true)
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, indexTwo), address2)
@@ -83,7 +85,17 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(IsLesseeConnectedPartyPage(srn, indexTwo), true)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, indexTwo), money)
     .unsafeSet(LandOrPropertyCompleted(srn, indexTwo), SectionCompleted)
+    .unsafeSet(LandOrPropertyProgress(srn, indexTwo), SectionJourneyStatus.Completed)
     .unsafeSet(RemovePropertyPage(srn, indexTwo), true)
+
+  private val thirdIncompleteUserAnswers = completedUserAnswers
+  // LOP 1 - Completed
+    .unsafeSet(LandPropertyInUKPage(srn, indexThree), true)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, indexThree), address1)
+    .unsafeSet(
+      LandOrPropertyProgress(srn, indexThree),
+      SectionJourneyStatus.InProgress(LandRegistryTitleNumberPage(srn, indexThree))
+    )
 
   private val completedUserAnswersToCheck = completedUserAnswers
     .unsafeSet(LandPropertyInUKPage(srn, indexThree), true)
@@ -91,7 +103,16 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(LandRegistryTitleNumberPage(srn, indexThree), ConditionalYesNo.yes[String, String]("some-number"))
     .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, indexThree), SchemeHoldLandProperty.Transfer)
     .unsafeSet(LandOrPropertyTotalCostPage(srn, indexThree), money)
+    .unsafeSet(LandOrPropertyProgress(srn, indexThree), SectionJourneyStatus.Completed)
     .unsafeSet(LandOrPropertyPrePopulated(srn, indexThree), false)
+
+  private val someIncompleteUserAnswersToCheck = completedUserAnswersToCheck
+    .unsafeSet(LandPropertyInUKPage(srn, indexFour), true)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, indexFour), address1)
+    .unsafeSet(
+      LandOrPropertyProgress(srn, indexFour),
+      SectionJourneyStatus.InProgress(LandRegistryTitleNumberPage(srn, indexThree))
+    )
 
   private val completedUserAnswersChecked = completedUserAnswers
     .unsafeSet(LandPropertyInUKPage(srn, indexThree), true)
@@ -100,6 +121,7 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, indexThree), SchemeHoldLandProperty.Transfer)
     .unsafeSet(LandOrPropertyTotalCostPage(srn, indexThree), money)
     .unsafeSet(LandOrPropertyPrePopulated(srn, indexThree), true)
+    .unsafeSet(LandOrPropertyProgress(srn, indexThree), SectionJourneyStatus.Completed)
 
   private val noUserAnswers = defaultUserAnswers
     .unsafeSet(LandOrPropertyHeldPage(srn), false)
@@ -153,6 +175,22 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
       )
     }.withName("Completed Journey - 1 added record"))
 
+    act.like(renderView(onPageLoad, thirdIncompleteUserAnswers) { implicit app => implicit request =>
+      injected[ListView].apply(
+        form(new YesNoPageFormProvider()),
+        viewModel(
+          srn,
+          1,
+          NormalMode,
+          addresses,
+          Map.empty,
+          schemeName,
+          showBackLink = true,
+          isPrePop = false
+        )
+      )
+    }.withName("Completed Journey - 1 added record and 1 incomplete record"))
+
     act.like(renderViewWithPrePopSession(onPageLoad, completedUserAnswersToCheck) { implicit app => implicit request =>
       injected[ListView].apply(
         form(new YesNoPageFormProvider()),
@@ -168,6 +206,23 @@ class LandOrPropertyListControllerSpec extends ControllerBaseSpec {
         )
       )
     }.withName("PrePop Journey - 1 added record, 1 PrePop record to Check"))
+
+    act.like(renderViewWithPrePopSession(onPageLoad, someIncompleteUserAnswersToCheck) {
+      implicit app => implicit request =>
+        injected[ListView].apply(
+          form(new YesNoPageFormProvider()),
+          viewModel(
+            srn,
+            page = 1,
+            NormalMode,
+            addresses,
+            addressesToCheck,
+            schemeName,
+            showBackLink = true,
+            isPrePop = true
+          )
+        )
+    }.withName("PrePop Journey - 1 added record, 1 added incomplete record, 1 PrePop record to Check"))
 
     act.like(renderViewWithPrePopSession(onPageLoad, completedUserAnswersChecked) { implicit app => implicit request =>
       injected[ListView].apply(

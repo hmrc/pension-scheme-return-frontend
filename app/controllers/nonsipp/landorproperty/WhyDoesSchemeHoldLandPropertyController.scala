@@ -76,10 +76,10 @@ class WhyDoesSchemeHoldLandPropertyController @Inject()(
             for {
               userAnswers <- Future
                 .fromTry(request.userAnswers.set(WhyDoesSchemeHoldLandPropertyPage(srn, index), success))
-              _ <- saveService.save(userAnswers)
-            } yield {
-              Redirect(navigator.nextPage(WhyDoesSchemeHoldLandPropertyPage(srn, index), mode, userAnswers))
-            }
+              nextPage = navigator.nextPage(WhyDoesSchemeHoldLandPropertyPage(srn, index), mode, userAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, userAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield { Redirect(nextPage) }
         )
   }
 }

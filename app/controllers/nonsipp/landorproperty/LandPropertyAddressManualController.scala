@@ -119,8 +119,10 @@ class LandPropertyAddressManualController @Inject()(
                 request.userAnswers
                   .set(LandOrPropertyChosenAddressPage(srn, index), Address.fromManualUKAddress(value))
               )
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(LandOrPropertyChosenAddressPage(srn, index), mode, updatedAnswers))
+            nextPage = navigator.nextPage(LandOrPropertyChosenAddressPage(srn, index), mode, updatedAnswers)
+            updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+            _ <- saveService.save(updatedProgressAnswers)
+          } yield Redirect(nextPage)
       )
 
   private def onSubmitInternationalAddress(srn: Srn, index: Max5000, mode: Mode)(
@@ -149,8 +151,10 @@ class LandPropertyAddressManualController @Inject()(
                     Address.fromManualInternationalAddress(value)
                   )
               )
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(LandOrPropertyChosenAddressPage(srn, index), mode, updatedAnswers))
+            nextPage = navigator.nextPage(LandOrPropertyChosenAddressPage(srn, index), mode, updatedAnswers)
+            updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+            _ <- saveService.save(updatedProgressAnswers)
+          } yield Redirect(nextPage)
       )
 }
 

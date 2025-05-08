@@ -20,11 +20,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import controllers.nonsipp.landorproperty.LandOrPropertyListController._
-import pages.nonsipp.landorproperty.{
-  LandOrPropertyAddressLookupPages,
-  LandOrPropertyListPage,
-  LandOrPropertyPrePopulated
-}
+import pages.nonsipp.landorproperty._
 import cats.implicits.toShow
 import config.Constants.maxLandOrProperties
 import controllers.actions._
@@ -139,40 +135,60 @@ class LandOrPropertyListController @Inject()(
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    addresses(srn).getOrRecoverJourney.map {
-      case (addressesToCheck, addresses) =>
-        if (addressesToCheck.size + addresses.size == maxLandOrProperties) {
-          Redirect(
-            navigator.nextPage(LandOrPropertyListPage(srn, addLandOrProperty = false), mode, request.userAnswers)
-          )
-        } else {
-          form
-            .bindFromRequest()
-            .fold(
-              errors =>
-                BadRequest(
-                  view(
-                    errors,
-                    viewModel(
-                      srn,
-                      page,
-                      mode,
-                      addresses = addresses,
-                      addressesToCheck = addressesToCheck,
-                      request.schemeDetails.schemeName,
-                      None,
-                      showBackLink = true,
-                      isPrePopulation
-                    )
-                  )
-                ),
-              answer =>
-                Redirect(
-                  navigator.nextPage(LandOrPropertyListPage(srn, addLandOrProperty = answer), mode, request.userAnswers)
-                )
+    {
+
+      val inProgressAnswers = request.userAnswers.map(LandOrPropertyProgress.all(srn))
+      val inProgressUrl = inProgressAnswers.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+      addresses(srn).getOrRecoverJourney.map {
+        case (addressesToCheck, addresses) =>
+          if (addressesToCheck.size + addresses.size == maxLandOrProperties) {
+            Redirect(
+              navigator.nextPage(LandOrPropertyListPage(srn, addLandOrProperty = false), mode, request.userAnswers)
             )
-        }
-    }.merge
+          } else {
+            form
+              .bindFromRequest()
+              .fold(
+                errors =>
+                  BadRequest(
+                    view(
+                      errors,
+                      viewModel(
+                        srn,
+                        page,
+                        mode,
+                        addresses = addresses,
+                        addressesToCheck = addressesToCheck,
+                        request.schemeDetails.schemeName,
+                        None,
+                        showBackLink = true,
+                        isPrePopulation
+                      )
+                    )
+                  ),
+                answer =>
+                  if (answer) {
+                    inProgressUrl match {
+                      case Some(url) => Redirect(url)
+                      case _ =>
+                        Redirect(
+                          navigator.nextPage(
+                            LandOrPropertyListPage(srn, addLandOrProperty = answer),
+                            mode,
+                            request.userAnswers
+                          )
+                        )
+                    }
+                  } else {
+                    Redirect(
+                      navigator
+                        .nextPage(LandOrPropertyListPage(srn, addLandOrProperty = answer), mode, request.userAnswers)
+                    )
+                  }
+              )
+          }
+      }.merge
+    }
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -209,11 +225,13 @@ class LandOrPropertyListController @Inject()(
 
   private def addresses(
     srn: Srn
-  )(implicit request: DataRequest[_]): Either[String, (Map[Max5000, Address], Map[Max5000, Address])] =
+  )(implicit request: DataRequest[_]): Either[String, (Map[Max5000, Address], Map[Max5000, Address])] = {
+    val completedIndexes = request.userAnswers.map(LandOrPropertyProgress.all(srn)).filter(_._2.completed).keys.toList
     // if return has been pre-populated, partition addresses by those that need to be checked
     if (isPrePopulation) {
       request.userAnswers
         .map(LandOrPropertyAddressLookupPages(srn))
+        .collect { case (index, address) if completedIndexes.contains(index) => (index, address) }
         .refine[Max5000.Refined]
         .map(_.map {
           case (index, address) =>
@@ -226,9 +244,11 @@ class LandOrPropertyListController @Inject()(
       val noAddressesToCheck = Map.empty[Max5000, Address]
       request.userAnswers
         .map(LandOrPropertyAddressLookupPages(srn))
+        .collect { case (index, address) if completedIndexes.contains(index) => (index, address) }
         .refine[Max5000.Refined]
         .map((noAddressesToCheck, _))
     }
+  }
 }
 
 object LandOrPropertyListController {

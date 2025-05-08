@@ -80,8 +80,10 @@ class LandOrPropertyTotalCostController @Inject()(
             for {
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.transformAndSet(LandOrPropertyTotalCostPage(srn, index), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(LandOrPropertyTotalCostPage(srn, index), mode, updatedAnswers))
+              nextPage = navigator.nextPage(LandOrPropertyTotalCostPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
   }
 }

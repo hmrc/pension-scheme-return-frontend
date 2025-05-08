@@ -79,10 +79,10 @@ class IndividualSellerNiController @Inject()(
                   request.userAnswers
                     .set(IndividualSellerNiPage(srn, index), ConditionalYesNo(value))
                 )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(IndividualSellerNiPage(srn, index), mode, updatedAnswers)
-            )
+              nextPage = navigator.nextPage(IndividualSellerNiPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

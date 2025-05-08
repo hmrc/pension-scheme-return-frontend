@@ -36,6 +36,8 @@ package object common {
     subject match {
       case IdentitySubject.LoanRecipient =>
         loansmadeoroutstanding.saveProgress(srn, index, userAnswers, nextPage, alwaysCompleted)
+      case IdentitySubject.LandOrPropertySeller =>
+        landorproperty.saveProgress(srn, index, userAnswers, nextPage, alwaysCompleted)
 
       case _ => Future.successful(userAnswers)
     }

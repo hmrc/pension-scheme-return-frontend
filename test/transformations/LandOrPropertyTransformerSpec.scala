@@ -30,7 +30,7 @@ import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
 import models._
 import pages.nonsipp.common._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import models.requests.{AllowedAccessRequest, DataRequest}
 import models.requests.psr._
 import config.Constants.PREPOPULATION_FLAG
@@ -61,6 +61,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
     .unsafeSet(LandOrPropertyTotalCostPage(srn, index1of5000), Money(100000.0))
     .unsafeSet(IsLandOrPropertyResidentialPage(srn, index1of5000), false)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, index1of5000), Money(100000.0))
+    .unsafeSet(LandOrPropertyProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
   private val transformer = new LandOrPropertyTransformer()
 
@@ -216,6 +217,25 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
         )
       )
     }
+
+    "should not include incomplete record" in {
+
+      val incompleteUserAnswers = emptyUserAnswers
+        .unsafeSet(LandOrPropertyHeldPage(srn), true)
+        .unsafeSet(LandPropertyInUKPage(srn, index1of5000), true)
+        .unsafeSet(LandOrPropertyPostcodeLookupPage(srn, index1of5000), postcodeLookup)
+        .unsafeSet(AddressLookupResultsPage(srn, index1of5000), List(address, address, address))
+        .unsafeSet(
+          LandOrPropertyProgress(srn, index1of5000),
+          SectionJourneyStatus.InProgress(LandRegistryTitleNumberPage(srn, index1of5000))
+        )
+
+      val request = DataRequest(allowedAccessRequest, incompleteUserAnswers)
+
+      val result = transformer.transformToEtmp(srn, Some(true), incompleteUserAnswers)(request)
+
+      result mustBe Some(LandOrProperty(None, Some(true), Some(false), List()))
+    }
   }
 
   "LandOrPropertyTransformer - From Etmp" - {
@@ -278,6 +298,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
           userAnswers.get(IndividualBuyerNinoNumberPage(srn, refineMV(1), refineMV(1))) mustBe Some(
             ConditionalYesNo.yes(nino)
           )
+          userAnswers.get(LandOrPropertyProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
         }
       )
     }

@@ -26,6 +26,7 @@ import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models._
+import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
@@ -84,6 +85,16 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(IsLandPropertyLeasedPage(srn, index), false)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
 
+  private val incompleteUserAnswers = filledUserAnswers
+    .unsafeSet(
+      LandOrPropertyProgress(srn, index),
+      SectionJourneyStatus.InProgress(
+        controllers.nonsipp.landorproperty.routes.LandRegistryTitleNumberController
+          .onPageLoad(srn, refineMV(1), NormalMode)
+          .url
+      )
+    )
+
   "LandOrPropertyCYAController" - {
     List(NormalMode, CheckMode).foreach { mode =>
       act.like(
@@ -124,6 +135,16 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
             reset(mockPsrSubmissionService)
           })
           .withName(s"redirect to next page when in $mode mode")
+      )
+
+      act.like(
+        redirectToPage(
+          call = onPageLoad(mode),
+          page = controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, page, mode),
+          userAnswers = incompleteUserAnswers,
+          previousUserAnswers = emptyUserAnswers,
+          mockSaveService = Some(mockSaveService)
+        ).withName(s"redirect to list page when in $mode mode and incomplete data")
       )
 
       act.like(

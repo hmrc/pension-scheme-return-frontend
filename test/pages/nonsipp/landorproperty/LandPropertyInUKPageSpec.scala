@@ -21,6 +21,7 @@ import pages.nonsipp.landorpropertydisposal.{HowWasPropertyDisposedOfPage, LandO
 import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import models._
+import viewmodels.models.SectionJourneyStatus
 import eu.timepit.refined.api.Refined
 import pages.behaviours.PageBehaviours
 
@@ -64,6 +65,7 @@ class LandPropertyInUKPageSpec extends PageBehaviours {
         .unsafeSet(IsLesseeConnectedPartyPage(srn, indexOne), true)
         .unsafeSet(LandOrPropertyTotalIncomePage(srn, indexOne), money)
         .unsafeSet(RemovePropertyPage(srn, indexOne), true)
+        .unsafeSet(LandOrPropertyProgress(srn, indexOne), SectionJourneyStatus.Completed)
         .unsafeSet(LandOrPropertyHeldPage(srn), true)
 
     s"remove dependant values when current answer is None" in {
@@ -81,6 +83,7 @@ class LandPropertyInUKPageSpec extends PageBehaviours {
       result.get(IsLesseeConnectedPartyPage(srn, indexOne)) mustBe None
       result.get(LandOrPropertyTotalIncomePage(srn, indexOne)) mustBe None
       result.get(RemovePropertyPage(srn, indexOne)) mustBe None
+      result.get(LandOrPropertyProgress(srn, indexOne)) mustBe None
       result.get(LandOrPropertyHeldPage(srn)) mustBe None
     }
 
@@ -104,6 +107,7 @@ class LandPropertyInUKPageSpec extends PageBehaviours {
         .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, indexOne), (leaseName, money, localDate))
         .unsafeSet(IsLesseeConnectedPartyPage(srn, indexOne), true)
         .unsafeSet(LandOrPropertyTotalIncomePage(srn, indexOne), money)
+        .unsafeSet(LandOrPropertyProgress(srn, indexOne), SectionJourneyStatus.Completed)
         .unsafeSet(RemovePropertyPage(srn, indexOne), true)
         .unsafeSet(LandPropertyInUKPage(srn, indexTwo), true)
         .unsafeSet(LandOrPropertyChosenAddressPage(srn, indexTwo), addressGen.sample.value)
@@ -116,6 +120,7 @@ class LandPropertyInUKPageSpec extends PageBehaviours {
         .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, indexTwo), (leaseName, money, localDate))
         .unsafeSet(IsLesseeConnectedPartyPage(srn, indexTwo), true)
         .unsafeSet(LandOrPropertyTotalIncomePage(srn, indexTwo), money)
+        .unsafeSet(LandOrPropertyProgress(srn, indexTwo), SectionJourneyStatus.Completed)
         .unsafeSet(RemovePropertyPage(srn, indexTwo), true)
         .unsafeSet(LandOrPropertyHeldPage(srn), true)
         // dependant disposal data:
@@ -138,6 +143,7 @@ class LandPropertyInUKPageSpec extends PageBehaviours {
       result.get(LandOrPropertyLeaseDetailsPage(srn, indexOne)) mustBe None
       result.get(IsLesseeConnectedPartyPage(srn, indexOne)) mustBe None
       result.get(LandOrPropertyTotalIncomePage(srn, indexOne)) mustBe None
+      result.get(LandOrPropertyProgress(srn, indexOne)) mustBe None
       result.get(RemovePropertyPage(srn, indexOne)) mustBe None
 
       result.get(LandOrPropertyChosenAddressPage(srn, indexTwo)) must not be None
@@ -150,6 +156,7 @@ class LandPropertyInUKPageSpec extends PageBehaviours {
       result.get(LandOrPropertyLeaseDetailsPage(srn, indexTwo)) must not be None
       result.get(IsLesseeConnectedPartyPage(srn, indexTwo)) must not be None
       result.get(LandOrPropertyTotalIncomePage(srn, indexTwo)) must not be None
+      result.get(LandOrPropertyProgress(srn, indexTwo)) must not be None
       result.get(RemovePropertyPage(srn, indexTwo)) must not be None
 
       result.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)

@@ -23,7 +23,7 @@ import eu.timepit.refined.refineV
 import models._
 import pages.nonsipp.common._
 import models.IdentitySubject.LandOrPropertySeller
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import models.requests.DataRequest
 import eu.timepit.refined.api.Refined
 import models.HowDisposed.{HowDisposed, Other, Sold}
@@ -87,51 +87,60 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
         key.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
           case None => None
           case Some(index) =>
-            for {
-              landOrPropertyInUK <- request.userAnswers.get(LandPropertyInUKPage(srn, index))
-              addressDetails <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index))
-              landRegistryTitleNumber <- request.userAnswers.get(LandRegistryTitleNumberPage(srn, index))
-              methodOfHolding <- request.userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, index))
+            val progress = request.userAnswers.get(LandOrPropertyProgress(srn, index))
+            if (progress.contains(SectionJourneyStatus.Completed)) {
 
-              totalCostOfLandOrProperty <- request.userAnswers.get(LandOrPropertyTotalCostPage(srn, index))
-              prePopulated = request.userAnswers.get(LandOrPropertyPrePopulated(srn, index))
-            } yield {
+              for {
+                landOrPropertyInUK <- request.userAnswers.get(LandPropertyInUKPage(srn, index))
+                addressDetails <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index))
+                landRegistryTitleNumber <- request.userAnswers.get(LandRegistryTitleNumberPage(srn, index))
+                methodOfHolding <- request.userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, index))
 
-              val optNoneTransferRelatedDetails = buildOptNoneTransferRelatedDetails(methodOfHolding, srn, index)
-              val optAcquisitionRelatedDetails = buildOptAcquisitionRelatedDetails(methodOfHolding, srn, index)
+                totalCostOfLandOrProperty <- request.userAnswers.get(LandOrPropertyTotalCostPage(srn, index))
+                prePopulated = request.userAnswers.get(LandOrPropertyPrePopulated(srn, index))
+              } yield {
 
-              LandOrPropertyTransactions(
-                prePopulated = prePopulated,
-                propertyDetails = PropertyDetails(
-                  landOrPropertyInUK = landOrPropertyInUK,
-                  addressDetails = addressDetails,
-                  landRegistryTitleNumberKey = landRegistryTitleNumber.value.isRight,
-                  landRegistryTitleNumberValue = landRegistryTitleNumber.value.merge
-                ),
-                heldPropertyTransaction = HeldPropertyTransaction(
-                  methodOfHolding = methodOfHolding,
-                  dateOfAcquisitionOrContribution = optNoneTransferRelatedDetails.map(_._2),
-                  optPropertyAcquiredFromName = optAcquisitionRelatedDetails.map(_._1),
-                  optPropertyAcquiredFrom = optAcquisitionRelatedDetails.map(_._3),
-                  optConnectedPartyStatus = optAcquisitionRelatedDetails.map(_._2),
-                  totalCostOfLandOrProperty = totalCostOfLandOrProperty.value,
-                  optIndepValuationSupport = optNoneTransferRelatedDetails.map(_._1),
-                  optIsLandOrPropertyResidential = request.userAnswers.get(IsLandOrPropertyResidentialPage(srn, index)),
-                  optLeaseDetails = buildOptLandOrPropertyLeasedDetails(
-                    request.userAnswers.get(IsLandPropertyLeasedPage(srn, index)).getOrElse(false),
-                    srn,
-                    index
+                val optNoneTransferRelatedDetails = buildOptNoneTransferRelatedDetails(methodOfHolding, srn, index)
+                val optAcquisitionRelatedDetails = buildOptAcquisitionRelatedDetails(methodOfHolding, srn, index)
+
+                LandOrPropertyTransactions(
+                  prePopulated = prePopulated,
+                  propertyDetails = PropertyDetails(
+                    landOrPropertyInUK = landOrPropertyInUK,
+                    addressDetails = addressDetails,
+                    landRegistryTitleNumberKey = landRegistryTitleNumber.value.isRight,
+                    landRegistryTitleNumberValue = landRegistryTitleNumber.value.merge
                   ),
-                  optLandOrPropertyLeased = request.userAnswers.get(IsLandPropertyLeasedPage(srn, index)),
-                  optTotalIncomeOrReceipts = request.userAnswers
-                    .get(LandOrPropertyTotalIncomePage(srn, index))
-                    .fold(None: Option[Double])(
-                      money => Some(money.value)
+                  heldPropertyTransaction = HeldPropertyTransaction(
+                    methodOfHolding = methodOfHolding,
+                    dateOfAcquisitionOrContribution = optNoneTransferRelatedDetails.map(_._2),
+                    optPropertyAcquiredFromName = optAcquisitionRelatedDetails.map(_._1),
+                    optPropertyAcquiredFrom = optAcquisitionRelatedDetails.map(_._3),
+                    optConnectedPartyStatus = optAcquisitionRelatedDetails.map(_._2),
+                    totalCostOfLandOrProperty = totalCostOfLandOrProperty.value,
+                    optIndepValuationSupport = optNoneTransferRelatedDetails.map(_._1),
+                    optIsLandOrPropertyResidential =
+                      request.userAnswers.get(IsLandOrPropertyResidentialPage(srn, index)),
+                    optLeaseDetails = buildOptLandOrPropertyLeasedDetails(
+                      request.userAnswers.get(IsLandPropertyLeasedPage(srn, index)).getOrElse(false),
+                      srn,
+                      index
+                    ),
+                    optLandOrPropertyLeased = request.userAnswers.get(IsLandPropertyLeasedPage(srn, index)),
+                    optTotalIncomeOrReceipts = request.userAnswers
+                      .get(LandOrPropertyTotalIncomePage(srn, index))
+                      .fold(None: Option[Double])(
+                        money => Some(money.value)
+                      )
+                  ),
+                  optDisposedPropertyTransaction = Option
+                    .when(optDisposeAnyLandOrProperty.getOrElse(false))(
+                      buildOptDisposedPropertyTransactions(srn, index)
                     )
-                ),
-                optDisposedPropertyTransaction = Option
-                  .when(optDisposeAnyLandOrProperty.getOrElse(false))(buildOptDisposedPropertyTransactions(srn, index))
-              )
+                )
+              }
+            } else {
+              None
             }
         }
       }
@@ -308,6 +317,10 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
 
           val landOrPropertyCompleted = LandOrPropertyCompleted(srn, index) -> SectionCompleted
 
+          val progress = indexes.map(
+            index => LandOrPropertyProgress(srn, index) -> SectionJourneyStatus.Completed
+          )
+
           val landOrPropertyPrePopulated = indexes
             .filter(
               index => {
@@ -362,11 +375,12 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
             ua23 <- landOrPropertyPrePopulated.foldLeft(Try(ua22)) {
               case (ua, (page, value)) => ua.flatMap(_.set(page, value))
             }
+            ua24 <- progress.foldLeft(Try(ua23)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
           } yield {
             buildOptDisposedTransactionUA(
               index,
               srn,
-              ua23,
+              ua24,
               transaction.optDisposedPropertyTransaction,
               landOrProperty.optDisposeAnyLandOrProperty
             )

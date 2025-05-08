@@ -194,6 +194,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     .unsafeSet(IsLesseeConnectedPartyPage(srn, index1of5000), false)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, index1of5000), money)
     .unsafeSet(LandOrPropertyCompleted(srn, index1of5000), SectionCompleted)
+    .unsafeSet(LandOrPropertyProgress(srn, index1of5000), SectionJourneyStatus.Completed)
     // (S6) Land or Property Disposals
     .unsafeSet(LandOrPropertyDisposalPage(srn), true)
     .unsafeSet(HowWasPropertyDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Transferred)
@@ -383,6 +384,10 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LandOrPropertyHeldPage(srn), true)
           .unsafeSet(LandPropertyInUKPages(srn), Map("0" -> true))
+          .unsafeSet(
+            LandOrPropertyProgress(srn, index1of5000),
+            SectionJourneyStatus.InProgress(secondQuestionPageUrl(index1of5000))
+          )
 
         val result =
           TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)

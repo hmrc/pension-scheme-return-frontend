@@ -79,119 +79,128 @@ class LandOrPropertyCYAController @Inject()(
 
   def onPageLoadCommon(srn: SchemeId.Srn, index: Max5000, mode: Mode)(
     implicit request: DataRequest[AnyContent]
-  ): Result =
-    (
-      for {
-        landOrPropertyInUk <- requiredPage(LandPropertyInUKPage(srn, index))
-        landRegistryTitleNumber <- requiredPage(LandRegistryTitleNumberPage(srn, index))
-        addressLookUpPage <- requiredPage(LandOrPropertyChosenAddressPage(srn, index))
-        holdLandProperty <- requiredPage(WhyDoesSchemeHoldLandPropertyPage(srn, index))
-        landOrPropertyTotalCost <- requiredPage(LandOrPropertyTotalCostPage(srn, index))
-
-        landPropertyIndependentValuation = Option.when(holdLandProperty != Transfer)(
-          request.userAnswers.get(LandPropertyIndependentValuationPage(srn, index)).get
+  ): Result = {
+    request.userAnswers.get(LandOrPropertyProgress(srn, index)) match {
+      case Some(value) if value.inProgress =>
+        Redirect(
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, 1, mode)
         )
-        landOrPropertyAcquire = Option.when(holdLandProperty != Transfer)(
-          request.userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, index)).get
-        )
+      case _ =>
+        (
+          for {
+            landOrPropertyInUk <- requiredPage(LandPropertyInUKPage(srn, index))
+            landRegistryTitleNumber <- requiredPage(LandRegistryTitleNumberPage(srn, index))
+            addressLookUpPage <- requiredPage(LandOrPropertyChosenAddressPage(srn, index))
+            holdLandProperty <- requiredPage(WhyDoesSchemeHoldLandPropertyPage(srn, index))
+            landOrPropertyTotalCost <- requiredPage(LandOrPropertyTotalCostPage(srn, index))
 
-        receivedLandType = Option.when(holdLandProperty == Acquisition)(
-          request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller)).get
-        )
+            landPropertyIndependentValuation = Option.when(holdLandProperty != Transfer)(
+              request.userAnswers.get(LandPropertyIndependentValuationPage(srn, index)).get
+            )
+            landOrPropertyAcquire = Option.when(holdLandProperty != Transfer)(
+              request.userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, index)).get
+            )
 
-        landOrPropertySellerConnectedParty = Option.when(holdLandProperty == Acquisition)(
-          request.userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, index)).get
-        )
+            receivedLandType = Option.when(holdLandProperty == Acquisition)(
+              request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller)).get
+            )
 
-        recipientName = Option.when(holdLandProperty == Acquisition)(
-          List(
-            request.userAnswers.get(LandPropertyIndividualSellersNamePage(srn, index)),
-            request.userAnswers.get(CompanySellerNamePage(srn, index)),
-            request.userAnswers.get(PartnershipSellerNamePage(srn, index)),
-            request.userAnswers
-              .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
-              .map(_.name)
-          ).flatten.head
-        )
+            landOrPropertySellerConnectedParty = Option.when(holdLandProperty == Acquisition)(
+              request.userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, index)).get
+            )
 
-        recipientDetails = Option.when(holdLandProperty == Acquisition)(
-          List(
-            request.userAnswers.get(IndividualSellerNiPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
-              .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller))
-              .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
-              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller))
-              .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
-              .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
-              .map(_.description)
-          ).flatten.headOption
-        )
+            recipientName = Option.when(holdLandProperty == Acquisition)(
+              List(
+                request.userAnswers.get(LandPropertyIndividualSellersNamePage(srn, index)),
+                request.userAnswers.get(CompanySellerNamePage(srn, index)),
+                request.userAnswers.get(PartnershipSellerNamePage(srn, index)),
+                request.userAnswers
+                  .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
+                  .map(_.name)
+              ).flatten.head
+            )
 
-        recipientReasonNoDetails = Option.when(holdLandProperty == Acquisition)(
-          List(
-            request.userAnswers
-              .get(IndividualSellerNiPage(srn, index))
-              .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
-              .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller))
-              .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
-              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller))
-              .flatMap(_.value.swap.toOption.map(_.value))
-          ).flatten.headOption
-        )
+            recipientDetails = Option.when(holdLandProperty == Acquisition)(
+              List(
+                request.userAnswers.get(IndividualSellerNiPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
+                request.userAnswers
+                  .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller))
+                  .flatMap(_.value.toOption.map(_.value)),
+                request.userAnswers
+                  .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller))
+                  .flatMap(_.value.toOption.map(_.value)),
+                request.userAnswers
+                  .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
+                  .map(_.description)
+              ).flatten.headOption
+            )
 
-        landOrPropertyResidential <- requiredPage(IsLandOrPropertyResidentialPage(srn, index))
-        landOrPropertyLease <- requiredPage(IsLandPropertyLeasedPage(srn, index))
-        landOrPropertyTotalIncome <- requiredPage(LandOrPropertyTotalIncomePage(srn, index))
+            recipientReasonNoDetails = Option.when(holdLandProperty == Acquisition)(
+              List(
+                request.userAnswers
+                  .get(IndividualSellerNiPage(srn, index))
+                  .flatMap(_.value.swap.toOption.map(_.value)),
+                request.userAnswers
+                  .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller))
+                  .flatMap(_.value.swap.toOption.map(_.value)),
+                request.userAnswers
+                  .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller))
+                  .flatMap(_.value.swap.toOption.map(_.value))
+              ).flatten.headOption
+            )
 
-        leaseDetails = Option.when(landOrPropertyLease) {
-          val landOrPropertyLeaseDetailsPage = request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).get
-          val leaseConnectedParty = request.userAnswers.get(IsLesseeConnectedPartyPage(srn, index)).get
+            landOrPropertyResidential <- requiredPage(IsLandOrPropertyResidentialPage(srn, index))
+            landOrPropertyLease <- requiredPage(IsLandPropertyLeasedPage(srn, index))
+            landOrPropertyTotalIncome <- requiredPage(LandOrPropertyTotalIncomePage(srn, index))
 
-          Tuple4(
-            landOrPropertyLeaseDetailsPage._1,
-            landOrPropertyLeaseDetailsPage._2,
-            landOrPropertyLeaseDetailsPage._3,
-            leaseConnectedParty
+            leaseDetails = Option.when(landOrPropertyLease) {
+              val landOrPropertyLeaseDetailsPage =
+                request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).get
+              val leaseConnectedParty = request.userAnswers.get(IsLesseeConnectedPartyPage(srn, index)).get
+
+              Tuple4(
+                landOrPropertyLeaseDetailsPage._1,
+                landOrPropertyLeaseDetailsPage._2,
+                landOrPropertyLeaseDetailsPage._3,
+                leaseConnectedParty
+              )
+            }
+
+            schemeName = request.schemeDetails.schemeName
+          } yield Ok(
+            view(
+              viewModel(
+                srn,
+                index,
+                schemeName,
+                landOrPropertyInUk,
+                landRegistryTitleNumber,
+                holdLandProperty,
+                landOrPropertyAcquire,
+                landOrPropertyTotalCost,
+                landPropertyIndependentValuation,
+                receivedLandType,
+                recipientName,
+                recipientDetails.flatten,
+                recipientReasonNoDetails.flatten,
+                landOrPropertySellerConnectedParty,
+                landOrPropertyResidential,
+                landOrPropertyLease,
+                landOrPropertyTotalIncome,
+                addressLookUpPage,
+                leaseDetails,
+                mode,
+                viewOnlyUpdated = false,
+                optYear = request.year,
+                optCurrentVersion = request.currentVersion,
+                optPreviousVersion = request.previousVersion,
+                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+              )
+            )
           )
-        }
-
-        schemeName = request.schemeDetails.schemeName
-      } yield Ok(
-        view(
-          viewModel(
-            srn,
-            index,
-            schemeName,
-            landOrPropertyInUk,
-            landRegistryTitleNumber,
-            holdLandProperty,
-            landOrPropertyAcquire,
-            landOrPropertyTotalCost,
-            landPropertyIndependentValuation,
-            receivedLandType,
-            recipientName,
-            recipientDetails.flatten,
-            recipientReasonNoDetails.flatten,
-            landOrPropertySellerConnectedParty,
-            landOrPropertyResidential,
-            landOrPropertyLease,
-            landOrPropertyTotalIncome,
-            addressLookUpPage,
-            leaseDetails,
-            mode,
-            viewOnlyUpdated = false,
-            optYear = request.year,
-            optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
-          )
-        )
-      )
-    ).merge
+        ).merge
+    }
+  }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
