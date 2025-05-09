@@ -37,7 +37,7 @@ sbt 'run 17000'
 ### Running the test suite
 
 ```bash
-sbt clean coverage test it/test coverageReport
+SBT_OPTS="-Xmx4g -XX:+UseParallelGC" sbt clean coverage test it/test coverageReport
 ```
 
 or
