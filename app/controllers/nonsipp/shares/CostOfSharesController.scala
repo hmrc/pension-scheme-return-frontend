@@ -86,8 +86,10 @@ class CostOfSharesController @Inject()(
               for {
                 updatedAnswers <- Future
                   .fromTry(request.userAnswers.set(CostOfSharesPage(srn, index), answer))
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(CostOfSharesPage(srn, index), mode, updatedAnswers))
+                nextPage = navigator.nextPage(CostOfSharesPage(srn, index), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(nextPage)
             }
           )
       }

@@ -23,6 +23,7 @@ import controllers.nonsipp.shares.SharesCYAController._
 import pages.nonsipp.FbVersionPage
 import models._
 import pages.nonsipp.common.IdentityTypePage
+import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
@@ -94,6 +95,16 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(TotalAssetValuePage(srn, index), money)
     .unsafeSet(SharesTotalIncomePage(srn, index), money)
 
+  private val incompleteUserAnswers = filledUserAnswers
+    .unsafeSet(
+      SharesProgress(srn, index),
+      SectionJourneyStatus.InProgress(
+        controllers.nonsipp.shares.routes.CostOfSharesController
+          .onPageLoad(srn, refineMV(1), NormalMode)
+          .url
+      )
+    )
+
   "SharesCYAController" - {
     List(NormalMode, CheckMode).foreach { mode =>
       act.like(
@@ -150,6 +161,12 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
           .updateName("onSubmit" + _)
           .withName(s"redirect to journey recovery page on submit when in $mode mode")
       )
+      redirectToPage(
+        call = onPageLoad(mode),
+        page = routes.CostOfSharesController.onPageLoad(srn, index, mode),
+        userAnswers = incompleteUserAnswers,
+        previousUserAnswers = emptyUserAnswers
+      ).withName(s"redirect to list page when in $mode mode and incomplete data")
     }
   }
 

@@ -139,46 +139,55 @@ class SharesListController @Inject()(
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      shares(srn).traverse {
-        case (sharesToCheck, shares) =>
-          if (sharesToCheck.size + shares.size >= Constants.maxSharesTransactions) {
-            Future.successful(
-              Redirect(
-                navigator.nextPage(SharesListPage(srn), mode, request.userAnswers)
+      {
+        val inProgressAnswers = request.userAnswers.map(SharesProgress.all(srn))
+        val inProgressUrl = inProgressAnswers.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+
+        shares(srn).traverse {
+          case (sharesToCheck, shares) =>
+            if (sharesToCheck.size + shares.size >= Constants.maxSharesTransactions) {
+              Future.successful(
+                Redirect(
+                  navigator.nextPage(SharesListPage(srn), mode, request.userAnswers)
+                )
               )
-            )
-          } else {
-            form
-              .bindFromRequest()
-              .fold(
-                errors => {
-                  BadRequest(
-                    view(
-                      errors,
-                      viewModel(
-                        srn,
-                        page,
-                        mode,
-                        shares,
-                        sharesToCheck,
-                        request.schemeDetails.schemeName,
-                        None,
-                        showBackLink = true,
-                        isPrePopulation
+            } else {
+              form
+                .bindFromRequest()
+                .fold(
+                  errors => {
+                    BadRequest(
+                      view(
+                        errors,
+                        viewModel(
+                          srn,
+                          page,
+                          mode,
+                          shares,
+                          sharesToCheck,
+                          request.schemeDetails.schemeName,
+                          None,
+                          showBackLink = true,
+                          isPrePopulation
+                        )
                       )
-                    )
-                  ).pure[Future]
-                },
-                addAnother =>
-                  for {
-                    updatedUserAnswers <- Future.fromTry(request.userAnswers.set(SharesListPage(srn), addAnother))
-                    _ <- saveService.save(updatedUserAnswers)
-                  } yield Redirect(
-                    navigator.nextPage(SharesListPage(srn), mode, updatedUserAnswers)
-                  )
-              )
-          }
-      }.merge
+                    ).pure[Future]
+                  },
+                  addAnother =>
+                    for {
+                      updatedUserAnswers <- Future.fromTry(request.userAnswers.set(SharesListPage(srn), addAnother))
+                      _ <- saveService.save(updatedUserAnswers)
+                    } yield (addAnother, inProgressUrl) match {
+                      case (true, Some(url)) => Redirect(url)
+                      case _ =>
+                        Redirect(
+                          navigator.nextPage(SharesListPage(srn), mode, updatedUserAnswers)
+                        )
+                    }
+                )
+            }
+        }.merge
+      }
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -229,10 +238,12 @@ class SharesListController @Inject()(
         canRemove = request.userAnswers.get(SharePrePopulated(srn, index)).isEmpty
       } yield SharesData(index, typeOfSharesHeld, companyName, acquisitionType, acquisitionDate, canRemove)
 
+    val completedIndexes = request.userAnswers.map(SharesProgress.all(srn)).filter(_._2.completed).keys.toList
     if (isPrePopulation) {
       for {
         indexes <- request.userAnswers
           .map(TypeOfSharesHeldPages(srn))
+          .collect { case (index, address) if completedIndexes.contains(index) => (index, address) }
           .refine[Max5000.Refined]
           .map(_.keys.toList)
           .getOrRecoverJourney
@@ -245,6 +256,7 @@ class SharesListController @Inject()(
       for {
         indexes <- request.userAnswers
           .map(TypeOfSharesHeldPages(srn))
+          .collect { case (index, address) if completedIndexes.contains(index) => (index, address) }
           .refine[Max5000.Refined]
           .map(_.keys.toList)
           .getOrRecoverJourney

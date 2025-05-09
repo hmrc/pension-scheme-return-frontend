@@ -160,6 +160,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     .unsafeSet(SharesTotalIncomePage(srn, index1of5000), money)
     .unsafeSet(SharesListPage(srn), false)
     .unsafeSet(SharesCompleted(srn, index1of5000), SectionCompleted)
+    .unsafeSet(SharesProgress(srn, index1of5000), SectionJourneyStatus.Completed)
     // (S5) Shares Disposals
     .unsafeSet(SharesDisposalPage(srn), true)
     .unsafeSet(HowWereSharesDisposedPage(srn, index1of5000, index1of50), Sold)
@@ -561,6 +562,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
           .unsafeSet(TypeOfSharesHeldPage(srn, index1of5000), TypeOfShares.ConnectedParty)
           .unsafeSet(SharesCompleted(srn, index1of5000), SectionCompleted)
+          .unsafeSet(SharesProgress(srn, index1of5000), SectionJourneyStatus.Completed)
         val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "shares"), listPageUrl)
       }
@@ -573,6 +575,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           // second share:
           .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
           .unsafeSet(SharesCompleted(srn, refineMV(2)), SectionCompleted)
+          .unsafeSet(SharesProgress(srn, index1of5000), SectionJourneyStatus.Completed)
 
         val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "shares"), listPageUrl)
@@ -586,6 +589,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
           // second share:
           .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
+          .unsafeSet(SharesProgress(srn, index1of5000), SectionJourneyStatus.Completed)
 
         val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "shares"), listPageUrl)
@@ -604,6 +608,10 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
           .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), TypeOfShares.Unquoted)
+          .unsafeSet(
+            SharesProgress(srn, index1of5000),
+            SectionJourneyStatus.InProgress(secondQuestionPageUrl(index1of5000))
+          )
         val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, secondQuestionPageUrl(index1of5000))
       }
@@ -614,6 +622,10 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           // nothing for first share
           // second share:
           .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
+          .unsafeSet(
+            SharesProgress(srn, refineMV(2)),
+            SectionJourneyStatus.InProgress(secondQuestionPageUrl(refineMV(2)))
+          )
 
         val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, secondQuestionPageUrl(index2of5000))

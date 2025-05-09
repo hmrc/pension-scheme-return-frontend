@@ -69,11 +69,10 @@ class PartnershipNameOfSharesSellerController @Inject()(
               updatedAnswers <- Future.fromTry(
                 request.userAnswers.set(PartnershipShareSellerNamePage(srn, index), value)
               )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator
-                .nextPage(PartnershipShareSellerNamePage(srn, index), mode, updatedAnswers)
-            )
+              nextPage = navigator.nextPage(PartnershipShareSellerNamePage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }
