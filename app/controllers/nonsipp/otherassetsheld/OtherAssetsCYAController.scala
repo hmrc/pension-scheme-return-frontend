@@ -80,128 +80,134 @@ class OtherAssetsCYAController @Inject()(
       onPageLoadCommon(srn, index, mode)
     }
 
-  def onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
-    (
-      for {
+  def onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
+    request.userAnswers.get(OtherAssetsProgress(srn, index)) match {
+      case Some(value) if value.inProgress =>
+        Redirect(controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onPageLoad(srn, 1, mode))
+      case _ =>
+        (
+          for {
 
-        description <- request.userAnswers
-          .get(WhatIsOtherAssetPage(srn, index))
-          .getOrRecoverJourney
+            description <- request.userAnswers
+              .get(WhatIsOtherAssetPage(srn, index))
+              .getOrRecoverJourney
 
-        isTangibleMoveableProperty <- request.userAnswers
-          .get(IsAssetTangibleMoveablePropertyPage(srn, index))
-          .getOrRecoverJourney
+            isTangibleMoveableProperty <- request.userAnswers
+              .get(IsAssetTangibleMoveablePropertyPage(srn, index))
+              .getOrRecoverJourney
 
-        whyHeld <- request.userAnswers
-          .get(WhyDoesSchemeHoldAssetsPage(srn, index))
-          .getOrRecoverJourney
+            whyHeld <- request.userAnswers
+              .get(WhyDoesSchemeHoldAssetsPage(srn, index))
+              .getOrRecoverJourney
 
-        acquisitionOrContributionDate = Option.when(whyHeld != Transfer)(
-          request.userAnswers
-            .get(WhenDidSchemeAcquireAssetsPage(srn, index))
-            .get
-        )
+            acquisitionOrContributionDate = Option.when(whyHeld != Transfer)(
+              request.userAnswers
+                .get(WhenDidSchemeAcquireAssetsPage(srn, index))
+                .get
+            )
 
-        sellerIdentityType = Option.when(whyHeld == Acquisition)(
-          request.userAnswers
-            .get(IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller))
-            .get
-        )
+            sellerIdentityType = Option.when(whyHeld == Acquisition)(
+              request.userAnswers
+                .get(IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller))
+                .get
+            )
 
-        sellerName = Option.when(whyHeld == Acquisition)(
-          List(
-            request.userAnswers.get(IndividualNameOfOtherAssetSellerPage(srn, index)),
-            request.userAnswers.get(CompanyNameOfOtherAssetSellerPage(srn, index)),
-            request.userAnswers.get(PartnershipOtherAssetSellerNamePage(srn, index)),
-            request.userAnswers
-              .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.OtherAssetSeller))
-              .map(_.name)
-          ).flatten.head
-        )
+            sellerName = Option.when(whyHeld == Acquisition)(
+              List(
+                request.userAnswers.get(IndividualNameOfOtherAssetSellerPage(srn, index)),
+                request.userAnswers.get(CompanyNameOfOtherAssetSellerPage(srn, index)),
+                request.userAnswers.get(PartnershipOtherAssetSellerNamePage(srn, index)),
+                request.userAnswers
+                  .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.OtherAssetSeller))
+                  .map(_.name)
+              ).flatten.head
+            )
 
-        sellerDetails = Option.when(whyHeld == Acquisition)(
-          List(
-            request.userAnswers
-              .get(OtherAssetIndividualSellerNINumberPage(srn, index))
-              .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
-              .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.OtherAssetSeller))
-              .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
-              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.OtherAssetSeller))
-              .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
-              .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.OtherAssetSeller))
-              .map(_.description)
-          ).flatten.headOption
-        )
+            sellerDetails = Option.when(whyHeld == Acquisition)(
+              List(
+                request.userAnswers
+                  .get(OtherAssetIndividualSellerNINumberPage(srn, index))
+                  .flatMap(_.value.toOption.map(_.value)),
+                request.userAnswers
+                  .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.OtherAssetSeller))
+                  .flatMap(_.value.toOption.map(_.value)),
+                request.userAnswers
+                  .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.OtherAssetSeller))
+                  .flatMap(_.value.toOption.map(_.value)),
+                request.userAnswers
+                  .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.OtherAssetSeller))
+                  .map(_.description)
+              ).flatten.headOption
+            )
 
-        sellerReasonNoDetails = Option.when(whyHeld == Acquisition)(
-          List(
-            request.userAnswers
-              .get(OtherAssetIndividualSellerNINumberPage(srn, index))
-              .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
-              .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.OtherAssetSeller))
-              .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
-              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.OtherAssetSeller))
-              .flatMap(_.value.swap.toOption.map(_.value))
-          ).flatten.headOption
-        )
+            sellerReasonNoDetails = Option.when(whyHeld == Acquisition)(
+              List(
+                request.userAnswers
+                  .get(OtherAssetIndividualSellerNINumberPage(srn, index))
+                  .flatMap(_.value.swap.toOption.map(_.value)),
+                request.userAnswers
+                  .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.OtherAssetSeller))
+                  .flatMap(_.value.swap.toOption.map(_.value)),
+                request.userAnswers
+                  .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.OtherAssetSeller))
+                  .flatMap(_.value.swap.toOption.map(_.value))
+              ).flatten.headOption
+            )
 
-        isSellerConnectedParty = Option.when(whyHeld == Acquisition)(
-          request.userAnswers
-            .get(OtherAssetSellerConnectedPartyPage(srn, index))
-            .get
-        )
+            isSellerConnectedParty = Option.when(whyHeld == Acquisition)(
+              request.userAnswers
+                .get(OtherAssetSellerConnectedPartyPage(srn, index))
+                .get
+            )
 
-        totalCost <- request.userAnswers
-          .get(CostOfOtherAssetPage(srn, index))
-          .getOrRecoverJourney
+            totalCost <- request.userAnswers
+              .get(CostOfOtherAssetPage(srn, index))
+              .getOrRecoverJourney
 
-        isIndependentValuation = Option.when(whyHeld != Transfer)(
-          request.userAnswers
-            .get(IndependentValuationPage(srn, index))
-            .get
-        )
+            isIndependentValuation = Option.when(whyHeld != Transfer)(
+              request.userAnswers
+                .get(IndependentValuationPage(srn, index))
+                .get
+            )
 
-        totalIncome <- request.userAnswers
-          .get(IncomeFromAssetPage(srn, index))
-          .getOrRecoverJourney
+            totalIncome <- request.userAnswers
+              .get(IncomeFromAssetPage(srn, index))
+              .getOrRecoverJourney
 
-        schemeName = request.schemeDetails.schemeName
+            schemeName = request.schemeDetails.schemeName
 
-      } yield Ok(
-        view(
-          viewModel(
-            ViewModelParameters(
-              srn,
-              index,
-              schemeName,
-              description,
-              isTangibleMoveableProperty,
-              whyHeld,
-              acquisitionOrContributionDate,
-              sellerIdentityType,
-              sellerName,
-              sellerDetails.flatten,
-              sellerReasonNoDetails.flatten,
-              isSellerConnectedParty,
-              totalCost,
-              isIndependentValuation,
-              totalIncome,
-              mode
-            ),
-            viewOnlyUpdated = false, // flag is not displayed on this tier
-            optYear = request.year,
-            optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          } yield Ok(
+            view(
+              viewModel(
+                ViewModelParameters(
+                  srn,
+                  index,
+                  schemeName,
+                  description,
+                  isTangibleMoveableProperty,
+                  whyHeld,
+                  acquisitionOrContributionDate,
+                  sellerIdentityType,
+                  sellerName,
+                  sellerDetails.flatten,
+                  sellerReasonNoDetails.flatten,
+                  isSellerConnectedParty,
+                  totalCost,
+                  isIndependentValuation,
+                  totalIncome,
+                  mode
+                ),
+                viewOnlyUpdated = false, // flag is not displayed on this tier
+                optYear = request.year,
+                optCurrentVersion = request.currentVersion,
+                optPreviousVersion = request.previousVersion,
+                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+              )
+            )
           )
-        )
-      )
-    ).merge
+        ).merge
+    }
+  }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>

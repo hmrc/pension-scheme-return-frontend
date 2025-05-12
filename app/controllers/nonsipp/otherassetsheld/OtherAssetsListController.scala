@@ -19,7 +19,6 @@ package controllers.nonsipp.otherassetsheld
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
-import utils.ListUtils._
 import cats.implicits.{toShow, toTraverseOps, _}
 import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
@@ -107,13 +106,13 @@ class OtherAssetsListController @Inject()(
   )(
     implicit request: DataRequest[AnyContent]
   ): Result = {
-    val indexes: List[Max5000] =
-      request.userAnswers.map(OtherAssetsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+    val completedIndexes: List[String] =
+      request.userAnswers.map(OtherAssetsProgress.all(srn)).filter(_._2.completed).keys.toList
 
     val filledForm = request.userAnswers.get(OtherAssetsListPage(srn)).fold(form)(form.fill)
 
-    if (indexes.nonEmpty || mode.isViewOnlyMode) {
-      otherAssetsToTraverse(srn).map {
+    if (completedIndexes.nonEmpty || mode.isViewOnlyMode) {
+      otherAssetsToTraverse(srn, completedIndexes).map {
         case (otherAssetsToCheck, otherAssets) =>
           Ok(
             view(
@@ -139,7 +138,10 @@ class OtherAssetsListController @Inject()(
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      otherAssetsToTraverse(srn).traverse {
+      val progressPages = request.userAnswers.map(OtherAssetsProgress.all(srn))
+      val completedIndexes: List[String] = progressPages.filter(_._2.completed).keys.toList
+      val inProgressUrl = progressPages.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+      otherAssetsToTraverse(srn, completedIndexes).traverse {
         case (otherAssetsToCheck, otherAssets) =>
           if (otherAssetsToCheck.size + otherAssets.size >= Constants.maxOtherAssetsTransactions) {
             Future.successful(
@@ -175,9 +177,10 @@ class OtherAssetsListController @Inject()(
                   for {
                     updatedUserAnswers <- Future.fromTry(request.userAnswers.set(OtherAssetsListPage(srn), addAnother))
                     _ <- saveService.save(updatedUserAnswers)
-                  } yield Redirect(
-                    navigator.nextPage(OtherAssetsListPage(srn), mode, updatedUserAnswers)
-                  )
+                  } yield (addAnother, inProgressUrl) match {
+                    case (true, Some(url)) => Redirect(url)
+                    case _ => Redirect(navigator.nextPage(OtherAssetsListPage(srn), mode, updatedUserAnswers))
+                  }
               )
           }
       }.merge
@@ -217,7 +220,7 @@ class OtherAssetsListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
   }
 
-  private def otherAssetsToTraverse(srn: Srn)(
+  private def otherAssetsToTraverse(srn: Srn, completedIndexes: List[String])(
     implicit request: DataRequest[_],
     logger: Logger
   ): Either[Result, (List[OtherAssetsData], List[OtherAssetsData])] = {
@@ -232,6 +235,7 @@ class OtherAssetsListController @Inject()(
       for {
         indexes <- request.userAnswers
           .map(WhatIsOtherAssetPages(srn))
+          .collect { case (index, whatIsOtherAsset) if completedIndexes.contains(index) => (index, whatIsOtherAsset) }
           .refine[Max5000.Refined]
           .map(_.keys.toList)
           .getOrRecoverJourney
@@ -244,6 +248,7 @@ class OtherAssetsListController @Inject()(
       for {
         indexes <- request.userAnswers
           .map(WhatIsOtherAssetPages(srn))
+          .collect { case (index, whatIsOtherAsset) if completedIndexes.contains(index) => (index, whatIsOtherAsset) }
           .refine[Max5000.Refined]
           .map(_.keys.toList)
           .getOrRecoverJourney

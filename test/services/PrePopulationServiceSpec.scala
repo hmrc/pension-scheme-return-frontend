@@ -49,6 +49,8 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     mock[LoansProgressPrePopulationProcessor]
   lazy val mockOtherAssetsPrePopulationProcessor: OtherAssetsPrePopulationProcessor =
     mock[OtherAssetsPrePopulationProcessor]
+  lazy val mockOtherAssetsProgressPrePopulationProcessor: OtherAssetsProgressPrePopulationProcessor =
+    mock[OtherAssetsProgressPrePopulationProcessor]
   lazy val mockLandOrPropertyProgressPrePopulationProcessor: LandOrPropertyProgressPrePopulationProcessor =
     mock[LandOrPropertyProgressPrePopulationProcessor]
   lazy val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
@@ -61,6 +63,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     mockBondsPrePopulationProcessor,
     mockLoansProgressPrePopulationProcessor,
     mockOtherAssetsPrePopulationProcessor,
+    mockOtherAssetsProgressPrePopulationProcessor,
     mockLandOrPropertyProgressPrePopulationProcessor,
     mockConfig
   )
@@ -73,6 +76,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     reset(mockBondsPrePopulationProcessor)
     reset(mockLoansProgressPrePopulationProcessor)
     reset(mockOtherAssetsPrePopulationProcessor)
+    reset(mockOtherAssetsProgressPrePopulationProcessor)
     reset(mockLandOrPropertyProgressPrePopulationProcessor)
     reset(mockConfig)
   }
@@ -144,6 +148,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
               |  "bonds": "dummy-bonds-data",
               |  "loansProgress": "dummy-loans-progress-data",
               |  "otherAssets": "dummy-other-assets-data",
+              |  "otherAssetsProgress": "dummy-other-assets-progress-data",
               |  "landOrPropertyProgress": "dummy-lop-progress-data"
               |}
               |""".stripMargin).as[JsObject]
@@ -155,6 +160,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
           verify(mockBondsPrePopulationProcessor, times(1)).clean(any(), any())(any())
           verify(mockLoansProgressPrePopulationProcessor, times(1)).clean(any(), any())(any())
           verify(mockOtherAssetsPrePopulationProcessor, times(1)).clean(any(), any())(any())
+          verify(mockOtherAssetsProgressPrePopulationProcessor, times(1)).clean(any(), any())(any())
           verify(mockLandOrPropertyProgressPrePopulationProcessor, times(1)).clean(any(), any())(any())
         }
       }
@@ -177,6 +183,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
           verify(mockBondsPrePopulationProcessor, never()).clean(any(), any())(any())
           verify(mockLoansProgressPrePopulationProcessor, never()).clean(any(), any())(any())
           verify(mockOtherAssetsPrePopulationProcessor, never()).clean(any(), any())(any())
+          verify(mockOtherAssetsProgressPrePopulationProcessor, never()).clean(any(), any())(any())
           verify(mockLandOrPropertyProgressPrePopulationProcessor, never).clean(any(), any())(any())
         }
       }
@@ -193,7 +200,10 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     val bondsUa = loansUa.unsafeSet(__ \ "bonds", JsString("dummy-bonds-data"))
     val loansProgressUa = bondsUa.unsafeSet(__ \ "loansProgress", JsString("dummy-loans-progress-data"))
     val otherAssetsUa = loansProgressUa.unsafeSet(__ \ "otherAssets", JsString("dummy-other-assets-data"))
-    val lopProgressUa = otherAssetsUa.unsafeSet(__ \ "landOrPropertyProgress", JsString("dummy-lop-progress-data"))
+    val otherAssetsProgressUa =
+      otherAssetsUa.unsafeSet(__ \ "otherAssetsProgress", JsString("dummy-other-assets-progress-data"))
+    val lopProgressUa =
+      otherAssetsProgressUa.unsafeSet(__ \ "landOrPropertyProgress", JsString("dummy-lop-progress-data"))
 
     when(
       mockLandOrPropertyPrePopulationProcessor
@@ -224,8 +234,12 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
         .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(loansProgressUa))(ArgumentMatchers.eq(srn))
     ).thenReturn(Success(otherAssetsUa))
     when(
-      mockLandOrPropertyProgressPrePopulationProcessor
+      mockOtherAssetsProgressPrePopulationProcessor
         .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(otherAssetsUa))(ArgumentMatchers.eq(srn))
+    ).thenReturn(Success(otherAssetsProgressUa))
+    when(
+      mockLandOrPropertyProgressPrePopulationProcessor
+        .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(otherAssetsProgressUa))(ArgumentMatchers.eq(srn))
     ).thenReturn(Success(lopProgressUa))
     when(mockConfig.prePopulationEnabled).thenReturn(prePopulationEnabled)
     (baseReturnUA, currentUa)

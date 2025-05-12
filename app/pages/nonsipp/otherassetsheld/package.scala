@@ -23,6 +23,7 @@ package object otherassetsheld {
   object Paths {
     val assets: JsPath = __ \ "assets"
     val otherAssets: JsPath = assets \ "otherAssets"
+    val otherAssetsProgress: JsPath = __ \ "otherAssetsProgress"
     val otherAssetsTransactions: JsPath = otherAssets \ "otherAssetTransactions"
   }
 }

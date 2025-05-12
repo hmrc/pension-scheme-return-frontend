@@ -230,6 +230,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
     .unsafeSet(pages.nonsipp.otherassetsheld.IndependentValuationPage(srn, index1of5000), true)
     .unsafeSet(IncomeFromAssetPage(srn, index1of5000), money)
     .unsafeSet(OtherAssetsCompleted(srn, index1of5000), SectionCompleted)
+    .unsafeSet(OtherAssetsProgress(srn, index1of5000), SectionJourneyStatus.Completed)
     // (S8) Other Assets Disposals
     .unsafeSet(OtherAssetsDisposalPage(srn), true)
     .unsafeSet(HowWasAssetDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Transferred)
@@ -744,7 +745,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         .url
 
     def secondQuestionPageUrl(index: Max5000): String =
-      controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController
+      controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
         .onPageLoad(srn, index, NormalMode)
         .url
 
@@ -771,6 +772,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           // second asset:
           .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "asset two")
           .unsafeSet(OtherAssetsCompleted(srn, refineMV(2)), SectionCompleted)
+          .unsafeSet(OtherAssetsProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
         val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "otherAssets"), listPageUrl)
       }
@@ -781,6 +783,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           // first asset:
           .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(1)), "asset one")
           .unsafeSet(OtherAssetsCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(OtherAssetsProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
           // second asset:
           .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "asset two")
         val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
@@ -800,6 +803,10 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(OtherAssetsHeldPage(srn), true)
           .unsafeSet(WhatIsOtherAssetPage(srn, index1of5000), otherAssetDescription)
+          .unsafeSet(
+            OtherAssetsProgress(srn, index1of5000),
+            SectionJourneyStatus.InProgress(secondQuestionPageUrl(index1of5000))
+          )
         val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, secondQuestionPageUrl(index1of5000))
       }
@@ -809,7 +816,12 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(OtherAssetsHeldPage(srn), true)
           // nothing for the first asset:
           // second asset:
-          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "asset two")
+          .unsafeSet(WhatIsOtherAssetPage(srn, index2of5000), "asset two")
+          .unsafeSet(
+            OtherAssetsProgress(srn, index2of5000),
+            SectionJourneyStatus.InProgress(secondQuestionPageUrl(index2of5000))
+          )
+
         val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, secondQuestionPageUrl(index2of5000))
       }

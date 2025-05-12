@@ -90,14 +90,10 @@ class WhyDoesSchemeHoldAssetsController @Inject()(
                 updatedAnswers <- Future.fromTry(
                   request.userAnswers.set(WhyDoesSchemeHoldAssetsPage(srn, index), answer)
                 )
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(
-                navigator.nextPage(
-                  WhyDoesSchemeHoldAssetsPage(srn, index),
-                  mode,
-                  updatedAnswers
-                )
-              )
+                nextPage = navigator.nextPage(WhyDoesSchemeHoldAssetsPage(srn, index), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(nextPage)
             } else {
               // In CheckMode, before saving answers, set PointOfEntry based on the previous answer and new answer
               val previousAnswer = request.userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index))
@@ -127,14 +123,10 @@ class WhyDoesSchemeHoldAssetsController @Inject()(
                         .set(WhyDoesSchemeHoldAssetsPage(srn, index), answer)
                         .set(OtherAssetsCYAPointOfEntry(srn, index), updatedPointOfEntry)
                     )
-                    _ <- saveService.save(updatedAnswers)
-                  } yield Redirect(
-                    navigator.nextPage(
-                      WhyDoesSchemeHoldAssetsPage(srn, index),
-                      mode,
-                      updatedAnswers
-                    )
-                  )
+                    nextPage = navigator.nextPage(WhyDoesSchemeHoldAssetsPage(srn, index), mode, updatedAnswers)
+                    updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                    _ <- saveService.save(updatedProgressAnswers)
+                  } yield Redirect(nextPage)
               }
             }
           }
