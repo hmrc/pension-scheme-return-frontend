@@ -64,8 +64,9 @@ object TransferOutNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         (
           for {
-            map <- userAnswers.get(WhenWasTransferMadePages(srn, index)).getOrRecoverJourney
-            indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+            map <- userAnswers.get(MemberTransferOutProgress.all(srn, index)).getOrRecoverJourney
+            filtered = map.filter { case (_, status) => status.completed }
+            indexes <- filtered.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
             nextIndex <- findNextOpenIndex[Max5.Refined](indexes).getOrRecoverJourney
           } yield controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
             .onPageLoad(srn, index, nextIndex, NormalMode)
@@ -116,8 +117,9 @@ object TransferOutNavigator extends JourneyNavigator {
           if (userAnswers.get(page).contains(true)) {
             (
               for {
-                map <- userAnswers.get(WhenWasTransferMadePages(srn, index)).getOrRecoverJourney
-                indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+                map <- userAnswers.get(MemberTransferOutProgress.all(srn, index)).getOrRecoverJourney
+                filtered = map.filter { case (_, status) => status.completed }
+                indexes <- filtered.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
                 nextIndex <- findNextOpenIndex[Max5.Refined](indexes).getOrRecoverJourney
               } yield controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
                 .onPageLoad(srn, index, nextIndex, NormalMode)

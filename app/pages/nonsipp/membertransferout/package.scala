@@ -33,6 +33,7 @@ package object membertransferout {
     ReceivingSchemeTypePage(srn, index, secondaryIndex),
     ReportAnotherTransferOutPage(srn, index, secondaryIndex),
     TransfersOutSectionCompleted(srn, index, secondaryIndex),
-    WhenWasTransferMadePage(srn, index, secondaryIndex)
+    WhenWasTransferMadePage(srn, index, secondaryIndex),
+    MemberTransferOutProgress(srn, index, secondaryIndex)
   )
 }

@@ -21,21 +21,23 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
+import utils.ListUtils.ListOps
 import cats.implicits._
+import controllers.actions.IdentifyAndRequireData
 import forms.RadioListFormProvider
-import utils.DateTimeUtils.localDateShow
-import play.api.data.Form
-import config.RefinedTypes.{Max300, Max5, OneTo5}
+import config.RefinedTypes.{Max300, Max5}
 import controllers.PSRController
 import views.html.ListRadiosView
 import models.SchemeId.Srn
-import controllers.actions.IdentifyAndRequireData
-import eu.timepit.refined.refineV
-import pages.nonsipp.membertransferout.{ReceivingSchemeNamePages, WhenWasTransferMadePages}
+import utils.DateTimeUtils.localDateShow
+import models.NormalMode
+import pages.nonsipp.membertransferout._
 import play.api.i18n.MessagesApi
 import controllers.nonsipp.membertransferout.WhichTransferOutRemoveController._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
 
 import scala.collection.immutable.SortedMap
 
@@ -52,43 +54,47 @@ class WhichTransferOutRemoveController @Inject()(
   val form: Form[Max5] = WhichTransferOutRemoveController.form(formProvider)
 
   def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val dateOfTransfer = request.userAnswers.map(WhenWasTransferMadePages(srn, memberIndex))
-    val receivingSchemeName = request.userAnswers.map(ReceivingSchemeNamePages(srn, memberIndex))
-    if (dateOfTransfer.size == 1) {
-      refineV[OneTo5](dateOfTransfer.head._1.toInt + 1).fold(
-        _ => Redirect(controllers.routes.UnauthorisedController.onPageLoad()),
-        index =>
-          Redirect(
-            controllers.nonsipp.membertransferout.routes.RemoveTransferOutController.onSubmit(srn, memberIndex, index)
-          )
-      )
-    } else {
-      request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
-        withIndexedValues(receivingSchemeName, dateOfTransfer) { sortedValues =>
-          Ok(view(form, viewModel(srn, memberIndex, memberName.fullName, sortedValues)))
-        }
+    val completed: List[Max5] = request.userAnswers
+      .map(MemberTransferOutProgress.all(srn, memberIndex))
+      .filter {
+        case (_, status) => status.completed
       }
+      .keys
+      .toList
+      .refine[Max5.Refined]
+
+    completed match {
+      case Nil =>
+        Redirect(
+          controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
+            .onPageLoad(srn, page = 1, NormalMode)
+        )
+      case head :: Nil =>
+        Redirect(
+          controllers.nonsipp.membertransferout.routes.RemoveTransferOutController.onSubmit(srn, memberIndex, head)
+        )
+      case _ =>
+        (
+          for {
+            memberName <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney
+            values <- getJourneyValues(srn, memberIndex)
+          } yield Ok(view(form, viewModel(srn, memberIndex, memberName.fullName, values)))
+        ).merge
+
     }
   }
 
   def onSubmit(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val dateOfTransfer = request.userAnswers.map(WhenWasTransferMadePages(srn, memberIndex))
-    val receivingSchemeName = request.userAnswers.map(ReceivingSchemeNamePages(srn, memberIndex))
     form
       .bindFromRequest()
       .fold(
         errors =>
-          request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
-            withIndexedValues(receivingSchemeName, dateOfTransfer)(
-              sortedValues =>
-                BadRequest(
-                  view(
-                    errors,
-                    viewModel(srn, memberIndex, memberName.fullName, sortedValues)
-                  )
-                )
-            )
-          },
+          (
+            for {
+              memberName <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney
+              values <- getJourneyValues(srn, memberIndex)
+            } yield BadRequest(view(errors, viewModel(srn, memberIndex, memberName.fullName, values)))
+          ).merge,
         answer =>
           Redirect(
             controllers.nonsipp.membertransferout.routes.RemoveTransferOutController
@@ -111,6 +117,30 @@ class WhichTransferOutRemoveController @Inject()(
         f(sortedMap)
     }
   }
+
+  private def getJourneyValues(srn: Srn, memberIndex: Max300)(
+    implicit request: DataRequest[_]
+  ) =
+    request.userAnswers
+      .map(MemberTransferOutProgress.all(srn, memberIndex))
+      .filter {
+        case (_, status) => status.completed
+      }
+      .keys
+      .toList
+      .refine[Max5.Refined]
+      .traverse { secondaryIndex =>
+        for {
+          receivingSchemeName <- request.userAnswers
+            .get(ReceivingSchemeNamePage(srn, memberIndex, secondaryIndex))
+            .getOrRecoverJourney
+
+          dateOfTransfer <- request.userAnswers
+            .get(WhenWasTransferMadePage(srn, memberIndex, secondaryIndex))
+            .getOrRecoverJourney
+        } yield (secondaryIndex, receivingSchemeName, dateOfTransfer)
+      }
+
 }
 
 object WhichTransferOutRemoveController {
@@ -119,18 +149,14 @@ object WhichTransferOutRemoveController {
       "transferOut.whichTransferOutRemove.error.required"
     )
 
-  private def buildRows(values: Map[Int, (String, LocalDate)]): List[ListRadiosRow] =
+  private def buildRows(values: List[(Max5, String, LocalDate)]): List[ListRadiosRow] =
     values.flatMap {
-      case (index, value) =>
-        refineV[Max5.Refined](index + 1).fold(
-          _ => Nil,
-          index =>
-            List(
-              ListRadiosRow(
-                index.value,
-                Message("transferOut.whichTransferOutRemove.radio.label", value._1, value._2.show)
-              )
-            )
+      case (index, receivingSchemeName, value) =>
+        List(
+          ListRadiosRow(
+            index.value,
+            Message("transferOut.whichTransferOutRemove.radio.label", receivingSchemeName, value.show)
+          )
         )
     }.toList
 
@@ -138,7 +164,7 @@ object WhichTransferOutRemoveController {
     srn: Srn,
     memberIndex: Max300,
     memberName: String,
-    values: Map[Int, (String, LocalDate)]
+    values: List[(Max5, String, LocalDate)]
   ): FormPageViewModel[ListRadiosViewModel] = {
     val rows = buildRows(values)
 

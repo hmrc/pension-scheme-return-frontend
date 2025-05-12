@@ -45,7 +45,8 @@ case class ReceivingSchemeNamePage(srn: Srn, index: Max300, transferIndex: Max5)
     List(
       ReceivingSchemeTypePage(srn, index, transferIndex),
       WhenWasTransferMadePage(srn, index, transferIndex),
-      ReportAnotherTransferOutPage(srn, index, transferIndex)
+      ReportAnotherTransferOutPage(srn, index, transferIndex),
+      MemberTransferOutProgress(srn, index, transferIndex)
     )
 }
 

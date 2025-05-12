@@ -34,6 +34,7 @@ import utils.DateTimeUtils.localDateShow
 import models.{DateRange, Mode}
 import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, TransfersOutSectionCompleted, WhenWasTransferMadePage}
 import play.api.i18n.{Messages, MessagesApi}
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{DatePageViewModel, FormPageViewModel, SectionCompleted}
 import models.requests.DataRequest
@@ -111,17 +112,24 @@ class WhenWasTransferMadeController @Inject()(
             },
             value =>
               for {
-                updatedAnswers <- Future
-                  .fromTry(
-                    request.userAnswers
-                      .set(WhenWasTransferMadePage(srn, index, secondaryIndex), value)
-                      .set(TransfersOutSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
-                  )
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(
-                navigator.nextPage(WhenWasTransferMadePage(srn, index, secondaryIndex), mode, updatedAnswers)
-              )
+                updatedAnswers <- request.userAnswers
+                  .set(WhenWasTransferMadePage(srn, index, secondaryIndex), value)
+                  .set(TransfersOutSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
+                  .mapK[Future]
+                nextPage = navigator
+                  .nextPage(WhenWasTransferMadePage(srn, index, secondaryIndex), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(
+                  srn,
+                  index,
+                  secondaryIndex,
+                  updatedAnswers,
+                  nextPage,
+                  alwaysCompleted = true
+                )
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(nextPage)
           )
+
       }
     }
 

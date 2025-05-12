@@ -17,13 +17,15 @@
 package controllers.nonsipp.membertransferout
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import controllers.ControllerBaseSpec
 import views.html.ListRadiosView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.NameDOB
-import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, WhenWasTransferMadePage}
+import pages.nonsipp.membertransferout.{MemberTransferOutProgress, ReceivingSchemeNamePage, WhenWasTransferMadePage}
+import config.RefinedTypes.Max5
+import controllers.ControllerBaseSpec
 import controllers.nonsipp.membertransferout.WhichTransferOutRemoveController._
+import viewmodels.models.SectionJourneyStatus
 
 import java.time.LocalDate
 
@@ -34,22 +36,25 @@ class WhichTransferOutRemoveControllerSpec extends ControllerBaseSpec {
 
   private val memberDetail1: NameDOB = nameDobGen.sample.value
   private val memberDetail2: NameDOB = nameDobGen.sample.value
-  private val memberDetailsMap: Map[Int, (String, LocalDate)] =
-    Map(0 -> (receivingSchemeName, localDate), 1 -> (receivingSchemeName + "2", localDate))
+  private val memberDetailsMap: List[(Max5, String, LocalDate)] =
+    List((refineMV(1), receivingSchemeName, localDate), (refineMV(2), receivingSchemeName + "2", localDate))
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetail1)
     .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetail2)
     .unsafeSet(WhenWasTransferMadePage(srn, refineMV(1), refineMV(1)), localDate)
     .unsafeSet(ReceivingSchemeNamePage(srn, refineMV(1), refineMV(1)), receivingSchemeName)
+    .unsafeSet(MemberTransferOutProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
     .unsafeSet(WhenWasTransferMadePage(srn, refineMV(1), refineMV(2)), localDate)
     .unsafeSet(ReceivingSchemeNamePage(srn, refineMV(1), refineMV(2)), receivingSchemeName + "2")
+    .unsafeSet(MemberTransferOutProgress(srn, refineMV(1), refineMV(2)), SectionJourneyStatus.Completed)
 
   private val userAnswersWithOneContributionOnly = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetail1)
     .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetail2)
     .unsafeSet(WhenWasTransferMadePage(srn, refineMV(1), refineMV(1)), localDate)
     .unsafeSet(ReceivingSchemeNamePage(srn, refineMV(1), refineMV(1)), receivingSchemeName)
+    .unsafeSet(MemberTransferOutProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
 
   "WhichTransferOutRemoveController" - {
 

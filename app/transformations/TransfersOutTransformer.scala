@@ -22,7 +22,7 @@ import config.RefinedTypes.{Max300, Max5}
 import models.SchemeId.Srn
 import models.UserAnswers
 import pages.nonsipp.membertransferout._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import models.requests.psr._
 import models.UserAnswers.implicits.UserAnswersTryOps
 
@@ -67,7 +67,8 @@ class TransfersOutTransformer @Inject() extends Transformer {
               ),
               _.set(ReceivingSchemeNamePage(srn, index, secondaryIndex), transferOut.schemeName),
               _.set(WhenWasTransferMadePage(srn, index, secondaryIndex), transferOut.dateOfTransfer),
-              _.set(ReceivingSchemeTypePage(srn, index, secondaryIndex), transferOut.transferSchemeType)
+              _.set(ReceivingSchemeTypePage(srn, index, secondaryIndex), transferOut.transferSchemeType),
+              _.set(MemberTransferOutProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed)
             )
         }
     }
