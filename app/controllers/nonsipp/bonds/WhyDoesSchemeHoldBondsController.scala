@@ -34,7 +34,7 @@ import views.html.RadioListView
 import models.SchemeId.Srn
 import controllers.nonsipp.bonds.WhyDoesSchemeHoldBondsController._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -84,13 +84,15 @@ class WhyDoesSchemeHoldBondsController @Inject()(
               updatedAnswers <- Future.fromTry(
                 request.userAnswers.set(WhyDoesSchemeHoldBondsPage(srn, index), answer)
               )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
+              nextPage = navigator.nextPage(
                 WhyDoesSchemeHoldBondsPage(srn, index),
                 mode,
                 updatedAnswers
               )
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(
+              nextPage
             )
           }
         )

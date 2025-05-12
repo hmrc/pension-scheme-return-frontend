@@ -36,6 +36,7 @@ import utils.DateTimeUtils.localDateShow
 import models._
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage._
+import viewmodels.models.SectionJourneyStatus.InProgress
 import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -76,49 +77,55 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
     }
 
   def onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
-    (
-      for {
-        nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, index)).getOrRecoverJourney
-        whyDoesSchemeHoldBonds <- request.userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, index)).getOrRecoverJourney
+    request.userAnswers.get(BondsProgress(srn, index)) match {
+      case Some(InProgress(_)) => Redirect(routes.BondsListController.onPageLoad(srn, 1, mode))
+      case _ =>
+        (
+          for {
+            nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, index)).getOrRecoverJourney
+            whyDoesSchemeHoldBonds <- request.userAnswers
+              .get(WhyDoesSchemeHoldBondsPage(srn, index))
+              .getOrRecoverJourney
 
-        whenDidSchemeAcquireBonds = Option.when(whyDoesSchemeHoldBonds != Transfer)(
-          request.userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, index)).get
-        )
+            whenDidSchemeAcquireBonds = Option.when(whyDoesSchemeHoldBonds != Transfer)(
+              request.userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, index)).get
+            )
 
-        costOfBonds <- request.userAnswers.get(CostOfBondsPage(srn, index)).getOrRecoverJourney
+            costOfBonds <- request.userAnswers.get(CostOfBondsPage(srn, index)).getOrRecoverJourney
 
-        bondsFromConnectedParty = Option.when(whyDoesSchemeHoldBonds == Acquisition)(
-          request.userAnswers.get(BondsFromConnectedPartyPage(srn, index)).get
-        )
+            bondsFromConnectedParty = Option.when(whyDoesSchemeHoldBonds == Acquisition)(
+              request.userAnswers.get(BondsFromConnectedPartyPage(srn, index)).get
+            )
 
-        areBondsUnregulated <- request.userAnswers.get(AreBondsUnregulatedPage(srn, index)).getOrRecoverJourney
+            areBondsUnregulated <- request.userAnswers.get(AreBondsUnregulatedPage(srn, index)).getOrRecoverJourney
 
-        incomeFromBonds <- request.userAnswers.get(IncomeFromBondsPage(srn, index)).getOrRecoverJourney
+            incomeFromBonds <- request.userAnswers.get(IncomeFromBondsPage(srn, index)).getOrRecoverJourney
 
-        schemeName = request.schemeDetails.schemeName
-      } yield Ok(
-        view(
-          viewModel(
-            srn,
-            index,
-            schemeName,
-            nameOfBonds,
-            whyDoesSchemeHoldBonds,
-            whenDidSchemeAcquireBonds,
-            costOfBonds,
-            bondsFromConnectedParty,
-            areBondsUnregulated,
-            incomeFromBonds,
-            mode,
-            viewOnlyUpdated = false,
-            optYear = request.year,
-            optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+            schemeName = request.schemeDetails.schemeName
+          } yield Ok(
+            view(
+              viewModel(
+                srn,
+                index,
+                schemeName,
+                nameOfBonds,
+                whyDoesSchemeHoldBonds,
+                whenDidSchemeAcquireBonds,
+                costOfBonds,
+                bondsFromConnectedParty,
+                areBondsUnregulated,
+                incomeFromBonds,
+                mode,
+                viewOnlyUpdated = false,
+                optYear = request.year,
+                optCurrentVersion = request.currentVersion,
+                optPreviousVersion = request.previousVersion,
+                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+              )
+            )
           )
-        )
-      )
-    ).merge
+        ).merge
+    }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>

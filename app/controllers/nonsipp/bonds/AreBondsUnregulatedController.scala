@@ -72,9 +72,11 @@ class AreBondsUnregulatedController @Inject()(
             for {
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(AreBondsUnregulatedPage(srn, index), value))
-              _ <- saveService.save(updatedAnswers)
+              nextPage = navigator.nextPage(AreBondsUnregulatedPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(
-              navigator.nextPage(AreBondsUnregulatedPage(srn, index), mode, updatedAnswers)
+              nextPage
             )
         )
     }

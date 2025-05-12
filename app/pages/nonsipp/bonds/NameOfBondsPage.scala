@@ -56,7 +56,8 @@ case class NameOfBondsPage(srn: Srn, index: Max5000) extends QuestionPage[String
       AreBondsUnregulatedPage(srn, index),
       IncomeFromBondsPage(srn, index),
       BondsCompleted(srn, index),
-      BondsListPage(srn)
+      BondsListPage(srn),
+      BondsProgress(srn, index)
     )
     if (isLastRecord) list :+ UnregulatedOrConnectedBondsHeldPage(srn) else list
   }

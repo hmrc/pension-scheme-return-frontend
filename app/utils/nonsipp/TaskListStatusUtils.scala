@@ -499,7 +499,11 @@ object TaskListStatusUtils {
       )
     } else {
       val wereBonds = userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
-      val numRecorded = userAnswers.get(BondsCompleted.all(srn)).getOrElse(Map.empty).size
+      val numRecorded = userAnswers
+        .get(BondsProgress.all(srn))
+        .getOrElse(Map.empty)
+        .values
+        .count(_.completed)
 
       val firstQuestionPageUrl =
         controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
@@ -513,17 +517,16 @@ object TaskListStatusUtils {
 
       val firstPages = userAnswers.get(NameOfBondsPages(srn))
       val lastPages = userAnswers.map(BondsCompleted.all(srn))
-      val incompleteIndex: Int = getIncompleteIndex(firstPages, Some(lastPages))
 
-      val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
-        _ => firstQuestionPageUrl,
-        index => controllers.nonsipp.bonds.routes.NameOfBondsController.onPageLoad(srn, index, NormalMode).url
-      )
+      val inProgressUrl = userAnswers
+        .map(BondsProgress.all(srn))
+        .collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+        .getOrElse(firstQuestionPageUrl)
 
       (wereBonds, numRecorded) match {
         case (None, _) => (NotStarted, firstQuestionPageUrl)
         case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
-        case (Some(true), 0) => (InProgress, inProgressCalculatedUrl)
+        case (Some(true), 0) => (InProgress, inProgressUrl)
         case (Some(true), _) => (Recorded(numRecorded, "bonds"), listPageUrl)
       }
     }

@@ -25,9 +25,10 @@ import eu.timepit.refined.refineV
 import play.api.libs.json.{JsObject, JsSuccess}
 import models.UserAnswers
 import pages.nonsipp.bondsdisposal.BondsDisposalPage
-import utils.JsonUtils.JsResultOps
 import utils.ListUtils.ListOps
 import models.UserAnswers.SensitiveJsObject
+import utils.JsonUtils.JsResultOps
+import viewmodels.models.SectionJourneyStatus
 
 import scala.util.Try
 
@@ -52,7 +53,7 @@ class BondsPrePopulationProcessor @Inject()() {
       .prune(UnregulatedOrConnectedBondsHeldPage(srn).path)
       .prune(BondsDisposalPage(srn).path)
       .prune(bondsDisposed)
-      .prune((Paths.bondTransactions \ "totalIncomeOrReceipts")) match {
+      .prune(Paths.bondTransactions \ "totalIncomeOrReceipts") match {
       case JsSuccess(value, _) =>
         val uaWithBondsData = currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue)))
 
@@ -62,13 +63,18 @@ class BondsPrePopulationProcessor @Inject()() {
           .toList
           .flatten
           .refine[Max5000.Refined]
-          .map(index => BondPrePopulated(srn, index))
+          .map(
+            index =>
+              (
+                BondPrePopulated(srn, index),
+                BondsProgress(srn, index)
+              )
+          )
           .foldLeft(Try(uaWithBondsData)) {
-            case (ua, bondsPrePopulated) => {
+            case (ua, (bondsPrePopulated, bondsProgress)) =>
               ua.flatMap(_.set(bondsPrePopulated, false))
-            }
+                .flatMap(_.set(bondsProgress, SectionJourneyStatus.Completed))
           }
-
         updatedUA
       case _ => Try(currentUA)
     }

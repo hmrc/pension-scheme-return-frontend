@@ -22,7 +22,7 @@ import views.html.ListView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
@@ -78,6 +78,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(BondsFromConnectedPartyPage(srn, index), true)
       .unsafeSet(AreBondsUnregulatedPage(srn, index), true)
       .unsafeSet(IncomeFromBondsPage(srn, index), money)
+      .unsafeSet(BondsProgress(srn, index), SectionJourneyStatus.Completed)
 
   private val userAnswersHalfChecked =
     userAnswers
@@ -89,6 +90,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(BondsFromConnectedPartyPage(srn, indexTwo), true)
       .unsafeSet(AreBondsUnregulatedPage(srn, indexTwo), true)
       .unsafeSet(BondPrePopulated(srn, indexTwo), false)
+      .unsafeSet(BondsProgress(srn, indexTwo), SectionJourneyStatus.Completed)
       .unsafeSet(BondsCompleted(srn, indexThree), SectionCompleted)
       .unsafeSet(NameOfBondsPage(srn, indexThree), "NameThree")
       .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, indexThree), SchemeHoldBond.Acquisition)
@@ -97,6 +99,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(BondsFromConnectedPartyPage(srn, indexThree), true)
       .unsafeSet(AreBondsUnregulatedPage(srn, indexThree), true)
       .unsafeSet(BondPrePopulated(srn, indexThree), true)
+      .unsafeSet(BondsProgress(srn, indexThree), SectionJourneyStatus.Completed)
 
   private val bondsData = List(
     BondsData(
