@@ -87,33 +87,38 @@ class OtherAssetsTransformer @Inject() extends Transformer {
         key.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
           case None => None
           case Some(index) =>
-            for {
-              assetDescription <- request.userAnswers.get(WhatIsOtherAssetPage(srn, index))
-              methodOfHolding <- request.userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index))
-              costOfAsset <- request.userAnswers.get(CostOfOtherAssetPage(srn, index))
-              prePopulated = request.userAnswers.get(OtherAssetsPrePopulated(srn, index))
-            } yield {
+            val progress = request.userAnswers.get(OtherAssetsProgress(srn, index))
+            if (progress.contains(SectionJourneyStatus.Completed)) {
+              for {
+                assetDescription <- request.userAnswers.get(WhatIsOtherAssetPage(srn, index))
+                methodOfHolding <- request.userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index))
+                costOfAsset <- request.userAnswers.get(CostOfOtherAssetPage(srn, index))
+                prePopulated = request.userAnswers.get(OtherAssetsPrePopulated(srn, index))
+              } yield {
 
-              val optNoneTransferRelatedDetails = buildOptNoneTransferRelatedDetails(methodOfHolding, srn, index)
-              val optAcquisitionRelatedDetails = buildOptAcquisitionRelatedDetails(methodOfHolding, srn, index)
-              val optMovableSchedule29A = request.userAnswers.get(IsAssetTangibleMoveablePropertyPage(srn, index))
-              val optTotalIncomeOrReceipts = request.userAnswers.get(IncomeFromAssetPage(srn, index))
+                val optNoneTransferRelatedDetails = buildOptNoneTransferRelatedDetails(methodOfHolding, srn, index)
+                val optAcquisitionRelatedDetails = buildOptAcquisitionRelatedDetails(methodOfHolding, srn, index)
+                val optMovableSchedule29A = request.userAnswers.get(IsAssetTangibleMoveablePropertyPage(srn, index))
+                val optTotalIncomeOrReceipts = request.userAnswers.get(IncomeFromAssetPage(srn, index))
 
-              OtherAssetTransaction(
-                prePopulated = prePopulated,
-                assetDescription = assetDescription,
-                methodOfHolding = methodOfHolding,
-                optDateOfAcqOrContrib = optNoneTransferRelatedDetails.map(_._2),
-                costOfAsset = costOfAsset.value,
-                optPropertyAcquiredFromName = optAcquisitionRelatedDetails.map(_._1),
-                optPropertyAcquiredFrom = optAcquisitionRelatedDetails.map(_._3),
-                optConnectedStatus = optAcquisitionRelatedDetails.map(_._2),
-                optIndepValuationSupport = optNoneTransferRelatedDetails.map(_._1),
-                optMovableSchedule29A = optMovableSchedule29A,
-                optTotalIncomeOrReceipts = optTotalIncomeOrReceipts.map(_.value),
-                optOtherAssetDisposed =
-                  Option.when(optDisposeAnyOtherAssets.getOrElse(false))(buildOptOtherAssetsDisposed(srn, index))
-              )
+                OtherAssetTransaction(
+                  prePopulated = prePopulated,
+                  assetDescription = assetDescription,
+                  methodOfHolding = methodOfHolding,
+                  optDateOfAcqOrContrib = optNoneTransferRelatedDetails.map(_._2),
+                  costOfAsset = costOfAsset.value,
+                  optPropertyAcquiredFromName = optAcquisitionRelatedDetails.map(_._1),
+                  optPropertyAcquiredFrom = optAcquisitionRelatedDetails.map(_._3),
+                  optConnectedStatus = optAcquisitionRelatedDetails.map(_._2),
+                  optIndepValuationSupport = optNoneTransferRelatedDetails.map(_._1),
+                  optMovableSchedule29A = optMovableSchedule29A,
+                  optTotalIncomeOrReceipts = optTotalIncomeOrReceipts.map(_.value),
+                  optOtherAssetDisposed =
+                    Option.when(optDisposeAnyOtherAssets.getOrElse(false))(buildOptOtherAssetsDisposed(srn, index))
+                )
+              }
+            } else {
+              None
             }
         }
       }
@@ -577,6 +582,10 @@ class OtherAssetsTransformer @Inject() extends Transformer {
               index => OtherAssetsPrePopulated(srn, index) -> otherAssetTransactions(index.value - 1).prePopulated.get
             )
 
+          val progress = indexes.map(
+            index => OtherAssetsProgress(srn, index) -> SectionJourneyStatus.Completed
+          )
+
           val triedUA = for {
             ua0 <- ua
             ua1 <- ua0.set(assetDescription._1, assetDescription._2)
@@ -599,11 +608,12 @@ class OtherAssetsTransformer @Inject() extends Transformer {
             ua18 <- otherAssetsPrePopulated.foldLeft(Try(ua17)) {
               case (ua, (page, value)) => ua.flatMap(_.set(page, value))
             }
+            ua19 <- progress.foldLeft(Try(ua18)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
           } yield {
             buildOptDisposedOtherAssetsUA(
               index,
               srn,
-              ua18,
+              ua19,
               otherAssetTransaction.optOtherAssetDisposed
             )
           }

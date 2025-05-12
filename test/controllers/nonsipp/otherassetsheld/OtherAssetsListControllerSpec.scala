@@ -24,10 +24,10 @@ import controllers.ControllerBaseSpec
 import views.html.ListView
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
-import controllers.nonsipp.otherassetsheld.OtherAssetsListController.{OtherAssetsData, _}
+import controllers.nonsipp.otherassetsheld.OtherAssetsListController._
 import pages.nonsipp.common.IdentityTypePage
 import models.IdentitySubject.OtherAssetSeller
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import org.mockito.ArgumentMatchers.any
 import models._
 import models.SchemeHoldAsset._
@@ -49,6 +49,7 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(IndependentValuationPage(srn, index1of5000), true)
     .unsafeSet(IncomeFromAssetPage(srn, index1of5000), money)
     .unsafeSet(OtherAssetsCompleted(srn, index1of5000), SectionCompleted)
+    .unsafeSet(OtherAssetsProgress(srn, index1of5000), SectionJourneyStatus.Completed)
     // Second Other Assets record:
     .unsafeSet(WhatIsOtherAssetPage(srn, index2of5000), "nameOfOtherAsset2")
     .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, index2of5000), false)
@@ -58,12 +59,14 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(IndependentValuationPage(srn, index2of5000), false)
     .unsafeSet(IncomeFromAssetPage(srn, index2of5000), money)
     .unsafeSet(OtherAssetsCompleted(srn, index2of5000), SectionCompleted)
+    .unsafeSet(OtherAssetsProgress(srn, index2of5000), SectionJourneyStatus.Completed)
 
   private val userAnswersToCheck = completedUserAnswers
     .unsafeSet(WhatIsOtherAssetPage(srn, index3of5000), "nameOfOtherAsset3")
     .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index3of5000), Transfer)
     .unsafeSet(CostOfOtherAssetPage(srn, index3of5000), money)
     .unsafeSet(OtherAssetsCompleted(srn, index3of5000), SectionCompleted)
+    .unsafeSet(OtherAssetsProgress(srn, index3of5000), SectionJourneyStatus.Completed)
     .unsafeSet(OtherAssetsPrePopulated(srn, index3of5000), false)
 
   private val userAnswersChecked = completedUserAnswers
@@ -71,7 +74,25 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index3of5000), Transfer)
     .unsafeSet(CostOfOtherAssetPage(srn, index3of5000), money)
     .unsafeSet(OtherAssetsCompleted(srn, index3of5000), SectionCompleted)
+    .unsafeSet(OtherAssetsProgress(srn, index3of5000), SectionJourneyStatus.Completed)
     .unsafeSet(OtherAssetsPrePopulated(srn, index3of5000), true)
+
+  private val userAnswersWithIncompleteRecord = completedUserAnswers
+    .unsafeSet(WhatIsOtherAssetPage(srn, index4of5000), "nameOfOtherAsset3")
+    .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index4of5000), Transfer)
+    .unsafeSet(
+      OtherAssetsProgress(srn, index4of5000),
+      SectionJourneyStatus.InProgress(CostOfOtherAssetPage(srn, index4of5000))
+    )
+
+  private val userAnswersToCheckWithIncompleteRecord = userAnswersToCheck
+    .unsafeSet(WhatIsOtherAssetPage(srn, index4of5000), "nameOfOtherAsset3")
+    .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index4of5000), Transfer)
+    .unsafeSet(
+      OtherAssetsProgress(srn, index4of5000),
+      SectionJourneyStatus.InProgress(CostOfOtherAssetPage(srn, index4of5000))
+    )
+    .unsafeSet(OtherAssetsPrePopulated(srn, index4of5000), false)
 
   private val page = 1
 
@@ -193,6 +214,24 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
         )
     }.withName("Completed Journey"))
 
+    act.like(renderView(onPageLoad, userAnswersWithIncompleteRecord) { implicit app => implicit request =>
+      injected[ListView]
+        .apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(
+            srn = srn,
+            page = page,
+            mode = NormalMode,
+            otherAssets = otherAssetsData,
+            otherAssetsToCheck = Nil,
+            schemeName = schemeName,
+            viewOnlyViewModel = None,
+            showBackLink = true,
+            isPrePop = false
+          )
+        )
+    }.withName("Completed Journey with incomplete record"))
+
     act.like(renderViewWithPrePopSession(onPageLoad, userAnswersToCheck) { implicit app => implicit request =>
       injected[ListView].apply(
         form(new YesNoPageFormProvider()),
@@ -226,6 +265,24 @@ class OtherAssetsListControllerSpec extends ControllerBaseSpec {
         )
       )
     }.withName("PrePop Journey Checked"))
+
+    act.like(renderViewWithPrePopSession(onPageLoad, userAnswersToCheckWithIncompleteRecord) {
+      implicit app => implicit request =>
+        injected[ListView].apply(
+          form(new YesNoPageFormProvider()),
+          viewModel(
+            srn = srn,
+            page = page,
+            mode = NormalMode,
+            otherAssets = otherAssetsData,
+            otherAssetsToCheck = otherAssetsDataToCheck,
+            schemeName = schemeName,
+            viewOnlyViewModel = None,
+            showBackLink = true,
+            isPrePop = true
+          )
+        )
+    }.withName("PrePop Journey with 2 added records, 1 record to check and 1 incomplete data"))
 
     act.like(
       renderPrePopView(onPageLoad, OtherAssetsListPage(srn), true, completedUserAnswers) {

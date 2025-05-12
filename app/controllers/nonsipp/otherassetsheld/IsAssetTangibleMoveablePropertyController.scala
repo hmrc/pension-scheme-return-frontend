@@ -83,7 +83,9 @@ class IsAssetTangibleMoveablePropertyController @Inject()(
             for {
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(IsAssetTangibleMoveablePropertyPage(srn, index), value))
-              _ <- saveService.save(updatedAnswers)
+              nextPage = navigator.nextPage(IsAssetTangibleMoveablePropertyPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
             } yield (
               isPrePopulation,
               request.userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index)),
@@ -96,7 +98,7 @@ class IsAssetTangibleMoveablePropertyController @Inject()(
                     .onPageLoad(srn, index, mode)
                 )
               case _ =>
-                Redirect(navigator.nextPage(IsAssetTangibleMoveablePropertyPage(srn, index), mode, updatedAnswers))
+                Redirect(nextPage)
             }
         )
   }
