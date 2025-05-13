@@ -39,6 +39,7 @@ import models.SchemeHoldAsset._
 import play.api.i18n.MessagesApi
 import viewmodels.Margin
 import viewmodels.DisplayMessage.{Heading2, Message}
+import viewmodels.models.SectionJourneyStatus.Completed
 import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -59,12 +60,14 @@ class OtherAssetsCYAController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      //Clear any PointOfEntry
-      saveService.save(
-        request.userAnswers
-          .set(OtherAssetsCYAPointOfEntry(srn, index), NoPointOfEntry)
-          .getOrElse(request.userAnswers)
-      )
+      if (request.userAnswers.get(OtherAssetsProgress(srn, index)).contains(Completed)) {
+        //Clear any PointOfEntry
+        saveService.save(
+          request.userAnswers
+            .set(OtherAssetsCYAPointOfEntry(srn, index), NoPointOfEntry)
+            .getOrElse(request.userAnswers)
+        )
+      }
       onPageLoadCommon(srn, index, mode)
     }
 

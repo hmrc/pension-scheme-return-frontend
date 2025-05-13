@@ -88,6 +88,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(CostOfOtherAssetPage(srn, index), money)
     .unsafeSet(IndependentValuationPage(srn, index), true)
     .unsafeSet(IncomeFromAssetPage(srn, index), money)
+    .unsafeSet(OtherAssetsProgress(srn, index), SectionJourneyStatus.Completed)
 
   private val incompleteUserAnswers = filledUserAnswers
     .unsafeSet(
@@ -156,6 +157,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
           userAnswers = incompleteUserAnswers,
           previousUserAnswers = emptyUserAnswers
         ).after({
+            verify(mockSaveService, never()).save(any())(any(), any())
             reset(mockPsrSubmissionService)
             reset(mockSaveService)
           })
