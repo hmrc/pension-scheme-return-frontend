@@ -80,6 +80,20 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(IncomeFromBondsPage(srn, index), money)
       .unsafeSet(BondsProgress(srn, index), SectionJourneyStatus.Completed)
 
+  private val incompleteAnswers = userAnswers
+    .unsafeSet(NameOfBondsPage(srn, indexTwo), "Name")
+    .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, indexTwo), SchemeHoldBond.Acquisition)
+    .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, indexTwo), localDate)
+    .unsafeSet(CostOfBondsPage(srn, indexTwo), money)
+    .unsafeSet(BondsFromConnectedPartyPage(srn, indexTwo), true)
+    .unsafeSet(AreBondsUnregulatedPage(srn, indexTwo), true)
+    .unsafeSet(
+      BondsProgress(srn, indexTwo),
+      SectionJourneyStatus.InProgress(
+        routes.IncomeFromBondsController.onPageLoad(srn, indexTwo, NormalMode).url
+      )
+    )
+
   private val userAnswersHalfChecked =
     userAnswers
       .unsafeSet(BondsCompleted(srn, indexTwo), SectionCompleted)
@@ -183,6 +197,23 @@ class BondsListControllerSpec extends ControllerBaseSpec {
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
     )
+
+    act.like(renderView(onPageLoad, incompleteAnswers) { implicit app => implicit request =>
+      injected[ListView]
+        .apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(srn, page, NormalMode, bondsData, Nil, schemeName, showBackLink = true, isPrePop = false)
+        )
+    }.updateName(_ + " - Smart nav index 2 missing"))
+
+//    act.like(
+//      redirectToPage(
+//        onSubmit,
+//        controllers.nonsipp.bonds.routes.IncomeFromBondsController.onPageLoad(srn, indexTwo, NormalMode),
+//        incompleteAnswers,
+//        "value" -> "true"
+//      )
+//    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

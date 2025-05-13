@@ -36,7 +36,7 @@ import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, T
 import org.mockito.Mockito.when
 import utils.CommonTestValues
 import play.api.inject.guice.GuiceableModule
-import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage, UnregulatedOrConnectedBondsHeldPage}
+import pages.nonsipp.bonds._
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import pages.nonsipp.sharesdisposal._
 import pages.nonsipp.{CheckReturnDatesPage, FbVersionPage, WhichTaxYearPage}
@@ -1107,6 +1107,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
           defaultUserAnswers
             .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
             .unsafeSet(NameOfBondsPage(srn, index1of5000), nameOfBonds)
+            .unsafeSet(BondsProgress(srn, index1of5000), SectionJourneyStatus.InProgress("next-page"))
 
         testViewModel(
           userAnswersWithData,
@@ -1115,9 +1116,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
           expectedStatus = TaskListStatus.InProgress,
           expectedTitleKey = "nonsipp.tasklist.bonds.title",
           expectedLinkContentKey = "nonsipp.tasklist.bonds.change.unregulatedorconnected.title",
-          expectedLinkUrl = controllers.nonsipp.bonds.routes.NameOfBondsController
-            .onPageLoad(srn, index1of5000, NormalMode)
-            .url
+          expectedLinkUrl = "next-page"
         )
       }
 
@@ -1127,6 +1126,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
             .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
             .unsafeSet(NameOfBondsPage(srn, index1of5000), nameOfBonds)
             .unsafeSet(BondsCompleted(srn, index1of5000), SectionCompleted)
+            .unsafeSet(BondsProgress(srn, index1of5000), SectionJourneyStatus.Completed)
 
         testViewModel(
           userAnswersWithData,
