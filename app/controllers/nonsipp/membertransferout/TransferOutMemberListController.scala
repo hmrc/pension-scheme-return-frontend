@@ -18,6 +18,7 @@ package controllers.nonsipp.membertransferout
 
 import controllers.nonsipp.membertransferout.TransferOutMemberListController._
 import viewmodels.implicits._
+import pages.nonsipp.membertransferout.MemberTransferOutProgress.TransfersOutSectionCompletedUserAnswersOps
 import play.api.mvc._
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
@@ -25,7 +26,7 @@ import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import cats.implicits.toShow
 import viewmodels.models.TaskListStatus.Updated
 import models.requests.DataRequest
-import config.RefinedTypes.Max300
+import config.RefinedTypes.{Max300, Max5}
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
@@ -40,6 +41,7 @@ import models._
 import pages.nonsipp.membertransferout._
 import play.api.i18n.MessagesApi
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.models.SectionJourneyStatus.InProgress
 import viewmodels.models._
 
 import scala.concurrent.Future
@@ -86,20 +88,14 @@ class TransferOutMemberListController @Inject()(
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       case Right(completedMemberDetails) =>
         val noPageEnabled = !request.userAnswers.get(SchemeTransferOutPage(srn)).getOrElse(false)
-        val membersWithTransfers = completedMemberDetails.map {
-          case (index, memberDetails) =>
-            val completedTransfersOut =
-              request.userAnswers.map(TransfersOutSectionCompleted.all(srn, index)).values.size
-            (index, memberDetails, completedTransfersOut)
-        }
         Ok(
           view(
             viewModel(
               srn,
               page,
               mode,
-              membersWithTransfers,
-              viewOnlyUpdated = if (mode.isViewOnlyMode && request.previousUserAnswers.nonEmpty) {
+              membersWithTransfers = buildTransferOut(srn, completedMemberDetails),
+              viewOnlyUpdated = if (mode == ViewOnlyMode && request.previousUserAnswers.nonEmpty) {
                 getCompletedOrUpdatedTaskListStatus(
                   request.userAnswers,
                   request.previousUserAnswers.get,
@@ -145,6 +141,22 @@ class TransferOutMemberListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
+  private def buildTransferOut(srn: Srn, memberTransferOutList: List[(Max300, NameDOB)])(
+    implicit request: DataRequest[_]
+  ): List[MemberWithTransferOut] = memberTransferOutList.map {
+    case (index, nameDOB) =>
+      MemberWithTransferOut(
+        memberIndex = index,
+        transferFullName = nameDOB.fullName,
+        transfer = request.userAnswers
+          .memberTransferOutProgress(srn, index)
+          .map {
+            case (secondaryIndex, status) =>
+              TransferOut(secondaryIndex, status)
+          }
+      )
+  }
+
 }
 
 object TransferOutMemberListController {
@@ -154,92 +166,101 @@ object TransferOutMemberListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    memberList: List[(Max300, NameDOB, CompletedTransfersOut)],
+    membersWithTransfers: List[MemberWithTransferOut],
     optYear: Option[String],
     optCurrentVersion: Option[Int],
     optPreviousVersion: Option[Int]
   ): List[List[TableElemBase]] =
-    memberList
-      .map {
-        case (index, memberName, completedTransfersOut) =>
-          if (completedTransfersOut == 0) {
-            List(
-              TableElem(
-                memberName.fullName
-              ),
-              TableElem(
-                Message("transferOut.memberList.status.no.contributions")
-              ),
-              if (!mode.isViewOnlyMode) {
-                TableElem(
-                  LinkMessage(
-                    Message("site.add"),
+    membersWithTransfers
+      .map { membersWithTransfers =>
+        val noTransfers = membersWithTransfers.transfer.isEmpty
+        val onlyInProgressTransfers = membersWithTransfers.transfer.forall(_.status.inProgress)
+
+        if (noTransfers || onlyInProgressTransfers) {
+          List(
+            TableElem(
+              membersWithTransfers.transferFullName
+            ),
+            TableElem(
+              Message("transferOut.memberList.status.no.contributions")
+            ),
+            if (mode != ViewOnlyMode) {
+              TableElem.add(
+                membersWithTransfers.transfer.find(_.status.inProgress) match {
+                  case Some(TransferOut(_, InProgress(url))) => url
+                  case _ =>
                     controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
-                      .onSubmit(srn, index, refineMV(1), mode)
-                      .url,
-                    Message(
-                      "transferOut.memberList.add.hidden.text",
-                      memberName.fullName
-                    )
-                  )
-                )
-              } else {
-                TableElem.empty
-              }
-            )
-          } else {
-            List(
-              TableElem(
-                memberName.fullName
-              ),
-              TableElem(
-                if (completedTransfersOut == 1) {
-                  Message("transferOut.memberList.singleStatus.some.contribution", completedTransfersOut)
-                } else {
-                  Message("transferOut.memberList.status.some.contributions", completedTransfersOut)
-                }
-              ),
-              TableElemDoubleLink(
-                (
-                  (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-                    case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                      TableElem.view(
-                        controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
-                          .onPageLoadViewOnly(
-                            srn,
-                            index,
-                            year = year,
-                            current = currentVersion,
-                            previous = previousVersion
-                          ),
-                        memberName.fullName
-                      )
-                    case _ =>
-                      TableElem.change(
-                        controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
-                          .onPageLoad(srn, index, CheckMode),
-                        Message(
-                          "transferOut.memberList.change.hidden.text",
-                          memberName.fullName
-                        )
-                      )
-                  },
-                  if (mode.isViewOnlyMode) {
-                    TableElem.empty
-                  } else {
-                    TableElem.remove(
-                      controllers.nonsipp.membertransferout.routes.WhichTransferOutRemoveController
-                        .onSubmit(srn, index),
-                      Message(
-                        "transferOut.memberList.remove.hidden.text",
-                        memberName.fullName
-                      )
-                    )
-                  }
+                      .onSubmit(srn, membersWithTransfers.memberIndex, refineMV(1), mode)
+                      .url
+                },
+                Message(
+                  "transferOut.memberList.add.hidden.text",
+                  membersWithTransfers.transferFullName
                 )
               )
+            } else {
+              TableElem.empty
+            }
+          )
+        } else {
+          List(
+            TableElem(
+              membersWithTransfers.transferFullName
+            ),
+            TableElem(
+              if (membersWithTransfers.transfer.size == 1) {
+                Message(
+                  "transferOut.memberList.singleStatus.some.contribution",
+                  membersWithTransfers.transfer.size
+                )
+              } else {
+                Message(
+                  "transferOut.memberList.status.some.contributions",
+                  membersWithTransfers.transfer.count(_.status.completed)
+                )
+              }
+            ),
+            TableElemDoubleLink(
+              (
+                (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                  case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                    TableElem.view(
+                      controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
+                        .onPageLoadViewOnly(
+                          srn,
+                          membersWithTransfers.memberIndex,
+                          year = year,
+                          current = currentVersion,
+                          previous = previousVersion
+                        ),
+                      membersWithTransfers.transferFullName
+                    )
+                  case _ =>
+                    TableElem.change(
+                      controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
+                        .onPageLoad(srn, membersWithTransfers.memberIndex, CheckMode),
+                      Message(
+                        "transferOut.memberList.change.hidden.text",
+                        membersWithTransfers.transferFullName
+                      )
+                    )
+                },
+                if (mode == ViewOnlyMode) {
+                  TableElem.empty
+                } else {
+                  TableElem.remove(
+                    controllers.nonsipp.membertransferout.routes.WhichTransferOutRemoveController
+                      .onSubmit(srn, membersWithTransfers.memberIndex),
+                    Message(
+                      "transferOut.memberList.remove.hidden.text",
+                      membersWithTransfers.transferFullName
+                    )
+                  )
+                }
+              )
             )
-          }
+          )
+        }
       }
       .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString))
 
@@ -247,7 +268,7 @@ object TransferOutMemberListController {
     srn: Srn,
     page: Int,
     mode: Mode,
-    membersWithTransfers: List[(Max300, NameDOB, CompletedTransfersOut)],
+    membersWithTransfers: List[MemberWithTransferOut],
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
@@ -265,8 +286,6 @@ object TransferOutMemberListController {
       } else {
         ("transferOut.memberList.title.plural", "transferOut.memberList.heading.plural")
       }
-
-    val sumTransfersOut = membersWithTransfers.map(_._3).sum
 
     // in view-only mode or with direct url edit page value can be higher than needed
     val currentPage = if ((page - 1) * Constants.transferOutListSize >= memberListSize) 1 else page
@@ -309,7 +328,14 @@ object TransferOutMemberListController {
             TableElem.empty
           )
         ),
-        rows = rows(srn, mode, membersWithTransfers, optYear, optCurrentVersion, optPreviousVersion),
+        rows = rows(
+          srn,
+          mode,
+          membersWithTransfers.sortBy(_.transferFullName),
+          optYear,
+          optCurrentVersion,
+          optPreviousVersion
+        ),
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
@@ -328,6 +354,7 @@ object TransferOutMemberListController {
       onSubmit = controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
         .onSubmit(srn, page, mode),
       optViewOnlyDetails = if (mode.isViewOnlyMode) {
+        val sumTransfersOut: Int = membersWithTransfers.map(_.transfer.size).sum
         Some(
           ViewOnlyDetailsViewModel(
             updated = viewOnlyUpdated,
@@ -378,4 +405,13 @@ object TransferOutMemberListController {
       showBackLink = showBackLink
     )
   }
+
+  protected[membertransferout] case class MemberWithTransferOut(
+    memberIndex: Max300,
+    transferFullName: String,
+    transfer: List[TransferOut]
+  )
+
+  protected[membertransferout] case class TransferOut(memberIndex: Max5, status: SectionJourneyStatus)
+
 }

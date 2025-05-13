@@ -121,7 +121,8 @@ trait SoftDelete { _: PSRController =>
         ReceivingSchemeNamePage(srn, index, secondaryIndex),
         WhenWasTransferMadePage(srn, index, secondaryIndex),
         ReceivingSchemeTypePage(srn, index, secondaryIndex),
-        ReportAnotherTransferOutPage(srn, index, secondaryIndex)
+        ReportAnotherTransferOutPage(srn, index, secondaryIndex),
+        MemberTransferOutProgress(srn, index, secondaryIndex)
       )
 
     val surrenderedBenefitsPages: List[Removable[_]] = List(

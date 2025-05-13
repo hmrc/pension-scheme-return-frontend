@@ -248,6 +248,7 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(ReceivingSchemeNamePage(srn, index, transfersOutIndex), schemeName)
     .unsafeSet(WhenWasTransferMadePage(srn, index, transfersOutIndex), localDate)
     .unsafeSet(ReceivingSchemeTypePage(srn, index, transfersOutIndex), PensionSchemeType.RegisteredPS("456"))
+    .unsafeSet(MemberTransferOutProgress(srn, index, transfersOutIndex), SectionJourneyStatus.Completed)
     // pension surrender
     .unsafeSet(SurrenderedBenefitsCompletedPage(srn, index), SectionCompleted)
     .unsafeSet(SurrenderedBenefitsPage(srn), true)

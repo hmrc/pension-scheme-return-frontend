@@ -30,11 +30,10 @@ import config.RefinedTypes.{Max300, Max5}
 import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
-import pages.nonsipp.membertransferout.{ReportAnotherTransferOutPage, TransfersOutSectionCompleted}
+import pages.nonsipp.membertransferout.ReportAnotherTransferOutPage
 import play.api.i18n.MessagesApi
-import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, SectionCompleted, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -77,10 +76,10 @@ class ReportAnotherTransferOutController @Inject()(
             },
           value =>
             for {
-              updatedAnswers <- request.userAnswers
-                .set(ReportAnotherTransferOutPage(srn, index, secondaryIndex), value)
-                .set(TransfersOutSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
-                .mapK[Future]
+              updatedAnswers <- Future.fromTry(
+                request.userAnswers
+                  .set(ReportAnotherTransferOutPage(srn, index, secondaryIndex), value)
+              )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
               navigator

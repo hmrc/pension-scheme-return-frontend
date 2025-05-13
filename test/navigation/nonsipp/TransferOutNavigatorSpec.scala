@@ -23,6 +23,7 @@ import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import models.NormalMode
 import pages.nonsipp.membertransferout._
+import viewmodels.models.SectionJourneyStatus
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
 
@@ -143,6 +144,10 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           defaultUserAnswers
             .unsafeSet(ReportAnotherTransferOutPage(srn, index, secondaryIndex), true)
             .unsafeSet(WhenWasTransferMadePages(srn, index), existingIndexes.map(_ -> localDate).toMap)
+            .unsafeSet(
+              MemberTransferOutProgress.all(srn, index),
+              existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
+            )
 
         act.like(
           normalmode
@@ -223,6 +228,10 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           defaultUserAnswers
             .unsafeSet(ReportAnotherTransferOutPage(srn, index, secondaryIndex), true)
             .unsafeSet(WhenWasTransferMadePages(srn, index), existingIndexes.map(_ -> localDate).toMap)
+            .unsafeSet(
+              MemberTransferOutProgress.all(srn, index),
+              existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
+            )
 
         act.like(
           checkmode

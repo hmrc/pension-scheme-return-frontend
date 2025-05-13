@@ -35,6 +35,7 @@ import models.SchemeId.Srn
 import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, ReceivingSchemeTypePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -98,12 +99,13 @@ class ReceivingSchemeTypeController @Inject()(
             ),
         answer =>
           for {
-            updatedAnswers <- Future
-              .fromTry(request.userAnswers.set(ReceivingSchemeTypePage(srn, index, secondaryIndex), answer))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(
-            navigator.nextPage(ReceivingSchemeTypePage(srn, index, secondaryIndex), mode, updatedAnswers)
-          )
+            updatedAnswers <- request.userAnswers
+              .set(ReceivingSchemeTypePage(srn, index, secondaryIndex), answer)
+              .mapK
+            nextPage = navigator.nextPage(ReceivingSchemeTypePage(srn, index, secondaryIndex), mode, updatedAnswers)
+            updatedProgressAnswers <- saveProgress(srn, index, secondaryIndex, updatedAnswers, nextPage)
+            _ <- saveService.save(updatedProgressAnswers)
+          } yield Redirect(nextPage)
       )
   }
 }

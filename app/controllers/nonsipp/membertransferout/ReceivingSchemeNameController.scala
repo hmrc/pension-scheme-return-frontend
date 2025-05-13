@@ -23,7 +23,6 @@ import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
-import viewmodels.models.{FormPageViewModel, TextInputViewModel}
 import play.api.data.Form
 import config.RefinedTypes.{Max300, Max5}
 import controllers.PSRController
@@ -31,6 +30,8 @@ import views.html.TextInputViewWidth40
 import models.SchemeId.Srn
 import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
 import play.api.i18n.MessagesApi
+import utils.FunctionKUtils._
+import viewmodels.models.{FormPageViewModel, TextInputViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -69,12 +70,11 @@ class ReceivingSchemeNameController @Inject()(
               ),
           value =>
             for {
-              updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(ReceivingSchemeNamePage(srn, index, transferIndex), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(ReceivingSchemeNamePage(srn, index, transferIndex), mode, updatedAnswers)
-            )
+              updatedAnswers <- request.userAnswers.set(ReceivingSchemeNamePage(srn, index, transferIndex), value).mapK
+              nextPage = navigator.nextPage(ReceivingSchemeNamePage(srn, index, transferIndex), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, transferIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }
