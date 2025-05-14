@@ -209,7 +209,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
 //    act.like(
 //      redirectToPage(
 //        onSubmit,
-//        controllers.nonsipp.bonds.routes.IncomeFromBondsController.onPageLoad(srn, indexTwo, NormalMode),
+//        routes.IncomeFromBondsController.onPageLoad(srn, indexTwo, NormalMode),
 //        incompleteAnswers,
 //        "value" -> "true"
 //      )

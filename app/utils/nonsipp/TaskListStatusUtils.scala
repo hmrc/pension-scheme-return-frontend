@@ -515,9 +515,6 @@ object TaskListStatusUtils {
           .onPageLoad(srn, 1, NormalMode)
           .url
 
-      val firstPages = userAnswers.get(NameOfBondsPages(srn))
-      val lastPages = userAnswers.map(BondsCompleted.all(srn))
-
       val inProgressUrl = userAnswers
         .map(BondsProgress.all(srn))
         .collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }

@@ -30,6 +30,7 @@ import pages.nonsipp.bonds._
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
 import models.SchemeHoldBond.Acquisition
+import viewmodels.models.SectionJourneyStatus
 
 class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpec {
 
@@ -74,6 +75,17 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
     .unsafeSet(BondsFromConnectedPartyPage(srn, index), true)
     .unsafeSet(AreBondsUnregulatedPage(srn, index), true)
     .unsafeSet(IncomeFromBondsPage(srn, index), money)
+    .unsafeSet(BondsProgress(srn, index), SectionJourneyStatus.Completed)
+
+  private val incompleteUserAnswers = defaultUserAnswers
+    .unsafeSet(NameOfBondsPage(srn, index), otherName)
+    .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, index), Acquisition)
+    .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, index), localDate)
+    .unsafeSet(CostOfBondsPage(srn, index), money)
+    .unsafeSet(BondsFromConnectedPartyPage(srn, index), true)
+    .unsafeSet(AreBondsUnregulatedPage(srn, index), true)
+    .unsafeSet(BondsProgress(srn, index), SectionJourneyStatus.InProgress("some-url"))
+
 
   "UnregulatedOrConnectedBondsHeldCYAController" - {
     List(NormalMode, CheckMode).foreach { mode =>
@@ -118,6 +130,15 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
         journeyRecoveryPage(onSubmit(mode))
           .updateName("onSubmit" + _)
           .withName(s"redirect to journey recovery page on submit when in $mode mode")
+      )
+
+      act.like(
+        redirectToPage(
+          call = onPageLoad(mode),
+          page = controllers.nonsipp.bonds.routes.BondsListController.onPageLoad(srn, page, mode),
+          userAnswers = incompleteUserAnswers,
+          previousUserAnswers = emptyUserAnswers,
+        ).withName(s"redirect to list page when in $mode mode and incomplete data")
       )
     }
   }

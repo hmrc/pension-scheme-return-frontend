@@ -146,8 +146,9 @@ class BondsListController @Inject()(
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val indexes: List[Max5000] = request.userAnswers.map(BondsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
-      val inProgressAnswers = request.userAnswers.map(BondsProgress.all(srn))
-      val inProgressUrl = inProgressAnswers.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+      val inProgressUrl = request.userAnswers.map(BondsProgress.all(srn)).collectFirst {
+        case (_, SectionJourneyStatus.InProgress(url)) => url
+      }
 
       if (indexes.size >= Constants.maxBondsTransactions) {
         Future.successful(
@@ -258,7 +259,7 @@ class BondsListController @Inject()(
         completedIndexes <- completedIndexesOrError
         bonds <- completedIndexes.traverse(buildBonds)
       } yield bonds.partition(
-        shares => BondsCheckStatusUtils.checkBondsRecord(request.userAnswers, srn, shares.index)
+        bonds => BondsCheckStatusUtils.checkBondsRecord(request.userAnswers, srn, bonds.index)
       )
     } else {
       val noBondsToCheck = List.empty[BondsData]
