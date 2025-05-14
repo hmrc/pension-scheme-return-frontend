@@ -49,8 +49,6 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     mock[LoansProgressPrePopulationProcessor]
   lazy val mockOtherAssetsPrePopulationProcessor: OtherAssetsPrePopulationProcessor =
     mock[OtherAssetsPrePopulationProcessor]
-  lazy val mockOtherAssetsProgressPrePopulationProcessor: OtherAssetsProgressPrePopulationProcessor =
-    mock[OtherAssetsProgressPrePopulationProcessor]
   lazy val mockLandOrPropertyProgressPrePopulationProcessor: LandOrPropertyProgressPrePopulationProcessor =
     mock[LandOrPropertyProgressPrePopulationProcessor]
   lazy val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
@@ -63,7 +61,6 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     mockBondsPrePopulationProcessor,
     mockLoansProgressPrePopulationProcessor,
     mockOtherAssetsPrePopulationProcessor,
-    mockOtherAssetsProgressPrePopulationProcessor,
     mockLandOrPropertyProgressPrePopulationProcessor,
     mockConfig
   )
@@ -76,7 +73,6 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     reset(mockBondsPrePopulationProcessor)
     reset(mockLoansProgressPrePopulationProcessor)
     reset(mockOtherAssetsPrePopulationProcessor)
-    reset(mockOtherAssetsProgressPrePopulationProcessor)
     reset(mockLandOrPropertyProgressPrePopulationProcessor)
     reset(mockConfig)
   }
@@ -160,7 +156,6 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
           verify(mockBondsPrePopulationProcessor, times(1)).clean(any(), any())(any())
           verify(mockLoansProgressPrePopulationProcessor, times(1)).clean(any(), any())(any())
           verify(mockOtherAssetsPrePopulationProcessor, times(1)).clean(any(), any())(any())
-          verify(mockOtherAssetsProgressPrePopulationProcessor, times(1)).clean(any(), any())(any())
           verify(mockLandOrPropertyProgressPrePopulationProcessor, times(1)).clean(any(), any())(any())
         }
       }
@@ -183,7 +178,6 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
           verify(mockBondsPrePopulationProcessor, never()).clean(any(), any())(any())
           verify(mockLoansProgressPrePopulationProcessor, never()).clean(any(), any())(any())
           verify(mockOtherAssetsPrePopulationProcessor, never()).clean(any(), any())(any())
-          verify(mockOtherAssetsProgressPrePopulationProcessor, never()).clean(any(), any())(any())
           verify(mockLandOrPropertyProgressPrePopulationProcessor, never).clean(any(), any())(any())
         }
       }
@@ -233,10 +227,6 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
       mockOtherAssetsPrePopulationProcessor
         .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(loansProgressUa))(ArgumentMatchers.eq(srn))
     ).thenReturn(Success(otherAssetsUa))
-    when(
-      mockOtherAssetsProgressPrePopulationProcessor
-        .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(otherAssetsUa))(ArgumentMatchers.eq(srn))
-    ).thenReturn(Success(otherAssetsProgressUa))
     when(
       mockLandOrPropertyProgressPrePopulationProcessor
         .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(otherAssetsProgressUa))(ArgumentMatchers.eq(srn))
