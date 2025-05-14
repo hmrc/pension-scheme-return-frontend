@@ -49,8 +49,6 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     mock[LoansProgressPrePopulationProcessor]
   lazy val mockOtherAssetsPrePopulationProcessor: OtherAssetsPrePopulationProcessor =
     mock[OtherAssetsPrePopulationProcessor]
-  lazy val mockLandOrPropertyProgressPrePopulationProcessor: LandOrPropertyProgressPrePopulationProcessor =
-    mock[LandOrPropertyProgressPrePopulationProcessor]
   lazy val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
   private val service = new PrePopulationService(
@@ -61,7 +59,6 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     mockBondsPrePopulationProcessor,
     mockLoansProgressPrePopulationProcessor,
     mockOtherAssetsPrePopulationProcessor,
-    mockLandOrPropertyProgressPrePopulationProcessor,
     mockConfig
   )
 
@@ -73,7 +70,6 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     reset(mockBondsPrePopulationProcessor)
     reset(mockLoansProgressPrePopulationProcessor)
     reset(mockOtherAssetsPrePopulationProcessor)
-    reset(mockLandOrPropertyProgressPrePopulationProcessor)
     reset(mockConfig)
   }
 
@@ -143,8 +139,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
               |  "loans": "dummy-loans-data",
               |  "bonds": "dummy-bonds-data",
               |  "loansProgress": "dummy-loans-progress-data",
-              |  "otherAssets": "dummy-other-assets-data",
-              |  "landOrPropertyProgress": "dummy-lop-progress-data"
+              |  "otherAssets": "dummy-other-assets-data"
               |}
               |""".stripMargin).as[JsObject]
 
@@ -155,7 +150,6 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
           verify(mockBondsPrePopulationProcessor, times(1)).clean(any(), any())(any())
           verify(mockLoansProgressPrePopulationProcessor, times(1)).clean(any(), any())(any())
           verify(mockOtherAssetsPrePopulationProcessor, times(1)).clean(any(), any())(any())
-          verify(mockLandOrPropertyProgressPrePopulationProcessor, times(1)).clean(any(), any())(any())
         }
       }
       "when pre population is disabled" - {
@@ -177,7 +171,6 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
           verify(mockBondsPrePopulationProcessor, never()).clean(any(), any())(any())
           verify(mockLoansProgressPrePopulationProcessor, never()).clean(any(), any())(any())
           verify(mockOtherAssetsPrePopulationProcessor, never()).clean(any(), any())(any())
-          verify(mockLandOrPropertyProgressPrePopulationProcessor, never).clean(any(), any())(any())
         }
       }
     }
@@ -223,10 +216,6 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
       mockOtherAssetsPrePopulationProcessor
         .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(loansProgressUa))(ArgumentMatchers.eq(srn))
     ).thenReturn(Success(otherAssetsUa))
-    when(
-      mockLandOrPropertyProgressPrePopulationProcessor
-        .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(otherAssetsUa))(ArgumentMatchers.eq(srn))
-    ).thenReturn(Success(lopProgressUa))
     when(mockConfig.prePopulationEnabled).thenReturn(prePopulationEnabled)
     (baseReturnUA, currentUa)
   }
