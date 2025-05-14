@@ -73,7 +73,6 @@ class SharesPrePopulationProcessor @Inject()() {
 
       cleanedAnswers <- transformedAnswers.remove(sharesPagesToRemove)
 
-      // TODO: check if any shares, if not, prune DidSchemeHoldAnySharesPage
       prePopFlagsToAdd = for {
         typeOfSharesPages <- cleanedAnswers.get(TypeOfSharesHeldPages(srn)).toList
         index <- typeOfSharesPages.keys
