@@ -23,11 +23,12 @@ import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
 import eu.timepit.refined.refineV
 import play.api.libs.json.JsSuccess
 import models.UserAnswers
-import utils.JsonUtils.JsResultOps
 import utils.ListUtils.ListOps
 import models.UserAnswers.SensitiveJsObject
 import pages.nonsipp.landorproperty.Paths.landOrProperty
 import models.SchemeId.Srn
+import utils.JsonUtils.JsResultOps
+import viewmodels.models.SectionJourneyStatus
 
 import scala.util.{Success, Try}
 
@@ -51,10 +52,10 @@ class LandOrPropertyPrePopulationProcessor @Inject()() {
       .prune(LandOrPropertyHeldPage(srn).path)
       .prune(LandOrPropertyDisposalPage(srn).path)
       .prune(disposalPropertyTransaction)
-      .prune((Paths.heldPropertyTransactions \ "isLandOrPropertyResidential"))
-      .prune((Paths.heldPropertyTransactions \ "landOrPropertyLeased"))
-      .prune((Paths.heldPropertyTransactions \ "leaseDetails"))
-      .prune((Paths.heldPropertyTransactions \ "totalIncomeOrReceipts")) match {
+      .prune(Paths.heldPropertyTransactions \ "isLandOrPropertyResidential")
+      .prune(Paths.heldPropertyTransactions \ "landOrPropertyLeased")
+      .prune(Paths.heldPropertyTransactions \ "leaseDetails")
+      .prune(Paths.heldPropertyTransactions \ "totalIncomeOrReceipts") match {
       case JsSuccess(value, _) =>
         Success(currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue))))
       case _ => Try(currentUA)
@@ -79,11 +80,17 @@ class LandOrPropertyPrePopulationProcessor @Inject()() {
         .toList
         .flatten
         .refine[Max5000.Refined]
-        .map(index => LandOrPropertyPrePopulated(srn, index))
+        .map(
+          index =>
+            (
+              LandOrPropertyPrePopulated(srn, index),
+              LandOrPropertyProgress(srn, index)
+            )
+        )
         .foldLeft(Try(ua)) {
-          case (ua, landOrPropertyPrePopulated) => {
+          case (ua, (landOrPropertyPrePopulated, landOrPropertyProgress)) =>
             ua.flatMap(_.set(landOrPropertyPrePopulated, false))
-          }
+              .flatMap(_.set(landOrPropertyProgress, SectionJourneyStatus.Completed))
         }
 
     }

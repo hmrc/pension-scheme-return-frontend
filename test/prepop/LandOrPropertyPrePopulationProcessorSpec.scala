@@ -654,6 +654,9 @@ object LandOrPropertyPrePopulationProcessorSpec {
       |        "2": {}
       |      }
       |    }
+      |  },
+      |  "landOrPropertyProgress": {
+      |    "2": { "status": "JourneyCompleted" }
       |  }
       |}
       |""".stripMargin)
@@ -790,6 +793,11 @@ object LandOrPropertyPrePopulationProcessorSpec {
       |        "2": {}
       |      }
       |    }
+      |  },
+      |  "landOrPropertyProgress": {
+      |    "0": { "status": "JourneyCompleted" },
+      |    "1": { "status": "JourneyCompleted" },
+      |    "2": { "status": "JourneyCompleted" }
       |  }
       |}
       |""".stripMargin)
