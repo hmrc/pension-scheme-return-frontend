@@ -35,6 +35,7 @@ import controllers.nonsipp.membersurrenderedbenefits.WhenDidMemberSurrenderBenef
 import forms.DatePageFormProvider
 import utils.DateTimeUtils.localDateShow
 import models.{DateRange, Mode}
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{DatePageViewModel, FormPageViewModel}
 import models.requests.DataRequest
@@ -101,12 +102,19 @@ class WhenDidMemberSurrenderBenefitsController @Inject()(
                     ),
                   value =>
                     for {
-                      updatedAnswers <- Future
-                        .fromTry(request.userAnswers.set(WhenDidMemberSurrenderBenefitsPage(srn, index), value))
-                      _ <- saveService.save(updatedAnswers)
-                    } yield Redirect(
-                      navigator.nextPage(WhenDidMemberSurrenderBenefitsPage(srn, index), mode, updatedAnswers)
-                    )
+                      updatedAnswers <- request.userAnswers
+                        .set(WhenDidMemberSurrenderBenefitsPage(srn, index), value)
+                        .mapK[Future]
+                      nextPage = navigator
+                        .nextPage(WhenDidMemberSurrenderBenefitsPage(srn, index), mode, updatedAnswers)
+                      updatedProgressAnswers <- saveProgress(
+                        srn,
+                        index,
+                        updatedAnswers,
+                        nextPage
+                      )
+                      _ <- saveService.save(updatedProgressAnswers)
+                    } yield Redirect(nextPage)
                 )
           }
         }

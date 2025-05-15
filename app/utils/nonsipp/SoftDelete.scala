@@ -129,7 +129,8 @@ trait SoftDelete { _: PSRController =>
       SurrenderedBenefitsCompletedPage(srn, index),
       SurrenderedBenefitsAmountPage(srn, index),
       WhenDidMemberSurrenderBenefitsPage(srn, index),
-      WhyDidMemberSurrenderBenefitsPage(srn, index)
+      WhyDidMemberSurrenderBenefitsPage(srn, index),
+      MemberSurrenderedBenefitsProgress(srn, index)
     )
 
     val memberContributionsPages: List[Removable[_]] = List(

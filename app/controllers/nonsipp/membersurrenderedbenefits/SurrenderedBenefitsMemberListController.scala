@@ -28,6 +28,7 @@ import pages.nonsipp.membersurrenderedbenefits._
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
+import pages.nonsipp.membersurrenderedbenefits.MemberSurrenderedBenefitsProgress.SurrenderedBenefitsUserAnswersOps
 import config.RefinedTypes.Max300
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
@@ -84,17 +85,21 @@ class SurrenderedBenefitsMemberListController @Inject()(
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       case Right(completedMemberDetails) =>
         val noPageEnabled = !request.userAnswers.get(SurrenderedBenefitsPage(srn)).getOrElse(false)
-        val memberDetails = completedMemberDetails.map {
-          case (index, memberDetails) =>
-            (index, memberDetails, request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, index)))
-        }
+        val memberDetailsWithAmount: List[(Max300, NameDOB, Option[SurrenderedBenefitsAmount])] =
+          completedMemberDetails.map {
+            case (index, memberDetails) =>
+              (index, memberDetails, request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, index)))
+          }
+
+        val memberDetails = buildSurrenderedBenefits(srn, memberDetailsWithAmount)
+
         Ok(
           view(
             viewModel(
               srn,
               page,
               mode,
-              memberDetails,
+              memberList = memberDetails,
               viewOnlyUpdated = if (mode.isViewOnlyMode && request.previousUserAnswers.nonEmpty) {
                 getCompletedOrUpdatedTaskListStatus(
                   request.userAnswers,
@@ -141,6 +146,21 @@ class SurrenderedBenefitsMemberListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
+  private def buildSurrenderedBenefits(
+    srn: Srn,
+    indexes: List[(Max300, NameDOB, Option[SurrenderedBenefitsAmount])]
+  )(implicit request: DataRequest[_]): List[MemberSurrenderedBenefits] =
+    indexes.map {
+      case (index, nameDOB, surrenderedAccountOpt) =>
+        val status = request.userAnswers.memberSurrenderedBenefitsProgress(srn, index)
+        MemberSurrenderedBenefits(
+          memberIndex = index,
+          surrenderedFullName = nameDOB.fullName,
+          status = status,
+          surrenderedBenefitsAccount = surrenderedAccountOpt
+        )
+    }
+
 }
 
 object SurrenderedBenefitsMemberListController {
@@ -150,81 +170,96 @@ object SurrenderedBenefitsMemberListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    memberList: List[(Max300, NameDOB, Option[SurrenderedBenefitsAmount])],
+    memberList: List[MemberSurrenderedBenefits],
     optYear: Option[String],
     optCurrentVersion: Option[Int],
     optPreviousVersion: Option[Int]
   ): List[List[TableElemBase]] =
     memberList
       .map {
-        case (index, memberName, None) =>
+        case MemberSurrenderedBenefits(index, memberName, None, None) =>
           List(
-            TableElem(
-              memberName.fullName
-            ),
-            TableElem(
-              "surrenderedBenefits.memberList.status.no.items"
-            ),
+            TableElem(memberName),
+            TableElem("surrenderedBenefits.memberList.status.no.items"),
             if (!mode.isViewOnlyMode) {
               TableElem.add(
                 controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsAmountController
                   .onSubmit(srn, index, mode),
                 Message(
                   "surrenderedBenefits.memberList.add.hidden.text",
-                  memberName.fullName
+                  memberName
                 )
               )
             } else {
               TableElem.empty
             }
           )
-        case (index, memberName, _) =>
+
+        case MemberSurrenderedBenefits(_, memberName, Some(SectionJourneyStatus.InProgress(url)), _) =>
           List(
-            TableElem(
-              memberName.fullName
-            ),
-            TableElem(
-              "surrenderedBenefits.memberList.status.some.item"
-            ),
-            TableElemDoubleLink(
-              (
-                (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-                  case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                    TableElem.view(
-                      controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
-                        .onPageLoadViewOnly(
-                          srn,
-                          index,
-                          year = year,
-                          current = currentVersion,
-                          previous = previousVersion
-                        ),
-                      hiddenText = Message("surrenderedBenefits.memberList.add.hidden.text", memberName.fullName)
-                    )
-                  case _ =>
-                    TableElem.change(
-                      controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
-                        .onPageLoad(srn, index, CheckMode),
-                      Message(
-                        "surrenderedBenefits.memberList.change.hidden.text",
-                        memberName.fullName
-                      )
-                    )
-                },
-                if (mode.isViewOnlyMode) {
-                  TableElem.empty
-                } else {
-                  TableElem.remove(
-                    controllers.nonsipp.membersurrenderedbenefits.routes.RemoveSurrenderedBenefitsController
-                      .onSubmit(srn, index),
-                    Message(
-                      "surrenderedBenefits.memberList.remove.hidden.text",
-                      memberName.fullName
-                    )
-                  )
-                }
+            TableElem(memberName),
+            TableElem("surrenderedBenefits.memberList.status.no.items"),
+            if (!mode.isViewOnlyMode) {
+              TableElem.add(
+                url,
+                Message(
+                  "surrenderedBenefits.memberList.add.hidden.text",
+                  memberName
+                )
               )
-            )
+            } else {
+              TableElem.empty
+            }
+          )
+
+        case MemberSurrenderedBenefits(index, memberName, _, Some(_)) =>
+          val viewOrChangeLink =
+            (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+              case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                TableElem.view(
+                  controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
+                    .onPageLoadViewOnly(
+                      srn,
+                      index,
+                      year = year,
+                      current = currentVersion,
+                      previous = previousVersion
+                    ),
+                  hiddenText = Message(
+                    "surrenderedBenefits.memberList.add.hidden.text",
+                    memberName
+                  )
+                )
+
+              case _ =>
+                TableElem.change(
+                  controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
+                    .onPageLoad(srn, index, CheckMode),
+                  Message(
+                    "surrenderedBenefits.memberList.change.hidden.text",
+                    memberName
+                  )
+                )
+            }
+
+          val removeLink =
+            if (mode.isViewOnlyMode) {
+              TableElem.empty
+            } else {
+              TableElem.remove(
+                controllers.nonsipp.membersurrenderedbenefits.routes.RemoveSurrenderedBenefitsController
+                  .onSubmit(srn, index),
+                Message(
+                  "surrenderedBenefits.memberList.remove.hidden.text",
+                  memberName
+                )
+              )
+            }
+
+          List(
+            TableElem(memberName),
+            TableElem("surrenderedBenefits.memberList.status.some.item"),
+            TableElemDoubleLink((viewOrChangeLink, removeLink))
           )
       }
       .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString))
@@ -233,7 +268,7 @@ object SurrenderedBenefitsMemberListController {
     srn: Srn,
     page: Int,
     mode: Mode,
-    memberList: List[(Max300, NameDOB, Option[SurrenderedBenefitsAmount])],
+    memberList: List[MemberSurrenderedBenefits],
     viewOnlyUpdated: Boolean,
     optYear: Option[String] = None,
     optCurrentVersion: Option[Int] = None,
@@ -245,8 +280,8 @@ object SurrenderedBenefitsMemberListController {
   ): FormPageViewModel[ActionTableViewModel] = {
 
     val sumSurrenderedBenefits = memberList.count {
-      case (_, _, Some(amount)) => !amount.isZero
-      case (_, _, None) => false
+      case MemberSurrenderedBenefits(_, _, _, Some(amount)) => !amount.isZero
+      case MemberSurrenderedBenefits(_, _, _, None) => false
     }
 
     val memberListSize = memberList.size
@@ -359,4 +394,11 @@ object SurrenderedBenefitsMemberListController {
       showBackLink = showBackLink
     )
   }
+
+  case class MemberSurrenderedBenefits(
+    memberIndex: Max300,
+    surrenderedFullName: String,
+    status: Option[SectionJourneyStatus],
+    surrenderedBenefitsAccount: Option[SurrenderedBenefitsAmount]
+  )
 }

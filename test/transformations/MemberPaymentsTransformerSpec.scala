@@ -256,6 +256,7 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(SurrenderedBenefitsAmountPage(srn, index), Money(12.34))
     .unsafeSet(WhenDidMemberSurrenderBenefitsPage(srn, index), LocalDate.of(2022, 12, 12))
     .unsafeSet(WhyDidMemberSurrenderBenefitsPage(srn, index), "some reason")
+    .unsafeSet(MemberSurrenderedBenefitsProgress(srn, index), SectionJourneyStatus.Completed)
     // pension payments
     .unsafeSet(PensionPaymentsReceivedPage(srn), true)
     .unsafeSet(TotalAmountPensionPaymentsPage(srn, index), Money(12.34))
