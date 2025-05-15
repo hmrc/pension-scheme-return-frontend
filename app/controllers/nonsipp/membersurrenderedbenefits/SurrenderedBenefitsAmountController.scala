@@ -35,6 +35,7 @@ import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountController._
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.models.{FormPageViewModel, QuestionField}
 
@@ -82,12 +83,14 @@ class SurrenderedBenefitsAmountController @Inject()(
             },
             value =>
               for {
-                updatedAnswers <- Future
-                  .fromTry(request.userAnswers.set(SurrenderedBenefitsAmountPage(srn, memberIndex), value))
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(
-                navigator.nextPage(SurrenderedBenefitsAmountPage(srn, memberIndex), mode, updatedAnswers)
-              )
+                updatedAnswers <- request.userAnswers
+                  .set(SurrenderedBenefitsAmountPage(srn, memberIndex), value)
+                  .mapK[Future]
+                nextPage = navigator
+                  .nextPage(SurrenderedBenefitsAmountPage(srn, memberIndex), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, memberIndex, updatedAnswers, nextPage)
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(nextPage)
           )
       }
     }

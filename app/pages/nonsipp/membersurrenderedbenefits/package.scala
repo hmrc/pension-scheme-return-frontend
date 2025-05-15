@@ -33,6 +33,7 @@ package object membersurrenderedbenefits {
     SurrenderedBenefitsAmountPage(srn, index),
     WhenDidMemberSurrenderBenefitsPage(srn, index),
     WhyDidMemberSurrenderBenefitsPage(srn, index),
-    SurrenderedBenefitsCompletedPage(srn, index)
+    SurrenderedBenefitsCompletedPage(srn, index),
+    MemberSurrenderedBenefitsProgress(srn, index)
   )
 }
