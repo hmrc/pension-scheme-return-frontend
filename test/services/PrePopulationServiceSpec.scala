@@ -51,6 +51,8 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     mock[OtherAssetsPrePopulationProcessor]
   lazy val mockLandOrPropertyProgressPrePopulationProcessor: LandOrPropertyProgressPrePopulationProcessor =
     mock[LandOrPropertyProgressPrePopulationProcessor]
+  lazy val mockSharesProgressPrePopulationProcessor: SharesProgressPrePopulationProcessor =
+    mock[SharesProgressPrePopulationProcessor]
   lazy val mockConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
   private val service = new PrePopulationService(
@@ -62,6 +64,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     mockLoansProgressPrePopulationProcessor,
     mockOtherAssetsPrePopulationProcessor,
     mockLandOrPropertyProgressPrePopulationProcessor,
+    mockSharesProgressPrePopulationProcessor,
     mockConfig
   )
 
@@ -74,6 +77,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     reset(mockLoansProgressPrePopulationProcessor)
     reset(mockOtherAssetsPrePopulationProcessor)
     reset(mockLandOrPropertyProgressPrePopulationProcessor)
+    reset(mockSharesProgressPrePopulationProcessor)
     reset(mockConfig)
   }
 
@@ -144,7 +148,8 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
               |  "bonds": "dummy-bonds-data",
               |  "loansProgress": "dummy-loans-progress-data",
               |  "otherAssets": "dummy-other-assets-data",
-              |  "landOrPropertyProgress": "dummy-lop-progress-data"
+              |  "landOrPropertyProgress": "dummy-lop-progress-data",
+              |  "sharesProgress": "dummy-shares-progress-data"
               |}
               |""".stripMargin).as[JsObject]
 
@@ -156,6 +161,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
           verify(mockLoansProgressPrePopulationProcessor, times(1)).clean(any(), any())(any())
           verify(mockOtherAssetsPrePopulationProcessor, times(1)).clean(any(), any())(any())
           verify(mockLandOrPropertyProgressPrePopulationProcessor, times(1)).clean(any(), any())(any())
+          verify(mockSharesProgressPrePopulationProcessor, times(1)).clean(any(), any())(any())
         }
       }
       "when pre population is disabled" - {
@@ -177,7 +183,8 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
           verify(mockBondsPrePopulationProcessor, never()).clean(any(), any())(any())
           verify(mockLoansProgressPrePopulationProcessor, never()).clean(any(), any())(any())
           verify(mockOtherAssetsPrePopulationProcessor, never()).clean(any(), any())(any())
-          verify(mockLandOrPropertyProgressPrePopulationProcessor, never).clean(any(), any())(any())
+          verify(mockLandOrPropertyProgressPrePopulationProcessor, never()).clean(any(), any())(any())
+          verify(mockSharesProgressPrePopulationProcessor, never()).clean(any(), any())(any())
         }
       }
     }
@@ -194,6 +201,7 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
     val loansProgressUa = bondsUa.unsafeSet(__ \ "loansProgress", JsString("dummy-loans-progress-data"))
     val otherAssetsUa = loansProgressUa.unsafeSet(__ \ "otherAssets", JsString("dummy-other-assets-data"))
     val lopProgressUa = otherAssetsUa.unsafeSet(__ \ "landOrPropertyProgress", JsString("dummy-lop-progress-data"))
+    val sharesProgressUa = lopProgressUa.unsafeSet(__ \ "sharesProgress", JsString("dummy-shares-progress-data"))
 
     when(
       mockLandOrPropertyPrePopulationProcessor
@@ -227,6 +235,10 @@ class PrePopulationServiceSpec extends BaseSpec with TestValues {
       mockLandOrPropertyProgressPrePopulationProcessor
         .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(otherAssetsUa))(ArgumentMatchers.eq(srn))
     ).thenReturn(Success(lopProgressUa))
+    when(
+      mockSharesProgressPrePopulationProcessor
+        .clean(ArgumentMatchers.eq(baseReturnUA), ArgumentMatchers.eq(lopProgressUa))(ArgumentMatchers.eq(srn))
+    ).thenReturn(Success(sharesProgressUa))
     when(mockConfig.prePopulationEnabled).thenReturn(prePopulationEnabled)
     (baseReturnUA, currentUa)
   }

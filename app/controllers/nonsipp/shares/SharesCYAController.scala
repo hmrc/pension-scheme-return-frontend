@@ -79,116 +79,124 @@ class SharesCYAController @Inject()(
 
   def onPageLoadCommon(srn: SchemeId.Srn, index: Max5000, mode: Mode)(
     implicit request: DataRequest[AnyContent]
-  ): Result =
-    (
-      for {
-        typeOfShare <- requiredPage(TypeOfSharesHeldPage(srn, index))
-        holdShares <- requiredPage(WhyDoesSchemeHoldSharesPage(srn, index))
-
-        whenDidSchemeAcquire = Option.when(holdShares != Transfer)(
-          request.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)).get
+  ): Result = {
+    request.userAnswers.get(SharesProgress(srn, index)) match {
+      case Some(value) if value.inProgress =>
+        Redirect(
+          controllers.nonsipp.shares.routes.SharesListController.onPageLoad(srn, 1, mode)
         )
-        companyNameRelatedShares <- requiredPage(CompanyNameRelatedSharesPage(srn, index))
+      case _ =>
+        (
+          for {
+            typeOfShare <- requiredPage(TypeOfSharesHeldPage(srn, index))
+            holdShares <- requiredPage(WhyDoesSchemeHoldSharesPage(srn, index))
 
-        companySharesCrn <- requiredPage(SharesCompanyCrnPage(srn, index))
+            whenDidSchemeAcquire = Option.when(holdShares != Transfer)(
+              request.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)).get
+            )
+            companyNameRelatedShares <- requiredPage(CompanyNameRelatedSharesPage(srn, index))
 
-        classOfShares <- requiredPage(ClassOfSharesPage(srn, index))
+            companySharesCrn <- requiredPage(SharesCompanyCrnPage(srn, index))
 
-        howManyShares <- requiredPage(HowManySharesPage(srn, index))
+            classOfShares <- requiredPage(ClassOfSharesPage(srn, index))
 
-        identityType = Option.when(holdShares == Acquisition)(
-          request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.SharesSeller)).get
-        )
+            howManyShares <- requiredPage(HowManySharesPage(srn, index))
 
-        sharesFromConnectedParty = Option.when(typeOfShare == Unquoted)(
-          request.userAnswers.get(SharesFromConnectedPartyPage(srn, index)).get
-        )
+            identityType = Option.when(holdShares == Acquisition)(
+              request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.SharesSeller)).get
+            )
 
-        recipientName = Option.when(holdShares == Acquisition)(
-          List(
-            request.userAnswers.get(IndividualNameOfSharesSellerPage(srn, index)),
-            request.userAnswers.get(CompanyNameOfSharesSellerPage(srn, index)),
-            request.userAnswers.get(PartnershipShareSellerNamePage(srn, index)),
-            request.userAnswers
-              .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.SharesSeller))
-              .map(_.name)
-          ).flatten.head
-        )
+            sharesFromConnectedParty = Option.when(typeOfShare == Unquoted)(
+              request.userAnswers.get(SharesFromConnectedPartyPage(srn, index)).get
+            )
 
-        recipientDetails = Option.when(holdShares == Acquisition)(
-          List(
-            request.userAnswers
-              .get(SharesIndividualSellerNINumberPage(srn, index))
-              .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
-              .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.SharesSeller))
-              .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
-              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.SharesSeller))
-              .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers
-              .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.SharesSeller))
-              .map(_.description)
-          ).flatten.headOption
-        )
+            recipientName = Option.when(holdShares == Acquisition)(
+              List(
+                request.userAnswers.get(IndividualNameOfSharesSellerPage(srn, index)),
+                request.userAnswers.get(CompanyNameOfSharesSellerPage(srn, index)),
+                request.userAnswers.get(PartnershipShareSellerNamePage(srn, index)),
+                request.userAnswers
+                  .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.SharesSeller))
+                  .map(_.name)
+              ).flatten.head
+            )
 
-        recipientReasonNoDetails = Option.when(holdShares == Acquisition)(
-          List(
-            request.userAnswers
-              .get(SharesIndividualSellerNINumberPage(srn, index))
-              .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
-              .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.SharesSeller))
-              .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers
-              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.SharesSeller))
-              .flatMap(_.value.swap.toOption.map(_.value))
-          ).flatten.headOption
-        )
+            recipientDetails = Option.when(holdShares == Acquisition)(
+              List(
+                request.userAnswers
+                  .get(SharesIndividualSellerNINumberPage(srn, index))
+                  .flatMap(_.value.toOption.map(_.value)),
+                request.userAnswers
+                  .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.SharesSeller))
+                  .flatMap(_.value.toOption.map(_.value)),
+                request.userAnswers
+                  .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.SharesSeller))
+                  .flatMap(_.value.toOption.map(_.value)),
+                request.userAnswers
+                  .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.SharesSeller))
+                  .map(_.description)
+              ).flatten.headOption
+            )
 
-        costOfShares <- requiredPage(CostOfSharesPage(srn, index))
+            recipientReasonNoDetails = Option.when(holdShares == Acquisition)(
+              List(
+                request.userAnswers
+                  .get(SharesIndividualSellerNINumberPage(srn, index))
+                  .flatMap(_.value.swap.toOption.map(_.value)),
+                request.userAnswers
+                  .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.SharesSeller))
+                  .flatMap(_.value.swap.toOption.map(_.value)),
+                request.userAnswers
+                  .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.SharesSeller))
+                  .flatMap(_.value.swap.toOption.map(_.value))
+              ).flatten.headOption
+            )
 
-        shareIndependentValue <- requiredPage(SharesIndependentValuationPage(srn, index))
+            costOfShares <- requiredPage(CostOfSharesPage(srn, index))
 
-        totalAssetValue = Option.when(typeOfShare == SponsoringEmployer && holdShares == Acquisition)(
-          request.userAnswers.get(TotalAssetValuePage(srn, index)).get
-        )
+            shareIndependentValue <- requiredPage(SharesIndependentValuationPage(srn, index))
 
-        sharesTotalIncome <- requiredPage(SharesTotalIncomePage(srn, index))
+            totalAssetValue = Option.when(typeOfShare == SponsoringEmployer && holdShares == Acquisition)(
+              request.userAnswers.get(TotalAssetValuePage(srn, index)).get
+            )
 
-        schemeName = request.schemeDetails.schemeName
-      } yield Ok(
-        view(
-          viewModel(
-            srn,
-            index,
-            schemeName,
-            typeOfShare,
-            holdShares,
-            whenDidSchemeAcquire,
-            companyNameRelatedShares,
-            companySharesCrn,
-            classOfShares,
-            howManyShares,
-            identityType,
-            recipientName,
-            recipientDetails.flatten,
-            recipientReasonNoDetails.flatten,
-            sharesFromConnectedParty,
-            costOfShares,
-            shareIndependentValue,
-            totalAssetValue,
-            sharesTotalIncome,
-            mode,
-            viewOnlyUpdated = false,
-            optYear = request.year,
-            optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+            sharesTotalIncome <- requiredPage(SharesTotalIncomePage(srn, index))
+
+            schemeName = request.schemeDetails.schemeName
+          } yield Ok(
+            view(
+              viewModel(
+                srn,
+                index,
+                schemeName,
+                typeOfShare,
+                holdShares,
+                whenDidSchemeAcquire,
+                companyNameRelatedShares,
+                companySharesCrn,
+                classOfShares,
+                howManyShares,
+                identityType,
+                recipientName,
+                recipientDetails.flatten,
+                recipientReasonNoDetails.flatten,
+                sharesFromConnectedParty,
+                costOfShares,
+                shareIndependentValue,
+                totalAssetValue,
+                sharesTotalIncome,
+                mode,
+                viewOnlyUpdated = false,
+                optYear = request.year,
+                optCurrentVersion = request.currentVersion,
+                optPreviousVersion = request.previousVersion,
+                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+              )
+            )
           )
-        )
-      )
-    ).merge
+        ).merge
+    }
+  }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>

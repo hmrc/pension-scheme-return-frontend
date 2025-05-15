@@ -97,58 +97,63 @@ class SharesTransformer @Inject() extends Transformer {
               key.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
                 case None => None
                 case Some(index) =>
-                  for {
-                    typeOfSharesHeld <- request.userAnswers.get(TypeOfSharesHeldPage(srn, index))
-                    schemeHoldShare <- request.userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index))
-                    nameOfSharesCompany <- request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index))
-                    eitherSharesCompanyCrnOrReason <- request.userAnswers.get(SharesCompanyCrnPage(srn, index))
-                    classOfShares <- request.userAnswers.get(ClassOfSharesPage(srn, index))
-                    totalShares <- request.userAnswers.get(HowManySharesPage(srn, index))
-                    costOfShares <- request.userAnswers.get(CostOfSharesPage(srn, index))
-                    supportedByIndepValuation <- request.userAnswers.get(SharesIndependentValuationPage(srn, index))
-                    prePopulated = request.userAnswers.get(SharePrePopulated(srn, index))
-                  } yield {
-                    val optDateOfAcqOrContrib = Option.when(schemeHoldShare != Transfer)(
-                      request.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)).get
-                    )
-
-                    val optConnectedPartyStatus = Option.when(typeOfSharesHeld == Unquoted)(
-                      request.userAnswers.get(SharesFromConnectedPartyPage(srn, index)).get
-                    )
-
-                    val optTotalAssetValue =
-                      Option.when((schemeHoldShare == Acquisition) && (typeOfSharesHeld == SponsoringEmployer))(
-                        request.userAnswers.get(TotalAssetValuePage(srn, index)).get
+                  val progress = request.userAnswers.get(SharesProgress(srn, index))
+                  if (progress.contains(SectionJourneyStatus.Completed)) {
+                    for {
+                      typeOfSharesHeld <- request.userAnswers.get(TypeOfSharesHeldPage(srn, index))
+                      schemeHoldShare <- request.userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index))
+                      nameOfSharesCompany <- request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index))
+                      eitherSharesCompanyCrnOrReason <- request.userAnswers.get(SharesCompanyCrnPage(srn, index))
+                      classOfShares <- request.userAnswers.get(ClassOfSharesPage(srn, index))
+                      totalShares <- request.userAnswers.get(HowManySharesPage(srn, index))
+                      costOfShares <- request.userAnswers.get(CostOfSharesPage(srn, index))
+                      supportedByIndepValuation <- request.userAnswers.get(SharesIndependentValuationPage(srn, index))
+                      prePopulated = request.userAnswers.get(SharePrePopulated(srn, index))
+                    } yield {
+                      val optDateOfAcqOrContrib = Option.when(schemeHoldShare != Transfer)(
+                        request.userAnswers.get(WhenDidSchemeAcquireSharesPage(srn, index)).get
                       )
 
-                    val optTotalDividendsOrReceipts = request.userAnswers.get(SharesTotalIncomePage(srn, index))
+                      val optConnectedPartyStatus = Option.when(typeOfSharesHeld == Unquoted)(
+                        request.userAnswers.get(SharesFromConnectedPartyPage(srn, index)).get
+                      )
 
-                    val optAcquisitionRelatedDetails = buildOptAcquisitionRelatedDetails(schemeHoldShare, srn, index)
+                      val optTotalAssetValue =
+                        Option.when((schemeHoldShare == Acquisition) && (typeOfSharesHeld == SponsoringEmployer))(
+                          request.userAnswers.get(TotalAssetValuePage(srn, index)).get
+                        )
 
-                    ShareTransaction(
-                      prePopulated = prePopulated,
-                      typeOfSharesHeld = typeOfSharesHeld,
-                      shareIdentification = ShareIdentification(
-                        nameOfSharesCompany = nameOfSharesCompany,
-                        optCrnNumber = eitherSharesCompanyCrnOrReason.value.toOption.map(_.crn),
-                        optReasonNoCRN = eitherSharesCompanyCrnOrReason.value.left.toOption,
-                        classOfShares = classOfShares
-                      ),
-                      heldSharesTransaction = HeldSharesTransaction(
-                        schemeHoldShare = schemeHoldShare,
-                        optDateOfAcqOrContrib = optDateOfAcqOrContrib,
-                        totalShares = totalShares,
-                        optAcquiredFromName = optAcquisitionRelatedDetails.map(_._1),
-                        optPropertyAcquiredFrom = optAcquisitionRelatedDetails.map(_._2),
-                        optConnectedPartyStatus = optConnectedPartyStatus,
-                        costOfShares = costOfShares.value,
-                        supportedByIndepValuation = supportedByIndepValuation,
-                        optTotalAssetValue = optTotalAssetValue.map(_.value),
-                        optTotalDividendsOrReceipts = optTotalDividendsOrReceipts.map(_.value)
-                      ),
-                      optDisposedSharesTransaction = Option
-                        .when(sharesDisposal)(buildOptDisposedSharesTransactions(srn, index))
-                    )
+                      val optTotalDividendsOrReceipts = request.userAnswers.get(SharesTotalIncomePage(srn, index))
+
+                      val optAcquisitionRelatedDetails = buildOptAcquisitionRelatedDetails(schemeHoldShare, srn, index)
+
+                      ShareTransaction(
+                        prePopulated = prePopulated,
+                        typeOfSharesHeld = typeOfSharesHeld,
+                        shareIdentification = ShareIdentification(
+                          nameOfSharesCompany = nameOfSharesCompany,
+                          optCrnNumber = eitherSharesCompanyCrnOrReason.value.toOption.map(_.crn),
+                          optReasonNoCRN = eitherSharesCompanyCrnOrReason.value.left.toOption,
+                          classOfShares = classOfShares
+                        ),
+                        heldSharesTransaction = HeldSharesTransaction(
+                          schemeHoldShare = schemeHoldShare,
+                          optDateOfAcqOrContrib = optDateOfAcqOrContrib,
+                          totalShares = totalShares,
+                          optAcquiredFromName = optAcquisitionRelatedDetails.map(_._1),
+                          optPropertyAcquiredFrom = optAcquisitionRelatedDetails.map(_._2),
+                          optConnectedPartyStatus = optConnectedPartyStatus,
+                          costOfShares = costOfShares.value,
+                          supportedByIndepValuation = supportedByIndepValuation,
+                          optTotalAssetValue = optTotalAssetValue.map(_.value),
+                          optTotalDividendsOrReceipts = optTotalDividendsOrReceipts.map(_.value)
+                        ),
+                        optDisposedSharesTransaction = Option
+                          .when(sharesDisposal)(buildOptDisposedSharesTransactions(srn, index))
+                      )
+                    }
+                  } else {
+                    None
                   }
               }
             }
@@ -607,6 +612,10 @@ class SharesTransformer @Inject() extends Transformer {
                 }
               }
 
+              val progress = indexes.map(
+                index => SharesProgress(srn, index) -> SectionJourneyStatus.Completed
+              )
+
               val triedUA = for {
                 ua0 <- ua
                 ua1 <- ua0.set(TypeOfSharesHeldPage(srn, index), typeOfSharesHeld)
@@ -636,11 +645,12 @@ class SharesTransformer @Inject() extends Transformer {
                 ua22 <- shareTransaction.prePopulated
                   .map(p => ua21.set(SharePrePopulated(srn, index), p))
                   .getOrElse(Try(ua21))
+                ua23 <- progress.foldLeft(Try(ua22)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
               } yield {
                 buildOptDisposedShareTransactionUA(
                   index,
                   srn,
-                  ua22,
+                  ua23,
                   shareTransaction.optDisposedSharesTransaction
                 )
               }

@@ -82,14 +82,10 @@ class TypeOfSharesHeldController @Inject()(
               updatedAnswers <- Future.fromTry(
                 request.userAnswers.set(TypeOfSharesHeldPage(srn, index), answer)
               )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
-                TypeOfSharesHeldPage(srn, index),
-                mode,
-                updatedAnswers
-              )
-            )
+              nextPage = navigator.nextPage(TypeOfSharesHeldPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
     }

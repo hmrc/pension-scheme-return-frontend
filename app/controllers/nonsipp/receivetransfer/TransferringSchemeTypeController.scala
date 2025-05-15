@@ -16,32 +16,33 @@
 
 package controllers.nonsipp.receivetransfer
 
+import services.SaveService
+import viewmodels.implicits._
+import forms.mappings.Mappings
+import models.PensionSchemeType._
+import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, TransferringSchemeTypePage}
 import config.Constants.{inputRegexPSTR, inputRegexQROPS, maxNotRelevant}
-import config.RefinedTypes.{Max300, Max5}
-import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.receivetransfer.TransferringSchemeTypeController._
+import navigation.Navigator
 import forms.RadioListFormProvider
-import forms.mappings.Mappings
+import models.{ConditionalRadioMapper, Mode, PensionSchemeType}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.data.Form
 import forms.mappings.errors.InputFormErrors
 import models.GenericFormMapper.ConditionalRadioMapper
-import models.PensionSchemeType._
-import models.SchemeId.Srn
-import models.{ConditionalRadioMapper, Mode, PensionSchemeType}
-import navigation.Navigator
-import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, TransferringSchemeTypePage}
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import config.RefinedTypes.{Max300, Max5}
+import controllers.PSRController
+import views.html.RadioListView
+import models.SchemeId.Srn
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models._
-import views.html.RadioListView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class TransferringSchemeTypeController @Inject()(
   override val messagesApi: MessagesApi,

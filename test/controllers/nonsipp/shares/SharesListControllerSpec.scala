@@ -23,7 +23,7 @@ import controllers.nonsipp.shares.SharesListController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
@@ -36,6 +36,7 @@ class SharesListControllerSpec extends ControllerBaseSpec {
 
   private val indexOne = refineMV[Max5000.Refined](1)
   private val indexTwo = refineMV[Max5000.Refined](2)
+  private val indexThree = refineMV[Max5000.Refined](3)
 
   private val page = 1
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
@@ -74,6 +75,7 @@ class SharesListControllerSpec extends ControllerBaseSpec {
     defaultUserAnswers
       .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
       .unsafeSet(SharesCompleted(srn, indexOne), SectionCompleted)
+      .unsafeSet(SharesProgress(srn, indexOne), SectionJourneyStatus.Completed)
       .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, indexOne), SchemeHoldShare.Transfer)
       .unsafeSet(TypeOfSharesHeldPage(srn, indexOne), TypeOfShares.ConnectedParty)
       .unsafeSet(CompanyNameRelatedSharesPage(srn, indexOne), companyName)
@@ -94,9 +96,27 @@ class SharesListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(CostOfSharesPage(srn, indexTwo), money)
     .unsafeSet(SharesIndependentValuationPage(srn, indexTwo), true)
     .unsafeSet(SharePrePopulated(srn, indexTwo), false)
+    .unsafeSet(SharesProgress(srn, indexTwo), SectionJourneyStatus.Completed)
+
+  private val incompleteUserAnswers = userAnswers
+    .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, indexTwo), SchemeHoldShare.Transfer)
+    .unsafeSet(TypeOfSharesHeldPage(srn, indexTwo), TypeOfShares.ConnectedParty)
+    .unsafeSet(CompanyNameRelatedSharesPage(srn, indexTwo), companyName)
+    .unsafeSet(
+      SharesProgress(srn, indexTwo),
+      SectionJourneyStatus.InProgress(SharesCompanyCrnPage(srn, indexTwo))
+    )
 
   private val userAnswersChecked = userAnswersToCheck
     .unsafeSet(SharePrePopulated(srn, indexTwo), true)
+
+  private val someIncompleteUserAnswersToCheck = userAnswersToCheck
+    .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, indexThree), SchemeHoldShare.Transfer)
+    .unsafeSet(TypeOfSharesHeldPage(srn, indexThree), TypeOfShares.ConnectedParty)
+    .unsafeSet(
+      SharesProgress(srn, indexThree),
+      SectionJourneyStatus.InProgress(CompanyNameRelatedSharesPage(srn, indexThree))
+    )
 
   private val noUserAnswers =
     defaultUserAnswers
@@ -169,6 +189,22 @@ class SharesListControllerSpec extends ControllerBaseSpec {
         )
     })
 
+    act.like(renderView(onPageLoad, incompleteUserAnswers) { implicit app => implicit request =>
+      injected[ListView].apply(
+        form(new YesNoPageFormProvider()),
+        viewModel(
+          srn,
+          1,
+          NormalMode,
+          sharesData,
+          Nil,
+          schemeName,
+          showBackLink = true,
+          isPrePop = false
+        )
+      )
+    }.withName("Completed Journey - 1 added record and 1 incomplete record"))
+
     act.like(renderViewWithPrePopSession(onPageLoad, userAnswersToCheck) { implicit app => implicit request =>
       injected[ListView]
         .apply(
@@ -185,6 +221,23 @@ class SharesListControllerSpec extends ControllerBaseSpec {
           )
         )
     }.updateName(_ + " - To Check"))
+
+    act.like(renderViewWithPrePopSession(onPageLoad, someIncompleteUserAnswersToCheck) {
+      implicit app => implicit request =>
+        injected[ListView].apply(
+          form(new YesNoPageFormProvider()),
+          viewModel(
+            srn,
+            1,
+            NormalMode,
+            sharesData,
+            shareToCheckData,
+            schemeName,
+            showBackLink = true,
+            isPrePop = true
+          )
+        )
+    }.withName("PrePop Journey - 1 added record, 1 added incomplete record, 1 PrePop record to Check"))
 
     act.like(renderViewWithPrePopSession(onPageLoad, userAnswersChecked) { implicit app => implicit request =>
       injected[ListView]

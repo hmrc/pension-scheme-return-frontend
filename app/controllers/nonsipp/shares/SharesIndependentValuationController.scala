@@ -73,8 +73,10 @@ class SharesIndependentValuationController @Inject()(
             for {
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(SharesIndependentValuationPage(srn, index), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(SharesIndependentValuationPage(srn, index), mode, updatedAnswers))
+              nextPage = navigator.nextPage(SharesIndependentValuationPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
   }
 }

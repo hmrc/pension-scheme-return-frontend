@@ -88,11 +88,10 @@ class SharesIndividualSellerNINumberController @Inject()(
                       ConditionalYesNo(value)
                     )
                 )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator
-                .nextPage(SharesIndividualSellerNINumberPage(srn, index), mode, updatedAnswers)
-            )
+              nextPage = navigator.nextPage(SharesIndividualSellerNINumberPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

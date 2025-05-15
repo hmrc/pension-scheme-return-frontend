@@ -82,8 +82,10 @@ class CompanyNameRelatedSharesController @Inject()(
               for {
                 updatedAnswers <- Future
                   .fromTry(request.userAnswers.set(CompanyNameRelatedSharesPage(srn, index), answer))
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(CompanyNameRelatedSharesPage(srn, index), mode, updatedAnswers))
+                nextPage = navigator.nextPage(CompanyNameRelatedSharesPage(srn, index), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(nextPage)
             }
           )
       }

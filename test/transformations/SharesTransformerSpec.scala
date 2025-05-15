@@ -208,6 +208,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           .unsafeSet(WhenWereSharesRedeemedPage(srn, refineMV(1), refineMV(1)), localDate)
           .unsafeSet(HowManySharesRedeemedPage(srn, refineMV(1), refineMV(1)), 123)
           .unsafeSet(TotalConsiderationSharesRedeemedPage(srn, refineMV(1), refineMV(1)), money)
+          .unsafeSet(SharesProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
         val result = transformer.transformToEtmp(srn = srn, userAnswers)(DataRequest(allowedAccessRequest, userAnswers))
         result mustBe Some(
@@ -275,6 +276,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, refineMV(1)), localDate)
           .unsafeSet(SharesFromConnectedPartyPage(srn, refineMV(1)), false)
           .unsafeSet(SharePrePopulated(srn, refineMV(1)), true)
+          .unsafeSet(SharesProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
           .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), Unquoted)
           .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, refineMV(2)), Contribution)
           .unsafeSet(CompanyNameRelatedSharesPage(srn, refineMV(2)), "nameOfSharesCompany2")
@@ -286,6 +288,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, refineMV(2)), localDate)
           .unsafeSet(SharesFromConnectedPartyPage(srn, refineMV(2)), false)
           .unsafeSet(SharePrePopulated(srn, refineMV(2)), false)
+          .unsafeSet(SharesProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
 
         val result = transformer.transformToEtmp(srn = srn, userAnswers)(
           DataRequest(allowedAccessRequestPrePopulation, userAnswers)
@@ -348,6 +351,25 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           )
         )
       }
+    }
+
+    "should not include incomplete record" in {
+
+      val incompleteUserAnswers = emptyUserAnswers
+        .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+        .unsafeSet(TotalValueQuotedSharesPage(srn), money)
+        .unsafeSet(SharesRecordVersionPage(srn), "001")
+        .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), Unquoted)
+        .unsafeSet(
+          SharesProgress(srn, refineMV(1)),
+          SectionJourneyStatus.InProgress(WhyDoesSchemeHoldSharesPage(srn, refineMV(1)))
+        )
+
+      val request = DataRequest(allowedAccessRequest, incompleteUserAnswers)
+
+      val result = transformer.transformToEtmp(srn, incompleteUserAnswers)(request)
+
+      result mustBe Some(Shares(Some("001"), Some(true), Some(List()), Some(123456.0)))
     }
   }
 

@@ -80,8 +80,10 @@ class SharesTotalIncomeController @Inject()(
                     .transformAndSet(SharesTotalIncomePage(srn, index), value)
                     .set(SharesCompleted(srn, index), SectionCompleted)
                 )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(SharesTotalIncomePage(srn, index), mode, updatedAnswers))
+              nextPage = navigator.nextPage(SharesTotalIncomePage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
   }
 }

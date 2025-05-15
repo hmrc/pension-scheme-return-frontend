@@ -38,6 +38,7 @@ class PrePopulationService @Inject()(
   loanProgressPrePopulationProcessor: LoansProgressPrePopulationProcessor,
   otherAssetsPrePopulationProcessor: OtherAssetsPrePopulationProcessor,
   landOrPropertyProgressPrePopulationProcessor: LandOrPropertyProgressPrePopulationProcessor,
+  sharesProgressPrePopulationProcessor: SharesProgressPrePopulationProcessor,
   config: FrontendAppConfig
 ) {
 
@@ -80,7 +81,8 @@ class PrePopulationService @Inject()(
         ua5 <- loanProgressPrePopulationProcessor.clean(baseReturnUA, ua4)(srn)
         ua6 <- otherAssetsPrePopulationProcessor.clean(baseReturnUA, ua5)(srn)
         ua7 <- landOrPropertyProgressPrePopulationProcessor.clean(baseReturnUA, ua6)(srn)
-      } yield ua7
+        ua8 <- sharesProgressPrePopulationProcessor.clean(baseReturnUA, ua7)(srn)
+      } yield ua8
     } else {
       Try(userAnswers)
     }
