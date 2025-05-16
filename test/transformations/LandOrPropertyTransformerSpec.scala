@@ -36,6 +36,7 @@ import models.requests.psr._
 import config.Constants.PREPOPULATION_FLAG
 import pages.nonsipp.landorpropertydisposal.{Paths, _}
 import org.scalatest.OptionValues
+import uk.gov.hmrc.domain.Nino
 import play.api.libs.json.Json
 
 class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
@@ -236,6 +237,53 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
 
       result mustBe Some(LandOrProperty(None, Some(true), Some(false), List()))
     }
+
+    "should include complete disposal" in {
+
+      val incompleteUserAnswers = userAnswers
+        .unsafeSet(HowWasPropertyDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Sold)
+        .unsafeSet(
+          LandOrPropertyDisposalProgress(srn, index1of5000, index1of50),
+          SectionJourneyStatus.InProgress("some-url")
+        )
+
+      val request = DataRequest(allowedAccessRequest, incompleteUserAnswers)
+
+      val result = transformer.transformToEtmp(srn, Some(true), incompleteUserAnswers)(request)
+
+      result.get.landOrPropertyTransactions.head.optDisposedPropertyTransaction mustBe None
+    }
+
+    "should not include incomplete disposal" in {
+
+      val incompleteUserAnswers = userAnswers
+        .unsafeSet(HowWasPropertyDisposedOfPage(srn, index1of5000, index1of50), HowDisposed.Sold)
+        .unsafeSet(LandOrPropertyDisposalPage(srn), true)
+        .unsafeSet(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1)), Sold)
+        .unsafeSet(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1)), true)
+        .unsafeSet(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1)), localDate)
+        .unsafeSet(
+          LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1)),
+          true
+        )
+        .unsafeSet(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1)), money)
+        .unsafeSet(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1)), true)
+        .unsafeSet(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1)), IdentityType.Individual)
+        .unsafeSet(LandOrPropertyIndividualBuyerNamePage(srn, refineMV(1), refineMV(1)), individualRecipientName)
+        .unsafeSet(
+          IndividualBuyerNinoNumberPage(srn, refineMV(1), refineMV(1)),
+          ConditionalYesNo.no[String, Nino](noninoReason)
+        )
+        .unsafeSet(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1)), SectionCompleted)
+        .unsafeSet(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
+
+      val request = DataRequest(allowedAccessRequest, incompleteUserAnswers)
+
+      val result = transformer.transformToEtmp(srn, Some(true), incompleteUserAnswers)(request)
+
+      result.get.landOrPropertyTransactions.head.optDisposedPropertyTransaction.map(_.size) mustBe Some(1)
+    }
+
   }
 
   "LandOrPropertyTransformer - From Etmp" - {
@@ -279,6 +327,9 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
           userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
           userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
             SectionCompleted
+          )
+          userAnswers.get(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1))) mustBe Some(
+            SectionJourneyStatus.Completed
           )
           userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
           userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
@@ -345,6 +396,9 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
           userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
             SectionCompleted
           )
+          userAnswers.get(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1))) mustBe Some(
+            SectionJourneyStatus.Completed
+          )
           userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
           userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
           userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
@@ -409,6 +463,9 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
           userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
           userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
             SectionCompleted
+          )
+          userAnswers.get(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1))) mustBe Some(
+            SectionJourneyStatus.Completed
           )
           userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
           userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
@@ -475,6 +532,9 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
           userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
             SectionCompleted
           )
+          userAnswers.get(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1))) mustBe Some(
+            SectionJourneyStatus.Completed
+          )
           userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
           userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
           userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
@@ -540,6 +600,9 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
           userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
           userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
             SectionCompleted
+          )
+          userAnswers.get(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1))) mustBe Some(
+            SectionJourneyStatus.Completed
           )
           userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
           userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
@@ -671,6 +734,9 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
           userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
           userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
             SectionCompleted
+          )
+          userAnswers.get(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1))) mustBe Some(
+            SectionJourneyStatus.Completed
           )
           userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
           userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)

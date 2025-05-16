@@ -89,14 +89,14 @@ class HowWasPropertyDisposedOfController @Inject()(
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
               hasAnswerChanged = request.userAnswers.exists(page)(_ == value)
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
+              nextPage = navigator.nextPage(
                 HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex, hasAnswerChanged),
                 mode,
                 updatedAnswers
               )
-            )
+              updatedProgressAnswers <- saveProgress(srn, landOrPropertyIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
     }

@@ -83,133 +83,138 @@ class LandPropertyDisposalCYAController @Inject()(
   def onPageLoadCommon(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode)(
     implicit request: DataRequest[AnyContent]
   ): Future[Result] =
-    (
-      for {
-        updatedUserAnswers <- request.userAnswers
-          .set(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndex, disposalIndex), SectionCompleted)
-          .toOption
-          .getOrRecoverJourneyT
+    if (!request.userAnswers
+        .get(LandOrPropertyDisposalProgress(srn, landOrPropertyIndex, disposalIndex))
+        .exists(_.completed))
+      Future.successful(Redirect(routes.LandOrPropertyDisposalListController.onPageLoad(srn, 1)))
+    else
+      (
+        for {
+          updatedUserAnswers <- request.userAnswers
+            .set(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndex, disposalIndex), SectionCompleted)
+            .toOption
+            .getOrRecoverJourneyT
 
-        howWasPropertyDisposed <- updatedUserAnswers
-          .get(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
-          .getOrRecoverJourneyT
+          howWasPropertyDisposed <- updatedUserAnswers
+            .get(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
+            .getOrRecoverJourneyT
 
-        addressLookUpPage <- updatedUserAnswers
-          .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex))
-          .getOrRecoverJourneyT
+          addressLookUpPage <- updatedUserAnswers
+            .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex))
+            .getOrRecoverJourneyT
 
-        landOrPropertyStillHeld <- updatedUserAnswers
-          .get(LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex))
-          .getOrRecoverJourneyT
+          landOrPropertyStillHeld <- updatedUserAnswers
+            .get(LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex))
+            .getOrRecoverJourneyT
 
-        totalProceedsSale = Option.when(howWasPropertyDisposed == Sold)(
-          updatedUserAnswers.get(TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex)).get
-        )
-        independentValuation = Option.when(howWasPropertyDisposed == Sold)(
-          updatedUserAnswers.get(DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex)).get
-        )
-        landOrPropertyDisposedType = Option.when(howWasPropertyDisposed == Sold)(
-          updatedUserAnswers
-            .get(WhoPurchasedLandOrPropertyPage(srn: Srn, landOrPropertyIndex, disposalIndex))
-            .get
-        )
-
-        whenWasPropertySold = Option.when(howWasPropertyDisposed == Sold)(
-          updatedUserAnswers.get(WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex)).get
-        )
-
-        landOrPropertyDisposalBuyerConnectedParty = Option.when(howWasPropertyDisposed == Sold)(
-          updatedUserAnswers
-            .get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, landOrPropertyIndex, disposalIndex))
-            .get
-        )
-
-        recipientName = Option.when(howWasPropertyDisposed == Sold)(
-          List(
-            updatedUserAnswers.get(LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)),
-            updatedUserAnswers.get(CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)),
-            updatedUserAnswers.get(PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)),
+          totalProceedsSale = Option.when(howWasPropertyDisposed == Sold)(
+            updatedUserAnswers.get(TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex)).get
+          )
+          independentValuation = Option.when(howWasPropertyDisposed == Sold)(
+            updatedUserAnswers.get(DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex)).get
+          )
+          landOrPropertyDisposedType = Option.when(howWasPropertyDisposed == Sold)(
             updatedUserAnswers
-              .get(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex))
-              .map(_.name)
-          ).flatten.head
-        )
+              .get(WhoPurchasedLandOrPropertyPage(srn: Srn, landOrPropertyIndex, disposalIndex))
+              .get
+          )
 
-        recipientDetails = Option.when(howWasPropertyDisposed == Sold)(
-          List(
-            updatedUserAnswers
-              .get(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex))
-              .flatMap(_.value.toOption.map(_.value)),
-            updatedUserAnswers
-              .get(CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex))
-              .flatMap(_.value.toOption.map(_.value)),
-            updatedUserAnswers
-              .get(PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex))
-              .flatMap(_.value.toOption.map(_.value)),
-            updatedUserAnswers
-              .get(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex))
-              .map(_.description)
-          ).flatten.headOption
-        )
+          whenWasPropertySold = Option.when(howWasPropertyDisposed == Sold)(
+            updatedUserAnswers.get(WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex)).get
+          )
 
-        recipientReasonNoDetails = Option.when(howWasPropertyDisposed == Sold)(
-          List(
+          landOrPropertyDisposalBuyerConnectedParty = Option.when(howWasPropertyDisposed == Sold)(
             updatedUserAnswers
-              .get(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex))
-              .flatMap(_.value.swap.toOption.map(_.value)),
-            updatedUserAnswers
-              .get(CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex))
-              .flatMap(_.value.swap.toOption.map(_.value)),
-            updatedUserAnswers
-              .get(PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex))
-              .flatMap(_.value.swap.toOption.map(_.value))
-          ).flatten.headOption
-        )
+              .get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, landOrPropertyIndex, disposalIndex))
+              .get
+          )
 
-        disposalAmount = updatedUserAnswers
-          .map(LandPropertyDisposalCompleted.all(srn, landOrPropertyIndex))
-          .size
+          recipientName = Option.when(howWasPropertyDisposed == Sold)(
+            List(
+              updatedUserAnswers.get(LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)),
+              updatedUserAnswers.get(CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)),
+              updatedUserAnswers.get(PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)),
+              updatedUserAnswers
+                .get(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex))
+                .map(_.name)
+            ).flatten.head
+          )
 
-        schemeName = request.schemeDetails.schemeName
+          recipientDetails = Option.when(howWasPropertyDisposed == Sold)(
+            List(
+              updatedUserAnswers
+                .get(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex))
+                .flatMap(_.value.toOption.map(_.value)),
+              updatedUserAnswers
+                .get(CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex))
+                .flatMap(_.value.toOption.map(_.value)),
+              updatedUserAnswers
+                .get(PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex))
+                .flatMap(_.value.toOption.map(_.value)),
+              updatedUserAnswers
+                .get(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex))
+                .map(_.description)
+            ).flatten.headOption
+          )
 
-        _ <- saveService.save(updatedUserAnswers).liftF
+          recipientReasonNoDetails = Option.when(howWasPropertyDisposed == Sold)(
+            List(
+              updatedUserAnswers
+                .get(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex))
+                .flatMap(_.value.swap.toOption.map(_.value)),
+              updatedUserAnswers
+                .get(CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex))
+                .flatMap(_.value.swap.toOption.map(_.value)),
+              updatedUserAnswers
+                .get(PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex))
+                .flatMap(_.value.swap.toOption.map(_.value))
+            ).flatten.headOption
+          )
 
-      } yield {
-        val isMaximumReached = disposalAmount >= maxLandOrPropertyDisposals
-        Ok(
-          view(
-            viewModel(
-              ViewModelParameters(
+          disposalAmount = updatedUserAnswers
+            .map(LandPropertyDisposalCompleted.all(srn, landOrPropertyIndex))
+            .size
+
+          schemeName = request.schemeDetails.schemeName
+
+          _ <- saveService.save(updatedUserAnswers).liftF
+
+        } yield {
+          val isMaximumReached = disposalAmount >= maxLandOrPropertyDisposals
+          Ok(
+            view(
+              viewModel(
+                ViewModelParameters(
+                  srn,
+                  landOrPropertyIndex,
+                  disposalIndex,
+                  schemeName,
+                  howWasPropertyDisposed,
+                  whenWasPropertySold,
+                  addressLookUpPage,
+                  landOrPropertyDisposedType,
+                  landOrPropertyDisposalBuyerConnectedParty,
+                  totalProceedsSale,
+                  independentValuation,
+                  landOrPropertyStillHeld,
+                  recipientName,
+                  recipientDetails.flatten,
+                  recipientReasonNoDetails.flatten,
+                  mode
+                ),
                 srn,
-                landOrPropertyIndex,
-                disposalIndex,
-                schemeName,
-                howWasPropertyDisposed,
-                whenWasPropertySold,
-                addressLookUpPage,
-                landOrPropertyDisposedType,
-                landOrPropertyDisposalBuyerConnectedParty,
-                totalProceedsSale,
-                independentValuation,
-                landOrPropertyStillHeld,
-                recipientName,
-                recipientDetails.flatten,
-                recipientReasonNoDetails.flatten,
-                mode
-              ),
-              srn,
-              mode,
-              viewOnlyUpdated = false, // flag is not displayed on this tier
-              optYear = request.year,
-              optCurrentVersion = request.currentVersion,
-              optPreviousVersion = request.previousVersion,
-              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
-              isMaximumReached = isMaximumReached
+                mode,
+                viewOnlyUpdated = false, // flag is not displayed on this tier
+                optYear = request.year,
+                optCurrentVersion = request.currentVersion,
+                optPreviousVersion = request.previousVersion,
+                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+                isMaximumReached = isMaximumReached
+              )
             )
           )
-        )
-      }
-    ).merge
+        }
+      ).merge
 
   def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>

@@ -21,11 +21,11 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
-import pages.nonsipp.landorpropertydisposal.{HowWasPropertyDisposedOfPage, LandOrPropertyStillHeldPage}
+import pages.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldPage
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
-import models.{HowDisposed, Mode}
+import models.Mode
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import config.RefinedTypes.{Max50, Max5000}
@@ -105,41 +105,15 @@ class LandOrPropertyStillHeldController @Inject()(
               updatedAnswers <- Future.fromTry(
                 request.userAnswers.set(LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex), value)
               )
-              _ <- saveService.save(updatedAnswers)
-            } yield {
-              updatedAnswers.get(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex)) match {
-                case Some(HowDisposed.Transferred) =>
-                  Redirect(
-                    navigator
-                      .nextPage(
-                        LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex),
-                        mode,
-                        updatedAnswers
-                      )
-                  )
-
-                case Some(HowDisposed.Sold) =>
-                  Redirect(
-                    navigator
-                      .nextPage(
-                        LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex),
-                        mode,
-                        updatedAnswers
-                      )
-                  )
-
-                case _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(
-                        LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex),
-                        mode,
-                        updatedAnswers
-                      )
-                  )
-              }
-
-            }
+              nextPage = navigator
+                .nextPage(
+                  LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex),
+                  mode,
+                  updatedAnswers
+                )
+              updatedProgressAnswers <- saveProgress(srn, landOrPropertyIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }
