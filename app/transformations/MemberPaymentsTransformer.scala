@@ -222,7 +222,14 @@ class MemberPaymentsTransformer @Inject()(
       .membersDetails(srn)
       .flatMap { case (index, value) => refineIndex[Refined](index).map(_ -> value) }
 
-    refinedMemberDetails.toList
+    val completedJourneyMembers = refinedMemberDetails.toList.filter {
+      case (index, _) =>
+        userAnswers
+          .get(pages.nonsipp.memberdetails.MemberDetailsManualProgress(srn, index))
+          .contains(SectionJourneyStatus.Completed)
+    }
+
+    completedJourneyMembers
       .traverse {
         case (index, memberDetails) =>
           val employerContributions = buildEmployerContributions(srn, index, userAnswers).getOrElse(Nil)
@@ -514,7 +521,8 @@ class MemberPaymentsTransformer @Inject()(
         personalDetails.nino
           .map(nino => ua.set(MemberDetailsNinoPage(srn, index), Nino(nino)))
           .getOrElse(ua),
-      _.set(MemberDetailsCompletedPage(srn, index), SectionCompleted)
+      _.set(MemberDetailsCompletedPage(srn, index), SectionCompleted),
+      _.set(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
     )
 
   private def buildEmployerContributions(
