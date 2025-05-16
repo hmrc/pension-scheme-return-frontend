@@ -38,7 +38,7 @@ import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListCont
 import pages.nonsipp.landorproperty.{
   LandOrPropertyAddressLookupPages,
   LandOrPropertyChosenAddressPage,
-  LandOrPropertyCompleted
+  LandOrPropertyProgress
 }
 import config.Constants.{maxLandOrProperties, maxLandOrPropertyDisposals}
 import pages.nonsipp.landorpropertydisposal._
@@ -212,6 +212,13 @@ class LandOrPropertyDisposalListController @Inject()(
         numberOfDisposals >= maxPossibleNumberOfDisposals ||
         allPropertiesFullyDisposed
 
+      statusMap = for {
+        lpIndex -> disposals <- request.userAnswers.map(LandOrPropertyDisposalProgress.all(srn))
+        disposalIndex -> status <- disposals
+      } yield (lpIndex, disposalIndex) -> status
+
+      inProgressUrl = statusMap.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+
       result <- if (maximumDisposalsReachedUpdated) {
         Right(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
       } else {
@@ -239,7 +246,11 @@ class LandOrPropertyDisposalListController @Inject()(
                   )
                 ),
               answer =>
-                Redirect(navigator.nextPage(LandOrPropertyDisposalListPage(srn, answer), mode, request.userAnswers))
+                (answer, inProgressUrl) match {
+                  case (true, Some(url)) => Redirect(url)
+                  case _ =>
+                    Redirect(navigator.nextPage(LandOrPropertyDisposalListPage(srn, answer), mode, request.userAnswers))
+                }
             )
         )
       }
@@ -258,13 +269,15 @@ class LandOrPropertyDisposalListController @Inject()(
   )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
     Right(
       request.userAnswers
-        .map(LandOrPropertyCompleted.all(srn))
+        .map(LandOrPropertyProgress.all(srn))
+        .filter(_._2.completed)
         .keys
         .toList
         .refine[Max5000.Refined]
         .map { index =>
           index -> request.userAnswers
-            .map(LandPropertyDisposalCompleted.all(srn, index))
+            .map(LandOrPropertyDisposalProgress.all(srn, index))
+            .filter(_._2.completed)
             .keys
             .toList
             .refine[Max50.Refined]

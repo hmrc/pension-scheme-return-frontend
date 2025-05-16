@@ -545,7 +545,9 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
                     .map(t => disposalUA13.set(t._1, t._2))
                     .getOrElse(Try(disposalUA13))
                   disposalUA15 <- optOther.map(t => disposalUA14.set(t._1, t._2)).getOrElse(Try(disposalUA14))
-                } yield disposalUA15
+                  disposalUA16 <- disposalUA15
+                    .set(LandOrPropertyDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
+                } yield disposalUA16
             }
           } yield resultDisposalUA
         }
@@ -731,8 +733,9 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
   ): Seq[DisposedPropertyTransaction] =
     request.userAnswers
       .map(
-        HowWasPropertyDisposedOfPages(srn, landOrPropertyIndex)
+        LandOrPropertyDisposalProgress.all(srn, landOrPropertyIndex)
       )
+      .filter(_._2.completed)
       .keys
       .toList
       .flatMap { key =>
