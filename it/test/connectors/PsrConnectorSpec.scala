@@ -197,6 +197,23 @@ class PsrConnectorSpec extends BaseConnectorSpec with CommonTestValues {
     }
   }
 
+  "submit standard Psr when response is html" in runningApplication { implicit app =>
+    val body = "<html>\\n<head><title>504 Gateway Time-out</title></head>\\n<body>\\n<center><h1>504 Gateway Time-out</h1></center>\\n<hr><center>nginx/1.27.5</center>\\n</body>\\n</html>"
+    stubPost(
+      submitStandardUrl,
+      aResponse().withStatus(504)
+        .withBody(body)
+        .withHeader("Content-Type", "text/html; charset=UTF-8")
+    )
+
+    val result: Either[String, Unit] =
+      connector
+        .submitPsrDetails(minimalSubmissionData, commonUserName, commonSchemeName, Srn(commonSrn).get)
+        .futureValue
+
+    result mustBe Left(s"status: 504, body: $body")
+  }
+
   "submitPrePopulatedPsrDetails" - {
 
     "submit pre-populated Psr" in runningApplication { implicit app =>
