@@ -20,11 +20,11 @@ import pages.nonsipp.employercontributions.{EmployerContributionsCompleted, Empl
 import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalPage, OtherAssetsDisposalProgress}
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
-import config.RefinedTypes.OneTo5000
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInSectionCompleted}
-import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
+import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandOrPropertyDisposalProgress}
+import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import pages.nonsipp.sharesdisposal._
 import play.api.libs.json.{JsObject, JsPath}
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsCompleted, SurrenderedBenefitsPage}
@@ -36,8 +36,6 @@ import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, T
 import pages.nonsipp.membercontributions._
 import pages.nonsipp.accountingperiod.Paths.accountingPeriodDetails
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
-import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
-import eu.timepit.refined.refineV
 import viewmodels.models.TaskListStatus._
 import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import utils.nonsipp.check._
@@ -438,7 +436,7 @@ object TaskListStatusUtils {
       )
     } else {
       val wereLandOrPropertiesHeld = userAnswers.get(LandOrPropertyHeldPage(srn))
-      val numRecorded = userAnswers.get(LandOrPropertyProgress.all(srn)).getOrElse(Map.empty).count(_._2.completed)
+      val numRecorded = userAnswers.map(LandOrPropertyProgress.all(srn)).count(_._2.completed)
 
       val firstQuestionPageUrl =
         controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController
@@ -465,7 +463,12 @@ object TaskListStatusUtils {
 
   def getLandOrPropertyDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val wereLandOrPropertyDisposals = userAnswers.get(LandOrPropertyDisposalPage(srn))
-    val numRecorded = userAnswers.map(LandPropertyDisposalCompletedPages(srn)).flatten(_._2).size
+    val numRecorded = userAnswers
+      .map(LandOrPropertyDisposalProgress.all(srn))
+      .values
+      .flatMap(_.values)
+      .toList
+      .count(_.completed)
 
     val firstQuestionPageUrl =
       controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalController

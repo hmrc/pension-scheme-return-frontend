@@ -81,14 +81,14 @@ class LandOrPropertyDisposalBuyerConnectedPartyController @Inject()(
                   request.userAnswers
                     .set(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex), value)
                 )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
+              nextPage = navigator.nextPage(
                 LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex),
                 mode,
                 updatedAnswers
               )
-            )
+              updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 

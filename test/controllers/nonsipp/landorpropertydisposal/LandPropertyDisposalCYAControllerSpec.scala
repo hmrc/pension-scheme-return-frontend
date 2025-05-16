@@ -25,6 +25,7 @@ import pages.nonsipp.landorpropertydisposal._
 import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models._
+import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
@@ -86,6 +87,13 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(PartnershipBuyerNamePage(srn, assetIndex, disposalIndex), recipientName)
     .unsafeSet(WhenWasPropertySoldPage(srn, assetIndex, disposalIndex), dateSold.get)
     .unsafeSet(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, assetIndex, disposalIndex), isBuyerConnectedParty.get)
+    .unsafeSet(LandOrPropertyDisposalProgress(srn, assetIndex, disposalIndex), SectionJourneyStatus.Completed)
+
+  private val incompleteUserAnswers = userAnswers
+    .unsafeSet(
+      LandOrPropertyDisposalProgress(srn, assetIndex, disposalIndex),
+      SectionJourneyStatus.InProgress("some-url")
+    )
 
   "LandPropertyDisposalCYAController" - {
 
@@ -131,6 +139,14 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           })
           .withName(s"redirect to next page when in $mode mode")
+      )
+
+      act.like(
+        redirectToPage(
+          onPageLoad(mode),
+          routes.LandOrPropertyDisposalListController.onPageLoad(srn, 1),
+          incompleteUserAnswers
+        ).updateName(_ + s" - in progress redirect to disposal list page ($mode)")
       )
 
       act.like(

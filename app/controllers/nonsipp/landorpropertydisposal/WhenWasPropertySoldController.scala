@@ -102,11 +102,17 @@ class WhenWasPropertySoldController @Inject()(
                   .fromTry(
                     request.userAnswers.set(WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex), value)
                   )
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(
-                navigator
+                nextPage = navigator
                   .nextPage(WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex), mode, updatedAnswers)
-              )
+                updatedProgressAnswers <- saveProgress(
+                  srn,
+                  landOrPropertyIndex,
+                  disposalIndex,
+                  updatedAnswers,
+                  nextPage
+                )
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(nextPage)
           )
       }
     }

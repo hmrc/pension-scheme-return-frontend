@@ -88,10 +88,11 @@ class OtherBuyerDetailsController @Inject()(
                 .fromTry(
                   request.userAnswers.set(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex), answer)
                 )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex), mode, updatedAnswers)
-            )
+              nextPage = navigator
+                .nextPage(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, landOrPropertyIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
     }
