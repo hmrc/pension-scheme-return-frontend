@@ -214,6 +214,7 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(MemberDetailsCompletedPage(srn, index), SectionCompleted)
     .unsafeSet(MemberPsrVersionPage(srn, index), "001")
     .unsafeSet(MemberStatus(srn, index), MemberState.New)
+    .unsafeSet(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
 
     // employer contributions
     .unsafeSet(EmployerContributionsPage(srn), true)
@@ -268,12 +269,14 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(MemberDetailsCompletedPage(srn, index3), SectionCompleted)
     .unsafeSet(MemberPsrVersionPage(srn, index3), "001")
     .unsafeSet(MemberStatus(srn, index3), MemberState.New)
+    .unsafeSet(MemberDetailsManualProgress(srn, index3), SectionJourneyStatus.Completed)
     .unsafeSet(MemberDetailsPage(srn, index2), memberDetailsIndexTwo)
     .unsafeSet(DoesMemberHaveNinoPage(srn, index2), false)
     .unsafeSet(NoNINOPage(srn, index2), noninoReason)
     .unsafeSet(MemberDetailsCompletedPage(srn, index2), SectionCompleted)
     .unsafeSet(MemberPsrVersionPage(srn, index2), "001")
     .unsafeSet(MemberStatus(srn, index2), MemberState.New)
+    .unsafeSet(MemberDetailsManualProgress(srn, index2), SectionJourneyStatus.Completed)
 
   private val userAnswersAllSectionsNotChecked = userAnswersAllSections
     .unsafeSet(MembersDetailsChecked(srn), false)
@@ -382,6 +385,7 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(MemberPsrVersionPage(srn, index), "001")
     .unsafeSet(MemberPaymentsRecordVersionPage(srn), "001")
     .unsafeSet(MemberStatus(srn, index), MemberState.New)
+    .unsafeSet(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
     // employer contributions
     .unsafeSet(EmployerContributionsPage(srn), false)
     // unallocated employer contributions
@@ -459,6 +463,7 @@ class MemberPaymentsTransformerSpec
           .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
           .unsafeSet(MemberDetailsCompletedPage(srn, index), SectionCompleted)
           .unsafeSet(MemberStatus(srn, index), MemberState.New)
+          .unsafeSet(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
 
         val expected = emptyMemberPayments.copy(
           memberDetails = List(
@@ -479,6 +484,7 @@ class MemberPaymentsTransformerSpec
           .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
           .unsafeSet(MemberDetailsCompletedPage(srn, index), SectionCompleted)
           .unsafeSet(MemberStatus(srn, index), MemberState.New)
+          .unsafeSet(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
 
         val expected = emptyMemberPayments.copy(
           memberDetails = List(
