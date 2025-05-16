@@ -24,7 +24,11 @@ import config.Constants.maxInputLength
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.TextFormProvider
-import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, WhyDidMemberSurrenderBenefitsPage}
+import pages.nonsipp.membersurrenderedbenefits.{
+  SurrenderedBenefitsAmountPage,
+  SurrenderedBenefitsCompletedPage,
+  WhyDidMemberSurrenderBenefitsPage
+}
 import models.Mode
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.data.Form
@@ -32,8 +36,9 @@ import config.RefinedTypes.Max300
 import controllers.PSRController
 import views.html.TextAreaView
 import models.SchemeId.Srn
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, TextAreaViewModel}
+import viewmodels.models.{FormPageViewModel, SectionCompleted, TextAreaViewModel}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -104,12 +109,21 @@ class WhyDidMemberSurrenderBenefitsController @Inject()(
                 ),
               value =>
                 for {
-                  updatedAnswers <- Future
-                    .fromTry(request.userAnswers.set(WhyDidMemberSurrenderBenefitsPage(srn, memberIndex), value))
-                  _ <- saveService.save(updatedAnswers)
-                } yield Redirect(
-                  navigator.nextPage(WhyDidMemberSurrenderBenefitsPage(srn, memberIndex), mode, updatedAnswers)
-                )
+                  updatedAnswers <- request.userAnswers
+                    .set(WhyDidMemberSurrenderBenefitsPage(srn, memberIndex), value)
+                    .set(SurrenderedBenefitsCompletedPage(srn, memberIndex), SectionCompleted)
+                    .mapK[Future]
+                  nextPage = navigator
+                    .nextPage(WhyDidMemberSurrenderBenefitsPage(srn, memberIndex), mode, updatedAnswers)
+                  updatedProgressAnswers <- saveProgress(
+                    srn,
+                    memberIndex,
+                    updatedAnswers,
+                    nextPage,
+                    alwaysCompleted = true
+                  )
+                  _ <- saveService.save(updatedProgressAnswers)
+                } yield Redirect(nextPage)
             )
         }
       }

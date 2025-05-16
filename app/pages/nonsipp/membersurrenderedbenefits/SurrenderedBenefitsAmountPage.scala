@@ -43,6 +43,7 @@ case class SurrenderedBenefitsAmountPage(srn: Srn, memberIndex: Max300) extends 
   private def pages(srn: Srn): List[Removable[_]] =
     List(
       WhenDidMemberSurrenderBenefitsPage(srn, memberIndex),
-      WhyDidMemberSurrenderBenefitsPage(srn, memberIndex)
+      WhyDidMemberSurrenderBenefitsPage(srn, memberIndex),
+      MemberSurrenderedBenefitsProgress(srn, memberIndex)
     )
 }
