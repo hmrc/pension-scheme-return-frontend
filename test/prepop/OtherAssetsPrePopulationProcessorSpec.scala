@@ -236,7 +236,10 @@ object OtherAssetsPrePopulationProcessorSpec {
                  |      }
                  |    }
                  |  },
-                 |  "current": "dummy-current-data"
+                 |  "current": "dummy-current-data",
+                 |  "otherAssetsProgress": {
+                 |    "1": { "status": "JourneyCompleted" }
+                 |  }
                  |}
                  |""".stripMargin)
 
@@ -375,7 +378,11 @@ object OtherAssetsPrePopulationProcessorSpec {
                  |      }
                  |    }
                  |  },
-                 |  "current": "dummy-current-data"
+                 |  "current": "dummy-current-data",
+                 |  "otherAssetsProgress": {
+                 |    "0": { "status": "JourneyCompleted" },
+                 |    "1": { "status": "JourneyCompleted" }
+                 |  }
                  |}
                  |""".stripMargin)
 }

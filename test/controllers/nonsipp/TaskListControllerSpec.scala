@@ -18,7 +18,7 @@ package controllers.nonsipp
 
 import services.PsrVersionsService
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
-import pages.nonsipp.otherassetsheld.{OtherAssetsCompleted, OtherAssetsHeldPage, WhatIsOtherAssetPage}
+import pages.nonsipp.otherassetsheld._
 import controllers.ControllerBaseSpec
 import views.html.TaskListView
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
@@ -1163,6 +1163,14 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
           defaultUserAnswers
             .unsafeSet(OtherAssetsHeldPage(srn), true)
             .unsafeSet(WhatIsOtherAssetPage(srn, index1of5000), otherAssetDescription)
+            .unsafeSet(
+              OtherAssetsProgress(srn, index1of5000),
+              SectionJourneyStatus.InProgress(
+                controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
+                  .onPageLoad(srn, index1of5000, NormalMode)
+                  .url
+              )
+            )
 
         testViewModel(
           userAnswersWithData,
@@ -1171,7 +1179,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
           expectedStatus = TaskListStatus.InProgress,
           expectedTitleKey = "nonsipp.tasklist.otherassets.title",
           expectedLinkContentKey = "nonsipp.tasklist.otherassets.change.title",
-          expectedLinkUrl = controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController
+          expectedLinkUrl = controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
             .onPageLoad(srn, index1of5000, NormalMode)
             .url
         )
@@ -1183,6 +1191,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
             .unsafeSet(OtherAssetsHeldPage(srn), true)
             .unsafeSet(WhatIsOtherAssetPage(srn, index1of5000), otherAssetDescription)
             .unsafeSet(OtherAssetsCompleted(srn, index1of5000), SectionCompleted)
+            .unsafeSet(OtherAssetsProgress(srn, index1of5000), SectionJourneyStatus.Completed)
 
         testViewModel(
           userAnswersWithData,

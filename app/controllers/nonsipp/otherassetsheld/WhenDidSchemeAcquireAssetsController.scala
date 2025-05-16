@@ -92,10 +92,10 @@ class WhenDidSchemeAcquireAssetsController @Inject()(
               for {
                 updatedAnswers <- Future
                   .fromTry(request.userAnswers.set(WhenDidSchemeAcquireAssetsPage(srn, index), value))
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(
-                navigator.nextPage(WhenDidSchemeAcquireAssetsPage(srn, index), mode, updatedAnswers)
-              )
+                nextPage = navigator.nextPage(WhenDidSchemeAcquireAssetsPage(srn, index), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(nextPage)
           )
 
       }

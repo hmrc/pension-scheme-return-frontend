@@ -138,6 +138,7 @@ class OtherAssetsTransformerSpec
             OtherAssetIndividualSellerNINumberPage(srn, refineMV(1)),
             ConditionalYesNo.no[String, Nino]("reason")
           )
+          .unsafeSet(OtherAssetsProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
           //index-2
           .unsafeSet(OtherAssetsCompleted(srn, refineMV(2)), SectionCompleted)
           .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(2)), "assetDescription")
@@ -147,6 +148,7 @@ class OtherAssetsTransformerSpec
           .unsafeSet(IncomeFromAssetPage(srn, refineMV(2)), money)
           .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, refineMV(2)), localDate)
           .unsafeSet(IndependentValuationPage(srn, refineMV(2)), true)
+          .unsafeSet(OtherAssetsProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
           //index-3
           .unsafeSet(OtherAssetsCompleted(srn, refineMV(3)), SectionCompleted)
           .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(3)), "assetDescription")
@@ -154,6 +156,7 @@ class OtherAssetsTransformerSpec
           .unsafeSet(CostOfOtherAssetPage(srn, refineMV(3)), money)
           .unsafeSet(IsAssetTangibleMoveablePropertyPage(srn, refineMV(3)), false)
           .unsafeSet(IncomeFromAssetPage(srn, refineMV(3)), money)
+          .unsafeSet(OtherAssetsProgress(srn, refineMV(3)), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -252,6 +255,7 @@ class OtherAssetsTransformerSpec
           .unsafeSet(IsBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1)), true)
           .unsafeSet(AssetSaleIndependentValuationPage(srn, refineMV(1), refineMV(1)), false)
           .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(1), refineMV(1)), true)
+          .unsafeSet(OtherAssetsProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
           //index-2
           .unsafeSet(OtherAssetsCompleted(srn, refineMV(2)), SectionCompleted)
@@ -264,6 +268,7 @@ class OtherAssetsTransformerSpec
           .unsafeSet(IndependentValuationPage(srn, refineMV(2)), true)
           .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(2), refineMV(1)), Transferred)
           .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(2), refineMV(1)), false)
+          .unsafeSet(OtherAssetsProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
           //index-3
           .unsafeSet(OtherAssetsCompleted(srn, refineMV(3)), SectionCompleted)
           .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(3)), "assetDescription")
@@ -273,6 +278,7 @@ class OtherAssetsTransformerSpec
           .unsafeSet(IncomeFromAssetPage(srn, refineMV(3)), money)
           .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(3), refineMV(1)), Other("OtherMethod"))
           .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(3), refineMV(1)), true)
+          .unsafeSet(OtherAssetsProgress(srn, refineMV(3)), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -384,6 +390,27 @@ class OtherAssetsTransformerSpec
             )
           )
         )
+      }
+
+      "should not include incomplete record" in {
+
+        val incompleteUserAnswers = emptyUserAnswers
+          .unsafeSet(OtherAssetsHeldPage(srn), true)
+          .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(1)), "assetDescription")
+          .unsafeSet(
+            OtherAssetsProgress(srn, refineMV(1)),
+            SectionJourneyStatus.InProgress(
+              controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
+                .onPageLoad(srn, index1of5000, NormalMode)
+                .url
+            )
+          )
+
+        val request = DataRequest(allowedAccessRequest, incompleteUserAnswers)
+
+        val result = transformer.transformToEtmp(srn, Some(true), incompleteUserAnswers)(request)
+
+        result mustBe Some(OtherAssets(None, Some(true), Some(false), List()))
       }
     }
 
@@ -578,6 +605,7 @@ class OtherAssetsTransformerSpec
           userAnswers.get(AssetCompanyBuyerCrnPage(srn, refineMV(1), refineMV(1))) shouldMatchTo Some(
             ConditionalYesNo.no("optReasonNoCRN")
           )
+          userAnswers.get(OtherAssetsProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
 
           //index-2
           userAnswers.get(WhatIsOtherAssetPage(srn, refineMV(2))) shouldMatchTo Some("assetDescription")
@@ -588,11 +616,14 @@ class OtherAssetsTransformerSpec
           userAnswers.get(WhenDidSchemeAcquireAssetsPage(srn, refineMV(2))) shouldMatchTo Some(localDate)
           userAnswers.get(IndependentValuationPage(srn, refineMV(2))) shouldMatchTo Some(true)
           userAnswers.get(OtherAssetsCompleted(srn, refineMV(1))) shouldMatchTo Some(SectionCompleted)
-          userAnswers.get(OtherAssetsDisposalProgress(srn, refineMV(2), refineMV(1))) shouldMatchTo Some(
+          userAnswers.get(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1))) shouldMatchTo Some(
             SectionJourneyStatus.Completed
           )
           userAnswers.get(HowWasAssetDisposedOfPage(srn, refineMV(2), refineMV(1))) shouldMatchTo Some(Transferred)
           userAnswers.get(AnyPartAssetStillHeldPage(srn, refineMV(2), refineMV(1))) shouldMatchTo Some(true)
+          userAnswers.get(OtherAssetsDisposalProgress(srn, refineMV(2), refineMV(1))) shouldMatchTo Some(
+            SectionJourneyStatus.Completed
+          )
           //index-3
           userAnswers.get(WhatIsOtherAssetPage(srn, refineMV(3))) shouldMatchTo Some("assetDescription")
           userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, refineMV(3))) shouldMatchTo Some(Transfer)
@@ -607,6 +638,9 @@ class OtherAssetsTransformerSpec
             Other("OtherMethod")
           )
           userAnswers.get(AnyPartAssetStillHeldPage(srn, refineMV(3), refineMV(1))) shouldMatchTo Some(false)
+          userAnswers.get(OtherAssetsDisposalProgress(srn, refineMV(3), refineMV(1))) shouldMatchTo Some(
+            SectionJourneyStatus.Completed
+          )
         }
       )
     }

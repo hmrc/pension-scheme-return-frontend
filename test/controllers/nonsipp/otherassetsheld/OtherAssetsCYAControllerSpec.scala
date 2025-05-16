@@ -24,6 +24,7 @@ import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
 import models._
 import pages.nonsipp.common.IdentityTypePage
+import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
@@ -87,6 +88,17 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(CostOfOtherAssetPage(srn, index), money)
     .unsafeSet(IndependentValuationPage(srn, index), true)
     .unsafeSet(IncomeFromAssetPage(srn, index), money)
+    .unsafeSet(OtherAssetsProgress(srn, index), SectionJourneyStatus.Completed)
+
+  private val incompleteUserAnswers = filledUserAnswers
+    .unsafeSet(
+      OtherAssetsProgress(srn, index),
+      SectionJourneyStatus.InProgress(
+        controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
+          .onPageLoad(srn, refineMV(1), NormalMode)
+          .url
+      )
+    )
 
   "OtherAssetsCYAController" - {
     List(NormalMode, CheckMode).foreach { mode =>
@@ -136,6 +148,20 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
             reset(mockSaveService)
           })
           .withName(s"redirect to next page when in $mode mode")
+      )
+
+      act.like(
+        redirectToPage(
+          call = onPageLoad(mode),
+          page = controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onPageLoad(srn, page, mode),
+          userAnswers = incompleteUserAnswers,
+          previousUserAnswers = emptyUserAnswers
+        ).after({
+            verify(mockSaveService, never()).save(any())(any(), any())
+            reset(mockPsrSubmissionService)
+            reset(mockSaveService)
+          })
+          .withName(s"redirect to list page when in $mode mode and incomplete data")
       )
 
       act.like(

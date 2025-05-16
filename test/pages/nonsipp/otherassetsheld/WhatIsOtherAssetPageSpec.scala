@@ -65,8 +65,10 @@ class WhatIsOtherAssetPageSpec extends PageBehaviours with TestValues {
       UserAnswers("id")
         .unsafeSet(WhatIsOtherAssetPage(srn, index), otherName)
         .unsafeSet(IncomeFromAssetPage(srn, index), money)
+        .unsafeSet(OtherAssetsProgress(srn, index), SectionJourneyStatus.Completed)
         .unsafeSet(WhatIsOtherAssetPage(srn, index2), otherName)
         .unsafeSet(IncomeFromAssetPage(srn, index2), money)
+        .unsafeSet(OtherAssetsProgress(srn, index2), SectionJourneyStatus.Completed)
         .unsafeSet(OtherAssetsHeldPage(srn), true)
         .unsafeSet(OtherAssetsListPage(srn), true)
         // Disposal details:
@@ -82,7 +84,9 @@ class WhatIsOtherAssetPageSpec extends PageBehaviours with TestValues {
       val result =
         WhatIsOtherAssetPage(srn, index).cleanup(None, userAnswers).toOption.value
       result.get(IncomeFromAssetPage(srn, index)) mustBe None
+      result.get(OtherAssetsProgress(srn, index)) mustBe None
       result.get(IncomeFromAssetPage(srn, index2)) must not be None
+      result.get(OtherAssetsProgress(srn, index2)) must not be None
       result.get(OtherAssetsHeldPage(srn)) must not be None
       result.get(OtherAssetsListPage(srn)) must not be None
     }

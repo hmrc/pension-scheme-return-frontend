@@ -23,11 +23,12 @@ import models.SchemeId.Srn
 import pages.nonsipp.otherassetsdisposal.Paths.assetsDisposed
 import eu.timepit.refined.refineV
 import models.UserAnswers
-import utils.JsonUtils.JsResultOps
 import utils.ListUtils.ListOps
 import models.UserAnswers.SensitiveJsObject
 import pages.nonsipp.otherassetsheld.Paths.otherAssets
 import play.api.libs.json.{JsObject, JsSuccess}
+import utils.JsonUtils.JsResultOps
+import viewmodels.models.SectionJourneyStatus
 
 import scala.util.{Success, Try}
 
@@ -53,8 +54,8 @@ class OtherAssetsPrePopulationProcessor @Inject()() {
       .prune(OtherAssetsDisposalPage(srn).path)
       .prune(assetsDisposed)
       .prune(OtherAssetsDisposalProgress.all(srn).path)
-      .prune((Paths.otherAssetsTransactions \ "movableSchedule29A"))
-      .prune((Paths.otherAssetsTransactions \ "totalIncomeOrReceipts")) match {
+      .prune(Paths.otherAssetsTransactions \ "movableSchedule29A")
+      .prune(Paths.otherAssetsTransactions \ "totalIncomeOrReceipts") match {
       case JsSuccess(value, _) =>
         Success(currentUA.copy(data = SensitiveJsObject(value.deepMerge(currentUA.data.decryptedValue))))
       case _ => Try(currentUA)
@@ -80,11 +81,18 @@ class OtherAssetsPrePopulationProcessor @Inject()() {
         .toList
         .flatten
         .refine[Max5000.Refined]
-        .map(index => OtherAssetsPrePopulated(srn, index))
+        .map(
+          index =>
+            (
+              OtherAssetsPrePopulated(srn, index),
+              OtherAssetsProgress(srn, index)
+            )
+        )
         .foldLeft(Try(ua)) {
-          case (ua, otherAssetsPrePopulated) => {
+          case (ua, (otherAssetsPrePopulated, otherAssetsProgress)) =>
             ua.flatMap(_.set(otherAssetsPrePopulated, false))
-          }
+              .flatMap(_.set(otherAssetsProgress, SectionJourneyStatus.Completed))
+
         }
     }
   }
