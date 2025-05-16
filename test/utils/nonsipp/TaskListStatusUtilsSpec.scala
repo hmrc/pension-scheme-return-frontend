@@ -48,6 +48,7 @@ import controllers.TestValues
 import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
 import models.SchemeHoldShare.Acquisition
 import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
+import controllers.nonsipp.bonds.routes
 import eu.timepit.refined.refineMV
 import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import org.scalatest.OptionValues
@@ -679,7 +680,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
     "should be Not Started" - {
       "when default data" in {
-        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(defaultUserAnswers, srn, false)
+        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(defaultUserAnswers, srn, isPrePop = false)
         result mustBe (NotStarted, firstQuestionPageUrl)
       }
     }
@@ -688,7 +689,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when only UnregulatedOrConnectedBondsHeldPage false is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), false)
-        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, false)
+        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(0, ""), firstQuestionPageUrl)
       }
 
@@ -697,10 +698,17 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
           // first bond:
           .unsafeSet(NameOfBondsPage(srn, refineMV(1)), "NameOfFirstBond")
+          .unsafeSet(
+            BondsProgress(srn, refineMV(1)),
+            SectionJourneyStatus.InProgress(
+              routes.NameOfBondsController.onPageLoad(srn, refineMV(1), NormalMode)
+            )
+          )
           // second bond:
           .unsafeSet(NameOfBondsPage(srn, refineMV(2)), "NameOfSecondBond")
           .unsafeSet(BondsCompleted(srn, refineMV(2)), SectionCompleted)
-        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, false)
+          .unsafeSet(BondsProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
+        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "bonds"), listPageUrl)
       }
 
@@ -710,9 +718,16 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           // first bond:
           .unsafeSet(NameOfBondsPage(srn, refineMV(1)), "NameOfFirstBond")
           .unsafeSet(BondsCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(BondsProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
           // second bond:
           .unsafeSet(NameOfBondsPage(srn, refineMV(2)), "NameOfSecondBond")
-        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, false)
+          .unsafeSet(
+            BondsProgress(srn, refineMV(2)),
+            SectionJourneyStatus.InProgress(
+              routes.NameOfBondsController.onPageLoad(srn, refineMV(2), NormalMode)
+            )
+          )
+        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (Recorded(1, "bonds"), listPageUrl)
       }
     }
@@ -721,7 +736,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when only UnregulatedOrConnectedBondsHeldPage true" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
-        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, false)
+        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, firstQuestionPageUrl)
       }
 
@@ -729,7 +744,13 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
           .unsafeSet(NameOfBondsPage(srn, index1of5000), name)
-        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, false)
+          .unsafeSet(
+            BondsProgress(srn, index1of5000),
+            SectionJourneyStatus.InProgress(
+              routes.NameOfBondsController.onPageLoad(srn, index1of5000, NormalMode)
+            )
+          )
+        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, secondQuestionPageUrl(index1of5000))
       }
 
@@ -739,7 +760,14 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           // nothing for the first bond:
           // second bond:
           .unsafeSet(NameOfBondsPage(srn, refineMV(2)), "NameOfSecondBond")
-        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, false)
+          .unsafeSet(
+            BondsProgress(srn, refineMV(2)),
+            SectionJourneyStatus.InProgress(
+              routes.NameOfBondsController.onPageLoad(srn, refineMV(2), NormalMode)
+            )
+          )
+
+        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
         result mustBe (InProgress, secondQuestionPageUrl(index2of5000))
       }
     }

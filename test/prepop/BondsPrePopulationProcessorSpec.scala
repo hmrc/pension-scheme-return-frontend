@@ -50,6 +50,7 @@ class BondsPrePopulationProcessorSpec extends BaseSpec with TestValues {
           baseUA = emptyUserAnswers.copy(data = SensitiveJsObject(noDisposalsData.as[JsObject])),
           currentUA = currentUa
         )(srn)
+        result.get.data.decryptedValue mustBe cleanedNoDisposalsData.as[JsObject]
         result mustBe Success(
           currentUa.copy(data = SensitiveJsObject(cleanedNoDisposalsData.as[JsObject]))
         )
@@ -294,7 +295,7 @@ object BondsPrePopulationProcessorSpec {
                  |  "current": "dummy-current-data",
                  |  "assets": {
                  |    "bonds": {
-                 |    "bondsPrePopulated":{"4":false,"1":false,"0":false,"2":false,"3":false},
+                 |      "bondsPrePopulated":{"4":false,"1":false,"0":false,"2":false,"3":false},
                  |      "bondTransactions": {
                  |        "nameOfBonds": {
                  |          "0": "first bonds - no disposals",
@@ -337,6 +338,11 @@ object BondsPrePopulationProcessorSpec {
                  |          "2": {},
                  |          "4": {}
                  |        }
+                 |      },
+                 |      "bondsProgress": {
+                 |        "4": { "status": "JourneyCompleted" },
+                 |        "2": { "status": "JourneyCompleted" },
+                 |        "0": { "status": "JourneyCompleted" }
                  |      }
                  |    }
                  |  }
@@ -445,7 +451,7 @@ object BondsPrePopulationProcessorSpec {
                  |  "current": "dummy-current-data",
                  |  "assets": {
                  |    "bonds": {
-                 |    "bondsPrePopulated":{"4":false,"1":false,"0":false,"2":false,"3":false},
+                 |      "bondsPrePopulated":{"4":false,"1":false,"0":false,"2":false,"3":false},
                  |      "bondTransactions": {
                  |        "nameOfBonds": {
                  |          "0": "first bonds - no disposals",
@@ -507,6 +513,13 @@ object BondsPrePopulationProcessorSpec {
                  |          "3": {},
                  |          "4": {}
                  |        }
+                 |      },
+                 |      "bondsProgress": {
+                 |        "0": { "status": "JourneyCompleted" },
+                 |        "1": { "status": "JourneyCompleted" },
+                 |        "2": { "status": "JourneyCompleted" },
+                 |        "3": { "status": "JourneyCompleted" },
+                 |        "4": { "status": "JourneyCompleted" }
                  |      }
                  |    }
                  |  }

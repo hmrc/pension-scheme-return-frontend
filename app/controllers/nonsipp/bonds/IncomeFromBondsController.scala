@@ -36,7 +36,7 @@ import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.{Empty, Message}
-import viewmodels.models.{FormPageViewModel, QuestionField, SectionCompleted}
+import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -88,8 +88,10 @@ class IncomeFromBondsController @Inject()(
                     .set(IncomeFromBondsPage(srn, index), answer)
                     .set(BondsCompleted(srn, index), SectionCompleted)
                 )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(IncomeFromBondsPage(srn, index), mode, updatedAnswers))
+              nextPage = navigator.nextPage(IncomeFromBondsPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
   }

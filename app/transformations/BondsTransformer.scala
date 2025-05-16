@@ -79,7 +79,8 @@ class BondsTransformer @Inject() extends Transformer {
     implicit request: DataRequest[_]
   ): List[BondTransactions] =
     request.userAnswers
-      .map(BondsCompleted.all(srn))
+      .map(BondsProgress.all(srn))
+      .filter { case (_, status) => status.completed }
       .keys
       .toList
       .flatMap { key =>
@@ -240,6 +241,8 @@ class BondsTransformer @Inject() extends Transformer {
               index => BondPrePopulated(srn, index) -> bondTransactions(index.value - 1).prePopulated.get
             )
 
+          val bondsProgress = BondsProgress(srn, index) -> SectionJourneyStatus.Completed
+
           val triedUA = for {
             ua0 <- ua
             ua1 <- ua0.set(nameOfBonds._1, nameOfBonds._2)
@@ -251,11 +254,12 @@ class BondsTransformer @Inject() extends Transformer {
             ua7 <- optConnectedPartyStatus.map(t => ua6.set(t._1, t._2)).getOrElse(Try(ua6))
             ua8 <- ua7.set(bondsCompleted._1, bondsCompleted._2)
             ua9 <- bondsPrePopulated.foldLeft(Try(ua8)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+            ua10 <- ua9.set(bondsProgress._1, bondsProgress._2)
           } yield {
             buildOptDisposedBondsUA(
               index,
               srn,
-              ua9,
+              ua10,
               bondTransaction.optBondsDisposed,
               bond.optBondsWereDisposed
             )

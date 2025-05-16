@@ -23,6 +23,7 @@ package object bonds {
   object Paths {
     val assets: JsPath = __ \ "assets"
     val bonds: JsPath = assets \ "bonds"
+    val bondsProgress: JsPath = bonds \ "bondsProgress"
     val bondTransactions: JsPath = bonds \ "bondTransactions"
   }
 

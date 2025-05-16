@@ -24,7 +24,7 @@ import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
 import generators.ModelGenerators.allowedAccessRequestGen
 import pages.nonsipp.bondsdisposal._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import models.requests.{AllowedAccessRequest, DataRequest}
 import pages.nonsipp.bonds._
 import org.scalatest.freespec.AnyFreeSpec
@@ -110,6 +110,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, refineMV(1)), localDate)
           .unsafeSet(BondsFromConnectedPartyPage(srn, refineMV(1)), false)
           .unsafeSet(BondsCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(BondsProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -157,6 +158,7 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           .unsafeSet(HowWereBondsDisposedOfPage(srn, refineMV(1), refineMV(2)), Other("OtherMethod"))
           .unsafeSet(BondsStillHeldPage(srn, refineMV(1), refineMV(2)), 2)
           .unsafeSet(BondsCompleted(srn, refineMV(1)), SectionCompleted)
+          .unsafeSet(BondsProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -218,6 +220,51 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
           optBondsWereAdded = Some(true),
           optBondsWereDisposed = None,
           bondTransactions = Seq.empty // tests don't need to check these transactions in detail
+        )
+      )
+    }
+
+    "should exclude incomplete journeys" in {
+      val userAnswers = emptyUserAnswers
+        .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
+        .unsafeSet(BondsRecordVersionPage(srn), "001")
+        .unsafeSet(NameOfBondsPage(srn, refineMV(1)), "incomplete")
+        .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, refineMV(1)), Acquisition)
+        .unsafeSet(CostOfBondsPage(srn, refineMV(1)), money)
+        .unsafeSet(AreBondsUnregulatedPage(srn, refineMV(1)), true)
+        .unsafeSet(IncomeFromBondsPage(srn, refineMV(1)), money)
+        .unsafeSet(BondsProgress(srn, refineMV(1)), SectionJourneyStatus.InProgress("someUrl"))
+        .unsafeSet(NameOfBondsPage(srn, refineMV(2)), "nameOfBonds")
+        .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, refineMV(2)), Acquisition)
+        .unsafeSet(CostOfBondsPage(srn, refineMV(2)), money)
+        .unsafeSet(AreBondsUnregulatedPage(srn, refineMV(2)), true)
+        .unsafeSet(IncomeFromBondsPage(srn, refineMV(2)), money)
+        .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, refineMV(2)), localDate)
+        .unsafeSet(BondsFromConnectedPartyPage(srn, refineMV(2)), false)
+        .unsafeSet(BondsCompleted(srn, refineMV(2)), SectionCompleted)
+        .unsafeSet(BondsProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
+
+      val request = DataRequest(allowedAccessRequest, userAnswers)
+
+      val result = transformer.transformToEtmp(srn, Some(true), userAnswers)(request)
+      result mustBe Some(
+        Bonds(
+          recordVersion = Some("001"),
+          optBondsWereAdded = Some(true),
+          optBondsWereDisposed = Some(false),
+          bondTransactions = List(
+            BondTransactions(
+              prePopulated = None,
+              nameOfBonds = "nameOfBonds",
+              methodOfHolding = Acquisition,
+              optDateOfAcqOrContrib = Some(localDate),
+              costOfBonds = money.value,
+              optConnectedPartyStatus = Some(false),
+              bondsUnregulated = true,
+              optTotalIncomeOrReceipts = Some(money.value),
+              optBondsDisposed = None
+            )
+          )
         )
       )
     }
@@ -389,6 +436,48 @@ class BondsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
         ex => fail(ex.getMessage),
         userAnswers => {
           userAnswers.get(IncomeFromBondsPage(srn, refineMV(1))) mustBe Some(moneyZero)
+        }
+      )
+    }
+
+    "should set BondsProgress to Completed for all records" in {
+      val userAnswers = emptyUserAnswers
+      val result = transformer.transformFromEtmp(
+        userAnswers,
+        srn,
+        Bonds(
+          recordVersion = Some("001"),
+          optBondsWereAdded = Some(true),
+          optBondsWereDisposed = Some(true),
+          bondTransactions = Seq(
+            BondTransactions(
+              prePopulated = None,
+              nameOfBonds = "nameOfBonds",
+              methodOfHolding = Contribution,
+              optDateOfAcqOrContrib = Some(localDate),
+              costOfBonds = money.value,
+              optConnectedPartyStatus = Some(true),
+              bondsUnregulated = false,
+              optTotalIncomeOrReceipts = Some(money.value),
+              optBondsDisposed = None
+            )
+          )
+        )
+      )
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(BondsRecordVersionPage(srn)) mustBe Some("001")
+          userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn)) mustBe Some(true)
+          userAnswers.get(BondsDisposalPage(srn)) mustBe Some(true)
+          userAnswers.get(NameOfBondsPage(srn, refineMV(1))) mustBe Some("nameOfBonds")
+          userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, refineMV(1))) mustBe Some(Contribution)
+          userAnswers.get(CostOfBondsPage(srn, refineMV(1))) mustBe Some(money)
+          userAnswers.get(AreBondsUnregulatedPage(srn, refineMV(1))) mustBe Some(false)
+          userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, refineMV(1))) mustBe Some(localDate)
+          userAnswers.get(BondsFromConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
+          userAnswers.get(BondsCompleted(srn, refineMV(1))) mustBe Some(SectionCompleted)
+          userAnswers.get(BondsProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
         }
       )
     }

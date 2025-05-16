@@ -64,7 +64,7 @@ class BondsListController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  private implicit val logger = Logger(getClass)
+  private implicit val logger: Logger = Logger(getClass)
 
   val form: Form[Boolean] = BondsListController.form(formProvider)
 
@@ -146,6 +146,9 @@ class BondsListController @Inject()(
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val indexes: List[Max5000] = request.userAnswers.map(BondsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+      val inProgressUrl = request.userAnswers.map(BondsProgress.all(srn)).collectFirst {
+        case (_, SectionJourneyStatus.InProgress(url)) => url
+      }
 
       if (indexes.size >= Constants.maxBondsTransactions) {
         Future.successful(
@@ -184,9 +187,10 @@ class BondsListController @Inject()(
               for {
                 updatedUserAnswers <- Future.fromTry(request.userAnswers.set(BondsListPage(srn), addAnother))
                 _ <- saveService.save(updatedUserAnswers)
-              } yield Redirect(
-                navigator.nextPage(BondsListPage(srn), mode, updatedUserAnswers)
-              )
+              } yield (addAnother, inProgressUrl) match {
+                case (true, Some(url)) => Redirect(url)
+                case _ => Redirect(navigator.nextPage(BondsListPage(srn), mode, updatedUserAnswers))
+              }
           )
       }
   }
@@ -239,27 +243,30 @@ class BondsListController @Inject()(
         canRemove = request.userAnswers.get(BondPrePopulated(srn, index)).isEmpty
       } yield BondsData(index, nameOfBonds, acquisitionType, costOfBonds, canRemove)
 
+    val completedIndexesOrError = for {
+      indexes <- request.userAnswers
+        .map(BondsProgress.all(srn))
+        .refine[Max5000.Refined]
+        .getOrRecoverJourney
+      completedIndexes = indexes
+        .filter { case (_, progress) => progress.completed }
+        .map { case (key, _) => key }
+        .toList
+    } yield completedIndexes
+
     if (isPrePopulation) {
       for {
-        indexes <- request.userAnswers
-          .map(NameOfBondsPages(srn))
-          .refine[Max5000.Refined]
-          .map(_.keys.toList)
-          .getOrRecoverJourney
-        shares <- indexes.traverse(buildBonds)
-      } yield shares.partition(
-        shares => BondsCheckStatusUtils.checkBondsRecord(request.userAnswers, srn, shares.index)
+        completedIndexes <- completedIndexesOrError
+        bonds <- completedIndexes.traverse(buildBonds)
+      } yield bonds.partition(
+        bonds => BondsCheckStatusUtils.checkBondsRecord(request.userAnswers, srn, bonds.index)
       )
     } else {
       val noBondsToCheck = List.empty[BondsData]
       for {
-        indexes <- request.userAnswers
-          .map(NameOfBondsPages(srn))
-          .refine[Max5000.Refined]
-          .map(_.keys.toList)
-          .getOrRecoverJourney
-        shares <- indexes.traverse(buildBonds)
-      } yield (noBondsToCheck, shares)
+        completedIndexes <- completedIndexesOrError
+        bonds <- completedIndexes.traverse(buildBonds)
+      } yield (noBondsToCheck, bonds)
     }
   }
 }

@@ -22,7 +22,7 @@ import views.html.ListView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
@@ -78,6 +78,21 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(BondsFromConnectedPartyPage(srn, index), true)
       .unsafeSet(AreBondsUnregulatedPage(srn, index), true)
       .unsafeSet(IncomeFromBondsPage(srn, index), money)
+      .unsafeSet(BondsProgress(srn, index), SectionJourneyStatus.Completed)
+
+  private val incompleteAnswers = userAnswers
+    .unsafeSet(NameOfBondsPage(srn, indexTwo), "Name")
+    .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, indexTwo), SchemeHoldBond.Acquisition)
+    .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, indexTwo), localDate)
+    .unsafeSet(CostOfBondsPage(srn, indexTwo), money)
+    .unsafeSet(BondsFromConnectedPartyPage(srn, indexTwo), true)
+    .unsafeSet(AreBondsUnregulatedPage(srn, indexTwo), true)
+    .unsafeSet(
+      BondsProgress(srn, indexTwo),
+      SectionJourneyStatus.InProgress(
+        routes.IncomeFromBondsController.onPageLoad(srn, indexTwo, NormalMode).url
+      )
+    )
 
   private val userAnswersHalfChecked =
     userAnswers
@@ -89,6 +104,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(BondsFromConnectedPartyPage(srn, indexTwo), true)
       .unsafeSet(AreBondsUnregulatedPage(srn, indexTwo), true)
       .unsafeSet(BondPrePopulated(srn, indexTwo), false)
+      .unsafeSet(BondsProgress(srn, indexTwo), SectionJourneyStatus.Completed)
       .unsafeSet(BondsCompleted(srn, indexThree), SectionCompleted)
       .unsafeSet(NameOfBondsPage(srn, indexThree), "NameThree")
       .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, indexThree), SchemeHoldBond.Acquisition)
@@ -97,6 +113,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(BondsFromConnectedPartyPage(srn, indexThree), true)
       .unsafeSet(AreBondsUnregulatedPage(srn, indexThree), true)
       .unsafeSet(BondPrePopulated(srn, indexThree), true)
+      .unsafeSet(BondsProgress(srn, indexThree), SectionJourneyStatus.Completed)
 
   private val bondsData = List(
     BondsData(
@@ -180,6 +197,23 @@ class BondsListControllerSpec extends ControllerBaseSpec {
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
         .after(MockPsrSubmissionService.verify.submitPsrDetailsWithUA(times(0)))
     )
+
+    act.like(renderView(onPageLoad, incompleteAnswers) { implicit app => implicit request =>
+      injected[ListView]
+        .apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(srn, page, NormalMode, bondsData, Nil, schemeName, showBackLink = true, isPrePop = false)
+        )
+    }.updateName(_ + " - Smart nav index 2 missing"))
+
+//    act.like(
+//      redirectToPage(
+//        onSubmit,
+//        routes.IncomeFromBondsController.onPageLoad(srn, indexTwo, NormalMode),
+//        incompleteAnswers,
+//        "value" -> "true"
+//      )
+//    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

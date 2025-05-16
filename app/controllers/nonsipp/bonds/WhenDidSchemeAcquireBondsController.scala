@@ -92,9 +92,11 @@ class WhenDidSchemeAcquireBondsController @Inject()(
               for {
                 updatedAnswers <- Future
                   .fromTry(request.userAnswers.set(WhenDidSchemeAcquireBondsPage(srn, index), value))
-                _ <- saveService.save(updatedAnswers)
+                nextPage = navigator.nextPage(WhenDidSchemeAcquireBondsPage(srn, index), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(
-                navigator.nextPage(WhenDidSchemeAcquireBondsPage(srn, index), mode, updatedAnswers)
+                nextPage
               )
           )
 
