@@ -21,8 +21,9 @@ import views.html.ListRadiosView
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.bondsdisposal.BondsDisposalListController._
 import forms.RadioListFormProvider
-import models.{NormalMode, SchemeHoldBond}
-import viewmodels.models.SectionCompleted
+import models.{HowDisposed, NormalMode, SchemeHoldBond}
+import pages.nonsipp.bondsdisposal.{BondsDisposalProgress, HowWereBondsDisposedOfPage}
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import config.RefinedTypes.Max5000
 import controllers.ControllerBaseSpec
 
@@ -54,6 +55,15 @@ class BondsDisposalListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(CostOfBondsPage(srn, indexThree), money)
       .unsafeSet(BondsCompleted(srn, indexThree), SectionCompleted)
 
+  private val incompleteUserAnswers = userAnswers
+    .unsafeSet(HowWereBondsDisposedOfPage(srn, indexOne, index1of50), HowDisposed.Sold)
+    .unsafeSet(
+      BondsDisposalProgress(srn, indexOne, index1of50),
+      SectionJourneyStatus.InProgress(
+        routes.WhenWereBondsSoldController.onPageLoad(srn, indexOne, index1of50, NormalMode).url
+      )
+    )
+
   private val bondsData = List(
     BondsData(
       indexOne,
@@ -81,6 +91,16 @@ class BondsDisposalListControllerSpec extends ControllerBaseSpec {
       injected[ListRadiosView]
         .apply(form(injected[RadioListFormProvider]), viewModel(srn, page = 1, bondsData, NormalMode, userAnswers))
     })
+
+    act.like(
+      redirectToPage(
+        call = onSubmit,
+        page = routes.WhenWereBondsSoldController.onPageLoad(srn, indexOne, index1of50, NormalMode),
+        userAnswers = incompleteUserAnswers,
+        previousUserAnswers = emptyUserAnswers,
+        form = "value" -> "1"
+      ).withName("Redirect to incomplete record")
+    )
 
     act.like(redirectNextPage(onSubmit, "value" -> "1"))
 

@@ -62,7 +62,6 @@ class BondsDisposalCYAController @Inject()(
       saveService.save(
         request.userAnswers
           .set(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex), NoPointOfEntry)
-          .set(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.Completed)
           .getOrElse(request.userAnswers)
       )
       onPageLoadCommon(srn, bondIndex, disposalIndex, mode)
@@ -84,78 +83,84 @@ class BondsDisposalCYAController @Inject()(
   def onPageLoadCommon(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode)(
     implicit request: DataRequest[AnyContent]
   ): Future[Result] =
-    (
-      for {
-        bondsName <- request.userAnswers
-          .get(NameOfBondsPage(srn, bondIndex))
-          .getOrRecoverJourneyT
-        acquisitionType <- request.userAnswers
-          .get(WhyDoesSchemeHoldBondsPage(srn, bondIndex))
-          .getOrRecoverJourneyT
-        costOfBonds <- request.userAnswers
-          .get(CostOfBondsPage(srn, bondIndex))
-          .getOrRecoverJourneyT
+    if (!request.userAnswers
+        .get(BondsDisposalProgress(srn, bondIndex, disposalIndex))
+        .exists(_.completed)) {
+      Future.successful(Redirect(routes.ReportBondsDisposalListController.onPageLoad(srn, 1)))
+    } else {
+      (
+        for {
+          bondsName <- request.userAnswers
+            .get(NameOfBondsPage(srn, bondIndex))
+            .getOrRecoverJourneyT
+          acquisitionType <- request.userAnswers
+            .get(WhyDoesSchemeHoldBondsPage(srn, bondIndex))
+            .getOrRecoverJourneyT
+          costOfBonds <- request.userAnswers
+            .get(CostOfBondsPage(srn, bondIndex))
+            .getOrRecoverJourneyT
 
-        howBondsDisposed <- request.userAnswers
-          .get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex))
-          .getOrRecoverJourneyT
+          howBondsDisposed <- request.userAnswers
+            .get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex))
+            .getOrRecoverJourneyT
 
-        dateBondsSold = Option.when(howBondsDisposed == Sold)(
-          request.userAnswers.get(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex)).get
-        )
+          dateBondsSold = Option.when(howBondsDisposed == Sold)(
+            request.userAnswers.get(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex)).get
+          )
 
-        considerationBondsSold = Option.when(howBondsDisposed == Sold)(
-          request.userAnswers.get(TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex)).get
-        )
-        buyerName = Option.when(howBondsDisposed == Sold)(
-          request.userAnswers.get(BuyerNamePage(srn, bondIndex, disposalIndex)).get
-        )
-        isBuyerConnectedParty = Option.when(howBondsDisposed == Sold)(
-          request.userAnswers.get(IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex)).get
-        )
+          considerationBondsSold = Option.when(howBondsDisposed == Sold)(
+            request.userAnswers.get(TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex)).get
+          )
+          buyerName = Option.when(howBondsDisposed == Sold)(
+            request.userAnswers.get(BuyerNamePage(srn, bondIndex, disposalIndex)).get
+          )
+          isBuyerConnectedParty = Option.when(howBondsDisposed == Sold)(
+            request.userAnswers.get(IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex)).get
+          )
 
-        bondsStillHeld <- request.userAnswers
-          .get(BondsStillHeldPage(srn, bondIndex, disposalIndex))
-          .getOrRecoverJourneyT
+          bondsStillHeld <- request.userAnswers
+            .get(BondsStillHeldPage(srn, bondIndex, disposalIndex))
+            .getOrRecoverJourneyT
 
-        disposalAmount = request.userAnswers
-          .map(BondsDisposalProgress.all(srn, bondIndex))
-          .count { case (_, progress) => progress.completed }
+          disposalAmount = request.userAnswers
+            .map(BondsDisposalProgress.all(srn, bondIndex))
+            .count { case (_, progress) => progress.completed }
 
-        schemeName = request.schemeDetails.schemeName
-      } yield {
-        val isMaximumReached = disposalAmount >= maxDisposalPerBond
+          schemeName = request.schemeDetails.schemeName
+        } yield {
+          val isMaximumReached = disposalAmount >= maxDisposalPerBond
 
-        Ok(
-          view(
-            viewModel(
-              ViewModelParameters(
-                srn,
-                bondIndex,
-                disposalIndex,
-                bondsName,
-                acquisitionType,
-                costOfBonds,
-                howBondsDisposed,
-                dateBondsSold,
-                considerationBondsSold,
-                buyerName,
-                isBuyerConnectedParty,
-                bondsStillHeld,
-                schemeName,
-                mode
-              ),
-              viewOnlyUpdated = false, // flag is not displayed on this tier
-              optYear = request.year,
-              optCurrentVersion = request.currentVersion,
-              optPreviousVersion = request.previousVersion,
-              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
-              isMaximumReached
+          Ok(
+            view(
+              viewModel(
+                ViewModelParameters(
+                  srn,
+                  bondIndex,
+                  disposalIndex,
+                  bondsName,
+                  acquisitionType,
+                  costOfBonds,
+                  howBondsDisposed,
+                  dateBondsSold,
+                  considerationBondsSold,
+                  buyerName,
+                  isBuyerConnectedParty,
+                  bondsStillHeld,
+                  schemeName,
+                  mode
+                ),
+                viewOnlyUpdated = false, // flag is not displayed on this tier
+                optYear = request.year,
+                optCurrentVersion = request.currentVersion,
+                optPreviousVersion = request.previousVersion,
+                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn)),
+                isMaximumReached
+              )
             )
           )
-        )
-      }
-    ).merge
+        }
+      ).merge
+    }
 
   def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>

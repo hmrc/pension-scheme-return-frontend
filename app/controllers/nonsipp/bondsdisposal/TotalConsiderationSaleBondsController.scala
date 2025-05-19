@@ -82,11 +82,11 @@ class TotalConsiderationSaleBondsController @Inject()(
                 .fromTry(
                   request.userAnswers.set(TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex), value)
                 )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator
+              nextPage = navigator
                 .nextPage(TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex), mode, updatedAnswers)
-            )
+              updatedProgressAnswers <- saveProgress(srn, bondIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

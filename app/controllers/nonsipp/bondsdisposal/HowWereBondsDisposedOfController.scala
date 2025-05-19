@@ -100,14 +100,14 @@ class HowWereBondsDisposedOfController @Inject()(
                 .removeWhen(mode == NormalMode)(BondsDisposalCompleted(srn))
                 .mapK[Future]
               hasAnswerChanged = request.userAnswers.exists(page)(_ == value)
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
+              nextPage = navigator.nextPage(
                 HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex, hasAnswerChanged),
                 mode,
                 updatedAnswers
               )
-            )
+              updatedProgressAnswers <- saveProgress(srn, bondIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
     }
