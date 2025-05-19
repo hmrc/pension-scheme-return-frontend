@@ -22,6 +22,7 @@ import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models._
+import viewmodels.models.SectionJourneyStatus
 import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
@@ -30,7 +31,6 @@ import pages.nonsipp.bonds._
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
 import models.SchemeHoldBond.Acquisition
-import viewmodels.models.SectionJourneyStatus
 
 class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpec {
 
@@ -86,7 +86,6 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
     .unsafeSet(AreBondsUnregulatedPage(srn, index), true)
     .unsafeSet(BondsProgress(srn, index), SectionJourneyStatus.InProgress("some-url"))
 
-
   "UnregulatedOrConnectedBondsHeldCYAController" - {
     List(NormalMode, CheckMode).foreach { mode =>
       act.like(
@@ -137,7 +136,7 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
           call = onPageLoad(mode),
           page = controllers.nonsipp.bonds.routes.BondsListController.onPageLoad(srn, page, mode),
           userAnswers = incompleteUserAnswers,
-          previousUserAnswers = emptyUserAnswers,
+          previousUserAnswers = emptyUserAnswers
         ).withName(s"redirect to list page when in $mode mode and incomplete data")
       )
     }
