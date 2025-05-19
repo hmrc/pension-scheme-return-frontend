@@ -71,7 +71,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
         response.status match {
           case NO_CONTENT => Right(())
           case _ =>
-            Left(s"{${response.status}, ${response.json}}")
+            Left(s"status: ${response.status}, body: ${response.body}")
         }
       }
 
@@ -95,7 +95,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
         response.status match {
           case NO_CONTENT => Right(())
           case _ =>
-            Left(s"{${response.status}, ${response.json}}")
+            Left(s"status: ${response.status}, body: ${response.body}")
         }
       }
 
