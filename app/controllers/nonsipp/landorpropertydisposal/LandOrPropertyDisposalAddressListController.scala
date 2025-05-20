@@ -80,14 +80,23 @@ class LandOrPropertyDisposalAddressListController @Inject()(
 
           }.merge
         },
-        answer =>
-          Redirect(
-            navigator.nextPage(
-              LandOrPropertyDisposalAddressListPage(srn, answer),
-              mode,
-              request.userAnswers
-            )
-          )
+        answer => {
+          val inProgressUrl = request.userAnswers
+            .map(LandOrPropertyDisposalProgress.all(srn, answer))
+            .collectFirst { case _ -> SectionJourneyStatus.InProgress(url) => url }
+
+          inProgressUrl match {
+            case Some(url) => Redirect(url)
+            case _ =>
+              Redirect(
+                navigator.nextPage(
+                  LandOrPropertyDisposalAddressListPage(srn, answer),
+                  mode,
+                  request.userAnswers
+                )
+              )
+          }
+        }
       )
   }
 

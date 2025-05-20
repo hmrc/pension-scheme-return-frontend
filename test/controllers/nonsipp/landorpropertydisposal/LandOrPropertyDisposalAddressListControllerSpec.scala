@@ -16,8 +16,10 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import play.api.mvc.Call
 import controllers.ControllerBaseSpec
 import views.html.ListRadiosView
+import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalProgress
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
@@ -49,6 +51,18 @@ class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec
     .unsafeSet(LandOrPropertyProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
     .unsafeSet(LandOrPropertyProgress(srn, refineMV(2)), SectionJourneyStatus.InProgress("some-url"))
 
+  private val incompleteDisposalUserAnswers = defaultUserAnswers
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(1)), address1)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(2)), address2)
+    .unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(LandOrPropertyCompleted(srn, refineMV(2)), SectionCompleted)
+    .unsafeSet(LandOrPropertyProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+    .unsafeSet(LandOrPropertyProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
+    .unsafeSet(
+      LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1)),
+      SectionJourneyStatus.InProgress("some-url")
+    )
+
   "LandOrPropertyDisposalAddressListController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
@@ -65,6 +79,9 @@ class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec
     }.updateName(_ + " - hide incomplete disposals"))
 
     act.like(redirectNextPage(onSubmit, "value" -> "1"))
+
+    act.like(redirectToPage(onSubmit, Call(GET, "some-url"), incompleteDisposalUserAnswers, "value" -> "1"))
+    act.like(redirectNextPage(onSubmit, incompleteDisposalUserAnswers, "value" -> "2"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

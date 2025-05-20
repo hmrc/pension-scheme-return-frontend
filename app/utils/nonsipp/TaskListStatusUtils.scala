@@ -23,7 +23,7 @@ import pages.nonsipp.otherassetsheld._
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInSectionCompleted}
-import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandOrPropertyDisposalProgress, LandPropertyDisposalCompletedPages}
+import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandOrPropertyDisposalProgress}
 import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import pages.nonsipp.sharesdisposal._
 import play.api.libs.json.{JsObject, JsPath}

@@ -212,13 +212,6 @@ class LandOrPropertyDisposalListController @Inject()(
         numberOfDisposals >= maxPossibleNumberOfDisposals ||
         allPropertiesFullyDisposed
 
-      statusMap = for {
-        lpIndex -> disposals <- request.userAnswers.map(LandOrPropertyDisposalProgress.all(srn))
-        disposalIndex -> status <- disposals
-      } yield (lpIndex, disposalIndex) -> status
-
-      inProgressUrl = statusMap.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
-
       result <- if (maximumDisposalsReachedUpdated) {
         Right(Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn)))
       } else {
@@ -246,11 +239,7 @@ class LandOrPropertyDisposalListController @Inject()(
                   )
                 ),
               answer =>
-                (answer, inProgressUrl) match {
-                  case (true, Some(url)) => Redirect(url)
-                  case _ =>
-                    Redirect(navigator.nextPage(LandOrPropertyDisposalListPage(srn, answer), mode, request.userAnswers))
-                }
+                Redirect(navigator.nextPage(LandOrPropertyDisposalListPage(srn, answer), mode, request.userAnswers))
             )
         )
       }
