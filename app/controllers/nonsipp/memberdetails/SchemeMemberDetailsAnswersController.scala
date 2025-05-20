@@ -21,6 +21,7 @@ import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
 import pages.nonsipp.memberdetails._
 import play.api.mvc._
 import com.google.inject.Inject
+import models.ManualOrUpload.Manual
 import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
 import play.api.i18n.MessagesApi
@@ -82,31 +83,38 @@ class SchemeMemberDetailsAnswersController @Inject()(
   def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(
     implicit request: DataRequest[AnyContent]
   ): Result =
-    (
-      for {
-        memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index))
-        hasNINO <- request.userAnswers.get(DoesMemberHaveNinoPage(srn, index))
-        maybeNino <- Option.when(hasNINO)(request.userAnswers.get(MemberDetailsNinoPage(srn, index))).sequence
-        maybeNoNinoReason <- Option.when(!hasNINO)(request.userAnswers.get(NoNINOPage(srn, index))).sequence
-      } yield Ok(
-        view(
-          viewModel(
-            index,
-            srn,
-            mode,
-            memberDetails,
-            hasNINO,
-            maybeNino,
-            maybeNoNinoReason,
-            viewOnlyUpdated = false,
-            optYear = request.year,
-            optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
-          )
+    request.userAnswers.get(MemberDetailsManualProgress(srn, index)) match {
+      case Some(value) if value.inProgress =>
+        Redirect(
+          controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1, Manual)
         )
-      )
-    ).getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      case _ =>
+        (
+          for {
+            memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index))
+            hasNINO <- request.userAnswers.get(DoesMemberHaveNinoPage(srn, index))
+            maybeNino <- Option.when(hasNINO)(request.userAnswers.get(MemberDetailsNinoPage(srn, index))).sequence
+            maybeNoNinoReason <- Option.when(!hasNINO)(request.userAnswers.get(NoNINOPage(srn, index))).sequence
+          } yield Ok(
+            view(
+              viewModel(
+                index,
+                srn,
+                mode,
+                memberDetails,
+                hasNINO,
+                maybeNino,
+                maybeNoNinoReason,
+                viewOnlyUpdated = false,
+                optYear = request.year,
+                optCurrentVersion = request.currentVersion,
+                optPreviousVersion = request.previousVersion,
+                compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+              )
+            )
+          )
+        ).getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>

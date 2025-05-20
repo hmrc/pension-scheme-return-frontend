@@ -51,14 +51,11 @@ lazy val root = Project(appName, file("."))
     PlayKeys.playDefaultPort := 10701,
     scalacOptions ++= Seq(
       "-feature",
-      "-rootdir",
-      baseDirectory.value.getCanonicalPath,
       "-Wconf:cat=deprecation:e,cat=feature:ws,cat=optimizer:ws,src=target/.*:s"
     ),
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
     resolvers ++= Seq(
-      Resolver.jcenterRepo,
       "HMRC-open-artefacts-maven".at("https://open.artefacts.tax.service.gov.uk/maven2")
     ),
     // concatenate js

@@ -214,6 +214,7 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(MemberDetailsCompletedPage(srn, index), SectionCompleted)
     .unsafeSet(MemberPsrVersionPage(srn, index), "001")
     .unsafeSet(MemberStatus(srn, index), MemberState.New)
+    .unsafeSet(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
 
     // employer contributions
     .unsafeSet(EmployerContributionsPage(srn), true)
@@ -261,19 +262,24 @@ class MemberPaymentsTransformerSpec
     // soft deleted
     .unsafeSet(SoftDeletedMembers(srn), List(softDeletedMemberAllSections))
 
-  private val userAnswersAllSectionsReverseOrder = userAnswersAllSections
-    .unsafeSet(MemberDetailsPage(srn, index3), memberDetailsIndexThree)
-    .unsafeSet(DoesMemberHaveNinoPage(srn, index3), false)
-    .unsafeSet(NoNINOPage(srn, index3), noninoReason)
-    .unsafeSet(MemberDetailsCompletedPage(srn, index3), SectionCompleted)
-    .unsafeSet(MemberPsrVersionPage(srn, index3), "001")
-    .unsafeSet(MemberStatus(srn, index3), MemberState.New)
-    .unsafeSet(MemberDetailsPage(srn, index2), memberDetailsIndexTwo)
-    .unsafeSet(DoesMemberHaveNinoPage(srn, index2), false)
-    .unsafeSet(NoNINOPage(srn, index2), noninoReason)
-    .unsafeSet(MemberDetailsCompletedPage(srn, index2), SectionCompleted)
-    .unsafeSet(MemberPsrVersionPage(srn, index2), "001")
-    .unsafeSet(MemberStatus(srn, index2), MemberState.New)
+  private def addMembersTwoAndThreeReversed(userAnswers: UserAnswers) =
+    userAnswers
+      .unsafeSet(MemberDetailsPage(srn, index3), memberDetailsIndexThree)
+      .unsafeSet(DoesMemberHaveNinoPage(srn, index3), false)
+      .unsafeSet(NoNINOPage(srn, index3), noninoReason)
+      .unsafeSet(MemberDetailsCompletedPage(srn, index3), SectionCompleted)
+      .unsafeSet(MemberPsrVersionPage(srn, index3), "001")
+      .unsafeSet(MemberStatus(srn, index3), MemberState.New)
+      .unsafeSet(MemberDetailsManualProgress(srn, index3), SectionJourneyStatus.Completed)
+      .unsafeSet(MemberDetailsPage(srn, index2), memberDetailsIndexTwo)
+      .unsafeSet(DoesMemberHaveNinoPage(srn, index2), false)
+      .unsafeSet(NoNINOPage(srn, index2), noninoReason)
+      .unsafeSet(MemberDetailsCompletedPage(srn, index2), SectionCompleted)
+      .unsafeSet(MemberPsrVersionPage(srn, index2), "001")
+      .unsafeSet(MemberStatus(srn, index2), MemberState.New)
+      .unsafeSet(MemberDetailsManualProgress(srn, index2), SectionJourneyStatus.Completed)
+
+  private val userAnswersAllSectionsReverseOrder = addMembersTwoAndThreeReversed(userAnswersAllSections)
 
   private val userAnswersAllSectionsNotChecked = userAnswersAllSections
     .unsafeSet(MembersDetailsChecked(srn), false)
@@ -382,6 +388,7 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(MemberPsrVersionPage(srn, index), "001")
     .unsafeSet(MemberPaymentsRecordVersionPage(srn), "001")
     .unsafeSet(MemberStatus(srn, index), MemberState.New)
+    .unsafeSet(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
     // employer contributions
     .unsafeSet(EmployerContributionsPage(srn), false)
     // unallocated employer contributions
@@ -419,11 +426,12 @@ class MemberPaymentsTransformerSpec
       )
     }
 
-    "should error when member status does not exist" in {
-      val userAnswers1 = userAnswersAllSections.remove(MemberStatus(srn, index)).get
-      val result =
-        intercept[RuntimeException](memberPaymentsTransformer.transformToEtmp(srn, userAnswers1, emptyUserAnswers))
-      result.getMessage shouldMatchTo "error occurred: MemberStatus not found for member 1"
+    "should omit members without status" in {
+      val userAnswers1 = addMembersTwoAndThreeReversed(defaultUserAnswers)
+        .remove(MemberStatus(srn, index2))
+        .get
+      val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswers1, userAnswers1)
+      result.get.memberDetails.size shouldMatchTo 1
     }
 
     "should return member payments with recordVersion/memberPsrVersion when initial UA and current UA are same" in {
@@ -459,6 +467,7 @@ class MemberPaymentsTransformerSpec
           .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
           .unsafeSet(MemberDetailsCompletedPage(srn, index), SectionCompleted)
           .unsafeSet(MemberStatus(srn, index), MemberState.New)
+          .unsafeSet(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
 
         val expected = emptyMemberPayments.copy(
           memberDetails = List(
@@ -471,6 +480,16 @@ class MemberPaymentsTransformerSpec
         result shouldMatchTo Some(expected)
       }
 
+      "should return None when SectionJourneyStatus in not Completed" in {
+        val userAnswersNewMember = defaultUserAnswers
+          .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+          .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
+
+        val result =
+          memberPaymentsTransformer.transformToEtmp(srn, userAnswersNewMember, initialUA = defaultUserAnswers)
+        result shouldMatchTo None
+      }
+
       "should return member state New when PSR state is Submitted and member was just added before first POST since submitted" in {
         val userAnswersNewMember = defaultUserAnswers
           .unsafeSet(FbStatus(srn), Submitted)
@@ -479,6 +498,7 @@ class MemberPaymentsTransformerSpec
           .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
           .unsafeSet(MemberDetailsCompletedPage(srn, index), SectionCompleted)
           .unsafeSet(MemberStatus(srn, index), MemberState.New)
+          .unsafeSet(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed)
 
         val expected = emptyMemberPayments.copy(
           memberDetails = List(
