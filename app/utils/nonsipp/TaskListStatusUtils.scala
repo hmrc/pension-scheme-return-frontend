@@ -20,11 +20,11 @@ import pages.nonsipp.employercontributions.{EmployerContributionsCompleted, Empl
 import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalPage, OtherAssetsDisposalProgress}
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
-import config.RefinedTypes.OneTo5000
 import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer.{DidSchemeReceiveTransferPage, TransfersInSectionCompleted}
 import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
+import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import pages.nonsipp.sharesdisposal._
 import play.api.libs.json.{JsObject, JsPath}
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsCompleted, SurrenderedBenefitsPage}
@@ -36,8 +36,6 @@ import pages.nonsipp.totalvaluequotedshares.{QuotedSharesManagedFundsHeldPage, T
 import pages.nonsipp.membercontributions._
 import pages.nonsipp.accountingperiod.Paths.accountingPeriodDetails
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
-import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
-import eu.timepit.refined.refineV
 import viewmodels.models.TaskListStatus._
 import pages.nonsipp.schemedesignatory.Paths.schemeDesignatory
 import utils.nonsipp.check._

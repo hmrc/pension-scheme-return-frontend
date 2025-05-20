@@ -252,7 +252,8 @@ object TotalValueQuotedSharesCYAController {
           CheckYourAnswersRowViewModel(
             Message(
               "quotedSharesManagedFundsHeld.heading",
-              schemeDetails.schemeName
+              schemeDetails.schemeName,
+              taxEndDate(taxYearOrAccountingPeriods).show
             ),
             "site.no"
           )

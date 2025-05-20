@@ -16,12 +16,12 @@
 
 package controllers.nonsipp.totalvaluequotedshares
 
-import services.PsrSubmissionService
+import services.{PsrSubmissionService, SchemeDateService}
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
-import models.NormalMode
+import models.{DateRange, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import controllers.nonsipp.totalvaluequotedshares.QuotedSharesManagedFundsHeldController.{form, viewModel}
@@ -33,22 +33,43 @@ class QuotedSharesManagedFundsHeldControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.QuotedSharesManagedFundsHeldController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.QuotedSharesManagedFundsHeldController.onSubmit(srn, NormalMode)
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+  private val schemeDatePeriod: DateRange = dateRangeGen.sample.value
+  private val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
-    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService),
+    bind[SchemeDateService].toInstance(mockSchemeDateService)
   )
+
+  override def beforeEach(): Unit = {
+    reset(mockSchemeDateService)
+    setSchemeDate(Some(schemeDatePeriod))
+  }
+
+  def setSchemeDate(date: Option[DateRange]): Unit =
+    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(date)
 
   "QuotedSharesManagedFundsHeldController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, schemeName, NormalMode))
+      injected[YesNoPageView]
+        .apply(form(injected[YesNoPageFormProvider], schemeDatePeriod), viewModel(srn, schemeName, NormalMode, schemeDatePeriod))
     })
 
     act.like(renderPrePopView(onPageLoad, QuotedSharesManagedFundsHeldPage(srn), true) {
       implicit app => implicit request =>
         injected[YesNoPageView]
-          .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, NormalMode))
+          .apply(
+            form(injected[YesNoPageFormProvider], schemeDatePeriod).fill(true),
+            viewModel(srn, schemeName, NormalMode, schemeDatePeriod)
+          )
     })
+
+    act.like(
+      journeyRecoveryPage(onPageLoad)
+        .withName("onPageLoad redirect to journey recovery page when scheme date not found")
+        .before(setSchemeDate(None))
+    )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
@@ -74,5 +95,11 @@ class QuotedSharesManagedFundsHeldControllerSpec extends ControllerBaseSpec {
 
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+
+    act.like(
+      journeyRecoveryPage(onSubmit)
+        .withName("onSubmit redirect to journey recovery page when scheme date not found")
+        .before(setSchemeDate(None))
+    )
   }
 }
