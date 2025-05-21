@@ -284,8 +284,9 @@ class SharesTransformer @Inject() extends Transformer {
   ): Seq[DisposedSharesTransaction] =
     request.userAnswers
       .map(
-        HowWereSharesDisposedPagesForShare(srn, shareIndex)
+        SharesDisposalProgress.all(srn, shareIndex)
       )
+      .filter(_._2.completed)
       .keys
       .toList
       .flatMap { key =>
@@ -659,7 +660,6 @@ class SharesTransformer @Inject() extends Transformer {
         } yield resultUA
     }
 
-    // temporary E2E workaround
     val sharesDisposalMade =
       userAnswersWithTransactions
         .getOrElse(userAnswers)

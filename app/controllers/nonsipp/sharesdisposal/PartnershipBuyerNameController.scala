@@ -81,14 +81,14 @@ class PartnershipBuyerNameController @Inject()(
                 request.userAnswers
                   .set(PartnershipBuyerNamePage(srn, index, disposalIndex), answer)
               )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
+              nextPage = navigator.nextPage(
                 PartnershipBuyerNamePage(srn, index, disposalIndex),
                 mode,
                 updatedAnswers
               )
-            )
+              updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
     }

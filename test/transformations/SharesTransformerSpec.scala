@@ -209,6 +209,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           .unsafeSet(HowManySharesRedeemedPage(srn, refineMV(1), refineMV(1)), 123)
           .unsafeSet(TotalConsiderationSharesRedeemedPage(srn, refineMV(1), refineMV(1)), money)
           .unsafeSet(SharesProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(SharesDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
 
         val result = transformer.transformToEtmp(srn = srn, userAnswers)(DataRequest(allowedAccessRequest, userAnswers))
         result mustBe Some(

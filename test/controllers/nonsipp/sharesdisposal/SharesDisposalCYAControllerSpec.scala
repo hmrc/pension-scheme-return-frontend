@@ -24,6 +24,7 @@ import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal._
 import models._
+import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
@@ -115,6 +116,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex), isBuyerConnectedParty.get)
     .unsafeSet(IndependentValuationPage(srn, shareIndex, disposalIndex), isIndependentValuation.get)
     .unsafeSet(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex), sharesStillHeld)
+    .unsafeSet(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.Completed)
 
   private val redeemedUserAnswers = defaultUserAnswers
   // Shares pages
@@ -128,6 +130,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(HowManySharesRedeemedPage(srn, shareIndex, disposalIndex), numberSharesRedeemed.get)
     .unsafeSet(TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex), considerationSharesRedeemed.get)
     .unsafeSet(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex), sharesStillHeld)
+    .unsafeSet(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.Completed)
 
   private val transferredUserAnswers = defaultUserAnswers
   // Shares pages
@@ -137,6 +140,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
     // Shares Disposal pages
     .unsafeSet(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex), HowSharesDisposed.Transferred)
     .unsafeSet(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex), sharesStillHeld)
+    .unsafeSet(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.Completed)
 
   private val otherUserAnswers = defaultUserAnswers
   // Shares pages
@@ -147,6 +151,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
     // Shares Disposal pages
     .unsafeSet(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex), HowSharesDisposed.Other(otherDetails))
     .unsafeSet(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex), sharesStillHeld)
+    .unsafeSet(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.Completed)
 
   "SharesDisposalCYAController" - {
 
@@ -327,6 +332,16 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
       )
 
       act.like(
+        redirectToPage(
+          call = onPageLoad(mode),
+          page = routes.SharesDisposalListController.onPageLoad(srn, 1),
+          userAnswers = soldUserAnswers
+            .unsafeSet(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.InProgress("any")),
+          previousUserAnswers = emptyUserAnswers
+        ).withName(s"Redirect to shares list when incomplete when in $mode mode")
+      )
+
+      act.like(
         journeyRecoveryPage(onSubmit(mode))
           .updateName("onSubmit" + _)
           .withName(s"redirect to journey recovery page on submit when in $mode mode")
@@ -357,6 +372,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
       .unsafeSet(IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex), isBuyerConnectedParty.get)
       .unsafeSet(IndependentValuationPage(srn, shareIndex, disposalIndex), isIndependentValuation.get)
       .unsafeSet(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex), sharesStillHeld)
+      .unsafeSet(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.Completed)
 
     val previousUserAnswers = currentUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")
