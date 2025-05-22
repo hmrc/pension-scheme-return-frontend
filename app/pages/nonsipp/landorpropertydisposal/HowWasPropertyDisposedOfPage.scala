@@ -74,7 +74,8 @@ case class HowWasPropertyDisposedOfPage(
       RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex, disposalIndex),
       WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex),
       DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex),
-      TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex)
+      TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex),
+      LandOrPropertyDisposalProgress(srn, landOrPropertyIndex, disposalIndex)
     )
     if (isLastRecord) list :+ LandOrPropertyDisposalPage(srn) else list
   }

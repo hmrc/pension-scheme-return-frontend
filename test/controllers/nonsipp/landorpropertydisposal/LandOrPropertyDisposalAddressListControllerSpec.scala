@@ -16,13 +16,15 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import play.api.mvc.Call
 import controllers.ControllerBaseSpec
 import views.html.ListRadiosView
+import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalProgress
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyCompleted}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyCompleted, LandOrPropertyProgress}
 
 class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec {
 
@@ -39,6 +41,27 @@ class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(2)), address2)
     .unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
     .unsafeSet(LandOrPropertyCompleted(srn, refineMV(2)), SectionCompleted)
+    .unsafeSet(LandOrPropertyProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+    .unsafeSet(LandOrPropertyProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
+
+  private val incompleteUserAnswers = defaultUserAnswers
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(1)), address1)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(2)), address2)
+    .unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(LandOrPropertyProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+    .unsafeSet(LandOrPropertyProgress(srn, refineMV(2)), SectionJourneyStatus.InProgress("some-url"))
+
+  private val incompleteDisposalUserAnswers = defaultUserAnswers
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(1)), address1)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(2)), address2)
+    .unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(LandOrPropertyCompleted(srn, refineMV(2)), SectionCompleted)
+    .unsafeSet(LandOrPropertyProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+    .unsafeSet(LandOrPropertyProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
+    .unsafeSet(
+      LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1)),
+      SectionJourneyStatus.InProgress("some-url")
+    )
 
   "LandOrPropertyDisposalAddressListController" - {
 
@@ -47,7 +70,18 @@ class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec
         .apply(form(injected[RadioListFormProvider]), viewModel(srn, page = 1, addresses, userAnswers))
     })
 
+    act.like(renderView(onPageLoad, incompleteUserAnswers) { implicit app => implicit request =>
+      injected[ListRadiosView]
+        .apply(
+          form(injected[RadioListFormProvider]),
+          viewModel(srn, page = 1, List(LandOrPropertyData(refineMV(1), address1)), userAnswers)
+        )
+    }.updateName(_ + " - hide incomplete disposals"))
+
     act.like(redirectNextPage(onSubmit, "value" -> "1"))
+
+    act.like(redirectToPage(onSubmit, Call(GET, "some-url"), incompleteDisposalUserAnswers, "value" -> "1"))
+    act.like(redirectNextPage(onSubmit, incompleteDisposalUserAnswers, "value" -> "2"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

@@ -32,7 +32,7 @@ import com.google.inject.Inject
 import views.html.ListRadiosView
 import models.SchemeId.Srn
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyCompleted}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyCompleted, LandOrPropertyProgress}
 import _root_.config.Constants
 import pages.nonsipp.landorpropertydisposal._
 import controllers.actions._
@@ -57,7 +57,7 @@ class LandOrPropertyDisposalAddressListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val completedLandOrProperties = request.userAnswers.map(LandOrPropertyCompleted.all(srn))
+      val completedLandOrProperties = request.userAnswers.map(LandOrPropertyProgress.all(srn)).filter(_._2.completed)
 
       if (completedLandOrProperties.nonEmpty) {
         landOrPropertyData(srn, completedLandOrProperties.keys.toList.refine[Max5000.Refined]).map { data =>
@@ -80,14 +80,23 @@ class LandOrPropertyDisposalAddressListController @Inject()(
 
           }.merge
         },
-        answer =>
-          Redirect(
-            navigator.nextPage(
-              LandOrPropertyDisposalAddressListPage(srn, answer),
-              mode,
-              request.userAnswers
-            )
-          )
+        answer => {
+          val inProgressUrl = request.userAnswers
+            .map(LandOrPropertyDisposalProgress.all(srn, answer))
+            .collectFirst { case _ -> SectionJourneyStatus.InProgress(url) => url }
+
+          inProgressUrl match {
+            case Some(url) => Redirect(url)
+            case _ =>
+              Redirect(
+                navigator.nextPage(
+                  LandOrPropertyDisposalAddressListPage(srn, answer),
+                  mode,
+                  request.userAnswers
+                )
+              )
+          }
+        }
       )
   }
 

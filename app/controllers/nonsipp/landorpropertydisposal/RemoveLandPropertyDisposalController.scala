@@ -60,7 +60,8 @@ class RemoveLandPropertyDisposalController @Inject()(
       (
         for {
           _ <- request.userAnswers
-            .get(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndex, disposalIndex))
+            .get(LandOrPropertyDisposalProgress(srn, landOrPropertyIndex, disposalIndex))
+            .collect(_.completed)
             .getOrRedirectToTaskList(srn)
           address <- request.userAnswers
             .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex))

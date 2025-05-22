@@ -21,11 +21,15 @@ import controllers.nonsipp.landorpropertydisposal.RemoveLandPropertyDisposalCont
 import play.api.inject.bind
 import views.html.YesNoPageView
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
-import pages.nonsipp.landorpropertydisposal.{HowWasPropertyDisposedOfPage, LandPropertyDisposalCompletedPage}
+import pages.nonsipp.landorpropertydisposal.{
+  HowWasPropertyDisposedOfPage,
+  LandOrPropertyDisposalProgress,
+  LandPropertyDisposalCompletedPage
+}
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{HowDisposed, NormalMode}
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{when, _}
@@ -52,6 +56,7 @@ class RemoveLandPropertyDisposalControllerSpec extends ControllerBaseSpec {
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, index), testAddress)
     .unsafeSet(HowWasPropertyDisposedOfPage(srn, index, disposalIndex), methodOfDisposal)
     .unsafeSet(LandPropertyDisposalCompletedPage(srn, index, disposalIndex), SectionCompleted)
+    .unsafeSet(LandOrPropertyDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
 
   private val userAnswersAddress = defaultUserAnswers
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, index), testAddress)

@@ -90,10 +90,11 @@ class CompanyBuyerCrnController @Inject()(
                   request.userAnswers
                     .set(CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex), ConditionalYesNo(value))
                 )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex), mode, updatedAnswers)
-            )
+              nextPage = navigator
+                .nextPage(CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, landOrPropertyIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

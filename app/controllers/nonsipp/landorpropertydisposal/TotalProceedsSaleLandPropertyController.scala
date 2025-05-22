@@ -90,14 +90,14 @@ class TotalProceedsSaleLandPropertyController @Inject()(
                   request.userAnswers
                     .transformAndSet(TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex), value)
                 )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
+              nextPage = navigator.nextPage(
                 TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex),
                 mode,
                 updatedAnswers
               )
-            )
+              updatedProgressAnswers <- saveProgress(srn, landOrPropertyIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

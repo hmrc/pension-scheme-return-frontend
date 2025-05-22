@@ -90,14 +90,14 @@ class WhoPurchasedLandOrPropertyController @Inject()(
               updatedAnswers <- Future.fromTry(
                 request.userAnswers.set(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex), answer)
               )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
+              nextPage = navigator.nextPage(
                 WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex),
                 NormalMode,
                 updatedAnswers
               )
-            )
+              updatedProgressAnswers <- saveProgress(srn, landOrPropertyIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
     }

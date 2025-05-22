@@ -17,20 +17,16 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import views.html.ListView
-import pages.nonsipp.landorpropertydisposal.{
-  HowWasPropertyDisposedOfPage,
-  LandOrPropertyDisposalPage,
-  LandPropertyDisposalCompletedPage
-}
+import pages.nonsipp.landorpropertydisposal._
 import eu.timepit.refined.refineMV
 import pages.nonsipp.{CompilationOrSubmissionDatePage, FbVersionPage}
 import forms.YesNoPageFormProvider
 import models._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import config.RefinedTypes.{Max50, Max5000}
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController._
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyCompleted}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyCompleted, LandOrPropertyProgress}
 
 class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
 
@@ -66,10 +62,17 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
     refineMV[Max5000.Refined](1) -> List(refineMV[Max50.Refined](1), refineMV[Max50.Refined](2)) -> address1
   )
 
+  private val addressesWithIndexesIncomplete: List[((Max5000, List[Max50]), Address)] = List(
+    refineMV[Max5000.Refined](1) -> List(refineMV[Max50.Refined](1)) -> address1
+  )
+
   private val userAnswers = defaultUserAnswers
     .unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
+    .unsafeSet(LandOrPropertyProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
     .unsafeSet(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(2)), SectionCompleted)
     .unsafeSet(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1)), SectionCompleted)
+    .unsafeSet(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(2)), SectionJourneyStatus.Completed)
+    .unsafeSet(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
     .unsafeSet(LandOrPropertyChosenAddressPage(srn, refineMV(1)), address1)
     .unsafeSet(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(2)), HowDisposed.Transferred)
     .unsafeSet(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1)), HowDisposed.Transferred)
@@ -97,6 +100,30 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
           )
         )
     })
+
+    act.like(
+      renderView(onPageLoad, userAnswers.unsafeRemove(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(2)))) {
+        implicit app => implicit request =>
+          injected[ListView]
+            .apply(
+              form(injected[YesNoPageFormProvider]),
+              viewModel(
+                srn,
+                NormalMode,
+                page = 1,
+                addressesWithIndexesIncomplete,
+                numberOfDisposals = 1,
+                maxPossibleNumberOfDisposals = 50,
+                userAnswers,
+                schemeName,
+                viewOnlyViewModel = None,
+                showBackLink = true,
+                maximumDisposalsReached = false,
+                allPropertiesFullyDisposed = false
+              )
+            )
+      }.updateName(_ + " - hide incomplete journeys")
+    )
 
     act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "true"))
 
