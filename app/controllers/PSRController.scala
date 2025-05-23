@@ -18,7 +18,7 @@ package controllers
 
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
-import play.api.mvc.Result
+import play.api.mvc.{Call, Result}
 import config.RefinedTypes._
 import pages.nonsipp.membersurrenderedbenefits.{
   SurrenderedBenefitsAmountPage,
@@ -82,8 +82,11 @@ abstract class PSRController extends FrontendBaseController with I18nSupport wit
         Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def recoverJourneyWhen(bool: Boolean): Either[Result, Unit] =
-    if (bool) Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())) else Right(())
+  def recoverJourneyWhen(
+    bool: Boolean,
+    call: Call = controllers.routes.JourneyRecoveryController.onPageLoad()
+  ): Either[Result, Unit] =
+    if (bool) Left(Redirect(call)) else Right(())
 
   def loggedInUserNameOrRedirect(implicit request: DataRequest[_]): Either[Result, String] =
     request.minimalDetails.individualDetails match {
