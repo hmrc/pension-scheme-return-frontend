@@ -78,88 +78,94 @@ class LoansCYAController @Inject()(
     }
 
   def onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
-    (
-      for {
-        receivedLoanType <- requiredPage(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
-        recipientName <- List(
-          request.userAnswers.get(IndividualRecipientNamePage(srn, index)),
-          request.userAnswers.get(CompanyRecipientNamePage(srn, index)),
-          request.userAnswers.get(PartnershipRecipientNamePage(srn, index)),
-          request.userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient)).map(_.name)
-        ).flatten.headOption.getOrRecoverJourney
-        recipientDetails = List(
-          request.userAnswers.get(IndividualRecipientNinoPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
-          request.userAnswers
-            .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
-            .flatMap(_.value.toOption.map(_.value)),
-          request.userAnswers
-            .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
-            .flatMap(_.value.toOption.map(_.value)),
-          request.userAnswers
-            .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient))
-            .map(_.description)
-        ).flatten.headOption
-        recipientReasonNoDetails = List(
-          request.userAnswers
-            .get(IndividualRecipientNinoPage(srn, index))
-            .flatMap(_.value.swap.toOption.map(_.value)),
-          request.userAnswers
-            .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
-            .flatMap(_.value.swap.toOption.map(_.value)),
-          request.userAnswers
-            .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
-            .flatMap(_.value.swap.toOption.map(_.value))
-        ).flatten.headOption
-        connectedParty = if (request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).isEmpty) {
-          Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).get)
-        } else {
-          Left(request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).get)
-        }
-        datePeriodLoan <- request.userAnswers.get(DatePeriodLoanPage(srn, index)).getOrRecoverJourney
-        amountOfTheLoan <- request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrRecoverJourney
-        returnEndDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney.map(_.to)
-        repaymentInstalments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)).getOrRecoverJourney
-        interestOnLoan <- request.userAnswers.get(InterestOnLoanPage(srn, index)).getOrRecoverJourney
-        arrearsPrevYears = request.userAnswers.get(ArrearsPrevYears(srn, index))
-        outstandingArrearsOnLoan <- request.userAnswers
-          .get(OutstandingArrearsOnLoanPage(srn, index))
-          .map(_.value.toOption)
-          .getOrRecoverJourney
-        securityOnLoan <- request.userAnswers
-          .get(SecurityGivenForLoanPage(srn, index))
-          .map(_.value.toOption)
-          .getOrRecoverJourney
+    if (!request.userAnswers
+        .get(LoansProgress(srn, index))
+        .exists(_.completed)) {
+      Redirect(routes.LoansListController.onPageLoad(srn, 1, mode))
+    } else {
+      (
+        for {
+          receivedLoanType <- requiredPage(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
+          recipientName <- List(
+            request.userAnswers.get(IndividualRecipientNamePage(srn, index)),
+            request.userAnswers.get(CompanyRecipientNamePage(srn, index)),
+            request.userAnswers.get(PartnershipRecipientNamePage(srn, index)),
+            request.userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient)).map(_.name)
+          ).flatten.headOption.getOrRecoverJourney
+          recipientDetails = List(
+            request.userAnswers.get(IndividualRecipientNinoPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
+            request.userAnswers
+              .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
+              .flatMap(_.value.toOption.map(_.value)),
+            request.userAnswers
+              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
+              .flatMap(_.value.toOption.map(_.value)),
+            request.userAnswers
+              .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient))
+              .map(_.description)
+          ).flatten.headOption
+          recipientReasonNoDetails = List(
+            request.userAnswers
+              .get(IndividualRecipientNinoPage(srn, index))
+              .flatMap(_.value.swap.toOption.map(_.value)),
+            request.userAnswers
+              .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
+              .flatMap(_.value.swap.toOption.map(_.value)),
+            request.userAnswers
+              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
+              .flatMap(_.value.swap.toOption.map(_.value))
+          ).flatten.headOption
+          connectedParty = if (request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).isEmpty) {
+            Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).get)
+          } else {
+            Left(request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).get)
+          }
+          datePeriodLoan <- request.userAnswers.get(DatePeriodLoanPage(srn, index)).getOrRecoverJourney
+          amountOfTheLoan <- request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrRecoverJourney
+          returnEndDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney.map(_.to)
+          repaymentInstalments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)).getOrRecoverJourney
+          interestOnLoan <- request.userAnswers.get(InterestOnLoanPage(srn, index)).getOrRecoverJourney
+          arrearsPrevYears = request.userAnswers.get(ArrearsPrevYears(srn, index))
+          outstandingArrearsOnLoan <- request.userAnswers
+            .get(OutstandingArrearsOnLoanPage(srn, index))
+            .map(_.value.toOption)
+            .getOrRecoverJourney
+          securityOnLoan <- request.userAnswers
+            .get(SecurityGivenForLoanPage(srn, index))
+            .map(_.value.toOption)
+            .getOrRecoverJourney
 
-        schemeName = request.schemeDetails.schemeName
-      } yield Ok(
-        view(
-          viewModel(
-            srn,
-            index,
-            schemeName,
-            receivedLoanType,
-            recipientName,
-            recipientDetails,
-            recipientReasonNoDetails,
-            connectedParty,
-            datePeriodLoan,
-            amountOfTheLoan,
-            returnEndDate,
-            repaymentInstalments,
-            interestOnLoan,
-            arrearsPrevYears,
-            outstandingArrearsOnLoan,
-            securityOnLoan,
-            mode,
-            viewOnlyUpdated = false,
-            optYear = request.year,
-            optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+          schemeName = request.schemeDetails.schemeName
+        } yield Ok(
+          view(
+            viewModel(
+              srn,
+              index,
+              schemeName,
+              receivedLoanType,
+              recipientName,
+              recipientDetails,
+              recipientReasonNoDetails,
+              connectedParty,
+              datePeriodLoan,
+              amountOfTheLoan,
+              returnEndDate,
+              repaymentInstalments,
+              interestOnLoan,
+              arrearsPrevYears,
+              outstandingArrearsOnLoan,
+              securityOnLoan,
+              mode,
+              viewOnlyUpdated = false,
+              optYear = request.year,
+              optCurrentVersion = request.currentVersion,
+              optPreviousVersion = request.previousVersion,
+              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
+            )
           )
         )
-      )
-    ).merge
+      ).merge
+    }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
