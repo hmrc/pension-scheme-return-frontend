@@ -29,7 +29,7 @@ case class SharesDisposalProgress(srn: Srn, shareIndex: Max5000, disposalIndex: 
   override def path: JsPath =
     Paths.disposedSharesTransaction \ toString \ shareIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "sharesDisposalCompleted"
+  override def toString: String = "sharesDisposalProgress"
 }
 
 object SharesDisposalProgress {
@@ -41,7 +41,7 @@ object SharesDisposalProgress {
     override def path: JsPath =
       Paths.disposedSharesTransaction \ toString \ shareIndex.arrayIndex.toString
 
-    override def toString: String = "sharesDisposalCompleted"
+    override def toString: String = "sharesDisposalProgress"
   }
 
   def all(srn: Srn): IndexedQuestionPage[Map[String, SectionJourneyStatus]] =
@@ -50,6 +50,6 @@ object SharesDisposalProgress {
       override def path: JsPath =
         Paths.disposedSharesTransaction \ toString
 
-      override def toString: String = "sharesDisposalCompleted"
+      override def toString: String = "sharesDisposalProgress"
     }
 }

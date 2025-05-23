@@ -93,15 +93,14 @@ class TotalConsiderationSharesRedeemedController @Inject()(
                         request.userAnswers
                           .set(TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex), value)
                       )
-                    _ <- saveService.save(updatedAnswers)
-                  } yield Redirect(
-                    navigator
-                      .nextPage(
-                        TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex),
-                        mode,
-                        updatedAnswers
-                      )
-                  )
+                    nextPage = navigator.nextPage(
+                      TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex),
+                      mode,
+                      updatedAnswers
+                    )
+                    updatedProgressAnswers <- saveProgress(srn, shareIndex, disposalIndex, updatedAnswers, nextPage)
+                    _ <- saveService.save(updatedProgressAnswers)
+                  } yield Redirect(nextPage)
               )
         }
       }

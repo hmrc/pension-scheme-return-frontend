@@ -192,7 +192,7 @@ object SharesPrePopulationProcessorSpec {
                  |        "2" : { }
                  |      },
                  |      "disposedSharesTransaction" : {
-                 |        "sharesDisposalCompleted" : {
+                 |        "sharesDisposalProgress" : {
                  |          "0" : {
                  |            "0" : {
                  |              "status" : "JourneyCompleted"

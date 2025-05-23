@@ -107,10 +107,11 @@ class HowManySharesController @Inject()(
                   .set(HowManyDisposalSharesPage(srn, index, disposalIndex), answer)
                   .set(SharesDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
                   .mapK[Future]
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(
-                navigator.nextPage(HowManyDisposalSharesPage(srn, index, disposalIndex), mode, updatedAnswers)
-              )
+                nextPage = navigator
+                  .nextPage(HowManyDisposalSharesPage(srn, index, disposalIndex), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(nextPage)
             }
           )
       }

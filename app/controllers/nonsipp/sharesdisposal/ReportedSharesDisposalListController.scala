@@ -292,6 +292,7 @@ class ReportedSharesDisposalListController @Inject()(
         .map { index =>
           index -> request.userAnswers
             .map(SharesDisposalProgress.all(srn, index))
+            .filter(_._2.completed)
             .keys
             .toList
             .refine[Max50.Refined]

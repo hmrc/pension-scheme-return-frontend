@@ -92,11 +92,11 @@ class TotalConsiderationSharesSoldController @Inject()(
                       .fromTry(
                         request.userAnswers.set(TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex), value)
                       )
-                    _ <- saveService.save(updatedAnswers)
-                  } yield Redirect(
-                    navigator
+                    nextPage = navigator
                       .nextPage(TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex), mode, updatedAnswers)
-                  )
+                    updatedProgressAnswers <- saveProgress(srn, shareIndex, disposalIndex, updatedAnswers, nextPage)
+                    _ <- saveService.save(updatedProgressAnswers)
+                  } yield Redirect(nextPage)
               )
         }
       }

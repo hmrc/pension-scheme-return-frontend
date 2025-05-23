@@ -76,10 +76,10 @@ class IndependentValuationController @Inject()(
             for {
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(IndependentValuationPage(srn, index, disposalIndex), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(IndependentValuationPage(srn, index, disposalIndex), mode, updatedAnswers)
-            )
+              nextPage = navigator.nextPage(IndependentValuationPage(srn, index, disposalIndex), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

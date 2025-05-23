@@ -90,10 +90,10 @@ class PartnershipBuyerUtrController @Inject()(
                   request.userAnswers
                     .set(PartnershipBuyerUtrPage(srn, index, disposalIndex), ConditionalYesNo(value))
                 )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(PartnershipBuyerUtrPage(srn, index, disposalIndex), mode, updatedAnswers)
-            )
+              nextPage = navigator.nextPage(PartnershipBuyerUtrPage(srn, index, disposalIndex), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

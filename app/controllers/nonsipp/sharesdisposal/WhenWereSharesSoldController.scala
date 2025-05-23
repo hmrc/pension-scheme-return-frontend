@@ -96,10 +96,11 @@ class WhenWereSharesSoldController @Inject()(
                 for {
                   updatedAnswers <- Future
                     .fromTry(request.userAnswers.set(WhenWereSharesSoldPage(srn, shareIndex, disposalIndex), value))
-                  _ <- saveService.save(updatedAnswers)
-                } yield Redirect(
-                  navigator.nextPage(WhenWereSharesSoldPage(srn, shareIndex, disposalIndex), mode, updatedAnswers)
-                )
+                  nextPage = navigator
+                    .nextPage(WhenWereSharesSoldPage(srn, shareIndex, disposalIndex), mode, updatedAnswers)
+                  updatedProgressAnswers <- saveProgress(srn, shareIndex, disposalIndex, updatedAnswers, nextPage)
+                  _ <- saveService.save(updatedProgressAnswers)
+                } yield Redirect(nextPage)
             )
         }
       }
