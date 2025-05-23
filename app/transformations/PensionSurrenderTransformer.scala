@@ -21,7 +21,7 @@ import config.RefinedTypes.Max300
 import models.SchemeId.Srn
 import pages.nonsipp.membersurrenderedbenefits._
 import models.{Money, UserAnswers}
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import models.requests.psr._
 import models.UserAnswers.implicits.UserAnswersTryOps
 
@@ -51,6 +51,7 @@ class PensionSurrenderTransformer @Inject() extends Transformer {
       _.set(SurrenderedBenefitsCompletedPage(srn, index), SectionCompleted),
       _.set(SurrenderedBenefitsAmountPage(srn, index), Money(pensionSurrender.totalSurrendered)),
       _.set(WhenDidMemberSurrenderBenefitsPage(srn, index), pensionSurrender.dateOfSurrender),
-      _.set(WhyDidMemberSurrenderBenefitsPage(srn, index), pensionSurrender.surrenderReason)
+      _.set(WhyDidMemberSurrenderBenefitsPage(srn, index), pensionSurrender.surrenderReason),
+      _.set(MemberSurrenderedBenefitsProgress(srn, index), SectionJourneyStatus.Completed)
     )
 }

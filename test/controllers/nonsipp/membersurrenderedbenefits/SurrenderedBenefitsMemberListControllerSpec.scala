@@ -27,7 +27,7 @@ import play.api.test.FakeRequest
 import config.RefinedTypes.Max300
 import controllers.{ControllerBaseSpec, MemberListBaseSpec}
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 
 import java.time.LocalDate
 
@@ -65,8 +65,13 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec wit
       .unsafeSet(SurrenderedBenefitsPage(srn), true)
       .unsafeSet(SurrenderedBenefitsAmountPage(srn, refineMV(1)), money)
 
-  private val testMemberList: List[(Max300, NameDOB, Option[SurrenderedBenefitsAmount])] = List(
-    (refineMV[Max300.Refined](1), memberDetails, Some(money))
+  private val testMemberList: List[MemberSurrenderedBenefits] = List(
+    MemberSurrenderedBenefits(
+      refineMV[Max300.Refined](1),
+      "testFirstName testLastName",
+      Some(SectionJourneyStatus.Completed),
+      Some(money)
+    )
   )
 
   "SurrenderedBenefitsMemberListController" - {
@@ -105,9 +110,19 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec wit
       val memberDetails1 = NameDOB("testFirstName1", "testLastName1", LocalDate.of(1990, 12, 12))
       val memberDetails2 = NameDOB("testFirstName2", "testLastName2", LocalDate.of(1990, 12, 12))
 
-      val memberList: List[(Max300, NameDOB, Option[SurrenderedBenefitsAmount])] = List(
-        (refineMV[Max300.Refined](1), memberDetails1, Some(money)),
-        (refineMV[Max300.Refined](1), memberDetails2, Some(money))
+      val memberList: List[MemberSurrenderedBenefits] = List(
+        MemberSurrenderedBenefits(
+          refineMV[Max300.Refined](1),
+          "Ferdinand Bull",
+          Some(SectionJourneyStatus.Completed),
+          Some(money)
+        ),
+        MemberSurrenderedBenefits(
+          refineMV[Max300.Refined](1),
+          "Johnny Quicke",
+          Some(SectionJourneyStatus.Completed),
+          Some(money)
+        )
       )
 
       val result = SurrenderedBenefitsMemberListController.viewModel(
@@ -200,8 +215,13 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec wit
       val updatedUserAnswers = currentUserAnswers
         .unsafeSet(SurrenderedBenefitsAmountPage(srn, index), otherMoney)
 
-      val memberList: List[(Max300, NameDOB, Option[SurrenderedBenefitsAmount])] = List(
-        (refineMV[Max300.Refined](1), memberDetails, Some(otherMoney))
+      val memberList: List[MemberSurrenderedBenefits] = List(
+        MemberSurrenderedBenefits(
+          refineMV[Max300.Refined](1),
+          "testFirstName testLastName",
+          Some(SectionJourneyStatus.Completed),
+          Some(otherMoney)
+        )
       )
       renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
         implicit app => implicit request =>
