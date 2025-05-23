@@ -126,8 +126,9 @@ class BondsTransformer @Inject() extends Transformer {
   ): Seq[BondDisposed] =
     request.userAnswers
       .map(
-        HowWereBondsDisposedOfPagesForEachBond(srn, bondIndex)
+        BondsDisposalProgress.all(srn, bondIndex)
       )
+      .filter(_._2.completed)
       .keys
       .toList
       .flatMap { key =>

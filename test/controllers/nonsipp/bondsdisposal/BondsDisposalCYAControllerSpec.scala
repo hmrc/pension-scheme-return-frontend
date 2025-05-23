@@ -24,6 +24,7 @@ import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models._
 import pages.nonsipp.bondsdisposal._
+import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceableModule
@@ -90,6 +91,7 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(BuyerNamePage(srn, bondIndex, disposalIndex), nameOfBuyer.get)
     .unsafeSet(IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex), isBuyerConnectedParty.get)
     .unsafeSet(BondsStillHeldPage(srn, bondIndex, disposalIndex), bondsStillHeld)
+    .unsafeSet(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.Completed)
 
   "BondsDisposalCYAController" - {
 
@@ -141,6 +143,16 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
       )
 
       act.like(
+        redirectToPage(
+          call = onPageLoad(mode),
+          page = routes.ReportBondsDisposalListController.onPageLoad(srn, 1),
+          userAnswers = soldUserAnswers
+            .unsafeSet(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.InProgress("any")),
+          previousUserAnswers = emptyUserAnswers
+        ).withName(s"Redirect to bonds list when incomplete when in $mode mode")
+      )
+
+      act.like(
         journeyRecoveryPage(onSubmit(mode))
           .updateName("onSubmit" + _)
           .withName(s"redirect to journey recovery page on submit when in $mode mode")
@@ -161,6 +173,7 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
       .unsafeSet(BuyerNamePage(srn, bondIndex, disposalIndex), nameOfBuyer.get)
       .unsafeSet(IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex), isBuyerConnectedParty.get)
       .unsafeSet(BondsStillHeldPage(srn, bondIndex, disposalIndex), bondsStillHeld)
+      .unsafeSet(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.Completed)
 
     val previousUserAnswers = currentUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")

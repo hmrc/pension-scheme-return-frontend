@@ -29,7 +29,7 @@ case class BondsDisposalProgress(srn: Srn, bondIndex: Max5000, disposalIndex: Ma
   override def path: JsPath =
     Paths.bondsDisposed \ toString \ bondIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "bondsDisposalCompleted"
+  override def toString: String = "bondsDisposalProgress"
 }
 
 object BondsDisposalProgress {
@@ -39,7 +39,7 @@ object BondsDisposalProgress {
       override def path: JsPath =
         Paths.bondsDisposed \ toString \ bondIndex.arrayIndex.toString
 
-      override def toString: String = "bondsDisposalCompleted"
+      override def toString: String = "bondsDisposalProgress"
     }
 
   def all(srn: Srn): IndexedQuestionPage[Map[String, SectionJourneyStatus]] =
@@ -47,6 +47,6 @@ object BondsDisposalProgress {
 
       override def path: JsPath = Paths.bondsDisposed \ toString
 
-      override def toString: String = "bondsDisposalCompleted"
+      override def toString: String = "bondsDisposalProgress"
     }
 }

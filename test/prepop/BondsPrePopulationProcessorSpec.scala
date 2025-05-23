@@ -252,7 +252,7 @@ object BondsPrePopulationProcessorSpec {
                  |              "1": "NoPointOfEntry"
                  |            }
                  |          },
-                 |          "bondsDisposalCompleted": {
+                 |          "bondsDisposalProgress": {
                  |            "1": {
                  |              "0": {
                  |                "status": "JourneyCompleted"

@@ -98,10 +98,10 @@ class BondsStillHeldController @Inject()(
             for {
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(BondsStillHeldPage(srn, bondIndex, disposalIndex), answer))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(BondsStillHeldPage(srn, bondIndex, disposalIndex), mode, updatedAnswers)
-            )
+              nextPage = navigator.nextPage(BondsStillHeldPage(srn, bondIndex, disposalIndex), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, bondIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
     }
