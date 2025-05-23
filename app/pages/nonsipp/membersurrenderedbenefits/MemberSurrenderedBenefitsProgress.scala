@@ -24,8 +24,7 @@ import play.api.libs.json.JsPath
 import models.UserAnswers
 import viewmodels.models.SectionJourneyStatus
 
-case class MemberSurrenderedBenefitsProgress(srn: Srn, memberIndex: Max300)
-  extends QuestionPage[SectionJourneyStatus] {
+case class MemberSurrenderedBenefitsProgress(srn: Srn, memberIndex: Max300) extends QuestionPage[SectionJourneyStatus] {
 
   override def path: JsPath = JsPath \ toString \ memberIndex.arrayIndex.toString
 

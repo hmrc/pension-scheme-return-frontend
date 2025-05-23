@@ -26,8 +26,7 @@ import viewmodels.models.SectionJourneyStatus
 
 import scala.concurrent.Future
 
-package object membersurrenderedbenefits
-{
+package object membersurrenderedbenefits {
 
   implicit class CallOps(call: Call) {
 
@@ -40,12 +39,12 @@ package object membersurrenderedbenefits
   }
 
   def saveProgress(
-                    srn: Srn,
-                    index: Max300,
-                    userAnswers: UserAnswers,
-                    nextPage: Call,
-                    alwaysCompleted: Boolean = false
-                  ): Future[UserAnswers] =
+    srn: Srn,
+    index: Max300,
+    userAnswers: UserAnswers,
+    nextPage: Call,
+    alwaysCompleted: Boolean = false
+  ): Future[UserAnswers] =
     if (nextPage.isCyaPage) {
       userAnswers
         .set(
