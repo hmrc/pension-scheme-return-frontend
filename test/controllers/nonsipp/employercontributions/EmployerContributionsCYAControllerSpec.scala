@@ -79,6 +79,12 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(EmployerCompanyCrnPage(srn, index, secondaryIndex), ConditionalYesNo.yes[String, Crn](crn))
     .unsafeSet(EmployerContributionsProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed)
 
+  private val userAnswersInProgress = userAnswers
+    .unsafeSet(
+      EmployerContributionsProgress(srn, index, index1of50),
+      SectionJourneyStatus.InProgress(anyUrl)
+    )
+
   override def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)
     when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
@@ -93,6 +99,14 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec {
           viewModel(srn, memberDetails.fullName, index, page, employerCYAs, mode, viewOnlyUpdated = true)
         )
       }.withName(s"render correct ${mode.toString} view"))
+
+      act.like(
+        redirectToPage(
+          call = onPageLoad(mode),
+          page = routes.EmployerContributionsMemberListController.onPageLoad(srn, 1, mode),
+          userAnswers = userAnswersInProgress
+        ).withName(s"Redirect to list page if the only entry is incomplete in mode $mode")
+      )
 
       act.like(redirectNextPage(onSubmit(mode)).updateName(s"${mode.toString} onSubmit" + _))
 

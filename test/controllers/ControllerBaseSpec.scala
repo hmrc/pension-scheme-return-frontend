@@ -191,6 +191,7 @@ trait TestValues {
   val otherAssetDescription = "other asset description"
   val fallbackUrl = "fallbackUrl"
   val fallbackCall: Call = Call("GET", fallbackUrl)
+  val anyUrl = "any"
   val submissionNumberTwo: Int = 2
   val submissionNumberOne: Int = 1
   val submissionNumberZero: Int = 0

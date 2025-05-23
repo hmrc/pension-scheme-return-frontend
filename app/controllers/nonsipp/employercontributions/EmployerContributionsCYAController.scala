@@ -84,7 +84,14 @@ class EmployerContributionsCYAController @Inject()(
         indexes <- buildCompletedSecondaryIndexes(srn, index)
         employerCYAs <- indexes.map(secondaryIndex => buildCYA(srn, index, secondaryIndex)).sequence
         orderedCYAs = employerCYAs.sortBy(_.secondaryIndex.value)
-        _ <- recoverJourneyWhen(orderedCYAs.isEmpty)
+        _ <- recoverJourneyWhen(
+          orderedCYAs.isEmpty,
+          if (mode.isViewOnlyMode) {
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+          } else {
+            routes.EmployerContributionsMemberListController.onPageLoad(srn, 1, mode)
+          }
+        )
       } yield Ok(
         view(
           viewModel(

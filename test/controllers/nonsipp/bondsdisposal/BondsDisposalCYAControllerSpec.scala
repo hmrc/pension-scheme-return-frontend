@@ -147,7 +147,7 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
           call = onPageLoad(mode),
           page = routes.ReportBondsDisposalListController.onPageLoad(srn, 1),
           userAnswers = soldUserAnswers
-            .unsafeSet(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.InProgress("any")),
+            .unsafeSet(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.InProgress(anyUrl)),
           previousUserAnswers = emptyUserAnswers
         ).withName(s"Redirect to bonds list when incomplete when in $mode mode")
       )
