@@ -101,14 +101,14 @@ class WhoWereTheSharesSoldToController @Inject()(
               updatedAnswers <- Future.fromTry(
                 request.userAnswers.set(WhoWereTheSharesSoldToPage(srn, index, disposalIndex), answer)
               )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
+              nextPage = navigator.nextPage(
                 WhoWereTheSharesSoldToPage(srn, index, disposalIndex),
                 mode,
                 updatedAnswers
               )
-            )
+              updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
     }

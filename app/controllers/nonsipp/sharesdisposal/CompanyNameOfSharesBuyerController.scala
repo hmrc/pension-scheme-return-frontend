@@ -70,10 +70,10 @@ class CompanyNameOfSharesBuyerController @Inject()(
             for {
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(CompanyBuyerNamePage(srn, index, secondaryIndex), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(CompanyBuyerNamePage(srn, index, secondaryIndex), mode, updatedAnswers)
-            )
+              nextPage = navigator.nextPage(CompanyBuyerNamePage(srn, index, secondaryIndex), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, secondaryIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

@@ -108,14 +108,14 @@ class IsBuyerConnectedPartyController @Inject()(
               updatedAnswers <- Future.fromTry(
                 request.userAnswers.set(IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex), value)
               )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
+              nextPage = navigator.nextPage(
                 IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex),
                 mode,
                 updatedAnswers
               )
-            )
+              updatedProgressAnswers <- saveProgress(srn, shareIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

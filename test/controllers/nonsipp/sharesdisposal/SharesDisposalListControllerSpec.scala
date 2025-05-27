@@ -20,9 +20,10 @@ import pages.nonsipp.shares._
 import controllers.nonsipp.sharesdisposal.SharesDisposalListController.{SharesDisposalData, _}
 import views.html.ListRadiosView
 import eu.timepit.refined.refineMV
+import pages.nonsipp.sharesdisposal.{HowManySharesSoldPage, SharesDisposalProgress}
 import forms.RadioListFormProvider
-import models.{SchemeHoldShare, TypeOfShares}
-import viewmodels.models.SectionCompleted
+import models.{NormalMode, SchemeHoldShare, TypeOfShares}
+import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import config.RefinedTypes.Max5000
 import controllers.ControllerBaseSpec
 
@@ -52,6 +53,15 @@ class SharesDisposalListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(TypeOfSharesHeldPage(srn, shareIndexThree), TypeOfShares.ConnectedParty)
       .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndexThree), companyName)
       .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, shareIndexThree), SchemeHoldShare.Transfer)
+
+  private val incompleteUserAnswers = userAnswers
+    .unsafeSet(HowManySharesSoldPage(srn, shareIndexOne, index1of50), 1)
+    .unsafeSet(
+      SharesDisposalProgress(srn, shareIndexOne, index1of50),
+      SectionJourneyStatus.InProgress(
+        routes.WhenWereSharesSoldController.onPageLoad(srn, shareIndexOne, index1of50, NormalMode).url
+      )
+    )
 
   private val sharesDisposalData = List(
     SharesDisposalData(
@@ -83,6 +93,16 @@ class SharesDisposalListControllerSpec extends ControllerBaseSpec {
       injected[ListRadiosView]
         .apply(form(injected[RadioListFormProvider]), viewModel(srn, page = 1, sharesDisposalData, userAnswers))
     })
+
+    act.like(
+      redirectToPage(
+        call = onSubmit,
+        page = routes.WhenWereSharesSoldController.onPageLoad(srn, shareIndexOne, index1of50, NormalMode),
+        userAnswers = incompleteUserAnswers,
+        previousUserAnswers = emptyUserAnswers,
+        form = "value" -> "1"
+      ).withName("Redirect to incomplete record")
+    )
 
     act.like(redirectNextPage(onSubmit, "value" -> "1"))
 
