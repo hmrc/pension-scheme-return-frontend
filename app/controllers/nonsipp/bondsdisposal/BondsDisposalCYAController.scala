@@ -39,6 +39,7 @@ import play.api.i18n.MessagesApi
 import pages.nonsipp.bondsdisposal._
 import viewmodels.Margin
 import viewmodels.DisplayMessage.Message
+import viewmodels.models.SectionJourneyStatus.Completed
 import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -59,11 +60,13 @@ class BondsDisposalCYAController @Inject()(
 
   def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      saveService.save(
-        request.userAnswers
-          .set(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex), NoPointOfEntry)
-          .getOrElse(request.userAnswers)
-      )
+      if (request.userAnswers.get(BondsDisposalProgress(srn, bondIndex, disposalIndex)).contains(Completed)) {
+        saveService.save(
+          request.userAnswers
+            .set(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex), NoPointOfEntry)
+            .getOrElse(request.userAnswers)
+        )
+      }
       onPageLoadCommon(srn, bondIndex, disposalIndex, mode)
     }
 

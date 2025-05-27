@@ -42,6 +42,7 @@ import play.api.i18n.MessagesApi
 import viewmodels.Margin
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
+import viewmodels.models.SectionJourneyStatus.Completed
 import viewmodels.models._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -62,15 +63,16 @@ class SharesDisposalCYAController @Inject()(
 
   def onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      // Clear any PointOfEntry
-      saveService
-        .save(
-          request.userAnswers
-            .set(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex), NoPointOfEntry)
-            .getOrElse(request.userAnswers)
-        )
+      if (request.userAnswers.get(SharesDisposalProgress(srn, shareIndex, disposalIndex)).contains(Completed)) {
+        // Clear any PointOfEntry
+        saveService
+          .save(
+            request.userAnswers
+              .set(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex), NoPointOfEntry)
+              .getOrElse(request.userAnswers)
+          )
+      }
       onPageLoadCommon(srn, shareIndex, disposalIndex, mode)
-
     }
 
   def onPageLoadViewOnly(
