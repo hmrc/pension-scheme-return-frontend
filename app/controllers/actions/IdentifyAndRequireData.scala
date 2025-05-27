@@ -104,13 +104,19 @@ class IdentifyAndRequireData @Inject()(
           .andThen(getDataFromETMP.versionForYear(year, 1))
           .andThen(requireData)
           .andThen(saveData)
-      case Some(currentVersion) if currentVersion > 1 =>
-        identify
-          .andThen(allowAccess(srn))
-          .andThen(getDataFromETMP.currentAndPreviousVersionForYear(year, currentVersion, currentVersion - 1))
-          .andThen(requireData)
-          .andThen(saveData)
-      // current version was not a number
+
+      case Some(currentVersion) =>
+        if (currentVersion > 1) {
+          identify
+            .andThen(allowAccess(srn))
+            .andThen(getDataFromETMP.currentAndPreviousVersionForYear(year, currentVersion, currentVersion - 1))
+            .andThen(requireData)
+            .andThen(saveData)
+        } else {
+          logger.error(s"Unexpected PSA version number: $currentVersion")
+          errorAction
+        }
+
       case None =>
         logger.error(s"current PSA version $current is not a valid version number")
         errorAction

@@ -436,7 +436,7 @@ object AssetDisposalCYAController {
       case Some(IdentityType.Individual) => "assetDisposalCYA.identityType.pageContent"
       case Some(IdentityType.UKCompany) => "assetDisposalCYA.identityType.pageContent1"
       case Some(IdentityType.UKPartnership) => "assetDisposalCYA.identityType.pageContent2"
-      case Some(IdentityType.Other) => "assetDisposalCYA.identityType.pageContent3"
+      case _ => "assetDisposalCYA.identityType.pageContent3"
     }
 
     val recipientNameUrl = assetDisposedType match {
@@ -452,7 +452,7 @@ object AssetDisposalCYAController {
         controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerNameController
           .onSubmit(srn, index, disposalIndex, CheckMode)
           .url
-      case Some(IdentityType.Other) =>
+      case _ =>
         controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
           .onSubmit(srn, index, disposalIndex, CheckMode)
           .url
@@ -492,7 +492,7 @@ object AssetDisposalCYAController {
             "assetDisposalCYA.section1.recipientDetails.utr.hidden",
             "assetDisposalCYA.section1.recipientDetails.noUtrReason.hidden"
           )
-        case Some(IdentityType.Other) =>
+        case _ =>
           (
             Message("assetDisposalCYA.section1.recipientDetails.other", recipientName),
             controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
@@ -522,7 +522,7 @@ object AssetDisposalCYAController {
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
 
-      case Some(IdentityType.Other) =>
+      case _ =>
         Message("assetDisposalCYA.section1.recipientDetails.other", recipientName) ->
           controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
             .onSubmit(srn, index, disposalIndex, CheckMode)

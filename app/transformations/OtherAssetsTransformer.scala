@@ -648,7 +648,7 @@ class OtherAssetsTransformer @Inject() extends Transformer {
                 val methodOfDisposal = otherAssetDisposed.methodOfDisposal match {
                   case HowDisposed.Sold.name => HowDisposed.Sold
                   case HowDisposed.Transferred.name => HowDisposed.Transferred
-                  case HowDisposed.Other.name =>
+                  case _ =>
                     HowDisposed.Other(otherAssetDisposed.optOtherMethod.get)
                 }
 

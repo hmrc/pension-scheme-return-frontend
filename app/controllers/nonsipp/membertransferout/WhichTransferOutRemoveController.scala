@@ -39,8 +39,6 @@ import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
 import models.requests.DataRequest
 import play.api.data.Form
 
-import scala.collection.immutable.SortedMap
-
 import java.time.LocalDate
 
 class WhichTransferOutRemoveController @Inject()(
@@ -101,21 +99,6 @@ class WhichTransferOutRemoveController @Inject()(
               .onPageLoad(srn, memberIndex, answer)
           )
       )
-  }
-
-  private def withIndexedValues(receivingSchemeName: Map[String, String], dateOfTransfer: Map[String, LocalDate])(
-    f: Map[Int, (String, LocalDate)] => Result
-  ): Result = {
-    val values = (receivingSchemeName, dateOfTransfer).tupled
-    val maybeIndexedValues: Option[List[(Int, (String, LocalDate))]] = values.toList
-      .traverse { case (key, value) => key.toIntOption.map(_ -> value) }
-
-    maybeIndexedValues match {
-      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case Some(indexedValues) =>
-        val sortedMap = SortedMap.from(indexedValues)
-        f(sortedMap)
-    }
   }
 
   private def getJourneyValues(srn: Srn, memberIndex: Max300)(

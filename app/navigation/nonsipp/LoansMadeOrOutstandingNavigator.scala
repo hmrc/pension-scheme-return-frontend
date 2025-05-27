@@ -60,6 +60,8 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
         case Some(IdentityType.UKPartnership) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController
             .onPageLoad(srn, index, NormalMode)
+
+        case _ => controllers.routes.UnauthorisedController.onPageLoad()
       }
 
     case IndividualRecipientNamePage(srn, index) =>

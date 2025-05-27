@@ -81,6 +81,9 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         case Some(IdentityType.Other) =>
           controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
+        case _ => controllers.routes.UnauthorisedController.onPageLoad()
+
       }
 
     case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
@@ -211,6 +214,8 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
             case Some(IdentityType.Other) =>
               controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
                 .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
+            case _ => controllers.routes.UnauthorisedController.onPageLoad()
           }
 
         case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>

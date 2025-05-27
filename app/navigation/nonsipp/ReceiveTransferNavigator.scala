@@ -72,9 +72,6 @@ object ReceiveTransferNavigator extends JourneyNavigator {
           .onPageLoad(srn, index, secondaryIndex, NormalMode)
       ).merge
 
-    case TransferReceivedMemberListPage(srn) =>
-      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
-
     case page @ ReportAnotherTransferInPage(srn, index, _) =>
       if (userAnswers.get(page).contains(true)) {
         (
@@ -113,10 +110,6 @@ object ReceiveTransferNavigator extends JourneyNavigator {
           } else {
             controllers.nonsipp.membertransferout.routes.SchemeTransferOutController.onPageLoad(srn, NormalMode)
           }
-
-        case TransferringSchemeNamePage(srn, index, _) =>
-          controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
-            .onPageLoad(srn, index, NormalMode)
 
         case TransferringSchemeTypePage(srn, index, _) =>
           controllers.nonsipp.receivetransfer.routes.TransfersInCYAController

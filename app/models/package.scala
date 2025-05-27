@@ -142,7 +142,9 @@ package object models {
                     oldValue.set(JsPath(first :: Nil), newValue)
                   }
                 }
+
             }
+        case _ => JsError("Unsupported path or value for removal")
       }
   }
 }
