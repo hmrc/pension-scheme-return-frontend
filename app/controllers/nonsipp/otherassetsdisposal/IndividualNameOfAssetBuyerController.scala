@@ -81,14 +81,11 @@ class IndividualNameOfAssetBuyerController @Inject()(
                 request.userAnswers
                   .set(IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex), answer)
               )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
-                IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex),
-                mode,
-                updatedAnswers
-              )
-            )
+              nextPage = navigator
+                .nextPage(IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, assetIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
     }

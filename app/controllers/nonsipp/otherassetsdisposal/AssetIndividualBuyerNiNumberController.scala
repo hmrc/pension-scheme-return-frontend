@@ -89,11 +89,11 @@ class AssetIndividualBuyerNiNumberController @Inject()(
                       ConditionalYesNo(value)
                     )
                 )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator
+              nextPage = navigator
                 .nextPage(AssetIndividualBuyerNiNumberPage(srn, assetIndex, disposalIndex), mode, updatedAnswers)
-            )
+              updatedProgressAnswers <- saveProgress(srn, assetIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

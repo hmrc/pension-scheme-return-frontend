@@ -133,7 +133,7 @@ object OtherAssetsPrePopulationProcessorSpec {
                  |          "0": {},
                  |          "1": {}
                  |        },
-                 |        "otherAssetsDisposalCompleted": {
+                 |        "otherAssetsDisposalProgress": {
                  |          "0": {
                  |            "0": {
                  |              "status": "JourneyCompleted"

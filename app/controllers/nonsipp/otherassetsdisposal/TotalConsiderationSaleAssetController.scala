@@ -82,11 +82,11 @@ class TotalConsiderationSaleAssetController @Inject()(
                 .fromTry(
                   request.userAnswers.set(TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex), value)
                 )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator
+              nextPage = navigator
                 .nextPage(TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex), mode, updatedAnswers)
-            )
+              updatedProgressAnswers <- saveProgress(srn, assetIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

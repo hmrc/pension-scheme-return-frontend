@@ -93,10 +93,11 @@ class WhenWasAssetSoldController @Inject()(
               for {
                 updatedAnswers <- Future
                   .fromTry(request.userAnswers.set(WhenWasAssetSoldPage(srn, assetIndex, disposalIndex), value))
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(
-                navigator.nextPage(WhenWasAssetSoldPage(srn, assetIndex, disposalIndex), mode, updatedAnswers)
-              )
+                nextPage = navigator
+                  .nextPage(WhenWasAssetSoldPage(srn, assetIndex, disposalIndex), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, assetIndex, disposalIndex, updatedAnswers, nextPage)
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(nextPage)
           )
       }
     }

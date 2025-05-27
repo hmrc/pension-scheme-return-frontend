@@ -81,14 +81,22 @@ class StartReportingAssetsDisposalController @Inject()(
             BadRequest(view(errors, viewModel(srn, page, assets, userAnswers)))
           }.merge
         },
-        answer =>
-          Redirect(
-            navigator.nextPage(
-              OtherAssetsDisposalListPage(srn, answer),
-              mode,
-              request.userAnswers
-            )
-          )
+        answer => {
+          val inProgressUrl = request.userAnswers
+            .map(OtherAssetsDisposalProgress.all(srn, answer))
+            .collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+          inProgressUrl match {
+            case Some(url) => Redirect(url)
+            case _ =>
+              Redirect(
+                navigator.nextPage(
+                  OtherAssetsDisposalListPage(srn, answer),
+                  mode,
+                  request.userAnswers
+                )
+              )
+          }
+        }
       )
   }
 

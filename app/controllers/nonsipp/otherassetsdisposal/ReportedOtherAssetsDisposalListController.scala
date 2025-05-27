@@ -281,6 +281,7 @@ class ReportedOtherAssetsDisposalListController @Inject()(
         .map { index =>
           index -> request.userAnswers
             .map(OtherAssetsDisposalProgress.all(srn, index))
+            .filter(_._2.completed)
             .keys
             .toList
             .refine[Max50.Refined]

@@ -70,10 +70,11 @@ class CompanyNameOfAssetBuyerController @Inject()(
             for {
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex), mode, updatedAnswers)
-            )
+              nextPage = navigator
+                .nextPage(CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, assetIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

@@ -84,123 +84,129 @@ class AssetDisposalCYAController @Inject()(
   def onPageLoadCommon(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode)(
     implicit request: DataRequest[AnyContent]
   ): Future[Result] =
-    (
-      for {
-        updatedUserAnswers <- request.userAnswers
-          .set(OtherAssetsDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
-          .toOption
-          .getOrRecoverJourneyT
+    if (!request.userAnswers
+        .get(OtherAssetsDisposalProgress(srn, index, disposalIndex))
+        .exists(_.completed)) {
+      Future.successful(Redirect(routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, 1)))
+    } else {
+      (
+        for {
+          updatedUserAnswers <- request.userAnswers
+            .set(OtherAssetsDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
+            .toOption
+            .getOrRecoverJourneyT
 
-        howWasAssetDisposed <- updatedUserAnswers
-          .get(HowWasAssetDisposedOfPage(srn, index, disposalIndex))
-          .getOrRecoverJourneyT
-        whatIsOtherAsset <- updatedUserAnswers
-          .get(WhatIsOtherAssetPage(srn, index))
-          .getOrRecoverJourneyT
-        anyPartAssetStillHeld <- updatedUserAnswers
-          .get(AnyPartAssetStillHeldPage(srn, index, disposalIndex))
-          .getOrRecoverJourneyT
+          howWasAssetDisposed <- updatedUserAnswers
+            .get(HowWasAssetDisposedOfPage(srn, index, disposalIndex))
+            .getOrRecoverJourneyT
+          whatIsOtherAsset <- updatedUserAnswers
+            .get(WhatIsOtherAssetPage(srn, index))
+            .getOrRecoverJourneyT
+          anyPartAssetStillHeld <- updatedUserAnswers
+            .get(AnyPartAssetStillHeldPage(srn, index, disposalIndex))
+            .getOrRecoverJourneyT
 
-        totalConsiderationSale = Option.when(howWasAssetDisposed == Sold)(
-          updatedUserAnswers.get(TotalConsiderationSaleAssetPage(srn, index, disposalIndex)).get
-        )
-        independentValuation = Option.when(howWasAssetDisposed == Sold)(
-          updatedUserAnswers.get(AssetSaleIndependentValuationPage(srn, index, disposalIndex)).get
-        )
-        assetDisposedType = Option.when(howWasAssetDisposed == Sold)(
-          updatedUserAnswers
-            .get(TypeOfAssetBuyerPage(srn: Srn, index, disposalIndex))
-            .get
-        )
-
-        whenWasAssetSold = Option.when(howWasAssetDisposed == Sold)(
-          updatedUserAnswers.get(WhenWasAssetSoldPage(srn, index, disposalIndex)).get
-        )
-
-        assetDisposalBuyerConnectedParty = Option.when(howWasAssetDisposed == Sold)(
-          updatedUserAnswers.get(IsBuyerConnectedPartyPage(srn, index, disposalIndex)).get
-        )
-
-        recipientName = Option.when(howWasAssetDisposed == Sold)(
-          List(
-            updatedUserAnswers.get(IndividualNameOfAssetBuyerPage(srn, index, disposalIndex)),
-            updatedUserAnswers.get(CompanyNameOfAssetBuyerPage(srn, index, disposalIndex)),
-            updatedUserAnswers.get(PartnershipBuyerNamePage(srn, index, disposalIndex)),
+          totalConsiderationSale = Option.when(howWasAssetDisposed == Sold)(
+            updatedUserAnswers.get(TotalConsiderationSaleAssetPage(srn, index, disposalIndex)).get
+          )
+          independentValuation = Option.when(howWasAssetDisposed == Sold)(
+            updatedUserAnswers.get(AssetSaleIndependentValuationPage(srn, index, disposalIndex)).get
+          )
+          assetDisposedType = Option.when(howWasAssetDisposed == Sold)(
             updatedUserAnswers
-              .get(OtherBuyerDetailsPage(srn, index, disposalIndex))
-              .map(_.name)
-          ).flatten.head
-        )
+              .get(TypeOfAssetBuyerPage(srn: Srn, index, disposalIndex))
+              .get
+          )
 
-        recipientDetails = Option.when(howWasAssetDisposed == Sold)(
-          List(
-            updatedUserAnswers
-              .get(AssetIndividualBuyerNiNumberPage(srn, index, disposalIndex))
-              .flatMap(_.value.toOption.map(_.value)),
-            updatedUserAnswers
-              .get(AssetCompanyBuyerCrnPage(srn, index, disposalIndex))
-              .flatMap(_.value.toOption.map(_.value)),
-            updatedUserAnswers
-              .get(PartnershipBuyerUtrPage(srn, index, disposalIndex))
-              .flatMap(_.value.toOption.map(_.value)),
-            updatedUserAnswers
-              .get(OtherBuyerDetailsPage(srn, index, disposalIndex))
-              .map(_.description)
-          ).flatten.headOption
-        )
+          whenWasAssetSold = Option.when(howWasAssetDisposed == Sold)(
+            updatedUserAnswers.get(WhenWasAssetSoldPage(srn, index, disposalIndex)).get
+          )
 
-        recipientReasonNoDetails = Option.when(howWasAssetDisposed == Sold)(
-          List(
-            updatedUserAnswers
-              .get(AssetIndividualBuyerNiNumberPage(srn, index, disposalIndex))
-              .flatMap(_.value.swap.toOption.map(_.value)),
-            updatedUserAnswers
-              .get(AssetCompanyBuyerCrnPage(srn, index, disposalIndex))
-              .flatMap(_.value.swap.toOption.map(_.value)),
-            updatedUserAnswers
-              .get(PartnershipBuyerUtrPage(srn, index, disposalIndex))
-              .flatMap(_.value.swap.toOption.map(_.value))
-          ).flatten.headOption
-        )
-        schemeName = request.schemeDetails.schemeName
+          assetDisposalBuyerConnectedParty = Option.when(howWasAssetDisposed == Sold)(
+            updatedUserAnswers.get(IsBuyerConnectedPartyPage(srn, index, disposalIndex)).get
+          )
 
-        disposalAmount = updatedUserAnswers
-          .map(OtherAssetsDisposalProgress.all(srn, index))
-          .count { case (_, progress) => progress.completed }
+          recipientName = Option.when(howWasAssetDisposed == Sold)(
+            List(
+              updatedUserAnswers.get(IndividualNameOfAssetBuyerPage(srn, index, disposalIndex)),
+              updatedUserAnswers.get(CompanyNameOfAssetBuyerPage(srn, index, disposalIndex)),
+              updatedUserAnswers.get(PartnershipBuyerNamePage(srn, index, disposalIndex)),
+              updatedUserAnswers
+                .get(OtherBuyerDetailsPage(srn, index, disposalIndex))
+                .map(_.name)
+            ).flatten.head
+          )
 
-        isMaximumReached = disposalAmount >= maxDisposalPerOtherAsset
+          recipientDetails = Option.when(howWasAssetDisposed == Sold)(
+            List(
+              updatedUserAnswers
+                .get(AssetIndividualBuyerNiNumberPage(srn, index, disposalIndex))
+                .flatMap(_.value.toOption.map(_.value)),
+              updatedUserAnswers
+                .get(AssetCompanyBuyerCrnPage(srn, index, disposalIndex))
+                .flatMap(_.value.toOption.map(_.value)),
+              updatedUserAnswers
+                .get(PartnershipBuyerUtrPage(srn, index, disposalIndex))
+                .flatMap(_.value.toOption.map(_.value)),
+              updatedUserAnswers
+                .get(OtherBuyerDetailsPage(srn, index, disposalIndex))
+                .map(_.description)
+            ).flatten.headOption
+          )
 
-      } yield Ok(
-        view(
-          viewModel(
-            ViewModelParameters(
-              srn,
-              index,
-              disposalIndex,
-              schemeName,
-              howWasAssetDisposed,
-              whenWasAssetSold,
-              whatIsOtherAsset,
-              assetDisposedType,
-              assetDisposalBuyerConnectedParty,
-              totalConsiderationSale,
-              independentValuation,
-              anyPartAssetStillHeld,
-              recipientName,
-              recipientDetails.flatten,
-              recipientReasonNoDetails.flatten,
-              mode
-            ),
-            viewOnlyUpdated = false, // flag is not displayed on this tier
-            optYear = request.year,
-            optCurrentVersion = request.currentVersion,
-            optPreviousVersion = request.previousVersion,
-            compilationOrSubmissionDate = updatedUserAnswers.get(CompilationOrSubmissionDatePage(srn)),
-            isMaximumReached = isMaximumReached
+          recipientReasonNoDetails = Option.when(howWasAssetDisposed == Sold)(
+            List(
+              updatedUserAnswers
+                .get(AssetIndividualBuyerNiNumberPage(srn, index, disposalIndex))
+                .flatMap(_.value.swap.toOption.map(_.value)),
+              updatedUserAnswers
+                .get(AssetCompanyBuyerCrnPage(srn, index, disposalIndex))
+                .flatMap(_.value.swap.toOption.map(_.value)),
+              updatedUserAnswers
+                .get(PartnershipBuyerUtrPage(srn, index, disposalIndex))
+                .flatMap(_.value.swap.toOption.map(_.value))
+            ).flatten.headOption
+          )
+          schemeName = request.schemeDetails.schemeName
+
+          disposalAmount = updatedUserAnswers
+            .map(OtherAssetsDisposalProgress.all(srn, index))
+            .count { case (_, progress) => progress.completed }
+
+          isMaximumReached = disposalAmount >= maxDisposalPerOtherAsset
+
+        } yield Ok(
+          view(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                index,
+                disposalIndex,
+                schemeName,
+                howWasAssetDisposed,
+                whenWasAssetSold,
+                whatIsOtherAsset,
+                assetDisposedType,
+                assetDisposalBuyerConnectedParty,
+                totalConsiderationSale,
+                independentValuation,
+                anyPartAssetStillHeld,
+                recipientName,
+                recipientDetails.flatten,
+                recipientReasonNoDetails.flatten,
+                mode
+              ),
+              viewOnlyUpdated = false, // flag is not displayed on this tier
+              optYear = request.year,
+              optCurrentVersion = request.currentVersion,
+              optPreviousVersion = request.previousVersion,
+              compilationOrSubmissionDate = updatedUserAnswers.get(CompilationOrSubmissionDatePage(srn)),
+              isMaximumReached = isMaximumReached
+            )
           )
         )
-      )
-    ).merge
+      ).merge
+    }
 
   def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
