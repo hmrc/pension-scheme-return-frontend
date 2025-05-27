@@ -32,7 +32,7 @@ import viewmodels.models.{CheckYourAnswersViewModel, FormPageViewModel, SummaryA
 class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec {
 
   lazy val onPageLoad: Call =
-    routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, refineMV[OneToThree](1), NormalMode)
+    routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, 1, NormalMode)
   lazy val onSubmit: Call = routes.AccountingPeriodCheckYourAnswersController.onSubmit(srn, NormalMode)
   lazy val viewModel: FormPageViewModel[CheckYourAnswersViewModel] =
     AccountingPeriodCheckYourAnswersController.viewModel(srn, refineMV(1), dateRange, NormalMode)
@@ -50,7 +50,7 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
     act.like(
       redirectWhenCacheEmpty(
         onPageLoad,
-        routes.AccountingPeriodController.onPageLoad(srn, refineMV[OneToThree](1), NormalMode)
+        routes.AccountingPeriodController.onPageLoad(srn, 1, NormalMode)
       )
     )
 
@@ -121,7 +121,7 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
           val content = Message("site.change")
-          val href = routes.AccountingPeriodController.onPageLoad(srn, refineMV[OneToThree](1), NormalMode).url
+          val href = routes.AccountingPeriodController.onPageLoad(srn, 1, NormalMode).url
 
           val actions = List(
             SummaryAction(content, href + "#startDate", Message("site.startDate")),

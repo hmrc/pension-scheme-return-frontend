@@ -29,8 +29,8 @@ import controllers.ControllerBaseSpec
 class OtherAssetSellerConnectedPartyControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
-  private lazy val onPageLoad = routes.OtherAssetSellerConnectedPartyController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.OtherAssetSellerConnectedPartyController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.OtherAssetSellerConnectedPartyController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.OtherAssetSellerConnectedPartyController.onSubmit(srn, index.value, NormalMode)
   private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
 
   val userServicesWithIndividualName: UserAnswers =

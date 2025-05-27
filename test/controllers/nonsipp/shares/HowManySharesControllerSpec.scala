@@ -34,8 +34,8 @@ class HowManySharesControllerSpec extends ControllerBaseSpec {
 
   "HowManySharesController" - {
 
-    lazy val onPageLoad = routes.HowManySharesController.onPageLoad(srn, index, NormalMode)
-    lazy val onSubmit = routes.HowManySharesController.onSubmit(srn, index, NormalMode)
+    lazy val onPageLoad = routes.HowManySharesController.onPageLoad(srn, index.value, NormalMode)
+    lazy val onSubmit = routes.HowManySharesController.onSubmit(srn, index.value, NormalMode)
 
     act.like(
       renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>

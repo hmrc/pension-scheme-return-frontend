@@ -74,7 +74,7 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
           TotalMemberContributionPage,
           (srn, index: Max300, _) =>
             controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
-              .onPageLoad(srn, index, NormalMode)
+              .onPageLoad(srn, index.value, NormalMode)
         )
         .withName("go from total member contribution to CYAMemberContributions page")
     )

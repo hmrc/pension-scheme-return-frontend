@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import pages.nonsipp.receivetransfer.{
   DidTransferIncludeAssetPage,
   TransferringSchemeNamePage,
@@ -57,26 +58,28 @@ class DidTransferIncludeAssetController @Inject()(
 
   private val form = DidTransferIncludeAssetController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
-        request.userAnswers.get(DidTransferIncludeAssetPage(srn, index, secondaryIndex)).fold(form)(form.fill)
+        request.userAnswers
+          .get(DidTransferIncludeAssetPage(srn, index.refined, secondaryIndex.refined))
+          .fold(form)(form.fill)
       (
         for {
           schemeName <- request.userAnswers
-            .get(TransferringSchemeNamePage(srn, index, secondaryIndex))
+            .get(TransferringSchemeNamePage(srn, index.refined, secondaryIndex.refined))
             .getOrRecoverJourney
-          memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
+          memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney
         } yield Ok(
           view(
             preparedForm,
-            viewModel(srn, schemeName, memberDetails.fullName, index, secondaryIndex, mode)
+            viewModel(srn, schemeName, memberDetails.fullName, index.refined, secondaryIndex.refined, mode)
           )
         )
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -85,9 +88,9 @@ class DidTransferIncludeAssetController @Inject()(
             Future.successful(
               (for {
                 schemeName <- request.userAnswers
-                  .get(TransferringSchemeNamePage(srn, index, secondaryIndex))
+                  .get(TransferringSchemeNamePage(srn, index.refined, secondaryIndex.refined))
                   .getOrRecoverJourney
-                memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
+                memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney
               } yield BadRequest(
                 view(
                   formWithErrors,
@@ -95,8 +98,8 @@ class DidTransferIncludeAssetController @Inject()(
                     srn,
                     schemeName,
                     memberDetails.fullName,
-                    index,
-                    secondaryIndex,
+                    index.refined,
+                    secondaryIndex.refined,
                     mode
                   )
                 )
@@ -106,15 +109,15 @@ class DidTransferIncludeAssetController @Inject()(
           value =>
             for {
               updatedAnswers <- request.userAnswers
-                .set(DidTransferIncludeAssetPage(srn, index, secondaryIndex), value)
-                .set(TransfersInSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
+                .set(DidTransferIncludeAssetPage(srn, index.refined, secondaryIndex.refined), value)
+                .set(TransfersInSectionCompleted(srn, index.refined, secondaryIndex.refined), SectionCompleted)
                 .mapK[Future]
               nextPage = navigator
-                .nextPage(DidTransferIncludeAssetPage(srn, index, secondaryIndex), mode, updatedAnswers)
+                .nextPage(DidTransferIncludeAssetPage(srn, index.refined, secondaryIndex.refined), mode, updatedAnswers)
               updatedProgressAnswers <- saveProgress(
                 srn,
-                index,
-                secondaryIndex,
+                index.refined,
+                secondaryIndex.refined,
                 updatedAnswers,
                 nextPage,
                 alwaysCompleted = true

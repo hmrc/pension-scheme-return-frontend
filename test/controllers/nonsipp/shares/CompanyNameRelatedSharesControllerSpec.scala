@@ -34,8 +34,8 @@ class CompanyNameRelatedSharesControllerSpec extends ControllerBaseSpec {
 
   "CompanyNameRelatedSharesController" - {
 
-    lazy val onPageLoad = routes.CompanyNameRelatedSharesController.onPageLoad(srn, index, NormalMode)
-    lazy val onSubmit = routes.CompanyNameRelatedSharesController.onSubmit(srn, index, NormalMode)
+    lazy val onPageLoad = routes.CompanyNameRelatedSharesController.onPageLoad(srn, index.value, NormalMode)
+    lazy val onSubmit = routes.CompanyNameRelatedSharesController.onSubmit(srn, index.value, NormalMode)
 
     act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
       injected[TextInputView]

@@ -60,7 +60,7 @@ class BondsDisposalListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(
       BondsDisposalProgress(srn, indexOne, index1of50),
       SectionJourneyStatus.InProgress(
-        routes.WhenWereBondsSoldController.onPageLoad(srn, indexOne, index1of50, NormalMode).url
+        routes.WhenWereBondsSoldController.onPageLoad(srn, indexOne.value, index1of50.value, NormalMode).url
       )
     )
 
@@ -95,7 +95,7 @@ class BondsDisposalListControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         call = onSubmit,
-        page = routes.WhenWereBondsSoldController.onPageLoad(srn, indexOne, index1of50, NormalMode),
+        page = routes.WhenWereBondsSoldController.onPageLoad(srn, indexOne.value, index1of50.value, NormalMode),
         userAnswers = incompleteUserAnswers,
         previousUserAnswers = emptyUserAnswers,
         form = "value" -> "1"

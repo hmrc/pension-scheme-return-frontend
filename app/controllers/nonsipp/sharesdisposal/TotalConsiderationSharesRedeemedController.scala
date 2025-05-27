@@ -19,6 +19,7 @@ package controllers.nonsipp.sharesdisposal
 import services.SaveService
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import utils.IntUtils.{toInt, IntOpts}
 import config.Constants.{maxTotalConsiderationAmount, minTotalConsiderationAmount}
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal.{HowManySharesRedeemedPage, TotalConsiderationSharesRedeemedPage}
@@ -55,54 +56,73 @@ class TotalConsiderationSharesRedeemedController @Inject()(
 
   private val form = TotalConsiderationSharesRedeemedController.form(formProvider)
 
-  def onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).getOrRecoverJourney { companyName =>
-        request.userAnswers.get(HowManySharesRedeemedPage(srn, shareIndex, disposalIndex)).getOrRecoverJourney {
-          numShares =>
-            val preparedForm =
-              request.userAnswers.fillForm(TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex), form)
+      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex.refined)).getOrRecoverJourney {
+        companyName =>
+          request.userAnswers
+            .get(HowManySharesRedeemedPage(srn, shareIndex.refined, disposalIndex.refined))
+            .getOrRecoverJourney { numShares =>
+              val preparedForm =
+                request.userAnswers
+                  .fillForm(TotalConsiderationSharesRedeemedPage(srn, shareIndex.refined, disposalIndex.refined), form)
 
-            Ok(view(preparedForm, viewModel(srn, shareIndex, disposalIndex, numShares, companyName, form, mode)))
-        }
+              Ok(
+                view(
+                  preparedForm,
+                  viewModel(srn, shareIndex.refined, disposalIndex.refined, numShares, companyName, form, mode)
+                )
+              )
+            }
       }
     }
 
-  def onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).getOrRecoverJourney { companyName =>
-        request.userAnswers.get(HowManySharesRedeemedPage(srn, shareIndex, disposalIndex)).getOrRecoverJourney {
-          numShares =>
-            form
-              .bindFromRequest()
-              .fold(
-                formWithErrors => {
-                  Future.successful(
-                    BadRequest(
-                      view(
-                        formWithErrors,
-                        viewModel(srn, shareIndex, disposalIndex, numShares, companyName, form, mode)
+      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex.refined)).getOrRecoverJourney {
+        companyName =>
+          request.userAnswers
+            .get(HowManySharesRedeemedPage(srn, shareIndex.refined, disposalIndex.refined))
+            .getOrRecoverJourney { numShares =>
+              form
+                .bindFromRequest()
+                .fold(
+                  formWithErrors => {
+                    Future.successful(
+                      BadRequest(
+                        view(
+                          formWithErrors,
+                          viewModel(srn, shareIndex.refined, disposalIndex.refined, numShares, companyName, form, mode)
+                        )
                       )
                     )
-                  )
-                },
-                value =>
-                  for {
-                    updatedAnswers <- Future
-                      .fromTry(
-                        request.userAnswers
-                          .set(TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex), value)
+                  },
+                  value =>
+                    for {
+                      updatedAnswers <- Future
+                        .fromTry(
+                          request.userAnswers
+                            .set(
+                              TotalConsiderationSharesRedeemedPage(srn, shareIndex.refined, disposalIndex.refined),
+                              value
+                            )
+                        )
+                      nextPage = navigator.nextPage(
+                        TotalConsiderationSharesRedeemedPage(srn, shareIndex.refined, disposalIndex.refined),
+                        mode,
+                        updatedAnswers
                       )
-                    nextPage = navigator.nextPage(
-                      TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex),
-                      mode,
-                      updatedAnswers
-                    )
-                    updatedProgressAnswers <- saveProgress(srn, shareIndex, disposalIndex, updatedAnswers, nextPage)
-                    _ <- saveService.save(updatedProgressAnswers)
-                  } yield Redirect(nextPage)
-              )
-        }
+                      updatedProgressAnswers <- saveProgress(
+                        srn,
+                        shareIndex.refined,
+                        disposalIndex.refined,
+                        updatedAnswers,
+                        nextPage
+                      )
+                      _ <- saveService.save(updatedProgressAnswers)
+                    } yield Redirect(nextPage)
+                )
+            }
       }
     }
 }

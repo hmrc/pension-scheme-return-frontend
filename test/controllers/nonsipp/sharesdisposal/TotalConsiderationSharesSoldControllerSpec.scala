@@ -32,9 +32,9 @@ class TotalConsiderationSharesSoldControllerSpec extends ControllerBaseSpec {
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.TotalConsiderationSharesSoldController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+    routes.TotalConsiderationSharesSoldController.onPageLoad(srn, shareIndex.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.TotalConsiderationSharesSoldController.onSubmit(srn, shareIndex, disposalIndex, NormalMode)
+    routes.TotalConsiderationSharesSoldController.onSubmit(srn, shareIndex.value, disposalIndex.value, NormalMode)
 
   private val userAnswers =
     defaultUserAnswers

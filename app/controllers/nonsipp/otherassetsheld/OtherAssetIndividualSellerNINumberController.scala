@@ -20,6 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.Max5000
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, Mode}
@@ -55,26 +56,26 @@ class OtherAssetIndividualSellerNINumberController @Inject()(
 
   private val form: Form[Either[String, Nino]] = OtherAssetIndividualSellerNINumberController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.usingAnswer(IndividualNameOfOtherAssetSellerPage(srn, index)).sync { individualName =>
+      request.usingAnswer(IndividualNameOfOtherAssetSellerPage(srn, index.refined)).sync { individualName =>
         val preparedForm =
-          request.userAnswers.fillForm(OtherAssetIndividualSellerNINumberPage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, individualName, mode)))
+          request.userAnswers.fillForm(OtherAssetIndividualSellerNINumberPage(srn, index.refined), form)
+        Ok(view(preparedForm, viewModel(srn, index.refined, individualName, mode)))
       }
 
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(IndividualNameOfOtherAssetSellerPage(srn, index)).async { individualName =>
+            request.usingAnswer(IndividualNameOfOtherAssetSellerPage(srn, index.refined)).async { individualName =>
               Future.successful(
                 BadRequest(
-                  view(formWithErrors, viewModel(srn, index, individualName, mode))
+                  view(formWithErrors, viewModel(srn, index.refined, individualName, mode))
                 )
               )
             },
@@ -84,12 +85,13 @@ class OtherAssetIndividualSellerNINumberController @Inject()(
                 .fromTry(
                   request.userAnswers
                     .set(
-                      OtherAssetIndividualSellerNINumberPage(srn, index),
+                      OtherAssetIndividualSellerNINumberPage(srn, index.refined),
                       ConditionalYesNo(value)
                     )
                 )
-              nextPage = navigator.nextPage(OtherAssetIndividualSellerNINumberPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              nextPage = navigator
+                .nextPage(OtherAssetIndividualSellerNINumberPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

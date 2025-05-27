@@ -22,6 +22,7 @@ import models.ConditionalYesNo._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import config.RefinedTypes.Max5000
+import utils.IntUtils.IntOpts
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -55,29 +56,29 @@ class SecurityGivenForLoanController @Inject()(
 
   private val form = SecurityGivenForLoanController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       {
-        val preparedForm = request.userAnswers.fillForm(SecurityGivenForLoanPage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, mode)))
+        val preparedForm = request.userAnswers.fillForm(SecurityGivenForLoanPage(srn, index.refined), form)
+        Ok(view(preparedForm, viewModel(srn, index.refined, mode)))
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode))))
+            Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index.refined, mode))))
           },
           value =>
             for {
               updatedAnswers <- request.userAnswers
-                .set(SecurityGivenForLoanPage(srn, index), ConditionalYesNo(value))
+                .set(SecurityGivenForLoanPage(srn, index.refined), ConditionalYesNo(value))
                 .mapK
-              nextPage = navigator.nextPage(SecurityGivenForLoanPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              nextPage = navigator.nextPage(SecurityGivenForLoanPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )
@@ -108,6 +109,6 @@ object SecurityGivenForLoanController {
           ),
         no = YesNoViewModel.Unconditional
       ),
-      routes.SecurityGivenForLoanController.onSubmit(srn, index, mode)
+      routes.SecurityGivenForLoanController.onSubmit(srn, index.value, mode)
     )
 }

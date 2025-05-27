@@ -20,6 +20,7 @@ import services.SaveService
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.{Max50, Max5000}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import pages.nonsipp.sharesdisposal.SharesIndividualBuyerNamePage
 import navigation.Navigator
@@ -51,17 +52,17 @@ class SharesIndividualBuyerNameController @Inject()(
 
   private def form = SharesIndividualBuyerNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(SharesIndividualBuyerNamePage(srn, index, disposalIndex)),
-          SharesIndividualBuyerNameController.viewModel(srn, index, disposalIndex, mode)
+          form.fromUserAnswers(SharesIndividualBuyerNamePage(srn, index.refined, disposalIndex.refined)),
+          SharesIndividualBuyerNameController.viewModel(srn, index.refined, disposalIndex.refined, mode)
         )
       )
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -71,7 +72,7 @@ class SharesIndividualBuyerNameController @Inject()(
               BadRequest(
                 view(
                   formWithErrors,
-                  SharesIndividualBuyerNameController.viewModel(srn, index, disposalIndex, mode)
+                  SharesIndividualBuyerNameController.viewModel(srn, index.refined, disposalIndex.refined, mode)
                 )
               )
             ),
@@ -79,14 +80,20 @@ class SharesIndividualBuyerNameController @Inject()(
             for {
               updatedAnswers <- Future.fromTry(
                 request.userAnswers
-                  .set(SharesIndividualBuyerNamePage(srn, index, disposalIndex), answer)
+                  .set(SharesIndividualBuyerNamePage(srn, index.refined, disposalIndex.refined), answer)
               )
               nextPage = navigator.nextPage(
-                SharesIndividualBuyerNamePage(srn, index, disposalIndex),
+                SharesIndividualBuyerNamePage(srn, index.refined, disposalIndex.refined),
                 mode,
                 updatedAnswers
               )
-              updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                index.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

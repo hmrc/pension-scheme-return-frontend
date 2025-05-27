@@ -31,9 +31,9 @@ class TypeOfAssetBuyerControllerSpec extends ControllerBaseSpec {
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.TypeOfAssetBuyerController.onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+    routes.TypeOfAssetBuyerController.onPageLoad(srn, assetIndex.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.TypeOfAssetBuyerController.onSubmit(srn, assetIndex, disposalIndex, NormalMode)
+    routes.TypeOfAssetBuyerController.onSubmit(srn, assetIndex.value, disposalIndex.value, NormalMode)
 
   "TypeOfAssetBuyerController" - {
 

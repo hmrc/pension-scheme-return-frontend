@@ -41,9 +41,9 @@ class ReportAnotherTransferInControllerSpec extends ControllerBaseSpec {
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   private lazy val onPageLoad =
-    routes.ReportAnotherTransferInController.onPageLoad(srn, index, secondaryIndex, NormalMode)
+    routes.ReportAnotherTransferInController.onPageLoad(srn, index.value, secondaryIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.ReportAnotherTransferInController.onSubmit(srn, index, secondaryIndex, NormalMode)
+    routes.ReportAnotherTransferInController.onSubmit(srn, index.value, secondaryIndex.value, NormalMode)
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)

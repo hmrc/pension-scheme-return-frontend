@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc._
 import controllers.nonsipp.memberreceivedpcls.PclsCYAController._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import models._
 import play.api.i18n.MessagesApi
@@ -52,21 +53,21 @@ class PclsCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn, index, mode)
+      onPageLoadCommon(srn, index.refined, mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, index, mode)
+      onPageLoadCommon(srn, index.refined, mode)
     }
 
   def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
@@ -96,14 +97,14 @@ class PclsCYAController @Inject()(
       }
     ).merge
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       lazy val pclsChanged: Boolean =
-        request.userAnswers.changed(_.buildPCLS(srn, index))
+        request.userAnswers.changed(_.buildPCLS(srn, index.refined))
 
       for {
         updatedAnswers <- request.userAnswers
-          .setWhen(pclsChanged)(MemberStatus(srn, index), MemberState.Changed)
+          .setWhen(pclsChanged)(MemberStatus(srn, index.refined), MemberState.Changed)
           .mapK[Future]
         _ <- saveService.save(updatedAnswers)
         submissionResult <- psrSubmissionService
@@ -113,7 +114,7 @@ class PclsCYAController @Inject()(
             fallbackCall = controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController.onPageLoad(srn, index, mode)
           )
       } yield submissionResult.getOrRecoverJourney(
-        _ => Redirect(navigator.nextPage(PclsCYAPage(srn, index), mode, request.userAnswers))
+        _ => Redirect(navigator.nextPage(PclsCYAPage(srn, index.refined), mode, request.userAnswers))
       )
     }
 

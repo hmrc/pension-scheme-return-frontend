@@ -31,8 +31,8 @@ class CostOfBondsControllerSpec extends ControllerBaseSpec {
 
   "CostOfBondsController" - {
 
-    lazy val onPageLoad = routes.CostOfBondsController.onPageLoad(srn, index, NormalMode)
-    lazy val onSubmit = routes.CostOfBondsController.onSubmit(srn, index, NormalMode)
+    lazy val onPageLoad = routes.CostOfBondsController.onPageLoad(srn, index.value, NormalMode)
+    lazy val onSubmit = routes.CostOfBondsController.onSubmit(srn, index.value, NormalMode)
 
     act.like(renderView(onPageLoad, defaultUserAnswers) { implicit app => implicit request =>
       injected[MoneyView]

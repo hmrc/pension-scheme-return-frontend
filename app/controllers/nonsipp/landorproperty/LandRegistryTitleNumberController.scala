@@ -21,7 +21,6 @@ import viewmodels.implicits._
 import play.api.mvc._
 import forms.mappings.Mappings
 import controllers.nonsipp.landorproperty.LandRegistryTitleNumberController._
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandRegistryTitleNumberPage}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -33,6 +32,8 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandRegistryTitleNumberPage}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -53,30 +54,35 @@ class LandRegistryTitleNumberController @Inject()(
 
   private val form = LandRegistryTitleNumberController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-        val preparedForm = request.userAnswers.fillForm(LandRegistryTitleNumberPage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, address.addressLine1, mode)))
+      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney { address =>
+        val preparedForm = request.userAnswers.fillForm(LandRegistryTitleNumberPage(srn, index.refined), form)
+        Ok(view(preparedForm, viewModel(srn, index.refined, address.addressLine1, mode)))
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, address.addressLine1, mode))))
+            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney {
+              address =>
+                Future.successful(
+                  BadRequest(view(formWithErrors, viewModel(srn, index.refined, address.addressLine1, mode)))
+                )
             }
           },
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(LandRegistryTitleNumberPage(srn, index), ConditionalYesNo(value)))
-              nextPage = navigator.nextPage(LandRegistryTitleNumberPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                .fromTry(
+                  request.userAnswers.set(LandRegistryTitleNumberPage(srn, index.refined), ConditionalYesNo(value))
+                )
+              nextPage = navigator.nextPage(LandRegistryTitleNumberPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

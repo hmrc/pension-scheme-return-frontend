@@ -32,9 +32,9 @@ class HowWereSharesDisposedControllerSpec extends ControllerBaseSpec {
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.HowWereSharesDisposedController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+    routes.HowWereSharesDisposedController.onPageLoad(srn, shareIndex.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.HowWereSharesDisposedController.onSubmit(srn, shareIndex, disposalIndex, NormalMode)
+    routes.HowWereSharesDisposedController.onSubmit(srn, shareIndex.value, disposalIndex.value, NormalMode)
 
   private val userAnswers = defaultUserAnswers.unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndex), companyName)
 

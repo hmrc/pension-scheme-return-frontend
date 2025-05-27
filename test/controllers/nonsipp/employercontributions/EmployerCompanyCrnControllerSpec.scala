@@ -31,10 +31,10 @@ class EmployerCompanyCrnControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad =
     routes.EmployerCompanyCrnController
-      .onPageLoad(srn, memberIndex, index, NormalMode)
+      .onPageLoad(srn, memberIndex.value, index.value, NormalMode)
   private lazy val onSubmit =
     routes.EmployerCompanyCrnController
-      .onSubmit(srn, memberIndex, index, NormalMode)
+      .onSubmit(srn, memberIndex.value, index.value, NormalMode)
 
   val userAnswersCompanyName: UserAnswers =
     defaultUserAnswers.unsafeSet(EmployerNamePage(srn, memberIndex, index), companyName)

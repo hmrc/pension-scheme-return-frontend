@@ -21,6 +21,7 @@ import pages.nonsipp.otherassetsdisposal.TypeOfAssetBuyerPage
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import models.IdentityType._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -52,17 +53,17 @@ class TypeOfAssetBuyerController @Inject()(
 
   private val form = TypeOfAssetBuyerController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex)),
-          viewModel(srn, assetIndex, disposalIndex, mode)
+          form.fromUserAnswers(TypeOfAssetBuyerPage(srn, assetIndex.refined, disposalIndex.refined)),
+          viewModel(srn, assetIndex.refined, disposalIndex.refined, mode)
         )
       )
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -73,19 +74,19 @@ class TypeOfAssetBuyerController @Inject()(
                 BadRequest(
                   view(
                     formWithErrors,
-                    viewModel(srn, assetIndex, disposalIndex, mode)
+                    viewModel(srn, assetIndex.refined, disposalIndex.refined, mode)
                   )
                 )
               ),
           answer => {
             for {
               updatedAnswers <- Future.fromTry(
-                request.userAnswers.set(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex), answer)
+                request.userAnswers.set(TypeOfAssetBuyerPage(srn, assetIndex.refined, disposalIndex.refined), answer)
               )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
               navigator.nextPage(
-                TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex),
+                TypeOfAssetBuyerPage(srn, assetIndex.refined, disposalIndex.refined),
                 mode,
                 updatedAnswers
               )

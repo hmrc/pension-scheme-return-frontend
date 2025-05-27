@@ -33,10 +33,10 @@ class IndividualBuyerNinoNumberControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad =
     controllers.nonsipp.landorpropertydisposal.routes.IndividualBuyerNinoNumberController
-      .onPageLoad(srn, index, disposalIndex, NormalMode)
+      .onPageLoad(srn, index.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
     controllers.nonsipp.landorpropertydisposal.routes.IndividualBuyerNinoNumberController
-      .onSubmit(srn, index, disposalIndex, NormalMode)
+      .onSubmit(srn, index.value, disposalIndex.value, NormalMode)
 
   val userAnswersWithIndividualName: UserAnswers =
     defaultUserAnswers.unsafeSet(LandOrPropertyIndividualBuyerNamePage(srn, index, disposalIndex), individualName)

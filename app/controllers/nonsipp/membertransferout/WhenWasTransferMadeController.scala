@@ -20,6 +20,7 @@ import services.{SaveService, SchemeDateService}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, IntOpts}
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -60,23 +61,30 @@ class WhenWasTransferMadeController @Inject()(
   private def form(date: DateRange)(implicit messages: Messages) =
     WhenWasTransferMadeController.form(formProvider, date)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       usingSchemeDate[Id](srn) { date =>
         (
           for {
-            member <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
+            member <- request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney
             schemeName <- request.userAnswers
-              .get(ReceivingSchemeNamePage(srn, index, secondaryIndex))
+              .get(ReceivingSchemeNamePage(srn, index.refined, secondaryIndex.refined))
               .getOrRecoverJourney
           } yield {
             val preparedForm = request.userAnswers
-              .get(WhenWasTransferMadePage(srn, index, secondaryIndex))
+              .get(WhenWasTransferMadePage(srn, index.refined, secondaryIndex.refined))
               .fold(form(date))(form(date).fill)
             Ok(
               view(
                 preparedForm,
-                WhenWasTransferMadeController.viewModel(srn, index, secondaryIndex, schemeName, member.fullName, mode)
+                WhenWasTransferMadeController.viewModel(
+                  srn,
+                  index.refined,
+                  secondaryIndex.refined,
+                  schemeName,
+                  member.fullName,
+                  mode
+                )
               )
             )
           }
@@ -84,7 +92,7 @@ class WhenWasTransferMadeController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       usingSchemeDate(srn) { date =>
         form(date)
@@ -94,16 +102,16 @@ class WhenWasTransferMadeController @Inject()(
               Future.successful(
                 (
                   for {
-                    member <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
+                    member <- request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney
                     schemeName <- request.userAnswers
-                      .get(ReceivingSchemeNamePage(srn, index, secondaryIndex))
+                      .get(ReceivingSchemeNamePage(srn, index.refined, secondaryIndex.refined))
                       .getOrRecoverJourney
                   } yield {
                     BadRequest(
                       view(
                         formWithErrors,
                         WhenWasTransferMadeController
-                          .viewModel(srn, index, secondaryIndex, schemeName, member.fullName, mode)
+                          .viewModel(srn, index.refined, secondaryIndex.refined, schemeName, member.fullName, mode)
                       )
                     )
                   }
@@ -113,15 +121,15 @@ class WhenWasTransferMadeController @Inject()(
             value =>
               for {
                 updatedAnswers <- request.userAnswers
-                  .set(WhenWasTransferMadePage(srn, index, secondaryIndex), value)
-                  .set(TransfersOutSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
+                  .set(WhenWasTransferMadePage(srn, index.refined, secondaryIndex.refined), value)
+                  .set(TransfersOutSectionCompleted(srn, index.refined, secondaryIndex.refined), SectionCompleted)
                   .mapK[Future]
                 nextPage = navigator
-                  .nextPage(WhenWasTransferMadePage(srn, index, secondaryIndex), mode, updatedAnswers)
+                  .nextPage(WhenWasTransferMadePage(srn, index.refined, secondaryIndex.refined), mode, updatedAnswers)
                 updatedProgressAnswers <- saveProgress(
                   srn,
-                  index,
-                  secondaryIndex,
+                  index.refined,
+                  secondaryIndex.refined,
                   updatedAnswers,
                   nextPage,
                   alwaysCompleted = true

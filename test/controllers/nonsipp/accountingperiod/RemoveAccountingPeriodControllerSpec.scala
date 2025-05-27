@@ -27,8 +27,8 @@ import models.NormalMode
 
 class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.RemoveAccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
-  private lazy val onSubmit = routes.RemoveAccountingPeriodController.onSubmit(srn, refineMV(1), NormalMode)
+  private lazy val onPageLoad = routes.RemoveAccountingPeriodController.onPageLoad(srn, 1, NormalMode)
+  private lazy val onSubmit = routes.RemoveAccountingPeriodController.onSubmit(srn, 1, NormalMode)
 
   private val period = dateRangeGen.sample.value
   private val otherPeriod = dateRangeGen.sample.value

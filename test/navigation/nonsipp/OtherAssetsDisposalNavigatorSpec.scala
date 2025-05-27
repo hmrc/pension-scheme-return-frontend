@@ -19,6 +19,7 @@ package navigation.nonsipp
 import pages.nonsipp.otherassetsdisposal._
 import utils.BaseSpec
 import config.RefinedTypes.{Max50, Max5000}
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import models._

@@ -19,6 +19,7 @@ package controllers.nonsipp.employercontributions
 import viewmodels.implicits._
 import controllers.nonsipp.employercontributions.EmployerNameController._
 import play.api.mvc._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -51,24 +52,28 @@ class EmployerNameController @Inject()(
 
   private val form = EmployerNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Int, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val preparedForm = request.userAnswers.fillForm(EmployerNamePage(srn, memberIndex, index), form)
-      Ok(view(preparedForm, viewModel(srn, memberIndex, index, mode)))
+      val preparedForm = request.userAnswers.fillForm(EmployerNamePage(srn, memberIndex.refined, index.refined), form)
+      Ok(view(preparedForm, viewModel(srn, memberIndex.refined, index.refined, mode)))
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, viewModel(srn, memberIndex, index, mode)))),
+            Future
+              .successful(BadRequest(view(formWithErrors, viewModel(srn, memberIndex.refined, index.refined, mode)))),
           value =>
             for {
-              updatedAnswers <- request.userAnswers.set(EmployerNamePage(srn, memberIndex, index), value).mapK
-              nextPage = navigator.nextPage(EmployerNamePage(srn, memberIndex, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, memberIndex, index, updatedAnswers, nextPage)
+              updatedAnswers <- request.userAnswers
+                .set(EmployerNamePage(srn, memberIndex.refined, index.refined), value)
+                .mapK
+              nextPage = navigator
+                .nextPage(EmployerNamePage(srn, memberIndex.refined, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, memberIndex.refined, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

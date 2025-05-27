@@ -17,6 +17,7 @@
 package navigation.nonsipp
 
 import utils.BaseSpec
+import navigation.nonsipp.RouteFnModeHelper.refine
 import config.RefinedTypes.{Max5000, OneTo5000}
 import models.SchemeId.Srn
 import eu.timepit.refined.refineMV
@@ -66,7 +67,8 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateTo(
           WhatYouWillNeedSharesPage,
-          (srn, _) => controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, index, NormalMode)
+          (srn, _) =>
+            controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, index.value, NormalMode)
         )
         .withName(
           "go from WhatYouWillNeedSharesPage to type of shares page"
@@ -79,7 +81,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           TypeOfSharesHeldPage,
           (srn, _: Max5000, _) =>
-            controllers.nonsipp.shares.routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, NormalMode)
+            controllers.nonsipp.shares.routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index.value, NormalMode)
         )
         .withName(
           "go from TypeOfSharesHeldPage to WhyDoesSchemeHoldShares page"
@@ -92,7 +94,8 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           WhyDoesSchemeHoldSharesPage,
           (srn, _: Max5000, _) =>
-            controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, NormalMode),
+            controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController
+              .onPageLoad(srn, index.value, NormalMode),
           srn =>
             defaultUserAnswers.unsafeSet(
               WhyDoesSchemeHoldSharesPage(srn, index),
@@ -110,7 +113,8 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           WhyDoesSchemeHoldSharesPage,
           (srn, _: Max5000, _) =>
-            controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, NormalMode),
+            controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController
+              .onPageLoad(srn, index.value, NormalMode),
           srn =>
             defaultUserAnswers.unsafeSet(
               WhyDoesSchemeHoldSharesPage(srn, index),
@@ -128,7 +132,8 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           WhyDoesSchemeHoldSharesPage,
           (srn, _: Max5000, _) =>
-            controllers.nonsipp.shares.routes.CompanyNameRelatedSharesController.onPageLoad(srn, index, NormalMode),
+            controllers.nonsipp.shares.routes.CompanyNameRelatedSharesController
+              .onPageLoad(srn, index.value, NormalMode),
           srn =>
             defaultUserAnswers.unsafeSet(
               WhyDoesSchemeHoldSharesPage(srn, index),
@@ -148,7 +153,8 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               subject,
               IdentityTypePage,
               Gen.const(IdentityType.Other),
-              controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
+              RouteFnSubjectModeHelper
+                .refine[5000](controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad)
             )
             .withName("go from identity type page to other seller details page")
         )
@@ -160,7 +166,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               subject,
               IdentityTypePage,
               Gen.const(IdentityType.Individual),
-              controllers.nonsipp.shares.routes.IndividualNameOfSharesSellerController.onPageLoad
+              refine[5000](controllers.nonsipp.shares.routes.IndividualNameOfSharesSellerController.onPageLoad)
             )
             .withName("go from identity type page to individual seller name page")
         )
@@ -172,7 +178,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               subject,
               IdentityTypePage,
               Gen.const(IdentityType.UKCompany),
-              controllers.nonsipp.shares.routes.CompanyNameOfSharesSellerController.onPageLoad
+              refine[5000](controllers.nonsipp.shares.routes.CompanyNameOfSharesSellerController.onPageLoad)
             )
             .withName("go from identity type page to company seller name page")
         )
@@ -184,7 +190,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               subject,
               IdentityTypePage,
               Gen.const(IdentityType.UKPartnership),
-              controllers.nonsipp.shares.routes.PartnershipNameOfSharesSellerController.onPageLoad
+              refine[5000](controllers.nonsipp.shares.routes.PartnershipNameOfSharesSellerController.onPageLoad)
             )
             .withName("go from identity type page to UKPartnership to partnership name of shares seller name page")
         )
@@ -198,7 +204,8 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             WhenDidSchemeAcquireSharesPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.CompanyNameRelatedSharesController.onPageLoad(srn, index, NormalMode)
+              controllers.nonsipp.shares.routes.CompanyNameRelatedSharesController
+                .onPageLoad(srn, index.value, NormalMode)
           )
           .withName(
             "go from WhenDidSchemeAcquireShares to CompanyNameRelatedShares page"
@@ -213,7 +220,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             CompanyNameRelatedSharesPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCompanyCrnController.onPageLoad(srn, index, NormalMode)
+              controllers.nonsipp.shares.routes.SharesCompanyCrnController.onPageLoad(srn, index.value, NormalMode)
           )
           .withName(
             "go from company name related shares page to shares company Crn page"
@@ -228,7 +235,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             SharesCompanyCrnPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.ClassOfSharesController.onPageLoad(srn, index, NormalMode)
+              controllers.nonsipp.shares.routes.ClassOfSharesController.onPageLoad(srn, index.value, NormalMode)
           )
           .withName(
             "go from shares company Crn page to class of shares page"
@@ -243,7 +250,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             ClassOfSharesPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.HowManySharesController.onPageLoad(srn, index, NormalMode)
+              controllers.nonsipp.shares.routes.HowManySharesController.onPageLoad(srn, index.value, NormalMode)
           )
           .withName("go from class of shares to identity subject shares seller page")
       )
@@ -257,7 +264,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             IndividualNameOfSharesSellerPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
           )
           .withName("go from individual name of shares seller page to shares individual seller NI number page")
       )
@@ -271,7 +278,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             SharesIndividualSellerNINumberPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
-                .onPageLoad(srn, index, NormalMode),
+                .onPageLoad(srn, index.value, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -291,7 +298,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             SharesIndividualSellerNINumberPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
+              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index.value, NormalMode)
           )
           .withName("go from SharesIndividualSellerNINumber page to CostOfShares page")
       )
@@ -305,7 +312,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             CompanyNameOfSharesSellerPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.common.routes.CompanyRecipientCrnController
-                .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+                .onPageLoad(srn, index.value, NormalMode, IdentitySubject.SharesSeller)
           )
           .withName("go from  company name of shares seller page to company recipient Crn page")
       )
@@ -319,7 +326,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             CostOfSharesPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesIndependentValuationController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
           )
           .withName("go from cost of shares page to SharesIndependentValuation page")
       )
@@ -333,7 +340,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             PartnershipShareSellerNamePage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-                .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+                .onPageLoad(srn, index.value, NormalMode, IdentitySubject.SharesSeller)
           )
           .withName("go from  company name of shares seller page to partnership recipient Utr page")
       )
@@ -348,7 +355,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             PartnershipRecipientUtrPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
-                .onPageLoad(srn, index, NormalMode),
+                .onPageLoad(srn, index.value, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -369,7 +376,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             subject,
             PartnershipRecipientUtrPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
+              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index.value, NormalMode)
           )
           .withName("go from PartnershipRecipientUtrPage page to CostOfShares page")
       )
@@ -384,7 +391,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             CompanyRecipientCrnPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
-                .onPageLoad(srn, index, NormalMode),
+                .onPageLoad(srn, index.value, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -405,7 +412,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             subject,
             CompanyRecipientCrnPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
+              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index.value, NormalMode)
           )
           .withName("go from CompanyRecipientCrnPage page to CostOfShares page")
       )
@@ -426,7 +433,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             OtherRecipientDetailsPage,
             Gen.const(shareDetails),
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
+              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index.value, NormalMode)
           )
           .withName("go from other recipient details page to CostOfShares page")
       )
@@ -440,7 +447,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             HowManySharesPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.common.routes.IdentityTypeController
-                .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller),
+                .onPageLoad(srn, index.value, NormalMode, IdentitySubject.SharesSeller),
             srn =>
               defaultUserAnswers.unsafeSet(
                 WhyDoesSchemeHoldSharesPage(srn, index),
@@ -461,7 +468,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             HowManySharesPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
-                .onPageLoad(srn, index, NormalMode),
+                .onPageLoad(srn, index.value, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -481,7 +488,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             HowManySharesPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode),
+              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index.value, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -501,7 +508,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             HowManySharesPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode),
+              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index.value, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -522,7 +529,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             SharesFromConnectedPartyPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.CostOfSharesController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
           )
           .withName("go from  shares from connected party page to cost of shares page")
       )
@@ -535,7 +542,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             SharesIndependentValuationPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesTotalIncomeController.onPageLoad(srn, index, NormalMode),
+              controllers.nonsipp.shares.routes.SharesTotalIncomeController.onPageLoad(srn, index.value, NormalMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -560,7 +567,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             SharesIndependentValuationPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, NormalMode),
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index.value, NormalMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -586,7 +593,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             SharesIndependentValuationPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesTotalIncomeController
-                .onPageLoad(srn, index, NormalMode),
+                .onPageLoad(srn, index.value, NormalMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -612,7 +619,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             SharesIndependentValuationPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesTotalIncomeController
-                .onPageLoad(srn, index, NormalMode),
+                .onPageLoad(srn, index.value, NormalMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -638,7 +645,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             TotalAssetValuePage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesTotalIncomeController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
           )
           .withName(
             "go from TotalAssetValuePage to SharesTotalIncomePage"
@@ -694,7 +701,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
       test(
         "go to CYA when unchanged answer is Unquoted and SharesFromConnectedPartyPage is complete",
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        refine(controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad),
         oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted),
         newUserAnswers = srn =>
           _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
@@ -703,14 +710,14 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
       test(
         "go to SharesFromConnectedParty when unchanged answer is Unquoted and SharesFromConnectedPartyPage is incomplete",
-        controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad,
+        refine[5000](controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad),
         oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted),
         newUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
       )
 
       test(
         "go to CYA when unchanged answer is SponsoringEmployer and TotalAssetValuePage is complete",
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        refine[5000](controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad),
         oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer),
         newUserAnswers = srn =>
           _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer)
@@ -720,7 +727,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
       test(
         "go to TotalAssetValue when unchanged answer is SponsoringEmployer and TotalAssetValuePage is incomplete",
-        controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad,
+        refine[5000](controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad),
         oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer),
         newUserAnswers = srn =>
           _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer)
@@ -729,21 +736,21 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
       test(
         "go to CYA when unchanged answer is ConnectedParty",
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        refine[5000](controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad),
         oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty),
         newUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty)
       )
 
       test(
         "go to CYA when answer is changed to SponsoringEmployer",
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        refine[5000](controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad),
         oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty),
         newUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer)
       )
 
       test(
         "go to TotalAssetValue when answer is changed to SponsoringEmployer and WhyDoesSchemeHoldShares is Acquisition",
-        controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad,
+        refine[5000](controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad),
         oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty),
         newUserAnswers = srn =>
           _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer)
@@ -752,14 +759,14 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
       test(
         "go to SharesFromConnectedPartyPage when answer is changed to Unquoted",
-        controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad,
+        refine[5000](controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad),
         oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty),
         newUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted)
       )
 
       test(
         "go to CYA when answer is changed to ConnectedParty",
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        refine[5000](controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad),
         oldUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.SponsoringEmployer),
         newUserAnswers = srn => _.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty)
       )
@@ -787,7 +794,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
       test(
         "go to CYA when unchanged answer is Contribution and WhenDidSchemeAcquireSharesPage is complete",
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        refine[5000](controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad),
         oldUserAnswers = srn => _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Contribution),
         newUserAnswers = srn =>
           _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Contribution)
@@ -796,7 +803,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
       test(
         "go to WhenDidSchemeAcquireShares when unchanged answer is Contribution and WhenDidSchemeAcquireSharesPage is incomplete",
-        controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad,
+        refine[5000](controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad),
         oldUserAnswers = srn => _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Contribution),
         newUserAnswers = srn => _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Contribution)
       )
@@ -804,7 +811,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       test(
         "go to CYA when unchanged answer is Acquisition and WhenDidSchemeAcquireSharesPage, at least one share seller" +
           "and TotalAssetValuePage are all complete when TypeOfSharesHeld is SponsoringEmployer",
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        refine[5000](controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad),
         oldUserAnswers = srn => _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition),
         newUserAnswers = srn =>
           _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition)
@@ -819,7 +826,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
       test(
         "go to CYA when unchanged answer is Transfer",
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad,
+        refine[5000](controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad),
         oldUserAnswers = srn => _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Transfer),
         newUserAnswers = srn => _.unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Transfer)
       )
@@ -832,7 +839,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             CompanyNameRelatedSharesPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode)
           )
           .withName(
             "go from company name related shares page to sharesCYA page"
@@ -847,7 +854,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             SharesCompanyCrnPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode)
           )
           .withName(
             "go from shares company Crn page to class of sharesCYA page"
@@ -862,7 +869,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             ClassOfSharesPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode)
           )
           .withName("go from class of shares to identity subject sharesCYA page")
       )
@@ -875,7 +882,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             HowManySharesPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 WhyDoesSchemeHoldSharesPage(srn, index),
@@ -895,7 +902,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             HowManySharesPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -915,7 +922,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             HowManySharesPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -935,7 +942,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             HowManySharesPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -956,7 +963,8 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             subject,
             IdentityTypePage,
             Gen.const(IdentityType.Other),
-            controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
+            RouteFnSubjectModeHelper
+              .refine[5000](controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad)
           )
           .withName("go from identity type page to other seller details page")
       )
@@ -968,7 +976,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             subject,
             IdentityTypePage,
             Gen.const(IdentityType.Individual),
-            controllers.nonsipp.shares.routes.IndividualNameOfSharesSellerController.onPageLoad
+            refine[5000](controllers.nonsipp.shares.routes.IndividualNameOfSharesSellerController.onPageLoad)
           )
           .withName("go from identity type page to individual seller name page")
       )
@@ -980,7 +988,8 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             subject,
             IdentityTypePage,
             Gen.const(IdentityType.UKCompany),
-            controllers.nonsipp.shares.routes.CompanyNameOfSharesSellerController.onPageLoad
+            RouteFnModeHelper
+              .refine[5000](controllers.nonsipp.shares.routes.CompanyNameOfSharesSellerController.onPageLoad)
           )
           .withName("go from identity type page to company seller name page")
       )
@@ -992,7 +1001,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             subject,
             IdentityTypePage,
             Gen.const(IdentityType.UKPartnership),
-            controllers.nonsipp.shares.routes.PartnershipNameOfSharesSellerController.onPageLoad
+            refine[5000](controllers.nonsipp.shares.routes.PartnershipNameOfSharesSellerController.onPageLoad)
           )
           .withName("go from identity type page to UKPartnership to partnership name of shares seller name page")
       )
@@ -1006,7 +1015,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             IndividualNameOfSharesSellerPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index.value, CheckMode)
           )
           .withName("go from individual name of shares seller page to shares individual seller NI number page")
       )
@@ -1018,7 +1027,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             IndividualNameOfSharesSellerPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesCYAController
-                .onPageLoad(srn, index, CheckMode),
+                .onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(SharesIndividualSellerNINumberPage(srn, index), ConditionalYesNo.no[String, Nino]("Reason"))
@@ -1036,7 +1045,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             WhenDidSchemeAcquireSharesPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.common.routes.IdentityTypeController
-                .onPageLoad(srn, index, CheckMode, IdentitySubject.SharesSeller),
+                .onPageLoad(srn, index.value, CheckMode, IdentitySubject.SharesSeller),
             srn =>
               defaultUserAnswers.unsafeSet(
                 WhyDoesSchemeHoldSharesPage(srn, index),
@@ -1054,7 +1063,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             WhenDidSchemeAcquireSharesPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -1071,7 +1080,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             WhenDidSchemeAcquireSharesPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
-                .onPageLoad(srn, index, CheckMode),
+                .onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -1090,7 +1099,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             WhenDidSchemeAcquireSharesPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesCYAController
-                .onPageLoad(srn, index, CheckMode),
+                .onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -1113,7 +1122,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             CompanyNameOfSharesSellerPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.common.routes.CompanyRecipientCrnController
-                .onPageLoad(srn, index, CheckMode, SharesSeller)
+                .onPageLoad(srn, index.value, CheckMode, SharesSeller)
           )
           .withName("go from company name of shares seller page to company recipient crn page")
       )
@@ -1125,7 +1134,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             CompanyNameOfSharesSellerPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesCYAController
-                .onPageLoad(srn, index, CheckMode),
+                .onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -1146,7 +1155,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             PartnershipShareSellerNamePage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-                .onPageLoad(srn, index, CheckMode, SharesSeller)
+                .onPageLoad(srn, index.value, CheckMode, SharesSeller)
           )
           .withName("go from Partnership Share Seller Name Page to partnership recipient utr page")
       )
@@ -1158,7 +1167,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             PartnershipShareSellerNamePage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesCYAController
-                .onPageLoad(srn, index, CheckMode),
+                .onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -1187,7 +1196,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             Gen.const(shareDetails),
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
-                .onPageLoad(srn, index, CheckMode),
+                .onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -1208,7 +1217,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             Gen.const(shareDetails),
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesCYAController
-                .onPageLoad(srn, index, CheckMode),
+                .onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -1230,7 +1239,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             OtherRecipientDetailsPage,
             Gen.const(shareDetails),
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -1250,7 +1259,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             OtherRecipientDetailsPage,
             Gen.const(shareDetails),
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -1271,7 +1280,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             SharesIndividualSellerNINumberPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
-                .onPageLoad(srn, index, CheckMode),
+                .onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -1290,7 +1299,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             SharesIndividualSellerNINumberPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesCYAController
-                .onPageLoad(srn, index, CheckMode),
+                .onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -1310,7 +1319,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             SharesIndividualSellerNINumberPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -1328,7 +1337,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             SharesIndividualSellerNINumberPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -1348,7 +1357,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             CompanyRecipientCrnPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
-                .onPageLoad(srn, index, CheckMode),
+                .onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -1368,7 +1377,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             CompanyRecipientCrnPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesCYAController
-                .onPageLoad(srn, index, CheckMode),
+                .onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -1389,7 +1398,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             subject,
             CompanyRecipientCrnPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -1408,7 +1417,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             subject,
             CompanyRecipientCrnPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -1428,7 +1437,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             PartnershipRecipientUtrPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
-                .onPageLoad(srn, index, CheckMode),
+                .onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -1448,7 +1457,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             PartnershipRecipientUtrPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.shares.routes.SharesCYAController
-                .onPageLoad(srn, index, CheckMode),
+                .onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -1469,7 +1478,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             subject,
             PartnershipRecipientUtrPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -1488,7 +1497,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             subject,
             PartnershipRecipientUtrPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -1506,7 +1515,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             SharesFromConnectedPartyPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode)
           )
           .withName("go from  shares from connected party page to  sharesCYA page")
       )
@@ -1519,7 +1528,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             SharesFromConnectedPartyPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -1542,7 +1551,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             CostOfSharesPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode)
           )
           .withName("go from cost of shares page to SharesCYA page")
       )
@@ -1555,7 +1564,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             SharesIndependentValuationPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -1580,7 +1589,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             SharesIndependentValuationPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -1605,7 +1614,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             SharesIndependentValuationPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -1630,7 +1639,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             SharesIndependentValuationPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -1655,7 +1664,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             TotalAssetValuePage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index.value, CheckMode)
           )
           .withName(
             "go from TotalAssetValuePage to SharesCYA Page"

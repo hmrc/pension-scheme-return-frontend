@@ -18,6 +18,7 @@ package controllers.nonsipp.employercontributions
 
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, IntOpts}
 import config.Constants.maxInputLength
 import controllers.actions._
 import navigation.Navigator
@@ -53,33 +54,51 @@ class OtherEmployeeDescriptionController @Inject()(
 
   private val form = OtherEmployeeDescriptionController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
-        request.userAnswers.get(OtherEmployeeDescriptionPage(srn, index, secondaryIndex)).fold(form)(form.fill)
-      request.userAnswers.get(EmployerNamePage(srn, index, secondaryIndex)).getOrRecoverJourney { employerName =>
-        Ok(view(preparedForm, viewModel(srn, employerName, index, secondaryIndex, mode)))
+        request.userAnswers
+          .get(OtherEmployeeDescriptionPage(srn, index.refined, secondaryIndex.refined))
+          .fold(form)(form.fill)
+      request.userAnswers.get(EmployerNamePage(srn, index.refined, secondaryIndex.refined)).getOrRecoverJourney {
+        employerName =>
+          Ok(view(preparedForm, viewModel(srn, employerName, index.refined, secondaryIndex.refined, mode)))
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(EmployerNamePage(srn, index, secondaryIndex)).getOrRecoverJourney { employerName =>
-              Future
-                .successful(BadRequest(view(formWithErrors, viewModel(srn, employerName, index, secondaryIndex, mode))))
+            request.userAnswers.get(EmployerNamePage(srn, index.refined, secondaryIndex.refined)).getOrRecoverJourney {
+              employerName =>
+                Future
+                  .successful(
+                    BadRequest(
+                      view(formWithErrors, viewModel(srn, employerName, index.refined, secondaryIndex.refined, mode))
+                    )
+                  )
             },
           value =>
             for {
               updatedAnswers <- request.userAnswers
-                .set(OtherEmployeeDescriptionPage(srn, index, secondaryIndex), value)
+                .set(OtherEmployeeDescriptionPage(srn, index.refined, secondaryIndex.refined), value)
                 .mapK
               nextPage = navigator
-                .nextPage(OtherEmployeeDescriptionPage(srn, index, secondaryIndex), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, secondaryIndex, updatedAnswers, nextPage)
+                .nextPage(
+                  OtherEmployeeDescriptionPage(srn, index.refined, secondaryIndex.refined),
+                  mode,
+                  updatedAnswers
+                )
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                index.refined,
+                secondaryIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

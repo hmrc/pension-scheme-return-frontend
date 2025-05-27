@@ -17,8 +17,10 @@
 package navigation.nonsipp
 
 import utils.BaseSpec
+import navigation.nonsipp.RouteFnDoubleModeHelper.refine
 import config.RefinedTypes.{Max50, Max5000}
 import models.SchemeId.Srn
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import models._
@@ -313,9 +315,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               disposalIndex,
               HowWereBondsDisposedOfPage.apply,
               Gen.const(HowDisposed.Transferred),
-              (srn, bondIndex, disposalIndex, _) =>
-                controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
-                  .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+              refine[5000, 50](controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController.onPageLoad)
             )
             .withName("go from How were disposed bond page to bond disposal CYA page when select transferred")
         )
@@ -327,9 +327,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               disposalIndex,
               HowWereBondsDisposedOfPage.apply,
               Gen.const(HowDisposed.Other("other details")),
-              (srn, bondIndex, disposalIndex, _) =>
-                controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
-                  .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+              refine[5000, 50](controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController.onPageLoad)
             )
             .withName("go from How were disposed bond page to bond disposal CYA page when select other")
         )

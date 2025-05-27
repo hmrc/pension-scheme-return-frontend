@@ -65,7 +65,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithData(
             CheckReturnDatesPage,
             Gen.const(false),
-            accountingperiod.routes.AccountingPeriodController.onPageLoad(_, refineMV(1), _)
+            accountingperiod.routes.AccountingPeriodController.onPageLoad(_, 1, _)
           )
           .withName("go from check return dates page to accounting period page when no is selected")
       )
@@ -156,7 +156,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithData(
             CheckReturnDatesPage,
             Gen.const(false),
-            (srn, mode) => nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), mode)
+            (srn, mode) => nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, 1, mode)
           )
           .withName(
             "go from CheckReturnDates page to AccountingPeriods when No selected and AccountingPeriods is empty"

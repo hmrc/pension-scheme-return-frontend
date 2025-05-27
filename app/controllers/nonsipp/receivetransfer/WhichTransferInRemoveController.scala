@@ -22,6 +22,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import utils.ListUtils.ListOps
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import controllers.nonsipp.receivetransfer.WhichTransferInRemoveController._
 import forms.RadioListFormProvider
@@ -50,9 +51,9 @@ class WhichTransferInRemoveController @Inject()(
 
   val form: Form[Max5] = WhichTransferInRemoveController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn, memberIndex: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val completed: List[Max5] = request.userAnswers
-      .map(ReceiveTransferProgress.all(srn, memberIndex))
+      .map(ReceiveTransferProgress.all(srn, memberIndex.refined))
       .filter {
         case (_, status) => status.completed
       }
@@ -73,23 +74,23 @@ class WhichTransferInRemoveController @Inject()(
       case _ =>
         (
           for {
-            memberName <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney
-            values <- getJourneyValues(srn, memberIndex)
-          } yield Ok(view(form, viewModel(srn, memberIndex, memberName.fullName, values)))
+            memberName <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex.refined)).getOrRecoverJourney
+            values <- getJourneyValues(srn, memberIndex.refined)
+          } yield Ok(view(form, viewModel(srn, memberIndex.refined, memberName.fullName, values)))
         ).merge
     }
   }
 
-  def onSubmit(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onSubmit(srn: Srn, memberIndex: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     form
       .bindFromRequest()
       .fold(
         errors =>
           (
             for {
-              memberName <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney
-              values <- getJourneyValues(srn, memberIndex)
-            } yield BadRequest(view(errors, viewModel(srn, memberIndex, memberName.fullName, values)))
+              memberName <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex.refined)).getOrRecoverJourney
+              values <- getJourneyValues(srn, memberIndex.refined)
+            } yield BadRequest(view(errors, viewModel(srn, memberIndex.refined, memberName.fullName, values)))
           ).merge,
         answer =>
           Redirect(
@@ -153,7 +154,7 @@ object WhichTransferInRemoveController {
             Message("whichTransferInRemove.radio.label", total.displayAs, transferringSchemeName)
           )
         )
-    }.toList
+    }
 
   def viewModel(
     srn: Srn,

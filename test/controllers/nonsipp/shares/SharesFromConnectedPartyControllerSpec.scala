@@ -30,8 +30,8 @@ import controllers.ControllerBaseSpec
 class SharesFromConnectedPartyControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
-  private lazy val onPageLoad = routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.SharesFromConnectedPartyController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.SharesFromConnectedPartyController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.SharesFromConnectedPartyController.onSubmit(srn, index.value, NormalMode)
   private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
   private val subject = IdentitySubject.SharesSeller
 

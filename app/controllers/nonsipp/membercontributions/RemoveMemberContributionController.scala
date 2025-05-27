@@ -19,6 +19,7 @@ package controllers.nonsipp.membercontributions
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -54,19 +55,21 @@ class RemoveMemberContributionController @Inject()(
 
   private val form = RemoveMemberContributionController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRedirectToTaskList(srn)
-          totalContrib <- request.userAnswers.get(TotalMemberContributionPage(srn, index)).getOrRedirectToTaskList(srn)
+          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRedirectToTaskList(srn)
+          totalContrib <- request.userAnswers
+            .get(TotalMemberContributionPage(srn, index.refined))
+            .getOrRedirectToTaskList(srn)
         } yield {
           Ok(
             view(
               form,
               RemoveMemberContributionController.viewModel(
                 srn,
-                index: Max300,
+                index.refined,
                 totalContrib,
                 nameDOB.fullName
               )
@@ -76,7 +79,7 @@ class RemoveMemberContributionController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max300): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -85,13 +88,13 @@ class RemoveMemberContributionController @Inject()(
             (
               for {
                 total <- request.userAnswers
-                  .get(TotalMemberContributionPage(srn, index))
+                  .get(TotalMemberContributionPage(srn, index.refined))
                   .getOrRecoverJourneyT
-                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourneyT
+                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourneyT
               } yield BadRequest(
                 view(
                   formWithErrors,
-                  RemoveMemberContributionController.viewModel(srn, index, total, nameDOB.fullName)
+                  RemoveMemberContributionController.viewModel(srn, index.refined, total, nameDOB.fullName)
                 )
               )
             ).merge
@@ -100,8 +103,8 @@ class RemoveMemberContributionController @Inject()(
             if (removeDetails) {
               for {
                 updatedAnswers <- request.userAnswers
-                  .remove(TotalMemberContributionPage(srn, index))
-                  .set(MemberStatus(srn, index), MemberState.Changed)
+                  .remove(TotalMemberContributionPage(srn, index.refined))
+                  .set(MemberStatus(srn, index.refined), MemberState.Changed)
                   .mapK[Future]
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
@@ -114,7 +117,7 @@ class RemoveMemberContributionController @Inject()(
                 _ =>
                   Redirect(
                     navigator
-                      .nextPage(RemoveMemberContributionPage(srn, index), NormalMode, updatedAnswers)
+                      .nextPage(RemoveMemberContributionPage(srn, index.refined), NormalMode, updatedAnswers)
                   )
               )
             } else {
@@ -122,7 +125,7 @@ class RemoveMemberContributionController @Inject()(
                 .successful(
                   Redirect(
                     navigator
-                      .nextPage(RemoveMemberContributionPage(srn, index), NormalMode, request.userAnswers)
+                      .nextPage(RemoveMemberContributionPage(srn, index.refined), NormalMode, request.userAnswers)
                   )
                 )
             }

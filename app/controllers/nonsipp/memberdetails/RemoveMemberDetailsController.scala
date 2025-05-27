@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails._
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.IntOpts
 import controllers.actions._
 import navigation.Navigator
 import models._
@@ -54,28 +55,28 @@ class RemoveMemberDetailsController @Inject()(
     extends PSRController
     with SoftDelete {
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      withMemberDetails(srn, index)(
-        nameDOB => Ok(view(form(formProvider, nameDOB), viewModel(srn, index, nameDOB, mode)))
+      withMemberDetails(srn, index.refined)(
+        nameDOB => Ok(view(form(formProvider, nameDOB), viewModel(srn, index.refined, nameDOB, mode)))
       )
     }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      form(formProvider, request.userAnswers.get(MemberDetailsPage(srn, index)).get)
+      form(formProvider, request.userAnswers.get(MemberDetailsPage(srn, index.refined)).get)
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future.successful(
-              withMemberDetails(srn, index)(
-                nameDOB => BadRequest(view(formWithErrors, viewModel(srn, index, nameDOB, mode)))
+              withMemberDetails(srn, index.refined)(
+                nameDOB => BadRequest(view(formWithErrors, viewModel(srn, index.refined, nameDOB, mode)))
               )
             ),
           removeMemberDetails => {
             if (removeMemberDetails) {
               for {
-                updatedAnswers <- softDeleteMember(srn, index).mapK[Future]
+                updatedAnswers <- softDeleteMember(srn, index.refined).mapK[Future]
                 _ <- saveService.save(updatedAnswers)
                 result <- submissionService
                   .submitPsrDetailsWithUA(srn, updatedAnswers, routes.PensionSchemeMembersController.onPageLoad(srn))
@@ -118,6 +119,6 @@ object RemoveMemberDetailsController {
       YesNoPageViewModel(
         hint = Some(Message("removeMemberDetails.hint"))
       ),
-      routes.RemoveMemberDetailsController.onSubmit(srn, index, mode)
+      routes.RemoveMemberDetailsController.onSubmit(srn, index.value, mode)
     )
 }

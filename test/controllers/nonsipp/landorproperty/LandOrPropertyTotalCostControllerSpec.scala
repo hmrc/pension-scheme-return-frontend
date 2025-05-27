@@ -28,8 +28,8 @@ import controllers.nonsipp.landorproperty.LandOrPropertyTotalCostController._
 class LandOrPropertyTotalCostControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
-  private lazy val onPageLoad = routes.LandOrPropertyTotalCostController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.LandOrPropertyTotalCostController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.LandOrPropertyTotalCostController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.LandOrPropertyTotalCostController.onSubmit(srn, index.value, NormalMode)
 
   "LandOrPropertyTotalCostController" - {
 

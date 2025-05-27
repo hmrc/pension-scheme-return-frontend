@@ -28,9 +28,9 @@ class LandPropertyAddressManualControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
   private lazy val onPageLoad =
-    routes.LandPropertyAddressManualController.onPageLoad(srn, index, isUkAddress = true, NormalMode)
+    routes.LandPropertyAddressManualController.onPageLoad(srn, index.value, isUkAddress = true, NormalMode)
   private lazy val onSubmit =
-    routes.LandPropertyAddressManualController.onSubmit(srn, index, isUkAddress = true, NormalMode)
+    routes.LandPropertyAddressManualController.onSubmit(srn, index.value, isUkAddress = true, NormalMode)
 
   "LandPropertyAddressManualController" - {
 

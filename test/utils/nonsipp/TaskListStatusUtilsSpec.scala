@@ -260,7 +260,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
     def secondQuestionPageUrl(index: Max5000): String =
       controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
         .url
 
     "should be Not Started" - {
@@ -364,7 +364,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
     def secondQuestionPageUrl(index: Max5000): String =
       controllers.nonsipp.landorproperty.routes.LandPropertyInUKController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
         .url
 
     "should be Not Started" - {
@@ -447,7 +447,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
     def secondQuestionPageUrl(index: Max5000): String =
       controllers.nonsipp.moneyborrowed.routes.LenderNameController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
         .url
 
     "should be Not Started" - {
@@ -541,7 +541,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
     def secondQuestionPageUrl(index: Max5000): String =
       controllers.nonsipp.shares.routes.TypeOfSharesHeldController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
         .url
 
     "should be Not Started" - {
@@ -675,7 +675,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
     def secondQuestionPageUrl(index: Max5000): String =
       controllers.nonsipp.bonds.routes.NameOfBondsController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
         .url
 
     "should be Not Started" - {
@@ -701,7 +701,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(
             BondsProgress(srn, refineMV(1)),
             SectionJourneyStatus.InProgress(
-              routes.NameOfBondsController.onPageLoad(srn, refineMV(1), NormalMode)
+              routes.NameOfBondsController.onPageLoad(srn, 1, NormalMode)
             )
           )
           // second bond:
@@ -724,7 +724,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(
             BondsProgress(srn, refineMV(2)),
             SectionJourneyStatus.InProgress(
-              routes.NameOfBondsController.onPageLoad(srn, refineMV(2), NormalMode)
+              routes.NameOfBondsController.onPageLoad(srn, 2, NormalMode)
             )
           )
         val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
@@ -747,7 +747,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(
             BondsProgress(srn, index1of5000),
             SectionJourneyStatus.InProgress(
-              routes.NameOfBondsController.onPageLoad(srn, index1of5000, NormalMode)
+              routes.NameOfBondsController.onPageLoad(srn, index1of5000.value, NormalMode)
             )
           )
         val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
@@ -763,7 +763,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(
             BondsProgress(srn, refineMV(2)),
             SectionJourneyStatus.InProgress(
-              routes.NameOfBondsController.onPageLoad(srn, refineMV(2), NormalMode)
+              routes.NameOfBondsController.onPageLoad(srn, 2, NormalMode)
             )
           )
 
@@ -786,7 +786,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
     def secondQuestionPageUrl(index: Max5000): String =
       controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
         .url
 
     "should be Not Started" - {

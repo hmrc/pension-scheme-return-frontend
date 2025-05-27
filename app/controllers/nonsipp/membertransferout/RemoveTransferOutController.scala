@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -53,27 +54,27 @@ class RemoveTransferOutController @Inject()(
 
   private val form = RemoveTransferOutController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, index: Max5): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Int, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRedirectToTaskList(srn)
+          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex.refined)).getOrRedirectToTaskList(srn)
           receivingSchemeName <- request.userAnswers
-            .get(ReceivingSchemeNamePage(srn, memberIndex, index))
+            .get(ReceivingSchemeNamePage(srn, memberIndex.refined, index.refined))
             .getOrRedirectToTaskList(srn)
         } yield {
           Ok(
             view(
               form,
               RemoveTransferOutController
-                .viewModel(srn, memberIndex: Max300, index: Max5, nameDOB.fullName, receivingSchemeName)
+                .viewModel(srn, memberIndex.refined, index.refined, nameDOB.fullName, receivingSchemeName)
             )
           )
         }
       ).merge
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, index: Max5): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -81,14 +82,15 @@ class RemoveTransferOutController @Inject()(
           formWithErrors => {
             (
               for {
-                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourneyT
+                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex.refined)).getOrRecoverJourneyT
                 receivingSchemeName <- request.userAnswers
-                  .get(ReceivingSchemeNamePage(srn, memberIndex, index))
+                  .get(ReceivingSchemeNamePage(srn, memberIndex.refined, index.refined))
                   .getOrRecoverJourneyT
               } yield BadRequest(
                 view(
                   formWithErrors,
-                  RemoveTransferOutController.viewModel(srn, memberIndex, index, nameDOB.fullName, receivingSchemeName)
+                  RemoveTransferOutController
+                    .viewModel(srn, memberIndex.refined, index.refined, nameDOB.fullName, receivingSchemeName)
                 )
               )
             ).merge
@@ -99,8 +101,8 @@ class RemoveTransferOutController @Inject()(
                 updatedAnswers <- Future
                   .fromTry(
                     request.userAnswers
-                      .removeOnlyMultiplePages(transferOutPages(srn, memberIndex, index))
-                      .set(MemberStatus(srn, memberIndex), MemberState.Changed)
+                      .removeOnlyMultiplePages(transferOutPages(srn, memberIndex.refined, index.refined))
+                      .set(MemberStatus(srn, memberIndex.refined), MemberState.Changed)
                   )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
@@ -113,7 +115,7 @@ class RemoveTransferOutController @Inject()(
                 _ =>
                   Redirect(
                     navigator
-                      .nextPage(RemoveTransferOutPage(srn, memberIndex), NormalMode, updatedAnswers)
+                      .nextPage(RemoveTransferOutPage(srn, memberIndex.refined), NormalMode, updatedAnswers)
                   )
               )
             } else {
@@ -121,7 +123,7 @@ class RemoveTransferOutController @Inject()(
                 .successful(
                   Redirect(
                     navigator
-                      .nextPage(RemoveTransferOutPage(srn, memberIndex), NormalMode, request.userAnswers)
+                      .nextPage(RemoveTransferOutPage(srn, memberIndex.refined), NormalMode, request.userAnswers)
                   )
                 )
             }

@@ -26,8 +26,8 @@ import models.NormalMode
 
 class WhatIsOtherAssetControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.WhatIsOtherAssetController.onPageLoad(srn, refineMV(1), NormalMode)
-  private lazy val onSubmit = routes.WhatIsOtherAssetController.onSubmit(srn, refineMV(1), NormalMode)
+  private lazy val onPageLoad = routes.WhatIsOtherAssetController.onPageLoad(srn, 1, NormalMode)
+  private lazy val onSubmit = routes.WhatIsOtherAssetController.onSubmit(srn, 1, NormalMode)
 
   "WhatIsOtherAssetController" - {
 

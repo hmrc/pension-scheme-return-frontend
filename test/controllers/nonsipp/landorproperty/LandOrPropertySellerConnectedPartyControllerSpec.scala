@@ -29,8 +29,9 @@ import controllers.ControllerBaseSpec
 class LandOrPropertySellerConnectedPartyControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
-  private lazy val onPageLoad = routes.LandOrPropertySellerConnectedPartyController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.LandOrPropertySellerConnectedPartyController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad =
+    routes.LandOrPropertySellerConnectedPartyController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.LandOrPropertySellerConnectedPartyController.onSubmit(srn, index.value, NormalMode)
   private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
 
   val userServicesWithIndividualName: UserAnswers =

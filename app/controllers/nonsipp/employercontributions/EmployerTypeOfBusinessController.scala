@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import models.IdentityType.{Other, UKCompany, UKPartnership}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -54,42 +55,45 @@ class EmployerTypeOfBusinessController @Inject()(
 
   private val form = EmployerTypeOfBusinessController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Int, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(EmployerNamePage(srn, memberIndex, index)).getOrRecoverJourney { employerName =>
-        Ok(
-          view(
-            form.fromUserAnswers(EmployerTypeOfBusinessPage(srn, memberIndex, index)),
-            viewModel(srn, memberIndex, index, employerName, mode)
+      request.userAnswers.get(EmployerNamePage(srn, memberIndex.refined, index.refined)).getOrRecoverJourney {
+        employerName =>
+          Ok(
+            view(
+              form.fromUserAnswers(EmployerTypeOfBusinessPage(srn, memberIndex.refined, index.refined)),
+              viewModel(srn, memberIndex.refined, index.refined, employerName, mode)
+            )
           )
-        )
       }
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(EmployerNamePage(srn, memberIndex, index)).getOrRecoverJourney { employerName =>
-              Future
-                .successful(
-                  BadRequest(
-                    view(
-                      formWithErrors,
-                      viewModel(srn, memberIndex, index, employerName, mode)
+            request.userAnswers.get(EmployerNamePage(srn, memberIndex.refined, index.refined)).getOrRecoverJourney {
+              employerName =>
+                Future
+                  .successful(
+                    BadRequest(
+                      view(
+                        formWithErrors,
+                        viewModel(srn, memberIndex.refined, index.refined, employerName, mode)
+                      )
                     )
                   )
-                )
             },
           answer => {
             for {
               updatedAnswers <- request.userAnswers
-                .set(EmployerTypeOfBusinessPage(srn, memberIndex, index), answer)
+                .set(EmployerTypeOfBusinessPage(srn, memberIndex.refined, index.refined), answer)
                 .mapK
-              nextPage = navigator.nextPage(EmployerTypeOfBusinessPage(srn, memberIndex, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, memberIndex, index, updatedAnswers, nextPage)
+              nextPage = navigator
+                .nextPage(EmployerTypeOfBusinessPage(srn, memberIndex.refined, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, memberIndex.refined, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

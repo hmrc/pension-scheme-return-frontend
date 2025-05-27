@@ -32,10 +32,10 @@ class IndividualSellerNiControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad =
     controllers.nonsipp.landorproperty.routes.IndividualSellerNiController
-      .onPageLoad(srn, index, NormalMode)
+      .onPageLoad(srn, index.value, NormalMode)
   private lazy val onSubmit =
     controllers.nonsipp.landorproperty.routes.IndividualSellerNiController
-      .onSubmit(srn, index, NormalMode)
+      .onSubmit(srn, index.value, NormalMode)
 
   val userAnswersWithIndividualName: UserAnswers =
     defaultUserAnswers.unsafeSet(LandPropertyIndividualSellersNamePage(srn, index), individualName)

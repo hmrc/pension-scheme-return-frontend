@@ -32,8 +32,8 @@ import java.time.LocalDate
 
 class MemberDetailsControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.MemberDetailsController.onPageLoad(srn, refineMV(1), NormalMode)
-  private lazy val onSubmit = routes.MemberDetailsController.onSubmit(srn, refineMV(1), NormalMode)
+  private lazy val onPageLoad = routes.MemberDetailsController.onPageLoad(srn, 1, NormalMode)
+  private lazy val onSubmit = routes.MemberDetailsController.onSubmit(srn, 1, NormalMode)
 
   private val validForm = List(
     "firstName" -> "testFirstName",

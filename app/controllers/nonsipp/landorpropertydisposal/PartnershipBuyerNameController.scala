@@ -18,6 +18,7 @@ package controllers.nonsipp.landorpropertydisposal
 
 import services.SaveService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import pages.nonsipp.landorpropertydisposal.PartnershipBuyerNamePage
 import controllers.actions._
 import navigation.Navigator
@@ -50,28 +51,44 @@ class PartnershipBuyerNameController @Inject()(
 
   private val form = PartnershipBuyerNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
-        request.userAnswers.fillForm(PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex), form)
-      Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, mode)))
+        request.userAnswers
+          .fillForm(PartnershipBuyerNamePage(srn, landOrPropertyIndex.refined, disposalIndex.refined), form)
+      Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex.refined, disposalIndex.refined, mode)))
     }
-  def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future
-              .successful(BadRequest(view(formWithErrors, viewModel(srn, landOrPropertyIndex, disposalIndex, mode)))),
+              .successful(
+                BadRequest(
+                  view(formWithErrors, viewModel(srn, landOrPropertyIndex.refined, disposalIndex.refined, mode))
+                )
+              ),
           value =>
             for {
               updatedAnswers <- Future.fromTry(
-                request.userAnswers.set(PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex), value)
+                request.userAnswers
+                  .set(PartnershipBuyerNamePage(srn, landOrPropertyIndex.refined, disposalIndex.refined), value)
               )
               nextPage = navigator
-                .nextPage(PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, landOrPropertyIndex, disposalIndex, updatedAnswers, nextPage)
+                .nextPage(
+                  PartnershipBuyerNamePage(srn, landOrPropertyIndex.refined, disposalIndex.refined),
+                  mode,
+                  updatedAnswers
+                )
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                landOrPropertyIndex.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

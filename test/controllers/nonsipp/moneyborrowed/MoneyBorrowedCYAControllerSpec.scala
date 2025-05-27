@@ -45,10 +45,10 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[OneTo5000](1)
 
   private def onPageLoad(mode: Mode) =
-    routes.MoneyBorrowedCYAController.onPageLoad(srn, index, mode)
+    routes.MoneyBorrowedCYAController.onPageLoad(srn, index.value, mode)
 
   private def onSubmit(mode: Mode) =
-    routes.MoneyBorrowedCYAController.onSubmit(srn, index, mode)
+    routes.MoneyBorrowedCYAController.onSubmit(srn, index.value, mode)
 
   private lazy val onSubmitViewOnly = routes.MoneyBorrowedCYAController.onSubmitViewOnly(
     srn,
@@ -60,7 +60,7 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoadViewOnly = routes.MoneyBorrowedCYAController.onPageLoadViewOnly(
     srn,
-    index,
+    index.value,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -83,7 +83,7 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
       MoneyBorrowedProgress(srn, index),
       SectionJourneyStatus.InProgress(
         routes.ValueOfSchemeAssetsWhenMoneyBorrowedController
-          .onPageLoad(srn, index, NormalMode)
+          .onPageLoad(srn, index.value, NormalMode)
           .url
       )
     )
@@ -135,7 +135,7 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
 
       redirectToPage(
         call = onPageLoad(mode),
-        page = routes.ValueOfSchemeAssetsWhenMoneyBorrowedController.onPageLoad(srn, index, mode),
+        page = routes.ValueOfSchemeAssetsWhenMoneyBorrowedController.onPageLoad(srn, index.value, mode),
         userAnswers = incompleteUserAnswers,
         previousUserAnswers = emptyUserAnswers
       ).withName(s"redirect to list page when in $mode mode and incomplete data")

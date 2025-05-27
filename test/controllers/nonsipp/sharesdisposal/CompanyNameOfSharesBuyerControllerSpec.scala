@@ -30,8 +30,9 @@ class CompanyNameOfSharesBuyerControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[Max5000.Refined](1)
   private val secondaryIndex = refineMV[Max50.Refined](1)
   private lazy val onPageLoad =
-    routes.CompanyNameOfSharesBuyerController.onPageLoad(srn, index, secondaryIndex, NormalMode)
-  private lazy val onSubmit = routes.CompanyNameOfSharesBuyerController.onSubmit(srn, index, secondaryIndex, NormalMode)
+    routes.CompanyNameOfSharesBuyerController.onPageLoad(srn, index.value, secondaryIndex.value, NormalMode)
+  private lazy val onSubmit =
+    routes.CompanyNameOfSharesBuyerController.onSubmit(srn, index.value, secondaryIndex.value, NormalMode)
 
   private val companyNameOfSharesBuyer = "test"
 

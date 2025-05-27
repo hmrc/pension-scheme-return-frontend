@@ -20,6 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalBuyerConnectedPartyController._
+import utils.IntUtils.{toInt, IntOpts}
 import pages.nonsipp.landorpropertydisposal._
 import controllers.actions._
 import navigation.Navigator
@@ -52,25 +53,31 @@ class LandOrPropertyDisposalBuyerConnectedPartyController @Inject()(
 
   private val form = LandOrPropertyDisposalBuyerConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
-        request.userAnswers.fillForm(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex), form)
-      getBuyersName(srn, index, disposalIndex)
-        .map(buyersName => Ok(view(preparedForm, viewModel(srn, buyersName, index, disposalIndex, mode))))
+        request.userAnswers
+          .fillForm(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index.refined, disposalIndex.refined), form)
+      getBuyersName(srn, index.refined, disposalIndex.refined)
+        .map(
+          buyersName => Ok(view(preparedForm, viewModel(srn, buyersName, index.refined, disposalIndex.refined, mode)))
+        )
         .merge
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future.successful(
-              getBuyersName(srn, index, disposalIndex)
+              getBuyersName(srn, index.refined, disposalIndex.refined)
                 .map(
-                  buyersName => BadRequest(view(formWithErrors, viewModel(srn, buyersName, index, disposalIndex, mode)))
+                  buyersName =>
+                    BadRequest(
+                      view(formWithErrors, viewModel(srn, buyersName, index.refined, disposalIndex.refined, mode))
+                    )
                 )
                 .merge
             ),
@@ -79,14 +86,23 @@ class LandOrPropertyDisposalBuyerConnectedPartyController @Inject()(
               updatedAnswers <- Future
                 .fromTry(
                   request.userAnswers
-                    .set(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex), value)
+                    .set(
+                      LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index.refined, disposalIndex.refined),
+                      value
+                    )
                 )
               nextPage = navigator.nextPage(
-                LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex),
+                LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index.refined, disposalIndex.refined),
                 mode,
                 updatedAnswers
               )
-              updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                index.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

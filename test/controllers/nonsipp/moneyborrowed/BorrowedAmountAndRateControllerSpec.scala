@@ -35,8 +35,8 @@ class BorrowedAmountAndRateControllerSpec extends ControllerBaseSpec {
 
     lazy val viewModel = BorrowedAmountAndRateController.viewModel(srn, index, NormalMode, schemeName, _)
 
-    lazy val onPageLoad = routes.BorrowedAmountAndRateController.onPageLoad(srn, index, NormalMode)
-    lazy val onSubmit = routes.BorrowedAmountAndRateController.onSubmit(srn, index, NormalMode)
+    lazy val onPageLoad = routes.BorrowedAmountAndRateController.onPageLoad(srn, index.value, NormalMode)
+    lazy val onSubmit = routes.BorrowedAmountAndRateController.onSubmit(srn, index.value, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[MultipleQuestionView]

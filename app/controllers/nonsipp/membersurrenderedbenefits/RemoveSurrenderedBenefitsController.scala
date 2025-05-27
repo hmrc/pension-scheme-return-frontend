@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -53,13 +54,13 @@ class RemoveSurrenderedBenefitsController @Inject()(
 
   private val form = RemoveSurrenderedBenefitsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRedirectToTaskList(srn)
+          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRedirectToTaskList(srn)
           surrenderedBenefitsAmount <- request.userAnswers
-            .get(SurrenderedBenefitsAmountPage(srn, index))
+            .get(SurrenderedBenefitsAmountPage(srn, index.refined))
             .getOrRedirectToTaskList(srn)
         } yield {
           Ok(
@@ -67,7 +68,7 @@ class RemoveSurrenderedBenefitsController @Inject()(
               form,
               RemoveSurrenderedBenefitsController.viewModel(
                 srn,
-                index: Max300,
+                index.refined,
                 surrenderedBenefitsAmount,
                 nameDOB.fullName
               )
@@ -77,7 +78,7 @@ class RemoveSurrenderedBenefitsController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max300): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -86,13 +87,13 @@ class RemoveSurrenderedBenefitsController @Inject()(
             (
               for {
                 total <- request.userAnswers
-                  .get(SurrenderedBenefitsAmountPage(srn, index))
+                  .get(SurrenderedBenefitsAmountPage(srn, index.refined))
                   .getOrRecoverJourneyT
-                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourneyT
+                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourneyT
               } yield BadRequest(
                 view(
                   formWithErrors,
-                  RemoveSurrenderedBenefitsController.viewModel(srn, index, total, nameDOB.fullName)
+                  RemoveSurrenderedBenefitsController.viewModel(srn, index.refined, total, nameDOB.fullName)
                 )
               )
             ).merge
@@ -104,9 +105,9 @@ class RemoveSurrenderedBenefitsController @Inject()(
                   .fromTry(
                     request.userAnswers
                       .removeOnlyMultiplePages(
-                        surrenderBenefitsPages(srn, index)
+                        surrenderBenefitsPages(srn, index.refined)
                       )
-                      .set(MemberStatus(srn, index), MemberState.Changed)
+                      .set(MemberStatus(srn, index.refined), MemberState.Changed)
                   )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
@@ -120,7 +121,7 @@ class RemoveSurrenderedBenefitsController @Inject()(
                 _ =>
                   Redirect(
                     navigator
-                      .nextPage(RemoveSurrenderedBenefitsPage(srn, index), NormalMode, updatedAnswers)
+                      .nextPage(RemoveSurrenderedBenefitsPage(srn, index.refined), NormalMode, updatedAnswers)
                   )
               )
             } else {
@@ -128,7 +129,7 @@ class RemoveSurrenderedBenefitsController @Inject()(
                 .successful(
                   Redirect(
                     navigator
-                      .nextPage(RemoveSurrenderedBenefitsPage(srn, index), NormalMode, request.userAnswers)
+                      .nextPage(RemoveSurrenderedBenefitsPage(srn, index.refined), NormalMode, request.userAnswers)
                   )
                 )
             }

@@ -32,8 +32,8 @@ class IndividualRecipientNameControllerSpec extends ControllerBaseSpec {
   "IndividualRecipientNameController" - {
 
     val populatedUserAnswers = defaultUserAnswers.set(IndividualRecipientNamePage(srn, index), recipientName).get
-    lazy val onPageLoad = routes.IndividualRecipientNameController.onPageLoad(srn, index, NormalMode)
-    lazy val onSubmit = routes.IndividualRecipientNameController.onSubmit(srn, index, NormalMode)
+    lazy val onPageLoad = routes.IndividualRecipientNameController.onPageLoad(srn, index.value, NormalMode)
+    lazy val onSubmit = routes.IndividualRecipientNameController.onSubmit(srn, index.value, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[TextInputView].apply(form(injected[TextFormProvider]), viewModel(srn, index, NormalMode))

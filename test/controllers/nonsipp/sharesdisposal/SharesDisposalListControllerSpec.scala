@@ -59,7 +59,7 @@ class SharesDisposalListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(
       SharesDisposalProgress(srn, shareIndexOne, index1of50),
       SectionJourneyStatus.InProgress(
-        routes.WhenWereSharesSoldController.onPageLoad(srn, shareIndexOne, index1of50, NormalMode).url
+        routes.WhenWereSharesSoldController.onPageLoad(srn, shareIndexOne.value, index1of50.value, NormalMode).url
       )
     )
 
@@ -97,7 +97,7 @@ class SharesDisposalListControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         call = onSubmit,
-        page = routes.WhenWereSharesSoldController.onPageLoad(srn, shareIndexOne, index1of50, NormalMode),
+        page = routes.WhenWereSharesSoldController.onPageLoad(srn, shareIndexOne.value, index1of50.value, NormalMode),
         userAnswers = incompleteUserAnswers,
         previousUserAnswers = emptyUserAnswers,
         form = "value" -> "1"

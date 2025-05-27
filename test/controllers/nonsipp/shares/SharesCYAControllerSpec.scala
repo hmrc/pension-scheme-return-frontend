@@ -60,12 +60,12 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
   private val subject = IdentitySubject.SharesSeller
 
   private def onPageLoad(mode: Mode): Call =
-    routes.SharesCYAController.onPageLoad(srn, index, mode)
-  private def onSubmit(mode: Mode) = routes.SharesCYAController.onSubmit(srn, index, mode)
+    routes.SharesCYAController.onPageLoad(srn, index.value, mode)
+  private def onSubmit(mode: Mode) = routes.SharesCYAController.onSubmit(srn, index.value, mode)
 
   private lazy val onPageLoadViewOnly = routes.SharesCYAController.onPageLoadViewOnly(
     srn,
-    index,
+    index.value,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -100,7 +100,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
       SharesProgress(srn, index),
       SectionJourneyStatus.InProgress(
         controllers.nonsipp.shares.routes.CostOfSharesController
-          .onPageLoad(srn, refineMV(1), NormalMode)
+          .onPageLoad(srn, 1, NormalMode)
           .url
       )
     )
@@ -163,7 +163,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
       )
       redirectToPage(
         call = onPageLoad(mode),
-        page = routes.CostOfSharesController.onPageLoad(srn, index, mode),
+        page = routes.CostOfSharesController.onPageLoad(srn, index.value, mode),
         userAnswers = incompleteUserAnswers,
         previousUserAnswers = emptyUserAnswers
       ).withName(s"redirect to list page when in $mode mode and incomplete data")

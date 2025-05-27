@@ -38,9 +38,9 @@ class RemoveBondsDisposalControllerSpec extends ControllerBaseSpec {
   private val methodOfDisposal = HowDisposed.Transferred
 
   private lazy val onPageLoad =
-    routes.RemoveBondsDisposalController.onPageLoad(srn, bondIndex, disposalIndex)
+    routes.RemoveBondsDisposalController.onPageLoad(srn, bondIndex.value, disposalIndex.value)
   private lazy val onSubmit =
-    routes.RemoveBondsDisposalController.onSubmit(srn, bondIndex, disposalIndex)
+    routes.RemoveBondsDisposalController.onSubmit(srn, bondIndex.value, disposalIndex.value)
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 

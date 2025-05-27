@@ -19,6 +19,7 @@ package controllers.nonsipp.shares
 import services.SaveService
 import utils.FormUtils._
 import controllers.nonsipp.shares.CompanyNameRelatedSharesController._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -51,21 +52,21 @@ class CompanyNameRelatedSharesController @Inject()(
 
   private def form = CompanyNameRelatedSharesController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.userAnswers.get(TypeOfSharesHeldPage(srn, index)).getOrRecoverJourney { typeOfShares =>
+      request.userAnswers.get(TypeOfSharesHeldPage(srn, index.refined)).getOrRecoverJourney { typeOfShares =>
         Ok(
           view(
-            form.fromUserAnswers(CompanyNameRelatedSharesPage(srn, index)),
-            viewModel(srn, index, typeOfShares.name, mode)
+            form.fromUserAnswers(CompanyNameRelatedSharesPage(srn, index.refined)),
+            viewModel(srn, index.refined, typeOfShares.name, mode)
           )
         )
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      request.userAnswers.get(TypeOfSharesHeldPage(srn, index)).getOrRecoverJourney { typeOfShares =>
+      request.userAnswers.get(TypeOfSharesHeldPage(srn, index.refined)).getOrRecoverJourney { typeOfShares =>
         form
           .bindFromRequest()
           .fold(
@@ -74,16 +75,16 @@ class CompanyNameRelatedSharesController @Inject()(
                 BadRequest(
                   view(
                     formWithErrors,
-                    CompanyNameRelatedSharesController.viewModel(srn, index, typeOfShares.name, mode)
+                    CompanyNameRelatedSharesController.viewModel(srn, index.refined, typeOfShares.name, mode)
                   )
                 )
               ),
             answer => {
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.set(CompanyNameRelatedSharesPage(srn, index), answer))
-                nextPage = navigator.nextPage(CompanyNameRelatedSharesPage(srn, index), mode, updatedAnswers)
-                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                  .fromTry(request.userAnswers.set(CompanyNameRelatedSharesPage(srn, index.refined), answer))
+                nextPage = navigator.nextPage(CompanyNameRelatedSharesPage(srn, index.refined), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
             }

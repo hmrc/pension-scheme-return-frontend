@@ -21,7 +21,6 @@ import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.FrontendAppConfig
-import pages.nonsipp.landorproperty._
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -32,6 +31,8 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty._
 import viewmodels.DisplayMessage._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import models.requests.DataRequest
@@ -55,35 +56,35 @@ class LandOrPropertySellerConnectedPartyController @Inject()(
 
   private val form = LandOrPropertySellerConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      recipientName(srn, index)
+      recipientName(srn, index.refined)
         .map { recipientName =>
           Ok(
             view(
-              form.fromUserAnswers(LandOrPropertySellerConnectedPartyPage(srn, index)),
+              form.fromUserAnswers(LandOrPropertySellerConnectedPartyPage(srn, index.refined)),
               LandOrPropertySellerConnectedPartyController
-                .viewModel(srn, index, recipientName, config.urls.incomeTaxAct, mode)
+                .viewModel(srn, index.refined, recipientName, config.urls.incomeTaxAct, mode)
             )
           )
         }
         .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            recipientName(srn, index)
+            recipientName(srn, index.refined)
               .map { recipientName =>
                 Future.successful(
                   BadRequest(
                     view(
                       formWithErrors,
                       LandOrPropertySellerConnectedPartyController
-                        .viewModel(srn, index, recipientName, config.urls.incomeTaxAct, mode)
+                        .viewModel(srn, index.refined, recipientName, config.urls.incomeTaxAct, mode)
                     )
                   )
                 )
@@ -92,9 +93,10 @@ class LandOrPropertySellerConnectedPartyController @Inject()(
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(LandOrPropertySellerConnectedPartyPage(srn, index), value))
-              nextPage = navigator.nextPage(LandOrPropertySellerConnectedPartyPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                .fromTry(request.userAnswers.set(LandOrPropertySellerConnectedPartyPage(srn, index.refined), value))
+              nextPage = navigator
+                .nextPage(LandOrPropertySellerConnectedPartyPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

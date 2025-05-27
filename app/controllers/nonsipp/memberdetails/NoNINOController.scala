@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.memberdetails.{MemberDetailsPage, NoNINOPage}
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.IntOpts
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -53,32 +54,35 @@ class NoNINOController @Inject()(
 
   private def form(memberFullName: String): Form[String] = NoNINOController.form(formProvider, memberFullName)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      withMemberDetails(srn, index) { memberDetails =>
+      withMemberDetails(srn, index.refined) { memberDetails =>
         val preparedForm =
           request.userAnswers
-            .get(NoNINOPage(srn, index))
+            .get(NoNINOPage(srn, index.refined))
             .fold(form(memberDetails.fullName))(form(memberDetails.fullName).fill)
-        Future.successful(Ok(view(preparedForm, viewModel(srn, memberDetails.fullName, index, mode))))
+        Future.successful(Ok(view(preparedForm, viewModel(srn, memberDetails.fullName, index.refined, mode))))
       }
   }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      withMemberDetails(srn, index) { memberDetails =>
+      withMemberDetails(srn, index.refined) { memberDetails =>
         form(memberDetails.fullName)
           .bindFromRequest()
           .fold(
             formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, memberDetails.fullName, index, mode)))),
+              Future
+                .successful(
+                  BadRequest(view(formWithErrors, viewModel(srn, memberDetails.fullName, index.refined, mode)))
+                ),
             value =>
               for {
                 updatedAnswers <- request.userAnswers
-                  .set(NoNINOPage(srn, index), value)
+                  .set(NoNINOPage(srn, index.refined), value)
                   .mapK
-                nextPage = navigator.nextPage(NoNINOPage(srn, index), mode, updatedAnswers)
-                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                nextPage = navigator.nextPage(NoNINOPage(srn, index.refined), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
           )
@@ -107,6 +111,6 @@ object NoNINOController {
       "noNINO.title",
       "noNINO.heading" -> memberFullName,
       TextAreaViewModel(),
-      routes.NoNINOController.onSubmit(srn, index, mode)
+      routes.NoNINOController.onSubmit(srn, index.value, mode)
     )
 }

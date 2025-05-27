@@ -32,10 +32,10 @@ class CompanyBuyerCrnControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad =
     routes.CompanyBuyerCrnController
-      .onPageLoad(srn, index, disposalIndex, NormalMode)
+      .onPageLoad(srn, index.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
     routes.CompanyBuyerCrnController
-      .onSubmit(srn, index, disposalIndex, NormalMode)
+      .onSubmit(srn, index.value, disposalIndex.value, NormalMode)
 
   val userAnswersCompanyName: UserAnswers =
     defaultUserAnswers.unsafeSet(CompanyBuyerNamePage(srn, index, disposalIndex), companyName)

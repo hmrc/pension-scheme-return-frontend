@@ -36,8 +36,8 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  private lazy val onPageLoad = routes.RemoveLoanController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.RemoveLoanController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.RemoveLoanController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.RemoveLoanController.onSubmit(srn, index.value, NormalMode)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)

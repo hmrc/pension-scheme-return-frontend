@@ -19,6 +19,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.IntOpts
 import controllers.actions._
 import navigation.Navigator
 import models._
@@ -54,12 +55,12 @@ class RemoveLoanController @Inject()(
 
   private val form = RemoveLoanController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      if (request.userAnswers.get(LoanPrePopulated(srn, index)).isDefined)
+      if (request.userAnswers.get(LoanPrePopulated(srn, index.refined)).isDefined)
         Redirect(controllers.routes.UnauthorisedController.onPageLoad())
       else
-        getResult(srn, index, mode, request.userAnswers.fillForm(RemoveLoanPage(srn, index), form))
+        getResult(srn, index.refined, mode, request.userAnswers.fillForm(RemoveLoanPage(srn, index.refined), form))
   }
 
   private def getResult(srn: Srn, index: Max5000, mode: Mode, form: Form[Boolean], error: Boolean = false)(
@@ -104,18 +105,18 @@ class RemoveLoanController @Inject()(
       }
     ).merge
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(getResult(srn, index, mode, formWithErrors, error = true)),
+          formWithErrors => Future.successful(getResult(srn, index.refined, mode, formWithErrors, error = true)),
           value =>
             if (value) {
               for {
                 updatedAnswers <- Future.fromTry(
                   request.userAnswers
-                    .remove(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
+                    .remove(IdentityTypePage(srn, index.refined, IdentitySubject.LoanRecipient))
                 )
                 _ <- saveService.save(updatedAnswers)
                 redirectTo <- psrSubmissionService
@@ -127,12 +128,13 @@ class RemoveLoanController @Inject()(
                   )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                   .map {
                     case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                    case Some(_) => Redirect(navigator.nextPage(RemoveLoanPage(srn, index), mode, updatedAnswers))
+                    case Some(_) =>
+                      Redirect(navigator.nextPage(RemoveLoanPage(srn, index.refined), mode, updatedAnswers))
                   }
               } yield redirectTo
             } else {
               Future
-                .successful(Redirect(navigator.nextPage(RemoveLoanPage(srn, index), mode, request.userAnswers)))
+                .successful(Redirect(navigator.nextPage(RemoveLoanPage(srn, index.refined), mode, request.userAnswers)))
             }
         )
   }
@@ -153,6 +155,6 @@ object RemoveLoanController {
     YesNoPageViewModel(
       "removeLoan.title",
       Message("removeLoan.heading", loanAmount, recipientName),
-      routes.RemoveLoanController.onSubmit(srn, index, mode)
+      routes.RemoveLoanController.onSubmit(srn, index.value, mode)
     )
 }

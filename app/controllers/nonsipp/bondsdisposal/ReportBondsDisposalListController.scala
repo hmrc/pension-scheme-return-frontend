@@ -23,6 +23,7 @@ import play.api.mvc._
 import utils.ListUtils.ListOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import utils.IntUtils.toInt
 import cats.implicits._
 import _root_.config.Constants
 import controllers.actions.IdentifyAndRequireData
@@ -294,7 +295,7 @@ class ReportBondsDisposalListController @Inject()(
             .get(BondsCompleted(srn, index))
             .getOrRecoverJourney
             .leftMap { result =>
-              logger.warn(s"couldn't find completed bonds page for index ${index} from bonds disposals completed")
+              logger.warn(s"couldn't find completed bonds page for index $index from bonds disposals completed")
               result
             }
             .map(bondsDisposal => (indexes, bondsDisposal))

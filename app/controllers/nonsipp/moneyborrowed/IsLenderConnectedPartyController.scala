@@ -23,6 +23,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.nonsipp.moneyborrowed.IsLenderConnectedPartyController.viewModel
 import config.RefinedTypes.Max5000
 import config.FrontendAppConfig
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -57,34 +58,34 @@ class IsLenderConnectedPartyController @Inject()(
   private def form: Form[Boolean] =
     IsLenderConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.usingAnswer(LenderNamePage(srn, index)).sync { lenderName =>
+      request.usingAnswer(LenderNamePage(srn, index.refined)).sync { lenderName =>
         Ok(
           view(
-            form.fromUserAnswers(IsLenderConnectedPartyPage(srn, index)),
-            viewModel(srn, index, lenderName, config.urls.incomeTaxAct, mode)
+            form.fromUserAnswers(IsLenderConnectedPartyPage(srn, index.refined)),
+            viewModel(srn, index.refined, lenderName, config.urls.incomeTaxAct, mode)
           )
         )
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           errors =>
-            request.usingAnswer(LenderNamePage(srn, index)).async { lenderName =>
+            request.usingAnswer(LenderNamePage(srn, index.refined)).async { lenderName =>
               Future.successful(
-                BadRequest(view(errors, viewModel(srn, index, lenderName, config.urls.incomeTaxAct, mode)))
+                BadRequest(view(errors, viewModel(srn, index.refined, lenderName, config.urls.incomeTaxAct, mode)))
               )
             },
           success =>
             for {
-              updatedAnswers <- request.userAnswers.set(IsLenderConnectedPartyPage(srn, index), success).mapK
-              nextPage = navigator.nextPage(IsLenderConnectedPartyPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              updatedAnswers <- request.userAnswers.set(IsLenderConnectedPartyPage(srn, index.refined), success).mapK
+              nextPage = navigator.nextPage(IsLenderConnectedPartyPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield {
               Redirect(nextPage)

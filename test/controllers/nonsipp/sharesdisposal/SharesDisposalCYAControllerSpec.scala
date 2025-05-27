@@ -18,6 +18,7 @@ package controllers.nonsipp.sharesdisposal
 
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.shares._
+import models.PointOfEntry.{HowWereSharesDisposedPointOfEntry, NoPointOfEntry}
 import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
@@ -25,13 +26,12 @@ import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal._
 import models._
 import viewmodels.models.SectionJourneyStatus
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import config.RefinedTypes.{OneTo50, OneTo5000}
 import controllers.ControllerBaseSpec
-import models.PointOfEntry.{HowWereSharesDisposedPointOfEntry, NoPointOfEntry}
-import org.mockito.ArgumentCaptor
 import pages.nonsipp.FbVersionPage
 import uk.gov.hmrc.domain.Nino
 
@@ -54,9 +54,9 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
   }
 
   private def onPageLoad(mode: Mode) =
-    routes.SharesDisposalCYAController.onPageLoad(srn, shareIndex, disposalIndex, mode)
+    routes.SharesDisposalCYAController.onPageLoad(srn, shareIndex.value, disposalIndex.value, mode)
   private def onSubmit(mode: Mode) =
-    routes.SharesDisposalCYAController.onSubmit(srn, shareIndex, disposalIndex, mode)
+    routes.SharesDisposalCYAController.onSubmit(srn, shareIndex.value, disposalIndex.value, mode)
 
   private lazy val onSubmitViewOnly = routes.SharesDisposalCYAController.onSubmitViewOnly(
     srn,
@@ -68,8 +68,8 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoadViewOnly = routes.SharesDisposalCYAController.onPageLoadViewOnly(
     srn,
-    shareIndex,
-    disposalIndex,
+    shareIndex.value,
+    disposalIndex.value,
     yearString,
     submissionNumberTwo,
     submissionNumberOne

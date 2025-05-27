@@ -20,7 +20,6 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
-import pages.nonsipp.landorproperty._
 import controllers.actions._
 import navigation.Navigator
 import forms.MoneyFormProvider
@@ -34,6 +33,8 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty._
 import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.models.{FormPageViewModel, QuestionField, SectionCompleted}
 
@@ -54,26 +55,27 @@ class LandOrPropertyTotalIncomeController @Inject()(
 
   private val form = LandOrPropertyTotalIncomeController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-        val preparedForm = request.userAnswers.fillForm(LandOrPropertyTotalIncomePage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, form, address.addressLine1, mode)))
+      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney { address =>
+        val preparedForm = request.userAnswers.fillForm(LandOrPropertyTotalIncomePage(srn, index.refined), form)
+        Ok(view(preparedForm, viewModel(srn, index.refined, form, address.addressLine1, mode)))
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-              Future.successful(
-                BadRequest(
-                  view(formWithErrors, viewModel(srn, index, form, address.addressLine1, mode))
+            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney {
+              address =>
+                Future.successful(
+                  BadRequest(
+                    view(formWithErrors, viewModel(srn, index.refined, form, address.addressLine1, mode))
+                  )
                 )
-              )
             }
           },
           value =>
@@ -81,11 +83,11 @@ class LandOrPropertyTotalIncomeController @Inject()(
               updatedAnswers <- Future
                 .fromTry(
                   request.userAnswers
-                    .set(LandOrPropertyTotalIncomePage(srn, index), value)
-                    .set(LandOrPropertyCompleted(srn, index), SectionCompleted)
+                    .set(LandOrPropertyTotalIncomePage(srn, index.refined), value)
+                    .set(LandOrPropertyCompleted(srn, index.refined), SectionCompleted)
                 )
-              nextPage = navigator.nextPage(LandOrPropertyTotalIncomePage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              nextPage = navigator.nextPage(LandOrPropertyTotalIncomePage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

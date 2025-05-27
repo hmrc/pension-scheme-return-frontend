@@ -276,7 +276,7 @@ class LoansListController @Inject()(
             case _ =>
               SectionJourneyStatus.InProgress(
                 controllers.nonsipp.common.routes.IdentityTypeController
-                  .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
+                  .onPageLoad(srn, index.value, NormalMode, IdentitySubject.LoanRecipient)
                   .url
               )
           }
@@ -349,7 +349,7 @@ object LoansListController {
                 Some(
                   ListRow.view(
                     text = Message("loansList.row", loanAmount.displayAs, recipientName),
-                    url = routes.LoansCYAController.onPageLoadViewOnly(srn, index, year, current, previous).url,
+                    url = routes.LoansCYAController.onPageLoadViewOnly(srn, index.value, year, current, previous).url,
                     hiddenText = Message("loansList.row.view.hidden", loanAmount.displayAs, recipientName)
                   )
                 )
@@ -357,7 +357,7 @@ object LoansListController {
                 Some(
                   ListRow.check(
                     text = Message("loansList.row", loanAmount.displayAs, recipientName),
-                    url = routes.LoansCheckAndUpdateController.onPageLoad(srn, index).url,
+                    url = routes.LoansCheckAndUpdateController.onPageLoad(srn, index.value).url,
                     hiddenText =
                       Message("site.check.param", Message("loansList.row", loanAmount.displayAs, recipientName))
                   )
@@ -368,9 +368,9 @@ object LoansListController {
                 Some(
                   ListRow(
                     text = Message("loansList.row", loanAmount.displayAs, recipientName),
-                    changeUrl = routes.LoansCYAController.onPageLoad(srn, index, CheckMode).url,
+                    changeUrl = routes.LoansCYAController.onPageLoad(srn, index.value, CheckMode).url,
                     changeHiddenText = Message("loansList.row.change.hidden", loanAmount.displayAs, recipientName),
-                    removeUrl = routes.RemoveLoanController.onPageLoad(srn, index, mode).url,
+                    removeUrl = routes.RemoveLoanController.onPageLoad(srn, index.value, mode).url,
                     removeHiddenText = Message("loansList.row.remove.hidden", loanAmount.displayAs, recipientName)
                   )
                 )
@@ -378,7 +378,7 @@ object LoansListController {
                 Some(
                   ListRow(
                     text = Message("loansList.row", loanAmount.displayAs, recipientName),
-                    changeUrl = routes.LoansCYAController.onPageLoad(srn, index, CheckMode).url,
+                    changeUrl = routes.LoansCYAController.onPageLoad(srn, index.value, CheckMode).url,
                     changeHiddenText = Message("loansList.row.change.hidden", loanAmount.displayAs, recipientName)
                   )
                 )

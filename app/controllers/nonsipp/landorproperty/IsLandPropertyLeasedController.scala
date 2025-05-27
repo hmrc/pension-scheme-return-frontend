@@ -30,6 +30,7 @@ import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import controllers.nonsipp.landorproperty.IsLandPropertyLeasedController._
+import utils.IntUtils.{toInt, IntOpts}
 import pages.nonsipp.landorproperty.{IsLandPropertyLeasedPage, LandOrPropertyChosenAddressPage, LandPropertyInUKPage}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -51,31 +52,34 @@ class IsLandPropertyLeasedController @Inject()(
 
   private val form = IsLandPropertyLeasedController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-        val preparedForm = request.userAnswers.fillForm(IsLandPropertyLeasedPage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, address.addressLine1, mode, request.userAnswers)))
+      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney { address =>
+        val preparedForm = request.userAnswers.fillForm(IsLandPropertyLeasedPage(srn, index.refined), form)
+        Ok(view(preparedForm, viewModel(srn, index.refined, address.addressLine1, mode, request.userAnswers)))
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-              Future.successful(
-                BadRequest(view(formWithErrors, viewModel(srn, index, address.addressLine1, mode, request.userAnswers)))
-              )
+            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney {
+              address =>
+                Future.successful(
+                  BadRequest(
+                    view(formWithErrors, viewModel(srn, index.refined, address.addressLine1, mode, request.userAnswers))
+                  )
+                )
             },
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(IsLandPropertyLeasedPage(srn, index), value))
-              nextPage = navigator.nextPage(IsLandPropertyLeasedPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                .fromTry(request.userAnswers.set(IsLandPropertyLeasedPage(srn, index.refined), value))
+              nextPage = navigator.nextPage(IsLandPropertyLeasedPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

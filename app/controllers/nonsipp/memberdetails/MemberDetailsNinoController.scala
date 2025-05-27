@@ -23,6 +23,7 @@ import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.Max300
+import utils.IntUtils.IntOpts
 import controllers.actions._
 import forms.TextFormProvider
 import models.{Mode, NameDOB}
@@ -58,37 +59,37 @@ class MemberDetailsNinoController @Inject()(
   private def form(details: NameDOB, duplicates: List[Nino] = List()) =
     MemberDetailsNinoController.form(formProvider, details.fullName, duplicates)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.usingAnswer(MemberDetailsPage(srn, index)).sync { details =>
+      request.usingAnswer(MemberDetailsPage(srn, index.refined)).sync { details =>
         Ok(
           view(
-            form(details).fromUserAnswers(MemberDetailsNinoPage(srn, index)),
-            viewModel(srn, index, mode, details.fullName)
+            form(details).fromUserAnswers(MemberDetailsNinoPage(srn, index.refined)),
+            viewModel(srn, index.refined, mode, details.fullName)
           )
         )
       }
   }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      request.usingAnswer(MemberDetailsPage(srn, index)).async { details =>
-        val duplicates = duplicateNinos(srn, index)
+      request.usingAnswer(MemberDetailsPage(srn, index.refined)).async { details =>
+        val duplicates = duplicateNinos(srn, index.refined)
 
         form(details, duplicates)
           .bindFromRequest()
           .fold(
             formWithErrors =>
               Future.successful(
-                BadRequest(view(formWithErrors, viewModel(srn, index, mode, details.fullName)))
+                BadRequest(view(formWithErrors, viewModel(srn, index.refined, mode, details.fullName)))
               ),
             value =>
               for {
                 updatedAnswers <- request.userAnswers
-                  .set(MemberDetailsNinoPage(srn, index), value)
+                  .set(MemberDetailsNinoPage(srn, index.refined), value)
                   .mapK
-                nextPage = navigator.nextPage(MemberDetailsNinoPage(srn, index), mode, updatedAnswers)
-                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                nextPage = navigator.nextPage(MemberDetailsNinoPage(srn, index.refined), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
           )
@@ -114,6 +115,6 @@ object MemberDetailsNinoController {
       Message("memberDetailsNino.title"),
       Message("memberDetailsNino.heading", memberFullName),
       TextInputViewModel(),
-      routes.MemberDetailsNinoController.onSubmit(srn, index, mode)
+      routes.MemberDetailsNinoController.onSubmit(srn, index.value, mode)
     )
 }

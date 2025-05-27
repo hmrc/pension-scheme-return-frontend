@@ -32,9 +32,9 @@ class WhoWereTheSharesSoldToControllerSpec extends ControllerBaseSpec {
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.WhoWereTheSharesSoldToController.onPageLoad(srn, index, disposalIndex, NormalMode)
+    routes.WhoWereTheSharesSoldToController.onPageLoad(srn, index.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.WhoWereTheSharesSoldToController.onSubmit(srn, index, disposalIndex, NormalMode)
+    routes.WhoWereTheSharesSoldToController.onSubmit(srn, index.value, disposalIndex.value, NormalMode)
 
   private val userAnswers = defaultUserAnswers.unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
 

@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import config.Constants.maxInputLength
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -58,12 +59,12 @@ class WhyDidMemberSurrenderBenefitsController @Inject()(
 
   private val form = WhyDidMemberSurrenderBenefitsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, memberIndex: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
-        request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, memberIndex)).getOrRecoverJourney { amount =>
+      request.userAnswers.get(MemberDetailsPage(srn, memberIndex.refined)).getOrRecoverJourney { memberName =>
+        request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, memberIndex.refined)).getOrRecoverJourney { amount =>
           val preparedForm = {
-            request.userAnswers.fillForm(WhyDidMemberSurrenderBenefitsPage(srn, memberIndex), form)
+            request.userAnswers.fillForm(WhyDidMemberSurrenderBenefitsPage(srn, memberIndex.refined), form)
           }
           Ok(
             view(
@@ -71,7 +72,7 @@ class WhyDidMemberSurrenderBenefitsController @Inject()(
               WhyDidMemberSurrenderBenefitsController
                 .viewModel(
                   srn,
-                  memberIndex,
+                  memberIndex.refined,
                   mode,
                   request.schemeDetails.schemeName,
                   amount.displayAs,
@@ -84,10 +85,10 @@ class WhyDidMemberSurrenderBenefitsController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, memberIndex: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
-        request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, memberIndex)).getOrRecoverJourney { amount =>
+      request.userAnswers.get(MemberDetailsPage(srn, memberIndex.refined)).getOrRecoverJourney { memberName =>
+        request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, memberIndex.refined)).getOrRecoverJourney { amount =>
           form
             .bindFromRequest()
             .fold(
@@ -98,7 +99,7 @@ class WhyDidMemberSurrenderBenefitsController @Inject()(
                       formWithErrors,
                       WhyDidMemberSurrenderBenefitsController.viewModel(
                         srn,
-                        memberIndex,
+                        memberIndex.refined,
                         mode,
                         request.schemeDetails.schemeName,
                         amount.displayAs,
@@ -110,14 +111,14 @@ class WhyDidMemberSurrenderBenefitsController @Inject()(
               value =>
                 for {
                   updatedAnswers <- request.userAnswers
-                    .set(WhyDidMemberSurrenderBenefitsPage(srn, memberIndex), value)
-                    .set(SurrenderedBenefitsCompletedPage(srn, memberIndex), SectionCompleted)
+                    .set(WhyDidMemberSurrenderBenefitsPage(srn, memberIndex.refined), value)
+                    .set(SurrenderedBenefitsCompletedPage(srn, memberIndex.refined), SectionCompleted)
                     .mapK[Future]
                   nextPage = navigator
-                    .nextPage(WhyDidMemberSurrenderBenefitsPage(srn, memberIndex), mode, updatedAnswers)
+                    .nextPage(WhyDidMemberSurrenderBenefitsPage(srn, memberIndex.refined), mode, updatedAnswers)
                   updatedProgressAnswers <- saveProgress(
                     srn,
-                    memberIndex,
+                    memberIndex.refined,
                     updatedAnswers,
                     nextPage,
                     alwaysCompleted = true

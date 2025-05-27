@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import com.google.inject.Inject
 import utils.ListUtils._
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import utils.IntUtils.toInt
 import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
@@ -64,7 +65,7 @@ class SharesListController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  private implicit val logger = Logger(getClass)
+  private implicit val logger: Logger = Logger(getClass)
 
   val form: Form[Boolean] = SharesListController.form(formProvider)
 

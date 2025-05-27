@@ -19,6 +19,7 @@ package controllers.nonsipp.memberreceivedpcls
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -53,13 +54,13 @@ class RemovePclsController @Inject()(
 
   private val form = RemovePclsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRedirectToTaskList(srn)
+          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex.refined)).getOrRedirectToTaskList(srn)
           total <- request.userAnswers
-            .get(PensionCommencementLumpSumAmountPage(srn, memberIndex))
+            .get(PensionCommencementLumpSumAmountPage(srn, memberIndex.refined))
             .getOrRedirectToTaskList(srn)
         } yield {
           Ok(
@@ -67,7 +68,7 @@ class RemovePclsController @Inject()(
               form,
               RemovePclsController.viewModel(
                 srn,
-                memberIndex: Max300,
+                memberIndex.refined,
                 total.lumpSumAmount,
                 nameDOB.fullName
               )
@@ -77,7 +78,7 @@ class RemovePclsController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -86,13 +87,13 @@ class RemovePclsController @Inject()(
             (
               for {
                 total <- request.userAnswers
-                  .get(PensionCommencementLumpSumAmountPage(srn, memberIndex))
+                  .get(PensionCommencementLumpSumAmountPage(srn, memberIndex.refined))
                   .getOrRecoverJourneyT
-                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourneyT
+                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex.refined)).getOrRecoverJourneyT
               } yield BadRequest(
                 view(
                   formWithErrors,
-                  RemovePclsController.viewModel(srn, memberIndex, total.lumpSumAmount, nameDOB.fullName)
+                  RemovePclsController.viewModel(srn, memberIndex.refined, total.lumpSumAmount, nameDOB.fullName)
                 )
               )
             ).merge
@@ -102,8 +103,8 @@ class RemovePclsController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(
                   request.userAnswers
-                    .remove(PensionCommencementLumpSumAmountPage(srn, memberIndex))
-                    .set(MemberStatus(srn, memberIndex), MemberState.Changed)
+                    .remove(PensionCommencementLumpSumAmountPage(srn, memberIndex.refined))
+                    .set(MemberStatus(srn, memberIndex.refined), MemberState.Changed)
                 )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
@@ -116,7 +117,7 @@ class RemovePclsController @Inject()(
                 _ =>
                   Redirect(
                     navigator
-                      .nextPage(RemovePclsPage(srn, memberIndex), NormalMode, updatedAnswers)
+                      .nextPage(RemovePclsPage(srn, memberIndex.refined), NormalMode, updatedAnswers)
                   )
               )
             } else {
@@ -124,7 +125,7 @@ class RemovePclsController @Inject()(
                 .successful(
                   Redirect(
                     navigator
-                      .nextPage(RemovePclsPage(srn, memberIndex), NormalMode, request.userAnswers)
+                      .nextPage(RemovePclsPage(srn, memberIndex.refined), NormalMode, request.userAnswers)
                   )
                 )
             }

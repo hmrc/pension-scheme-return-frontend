@@ -31,9 +31,9 @@ class HowWasAssetDisposedOfControllerSpec extends ControllerBaseSpec {
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.HowWasAssetDisposedOfController.onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+    routes.HowWasAssetDisposedOfController.onPageLoad(srn, assetIndex.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.HowWasAssetDisposedOfController.onSubmit(srn, assetIndex, disposalIndex, NormalMode)
+    routes.HowWasAssetDisposedOfController.onSubmit(srn, assetIndex.value, disposalIndex.value, NormalMode)
 
   "HowWasAssetDisposedOfController" - {
 

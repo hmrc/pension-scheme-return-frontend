@@ -23,6 +23,7 @@ import play.api.mvc._
 import forms.mappings.Mappings
 import controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController._
 import config.RefinedTypes.Max5000
+import utils.IntUtils.IntOpts
 import cats.implicits.toShow
 import controllers.actions._
 import navigation.Navigator
@@ -60,41 +61,43 @@ class OutstandingArrearsOnLoanController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       usingSchemeDate[Id](srn) { period =>
-        val storedYesNoAnswer = request.userAnswers.get(ArrearsPrevYears(srn, index))
+        val storedYesNoAnswer = request.userAnswers.get(ArrearsPrevYears(srn, index.refined))
         val form = OutstandingArrearsOnLoanController.form(formProvider, period)
 
         val preparedForm = if (isPrePopulation && storedYesNoAnswer.isEmpty) {
           form
         } else {
-          request.userAnswers.fillForm(OutstandingArrearsOnLoanPage(srn, index), form)
+          request.userAnswers.fillForm(OutstandingArrearsOnLoanPage(srn, index.refined), form)
         }
 
-        Ok(view(preparedForm, viewModel(srn, index, mode, period)))
+        Ok(view(preparedForm, viewModel(srn, index.refined, mode, period)))
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       usingSchemeDate(srn) { period =>
         val form = OutstandingArrearsOnLoanController.form(formProvider, period)
         form
           .bindFromRequest()
           .fold(
-            formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, period)))),
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index.refined, mode, period)))),
             value =>
               for {
-                yesNoAnswer <- request.userAnswers.set(ArrearsPrevYears(srn, index), value.isRight).mapK
+                yesNoAnswer <- request.userAnswers.set(ArrearsPrevYears(srn, index.refined), value.isRight).mapK
                 updatedAnswers <- yesNoAnswer
-                  .set(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo(value))
+                  .set(OutstandingArrearsOnLoanPage(srn, index.refined), ConditionalYesNo(value))
                   .mapK
                 answersWithProgress <- updatedAnswers
-                  .set(LoansProgress(srn, index), SectionJourneyStatus.Completed)
+                  .set(LoansProgress(srn, index.refined), SectionJourneyStatus.Completed)
                   .mapK
-                nextPage = navigator.nextPage(OutstandingArrearsOnLoanPage(srn, index), mode, answersWithProgress)
-                updatedProgressAnswers <- saveProgress(srn, index, answersWithProgress, nextPage)
+                nextPage = navigator
+                  .nextPage(OutstandingArrearsOnLoanPage(srn, index.refined), mode, answersWithProgress)
+                updatedProgressAnswers <- saveProgress(srn, index.refined, answersWithProgress, nextPage)
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
           )
@@ -140,6 +143,6 @@ object OutstandingArrearsOnLoanController {
           .Conditional("outstandingArrearsOnLoan.yes.conditional", FieldType.Currency),
         no = YesNoViewModel.Unconditional
       ),
-      routes.OutstandingArrearsOnLoanController.onSubmit(srn, index, mode)
+      routes.OutstandingArrearsOnLoanController.onSubmit(srn, index.value, mode)
     )
 }

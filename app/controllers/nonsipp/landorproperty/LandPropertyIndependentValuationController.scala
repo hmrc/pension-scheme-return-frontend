@@ -19,7 +19,6 @@ package controllers.nonsipp.landorproperty
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandPropertyIndependentValuationPage}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -31,6 +30,8 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandPropertyIndependentValuationPage}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
@@ -51,29 +52,33 @@ class LandPropertyIndependentValuationController @Inject()(
 
   private val form = LandPropertyIndependentValuationController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-        val preparedForm = request.userAnswers.fillForm(LandPropertyIndependentValuationPage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, address.addressLine1, mode)))
+      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney { address =>
+        val preparedForm = request.userAnswers.fillForm(LandPropertyIndependentValuationPage(srn, index.refined), form)
+        Ok(view(preparedForm, viewModel(srn, index.refined, address.addressLine1, mode)))
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, address.addressLine1, mode))))
+            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney {
+              address =>
+                Future.successful(
+                  BadRequest(view(formWithErrors, viewModel(srn, index.refined, address.addressLine1, mode)))
+                )
             },
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(LandPropertyIndependentValuationPage(srn, index), value))
-              nextPage = navigator.nextPage(LandPropertyIndependentValuationPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                .fromTry(request.userAnswers.set(LandPropertyIndependentValuationPage(srn, index.refined), value))
+              nextPage = navigator
+                .nextPage(LandPropertyIndependentValuationPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

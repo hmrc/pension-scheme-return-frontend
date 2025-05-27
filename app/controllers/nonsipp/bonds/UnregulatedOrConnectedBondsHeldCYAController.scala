@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.bonds._
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, IntOpts}
 import cats.implicits.toShow
 import controllers.actions._
 import play.api.i18n._
@@ -57,56 +58,58 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)
+      onPageLoadCommon(srn: Srn, index: Int, mode: Mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)
+      onPageLoadCommon(srn: Srn, index: Int, mode: Mode)
     }
 
-  def onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
-    request.userAnswers.get(BondsProgress(srn, index)) match {
+  def onPageLoadCommon(srn: Srn, index: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+    request.userAnswers.get(BondsProgress(srn, index.refined)) match {
       case Some(InProgress(_)) => Redirect(routes.BondsListController.onPageLoad(srn, 1, mode))
       case _ =>
         (
           for {
-            nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, index)).getOrRecoverJourney
+            nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, index.refined)).getOrRecoverJourney
             whyDoesSchemeHoldBonds <- request.userAnswers
-              .get(WhyDoesSchemeHoldBondsPage(srn, index))
+              .get(WhyDoesSchemeHoldBondsPage(srn, index.refined))
               .getOrRecoverJourney
 
             whenDidSchemeAcquireBonds = Option.when(whyDoesSchemeHoldBonds != Transfer)(
-              request.userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, index)).get
+              request.userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, index.refined)).get
             )
 
-            costOfBonds <- request.userAnswers.get(CostOfBondsPage(srn, index)).getOrRecoverJourney
+            costOfBonds <- request.userAnswers.get(CostOfBondsPage(srn, index.refined)).getOrRecoverJourney
 
             bondsFromConnectedParty = Option.when(whyDoesSchemeHoldBonds == Acquisition)(
-              request.userAnswers.get(BondsFromConnectedPartyPage(srn, index)).get
+              request.userAnswers.get(BondsFromConnectedPartyPage(srn, index.refined)).get
             )
 
-            areBondsUnregulated <- request.userAnswers.get(AreBondsUnregulatedPage(srn, index)).getOrRecoverJourney
+            areBondsUnregulated <- request.userAnswers
+              .get(AreBondsUnregulatedPage(srn, index.refined))
+              .getOrRecoverJourney
 
-            incomeFromBonds <- request.userAnswers.get(IncomeFromBondsPage(srn, index)).getOrRecoverJourney
+            incomeFromBonds <- request.userAnswers.get(IncomeFromBondsPage(srn, index.refined)).getOrRecoverJourney
 
             schemeName = request.schemeDetails.schemeName
           } yield Ok(
             view(
               viewModel(
                 srn,
-                index,
+                index.refined,
                 schemeName,
                 nameOfBonds,
                 whyDoesSchemeHoldBonds,
@@ -127,21 +130,21 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
         ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val prePopulated = request.userAnswers.get(BondPrePopulated(srn, index))
+      val prePopulated = request.userAnswers.get(BondPrePopulated(srn, index.refined))
       for {
         updatedAnswers <- request.userAnswers
           .set(UnregulatedOrConnectedBondsHeldPage(srn), true)
-          .setWhen(prePopulated.isDefined)(BondPrePopulated(srn, index), true)
+          .setWhen(prePopulated.isDefined)(BondPrePopulated(srn, index.refined), true)
           .mapK
         _ <- saveService.save(updatedAnswers)
         result <- psrSubmissionService
           .submitPsrDetailsWithUA(
             srn,
             updatedAnswers,
-            fallbackCall =
-              controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn, index, mode)
+            fallbackCall = controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+              .onPageLoad(srn, index, mode)
           )
       } yield result match {
         case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

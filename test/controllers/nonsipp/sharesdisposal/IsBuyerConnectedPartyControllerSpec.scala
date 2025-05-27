@@ -31,9 +31,9 @@ class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.IsBuyerConnectedPartyController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+    routes.IsBuyerConnectedPartyController.onPageLoad(srn, shareIndex.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.IsBuyerConnectedPartyController.onSubmit(srn, shareIndex, disposalIndex, NormalMode)
+    routes.IsBuyerConnectedPartyController.onSubmit(srn, shareIndex.value, disposalIndex.value, NormalMode)
 
   "IsBuyerConnectedPartyController" - {
 

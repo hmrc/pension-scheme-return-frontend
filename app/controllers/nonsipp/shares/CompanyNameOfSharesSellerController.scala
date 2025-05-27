@@ -18,6 +18,7 @@ package controllers.nonsipp.shares
 
 import services.SaveService
 import viewmodels.implicits._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -49,14 +50,14 @@ class CompanyNameOfSharesSellerController @Inject()(
 
   private val form = CompanyNameOfSharesSellerController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
-        request.userAnswers.fillForm(CompanyNameOfSharesSellerPage(srn, index), form)
-      Ok(view(preparedForm, CompanyNameOfSharesSellerController.viewModel(srn, index, mode)))
+        request.userAnswers.fillForm(CompanyNameOfSharesSellerPage(srn, index.refined), form)
+      Ok(view(preparedForm, CompanyNameOfSharesSellerController.viewModel(srn, index.refined, mode)))
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -66,16 +67,16 @@ class CompanyNameOfSharesSellerController @Inject()(
               BadRequest(
                 view(
                   formWithErrors,
-                  CompanyNameOfSharesSellerController.viewModel(srn, index, mode)
+                  CompanyNameOfSharesSellerController.viewModel(srn, index.refined, mode)
                 )
               )
             ),
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(CompanyNameOfSharesSellerPage(srn, index), value))
-              nextPage = navigator.nextPage(CompanyNameOfSharesSellerPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                .fromTry(request.userAnswers.set(CompanyNameOfSharesSellerPage(srn, index.refined), value))
+              nextPage = navigator.nextPage(CompanyNameOfSharesSellerPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

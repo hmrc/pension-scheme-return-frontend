@@ -25,6 +25,7 @@ import com.google.inject.Inject
 import utils.ListUtils.ListOps
 import config.RefinedTypes.Max3
 import config.FrontendAppConfig
+import utils.IntUtils.IntOpts
 import controllers.actions._
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriods}
 import forms.DateRangeFormProvider
@@ -68,33 +69,37 @@ class AccountingPeriodController @Inject()(
 
   private val viewModel = AccountingPeriodController.viewModel _
 
-  def onPageLoad(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       getWhichTaxYear(srn) { taxYear =>
         Ok(
           view(
-            form(taxYear = taxYear, index = index).fromUserAnswers(AccountingPeriodPage(srn, index, mode)),
-            viewModel(srn, index, mode)
+            form(taxYear = taxYear, index = index.refined)
+              .fromUserAnswers(AccountingPeriodPage(srn, index.refined, mode)),
+            viewModel(srn, index.refined, mode)
           )
         )
       }
     }
 
-  def onSubmit(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
-      val usedAccountingPeriods = duplicateAccountingPeriods(srn, index)
+      val usedAccountingPeriods = duplicateAccountingPeriods(srn, index.refined)
       request.userAnswers.get(WhichTaxYearPage(srn)) match {
         case Some(dateRange: DateRange) =>
-          form(usedAccountingPeriods, TaxYear(dateRange.from.getYear), index)
+          form(usedAccountingPeriods, TaxYear(dateRange.from.getYear), index.refined)
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index.refined, mode)))),
               value =>
                 for {
                   updatedAnswers <- Future
-                    .fromTry(request.userAnswers.set(AccountingPeriodPage(srn, index, mode), value))
+                    .fromTry(request.userAnswers.set(AccountingPeriodPage(srn, index.refined, mode), value))
                   _ <- saveService.save(updatedAnswers)
-                } yield Redirect(navigator.nextPage(AccountingPeriodPage(srn, index, mode), mode, updatedAnswers))
+                } yield Redirect(
+                  navigator.nextPage(AccountingPeriodPage(srn, index.refined, mode), mode, updatedAnswers)
+                )
             )
         case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
@@ -162,6 +167,6 @@ object AccountingPeriodController {
     "accountingPeriod.startDate.hint",
     "accountingPeriod.endDate.hint",
     Some(ParagraphMessage("accountingPeriod.description")),
-    routes.AccountingPeriodController.onSubmit(srn, index, mode)
+    routes.AccountingPeriodController.onSubmit(srn, index.value, mode)
   )
 }

@@ -44,10 +44,10 @@ class TotalAmountPensionPaymentsControllerSpec extends ControllerBaseSpec {
   private val mockPSRSubmissionService = mock[PsrSubmissionService]
 
   private lazy val onPageLoad =
-    routes.TotalAmountPensionPaymentsController.onPageLoad(srn, index, NormalMode)
+    routes.TotalAmountPensionPaymentsController.onPageLoad(srn, index.value, NormalMode)
 
   private lazy val onSubmit =
-    routes.TotalAmountPensionPaymentsController.onSubmit(srn, index, NormalMode)
+    routes.TotalAmountPensionPaymentsController.onSubmit(srn, index.value, NormalMode)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPSRSubmissionService)

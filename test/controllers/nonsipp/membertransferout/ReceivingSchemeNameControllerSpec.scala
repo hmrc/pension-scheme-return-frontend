@@ -30,10 +30,10 @@ class ReceivingSchemeNameControllerSpec extends ControllerBaseSpec {
   private val transferIndex = refineMV[OneTo5](1)
   private lazy val onPageLoad =
     controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
-      .onPageLoad(srn, index, transferIndex, NormalMode)
+      .onPageLoad(srn, index.value, transferIndex.value, NormalMode)
   private lazy val onSubmit =
     controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
-      .onSubmit(srn, index, transferIndex, NormalMode)
+      .onSubmit(srn, index.value, transferIndex.value, NormalMode)
 
   "ReceivingSchemeNameController" - {
 

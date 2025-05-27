@@ -31,11 +31,11 @@ class SharesCompanyCrnControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad =
     routes.SharesCompanyCrnController
-      .onPageLoad(srn, index, NormalMode)
+      .onPageLoad(srn, index.value, NormalMode)
 
   private lazy val onSubmit =
     routes.SharesCompanyCrnController
-      .onSubmit(srn, index, NormalMode)
+      .onSubmit(srn, index.value, NormalMode)
 
   val userAnswersCompanyName: UserAnswers =
     defaultUserAnswers

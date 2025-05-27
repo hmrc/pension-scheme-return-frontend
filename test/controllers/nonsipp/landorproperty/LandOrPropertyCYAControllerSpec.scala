@@ -53,13 +53,13 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[OneTo5000](1)
   private val page = 1
 
-  private def onPageLoad(mode: Mode): Call = routes.LandOrPropertyCYAController.onPageLoad(srn, index, mode)
+  private def onPageLoad(mode: Mode): Call = routes.LandOrPropertyCYAController.onPageLoad(srn, index.value, mode)
 
-  private def onSubmit(mode: Mode): Call = routes.LandOrPropertyCYAController.onSubmit(srn, index, mode)
+  private def onSubmit(mode: Mode): Call = routes.LandOrPropertyCYAController.onSubmit(srn, index.value, mode)
 
   private lazy val onPageLoadViewOnly = routes.LandOrPropertyCYAController.onPageLoadViewOnly(
     srn,
-    index,
+    index.value,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -90,7 +90,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
       LandOrPropertyProgress(srn, index),
       SectionJourneyStatus.InProgress(
         controllers.nonsipp.landorproperty.routes.LandRegistryTitleNumberController
-          .onPageLoad(srn, refineMV(1), NormalMode)
+          .onPageLoad(srn, 1, NormalMode)
           .url
       )
     )

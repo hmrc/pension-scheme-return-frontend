@@ -37,8 +37,8 @@ class OutstandingArrearsOnLoanControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  private lazy val onPageLoad = routes.OutstandingArrearsOnLoanController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.OutstandingArrearsOnLoanController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.OutstandingArrearsOnLoanController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.OutstandingArrearsOnLoanController.onSubmit(srn, index.value, NormalMode)
 
   private val conditionalYes: ConditionalYes[Money] = ConditionalYesNo.yes(money)
   private val conditionalNo: ConditionalYesNo[Unit, Money] = ConditionalYesNo.no(())

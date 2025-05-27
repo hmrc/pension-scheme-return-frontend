@@ -20,6 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
 import controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController._
+import utils.IntUtils.IntOpts
 import cats.implicits.toShow
 import controllers.actions._
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, RemoveAccountingPeriodPage}
@@ -55,28 +56,29 @@ class RemoveAccountingPeriodController @Inject()(
 
   private val form = RemoveAccountingPeriodController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      withAccountingPeriodAtIndex(srn, index, mode) { period =>
-        Ok(view(form, viewModel(srn, index, period, mode)))
+      withAccountingPeriodAtIndex(srn, index.refined, mode) { period =>
+        Ok(view(form, viewModel(srn, index.refined, period, mode)))
       }
   }
 
-  def onSubmit(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future.successful(
-              withAccountingPeriodAtIndex(srn, index, mode) { period =>
-                BadRequest(view(formWithErrors, viewModel(srn, index, period, mode)))
+              withAccountingPeriodAtIndex(srn, index.refined, mode) { period =>
+                BadRequest(view(formWithErrors, viewModel(srn, index.refined, period, mode)))
               }
             ),
           answer => {
             if (answer) {
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.remove(AccountingPeriodPage(srn, index, mode)))
+                updatedAnswers <- Future
+                  .fromTry(request.userAnswers.remove(AccountingPeriodPage(srn, index.refined, mode)))
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(navigator.nextPage(RemoveAccountingPeriodPage(srn, mode), mode, updatedAnswers))
             } else {
@@ -111,6 +113,6 @@ object RemoveAccountingPeriodController {
     YesNoPageViewModel(
       Message("removeAccountingPeriod.title", dateRange.from.show, dateRange.to.show),
       Message("removeAccountingPeriod.heading", dateRange.from.show, dateRange.to.show),
-      routes.RemoveAccountingPeriodController.onSubmit(srn, index, mode)
+      routes.RemoveAccountingPeriodController.onSubmit(srn, index.value, mode)
     )
 }

@@ -32,9 +32,9 @@ class TotalConsiderationSharesRedeemedControllerSpec extends ControllerBaseSpec 
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.TotalConsiderationSharesRedeemedController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+    routes.TotalConsiderationSharesRedeemedController.onPageLoad(srn, shareIndex.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.TotalConsiderationSharesRedeemedController.onSubmit(srn, shareIndex, disposalIndex, NormalMode)
+    routes.TotalConsiderationSharesRedeemedController.onSubmit(srn, shareIndex.value, disposalIndex.value, NormalMode)
 
   private val userAnswers =
     defaultUserAnswers

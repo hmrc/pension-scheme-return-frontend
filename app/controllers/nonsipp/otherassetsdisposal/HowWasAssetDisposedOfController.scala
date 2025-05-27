@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsdisposal
 import services.SaveService
 import pages.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfPage
 import viewmodels.implicits._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -56,18 +57,18 @@ class HowWasAssetDisposedOfController @Inject()(
 
   private val form = HowWasAssetDisposedOfController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.fillForm(
-          HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex),
+          HowWasAssetDisposedOfPage(srn, assetIndex.refined, disposalIndex.refined),
           form
         )
 
-      Ok(view(preparedForm, viewModel(srn, assetIndex, disposalIndex, mode)))
+      Ok(view(preparedForm, viewModel(srn, assetIndex.refined, disposalIndex.refined, mode)))
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -75,22 +76,28 @@ class HowWasAssetDisposedOfController @Inject()(
           formWithErrors =>
             Future.successful(
               BadRequest(
-                view(formWithErrors, viewModel(srn, assetIndex, disposalIndex, mode))
+                view(formWithErrors, viewModel(srn, assetIndex.refined, disposalIndex.refined, mode))
               )
             ),
           value => {
-            val page = HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex)
+            val page = HowWasAssetDisposedOfPage(srn, assetIndex.refined, disposalIndex.refined)
             for {
               updatedAnswers <- request.userAnswers
                 .set(page, value)
                 .mapK[Future]
               hasAnswerChanged = request.userAnswers.exists(page)(_ == value)
               nextPage = navigator.nextPage(
-                HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex, hasAnswerChanged),
+                HowWasAssetDisposedOfPage(srn, assetIndex.refined, disposalIndex.refined, hasAnswerChanged),
                 mode,
                 updatedAnswers
               )
-              updatedProgressAnswers <- saveProgress(srn, assetIndex, disposalIndex, updatedAnswers, nextPage)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                assetIndex.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

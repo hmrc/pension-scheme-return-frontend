@@ -23,6 +23,7 @@ import play.api.mvc._
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
+import utils.IntUtils.{toInt, IntOpts}
 import pages.nonsipp.receivetransfer.{TotalValueTransferPage, TransferringSchemeNamePage}
 import cats.syntax.applicative._
 import controllers.actions._
@@ -59,28 +60,36 @@ class TotalValueTransferController @Inject()(
   private implicit val logger: Logger = Logger(getClass)
   private val form = TotalValueTransferController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          completedMemberDetails <- request.userAnswers.completedMemberDetails(srn, index).getOrRecoverJourney
+          completedMemberDetails <- request.userAnswers.completedMemberDetails(srn, index.refined).getOrRecoverJourney
           (_, memberDetails) = completedMemberDetails
           transferSchemeName <- request.userAnswers
-            .get(TransferringSchemeNamePage(srn, index, secondaryIndex))
+            .get(TransferringSchemeNamePage(srn, index.refined, secondaryIndex.refined))
             .getOrRecoverJourney
           preparedForm = request.userAnswers
-            .get(TotalValueTransferPage(srn, index, secondaryIndex))
+            .get(TotalValueTransferPage(srn, index.refined, secondaryIndex.refined))
             .fold(form)(form.fill)
         } yield Ok(
           view(
             preparedForm,
-            viewModel(srn, index, secondaryIndex, memberDetails.fullName, transferSchemeName, form, mode)
+            viewModel(
+              srn,
+              index.refined,
+              secondaryIndex.refined,
+              memberDetails.fullName,
+              transferSchemeName,
+              form,
+              mode
+            )
           )
         )
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -88,26 +97,42 @@ class TotalValueTransferController @Inject()(
           formWithErrors =>
             (
               for {
-                completedMemberDetails <- request.userAnswers.completedMemberDetails(srn, index).getOrRecoverJourney
+                completedMemberDetails <- request.userAnswers
+                  .completedMemberDetails(srn, index.refined)
+                  .getOrRecoverJourney
                 (_, memberDetails) = completedMemberDetails
                 transferSchemeName <- request.userAnswers
-                  .get(TransferringSchemeNamePage(srn, index, secondaryIndex))
+                  .get(TransferringSchemeNamePage(srn, index.refined, secondaryIndex.refined))
                   .getOrRecoverJourney
               } yield BadRequest(
                 view(
                   formWithErrors,
-                  viewModel(srn, index, secondaryIndex, memberDetails.fullName, transferSchemeName, form, mode)
+                  viewModel(
+                    srn,
+                    index.refined,
+                    secondaryIndex.refined,
+                    memberDetails.fullName,
+                    transferSchemeName,
+                    form,
+                    mode
+                  )
                 )
               )
             ).merge.pure[Future],
           value =>
             for {
               updatedAnswers <- request.userAnswers
-                .set(TotalValueTransferPage(srn, index, secondaryIndex), value)
+                .set(TotalValueTransferPage(srn, index.refined, secondaryIndex.refined), value)
                 .mapK[Future]
               nextPage = navigator
-                .nextPage(TotalValueTransferPage(srn, index, secondaryIndex), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, secondaryIndex, updatedAnswers, nextPage)
+                .nextPage(TotalValueTransferPage(srn, index.refined, secondaryIndex.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                index.refined,
+                secondaryIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

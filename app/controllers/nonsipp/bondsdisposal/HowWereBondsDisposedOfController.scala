@@ -19,6 +19,7 @@ package controllers.nonsipp.bondsdisposal
 import controllers.nonsipp.bondsdisposal.HowWereBondsDisposedOfController._
 import services.SaveService
 import viewmodels.implicits._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -57,30 +58,33 @@ class HowWereBondsDisposedOfController @Inject()(
 
   private val form = HowWereBondsDisposedOfController.form(formProvider)
 
-  def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       // If this page is reached in CheckMode and there is no PointOfEntry set
       if (mode == CheckMode && request.userAnswers
-          .get(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex))
+          .get(BondsDisposalCYAPointOfEntry(srn, bondIndex.refined, disposalIndex.refined))
           .contains(NoPointOfEntry)) {
         // Set this page as the PointOfEntry
         saveService.save(
           request.userAnswers
-            .set(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex), HowWereBondsDisposedPointOfEntry)
+            .set(
+              BondsDisposalCYAPointOfEntry(srn, bondIndex.refined, disposalIndex.refined),
+              HowWereBondsDisposedPointOfEntry
+            )
             .getOrElse(request.userAnswers)
         )
       }
 
       val preparedForm =
         request.userAnswers.fillForm(
-          HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex),
+          HowWereBondsDisposedOfPage(srn, bondIndex.refined, disposalIndex.refined),
           form
         )
 
-      Ok(view(preparedForm, viewModel(srn, bondIndex, disposalIndex, mode)))
+      Ok(view(preparedForm, viewModel(srn, bondIndex.refined, disposalIndex.refined, mode)))
     }
 
-  def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -88,11 +92,11 @@ class HowWereBondsDisposedOfController @Inject()(
           formWithErrors =>
             Future.successful(
               BadRequest(
-                view(formWithErrors, viewModel(srn, bondIndex, disposalIndex, mode))
+                view(formWithErrors, viewModel(srn, bondIndex.refined, disposalIndex.refined, mode))
               )
             ),
           value => {
-            val page = HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex)
+            val page = HowWereBondsDisposedOfPage(srn, bondIndex.refined, disposalIndex.refined)
             for {
               updatedAnswers <- request.userAnswers
                 .set(page, value)
@@ -101,11 +105,17 @@ class HowWereBondsDisposedOfController @Inject()(
                 .mapK[Future]
               hasAnswerChanged = request.userAnswers.exists(page)(_ == value)
               nextPage = navigator.nextPage(
-                HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex, hasAnswerChanged),
+                HowWereBondsDisposedOfPage(srn, bondIndex.refined, disposalIndex.refined, hasAnswerChanged),
                 mode,
                 updatedAnswers
               )
-              updatedProgressAnswers <- saveProgress(srn, bondIndex, disposalIndex, updatedAnswers, nextPage)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                bondIndex.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

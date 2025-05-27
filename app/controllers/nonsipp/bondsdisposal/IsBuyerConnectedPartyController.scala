@@ -20,6 +20,7 @@ import services.SaveService
 import controllers.nonsipp.bondsdisposal.IsBuyerConnectedPartyController._
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -51,32 +52,49 @@ class IsBuyerConnectedPartyController @Inject()(
 
   private val form = IsBuyerConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
-        request.userAnswers.get(IsBuyerConnectedPartyPage(srn, index, disposalIndex)).fold(form)(form.fill)
-      request.userAnswers.get(BuyerNamePage(srn, index, disposalIndex)).getOrRecoverJourney { buyerName =>
-        Ok(view(preparedForm, viewModel(srn, index, disposalIndex, buyerName, mode)))
+        request.userAnswers
+          .get(IsBuyerConnectedPartyPage(srn, index.refined, disposalIndex.refined))
+          .fold(form)(form.fill)
+      request.userAnswers.get(BuyerNamePage(srn, index.refined, disposalIndex.refined)).getOrRecoverJourney {
+        buyerName =>
+          Ok(view(preparedForm, viewModel(srn, index.refined, disposalIndex.refined, buyerName, mode)))
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            request.userAnswers.get(BuyerNamePage(srn, index, disposalIndex)).getOrRecoverJourney { buyerName =>
-              Future
-                .successful(BadRequest(view(formWithErrors, viewModel(srn, index, disposalIndex, buyerName, mode))))
+            request.userAnswers.get(BuyerNamePage(srn, index.refined, disposalIndex.refined)).getOrRecoverJourney {
+              buyerName =>
+                Future
+                  .successful(
+                    BadRequest(
+                      view(formWithErrors, viewModel(srn, index.refined, disposalIndex.refined, buyerName, mode))
+                    )
+                  )
             }
           },
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(IsBuyerConnectedPartyPage(srn, index, disposalIndex), value))
-              nextPage = navigator.nextPage(IsBuyerConnectedPartyPage(srn, index, disposalIndex), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
+                .fromTry(
+                  request.userAnswers.set(IsBuyerConnectedPartyPage(srn, index.refined, disposalIndex.refined), value)
+                )
+              nextPage = navigator
+                .nextPage(IsBuyerConnectedPartyPage(srn, index.refined, disposalIndex.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                index.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

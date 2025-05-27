@@ -32,8 +32,8 @@ class SecurityGivenForLoanControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  private lazy val onPageLoad = routes.SecurityGivenForLoanController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.SecurityGivenForLoanController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.SecurityGivenForLoanController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.SecurityGivenForLoanController.onSubmit(srn, index.value, NormalMode)
 
   private val conditionalYes: ConditionalYes[Security] = ConditionalYesNo.yes(security)
 

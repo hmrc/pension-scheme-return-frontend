@@ -37,8 +37,8 @@ class RemoveTransferOutControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
   private val secondaryIndex = refineMV[Max5.Refined](1)
-  private lazy val onPageLoad = routes.RemoveTransferOutController.onPageLoad(srn, index, secondaryIndex)
-  private lazy val onSubmit = routes.RemoveTransferOutController.onSubmit(srn, index, secondaryIndex)
+  private lazy val onPageLoad = routes.RemoveTransferOutController.onPageLoad(srn, index.value, secondaryIndex.value)
+  private lazy val onSubmit = routes.RemoveTransferOutController.onSubmit(srn, index.value, secondaryIndex.value)
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 

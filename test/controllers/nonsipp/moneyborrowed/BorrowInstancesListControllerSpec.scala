@@ -96,7 +96,7 @@ class BorrowInstancesListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(
         MoneyBorrowedProgress(srn, indexTwo),
         SectionJourneyStatus.InProgress(
-          routes.ValueOfSchemeAssetsWhenMoneyBorrowedController.onPageLoad(srn, indexTwo, NormalMode).url
+          routes.ValueOfSchemeAssetsWhenMoneyBorrowedController.onPageLoad(srn, indexTwo.value, NormalMode).url
         )
       )
 

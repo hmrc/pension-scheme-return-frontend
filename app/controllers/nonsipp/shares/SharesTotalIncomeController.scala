@@ -20,6 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.nonsipp.shares.SharesTotalIncomeController._
 import controllers.actions._
 import navigation.Navigator
@@ -54,22 +55,24 @@ class SharesTotalIncomeController @Inject()(
 
   private val form = SharesTotalIncomeController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { companyName =>
-        val preparedForm = request.userAnswers.fillForm(SharesTotalIncomePage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, companyName, form, mode)))
+      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index.refined)).getOrRecoverJourney { companyName =>
+        val preparedForm = request.userAnswers.fillForm(SharesTotalIncomePage(srn, index.refined), form)
+        Ok(view(preparedForm, viewModel(srn, index.refined, companyName, form, mode)))
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { companyName =>
-              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, companyName, form, mode))))
+            request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index.refined)).getOrRecoverJourney {
+              companyName =>
+                Future
+                  .successful(BadRequest(view(formWithErrors, viewModel(srn, index.refined, companyName, form, mode))))
             }
           },
           value =>
@@ -77,11 +80,11 @@ class SharesTotalIncomeController @Inject()(
               updatedAnswers <- Future
                 .fromTry(
                   request.userAnswers
-                    .transformAndSet(SharesTotalIncomePage(srn, index), value)
-                    .set(SharesCompleted(srn, index), SectionCompleted)
+                    .transformAndSet(SharesTotalIncomePage(srn, index.refined), value)
+                    .set(SharesCompleted(srn, index.refined), SectionCompleted)
                 )
-              nextPage = navigator.nextPage(SharesTotalIncomePage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              nextPage = navigator.nextPage(SharesTotalIncomePage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

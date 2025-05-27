@@ -29,8 +29,8 @@ class BondsCheckAndUpdateControllerSpec extends ControllerBaseSpec {
 
   private val index: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
 
-  private def onPageLoad = routes.BondsCheckAndUpdateController.onPageLoad(srn, index)
-  private def onSubmit = routes.BondsCheckAndUpdateController.onSubmit(srn, index)
+  private def onPageLoad = routes.BondsCheckAndUpdateController.onPageLoad(srn, index.value)
+  private def onSubmit = routes.BondsCheckAndUpdateController.onSubmit(srn, index.value)
 
   private val completedUserAnswers = defaultUserAnswers
     .unsafeSet(NameOfBondsPage(srn, index), nameOfBonds)
@@ -54,7 +54,7 @@ class BondsCheckAndUpdateControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectToPage(onSubmit, routes.IncomeFromBondsController.onPageLoad(srn, index, NormalMode))
+      redirectToPage(onSubmit, routes.IncomeFromBondsController.onPageLoad(srn, index.value, NormalMode))
     )
 
     act.like(

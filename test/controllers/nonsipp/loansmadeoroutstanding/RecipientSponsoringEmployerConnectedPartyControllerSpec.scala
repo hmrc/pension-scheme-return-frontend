@@ -33,8 +33,9 @@ class RecipientSponsoringEmployerConnectedPartyControllerSpec extends Controller
   private val subject = IdentitySubject.LoanRecipient
 
   lazy val onPageLoad: Call =
-    routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn, index, NormalMode)
-  lazy val onSubmit: Call = routes.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn, index, NormalMode)
+    routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn, index.value, NormalMode)
+  lazy val onSubmit: Call =
+    routes.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn, index.value, NormalMode)
 
   val userAnswersWithCompanyName: UserAnswers =
     defaultUserAnswers

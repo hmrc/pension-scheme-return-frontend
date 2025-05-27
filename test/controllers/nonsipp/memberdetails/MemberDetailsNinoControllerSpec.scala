@@ -37,8 +37,8 @@ class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
     val validNino = ninoGen.sample.value
     val otherValidNino = ninoGen.sample.value
 
-    lazy val onPageLoad = routes.MemberDetailsNinoController.onPageLoad(srn, refineMV(1), NormalMode)
-    lazy val onSubmit = routes.MemberDetailsNinoController.onSubmit(srn, refineMV(1), NormalMode)
+    lazy val onPageLoad = routes.MemberDetailsNinoController.onPageLoad(srn, 1, NormalMode)
+    lazy val onSubmit = routes.MemberDetailsNinoController.onSubmit(srn, 1, NormalMode)
 
     act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
       val view = injected[TextInputView]

@@ -21,7 +21,6 @@ import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
 import models.SchemeHoldLandProperty.{Acquisition, Transfer}
-import pages.nonsipp.landorproperty._
 import cats.implicits.toShow
 import controllers.actions._
 import controllers.nonsipp.landorproperty.LandOrPropertyCYAController._
@@ -32,6 +31,8 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty._
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateShow
@@ -58,23 +59,23 @@ class LandOrPropertyCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)
+      onPageLoadCommon(srn: Srn, index.refined, mode: Mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)
+      onPageLoadCommon(srn: Srn, index.refined, mode: Mode)
     }
 
   def onPageLoadCommon(srn: SchemeId.Srn, index: Max5000, mode: Mode)(
@@ -202,13 +203,13 @@ class LandOrPropertyCYAController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val prePopulated = request.userAnswers.get(LandOrPropertyPrePopulated(srn, index))
+      val prePopulated = request.userAnswers.get(LandOrPropertyPrePopulated(srn, index.refined))
       for {
         updatedAnswers <- request.userAnswers
           .setWhen(request.userAnswers.get(LandOrPropertyHeldPage(srn)).isEmpty)(LandOrPropertyHeldPage(srn), true)
-          .setWhen(prePopulated.isDefined)(LandOrPropertyPrePopulated(srn, index), true)
+          .setWhen(prePopulated.isDefined)(LandOrPropertyPrePopulated(srn, index.refined), true)
           .mapK[Future]
         _ <- saveService.save(updatedAnswers)
         result <- psrSubmissionService
@@ -558,7 +559,7 @@ object LandOrPropertyCYAController {
       case IdentityType.UKPartnership => routes.PartnershipSellerNameController.onPageLoad(srn, index, mode).url
       case IdentityType.Other =>
         controllers.nonsipp.common.routes.OtherRecipientDetailsController
-          .onPageLoad(srn, index, mode, IdentitySubject.LandOrPropertySeller)
+          .onPageLoad(srn, index.value, mode, IdentitySubject.LandOrPropertySeller)
           .url
     }
 
@@ -580,7 +581,7 @@ object LandOrPropertyCYAController {
           (
             Message("landOrPropertyCYA.section3.recipientDetails.crn", recipientName),
             controllers.nonsipp.common.routes.CompanyRecipientCrnController
-              .onPageLoad(srn, index, mode, IdentitySubject.LandOrPropertySeller)
+              .onPageLoad(srn, index.value, mode, IdentitySubject.LandOrPropertySeller)
               .url,
             "landOrPropertyCYA.section3.recipientDetails.crn.hidden",
             "landOrPropertyCYA.section3.recipientDetails.noCrnReason.hidden"
@@ -589,7 +590,7 @@ object LandOrPropertyCYAController {
           (
             Message("landOrPropertyCYA.section3.recipientDetails.utr", recipientName),
             controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-              .onPageLoad(srn, index, mode, IdentitySubject.LandOrPropertySeller)
+              .onPageLoad(srn, index.value, mode, IdentitySubject.LandOrPropertySeller)
               .url,
             "landOrPropertyCYA.section3.recipientDetails.utr.hidden",
             "landOrPropertyCYA.section3.recipientDetails.noUtrReason.hidden"
@@ -598,7 +599,7 @@ object LandOrPropertyCYAController {
           (
             Message("landOrPropertyCYA.section3.recipientDetails.other", recipientName),
             controllers.nonsipp.common.routes.OtherRecipientDetailsController
-              .onPageLoad(srn, index, mode, IdentitySubject.LandOrPropertySeller)
+              .onPageLoad(srn, index.value, mode, IdentitySubject.LandOrPropertySeller)
               .url,
             "landOrPropertyCYA.section3.recipientDetails.other.hidden",
             ""
@@ -612,17 +613,17 @@ object LandOrPropertyCYAController {
       case IdentityType.UKCompany =>
         Message("landOrPropertyCYA.section3.recipientDetails.noCrnReason", recipientName) ->
           controllers.nonsipp.common.routes.CompanyRecipientCrnController
-            .onPageLoad(srn, index, mode, IdentitySubject.LandOrPropertySeller)
+            .onPageLoad(srn, index.value, mode, IdentitySubject.LandOrPropertySeller)
             .url
       case IdentityType.UKPartnership =>
         Message("landOrPropertyCYA.section3.recipientDetails.noUtrReason", recipientName) ->
           controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-            .onPageLoad(srn, index, mode, IdentitySubject.LandOrPropertySeller)
+            .onPageLoad(srn, index.value, mode, IdentitySubject.LandOrPropertySeller)
             .url
       case IdentityType.Other =>
         Message("landOrPropertyCYA.section3.recipientDetails.other", recipientName) ->
           controllers.nonsipp.common.routes.OtherRecipientDetailsController
-            .onPageLoad(srn, index, mode, IdentitySubject.LandOrPropertySeller)
+            .onPageLoad(srn, index.value, mode, IdentitySubject.LandOrPropertySeller)
             .url
     }
 
@@ -635,7 +636,7 @@ object LandOrPropertyCYAController {
               SummaryAction(
                 "site.change",
                 controllers.nonsipp.common.routes.IdentityTypeController
-                  .onPageLoad(srn, index, mode, IdentitySubject.LandOrPropertySeller)
+                  .onPageLoad(srn, index.value, mode, IdentitySubject.LandOrPropertySeller)
                   .url
               ).withVisuallyHiddenContent(("landOrPropertyCYA.section3.whoReceivedLand.hidden", address))
             ),

@@ -19,8 +19,8 @@ package navigation.nonsipp
 import pages.nonsipp.bonds._
 import play.api.mvc.Call
 import pages.Page
+import utils.IntUtils.toInt
 import cats.implicits.toTraverseOps
-import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
 import models.{CheckMode, NormalMode, UserAnswers}
 import config.RefinedTypes.Max5000
@@ -38,7 +38,7 @@ object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
 
     case WhatYouWillNeedBondsPage(srn) =>
       controllers.nonsipp.bonds.routes.NameOfBondsController
-        .onPageLoad(srn, refineMV(1), NormalMode)
+        .onPageLoad(srn, 1, NormalMode)
 
     case NameOfBondsPage(srn, index) =>
       controllers.nonsipp.bonds.routes.WhyDoesSchemeHoldBondsController

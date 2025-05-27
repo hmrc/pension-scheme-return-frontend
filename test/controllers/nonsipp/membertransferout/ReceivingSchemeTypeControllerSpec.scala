@@ -31,9 +31,9 @@ class ReceivingSchemeTypeControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad =
     controllers.nonsipp.membertransferout.routes.ReceivingSchemeTypeController
-      .onPageLoad(srn, index, secondarylIndex, NormalMode)
+      .onPageLoad(srn, index.value, secondarylIndex.value, NormalMode)
   private lazy val onSubmit = controllers.nonsipp.membertransferout.routes.ReceivingSchemeTypeController
-    .onSubmit(srn, index, secondarylIndex, NormalMode)
+    .onSubmit(srn, index.value, secondarylIndex.value, NormalMode)
   private val userAnswers = defaultUserAnswers
     .unsafeSet(ReceivingSchemeNamePage(srn, index, secondarylIndex), individualName)
 

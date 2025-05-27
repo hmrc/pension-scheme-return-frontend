@@ -23,6 +23,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.IncomeFromAssetPage
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.MoneyFormProvider
@@ -55,18 +56,18 @@ class IncomeFromAssetController @Inject()(
 
   private def form: Form[Money] = IncomeFromAssetController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(IncomeFromAssetPage(srn, index)),
-          viewModel(srn, index, form, mode)
+          form.fromUserAnswers(IncomeFromAssetPage(srn, index.refined)),
+          viewModel(srn, index.refined, form, mode)
         )
       )
 
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -76,7 +77,7 @@ class IncomeFromAssetController @Inject()(
               BadRequest(
                 view(
                   formWithErrors,
-                  IncomeFromAssetController.viewModel(srn, index, form, mode)
+                  IncomeFromAssetController.viewModel(srn, index.refined, form, mode)
                 )
               )
             ),
@@ -85,10 +86,10 @@ class IncomeFromAssetController @Inject()(
               updatedAnswers <- Future
                 .fromTry(
                   request.userAnswers
-                    .set(IncomeFromAssetPage(srn, index), answer)
+                    .set(IncomeFromAssetPage(srn, index.refined), answer)
                 )
-              nextPage = navigator.nextPage(IncomeFromAssetPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              nextPage = navigator.nextPage(IncomeFromAssetPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

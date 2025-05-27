@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import utils.IntUtils.toInt
 import cats.implicits.toShow
 import _root_.config.Constants
 import viewmodels.models.TaskListStatus.Updated

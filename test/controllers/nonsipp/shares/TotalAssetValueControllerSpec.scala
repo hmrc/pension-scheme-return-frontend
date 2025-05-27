@@ -31,8 +31,8 @@ class TotalAssetValueControllerSpec extends ControllerBaseSpec {
 
   "TotalAssetValueController" - {
 
-    lazy val onPageLoad = routes.TotalAssetValueController.onPageLoad(srn, index, NormalMode)
-    lazy val onSubmit = routes.TotalAssetValueController.onSubmit(srn, index, NormalMode)
+    lazy val onPageLoad = routes.TotalAssetValueController.onPageLoad(srn, index.value, NormalMode)
+    lazy val onSubmit = routes.TotalAssetValueController.onSubmit(srn, index.value, NormalMode)
 
     act.like(renderView(onPageLoad, defaultUserAnswers) { implicit app => implicit request =>
       injected[MoneyView]

@@ -38,10 +38,10 @@ class IdentityTypeControllerSpec extends ControllerBaseSpec {
     IdentitySubject.values.foreach { identitySubject =>
       lazy val onPageLoad =
         controllers.nonsipp.common.routes.IdentityTypeController
-          .onPageLoad(srn, index, NormalMode, identitySubject)
+          .onPageLoad(srn, index.value, NormalMode, identitySubject)
       lazy val onSubmit =
         controllers.nonsipp.common.routes.IdentityTypeController
-          .onSubmit(srn, index, NormalMode, identitySubject)
+          .onSubmit(srn, index.value, NormalMode, identitySubject)
 
       act.like(renderView(onPageLoad) { implicit app => implicit request =>
         val view = injected[RadioListView]
@@ -87,7 +87,7 @@ class IdentityTypeControllerSpec extends ControllerBaseSpec {
     "Unknown" - {
       lazy val onPageLoad =
         controllers.nonsipp.common.routes.IdentityTypeController
-          .onPageLoad(srn, index, NormalMode, IdentitySubject.Unknown)
+          .onPageLoad(srn, index.value, NormalMode, IdentitySubject.Unknown)
 
       act.like(
         unauthorisedPage(onPageLoad, Some(defaultUserAnswers))

@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import config.RefinedTypes.{Max50, Max5000}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal.{CompanyBuyerCrnPage, CompanyBuyerNamePage}
 import navigation.Navigator
@@ -51,34 +52,34 @@ class CompanyBuyerCrnController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
   val form: Form[Either[String, Crn]] = CompanyBuyerCrnController.form(formProvider)
-  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.usingAnswer(CompanyBuyerNamePage(srn, index, disposalIndex)).sync { companyName =>
+      request.usingAnswer(CompanyBuyerNamePage(srn, index.refined, disposalIndex.refined)).sync { companyName =>
         val preparedForm =
-          request.userAnswers.fillForm(CompanyBuyerCrnPage(srn, index, disposalIndex), form)
+          request.userAnswers.fillForm(CompanyBuyerCrnPage(srn, index.refined, disposalIndex.refined), form)
         Ok(
           view(
             preparedForm,
-            CompanyBuyerCrnController.viewModel(srn, index, disposalIndex, mode, companyName)
+            CompanyBuyerCrnController.viewModel(srn, index.refined, disposalIndex.refined, mode, companyName)
           )
         )
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(CompanyBuyerNamePage(srn, index, disposalIndex)).async { companyName =>
+            request.usingAnswer(CompanyBuyerNamePage(srn, index.refined, disposalIndex.refined)).async { companyName =>
               Future
                 .successful(
                   BadRequest(
                     view(
                       formWithErrors,
                       CompanyBuyerCrnController
-                        .viewModel(srn, index, disposalIndex, mode, companyName)
+                        .viewModel(srn, index.refined, disposalIndex.refined, mode, companyName)
                     )
                   )
                 )
@@ -88,10 +89,17 @@ class CompanyBuyerCrnController @Inject()(
               updatedAnswers <- Future
                 .fromTry(
                   request.userAnswers
-                    .set(CompanyBuyerCrnPage(srn, index, disposalIndex), ConditionalYesNo(value))
+                    .set(CompanyBuyerCrnPage(srn, index.refined, disposalIndex.refined), ConditionalYesNo(value))
                 )
-              nextPage = navigator.nextPage(CompanyBuyerCrnPage(srn, index, disposalIndex), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
+              nextPage = navigator
+                .nextPage(CompanyBuyerCrnPage(srn, index.refined, disposalIndex.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                index.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

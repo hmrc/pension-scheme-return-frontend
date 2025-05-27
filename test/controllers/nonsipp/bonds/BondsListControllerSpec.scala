@@ -90,7 +90,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(
       BondsProgress(srn, indexTwo),
       SectionJourneyStatus.InProgress(
-        routes.IncomeFromBondsController.onPageLoad(srn, indexTwo, NormalMode).url
+        routes.IncomeFromBondsController.onPageLoad(srn, indexTwo.value, NormalMode).url
       )
     )
 
@@ -209,7 +209,7 @@ class BondsListControllerSpec extends ControllerBaseSpec {
 //    act.like(
 //      redirectToPage(
 //        onSubmit,
-//        routes.IncomeFromBondsController.onPageLoad(srn, indexTwo, NormalMode),
+//        routes.IncomeFromBondsController.onPageLoad(srn, indexTwo.value, NormalMode),
 //        incompleteAnswers,
 //        "value" -> "true"
 //      )

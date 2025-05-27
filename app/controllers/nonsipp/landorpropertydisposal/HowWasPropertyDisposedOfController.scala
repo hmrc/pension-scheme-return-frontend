@@ -19,7 +19,6 @@ package controllers.nonsipp.landorpropertydisposal
 import services.SaveService
 import viewmodels.implicits._
 import controllers.nonsipp.landorpropertydisposal.HowWasPropertyDisposedOfController._
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.HowWasPropertyDisposedOfPage
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -36,6 +35,8 @@ import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
 import views.html.RadioListView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -56,45 +57,60 @@ class HowWasPropertyDisposedOfController @Inject()(
 
   private val form = HowWasPropertyDisposedOfController.form(formProvider)
 
-  def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
+      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex.refined)).getOrRecoverJourney {
         address =>
           val preparedForm =
             request.userAnswers.fillForm(
-              HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex),
+              HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex.refined, disposalIndex.refined),
               form
             )
 
-          Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode)))
+          Ok(
+            view(
+              preparedForm,
+              viewModel(srn, landOrPropertyIndex.refined, disposalIndex.refined, address.addressLine1, mode)
+            )
+          )
       }
     }
 
-  def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
-              address =>
+            request.userAnswers
+              .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex.refined))
+              .getOrRecoverJourney { address =>
                 Future.successful(
                   BadRequest(
-                    view(formWithErrors, viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode))
+                    view(
+                      formWithErrors,
+                      viewModel(srn, landOrPropertyIndex.refined, disposalIndex.refined, address.addressLine1, mode)
+                    )
                   )
                 )
-            },
+              },
           value => {
-            val page = HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex)
+            val page = HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex.refined, disposalIndex.refined)
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
               hasAnswerChanged = request.userAnswers.exists(page)(_ == value)
               nextPage = navigator.nextPage(
-                HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex, hasAnswerChanged),
+                HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex.refined, disposalIndex.refined, hasAnswerChanged),
                 mode,
                 updatedAnswers
               )
-              updatedProgressAnswers <- saveProgress(srn, landOrPropertyIndex, disposalIndex, updatedAnswers, nextPage)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                landOrPropertyIndex.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

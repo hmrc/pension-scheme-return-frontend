@@ -27,8 +27,8 @@ import controllers.ControllerBaseSpec
 
 class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, refineMV(1), NormalMode)
-  private lazy val onSubmit = routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, refineMV(1), NormalMode)
+  private lazy val onPageLoad = routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, 1, NormalMode)
+  private lazy val onSubmit = routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, 1, NormalMode)
 
   private val userAnswersWithMemberDetails =
     defaultUserAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).success.value

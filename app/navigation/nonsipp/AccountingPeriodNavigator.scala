@@ -31,7 +31,7 @@ object AccountingPeriodNavigator extends JourneyNavigator {
   val normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
     case AccountingPeriodPage(srn, index, mode) =>
-      routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index, mode)
+      routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index.value, mode)
 
     case AccountingPeriodCheckYourAnswersPage(srn, mode) =>
       routes.AccountingPeriodListController.onPageLoad(srn, mode)
@@ -43,7 +43,7 @@ object AccountingPeriodNavigator extends JourneyNavigator {
       val count = userAnswers.list(AccountingPeriods(srn)).length
       refineV[OneToThree](count + 1).fold(
         _ => nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, mode),
-        index => routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode)
+        index => routes.AccountingPeriodController.onPageLoad(srn, index.value, NormalMode)
       )
 
     case RemoveAccountingPeriodPage(srn, mode) =>
@@ -54,7 +54,7 @@ object AccountingPeriodNavigator extends JourneyNavigator {
     userAnswers => {
 
       case AccountingPeriodPage(srn, index, mode) =>
-        routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index, mode)
+        routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index.value, mode)
 
       case AccountingPeriodCheckYourAnswersPage(srn, mode) =>
         routes.AccountingPeriodListController.onPageLoad(srn, mode)
@@ -66,7 +66,7 @@ object AccountingPeriodNavigator extends JourneyNavigator {
         val count = userAnswers.list(AccountingPeriods(srn)).length
         refineV[OneToThree](count + 1).fold(
           _ => nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, mode),
-          index => routes.AccountingPeriodController.onPageLoad(srn, index, mode)
+          index => routes.AccountingPeriodController.onPageLoad(srn, index.value, mode)
         )
 
       case RemoveAccountingPeriodPage(srn, mode) =>

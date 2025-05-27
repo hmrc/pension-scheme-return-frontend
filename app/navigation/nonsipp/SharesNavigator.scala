@@ -19,8 +19,8 @@ package navigation.nonsipp
 import pages.Page
 import config.RefinedTypes.Max5000
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
+import utils.IntUtils.toInt
 import cats.implicits.toTraverseOps
-import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
 import models._
 import pages.nonsipp.common._
@@ -42,7 +42,7 @@ object SharesNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedSharesPage(srn) =>
-      controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, refineMV(1), NormalMode)
+      controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, 1, NormalMode)
 
     case TypeOfSharesHeldPage(srn, index) =>
       controllers.nonsipp.shares.routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, NormalMode)
@@ -75,7 +75,7 @@ object SharesNavigator extends JourneyNavigator {
 
         case Some(Acquisition) =>
           controllers.nonsipp.common.routes.IdentityTypeController
-            .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+            .onPageLoad(srn, index.value, NormalMode, IdentitySubject.SharesSeller)
         case _ =>
           userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
             case Some(Unquoted) =>
@@ -90,7 +90,7 @@ object SharesNavigator extends JourneyNavigator {
       userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.SharesSeller)) match {
         case Some(IdentityType.Other) =>
           controllers.nonsipp.common.routes.OtherRecipientDetailsController
-            .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+            .onPageLoad(srn, index.value, NormalMode, IdentitySubject.SharesSeller)
         case Some(IdentityType.Individual) =>
           controllers.nonsipp.shares.routes.IndividualNameOfSharesSellerController
             .onPageLoad(srn, index, NormalMode)
@@ -109,11 +109,11 @@ object SharesNavigator extends JourneyNavigator {
 
     case CompanyNameOfSharesSellerPage(srn, index) =>
       controllers.nonsipp.common.routes.CompanyRecipientCrnController
-        .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+        .onPageLoad(srn, index.value, NormalMode, IdentitySubject.SharesSeller)
 
     case PartnershipShareSellerNamePage(srn, index) =>
       controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-        .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+        .onPageLoad(srn, index.value, NormalMode, IdentitySubject.SharesSeller)
 
     case SharesIndividualSellerNINumberPage(srn, index) =>
       userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
@@ -279,7 +279,7 @@ object SharesNavigator extends JourneyNavigator {
                 }
               } else {
                 controllers.nonsipp.common.routes.IdentityTypeController
-                  .onPageLoad(srn, index, CheckMode, IdentitySubject.SharesSeller)
+                  .onPageLoad(srn, index.value, CheckMode, IdentitySubject.SharesSeller)
               }
             }
           // if unchanged answer is Transfer, go to CYA
@@ -311,7 +311,7 @@ object SharesNavigator extends JourneyNavigator {
               controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, CheckMode)
             } else {
               controllers.nonsipp.common.routes.IdentityTypeController
-                .onPageLoad(srn, index, CheckMode, IdentitySubject.SharesSeller)
+                .onPageLoad(srn, index.value, CheckMode, IdentitySubject.SharesSeller)
             }
           // if changed from Contribution to Transfer, go to CYA
           case (Some(Contribution), Some(Transfer)) =>
@@ -336,7 +336,7 @@ object SharesNavigator extends JourneyNavigator {
               }
             } else {
               controllers.nonsipp.common.routes.IdentityTypeController
-                .onPageLoad(srn, index, CheckMode, IdentitySubject.SharesSeller)
+                .onPageLoad(srn, index.value, CheckMode, IdentitySubject.SharesSeller)
             }
           case _ =>
             userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
@@ -378,7 +378,7 @@ object SharesNavigator extends JourneyNavigator {
         userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.SharesSeller)) match {
           case Some(IdentityType.Other) =>
             controllers.nonsipp.common.routes.OtherRecipientDetailsController
-              .onPageLoad(srn, index, CheckMode, IdentitySubject.SharesSeller)
+              .onPageLoad(srn, index.value, CheckMode, IdentitySubject.SharesSeller)
           case Some(IdentityType.Individual) =>
             controllers.nonsipp.shares.routes.IndividualNameOfSharesSellerController
               .onPageLoad(srn, index, CheckMode)
@@ -409,12 +409,12 @@ object SharesNavigator extends JourneyNavigator {
         userAnswers.get(CompanyRecipientCrnPage(srn, index, SharesSeller)) match {
           case None =>
             controllers.nonsipp.common.routes.CompanyRecipientCrnController
-              .onPageLoad(srn, index, CheckMode, SharesSeller)
+              .onPageLoad(srn, index.value, CheckMode, SharesSeller)
           case _ =>
             userAnswers.get(SharesFromConnectedPartyPage(srn, index)) match {
               case None =>
                 controllers.nonsipp.common.routes.CompanyRecipientCrnController
-                  .onPageLoad(srn, index, CheckMode, SharesSeller)
+                  .onPageLoad(srn, index.value, CheckMode, SharesSeller)
               case Some(_) => controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
             }
         }
@@ -423,12 +423,12 @@ object SharesNavigator extends JourneyNavigator {
         userAnswers.get(PartnershipRecipientUtrPage(srn, index, SharesSeller)) match {
           case None =>
             controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-              .onPageLoad(srn, index, CheckMode, SharesSeller)
+              .onPageLoad(srn, index.value, CheckMode, SharesSeller)
           case _ =>
             userAnswers.get(SharesFromConnectedPartyPage(srn, index)) match {
               case None =>
                 controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-                  .onPageLoad(srn, index, CheckMode, SharesSeller)
+                  .onPageLoad(srn, index.value, CheckMode, SharesSeller)
               case Some(_) => controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
             }
         }

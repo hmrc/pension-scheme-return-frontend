@@ -31,8 +31,9 @@ class DidTransferIncludeAssetControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[Max300.Refined](1)
   private val secondaryIndex = refineMV[Max5.Refined](1)
   private lazy val onPageLoad =
-    routes.DidTransferIncludeAssetController.onPageLoad(srn, index, secondaryIndex, NormalMode)
-  private lazy val onSubmit = routes.DidTransferIncludeAssetController.onSubmit(srn, index, secondaryIndex, NormalMode)
+    routes.DidTransferIncludeAssetController.onPageLoad(srn, index.value, secondaryIndex.value, NormalMode)
+  private lazy val onSubmit =
+    routes.DidTransferIncludeAssetController.onSubmit(srn, index.value, secondaryIndex.value, NormalMode)
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)

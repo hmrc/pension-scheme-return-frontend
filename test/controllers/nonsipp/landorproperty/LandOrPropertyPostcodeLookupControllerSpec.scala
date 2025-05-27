@@ -35,8 +35,8 @@ class LandOrPropertyPostcodeLookupControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  private lazy val onPageLoad = routes.LandOrPropertyPostcodeLookupController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.LandOrPropertyPostcodeLookupController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.LandOrPropertyPostcodeLookupController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.LandOrPropertyPostcodeLookupController.onSubmit(srn, index.value, NormalMode)
   private implicit val mockAddressService: AddressService = mock[AddressService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(

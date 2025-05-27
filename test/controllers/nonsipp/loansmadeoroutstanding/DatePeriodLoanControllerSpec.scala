@@ -54,8 +54,8 @@ class DatePeriodLoanControllerSpec extends ControllerBaseSpec {
   "DatePeriodLoanController" - {
 
     val populatedUserAnswers = defaultUserAnswers.set(CompanyRecipientNamePage(srn, index), companyName).get
-    lazy val onPageLoad = routes.DatePeriodLoanController.onPageLoad(srn, index, NormalMode)
-    lazy val onSubmit = routes.DatePeriodLoanController.onSubmit(srn, index, NormalMode)
+    lazy val onPageLoad = routes.DatePeriodLoanController.onPageLoad(srn, index.value, NormalMode)
+    lazy val onSubmit = routes.DatePeriodLoanController.onSubmit(srn, index.value, NormalMode)
 
     val date = LocalDate.of(2020, 12, 10)
 

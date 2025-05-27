@@ -34,8 +34,8 @@ import controllers.nonsipp.membercontributions.MemberContributionsCYAController.
 
 class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
 
-  private def onPageLoad(mode: Mode) = routes.MemberContributionsCYAController.onPageLoad(srn, index, mode)
-  private def onSubmit(mode: Mode) = routes.MemberContributionsCYAController.onSubmit(srn, index, mode)
+  private def onPageLoad(mode: Mode) = routes.MemberContributionsCYAController.onPageLoad(srn, index.value, mode)
+  private def onSubmit(mode: Mode) = routes.MemberContributionsCYAController.onSubmit(srn, index.value, mode)
 
   private lazy val onSubmitViewOnly = routes.MemberContributionsCYAController.onSubmitViewOnly(
     srn,
@@ -47,7 +47,7 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoadViewOnly = routes.MemberContributionsCYAController.onPageLoadViewOnly(
     srn,
-    index,
+    index.value,
     yearString,
     submissionNumberTwo,
     submissionNumberOne

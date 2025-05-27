@@ -20,6 +20,7 @@ import play.api.mvc.{Action, AnyContent}
 import org.slf4j.LoggerFactory
 import controllers.PSRController
 import models.SchemeId.Srn
+import utils.IntUtils.IntOpts
 import play.api.libs.json.{Json, Writes}
 import shapeless.{HList, Poly}
 import eu.timepit.refined.api.{Refined, Validate}
@@ -46,7 +47,7 @@ trait TestDataSingleIndexController[Index] extends TestDataController {
 
   private val logger = LoggerFactory.getLogger(this.getClass.getSimpleName)
 
-  def addTestData(srn: Srn, num: RefinedIndex)(
+  def addTestData(srn: Srn, num: Int)(
     implicit remover: UserAnswersRemover,
     setter: UserAnswersSetter,
     ev: Validate[Int, Index]
@@ -54,10 +55,10 @@ trait TestDataSingleIndexController[Index] extends TestDataController {
     identifyAndRequireData(srn).async { implicit request =>
       (for {
         removedUserAnswers <- Future.fromTry(removeAllPages(srn, request.userAnswers))
-        updatedUserAnswers <- Future.fromTry(updateUserAnswers(srn, num.value, removedUserAnswers))
+        updatedUserAnswers <- Future.fromTry(updateUserAnswers(srn, num, removedUserAnswers))
         _ <- saveService.save(updatedUserAnswers)
       } yield Ok(
-        s"Added ${num.value} entries to UserAnswers for index ${num.value}\n${Json.prettyPrint(updatedUserAnswers.data.decryptedValue)}"
+        s"Added $num entries to UserAnswers for index $num\n${Json.prettyPrint(updatedUserAnswers.data.decryptedValue)}"
       )).recover { err =>
         logger.error(s"Error when calling test endpoint: ${err.getMessage}")
         throw err
@@ -102,18 +103,19 @@ trait TestDataDoubleIndexController[Index, SecondaryIndex] extends TestDataContr
   private type RefinedIndex = Refined[Int, Index]
   private type RefinedSecondaryIndex = Refined[Int, SecondaryIndex]
 
-  def addTestData(srn: Srn, index: RefinedIndex, num: RefinedSecondaryIndex)(
+  def addTestData(srn: Srn, index: Int, num: Int)(
     implicit remover: UserAnswersRemover,
     setter: UserAnswersSetter,
-    ev: Validate[Int, SecondaryIndex]
+    ev: Validate[Int, Index],
+    sv: Validate[Int, SecondaryIndex]
   ): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
-        removedUserAnswers <- Future.fromTry(removeAllPages(srn, index, request.userAnswers))
-        updatedUserAnswers <- Future.fromTry(updateUserAnswers(num.value, srn, index, removedUserAnswers))
+        removedUserAnswers <- Future.fromTry(removeAllPages(srn, index.refined2, request.userAnswers))
+        updatedUserAnswers <- Future.fromTry(updateUserAnswers(num, srn, index.refined2, removedUserAnswers))
         _ <- saveService.save(updatedUserAnswers)
       } yield Ok(
-        s"Added ${num.value} entries to UserAnswers for index ${index.value}\n${Json.prettyPrint(updatedUserAnswers.data.decryptedValue)}"
+        s"Added $num entries to UserAnswers for index $index\n${Json.prettyPrint(updatedUserAnswers.data.decryptedValue)}"
       )
     }
 

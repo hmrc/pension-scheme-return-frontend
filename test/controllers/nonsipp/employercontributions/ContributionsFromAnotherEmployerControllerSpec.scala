@@ -41,9 +41,9 @@ class ContributionsFromAnotherEmployerControllerSpec extends ControllerBaseSpec 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   private lazy val onPageLoad =
-    routes.ContributionsFromAnotherEmployerController.onPageLoad(srn, index, secondaryIndex, NormalMode)
+    routes.ContributionsFromAnotherEmployerController.onPageLoad(srn, index.value, secondaryIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.ContributionsFromAnotherEmployerController.onSubmit(srn, index, secondaryIndex, NormalMode)
+    routes.ContributionsFromAnotherEmployerController.onSubmit(srn, index.value, secondaryIndex.value, NormalMode)
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)

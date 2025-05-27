@@ -20,6 +20,7 @@ import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldB
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import models._
 import config.RefinedTypes.Max5000
@@ -39,17 +40,17 @@ class BondsCheckAndUpdateController @Inject()(
   view: ContentTablePageView
 ) extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     (
       for {
-        nameOfBonds <- requiredPage(NameOfBondsPage(srn, index))
-        acquisitionType <- requiredPage(WhyDoesSchemeHoldBondsPage(srn, index))
-        costOfBonds <- requiredPage(CostOfBondsPage(srn, index))
+        nameOfBonds <- requiredPage(NameOfBondsPage(srn, index.refined))
+        acquisitionType <- requiredPage(WhyDoesSchemeHoldBondsPage(srn, index.refined))
+        costOfBonds <- requiredPage(CostOfBondsPage(srn, index.refined))
       } yield Ok(
         view(
           viewModel(
             srn,
-            index,
+            index.refined,
             nameOfBonds,
             acquisitionType,
             costOfBonds
@@ -59,7 +60,7 @@ class BondsCheckAndUpdateController @Inject()(
     ).merge
   }
 
-  def onSubmit(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
+  def onSubmit(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
     Redirect(routes.IncomeFromBondsController.onPageLoad(srn, index, NormalMode))
   }
 }

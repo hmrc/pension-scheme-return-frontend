@@ -36,8 +36,8 @@ class WhenDidMemberSurrenderBenefitsControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
 
-  private lazy val onPageLoad = routes.WhenDidMemberSurrenderBenefitsController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.WhenDidMemberSurrenderBenefitsController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.WhenDidMemberSurrenderBenefitsController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.WhenDidMemberSurrenderBenefitsController.onSubmit(srn, index.value, NormalMode)
 
   val schemeDatePeriod: DateRange = DateRange(LocalDate.parse("2020-04-06"), LocalDate.parse("2021-04-05"))
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]

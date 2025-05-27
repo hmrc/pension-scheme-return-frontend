@@ -269,7 +269,7 @@ object SchemeMembersListController {
                   ListRow.view(
                     memberFullName,
                     routes.SchemeMemberDetailsAnswersController
-                      .onPageLoadViewOnly(srn, index, year, current, previous)
+                      .onPageLoadViewOnly(srn, index.value, year, current, previous)
                       .url,
                     Message("site.view.param", memberFullName)
                   )
@@ -280,9 +280,9 @@ object SchemeMembersListController {
             List(
               ListRow(
                 memberFullName,
-                changeUrl = routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckMode).url,
+                changeUrl = routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index.value, CheckMode).url,
                 changeHiddenText = Message("schemeMembersList.change.hidden", memberFullName),
-                removeUrl = routes.RemoveMemberDetailsController.onPageLoad(srn, index, mode).url,
+                removeUrl = routes.RemoveMemberDetailsController.onPageLoad(srn, index.value, mode).url,
                 removeHiddenText = Message("schemeMembersList.remove.hidden", memberFullName)
               )
             )

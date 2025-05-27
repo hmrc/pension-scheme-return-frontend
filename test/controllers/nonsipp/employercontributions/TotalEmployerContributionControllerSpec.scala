@@ -31,9 +31,9 @@ class TotalEmployerContributionControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[Max300.Refined](1)
   private val secondaryIndex = refineMV[Max50.Refined](1)
   private lazy val onPageLoad =
-    routes.TotalEmployerContributionController.onPageLoad(srn, index, secondaryIndex, NormalMode)
+    routes.TotalEmployerContributionController.onPageLoad(srn, index.value, secondaryIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.TotalEmployerContributionController.onSubmit(srn, index, secondaryIndex, NormalMode)
+    routes.TotalEmployerContributionController.onSubmit(srn, index.value, secondaryIndex.value, NormalMode)
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(EmployerNamePage(srn, index, secondaryIndex), employerName)

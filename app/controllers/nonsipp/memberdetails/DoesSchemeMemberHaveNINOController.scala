@@ -23,6 +23,7 @@ import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc._
 import config.RefinedTypes.Max300
+import utils.IntUtils.IntOpts
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -56,39 +57,39 @@ class DoesSchemeMemberHaveNINOController @Inject()(
   private def form(memberName: String): Form[Boolean] =
     DoesSchemeMemberHaveNINOController.form(formProvider, memberName)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      withMemberDetails(srn, index)(
+      withMemberDetails(srn, index.refined)(
         memberDetails =>
           Future.successful(
             Ok(
               view(
-                form(memberDetails.fullName).fromUserAnswers(DoesMemberHaveNinoPage(srn, index)),
-                viewModel(index, memberDetails.fullName, srn, mode)
+                form(memberDetails.fullName).fromUserAnswers(DoesMemberHaveNinoPage(srn, index.refined)),
+                viewModel(index.refined, memberDetails.fullName, srn, mode)
               )
             )
           )
       )
   }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      withMemberDetails(srn, index)(
+      withMemberDetails(srn, index.refined)(
         memberDetails =>
           form(memberDetails.fullName)
             .bindFromRequest()
             .fold(
               formWithErrors =>
                 Future.successful(
-                  BadRequest(view(formWithErrors, viewModel(index, memberDetails.fullName, srn, mode)))
+                  BadRequest(view(formWithErrors, viewModel(index.refined, memberDetails.fullName, srn, mode)))
                 ),
               value =>
                 for {
                   updatedAnswers <- request.userAnswers
-                    .set(DoesMemberHaveNinoPage(srn, index), value)
+                    .set(DoesMemberHaveNinoPage(srn, index.refined), value)
                     .mapK
-                  nextPage = navigator.nextPage(DoesMemberHaveNinoPage(srn, index), mode, updatedAnswers)
-                  updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                  nextPage = navigator.nextPage(DoesMemberHaveNinoPage(srn, index.refined), mode, updatedAnswers)
+                  updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
                   _ <- saveService.save(updatedProgressAnswers)
                 } yield Redirect(nextPage)
             )
@@ -115,6 +116,6 @@ object DoesSchemeMemberHaveNINOController {
     YesNoPageViewModel(
       Message("nationalInsuranceNumber.title"),
       Message("nationalInsuranceNumber.heading", memberName),
-      routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, index, mode)
+      routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, index.value, mode)
     )
 }

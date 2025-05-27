@@ -20,6 +20,7 @@ import services.SaveService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import config.RefinedTypes.{Max50, Max5000}
+import utils.IntUtils.{toInt, IntOpts}
 import pages.nonsipp.landorpropertydisposal.{IndividualBuyerNinoNumberPage, LandOrPropertyIndividualBuyerNamePage}
 import controllers.actions._
 import forms.YesNoPageFormProvider
@@ -55,44 +56,64 @@ class IndividualBuyerNinoNumberController @Inject()(
 
   private val form: Form[Either[String, Nino]] = IndividualBuyerNinoNumberController.form(formProvider)
 
-  def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.usingAnswer(LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)).sync {
-        individualName =>
+      request
+        .usingAnswer(LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex.refined, disposalIndex.refined))
+        .sync { individualName =>
           val preparedForm =
-            request.userAnswers.fillForm(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex), form)
-          Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, individualName, mode)))
-      }
+            request.userAnswers
+              .fillForm(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex.refined, disposalIndex.refined), form)
+          Ok(
+            view(preparedForm, viewModel(srn, landOrPropertyIndex.refined, disposalIndex.refined, individualName, mode))
+          )
+        }
 
     }
 
-  def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)).async {
-              individualName =>
+            request
+              .usingAnswer(
+                LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex.refined, disposalIndex.refined)
+              )
+              .async { individualName =>
                 Future.successful(
                   BadRequest(
-                    view(formWithErrors, viewModel(srn, landOrPropertyIndex, disposalIndex, individualName, mode))
+                    view(
+                      formWithErrors,
+                      viewModel(srn, landOrPropertyIndex.refined, disposalIndex.refined, individualName, mode)
+                    )
                   )
                 )
-            },
+              },
           value =>
             for {
               updatedAnswers <- Future
                 .fromTry(
                   request.userAnswers
                     .set(
-                      IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex),
+                      IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex.refined, disposalIndex.refined),
                       ConditionalYesNo(value)
                     )
                 )
               nextPage = navigator
-                .nextPage(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, landOrPropertyIndex, disposalIndex, updatedAnswers, nextPage)
+                .nextPage(
+                  IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex.refined, disposalIndex.refined),
+                  mode,
+                  updatedAnswers
+                )
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                landOrPropertyIndex.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

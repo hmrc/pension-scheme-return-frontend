@@ -29,8 +29,9 @@ class EmployerNameControllerSpec extends ControllerBaseSpec {
 
   private val memberIndex = refineMV[Max300.Refined](1)
   private val index = refineMV[Max50.Refined](1)
-  private lazy val onPageLoad = routes.EmployerNameController.onPageLoad(srn, memberIndex, index, NormalMode)
-  private lazy val onSubmit = routes.EmployerNameController.onSubmit(srn, memberIndex, index, NormalMode)
+  private lazy val onPageLoad =
+    routes.EmployerNameController.onPageLoad(srn, memberIndex.value, index.value, NormalMode)
+  private lazy val onSubmit = routes.EmployerNameController.onSubmit(srn, memberIndex.value, index.value, NormalMode)
 
   "EmployerNameController" - {
 

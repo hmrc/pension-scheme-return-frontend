@@ -23,6 +23,7 @@ import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.MoneyFormProvider
@@ -55,17 +56,17 @@ class CostOfBondsController @Inject()(
 
   private def form: Form[Money] = CostOfBondsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(CostOfBondsPage(srn, index)),
-          viewModel(srn, index, form, mode)
+          form.fromUserAnswers(CostOfBondsPage(srn, index.refined)),
+          viewModel(srn, index.refined, form, mode)
         )
       )
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -75,16 +76,16 @@ class CostOfBondsController @Inject()(
               BadRequest(
                 view(
                   formWithErrors,
-                  CostOfBondsController.viewModel(srn, index, form, mode)
+                  CostOfBondsController.viewModel(srn, index.refined, form, mode)
                 )
               )
             ),
           answer => {
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(CostOfBondsPage(srn, index), answer))
-              nextPage = navigator.nextPage(CostOfBondsPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                .fromTry(request.userAnswers.set(CostOfBondsPage(srn, index.refined), answer))
+              nextPage = navigator.nextPage(CostOfBondsPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

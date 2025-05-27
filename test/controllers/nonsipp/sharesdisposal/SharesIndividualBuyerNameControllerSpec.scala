@@ -33,9 +33,9 @@ class SharesIndividualBuyerNameControllerSpec extends ControllerBaseSpec {
   "IndividualRecipientNameController" - {
 
     lazy val onPageLoad =
-      routes.SharesIndividualBuyerNameController.onPageLoad(srn, index, disposalIndex, NormalMode)
+      routes.SharesIndividualBuyerNameController.onPageLoad(srn, index.value, disposalIndex.value, NormalMode)
     lazy val onSubmit =
-      routes.SharesIndividualBuyerNameController.onSubmit(srn, index, disposalIndex, NormalMode)
+      routes.SharesIndividualBuyerNameController.onSubmit(srn, index.value, disposalIndex.value, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[TextInputView].apply(form(injected[TextFormProvider]), viewModel(srn, index, disposalIndex, NormalMode))

@@ -31,9 +31,9 @@ class BondsStillHeldControllerSpec extends ControllerBaseSpec {
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.BondsStillHeldController.onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
+    routes.BondsStillHeldController.onPageLoad(srn, bondIndex.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.BondsStillHeldController.onSubmit(srn, bondIndex, disposalIndex, NormalMode)
+    routes.BondsStillHeldController.onSubmit(srn, bondIndex.value, disposalIndex.value, NormalMode)
 
   private val userAnswers = defaultUserAnswers
 

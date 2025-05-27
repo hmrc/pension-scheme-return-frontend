@@ -28,8 +28,8 @@ import controllers.ControllerBaseSpec
 class SharesIndependentValuationControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
-  private lazy val onPageLoad = routes.SharesIndependentValuationController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.SharesIndependentValuationController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.SharesIndependentValuationController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.SharesIndependentValuationController.onSubmit(srn, index.value, NormalMode)
 
   private val userAnswers = defaultUserAnswers.unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
 

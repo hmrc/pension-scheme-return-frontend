@@ -30,9 +30,9 @@ class TypeOfSharesHeldControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[Max5000.Refined](1)
 
   private lazy val onPageLoad =
-    routes.TypeOfSharesHeldController.onPageLoad(srn, index, NormalMode)
+    routes.TypeOfSharesHeldController.onPageLoad(srn, index.value, NormalMode)
   private lazy val onSubmit =
-    routes.TypeOfSharesHeldController.onSubmit(srn, index, NormalMode)
+    routes.TypeOfSharesHeldController.onSubmit(srn, index.value, NormalMode)
 
   "TypeOfSharesHeldController" - {
 

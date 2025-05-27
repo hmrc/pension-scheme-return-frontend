@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsheld
 import services.SaveService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.PartnershipOtherAssetSellerNamePage
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -50,27 +51,28 @@ class PartnershipNameOfOtherAssetsSellerController @Inject()(
 
   private val form = PartnershipNameOfOtherAssetsSellerController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
-        request.userAnswers.fillForm(PartnershipOtherAssetSellerNamePage(srn, index), form)
-      Ok(view(preparedForm, viewModel(srn, index, mode)))
+        request.userAnswers.fillForm(PartnershipOtherAssetSellerNamePage(srn, index.refined), form)
+      Ok(view(preparedForm, viewModel(srn, index.refined, mode)))
     }
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future
-              .successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+              .successful(BadRequest(view(formWithErrors, viewModel(srn, index.refined, mode)))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(
-                request.userAnswers.set(PartnershipOtherAssetSellerNamePage(srn, index), value)
+                request.userAnswers.set(PartnershipOtherAssetSellerNamePage(srn, index.refined), value)
               )
-              nextPage = navigator.nextPage(PartnershipOtherAssetSellerNamePage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              nextPage = navigator
+                .nextPage(PartnershipOtherAssetSellerNamePage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

@@ -31,9 +31,9 @@ class TotalConsiderationSaleAssetControllerSpec extends ControllerBaseSpec {
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.TotalConsiderationSaleAssetController.onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+    routes.TotalConsiderationSaleAssetController.onPageLoad(srn, assetIndex.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.TotalConsiderationSaleAssetController.onSubmit(srn, assetIndex, disposalIndex, NormalMode)
+    routes.TotalConsiderationSaleAssetController.onSubmit(srn, assetIndex.value, disposalIndex.value, NormalMode)
 
   "TotalConsiderationSaleAssetController" - {
 

@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
 import config.RefinedTypes.Max5000
+import utils.IntUtils.IntOpts
 import cats.implicits.toShow
 import controllers.actions._
 import navigation.Navigator
@@ -62,10 +63,10 @@ class AmountOfTheLoanController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       usingSchemeDate[Id](srn) { period =>
-        val previousAnswer = request.userAnswers.get(AmountOfTheLoanPage(srn, index))
+        val previousAnswer = request.userAnswers.get(AmountOfTheLoanPage(srn, index.refined))
         val form = AmountOfTheLoanController.form(formProvider, period)
 
         val preparedForm = if (isPrePopulation) {
@@ -73,12 +74,12 @@ class AmountOfTheLoanController @Inject()(
             amountOfTheLoan => partialAnswersForm.fill(amountOfTheLoan.asTuple)
           )
         } else {
-          request.userAnswers.fillForm(AmountOfTheLoanPage(srn, index), form)
+          request.userAnswers.fillForm(AmountOfTheLoanPage(srn, index.refined), form)
         }
 
         val viewModel = AmountOfTheLoanController.viewModel(
           srn,
-          index,
+          index.refined,
           mode,
           request.schemeDetails.schemeName,
           period,
@@ -89,7 +90,7 @@ class AmountOfTheLoanController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       usingSchemeDate(srn) { period =>
         val form = AmountOfTheLoanController.form(formProvider, period)
@@ -100,20 +101,22 @@ class AmountOfTheLoanController @Inject()(
             formWithErrors => {
               val viewModel =
                 AmountOfTheLoanController
-                  .viewModel(srn, index, mode, request.schemeDetails.schemeName, period, form)
+                  .viewModel(srn, index.refined, mode, request.schemeDetails.schemeName, period, form)
 
               Future.successful(BadRequest(view(formWithErrors, viewModel)))
             },
             value =>
               for {
-                updatedAnswers <- request.userAnswers.transformAndSet(AmountOfTheLoanPage(srn, index), value).mapK
-                nextPage = navigator.nextPage(AmountOfTheLoanPage(srn, index), mode, updatedAnswers)
-                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                updatedAnswers <- request.userAnswers
+                  .transformAndSet(AmountOfTheLoanPage(srn, index.refined), value)
+                  .mapK
+                nextPage = navigator.nextPage(AmountOfTheLoanPage(srn, index.refined), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
                 _ <- saveService.save(updatedProgressAnswers)
               } yield (
                 isPrePopulation,
-                request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)),
-                request.userAnswers.get(InterestOnLoanPage(srn, index))
+                request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index.refined)),
+                request.userAnswers.get(InterestOnLoanPage(srn, index.refined))
               ) match {
                 case (true, Some(_), Some(interestDetails)) if interestDetails.hasMissingAnswer =>
                   Redirect(
@@ -121,7 +124,7 @@ class AmountOfTheLoanController @Inject()(
                       .onPageLoad(srn, index, mode)
                   )
                 case _ =>
-                  Redirect(navigator.nextPage(AmountOfTheLoanPage(srn, index), mode, updatedAnswers))
+                  Redirect(navigator.nextPage(AmountOfTheLoanPage(srn, index.refined), mode, updatedAnswers))
               }
           )
       }
@@ -191,6 +194,6 @@ object AmountOfTheLoanController {
         QuestionField.currency(Message("amountOfTheLoan.capRepaymentCY.label")),
         QuestionField.currency(Message("amountOfTheLoan.amountOutstanding.label", period.to.show))
       ),
-      routes.AmountOfTheLoanController.onSubmit(srn, index, mode)
+      routes.AmountOfTheLoanController.onSubmit(srn, index.value, mode)
     )
 }

@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.{OtherAssetsPrePopulated, RemoveOtherAssetPage, WhatIsOtherAssetPage}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -52,22 +53,24 @@ class RemoveOtherAssetController @Inject()(
 
   private val form = RemoveOtherAssetController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      if (request.userAnswers.get(OtherAssetsPrePopulated(srn, index)).isDefined) {
+      if (request.userAnswers.get(OtherAssetsPrePopulated(srn, index.refined)).isDefined) {
         Redirect(controllers.routes.UnauthorisedController.onPageLoad())
       } else {
         (
           for {
-            whatIsOtherAsset <- request.userAnswers.get(WhatIsOtherAssetPage(srn, index)).getOrRedirectToTaskList(srn)
+            whatIsOtherAsset <- request.userAnswers
+              .get(WhatIsOtherAssetPage(srn, index.refined))
+              .getOrRedirectToTaskList(srn)
           } yield {
             val preparedForm =
-              request.userAnswers.fillForm(RemoveOtherAssetPage(srn, index), form)
+              request.userAnswers.fillForm(RemoveOtherAssetPage(srn, index.refined), form)
             Ok(
               view(
                 preparedForm,
                 RemoveOtherAssetController
-                  .viewModel(srn, index, whatIsOtherAsset, mode)
+                  .viewModel(srn, index.refined, whatIsOtherAsset, mode)
               )
             )
           }
@@ -75,19 +78,19 @@ class RemoveOtherAssetController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           errors =>
-            request.userAnswers.get(WhatIsOtherAssetPage(srn, index)).getOrRecoverJourney { whatIsOtherAsset =>
+            request.userAnswers.get(WhatIsOtherAssetPage(srn, index.refined)).getOrRecoverJourney { whatIsOtherAsset =>
               Future.successful(
                 BadRequest(
                   view(
                     errors,
                     RemoveOtherAssetController
-                      .viewModel(srn, index, whatIsOtherAsset, mode)
+                      .viewModel(srn, index.refined, whatIsOtherAsset, mode)
                   )
                 )
               )
@@ -95,7 +98,8 @@ class RemoveOtherAssetController @Inject()(
           value =>
             if (value) {
               for {
-                removedUserAnswers <- Future.fromTry(request.userAnswers.remove(WhatIsOtherAssetPage(srn, index)))
+                removedUserAnswers <- Future
+                  .fromTry(request.userAnswers.remove(WhatIsOtherAssetPage(srn, index.refined)))
                 _ <- saveService.save(removedUserAnswers)
                 redirectTo <- psrSubmissionService
                   .submitPsrDetailsWithUA(
@@ -113,7 +117,7 @@ class RemoveOtherAssetController @Inject()(
                     case Some(_) =>
                       Redirect(
                         navigator.nextPage(
-                          RemoveOtherAssetPage(srn, index),
+                          RemoveOtherAssetPage(srn, index.refined),
                           mode,
                           removedUserAnswers
                         )
@@ -125,7 +129,7 @@ class RemoveOtherAssetController @Inject()(
                 .successful(
                   Redirect(
                     navigator.nextPage(
-                      RemoveOtherAssetPage(srn, index),
+                      RemoveOtherAssetPage(srn, index.refined),
                       mode,
                       request.userAnswers
                     )

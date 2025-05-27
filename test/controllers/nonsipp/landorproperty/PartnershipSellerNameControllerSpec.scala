@@ -27,8 +27,8 @@ import models.NormalMode
 class PartnershipSellerNameControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
-  private lazy val onPageLoad = routes.PartnershipSellerNameController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.PartnershipSellerNameController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.PartnershipSellerNameController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.PartnershipSellerNameController.onSubmit(srn, index.value, NormalMode)
 
   "PartnershipSellerNameController" - {
 

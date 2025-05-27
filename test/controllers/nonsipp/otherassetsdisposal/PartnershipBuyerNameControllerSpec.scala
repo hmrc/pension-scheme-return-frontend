@@ -33,9 +33,9 @@ class PartnershipBuyerNameControllerSpec extends ControllerBaseSpec {
   "PartnershipBuyerNameController" - {
 
     lazy val onPageLoad =
-      routes.PartnershipBuyerNameController.onPageLoad(srn, index, disposalIndex, NormalMode)
+      routes.PartnershipBuyerNameController.onPageLoad(srn, index.value, disposalIndex.value, NormalMode)
     lazy val onSubmit =
-      routes.PartnershipBuyerNameController.onSubmit(srn, index, disposalIndex, NormalMode)
+      routes.PartnershipBuyerNameController.onSubmit(srn, index.value, disposalIndex.value, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[TextInputView].apply(form(injected[TextFormProvider]), viewModel(srn, index, disposalIndex, NormalMode))

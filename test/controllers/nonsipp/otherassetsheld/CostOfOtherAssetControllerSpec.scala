@@ -31,8 +31,8 @@ class CostOfOtherAssetControllerSpec extends ControllerBaseSpec {
 
   "CostOfOtherAssetController" - {
 
-    lazy val onPageLoad = routes.CostOfOtherAssetController.onPageLoad(srn, index, NormalMode)
-    lazy val onSubmit = routes.CostOfOtherAssetController.onSubmit(srn, index, NormalMode)
+    lazy val onPageLoad = routes.CostOfOtherAssetController.onPageLoad(srn, index.value, NormalMode)
+    lazy val onSubmit = routes.CostOfOtherAssetController.onSubmit(srn, index.value, NormalMode)
 
     act.like(renderView(onPageLoad, defaultUserAnswers) { implicit app => implicit request =>
       injected[MoneyView]

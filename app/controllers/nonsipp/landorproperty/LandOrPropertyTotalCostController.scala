@@ -21,7 +21,6 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyTotalCostPage}
 import controllers.actions._
 import navigation.Navigator
 import forms.MoneyFormProvider
@@ -32,6 +31,8 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyTotalCostPage}
 import models.{Mode, Money}
 import controllers.nonsipp.landorproperty.LandOrPropertyTotalCostController._
 import viewmodels.DisplayMessage.{Empty, Message}
@@ -54,34 +55,35 @@ class LandOrPropertyTotalCostController @Inject()(
 
   private val form = LandOrPropertyTotalCostController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-        val preparedForm = request.userAnswers.fillForm(LandOrPropertyTotalCostPage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, address.addressLine1, form, mode)))
+      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney { address =>
+        val preparedForm = request.userAnswers.fillForm(LandOrPropertyTotalCostPage(srn, index.refined), form)
+        Ok(view(preparedForm, viewModel(srn, index.refined, address.addressLine1, form, mode)))
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-              Future.successful(
-                BadRequest(
-                  view(formWithErrors, viewModel(srn, index, address.addressLine1, form, mode))
+            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney {
+              address =>
+                Future.successful(
+                  BadRequest(
+                    view(formWithErrors, viewModel(srn, index.refined, address.addressLine1, form, mode))
+                  )
                 )
-              )
             }
           },
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.transformAndSet(LandOrPropertyTotalCostPage(srn, index), value))
-              nextPage = navigator.nextPage(LandOrPropertyTotalCostPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                .fromTry(request.userAnswers.transformAndSet(LandOrPropertyTotalCostPage(srn, index.refined), value))
+              nextPage = navigator.nextPage(LandOrPropertyTotalCostPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

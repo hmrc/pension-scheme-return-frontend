@@ -33,10 +33,10 @@ class AssetIndividualBuyerNiNumberControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad =
     routes.AssetIndividualBuyerNiNumberController
-      .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+      .onPageLoad(srn, assetIndex.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
     routes.AssetIndividualBuyerNiNumberController
-      .onSubmit(srn, assetIndex, disposalIndex, NormalMode)
+      .onSubmit(srn, assetIndex.value, disposalIndex.value, NormalMode)
 
   private val userAnswersWithIndividualName =
     defaultUserAnswers.unsafeSet(IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex), individualName)

@@ -32,10 +32,10 @@ class PartnershipBuyerUtrControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad =
     routes.PartnershipBuyerUtrController
-      .onPageLoad(srn, index, disposalIndex, NormalMode)
+      .onPageLoad(srn, index.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
     routes.PartnershipBuyerUtrController
-      .onSubmit(srn, index, disposalIndex, NormalMode)
+      .onSubmit(srn, index.value, disposalIndex.value, NormalMode)
 
   val userAnswersCompanyName: UserAnswers =
     defaultUserAnswers.unsafeSet(PartnershipBuyerNamePage(srn, index, disposalIndex), companyName)

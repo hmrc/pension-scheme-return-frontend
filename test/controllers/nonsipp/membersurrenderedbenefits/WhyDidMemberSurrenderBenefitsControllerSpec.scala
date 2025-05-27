@@ -30,8 +30,8 @@ class WhyDidMemberSurrenderBenefitsControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo300](1)
 
-  private lazy val onPageLoad = routes.WhyDidMemberSurrenderBenefitsController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.WhyDidMemberSurrenderBenefitsController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.WhyDidMemberSurrenderBenefitsController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.WhyDidMemberSurrenderBenefitsController.onSubmit(srn, index.value, NormalMode)
 
   val populatedUserAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)

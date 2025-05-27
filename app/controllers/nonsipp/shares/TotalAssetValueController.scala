@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import utils.FormUtils._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import controllers.nonsipp.shares.TotalAssetValueController._
 import navigation.Navigator
@@ -55,14 +56,14 @@ class TotalAssetValueController @Inject()(
 
   private def form = TotalAssetValueController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(TotalAssetValuePage(srn, index)),
+          form.fromUserAnswers(TotalAssetValuePage(srn, index.refined)),
           viewModel(
             srn,
-            index,
+            index.refined,
             request.schemeDetails.schemeName,
             form,
             mode
@@ -71,7 +72,7 @@ class TotalAssetValueController @Inject()(
       )
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -82,16 +83,16 @@ class TotalAssetValueController @Inject()(
                 view(
                   formWithErrors,
                   TotalAssetValueController
-                    .viewModel(srn, index, request.schemeDetails.schemeName, form, mode)
+                    .viewModel(srn, index.refined, request.schemeDetails.schemeName, form, mode)
                 )
               )
             ),
           answer => {
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(TotalAssetValuePage(srn, index), answer))
-              nextPage = navigator.nextPage(TotalAssetValuePage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                .fromTry(request.userAnswers.set(TotalAssetValuePage(srn, index.refined), answer))
+              nextPage = navigator.nextPage(TotalAssetValuePage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

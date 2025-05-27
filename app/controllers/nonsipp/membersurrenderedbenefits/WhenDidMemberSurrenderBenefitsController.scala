@@ -20,6 +20,7 @@ import services.{SaveService, SchemeDateService}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, IntOpts}
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -62,19 +63,19 @@ class WhenDidMemberSurrenderBenefitsController @Inject()(
   private def form(date: DateRange)(implicit messages: Messages): Form[LocalDate] =
     WhenDidMemberSurrenderBenefitsController.form(formProvider, date)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       usingSchemeDate[Id](srn) { date =>
-        request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { member =>
-          request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, index)).getOrRecoverJourney {
+        request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney { member =>
+          request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, index.refined)).getOrRecoverJourney {
             surrenderedBenefitsAmount =>
               val preparedForm = request.userAnswers
-                .get(WhenDidMemberSurrenderBenefitsPage(srn, index))
+                .get(WhenDidMemberSurrenderBenefitsPage(srn, index.refined))
                 .fold(form(date))(form(date).fill)
               Ok(
                 view(
                   preparedForm,
-                  viewModel(srn, index, member.fullName, surrenderedBenefitsAmount.displayAs, mode)
+                  viewModel(srn, index.refined, member.fullName, surrenderedBenefitsAmount.displayAs, mode)
                 )
               )
           }
@@ -82,11 +83,11 @@ class WhenDidMemberSurrenderBenefitsController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       usingSchemeDate(srn) { date =>
-        request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { member =>
-          request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, index)).getOrRecoverJourney {
+        request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney { member =>
+          request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, index.refined)).getOrRecoverJourney {
             surrenderedBenefitsAmount =>
               form(date)
                 .bindFromRequest()
@@ -96,20 +97,20 @@ class WhenDidMemberSurrenderBenefitsController @Inject()(
                       BadRequest(
                         view(
                           formWithErrors,
-                          viewModel(srn, index, member.fullName, surrenderedBenefitsAmount.displayAs, mode)
+                          viewModel(srn, index.refined, member.fullName, surrenderedBenefitsAmount.displayAs, mode)
                         )
                       )
                     ),
                   value =>
                     for {
                       updatedAnswers <- request.userAnswers
-                        .set(WhenDidMemberSurrenderBenefitsPage(srn, index), value)
+                        .set(WhenDidMemberSurrenderBenefitsPage(srn, index.refined), value)
                         .mapK[Future]
                       nextPage = navigator
-                        .nextPage(WhenDidMemberSurrenderBenefitsPage(srn, index), mode, updatedAnswers)
+                        .nextPage(WhenDidMemberSurrenderBenefitsPage(srn, index.refined), mode, updatedAnswers)
                       updatedProgressAnswers <- saveProgress(
                         srn,
-                        index,
+                        index.refined,
                         updatedAnswers,
                         nextPage
                       )

@@ -21,7 +21,6 @@ import controllers.nonsipp.landorproperty.LandPropertyInUKController._
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.Max5000
-import pages.nonsipp.landorproperty.LandPropertyInUKPage
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -30,6 +29,8 @@ import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import play.api.data.Form
 import views.html.YesNoPageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.LandPropertyInUKPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
@@ -51,23 +52,23 @@ class LandPropertyInUKController @Inject()(
 
   private val form = LandPropertyInUKController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val preparedForm = request.userAnswers.fillForm(LandPropertyInUKPage(srn, index), form)
-      Ok(view(preparedForm, viewModel(srn, index, mode)))
+      val preparedForm = request.userAnswers.fillForm(LandPropertyInUKPage(srn, index.refined), form)
+      Ok(view(preparedForm, viewModel(srn, index.refined, mode)))
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index.refined, mode)))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(LandPropertyInUKPage(srn, index), value))
-              nextPage = navigator.nextPage(LandPropertyInUKPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(LandPropertyInUKPage(srn, index.refined), value))
+              nextPage = navigator.nextPage(LandPropertyInUKPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

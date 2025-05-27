@@ -36,8 +36,8 @@ class RemoveSharesControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
 
-  private lazy val onPageLoad = routes.RemoveSharesController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.RemoveSharesController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.RemoveSharesController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.RemoveSharesController.onSubmit(srn, index.value, NormalMode)
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 

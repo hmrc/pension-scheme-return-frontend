@@ -48,8 +48,8 @@ class WhenBorrowedControllerSpec extends ControllerBaseSpec {
     .unsafeSet(LenderNamePage(srn, index), lenderName)
     .unsafeSet(BorrowedAmountAndRatePage(srn, index), amountBorrowed)
 
-  private lazy val onPageLoad = routes.WhenBorrowedController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.WhenBorrowedController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.WhenBorrowedController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.WhenBorrowedController.onSubmit(srn, index.value, NormalMode)
 
   private val dateTooEarlyForm = List(
     "value.day" -> "31",

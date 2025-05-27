@@ -30,8 +30,9 @@ class IsIndividualRecipientConnectedPartyControllerSpec extends ControllerBaseSp
 
   private val index = refineMV[OneTo5000](1)
 
-  lazy val onPageLoad: Call = routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, NormalMode)
-  lazy val onSubmit: Call = routes.IsIndividualRecipientConnectedPartyController.onSubmit(srn, index, NormalMode)
+  lazy val onPageLoad: Call =
+    routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index.value, NormalMode)
+  lazy val onSubmit: Call = routes.IsIndividualRecipientConnectedPartyController.onSubmit(srn, index.value, NormalMode)
   private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
 
   val userServicesWithIndividualName: UserAnswers =

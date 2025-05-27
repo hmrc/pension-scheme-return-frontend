@@ -30,6 +30,7 @@ import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController.LandOrPropertyDisposalData
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import viewmodels.DisplayMessage.Message
@@ -55,30 +56,33 @@ class RemoveLandPropertyDisposalController @Inject()(
 
   private val form = RemoveLandPropertyDisposalController.form(formProvider)
 
-  def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
           _ <- request.userAnswers
-            .get(LandOrPropertyDisposalProgress(srn, landOrPropertyIndex, disposalIndex))
+            .get(LandOrPropertyDisposalProgress(srn, landOrPropertyIndex.refined, disposalIndex.refined))
             .collect(_.completed)
             .getOrRedirectToTaskList(srn)
           address <- request.userAnswers
-            .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex))
+            .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex.refined))
             .getOrRedirectToTaskList(srn)
           methodOfDisposal <- request.userAnswers
-            .get(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
+            .get(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex.refined, disposalIndex.refined))
             .getOrRedirectToTaskList(srn)
         } yield {
           val preparedForm =
-            request.userAnswers.fillForm(RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex, disposalIndex), form)
+            request.userAnswers.fillForm(
+              RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex.refined, disposalIndex.refined),
+              form
+            )
           Ok(
             view(
               preparedForm,
               RemoveLandPropertyDisposalController.viewModel(
                 srn,
-                landOrPropertyIndex,
-                disposalIndex,
+                landOrPropertyIndex.refined,
+                disposalIndex.refined,
                 address.addressLine1,
                 methodOfDisposal,
                 mode
@@ -89,16 +93,17 @@ class RemoveLandPropertyDisposalController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           errors =>
-            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
-              address =>
+            request.userAnswers
+              .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex.refined))
+              .getOrRecoverJourney { address =>
                 request.userAnswers
-                  .get(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
+                  .get(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex.refined, disposalIndex.refined))
                   .getOrRecoverJourney { methodOfDisposal =>
                     Future.successful(
                       BadRequest(
@@ -106,8 +111,8 @@ class RemoveLandPropertyDisposalController @Inject()(
                           errors,
                           RemoveLandPropertyDisposalController.viewModel(
                             srn,
-                            landOrPropertyIndex,
-                            disposalIndex,
+                            landOrPropertyIndex.refined,
+                            disposalIndex.refined,
                             address.addressLine1,
                             methodOfDisposal,
                             mode
@@ -116,14 +121,15 @@ class RemoveLandPropertyDisposalController @Inject()(
                       )
                     )
                   }
-            },
+              },
           value =>
             if (value) {
               for {
                 removedUserAnswers <- Future
                   .fromTry(
                     // remove the first page in the journey only
-                    request.userAnswers.remove(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
+                    request.userAnswers
+                      .remove(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex.refined, disposalIndex.refined))
                   )
 
                 _ <- saveService.save(removedUserAnswers)
@@ -144,7 +150,7 @@ class RemoveLandPropertyDisposalController @Inject()(
                     case Some(_) =>
                       Redirect(
                         navigator.nextPage(
-                          RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex, disposalIndex),
+                          RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex.refined, disposalIndex.refined),
                           mode,
                           removedUserAnswers
                         )
@@ -156,7 +162,7 @@ class RemoveLandPropertyDisposalController @Inject()(
                 .successful(
                   Redirect(
                     navigator.nextPage(
-                      RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex, disposalIndex),
+                      RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex.refined, disposalIndex.refined),
                       mode,
                       request.userAnswers
                     )

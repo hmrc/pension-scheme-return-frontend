@@ -31,8 +31,8 @@ class LenderNameControllerSpec extends ControllerBaseSpec {
 
   "LenderNameController" - {
 
-    lazy val onPageLoad = routes.LenderNameController.onPageLoad(srn, index, NormalMode)
-    lazy val onSubmit = routes.LenderNameController.onSubmit(srn, index, NormalMode)
+    lazy val onPageLoad = routes.LenderNameController.onPageLoad(srn, index.value, NormalMode)
+    lazy val onSubmit = routes.LenderNameController.onSubmit(srn, index.value, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[TextInputView].apply(form(injected[TextFormProvider]), viewModel(srn, index, NormalMode))

@@ -45,8 +45,8 @@ class PensionCommencementLumpSumAmountControllerSpec extends ControllerBaseSpec 
 
     val lumpSumData = pensionCommencementLumpSumGen.sample.value
 
-    lazy val onPageLoad = routes.PensionCommencementLumpSumAmountController.onPageLoad(srn, index, NormalMode)
-    lazy val onSubmit = routes.PensionCommencementLumpSumAmountController.onSubmit(srn, index, NormalMode)
+    lazy val onPageLoad = routes.PensionCommencementLumpSumAmountController.onPageLoad(srn, index.value, NormalMode)
+    lazy val onSubmit = routes.PensionCommencementLumpSumAmountController.onSubmit(srn, index.value, NormalMode)
 
     act.like(
       renderView(onPageLoad, userAnswers) { implicit app => implicit request =>

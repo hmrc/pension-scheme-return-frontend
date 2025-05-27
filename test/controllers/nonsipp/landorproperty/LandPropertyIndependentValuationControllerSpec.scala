@@ -29,8 +29,9 @@ class LandPropertyIndependentValuationControllerSpec extends ControllerBaseSpec 
 
   private val index = refineMV[OneTo5000](1)
 
-  private lazy val onPageLoad = routes.LandPropertyIndependentValuationController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.LandPropertyIndependentValuationController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad =
+    routes.LandPropertyIndependentValuationController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.LandPropertyIndependentValuationController.onSubmit(srn, index.value, NormalMode)
 
   private val userAnswersWithLookUpPage =
     defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)

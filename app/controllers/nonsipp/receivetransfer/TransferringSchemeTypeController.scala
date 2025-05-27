@@ -20,6 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import forms.mappings.Mappings
 import models.PensionSchemeType._
+import utils.IntUtils.{toInt, IntOpts}
 import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, TransferringSchemeTypePage}
 import config.Constants.{inputRegexPSTR, inputRegexQROPS, maxNotRelevant}
 import controllers.actions.IdentifyAndRequireData
@@ -58,27 +59,29 @@ class TransferringSchemeTypeController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max300,
-    secondaryIndex: Max5,
+    index: Int,
+    secondaryIndex: Int,
     mode: Mode
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val maybeAnswer = request.userAnswers.get(TransferringSchemeTypePage(srn, index, secondaryIndex))
+    val maybeAnswer = request.userAnswers.get(TransferringSchemeTypePage(srn, index.refined, secondaryIndex.refined))
     val builtForm = maybeAnswer.fold(form(formProvider))(answer => form(formProvider, Some(answer.name)))
     val filledForm = maybeAnswer.fold(builtForm)(builtForm.fill)
-    request.userAnswers.get(TransferringSchemeNamePage(srn, index, secondaryIndex)).getOrRecoverJourney { schemeName =>
-      Ok(
-        view(
-          filledForm,
-          TransferringSchemeTypeController.viewModel(srn, index, secondaryIndex, schemeName, mode)
+    request.userAnswers
+      .get(TransferringSchemeNamePage(srn, index.refined, secondaryIndex.refined))
+      .getOrRecoverJourney { schemeName =>
+        Ok(
+          view(
+            filledForm,
+            TransferringSchemeTypeController.viewModel(srn, index.refined, secondaryIndex.refined, schemeName, mode)
+          )
         )
-      )
-    }
+      }
   }
 
   def onSubmit(
     srn: Srn,
-    index: Max300,
-    secondaryIndex: Max5,
+    index: Int,
+    secondaryIndex: Int,
     mode: Mode
   ): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val schemeName = request.schemeDetails.schemeName
@@ -91,17 +94,19 @@ class TransferringSchemeTypeController @Inject()(
               BadRequest(
                 view(
                   formWithErrors,
-                  TransferringSchemeTypeController.viewModel(srn, index, secondaryIndex, schemeName, mode)
+                  TransferringSchemeTypeController
+                    .viewModel(srn, index.refined, secondaryIndex.refined, schemeName, mode)
                 )
               )
             ),
         answer =>
           for {
             updatedAnswers <- request.userAnswers
-              .set(TransferringSchemeTypePage(srn, index, secondaryIndex), answer)
+              .set(TransferringSchemeTypePage(srn, index.refined, secondaryIndex.refined), answer)
               .mapK
-            nextPage = navigator.nextPage(TransferringSchemeTypePage(srn, index, secondaryIndex), mode, updatedAnswers)
-            updatedProgressAnswers <- saveProgress(srn, index, secondaryIndex, updatedAnswers, nextPage)
+            nextPage = navigator
+              .nextPage(TransferringSchemeTypePage(srn, index.refined, secondaryIndex.refined), mode, updatedAnswers)
+            updatedProgressAnswers <- saveProgress(srn, index.refined, secondaryIndex.refined, updatedAnswers, nextPage)
             _ <- saveService.save(updatedProgressAnswers)
           } yield Redirect(nextPage)
       )

@@ -26,8 +26,8 @@ import models.NormalMode
 
 class NameOfBondsControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.NameOfBondsController.onPageLoad(srn, refineMV(1), NormalMode)
-  private lazy val onSubmit = routes.NameOfBondsController.onSubmit(srn, refineMV(1), NormalMode)
+  private lazy val onPageLoad = routes.NameOfBondsController.onPageLoad(srn, 1, NormalMode)
+  private lazy val onSubmit = routes.NameOfBondsController.onSubmit(srn, 1, NormalMode)
 
   "NameOfBondsController" - {
 

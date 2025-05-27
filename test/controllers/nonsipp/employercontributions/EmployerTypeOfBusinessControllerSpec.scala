@@ -32,9 +32,9 @@ class EmployerTypeOfBusinessControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.EmployerTypeOfBusinessController.onPageLoad(srn, memberIndex, index, NormalMode)
+    routes.EmployerTypeOfBusinessController.onPageLoad(srn, memberIndex.value, index.value, NormalMode)
   private lazy val onSubmit =
-    routes.EmployerTypeOfBusinessController.onSubmit(srn, memberIndex, index, NormalMode)
+    routes.EmployerTypeOfBusinessController.onSubmit(srn, memberIndex.value, index.value, NormalMode)
 
   private val userAnswers =
     defaultUserAnswers.unsafeSet(EmployerNamePage(srn, memberIndex, index), employerName)

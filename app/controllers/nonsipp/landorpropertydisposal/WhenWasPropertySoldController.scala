@@ -18,7 +18,6 @@ package controllers.nonsipp.landorpropertydisposal
 
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import cats.implicits.toShow
 import pages.nonsipp.landorpropertydisposal.WhenWasPropertySoldPage
 import controllers.actions._
@@ -32,6 +31,8 @@ import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
 import views.html.DatePageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import utils.DateTimeUtils.localDateShow
 import models.Mode
 import viewmodels.DisplayMessage.Message
@@ -61,53 +62,64 @@ class WhenWasPropertySoldController @Inject()(
     (date: LocalDate, beforeDate: LocalDate, request: DataRequest[AnyContent]) =>
       WhenWasPropertySoldController.form(formProvider)(date, beforeDate, request.messages(messagesApi))
 
-  def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
+        request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex.refined)).getOrRecoverJourney {
           address =>
             val preparedForm = {
               request.userAnswers
                 .fillForm(
-                  WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex),
+                  WhenWasPropertySoldPage(srn, landOrPropertyIndex.refined, disposalIndex.refined),
                   form(date.to, date.from, request)
                 )
             }
-            Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode)))
+            Ok(
+              view(
+                preparedForm,
+                viewModel(srn, landOrPropertyIndex.refined, disposalIndex.refined, address.addressLine1, mode)
+              )
+            )
         }
       }
     }
 
-  def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         form(date.to, date.from, request)
           .bindFromRequest()
           .fold(
             formWithErrors =>
-              request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
-                address =>
+              request.userAnswers
+                .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex.refined))
+                .getOrRecoverJourney { address =>
                   Future.successful(
                     BadRequest(
                       view(
                         formWithErrors,
-                        viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode)
+                        viewModel(srn, landOrPropertyIndex.refined, disposalIndex.refined, address.addressLine1, mode)
                       )
                     )
                   )
-              },
+                },
             value =>
               for {
                 updatedAnswers <- Future
                   .fromTry(
-                    request.userAnswers.set(WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex), value)
+                    request.userAnswers
+                      .set(WhenWasPropertySoldPage(srn, landOrPropertyIndex.refined, disposalIndex.refined), value)
                   )
                 nextPage = navigator
-                  .nextPage(WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex), mode, updatedAnswers)
+                  .nextPage(
+                    WhenWasPropertySoldPage(srn, landOrPropertyIndex.refined, disposalIndex.refined),
+                    mode,
+                    updatedAnswers
+                  )
                 updatedProgressAnswers <- saveProgress(
                   srn,
-                  landOrPropertyIndex,
-                  disposalIndex,
+                  landOrPropertyIndex.refined,
+                  disposalIndex.refined,
                   updatedAnswers,
                   nextPage
                 )

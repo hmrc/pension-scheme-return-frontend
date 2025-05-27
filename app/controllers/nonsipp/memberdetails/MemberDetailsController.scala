@@ -21,6 +21,7 @@ import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.Max300
 import config.Constants
+import utils.IntUtils.IntOpts
 import controllers.actions._
 import navigation.Navigator
 import forms.NameDOBFormProvider
@@ -57,14 +58,14 @@ class MemberDetailsController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       val form = MemberDetailsController.form(formProvider, getTaxDates(srn)(request))
 
-      Ok(view(form.fromUserAnswers(MemberDetailsPage(srn, index)), viewModel(srn, index, mode)))
+      Ok(view(form.fromUserAnswers(MemberDetailsPage(srn, index.refined)), viewModel(srn, index.refined, mode)))
   }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val form = MemberDetailsController.form(formProvider, getTaxDates(srn)(request))
       form
@@ -72,13 +73,13 @@ class MemberDetailsController @Inject()(
         .fold(
           formWithErrors =>
             Future.successful(
-              BadRequest(view(formWithErrors, viewModel(srn, index, mode)))
+              BadRequest(view(formWithErrors, viewModel(srn, index.refined, mode)))
             ),
           value =>
             for {
-              updatedAnswers <- request.userAnswers.set(MemberDetailsPage(srn, index), value).mapK
-              nextPage = navigator.nextPage(MemberDetailsPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              updatedAnswers <- request.userAnswers.set(MemberDetailsPage(srn, index.refined), value).mapK
+              nextPage = navigator.nextPage(MemberDetailsPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )
@@ -146,6 +147,6 @@ object MemberDetailsController {
       Message("memberDetails.dateOfBirth"),
       Message("memberDetails.dateOfBirth.hint")
     ),
-    routes.MemberDetailsController.onSubmit(srn, index, mode)
+    routes.MemberDetailsController.onSubmit(srn, index.value, mode)
   )
 }

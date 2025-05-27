@@ -23,8 +23,10 @@ import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import controllers.PSRController
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
+import utils.IntUtils.toInt
 import cats.implicits.toShow
 import _root_.config.Constants
+import controllers.actions._
 import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
@@ -34,8 +36,6 @@ import _root_.config.RefinedTypes.{Max300, Max50}
 import com.google.inject.Inject
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
-import controllers.actions._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
@@ -185,7 +185,7 @@ object EmployerContributionsMemberListController {
                 case Some(EmployerContributions(_, InProgress(url))) => url
                 case _ =>
                   controllers.nonsipp.employercontributions.routes.EmployerNameController
-                    .onSubmit(srn, memberWithEmployerContributions.memberIndex, refineMV(1), mode)
+                    .onSubmit(srn, memberWithEmployerContributions.memberIndex, 1, mode)
                     .url
               },
               Message(

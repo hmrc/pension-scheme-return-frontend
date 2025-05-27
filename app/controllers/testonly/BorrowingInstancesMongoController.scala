@@ -44,13 +44,12 @@ class BorrowingInstancesMongoController @Inject()(
 
   private val max: Max5000 = refineMV(5000)
 
-  def addBorrowDetails(srn: Srn, num: Max5000): Action[AnyContent] = identifyAndRequireData(srn).async {
-    implicit request =>
-      for {
-        removedUserAnswers <- Future.fromTry(removeAllBorrowDetails(srn, request.userAnswers))
-        updatedUserAnswers <- Future.fromTry(updateUserAnswersWithBorrowDetails(num.value, srn, removedUserAnswers))
-        _ <- sessionRepository.set(updatedUserAnswers)
-      } yield Ok(s"Added ${num.value} of borrow instances to UserAnswers")
+  def addBorrowDetails(srn: Srn, num: Int): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    for {
+      removedUserAnswers <- Future.fromTry(removeAllBorrowDetails(srn, request.userAnswers))
+      updatedUserAnswers <- Future.fromTry(updateUserAnswersWithBorrowDetails(num, srn, removedUserAnswers))
+      _ <- sessionRepository.set(updatedUserAnswers)
+    } yield Ok(s"Added $num of borrow instances to UserAnswers")
   }
 
   private def buildIndexes(num: Int): Try[List[Max5000]] =

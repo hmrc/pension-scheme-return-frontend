@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -54,25 +55,25 @@ class RemoveBorrowInstancesController @Inject()(
 
   private val form = RemoveBorrowInstancesController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       (
         for {
-          borrows <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRedirectToTaskList(srn)
-          lenderName <- request.userAnswers.get(LenderNamePage(srn, index)).getOrRedirectToTaskList(srn)
+          borrows <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index.refined)).getOrRedirectToTaskList(srn)
+          lenderName <- request.userAnswers.get(LenderNamePage(srn, index.refined)).getOrRedirectToTaskList(srn)
         } yield {
-          val preparedForm = request.userAnswers.fillForm(RemoveBorrowInstancesPage(srn, index), form)
+          val preparedForm = request.userAnswers.fillForm(RemoveBorrowInstancesPage(srn, index.refined), form)
           Ok(
             view(
               preparedForm,
-              RemoveBorrowInstancesController.viewModel(srn, index, mode, borrows._1.displayAs, lenderName)
+              RemoveBorrowInstancesController.viewModel(srn, index.refined, mode, borrows._1.displayAs, lenderName)
             )
           )
         }
       ).merge
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -81,13 +82,14 @@ class RemoveBorrowInstancesController @Inject()(
             Future.successful {
               (
                 for {
-                  borrows <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney
-                  lenderName <- request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney
+                  borrows <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index.refined)).getOrRecoverJourney
+                  lenderName <- request.userAnswers.get(LenderNamePage(srn, index.refined)).getOrRecoverJourney
                 } yield {
                   BadRequest(
                     view(
                       errors,
-                      RemoveBorrowInstancesController.viewModel(srn, index, mode, borrows._1.displayAs, lenderName)
+                      RemoveBorrowInstancesController
+                        .viewModel(srn, index.refined, mode, borrows._1.displayAs, lenderName)
                     )
                   )
                 }
@@ -98,7 +100,7 @@ class RemoveBorrowInstancesController @Inject()(
             if (value) {
               for {
                 updatedAnswers <- Future
-                  .fromTry(removeAllMoneyBorrowedPages(srn, index, request.userAnswers))
+                  .fromTry(removeAllMoneyBorrowedPages(srn, index.refined, request.userAnswers))
                 _ <- saveService.save(updatedAnswers)
                 redirectTo <- psrSubmissionService
                   .submitPsrDetailsWithUA(
@@ -110,13 +112,13 @@ class RemoveBorrowInstancesController @Inject()(
                   .map {
                     case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
                     case Some(_) =>
-                      Redirect(navigator.nextPage(RemoveBorrowInstancesPage(srn, index), mode, updatedAnswers))
+                      Redirect(navigator.nextPage(RemoveBorrowInstancesPage(srn, index.refined), mode, updatedAnswers))
                   }
               } yield redirectTo
             } else {
               Future
                 .successful(
-                  Redirect(navigator.nextPage(RemoveBorrowInstancesPage(srn, index), mode, request.userAnswers))
+                  Redirect(navigator.nextPage(RemoveBorrowInstancesPage(srn, index.refined), mode, request.userAnswers))
                 )
             }
         )

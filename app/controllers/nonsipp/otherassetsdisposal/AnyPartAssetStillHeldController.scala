@@ -23,6 +23,7 @@ import pages.nonsipp.otherassetsdisposal.{
   OtherAssetsDisposalProgress
 }
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -56,17 +57,17 @@ class AnyPartAssetStillHeldController @Inject()(
 
   private val form = AnyPartAssetStillHeldController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
-        request.userAnswers.fillForm(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex), form)
+        request.userAnswers.fillForm(AnyPartAssetStillHeldPage(srn, assetIndex.refined, disposalIndex.refined), form)
       Ok(
         view(
           preparedForm,
           viewModel(
             srn,
-            assetIndex,
-            disposalIndex,
+            assetIndex.refined,
+            disposalIndex.refined,
             request.schemeDetails.schemeName,
             mode
           )
@@ -74,7 +75,7 @@ class AnyPartAssetStillHeldController @Inject()(
       )
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -86,8 +87,8 @@ class AnyPartAssetStillHeldController @Inject()(
                   formWithErrors,
                   viewModel(
                     srn,
-                    assetIndex,
-                    disposalIndex,
+                    assetIndex.refined,
+                    disposalIndex.refined,
                     request.schemeDetails.schemeName,
                     mode
                   )
@@ -97,17 +98,20 @@ class AnyPartAssetStillHeldController @Inject()(
           answer =>
             for {
               updatedAnswers <- request.userAnswers
-                .set(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex), answer)
-                .set(OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex), SectionJourneyStatus.Completed)
+                .set(AnyPartAssetStillHeldPage(srn, assetIndex.refined, disposalIndex.refined), answer)
+                .set(
+                  OtherAssetsDisposalProgress(srn, assetIndex.refined, disposalIndex.refined),
+                  SectionJourneyStatus.Completed
+                )
                 .mapK[Future]
               _ <- saveService.save(updatedAnswers)
             } yield {
-              updatedAnswers.get(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex)) match {
+              updatedAnswers.get(HowWasAssetDisposedOfPage(srn, assetIndex.refined, disposalIndex.refined)) match {
                 case Some(HowDisposed.Transferred) =>
                   Redirect(
                     navigator
                       .nextPage(
-                        AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex),
+                        AnyPartAssetStillHeldPage(srn, assetIndex.refined, disposalIndex.refined),
                         mode,
                         updatedAnswers
                       )
@@ -117,7 +121,7 @@ class AnyPartAssetStillHeldController @Inject()(
                   Redirect(
                     navigator
                       .nextPage(
-                        AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex),
+                        AnyPartAssetStillHeldPage(srn, assetIndex.refined, disposalIndex.refined),
                         mode,
                         updatedAnswers
                       )
@@ -127,7 +131,7 @@ class AnyPartAssetStillHeldController @Inject()(
                   Redirect(
                     navigator
                       .nextPage(
-                        AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex),
+                        AnyPartAssetStillHeldPage(srn, assetIndex.refined, disposalIndex.refined),
                         mode,
                         updatedAnswers
                       )

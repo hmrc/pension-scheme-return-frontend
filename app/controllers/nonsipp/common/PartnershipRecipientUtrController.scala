@@ -33,6 +33,7 @@ import forms.mappings.Mappings
 import pages.nonsipp.otherassetsheld.PartnershipOtherAssetSellerNamePage
 import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
+import utils.IntUtils.IntOpts
 import controllers.nonsipp.common.PartnershipRecipientUtrController._
 import pages.nonsipp.landorproperty.PartnershipSellerNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -57,18 +58,19 @@ class PartnershipRecipientUtrController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       subject match {
         case IdentitySubject.Unknown => Redirect(controllers.routes.UnauthorisedController.onPageLoad())
         case _ =>
           val form: Form[Either[String, Utr]] = PartnershipRecipientUtrController.form(formProvider, subject)
-          val preparedForm = request.userAnswers.fillForm(PartnershipRecipientUtrPage(srn, index, subject), form)
-          Ok(view(preparedForm, viewModel(srn, index, mode, subject, request.userAnswers)))
+          val preparedForm =
+            request.userAnswers.fillForm(PartnershipRecipientUtrPage(srn, index.refined, subject), form)
+          Ok(view(preparedForm, viewModel(srn, index.refined, mode, subject, request.userAnswers)))
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val form: Form[Either[String, Utr]] = PartnershipRecipientUtrController.form(formProvider, subject)
       form
@@ -76,14 +78,17 @@ class PartnershipRecipientUtrController @Inject()(
         .fold(
           formWithErrors =>
             Future
-              .successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, subject, request.userAnswers)))),
+              .successful(
+                BadRequest(view(formWithErrors, viewModel(srn, index.refined, mode, subject, request.userAnswers)))
+              ),
           value =>
             for {
               updatedAnswers <- request.userAnswers
-                .set(PartnershipRecipientUtrPage(srn, index, subject), ConditionalYesNo(value))
+                .set(PartnershipRecipientUtrPage(srn, index.refined, subject), ConditionalYesNo(value))
                 .mapK
-              nextPage = navigator.nextPage(PartnershipRecipientUtrPage(srn, index, subject), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage, subject)
+              nextPage = navigator
+                .nextPage(PartnershipRecipientUtrPage(srn, index.refined, subject), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage, subject)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )
@@ -153,7 +158,7 @@ object PartnershipRecipientUtrController {
             FieldType.Textarea
           )
       ),
-      routes.PartnershipRecipientUtrController.onSubmit(srn, index, mode, subject)
+      routes.PartnershipRecipientUtrController.onSubmit(srn, index.value, mode, subject)
     )
   }
 }

@@ -31,8 +31,8 @@ class IsLenderConnectedPartyControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[OneTo5000](1)
   private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
 
-  lazy val onPageLoad: Call = routes.IsLenderConnectedPartyController.onPageLoad(srn, index, NormalMode)
-  lazy val onSubmit: Call = routes.IsLenderConnectedPartyController.onSubmit(srn, index, NormalMode)
+  lazy val onPageLoad: Call = routes.IsLenderConnectedPartyController.onPageLoad(srn, index.value, NormalMode)
+  lazy val onSubmit: Call = routes.IsLenderConnectedPartyController.onSubmit(srn, index.value, NormalMode)
 
   val userServicesWithLenderName: UserAnswers =
     defaultUserAnswers.unsafeSet(LenderNamePage(srn, index), lenderName)

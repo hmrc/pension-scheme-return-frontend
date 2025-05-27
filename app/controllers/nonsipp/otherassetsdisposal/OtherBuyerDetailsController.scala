@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.otherassetsdisposal.OtherBuyerDetailsPage
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.RecipientDetailsFormProvider
@@ -52,23 +53,23 @@ class OtherBuyerDetailsController @Inject()(
 
   private def form: Form[RecipientDetails] = OtherBuyerDetailsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val form = OtherBuyerDetailsController.form(formProvider)
       Ok(
         view(
-          form.fromUserAnswers(OtherBuyerDetailsPage(srn, index, disposalIndex)),
+          form.fromUserAnswers(OtherBuyerDetailsPage(srn, index.refined, disposalIndex.refined)),
           viewModel(
             srn,
-            index,
-            disposalIndex,
+            index.refined,
+            disposalIndex.refined,
             mode
           )
         )
       )
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -80,8 +81,8 @@ class OtherBuyerDetailsController @Inject()(
                   formWithErrors,
                   viewModel(
                     srn,
-                    index,
-                    disposalIndex,
+                    index.refined,
+                    disposalIndex.refined,
                     mode
                   )
                 )
@@ -90,10 +91,12 @@ class OtherBuyerDetailsController @Inject()(
           answer =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(OtherBuyerDetailsPage(srn, index, disposalIndex), answer))
+                .fromTry(
+                  request.userAnswers.set(OtherBuyerDetailsPage(srn, index.refined, disposalIndex.refined), answer)
+                )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
-              navigator.nextPage(OtherBuyerDetailsPage(srn, index, disposalIndex), mode, updatedAnswers)
+              navigator.nextPage(OtherBuyerDetailsPage(srn, index.refined, disposalIndex.refined), mode, updatedAnswers)
             )
         )
     }

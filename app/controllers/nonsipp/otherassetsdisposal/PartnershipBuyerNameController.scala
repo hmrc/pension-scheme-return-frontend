@@ -21,6 +21,7 @@ import pages.nonsipp.otherassetsdisposal.PartnershipBuyerNamePage
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.{Max50, Max5000}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -51,17 +52,17 @@ class PartnershipBuyerNameController @Inject()(
 
   private def form = PartnershipBuyerNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(PartnershipBuyerNamePage(srn, index, disposalIndex)),
-          PartnershipBuyerNameController.viewModel(srn, index, disposalIndex, mode)
+          form.fromUserAnswers(PartnershipBuyerNamePage(srn, index.refined, disposalIndex.refined)),
+          PartnershipBuyerNameController.viewModel(srn, index.refined, disposalIndex.refined, mode)
         )
       )
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -71,7 +72,7 @@ class PartnershipBuyerNameController @Inject()(
               BadRequest(
                 view(
                   formWithErrors,
-                  PartnershipBuyerNameController.viewModel(srn, index, disposalIndex, mode)
+                  PartnershipBuyerNameController.viewModel(srn, index.refined, disposalIndex.refined, mode)
                 )
               )
             ),
@@ -79,12 +80,12 @@ class PartnershipBuyerNameController @Inject()(
             for {
               updatedAnswers <- Future.fromTry(
                 request.userAnswers
-                  .set(PartnershipBuyerNamePage(srn, index, disposalIndex), answer)
+                  .set(PartnershipBuyerNamePage(srn, index.refined, disposalIndex.refined), answer)
               )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
               navigator.nextPage(
-                PartnershipBuyerNamePage(srn, index, disposalIndex),
+                PartnershipBuyerNamePage(srn, index.refined, disposalIndex.refined),
                 mode,
                 updatedAnswers
               )

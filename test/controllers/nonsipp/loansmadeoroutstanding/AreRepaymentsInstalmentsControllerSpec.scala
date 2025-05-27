@@ -30,8 +30,8 @@ class AreRepaymentsInstalmentsControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  private lazy val onPageLoad = routes.AreRepaymentsInstalmentsController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.AreRepaymentsInstalmentsController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.AreRepaymentsInstalmentsController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.AreRepaymentsInstalmentsController.onSubmit(srn, index.value, NormalMode)
 
   val form: Form[Boolean] = AreRepaymentsInstalmentsController.form(new YesNoPageFormProvider())
 

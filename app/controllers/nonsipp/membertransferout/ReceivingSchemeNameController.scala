@@ -19,6 +19,7 @@ package controllers.nonsipp.membertransferout
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.TextFormProvider
@@ -50,13 +51,14 @@ class ReceivingSchemeNameController @Inject()(
 
   private val form = ReceivingSchemeNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, transferIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, transferIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val preparedForm = request.userAnswers.fillForm(ReceivingSchemeNamePage(srn, index, transferIndex), form)
-      Ok(view(preparedForm, ReceivingSchemeNameController.viewModel(srn, index, transferIndex, mode)))
+      val preparedForm =
+        request.userAnswers.fillForm(ReceivingSchemeNamePage(srn, index.refined, transferIndex.refined), form)
+      Ok(view(preparedForm, ReceivingSchemeNameController.viewModel(srn, index.refined, transferIndex.refined, mode)))
     }
 
-  def onSubmit(srn: Srn, index: Max300, transferIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, transferIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -65,14 +67,26 @@ class ReceivingSchemeNameController @Inject()(
             Future
               .successful(
                 BadRequest(
-                  view(formWithErrors, ReceivingSchemeNameController.viewModel(srn, index, transferIndex, mode))
+                  view(
+                    formWithErrors,
+                    ReceivingSchemeNameController.viewModel(srn, index.refined, transferIndex.refined, mode)
+                  )
                 )
               ),
           value =>
             for {
-              updatedAnswers <- request.userAnswers.set(ReceivingSchemeNamePage(srn, index, transferIndex), value).mapK
-              nextPage = navigator.nextPage(ReceivingSchemeNamePage(srn, index, transferIndex), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, transferIndex, updatedAnswers, nextPage)
+              updatedAnswers <- request.userAnswers
+                .set(ReceivingSchemeNamePage(srn, index.refined, transferIndex.refined), value)
+                .mapK
+              nextPage = navigator
+                .nextPage(ReceivingSchemeNamePage(srn, index.refined, transferIndex.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                index.refined,
+                transferIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )
