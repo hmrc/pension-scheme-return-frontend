@@ -119,6 +119,16 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
       )
 
       act.like(
+        redirectToPage(
+          call = onPageLoad(mode),
+          page = routes.LoansListController.onPageLoad(srn, 1, mode),
+          userAnswers = filledUserAnswers
+            .unsafeSet(LoansProgress(srn, index), SectionJourneyStatus.InProgress(anyUrl)),
+          previousUserAnswers = emptyUserAnswers
+        ).withName(s"Redirect to loans list when incomplete when in $mode mode")
+      )
+
+      act.like(
         redirectNextPage(onSubmit(mode))
           .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
           .after({

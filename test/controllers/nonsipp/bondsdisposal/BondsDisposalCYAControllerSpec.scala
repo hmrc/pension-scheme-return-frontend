@@ -16,21 +16,23 @@
 
 package controllers.nonsipp.bondsdisposal
 
-import services.{PsrSubmissionService, SaveService}
-import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
-import play.api.inject.bind
-import views.html.CheckYourAnswersView
-import eu.timepit.refined.refineMV
-import pages.nonsipp.FbVersionPage
-import models._
-import pages.nonsipp.bondsdisposal._
-import viewmodels.models.SectionJourneyStatus
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
-import play.api.inject.guice.GuiceableModule
-import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
 import config.RefinedTypes.{OneTo50, OneTo5000}
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
+import eu.timepit.refined.refineMV
+import models.PointOfEntry.{HowWereBondsDisposedPointOfEntry, NoPointOfEntry}
+import models._
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito._
+import pages.nonsipp.FbVersionPage
+import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
+import pages.nonsipp.bondsdisposal._
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.models.SectionJourneyStatus
+import views.html.CheckYourAnswersView
 
 import scala.concurrent.Future
 
@@ -91,6 +93,7 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(BuyerNamePage(srn, bondIndex, disposalIndex), nameOfBuyer.get)
     .unsafeSet(IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex), isBuyerConnectedParty.get)
     .unsafeSet(BondsStillHeldPage(srn, bondIndex, disposalIndex), bondsStillHeld)
+    .unsafeSet(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex), HowWereBondsDisposedPointOfEntry)
     .unsafeSet(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.Completed)
 
   "BondsDisposalCYAController" - {
@@ -147,7 +150,7 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
           call = onPageLoad(mode),
           page = routes.ReportBondsDisposalListController.onPageLoad(srn, 1),
           userAnswers = soldUserAnswers
-            .unsafeSet(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.InProgress("any")),
+            .unsafeSet(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.InProgress(anyUrl)),
           previousUserAnswers = emptyUserAnswers
         ).withName(s"Redirect to bonds list when incomplete when in $mode mode")
       )
@@ -158,6 +161,62 @@ class BondsDisposalCYAControllerSpec extends ControllerBaseSpec {
           .withName(s"redirect to journey recovery page on submit when in $mode mode")
       )
     }
+
+  }
+
+  "BondsDisposalCYAController PointOfEntry" - {
+    val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+    act.like(
+      renderView(
+        onPageLoad(CheckMode),
+        soldUserAnswers
+      ) { implicit app => implicit request =>
+        injected[CheckYourAnswersView].apply(
+          viewModel(
+            ViewModelParameters(
+              srn,
+              bondIndex,
+              disposalIndex,
+              "name",
+              acquisitionType = SchemeHoldBond.Acquisition,
+              costOfBonds = money,
+              howBondsDisposed = HowDisposed.Sold,
+              dateBondsSold,
+              considerationBondsSold,
+              Some(buyerName),
+              isBuyerConnectedParty,
+              bondsStillHeld,
+              schemeName,
+              CheckMode
+            ),
+            viewOnlyUpdated = true,
+            isMaximumReached = false
+          )
+        )
+      }.after({
+          verify(mockSaveService).save(captor.capture())(any(), any())
+          val userAnswers = captor.getValue
+          userAnswers.get(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex)) mustBe Some(NoPointOfEntry)
+          reset(mockPsrSubmissionService)
+        })
+        .withName(s"onPageLoad should clear out point of entry when completed")
+    )
+
+    act.like(
+      redirectToPage(
+        call = onPageLoad(CheckMode),
+        page = routes.ReportBondsDisposalListController.onPageLoad(srn, 1),
+        userAnswers = soldUserAnswers
+          .unsafeSet(BondsDisposalProgress(srn, bondIndex, disposalIndex), SectionJourneyStatus.InProgress(anyUrl))
+          .unsafeSet(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex), HowWereBondsDisposedPointOfEntry),
+        previousUserAnswers = emptyUserAnswers
+      ).after {
+          verify(mockSaveService, never).save(any())(any(), any())
+          reset(mockPsrSubmissionService)
+        }
+        .withName(s"onPageLoad should not clear out point of entry when in progress")
+    )
   }
 
   "BondsDisposalCYAController in view only mode" - {

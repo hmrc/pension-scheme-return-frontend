@@ -30,6 +30,8 @@ import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import config.RefinedTypes.{OneTo50, OneTo5000}
 import controllers.ControllerBaseSpec
+import models.PointOfEntry.{HowWereSharesDisposedPointOfEntry, NoPointOfEntry}
+import org.mockito.ArgumentCaptor
 import pages.nonsipp.FbVersionPage
 import uk.gov.hmrc.domain.Nino
 
@@ -116,6 +118,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex), isBuyerConnectedParty.get)
     .unsafeSet(IndependentValuationPage(srn, shareIndex, disposalIndex), isIndependentValuation.get)
     .unsafeSet(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex), sharesStillHeld)
+    .unsafeSet(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex), HowWereSharesDisposedPointOfEntry)
     .unsafeSet(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.Completed)
 
   private val redeemedUserAnswers = defaultUserAnswers
@@ -347,6 +350,70 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
           .withName(s"redirect to journey recovery page on submit when in $mode mode")
       )
     }
+  }
+
+  "SharesDisposalCYAController PointOfEntry" - {
+    val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+    act.like(
+      renderView(
+        onPageLoad(CheckMode),
+        soldUserAnswers
+      ) { implicit app => implicit request =>
+        injected[CheckYourAnswersView].apply(
+          viewModel(
+            ViewModelParameters(
+              srn,
+              shareIndex,
+              disposalIndex,
+              TypeOfShares.SponsoringEmployer,
+              companyName,
+              SchemeHoldShare.Acquisition,
+              acquisitionDate,
+              HowSharesDisposed.Sold,
+              dateSharesSold,
+              numberSharesSold,
+              considerationSharesSold,
+              buyerIdentity,
+              Some(buyerName),
+              Some(buyerDetails.toString),
+              buyerReasonNoDetails,
+              isBuyerConnectedParty,
+              isIndependentValuation,
+              None,
+              None,
+              None,
+              sharesStillHeld,
+              schemeName,
+              CheckMode
+            ),
+            viewOnlyUpdated = true,
+            isMaximumReached = false
+          )
+        )
+      }.after({
+          verify(mockSaveService).save(captor.capture())(any(), any())
+          val userAnswers = captor.getValue
+          userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) mustBe Some(NoPointOfEntry)
+          reset(mockPsrSubmissionService)
+        })
+        .withName(s"onPageLoad should clear out point of entry when completed")
+    )
+
+    act.like(
+      redirectToPage(
+        call = onPageLoad(CheckMode),
+        page = routes.SharesDisposalListController.onPageLoad(srn, 1),
+        userAnswers = soldUserAnswers
+          .unsafeSet(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.InProgress(anyUrl))
+          .unsafeSet(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex), HowWereSharesDisposedPointOfEntry),
+        previousUserAnswers = emptyUserAnswers
+      ).after {
+          verify(mockSaveService, never).save(any())(any(), any())
+          reset(mockPsrSubmissionService)
+        }
+        .withName(s"onPageLoad should not clear out point of entry when in progress")
+    )
   }
 
   "SharesDisposalCYAController in view only mode" - {
