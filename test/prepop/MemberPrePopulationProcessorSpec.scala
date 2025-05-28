@@ -902,6 +902,26 @@ object MemberPrePopulationProcessorSpec {
       |        }
       |      }
       |    }
+      |  },
+      |  "memberDetailsManualProgress": {
+      |    "0": {
+      |      "status": "JourneyCompleted"
+      |    },
+      |    "1": {
+      |      "status": "JourneyCompleted"
+      |    },
+      |    "2": {
+      |      "status": "JourneyCompleted"
+      |    },
+      |    "3": {
+      |      "status": "JourneyCompleted"
+      |    },
+      |    "4": {
+      |      "status": "JourneyCompleted"
+      |    },
+      |    "5": {
+      |      "status": "JourneyCompleted"
+      |    }
       |  }
       |}
       |""".stripMargin)

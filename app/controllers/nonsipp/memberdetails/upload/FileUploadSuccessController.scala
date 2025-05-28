@@ -121,6 +121,7 @@ class FileUploadSuccessController @Inject()(
           ),
           UserAnswers.set(MemberStatus(srn, index), MemberState.New),
           UserAnswers.set(SafeToHardDelete(srn, index)),
+          UserAnswers.set(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed),
           UserAnswers.set(MemberDetailsCompletedPage(srn, index), SectionCompleted)
         )
       }
