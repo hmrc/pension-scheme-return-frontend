@@ -159,11 +159,13 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
         userAnswers.get(MemberDetailsPage(srn, refineMV(1))) mustBe Some(NameDOB("A", "A", localDate))
         userAnswers.get(DoesMemberHaveNinoPage(srn, refineMV(1))) mustBe Some(true)
         userAnswers.get(MemberDetailsNinoPage(srn, refineMV(1))) mustBe Some(Nino("AB123456A"))
+        userAnswers.get(MemberDetailsManualProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
 
         userAnswers.get(MemberDetailsPage(srn, refineMV(2))) mustBe None
         userAnswers.get(DoesMemberHaveNinoPage(srn, refineMV(2))) mustBe None
         userAnswers.get(NoNINOPage(srn, refineMV(2))) mustBe None
         userAnswers.get(MemberDetailsNinoPage(srn, refineMV(2))) mustBe None
+        userAnswers.get(MemberDetailsManualProgress(srn, refineMV(2))) mustBe None
       }
     }
 
@@ -233,16 +235,19 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
             userAnswers.get(MemberDetailsNinoPage(srn, refineMV(1))) mustBe Some(Nino("AB123456A"))
             userAnswers.get(NoNINOPage(srn, refineMV(1))) mustBe None
             userAnswers.get(DoesMemberHaveNinoPage(srn, refineMV(1))) mustBe Some(true)
+            userAnswers.get(MemberDetailsManualProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
 
             userAnswers.get(MemberDetailsPage(srn, refineMV(2))) mustBe Some(NameDOB("B", "B", localDate))
             userAnswers.get(MemberDetailsNinoPage(srn, refineMV(2))) mustBe None
             userAnswers.get(NoNINOPage(srn, refineMV(2))) mustBe Some("reason B")
             userAnswers.get(DoesMemberHaveNinoPage(srn, refineMV(2))) mustBe Some(false)
+            userAnswers.get(MemberDetailsManualProgress(srn, refineMV(2))) mustBe Some(SectionJourneyStatus.Completed)
 
             userAnswers.get(MemberDetailsPage(srn, refineMV(3))) mustBe Some(NameDOB("C", "C", localDate))
             userAnswers.get(NoNINOPage(srn, refineMV(3))) mustBe Some("reason C")
             userAnswers.get(MemberDetailsNinoPage(srn, refineMV(3))) mustBe None
             userAnswers.get(DoesMemberHaveNinoPage(srn, refineMV(3))) mustBe Some(false)
+            userAnswers.get(MemberDetailsManualProgress(srn, refineMV(3))) mustBe Some(SectionJourneyStatus.Completed)
           }
       )
     }
