@@ -16,7 +16,7 @@
 
 package prepop
 
-import pages.nonsipp.memberdetails.{MemberStatus, MembersDetailsChecked, SafeToHardDelete}
+import pages.nonsipp.memberdetails._
 import models.UserAnswers.SensitiveJsObject
 import config.RefinedTypes.OneTo300
 import models.SchemeId.Srn
@@ -24,6 +24,7 @@ import eu.timepit.refined.refineV
 import play.api.libs.json._
 import pages.nonsipp.memberdetails.Paths.personalDetails
 import models.UserAnswers
+import viewmodels.models.SectionJourneyStatus
 
 import scala.util.{Success, Try}
 
@@ -65,7 +66,10 @@ class MemberPrePopulationProcessor @Inject()() {
         memberStatusMap.foldLeft(transformedResultWithCheckedFlag)((uaResult, memberStatusEntry) => {
           memberStatusEntry._1.toIntOption.flatMap(i => refineV[OneTo300](i + 1).toOption) match {
             case None => uaResult
-            case Some(index) => uaResult.flatMap(_.set(SafeToHardDelete(srn, index)))
+            case Some(index) =>
+              uaResult
+                .flatMap(_.set(SafeToHardDelete(srn, index)))
+                .flatMap(_.set(MemberDetailsManualProgress(srn, index), SectionJourneyStatus.Completed))
           }
         })
     )
