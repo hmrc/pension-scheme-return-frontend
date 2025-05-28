@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import utils.ListUtils.ListOps
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
+import utils.IntUtils.{toInt, IntOpts}
 import cats.implicits.toShow
 import controllers.actions._
 import controllers.nonsipp.shares.SharesCYAController._
@@ -58,23 +59,23 @@ class SharesCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)
+      onPageLoadCommon(srn: Srn, index.refined, mode: Mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)
+      onPageLoadCommon(srn: Srn, index.refined, mode: Mode)
     }
 
   def onPageLoadCommon(srn: SchemeId.Srn, index: Max5000, mode: Mode)(
@@ -198,17 +199,17 @@ class SharesCYAController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val prePopulated = request.userAnswers.get(SharePrePopulated(srn, index)).isDefined
+      val prePopulated = request.userAnswers.get(SharePrePopulated(srn, index.refined)).isDefined
 
       for {
         updatedAnswers <- Future
           .fromTry(
             request.userAnswers
               .set(DidSchemeHoldAnySharesPage(srn), true)
-              .set(SharesCompleted(srn, index), SectionCompleted)
-              .setWhen(prePopulated)(SharePrePopulated(srn, index), true)
+              .set(SharesCompleted(srn, index.refined), SectionCompleted)
+              .setWhen(prePopulated)(SharePrePopulated(srn, index.refined), true)
           )
         _ <- saveService.save(updatedAnswers)
         redirectTo <- psrSubmissionService
@@ -702,7 +703,7 @@ object SharesCYAController {
       case IdentityType.UKPartnership => routes.PartnershipNameOfSharesSellerController.onPageLoad(srn, index, mode).url
       case IdentityType.Other =>
         controllers.nonsipp.common.routes.OtherRecipientDetailsController
-          .onPageLoad(srn, index, mode, IdentitySubject.SharesSeller)
+          .onPageLoad(srn, index.value, mode, IdentitySubject.SharesSeller)
           .url
     }
 
@@ -724,7 +725,7 @@ object SharesCYAController {
           (
             Message("sharesCYA.section3.recipientDetails.crn", recipientName),
             controllers.nonsipp.common.routes.CompanyRecipientCrnController
-              .onPageLoad(srn, index, mode, IdentitySubject.SharesSeller)
+              .onPageLoad(srn, index.value, mode, IdentitySubject.SharesSeller)
               .url,
             "sharesCYA.section3.recipientDetails.crn.hidden",
             "sharesCYA.section3.recipientDetails.noCrnReason.hidden"
@@ -733,7 +734,7 @@ object SharesCYAController {
           (
             Message("sharesCYA.section3.recipientDetails.utr", recipientName),
             controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-              .onPageLoad(srn, index, mode, IdentitySubject.SharesSeller)
+              .onPageLoad(srn, index.value, mode, IdentitySubject.SharesSeller)
               .url,
             "sharesCYA.section3.recipientDetails.utr.hidden",
             "sharesCYA.section3.recipientDetails.noUtrReason.hidden"
@@ -742,7 +743,7 @@ object SharesCYAController {
           (
             Message("sharesCYA.section3.recipientDetails.other", recipientName),
             controllers.nonsipp.common.routes.OtherRecipientDetailsController
-              .onPageLoad(srn, index, mode, IdentitySubject.SharesSeller)
+              .onPageLoad(srn, index.value, mode, IdentitySubject.SharesSeller)
               .url + "#other",
             "sharesCYA.section3.recipientDetails.other.hidden",
             ""
@@ -756,17 +757,17 @@ object SharesCYAController {
       case IdentityType.UKCompany =>
         Message("sharesCYA.section3.recipientDetails.noCrnReason", recipientName) ->
           controllers.nonsipp.common.routes.CompanyRecipientCrnController
-            .onPageLoad(srn, index, mode, IdentitySubject.SharesSeller)
+            .onPageLoad(srn, index.value, mode, IdentitySubject.SharesSeller)
             .url
       case IdentityType.UKPartnership =>
         Message("sharesCYA.section3.recipientDetails.noUtrReason", recipientName) ->
           controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-            .onPageLoad(srn, index, mode, IdentitySubject.SharesSeller)
+            .onPageLoad(srn, index.value, mode, IdentitySubject.SharesSeller)
             .url
       case IdentityType.Other =>
         Message("sharesCYA.section3.recipientDetails.other", recipientName) ->
           controllers.nonsipp.common.routes.OtherRecipientDetailsController
-            .onPageLoad(srn, index, mode, IdentitySubject.SharesSeller)
+            .onPageLoad(srn, index.value, mode, IdentitySubject.SharesSeller)
             .url
     }
 
@@ -781,7 +782,7 @@ object SharesCYAController {
             SummaryAction(
               "site.change",
               controllers.nonsipp.common.routes.IdentityTypeController
-                .onPageLoad(srn, index, mode, IdentitySubject.SharesSeller)
+                .onPageLoad(srn, index.value, mode, IdentitySubject.SharesSeller)
                 .url
             ).withVisuallyHiddenContent(("sharesCYA.section3.whoWereSharesAcquired.hidden", companyNameRelatedShares))
           ),

@@ -42,8 +42,8 @@ class InterestOnLoanControllerSpec extends ControllerBaseSpec {
     val form = InterestOnLoanController.form()
     lazy val viewModel = InterestOnLoanController.viewModel(srn, index1of5000, NormalMode, schemeName, _)
 
-    lazy val onPageLoad = routes.InterestOnLoanController.onPageLoad(srn, index1of5000, NormalMode)
-    lazy val onSubmit = routes.InterestOnLoanController.onSubmit(srn, index1of5000, NormalMode)
+    lazy val onPageLoad = routes.InterestOnLoanController.onPageLoad(srn, index1of5000.value, NormalMode)
+    lazy val onSubmit = routes.InterestOnLoanController.onSubmit(srn, index1of5000.value, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[MultipleQuestionView]
@@ -76,7 +76,7 @@ class InterestOnLoanControllerSpec extends ControllerBaseSpec {
       redirectToPageWithPrePopSession(
         call = onSubmit,
         page = controllers.nonsipp.loansmadeoroutstanding.routes.OutstandingArrearsOnLoanController
-          .onPageLoad(srn, index1of5000, NormalMode),
+          .onPageLoad(srn, index1of5000.value, NormalMode),
         userAnswers = prePopUserAnswersMissing,
         previousUserAnswers = defaultUserAnswers,
         mockSaveService = None,
@@ -90,7 +90,7 @@ class InterestOnLoanControllerSpec extends ControllerBaseSpec {
       redirectToPageWithPrePopSession(
         call = onSubmit,
         page = controllers.nonsipp.loansmadeoroutstanding.routes.SecurityGivenForLoanController
-          .onPageLoad(srn, index1of5000, NormalMode),
+          .onPageLoad(srn, index1of5000.value, NormalMode),
         userAnswers = prePopUserAnswersCompleted,
         previousUserAnswers = defaultUserAnswers,
         mockSaveService = None,
@@ -104,7 +104,7 @@ class InterestOnLoanControllerSpec extends ControllerBaseSpec {
       redirectToPageWithPrePopSession(
         call = onSubmit,
         page = controllers.nonsipp.loansmadeoroutstanding.routes.SecurityGivenForLoanController
-          .onPageLoad(srn, index1of5000, NormalMode),
+          .onPageLoad(srn, index1of5000.value, NormalMode),
         userAnswers = defaultUserAnswers,
         previousUserAnswers = defaultUserAnswers,
         mockSaveService = None,

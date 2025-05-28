@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import models.PointOfEntry.{NoPointOfEntry, WhoWereTheSharesSoldToPointOfEntry}
 import models.IdentityType._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import controllers.nonsipp.sharesdisposal.WhoWereTheSharesSoldToController._
 import pages.nonsipp.sharesdisposal.{SharesDisposalCYAPointOfEntry, WhoWereTheSharesSoldToPage}
@@ -55,43 +56,46 @@ class WhoWereTheSharesSoldToController @Inject()(
 
   private val form = WhoWereTheSharesSoldToController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       // If this page is reached in CheckMode and there is no PointOfEntry set
       if (mode == CheckMode && request.userAnswers
-          .get(SharesDisposalCYAPointOfEntry(srn, index, disposalIndex))
+          .get(SharesDisposalCYAPointOfEntry(srn, index.refined, disposalIndex.refined))
           .contains(NoPointOfEntry)) {
         // Set this page as the PointOfEntry
         saveService.save(
           request.userAnswers
-            .set(SharesDisposalCYAPointOfEntry(srn, index, disposalIndex), WhoWereTheSharesSoldToPointOfEntry)
+            .set(
+              SharesDisposalCYAPointOfEntry(srn, index.refined, disposalIndex.refined),
+              WhoWereTheSharesSoldToPointOfEntry
+            )
             .getOrElse(request.userAnswers)
         )
       }
 
-      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { company =>
+      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index.refined)).getOrRecoverJourney { company =>
         Ok(
           view(
-            form.fromUserAnswers(WhoWereTheSharesSoldToPage(srn, index, disposalIndex)),
-            viewModel(srn, index, disposalIndex, company, mode)
+            form.fromUserAnswers(WhoWereTheSharesSoldToPage(srn, index.refined, disposalIndex.refined)),
+            viewModel(srn, index.refined, disposalIndex.refined, company, mode)
           )
         )
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { company =>
+            request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index.refined)).getOrRecoverJourney { company =>
               Future
                 .successful(
                   BadRequest(
                     view(
                       formWithErrors,
-                      viewModel(srn, index, disposalIndex, company, mode)
+                      viewModel(srn, index.refined, disposalIndex.refined, company, mode)
                     )
                   )
                 )
@@ -99,14 +103,20 @@ class WhoWereTheSharesSoldToController @Inject()(
           answer => {
             for {
               updatedAnswers <- Future.fromTry(
-                request.userAnswers.set(WhoWereTheSharesSoldToPage(srn, index, disposalIndex), answer)
+                request.userAnswers.set(WhoWereTheSharesSoldToPage(srn, index.refined, disposalIndex.refined), answer)
               )
               nextPage = navigator.nextPage(
-                WhoWereTheSharesSoldToPage(srn, index, disposalIndex),
+                WhoWereTheSharesSoldToPage(srn, index.refined, disposalIndex.refined),
                 mode,
                 updatedAnswers
               )
-              updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                index.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

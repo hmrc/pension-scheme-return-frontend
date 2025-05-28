@@ -39,8 +39,8 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[Max300.Refined](1)
   private val secondaryIndex = refineMV[Max5.Refined](1)
   private val page = 1
-  private lazy val onPageLoad = routes.TransfersInCYAController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.TransfersInCYAController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.TransfersInCYAController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.TransfersInCYAController.onSubmit(srn, index.value, NormalMode)
   private lazy val onSubmitViewOnly = routes.TransfersInCYAController.onSubmitViewOnly(
     srn,
     page,
@@ -51,7 +51,7 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoadViewOnly = routes.TransfersInCYAController.onPageLoadViewOnly(
     srn,
-    index,
+    index.value,
     yearString,
     submissionNumberTwo,
     submissionNumberOne

@@ -19,6 +19,7 @@ package controllers.nonsipp.shares
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import pages.nonsipp
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -54,23 +55,23 @@ class RemoveSharesController @Inject()(
 
   private val form = RemoveSharesController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      if (request.userAnswers.get(SharePrePopulated(srn, index)).isDefined)
+      if (request.userAnswers.get(SharePrePopulated(srn, index.refined)).isDefined)
         Redirect(controllers.routes.UnauthorisedController.onPageLoad())
       else
         (
           for {
             companyName <- request.userAnswers
-              .get(CompanyNameRelatedSharesPage(srn, index))
+              .get(CompanyNameRelatedSharesPage(srn, index.refined))
               .getOrRedirectToTaskList(srn)
           } yield Ok(
-            view(form, viewModel(srn, index, mode, companyName))
+            view(form, viewModel(srn, index.refined, mode, companyName))
           )
         ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -78,9 +79,11 @@ class RemoveSharesController @Inject()(
           formWithErrors => {
             (
               for {
-                companyName <- request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourneyT
+                companyName <- request.userAnswers
+                  .get(CompanyNameRelatedSharesPage(srn, index.refined))
+                  .getOrRecoverJourneyT
               } yield BadRequest(
-                view(formWithErrors, viewModel(srn, index, mode, companyName))
+                view(formWithErrors, viewModel(srn, index.refined, mode, companyName))
               )
             ).merge
           },
@@ -89,7 +92,7 @@ class RemoveSharesController @Inject()(
               val isLast = request.userAnswers.map(CompanyNameRelatedSharesPages(srn)).size == 1
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.remove(nonsipp.shares.sharesPages(srn, index, isLast)))
+                  .fromTry(request.userAnswers.remove(nonsipp.shares.sharesPages(srn, index.refined, isLast)))
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
                   srn,
@@ -100,7 +103,7 @@ class RemoveSharesController @Inject()(
                 _ =>
                   Redirect(
                     navigator
-                      .nextPage(RemoveSharesPage(srn, index), NormalMode, updatedAnswers)
+                      .nextPage(RemoveSharesPage(srn, index.refined), NormalMode, updatedAnswers)
                   )
               )
             } else {
@@ -108,7 +111,7 @@ class RemoveSharesController @Inject()(
                 .successful(
                   Redirect(
                     navigator
-                      .nextPage(RemoveSharesPage(srn, index), NormalMode, request.userAnswers)
+                      .nextPage(RemoveSharesPage(srn, index.refined), NormalMode, request.userAnswers)
                   )
                 )
             }

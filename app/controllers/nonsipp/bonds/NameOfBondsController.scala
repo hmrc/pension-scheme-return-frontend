@@ -20,6 +20,7 @@ import pages.nonsipp.bonds.NameOfBondsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.Max5000
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.TextFormProvider
@@ -51,23 +52,23 @@ class NameOfBondsController @Inject()(
 
   private val form = NameOfBondsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val preparedForm = request.userAnswers.fillForm(NameOfBondsPage(srn, index), form)
-      Ok(view(preparedForm, viewModel(srn, index, mode)))
+      val preparedForm = request.userAnswers.fillForm(NameOfBondsPage(srn, index.refined), form)
+      Ok(view(preparedForm, viewModel(srn, index.refined, mode)))
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index.refined, mode)))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(NameOfBondsPage(srn, index), value))
-              nextPage = navigator.nextPage(NameOfBondsPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(NameOfBondsPage(srn, index.refined), value))
+              nextPage = navigator.nextPage(NameOfBondsPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

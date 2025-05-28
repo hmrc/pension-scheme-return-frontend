@@ -30,9 +30,9 @@ class CompanyNameOfAssetBuyerControllerSpec extends ControllerBaseSpec {
   private val assetIndex = refineMV[Max5000.Refined](1)
   private val disposalIndex = refineMV[Max50.Refined](1)
   private lazy val onPageLoad =
-    routes.CompanyNameOfAssetBuyerController.onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+    routes.CompanyNameOfAssetBuyerController.onPageLoad(srn, assetIndex.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.CompanyNameOfAssetBuyerController.onSubmit(srn, assetIndex, disposalIndex, NormalMode)
+    routes.CompanyNameOfAssetBuyerController.onSubmit(srn, assetIndex.value, disposalIndex.value, NormalMode)
 
   private val companyNameOfAssetBuyer = "test"
 

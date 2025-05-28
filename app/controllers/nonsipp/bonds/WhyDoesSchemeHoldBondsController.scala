@@ -21,6 +21,7 @@ import pages.nonsipp.bonds.WhyDoesSchemeHoldBondsPage
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -53,18 +54,18 @@ class WhyDoesSchemeHoldBondsController @Inject()(
 
   private val form = WhyDoesSchemeHoldBondsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(WhyDoesSchemeHoldBondsPage(srn, index)),
-          viewModel(srn, index, request.schemeDetails.schemeName, mode)
+          form.fromUserAnswers(WhyDoesSchemeHoldBondsPage(srn, index.refined)),
+          viewModel(srn, index.refined, request.schemeDetails.schemeName, mode)
         )
       )
 
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -75,21 +76,21 @@ class WhyDoesSchemeHoldBondsController @Inject()(
                 BadRequest(
                   view(
                     formWithErrors,
-                    viewModel(srn, index, request.schemeDetails.schemeName, mode)
+                    viewModel(srn, index.refined, request.schemeDetails.schemeName, mode)
                   )
                 )
               ),
           answer => {
             for {
               updatedAnswers <- Future.fromTry(
-                request.userAnswers.set(WhyDoesSchemeHoldBondsPage(srn, index), answer)
+                request.userAnswers.set(WhyDoesSchemeHoldBondsPage(srn, index.refined), answer)
               )
               nextPage = navigator.nextPage(
-                WhyDoesSchemeHoldBondsPage(srn, index),
+                WhyDoesSchemeHoldBondsPage(srn, index.refined),
                 mode,
                 updatedAnswers
               )
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(
               nextPage

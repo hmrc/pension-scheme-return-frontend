@@ -37,9 +37,9 @@ class WhenWasAssetSoldControllerSpec extends ControllerBaseSpec {
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.WhenWasAssetSoldController.onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+    routes.WhenWasAssetSoldController.onPageLoad(srn, assetIndex.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.WhenWasAssetSoldController.onSubmit(srn, assetIndex, disposalIndex, NormalMode)
+    routes.WhenWasAssetSoldController.onSubmit(srn, assetIndex.value, disposalIndex.value, NormalMode)
 
   val schemeDatePeriod: DateRange = DateRange(LocalDate.parse("2020-04-06"), LocalDate.parse("2021-04-05"))
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]

@@ -44,13 +44,12 @@ class MemberDetailsMongoController @Inject()(
 
   private val max: Max300 = refineMV(300)
 
-  def addMemberDetails(srn: Srn, num: Max300): Action[AnyContent] = identifyAndRequireData(srn).async {
-    implicit request =>
-      for {
-        removedUserAnswers <- Future.fromTry(removeAllMemberDetails(srn, request.userAnswers))
-        updatedUserAnswers <- Future.fromTry(updateUserAnswersWithMemberDetails(num.value, srn, removedUserAnswers))
-        _ <- sessionRepository.set(updatedUserAnswers)
-      } yield Ok(s"Added ${num.value} member details to UserAnswers")
+  def addMemberDetails(srn: Srn, num: Int): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    for {
+      removedUserAnswers <- Future.fromTry(removeAllMemberDetails(srn, request.userAnswers))
+      updatedUserAnswers <- Future.fromTry(updateUserAnswersWithMemberDetails(num, srn, removedUserAnswers))
+      _ <- sessionRepository.set(updatedUserAnswers)
+    } yield Ok(s"Added $num member details to UserAnswers")
   }
 
   private def buildIndexes(num: Int): Try[List[Max300]] =

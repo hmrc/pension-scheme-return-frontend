@@ -29,8 +29,8 @@ class SharesCheckAndUpdateControllerSpec extends ControllerBaseSpec {
 
   private val index: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
 
-  private def onPageLoad = routes.SharesCheckAndUpdateController.onPageLoad(srn, index)
-  private def onSubmit = routes.SharesCheckAndUpdateController.onSubmit(srn, index)
+  private def onPageLoad = routes.SharesCheckAndUpdateController.onPageLoad(srn, index.value)
+  private def onSubmit = routes.SharesCheckAndUpdateController.onSubmit(srn, index.value)
 
   private val typeOfShares = typeOfSharesGen.sample.value
 
@@ -56,7 +56,7 @@ class SharesCheckAndUpdateControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectToPage(onSubmit, routes.SharesTotalIncomeController.onPageLoad(srn, index, NormalMode))
+      redirectToPage(onSubmit, routes.SharesTotalIncomeController.onPageLoad(srn, index.value, NormalMode))
     )
 
     act.like(

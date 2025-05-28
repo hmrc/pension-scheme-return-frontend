@@ -45,9 +45,9 @@ class WhenDidSchemeAcquireSharesControllerSpec extends ControllerBaseSpec {
     reset(mockSchemeDateService)
 
   private lazy val onPageLoad =
-    routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, NormalMode)
+    routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index.value, NormalMode)
   private lazy val onSubmit =
-    routes.WhenDidSchemeAcquireSharesController.onSubmit(srn, index, NormalMode)
+    routes.WhenDidSchemeAcquireSharesController.onSubmit(srn, index.value, NormalMode)
 
   private val populatedUserAnswers =
     defaultUserAnswers.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty)

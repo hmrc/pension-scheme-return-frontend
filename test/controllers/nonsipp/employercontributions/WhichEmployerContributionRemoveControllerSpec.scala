@@ -33,8 +33,8 @@ import controllers.ControllerBaseSpec
 
 class WhichEmployerContributionRemoveControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.WhichEmployerContributionRemoveController.onPageLoad(srn, refineMV(1))
-  private lazy val onSubmit = routes.WhichEmployerContributionRemoveController.onSubmit(srn, refineMV(1))
+  private lazy val onPageLoad = routes.WhichEmployerContributionRemoveController.onPageLoad(srn, 1)
+  private lazy val onSubmit = routes.WhichEmployerContributionRemoveController.onSubmit(srn, 1)
 
   private val memberDetail1: NameDOB = nameDobGen.sample.value
   private val memberDetail2: NameDOB = nameDobGen.sample.value
@@ -70,7 +70,7 @@ class WhichEmployerContributionRemoveControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onPageLoad,
-        routes.RemoveEmployerContributionsController.onPageLoad(srn, refineMV(1), refineMV(1)),
+        routes.RemoveEmployerContributionsController.onPageLoad(srn, 1, 1),
         userAnswersWithOneContributionOnly
       ).withName("should redirect to RemoveEmployerContributions page when only one contribution")
     )
@@ -80,7 +80,7 @@ class WhichEmployerContributionRemoveControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmit,
-        routes.RemoveEmployerContributionsController.onPageLoad(srn, refineMV(1), refineMV(1)),
+        routes.RemoveEmployerContributionsController.onPageLoad(srn, 1, 1),
         userAnswers,
         "value" -> "1"
       )

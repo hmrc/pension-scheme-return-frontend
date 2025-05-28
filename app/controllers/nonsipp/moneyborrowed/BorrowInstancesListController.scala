@@ -19,6 +19,7 @@ package controllers.nonsipp.moneyborrowed
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
+import utils.IntUtils.toInt
 import cats.implicits._
 import config.Constants.maxBorrows
 import forms.YesNoPageFormProvider

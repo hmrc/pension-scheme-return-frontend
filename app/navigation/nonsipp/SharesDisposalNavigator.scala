@@ -20,6 +20,7 @@ import play.api.mvc.Call
 import models.PointOfEntry._
 import pages.Page
 import config.RefinedTypes.Max50
+import utils.IntUtils.toInt
 import cats.implicits.{catsSyntaxEitherId, toBifunctorOps, toTraverseOps}
 import eu.timepit.refined.refineV
 import pages.nonsipp.sharesdisposal._

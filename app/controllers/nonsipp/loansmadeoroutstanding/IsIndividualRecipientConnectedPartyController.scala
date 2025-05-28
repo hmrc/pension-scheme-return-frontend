@@ -23,6 +23,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.viewModel
 import config.RefinedTypes.Max5000
 import config.FrontendAppConfig
+import utils.IntUtils.IntOpts
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -57,34 +58,37 @@ class IsIndividualRecipientConnectedPartyController @Inject()(
   private def form: Form[Boolean] =
     IsIndividualRecipientConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.usingAnswer(IndividualRecipientNamePage(srn, index)).sync { individualName =>
+      request.usingAnswer(IndividualRecipientNamePage(srn, index.refined)).sync { individualName =>
         Ok(
           view(
-            form.fromUserAnswers(IsIndividualRecipientConnectedPartyPage(srn, index)),
-            viewModel(srn, index, individualName, config.urls.incomeTaxAct, mode)
+            form.fromUserAnswers(IsIndividualRecipientConnectedPartyPage(srn, index.refined)),
+            viewModel(srn, index.refined, individualName, config.urls.incomeTaxAct, mode)
           )
         )
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           errors =>
-            request.usingAnswer(IndividualRecipientNamePage(srn, index)).async { individualName =>
+            request.usingAnswer(IndividualRecipientNamePage(srn, index.refined)).async { individualName =>
               Future.successful(
-                BadRequest(view(errors, viewModel(srn, index, individualName, config.urls.incomeTaxAct, mode)))
+                BadRequest(view(errors, viewModel(srn, index.refined, individualName, config.urls.incomeTaxAct, mode)))
               )
             },
           success =>
             for {
-              userAnswers <- request.userAnswers.set(IsIndividualRecipientConnectedPartyPage(srn, index), success).mapK
-              nextPage = navigator.nextPage(IsIndividualRecipientConnectedPartyPage(srn, index), mode, userAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, userAnswers, nextPage)
+              userAnswers <- request.userAnswers
+                .set(IsIndividualRecipientConnectedPartyPage(srn, index.refined), success)
+                .mapK
+              nextPage = navigator
+                .nextPage(IsIndividualRecipientConnectedPartyPage(srn, index.refined), mode, userAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, userAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )
@@ -108,7 +112,7 @@ object IsIndividualRecipientConnectedPartyController {
       YesNoPageViewModel(
         legend = Some(Message("isIndividualRecipientConnectedParty.label", individualName))
       ),
-      onSubmit = routes.IsIndividualRecipientConnectedPartyController.onSubmit(srn, index, mode)
+      onSubmit = routes.IsIndividualRecipientConnectedPartyController.onSubmit(srn, index.value, mode)
     ).withDescription(
       ParagraphMessage("isIndividualRecipientConnectedParty.paragraph1") ++
         ParagraphMessage("isIndividualRecipientConnectedParty.paragraph2") ++

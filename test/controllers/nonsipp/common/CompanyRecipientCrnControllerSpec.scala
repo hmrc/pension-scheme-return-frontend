@@ -39,10 +39,10 @@ class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
     IdentitySubject.values.foreach { identitySubject =>
       lazy val onPageLoad =
         controllers.nonsipp.common.routes.CompanyRecipientCrnController
-          .onPageLoad(srn, index, NormalMode, identitySubject)
+          .onPageLoad(srn, index.value, NormalMode, identitySubject)
       lazy val onSubmit =
         controllers.nonsipp.common.routes.CompanyRecipientCrnController
-          .onSubmit(srn, index, NormalMode, identitySubject)
+          .onSubmit(srn, index.value, NormalMode, identitySubject)
       val userAnswersWithData = defaultUserAnswers
         .unsafeSet(CompanyRecipientNamePage(srn, index), companyName)
         .unsafeSet(CompanySellerNamePage(srn, index), companyName)
@@ -53,7 +53,7 @@ class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
     "Unknown" - {
       lazy val onPageLoad =
         controllers.nonsipp.common.routes.CompanyRecipientCrnController
-          .onPageLoad(srn, index, NormalMode, IdentitySubject.Unknown)
+          .onPageLoad(srn, index.value, NormalMode, IdentitySubject.Unknown)
 
       act.like(
         unauthorisedPage(onPageLoad, Some(defaultUserAnswers))

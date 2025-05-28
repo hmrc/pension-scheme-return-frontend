@@ -48,9 +48,9 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec {
   }
 
   private def onPageLoad(mode: Mode) =
-    routes.LandPropertyDisposalCYAController.onPageLoad(srn, assetIndex, disposalIndex, mode)
+    routes.LandPropertyDisposalCYAController.onPageLoad(srn, assetIndex.value, disposalIndex.value, mode)
   private def onSubmit(mode: Mode) =
-    routes.LandPropertyDisposalCYAController.onSubmit(srn, assetIndex, disposalIndex, mode)
+    routes.LandPropertyDisposalCYAController.onSubmit(srn, assetIndex.value, disposalIndex.value, mode)
 
   private lazy val onSubmitViewOnly = routes.LandPropertyDisposalCYAController.onSubmitViewOnly(
     srn,
@@ -62,8 +62,8 @@ class LandPropertyDisposalCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoadViewOnly = routes.LandPropertyDisposalCYAController.onPageLoadViewOnly(
     srn,
-    assetIndex,
-    disposalIndex,
+    assetIndex.value,
+    disposalIndex.value,
     yearString,
     submissionNumberTwo,
     submissionNumberOne

@@ -22,6 +22,7 @@ import models.ConditionalYesNo._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
 import config.RefinedTypes.Max5000
+import utils.IntUtils.IntOpts
 import controllers.actions._
 import navigation.Navigator
 import forms.MultipleQuestionFormProvider
@@ -57,9 +58,9 @@ class InterestOnLoanController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val previousAnswer = request.userAnswers.get(InterestOnLoanPage(srn, index))
+      val previousAnswer = request.userAnswers.get(InterestOnLoanPage(srn, index.refined))
       val form = InterestOnLoanController.form()
 
       val preparedForm = if (isPrePopulation) {
@@ -67,12 +68,12 @@ class InterestOnLoanController @Inject()(
           interestOnLoan => partialAnswersForm.fill(interestOnLoan.asTuple)
         )
       } else {
-        request.userAnswers.fillForm(InterestOnLoanPage(srn, index), form)
+        request.userAnswers.fillForm(InterestOnLoanPage(srn, index.refined), form)
       }
 
       val viewModel = InterestOnLoanController.viewModel(
         srn,
-        index,
+        index.refined,
         mode,
         request.schemeDetails.schemeName,
         form
@@ -81,7 +82,7 @@ class InterestOnLoanController @Inject()(
       Ok(view(preparedForm, viewModel))
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val form = InterestOnLoanController.form()
 
@@ -90,20 +91,20 @@ class InterestOnLoanController @Inject()(
         .fold(
           formWithErrors => {
             val viewModel =
-              InterestOnLoanController.viewModel(srn, index, mode, request.schemeDetails.schemeName, form)
+              InterestOnLoanController.viewModel(srn, index.refined, mode, request.schemeDetails.schemeName, form)
 
             Future.successful(BadRequest(view(formWithErrors, viewModel)))
           },
           value =>
             for {
-              updatedAnswers <- request.userAnswers.transformAndSet(InterestOnLoanPage(srn, index), value).mapK
-              nextPage = navigator.nextPage(InterestOnLoanPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              updatedAnswers <- request.userAnswers.transformAndSet(InterestOnLoanPage(srn, index.refined), value).mapK
+              nextPage = navigator.nextPage(InterestOnLoanPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield (
               isPrePopulation,
-              request.userAnswers.get(SecurityGivenForLoanPage(srn, index)),
-              request.userAnswers.get(OutstandingArrearsOnLoanPage(srn, index))
+              request.userAnswers.get(SecurityGivenForLoanPage(srn, index.refined)),
+              request.userAnswers.get(OutstandingArrearsOnLoanPage(srn, index.refined))
             ) match {
               case (true, Some(_), None) =>
                 Redirect(
@@ -111,7 +112,7 @@ class InterestOnLoanController @Inject()(
                     .onPageLoad(srn, index, mode)
                 )
               case _ =>
-                Redirect(navigator.nextPage(InterestOnLoanPage(srn, index), mode, updatedAnswers))
+                Redirect(navigator.nextPage(InterestOnLoanPage(srn, index.refined), mode, updatedAnswers))
             }
         )
   }
@@ -177,6 +178,6 @@ object InterestOnLoanController {
         ),
         QuestionField.currency(Message("interestOnLoan.intReceivedCY.label"))
       ),
-      routes.InterestOnLoanController.onSubmit(srn, index, mode)
+      routes.InterestOnLoanController.onSubmit(srn, index.value, mode)
     )
 }

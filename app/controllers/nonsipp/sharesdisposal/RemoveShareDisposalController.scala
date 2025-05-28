@@ -18,6 +18,7 @@ package controllers.nonsipp.sharesdisposal
 
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import pages.nonsipp.sharesdisposal._
 import navigation.Navigator
@@ -53,52 +54,53 @@ class RemoveShareDisposalController @Inject()(
 
   private val form = RemoveShareDisposalController.form(formProvider)
 
-  def onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
           _ <- request.userAnswers
-            .get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex))
+            .get(HowWereSharesDisposedPage(srn, shareIndex.refined, disposalIndex.refined))
             .getOrRedirectToTaskList(srn)
           nameOfSharesCompany <- request.userAnswers
-            .get(CompanyNameRelatedSharesPage(srn, shareIndex))
+            .get(CompanyNameRelatedSharesPage(srn, shareIndex.refined))
             .getOrRedirectToTaskList(srn)
         } yield {
-          Ok(view(form, viewModel(srn, shareIndex, disposalIndex, nameOfSharesCompany, mode)))
+          Ok(view(form, viewModel(srn, shareIndex.refined, disposalIndex.refined, nameOfSharesCompany, mode)))
         }
       ).merge
     }
 
-  def onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           errors =>
-            request.userAnswers.get(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex)).getOrRecoverJourney {
-              _ =>
-                request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).getOrRecoverJourney {
+            request.userAnswers
+              .get(HowWereSharesDisposedPage(srn, shareIndex.refined, disposalIndex.refined))
+              .getOrRecoverJourney { _ =>
+                request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex.refined)).getOrRecoverJourney {
                   nameOfSharesCompany =>
                     Future.successful(
                       BadRequest(
                         view(
                           errors,
                           RemoveShareDisposalController
-                            .viewModel(srn, shareIndex, disposalIndex, nameOfSharesCompany, mode)
+                            .viewModel(srn, shareIndex.refined, disposalIndex.refined, nameOfSharesCompany, mode)
                         )
                       )
                     )
                 }
-            },
+              },
           removeDisposal =>
             if (removeDisposal) {
               for {
                 removedUserAnswers <- Future
                   .fromTry(
                     request.userAnswers
-                      .remove(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex))
+                      .remove(HowWereSharesDisposedPage(srn, shareIndex.refined, disposalIndex.refined))
                       .remove(SharesDisposalCompleted(srn))
-                      .remove(SharesDisposalProgress(srn, shareIndex, disposalIndex))
+                      .remove(SharesDisposalProgress(srn, shareIndex.refined, disposalIndex.refined))
                   )
                 _ <- saveService.save(removedUserAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(

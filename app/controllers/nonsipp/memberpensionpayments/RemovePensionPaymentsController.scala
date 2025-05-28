@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.{Money, NormalMode}
@@ -53,13 +54,13 @@ class RemovePensionPaymentsController @Inject()(
 
   private val form = RemovePensionPaymentsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRedirectToTaskList(srn)
+          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRedirectToTaskList(srn)
           totalAmountPensionPayment <- request.userAnswers
-            .get(TotalAmountPensionPaymentsPage(srn, index))
+            .get(TotalAmountPensionPaymentsPage(srn, index.refined))
             .getOrRedirectToTaskList(srn)
         } yield {
           Ok(
@@ -67,7 +68,7 @@ class RemovePensionPaymentsController @Inject()(
               form,
               RemovePensionPaymentsController.viewModel(
                 srn,
-                index: Max300,
+                index.refined,
                 totalAmountPensionPayment,
                 nameDOB.fullName
               )
@@ -77,7 +78,7 @@ class RemovePensionPaymentsController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max300): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -86,13 +87,13 @@ class RemovePensionPaymentsController @Inject()(
             (
               for {
                 total <- request.userAnswers
-                  .get(TotalAmountPensionPaymentsPage(srn, index))
+                  .get(TotalAmountPensionPaymentsPage(srn, index.refined))
                   .getOrRecoverJourneyT
-                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourneyT
+                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourneyT
               } yield BadRequest(
                 view(
                   formWithErrors,
-                  RemovePensionPaymentsController.viewModel(srn, index, total, nameDOB.fullName)
+                  RemovePensionPaymentsController.viewModel(srn, index.refined, total, nameDOB.fullName)
                 )
               )
             ).merge
@@ -103,8 +104,8 @@ class RemovePensionPaymentsController @Inject()(
                 updatedAnswers <- Future
                   .fromTry(
                     request.userAnswers
-                      .remove(TotalAmountPensionPaymentsPage(srn, index))
-                      .set(MemberStatus(srn, index), MemberState.Changed)
+                      .remove(TotalAmountPensionPaymentsPage(srn, index.refined))
+                      .set(MemberStatus(srn, index.refined), MemberState.Changed)
                   )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
@@ -117,7 +118,7 @@ class RemovePensionPaymentsController @Inject()(
                 _ =>
                   Redirect(
                     navigator
-                      .nextPage(RemovePensionPaymentsPage(srn, index), NormalMode, updatedAnswers)
+                      .nextPage(RemovePensionPaymentsPage(srn, index.refined), NormalMode, updatedAnswers)
                   )
               )
             } else {
@@ -125,7 +126,7 @@ class RemovePensionPaymentsController @Inject()(
                 .successful(
                   Redirect(
                     navigator
-                      .nextPage(RemovePensionPaymentsPage(srn, index), NormalMode, request.userAnswers)
+                      .nextPage(RemovePensionPaymentsPage(srn, index.refined), NormalMode, request.userAnswers)
                   )
                 )
             }

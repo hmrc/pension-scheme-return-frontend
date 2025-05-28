@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.DoubleDifferentQuestion
 import config.RefinedTypes.Max5000
+import utils.IntUtils.{toInt, IntOpts}
 import config.Constants.{borrowMaxPercentage, borrowMinPercentage, maxCurrencyValue}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -54,23 +55,23 @@ class BorrowedAmountAndRateController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       {
         val form = BorrowedAmountAndRateController.form()
         val viewModel = BorrowedAmountAndRateController.viewModel(
           srn,
-          index,
+          index.refined,
           mode,
           request.schemeDetails.schemeName,
           form
         )
 
-        Ok(view(request.userAnswers.fillForm(BorrowedAmountAndRatePage(srn, index), form), viewModel))
+        Ok(view(request.userAnswers.fillForm(BorrowedAmountAndRatePage(srn, index.refined), form), viewModel))
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val form = BorrowedAmountAndRateController.form()
 
@@ -80,17 +81,17 @@ class BorrowedAmountAndRateController @Inject()(
           formWithErrors => {
             val viewModel =
               BorrowedAmountAndRateController
-                .viewModel(srn, index, mode, request.schemeDetails.schemeName, form)
+                .viewModel(srn, index.refined, mode, request.schemeDetails.schemeName, form)
 
             Future.successful(BadRequest(view(formWithErrors, viewModel)))
           },
           value =>
             for {
               updatedAnswers <- request.userAnswers
-                .transformAndSet(BorrowedAmountAndRatePage(srn, index), value)
+                .transformAndSet(BorrowedAmountAndRatePage(srn, index.refined), value)
                 .mapK[Future]
-              nextPage = navigator.nextPage(BorrowedAmountAndRatePage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              nextPage = navigator.nextPage(BorrowedAmountAndRatePage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield {
               Redirect(nextPage)

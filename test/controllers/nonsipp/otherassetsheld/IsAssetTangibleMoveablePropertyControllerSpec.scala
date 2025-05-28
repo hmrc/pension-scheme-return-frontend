@@ -29,8 +29,9 @@ import models.SchemeHoldAsset.Transfer
 class IsAssetTangibleMoveablePropertyControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
-  private lazy val onPageLoad = routes.IsAssetTangibleMoveablePropertyController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.IsAssetTangibleMoveablePropertyController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad =
+    routes.IsAssetTangibleMoveablePropertyController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.IsAssetTangibleMoveablePropertyController.onSubmit(srn, index.value, NormalMode)
   private val incomeTaxAct = "https://www.gov.uk/hmrc-internal-manuals/pensions-tax-manual/ptm125100#IDAUURQB"
 
   private val prePopUserAnswersMissing: UserAnswers = defaultUserAnswers
@@ -68,7 +69,7 @@ class IsAssetTangibleMoveablePropertyControllerSpec extends ControllerBaseSpec {
       redirectToPageWithPrePopSession(
         call = onSubmit,
         page = controllers.nonsipp.otherassetsheld.routes.IncomeFromAssetController
-          .onPageLoad(srn, index1of5000, NormalMode),
+          .onPageLoad(srn, index1of5000.value, NormalMode),
         userAnswers = prePopUserAnswersMissing,
         previousUserAnswers = defaultUserAnswers,
         mockSaveService = None,
@@ -80,7 +81,7 @@ class IsAssetTangibleMoveablePropertyControllerSpec extends ControllerBaseSpec {
       redirectToPageWithPrePopSession(
         call = onSubmit,
         page = controllers.nonsipp.otherassetsheld.routes.WhyDoesSchemeHoldAssetsController
-          .onPageLoad(srn, index1of5000, NormalMode),
+          .onPageLoad(srn, index1of5000.value, NormalMode),
         userAnswers = prePopUserAnswersCompleted,
         previousUserAnswers = defaultUserAnswers,
         mockSaveService = None,
@@ -92,7 +93,7 @@ class IsAssetTangibleMoveablePropertyControllerSpec extends ControllerBaseSpec {
       redirectToPageWithPrePopSession(
         call = onSubmit,
         page = controllers.nonsipp.otherassetsheld.routes.WhyDoesSchemeHoldAssetsController
-          .onPageLoad(srn, index1of5000, NormalMode),
+          .onPageLoad(srn, index1of5000.value, NormalMode),
         userAnswers = defaultUserAnswers,
         previousUserAnswers = defaultUserAnswers,
         mockSaveService = None,

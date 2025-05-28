@@ -19,6 +19,7 @@ package controllers.nonsipp.shares
 import services.{SaveService, SchemeDateService}
 import viewmodels.implicits._
 import config.Constants
+import utils.IntUtils.{toInt, IntOpts}
 import cats.implicits.toShow
 import controllers.actions._
 import navigation.Navigator
@@ -62,22 +63,24 @@ class WhenDidSchemeAcquireSharesController @Inject()(
     (date: LocalDate, request: DataRequest[AnyContent]) =>
       WhenDidSchemeAcquireSharesController.form(formProvider)(date, request.messages(messagesApi))
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(TypeOfSharesHeldPage(srn, index)).getOrRecoverJourney { typeOfShares =>
+        request.userAnswers.get(TypeOfSharesHeldPage(srn, index.refined)).getOrRecoverJourney { typeOfShares =>
           val preparedForm = {
-            request.userAnswers.fillForm(WhenDidSchemeAcquireSharesPage(srn, index), form(date.to, request))
+            request.userAnswers.fillForm(WhenDidSchemeAcquireSharesPage(srn, index.refined), form(date.to, request))
           }
-          Ok(view(preparedForm, viewModel(srn, index, mode, request.schemeDetails.schemeName, typeOfShares.name)))
+          Ok(
+            view(preparedForm, viewModel(srn, index.refined, mode, request.schemeDetails.schemeName, typeOfShares.name))
+          )
         }
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(TypeOfSharesHeldPage(srn, index)).getOrRecoverJourney { typeOfShares =>
+        request.userAnswers.get(TypeOfSharesHeldPage(srn, index.refined)).getOrRecoverJourney { typeOfShares =>
           form(date.to, request)
             .bindFromRequest()
             .fold(
@@ -86,16 +89,17 @@ class WhenDidSchemeAcquireSharesController @Inject()(
                   BadRequest(
                     view(
                       formWithErrors,
-                      viewModel(srn, index, mode, request.schemeDetails.schemeName, typeOfShares.name)
+                      viewModel(srn, index.refined, mode, request.schemeDetails.schemeName, typeOfShares.name)
                     )
                   )
                 ),
               value =>
                 for {
                   updatedAnswers <- Future
-                    .fromTry(request.userAnswers.set(WhenDidSchemeAcquireSharesPage(srn, index), value))
-                  nextPage = navigator.nextPage(WhenDidSchemeAcquireSharesPage(srn, index), mode, updatedAnswers)
-                  updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                    .fromTry(request.userAnswers.set(WhenDidSchemeAcquireSharesPage(srn, index.refined), value))
+                  nextPage = navigator
+                    .nextPage(WhenDidSchemeAcquireSharesPage(srn, index.refined), mode, updatedAnswers)
+                  updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
                   _ <- saveService.save(updatedProgressAnswers)
                 } yield Redirect(nextPage)
             )

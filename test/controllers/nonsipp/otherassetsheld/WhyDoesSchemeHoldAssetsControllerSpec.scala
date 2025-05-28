@@ -33,11 +33,11 @@ class WhyDoesSchemeHoldAssetsControllerSpec extends ControllerBaseSpec {
   private val schemeHoldAssets = schemeHoldAssetsGen.sample.value
 
   private lazy val onPageLoad =
-    routes.WhyDoesSchemeHoldAssetsController.onPageLoad(srn, index, NormalMode)
+    routes.WhyDoesSchemeHoldAssetsController.onPageLoad(srn, index.value, NormalMode)
   private lazy val onSubmit =
-    routes.WhyDoesSchemeHoldAssetsController.onSubmit(srn, index, NormalMode)
+    routes.WhyDoesSchemeHoldAssetsController.onSubmit(srn, index.value, NormalMode)
   private lazy val onSubmitCheckMode =
-    routes.WhyDoesSchemeHoldAssetsController.onSubmit(srn, index, CheckMode)
+    routes.WhyDoesSchemeHoldAssetsController.onSubmit(srn, index.value, CheckMode)
 
   "WhyDoesSchemeHoldAssetsController" - {
 
@@ -86,7 +86,7 @@ class WhyDoesSchemeHoldAssetsControllerSpec extends ControllerBaseSpec {
           redirectToPage(
             onSubmitCheckMode,
             controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
-              .onPageLoad(srn, index, CheckMode),
+              .onPageLoad(srn, index.value, CheckMode),
             defaultUserAnswers
               .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index), Contribution),
             "value" -> Acquisition.name
@@ -98,7 +98,7 @@ class WhyDoesSchemeHoldAssetsControllerSpec extends ControllerBaseSpec {
           redirectToPage(
             onSubmitCheckMode,
             controllers.nonsipp.common.routes.IdentityTypeController
-              .onPageLoad(srn, index, CheckMode, OtherAssetSeller),
+              .onPageLoad(srn, index.value, CheckMode, OtherAssetSeller),
             defaultUserAnswers
               .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index), Contribution)
               .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, index), localDate),

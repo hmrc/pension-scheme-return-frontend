@@ -22,6 +22,7 @@ import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld._
 import config.FrontendAppConfig
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -55,35 +56,35 @@ class OtherAssetSellerConnectedPartyController @Inject()(
 
   private val form = OtherAssetSellerConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      recipientName(srn, index)
+      recipientName(srn, index.refined)
         .map { recipientName =>
           Ok(
             view(
-              form.fromUserAnswers(OtherAssetSellerConnectedPartyPage(srn, index)),
+              form.fromUserAnswers(OtherAssetSellerConnectedPartyPage(srn, index.refined)),
               OtherAssetSellerConnectedPartyController
-                .viewModel(srn, index, recipientName, config.urls.incomeTaxAct, mode)
+                .viewModel(srn, index.refined, recipientName, config.urls.incomeTaxAct, mode)
             )
           )
         }
         .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            recipientName(srn, index)
+            recipientName(srn, index.refined)
               .map { recipientName =>
                 Future.successful(
                   BadRequest(
                     view(
                       formWithErrors,
                       OtherAssetSellerConnectedPartyController
-                        .viewModel(srn, index, recipientName, config.urls.incomeTaxAct, mode)
+                        .viewModel(srn, index.refined, recipientName, config.urls.incomeTaxAct, mode)
                     )
                   )
                 )
@@ -92,9 +93,10 @@ class OtherAssetSellerConnectedPartyController @Inject()(
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(OtherAssetSellerConnectedPartyPage(srn, index), value))
-              nextPage = navigator.nextPage(OtherAssetSellerConnectedPartyPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                .fromTry(request.userAnswers.set(OtherAssetSellerConnectedPartyPage(srn, index.refined), value))
+              nextPage = navigator
+                .nextPage(OtherAssetSellerConnectedPartyPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

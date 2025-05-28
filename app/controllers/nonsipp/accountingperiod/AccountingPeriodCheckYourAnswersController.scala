@@ -19,6 +19,7 @@ package controllers.nonsipp.accountingperiod
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
 import config.RefinedTypes.Max3
+import utils.IntUtils.IntOpts
 import cats.implicits.toShow
 import controllers.actions._
 import pages.nonsipp.accountingperiod.{AccountingPeriodCheckYourAnswersPage, AccountingPeriodPage}
@@ -46,13 +47,13 @@ class AccountingPeriodCheckYourAnswersController @Inject()(
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      request.userAnswers.get(AccountingPeriodPage(srn, index, mode)) match {
+      request.userAnswers.get(AccountingPeriodPage(srn, index.refined, mode)) match {
         case None =>
           Redirect(routes.AccountingPeriodController.onPageLoad(srn, index, mode))
         case Some(accountingPeriod) =>
-          Ok(view(viewModel(srn, index, accountingPeriod, mode)))
+          Ok(view(viewModel(srn, index.refined, accountingPeriod, mode)))
       }
     }
 
@@ -67,13 +68,17 @@ object AccountingPeriodCheckYourAnswersController {
   private def rows(srn: Srn, index: Max3, dateRange: DateRange, mode: Mode): List[CheckYourAnswersRowViewModel] = List(
     CheckYourAnswersRowViewModel("site.startDate", dateRange.from.show)
       .withAction(
-        SummaryAction("site.change", routes.AccountingPeriodController.onPageLoad(srn, index, mode).url + "#startDate")
-          .withVisuallyHiddenContent("site.startDate")
+        SummaryAction(
+          "site.change",
+          routes.AccountingPeriodController.onPageLoad(srn, index.value, mode).url + "#startDate"
+        ).withVisuallyHiddenContent("site.startDate")
       ),
     CheckYourAnswersRowViewModel("site.endDate", dateRange.to.show)
       .withAction(
-        SummaryAction("site.change", routes.AccountingPeriodController.onPageLoad(srn, index, mode).url + "#endDate")
-          .withVisuallyHiddenContent("site.endDate")
+        SummaryAction(
+          "site.change",
+          routes.AccountingPeriodController.onPageLoad(srn, index.value, mode).url + "#endDate"
+        ).withVisuallyHiddenContent("site.endDate")
       )
   )
 

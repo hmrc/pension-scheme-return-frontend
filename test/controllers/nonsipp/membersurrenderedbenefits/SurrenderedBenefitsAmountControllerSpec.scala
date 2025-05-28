@@ -29,8 +29,8 @@ import controllers.ControllerBaseSpec
 class SurrenderedBenefitsAmountControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
-  private lazy val onPageLoad = routes.SurrenderedBenefitsAmountController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.SurrenderedBenefitsAmountController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.SurrenderedBenefitsAmountController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.SurrenderedBenefitsAmountController.onSubmit(srn, index.value, NormalMode)
 
   private val userAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, index), memberDetails)
 

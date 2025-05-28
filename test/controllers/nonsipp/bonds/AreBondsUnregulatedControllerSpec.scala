@@ -28,8 +28,8 @@ import controllers.ControllerBaseSpec
 class AreBondsUnregulatedControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
-  private lazy val onPageLoad = routes.AreBondsUnregulatedController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.AreBondsUnregulatedController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.AreBondsUnregulatedController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.AreBondsUnregulatedController.onSubmit(srn, index.value, NormalMode)
 
   "AreBondsUnregulatedController" - {
 

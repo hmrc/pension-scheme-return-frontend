@@ -20,7 +20,6 @@ import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.nonsipp.landorpropertydisposal.OtherBuyerDetailsController._
 import pages.nonsipp.landorpropertydisposal.OtherBuyerDetailsPage
 import controllers.actions.IdentifyAndRequireData
@@ -33,6 +32,8 @@ import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
 import views.html.RecipientDetailsView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, RecipientDetailsViewModel}
 
@@ -54,43 +55,56 @@ class OtherBuyerDetailsController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    landOrPropertyIndex: Max5000,
-    disposalIndex: Max50,
+    landOrPropertyIndex: Int,
+    disposalIndex: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val address: String =
-        request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).get.addressLine1
+        request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex.refined)).get.addressLine1
       val form = OtherBuyerDetailsController.form(formProvider)
       Ok(
         view(
-          form.fromUserAnswers(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex)),
-          viewModel(srn, landOrPropertyIndex, disposalIndex, mode, address)
+          form.fromUserAnswers(OtherBuyerDetailsPage(srn, landOrPropertyIndex.refined, disposalIndex.refined)),
+          viewModel(srn, landOrPropertyIndex.refined, disposalIndex.refined, mode, address)
         )
       )
     }
 
-  def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val address: String =
-        request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).get.addressLine1
+        request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex.refined)).get.addressLine1
       val form = OtherBuyerDetailsController.form(formProvider)
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future.successful(
-              BadRequest(view(formWithErrors, viewModel(srn, landOrPropertyIndex, disposalIndex, mode, address)))
+              BadRequest(
+                view(formWithErrors, viewModel(srn, landOrPropertyIndex.refined, disposalIndex.refined, mode, address))
+              )
             ),
           answer => {
             for {
               updatedAnswers <- Future
                 .fromTry(
-                  request.userAnswers.set(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex), answer)
+                  request.userAnswers
+                    .set(OtherBuyerDetailsPage(srn, landOrPropertyIndex.refined, disposalIndex.refined), answer)
                 )
               nextPage = navigator
-                .nextPage(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, landOrPropertyIndex, disposalIndex, updatedAnswers, nextPage)
+                .nextPage(
+                  OtherBuyerDetailsPage(srn, landOrPropertyIndex.refined, disposalIndex.refined),
+                  mode,
+                  updatedAnswers
+                )
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                landOrPropertyIndex.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

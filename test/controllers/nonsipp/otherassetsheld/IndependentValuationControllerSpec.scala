@@ -28,8 +28,8 @@ import views.html.YesNoPageView
 class IndependentValuationControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
-  private lazy val onPageLoad = routes.IndependentValuationController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.IndependentValuationController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.IndependentValuationController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.IndependentValuationController.onSubmit(srn, index.value, NormalMode)
 
   "IndependentValuationController" - {
 

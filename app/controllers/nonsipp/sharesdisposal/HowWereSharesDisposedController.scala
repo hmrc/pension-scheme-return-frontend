@@ -18,6 +18,7 @@ package controllers.nonsipp.sharesdisposal
 
 import services.SaveService
 import viewmodels.implicits._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, SharesDisposalCYAPointOfEntry}
 import forms.RadioListFormProvider
@@ -58,57 +59,68 @@ class HowWereSharesDisposedController @Inject()(
 
   private val form = HowWereSharesDisposedController.form(formProvider)
 
-  def onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       // If this page is reached in CheckMode and there is no PointOfEntry set
       if (mode == CheckMode && request.userAnswers
-          .get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex))
+          .get(SharesDisposalCYAPointOfEntry(srn, shareIndex.refined, disposalIndex.refined))
           .contains(NoPointOfEntry)) {
         // Set this page as the PointOfEntry
         saveService.save(
           request.userAnswers
-            .set(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex), HowWereSharesDisposedPointOfEntry)
+            .set(
+              SharesDisposalCYAPointOfEntry(srn, shareIndex.refined, disposalIndex.refined),
+              HowWereSharesDisposedPointOfEntry
+            )
             .getOrElse(request.userAnswers)
         )
       }
 
-      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).getOrRecoverJourney { companyName =>
-        val preparedForm =
-          request.userAnswers.fillForm(
-            HowWereSharesDisposedPage(srn, shareIndex, disposalIndex),
-            form
-          )
+      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex.refined)).getOrRecoverJourney {
+        companyName =>
+          val preparedForm =
+            request.userAnswers.fillForm(
+              HowWereSharesDisposedPage(srn, shareIndex.refined, disposalIndex.refined),
+              form
+            )
 
-        Ok(view(preparedForm, viewModel(srn, shareIndex, disposalIndex, companyName, mode)))
+          Ok(view(preparedForm, viewModel(srn, shareIndex.refined, disposalIndex.refined, companyName, mode)))
       }
     }
 
-  def onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).getOrRecoverJourney { companyName =>
-              Future.successful(
-                BadRequest(
-                  view(formWithErrors, viewModel(srn, shareIndex, disposalIndex, companyName, mode))
+            request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex.refined)).getOrRecoverJourney {
+              companyName =>
+                Future.successful(
+                  BadRequest(
+                    view(formWithErrors, viewModel(srn, shareIndex.refined, disposalIndex.refined, companyName, mode))
+                  )
                 )
-              )
             },
           value => {
-            val page = HowWereSharesDisposedPage(srn, shareIndex, disposalIndex)
+            val page = HowWereSharesDisposedPage(srn, shareIndex.refined, disposalIndex.refined)
             for {
               updatedAnswers <- request.userAnswers
                 .set(page, value)
                 .mapK[Future]
               hasAnswerChanged = request.userAnswers.exists(page)(_ == value)
               nextPage = navigator.nextPage(
-                HowWereSharesDisposedPage(srn, shareIndex, disposalIndex, hasAnswerChanged),
+                HowWereSharesDisposedPage(srn, shareIndex.refined, disposalIndex.refined, hasAnswerChanged),
                 mode,
                 updatedAnswers
               )
-              updatedProgressAnswers <- saveProgress(srn, shareIndex, disposalIndex, updatedAnswers, nextPage)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                shareIndex.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

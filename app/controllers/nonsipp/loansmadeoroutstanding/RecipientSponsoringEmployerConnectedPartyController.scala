@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.Max5000
+import utils.IntUtils.IntOpts
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -55,33 +56,34 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
 
   val form: Form[SponsoringOrConnectedParty] = RecipientSponsoringEmployerConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      recipientName(srn, index)
+      recipientName(srn, index.refined)
         .map { recipientName =>
           Ok(
             view(
-              form.fromUserAnswers(RecipientSponsoringEmployerConnectedPartyPage(srn, index)),
-              RecipientSponsoringEmployerConnectedPartyController.viewModel(srn, index, recipientName, mode)
+              form.fromUserAnswers(RecipientSponsoringEmployerConnectedPartyPage(srn, index.refined)),
+              RecipientSponsoringEmployerConnectedPartyController.viewModel(srn, index.refined, recipientName, mode)
             )
           )
         }
         .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           errors =>
-            recipientName(srn, index)
+            recipientName(srn, index.refined)
               .map { recipientName =>
                 Future.successful(
                   BadRequest(
                     view(
                       errors,
-                      RecipientSponsoringEmployerConnectedPartyController.viewModel(srn, index, recipientName, mode)
+                      RecipientSponsoringEmployerConnectedPartyController
+                        .viewModel(srn, index.refined, recipientName, mode)
                     )
                   )
                 )
@@ -90,14 +92,16 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
           success =>
             for {
               userAnswers <- request.userAnswers
-                .set(RecipientSponsoringEmployerConnectedPartyPage(srn, index), success)
+                .set(RecipientSponsoringEmployerConnectedPartyPage(srn, index.refined), success)
                 .mapK
               nextPage = navigator
-                .nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn, index), mode, userAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, userAnswers, nextPage)
+                .nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn, index.refined), mode, userAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, userAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield {
-              Redirect(navigator.nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn, index), mode, userAnswers))
+              Redirect(
+                navigator.nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn, index.refined), mode, userAnswers)
+              )
             }
         )
   }
@@ -136,6 +140,6 @@ object RecipientSponsoringEmployerConnectedPartyController {
           SponsoringOrConnectedParty.Neither.name
         )
       ),
-      routes.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn, index, mode)
+      routes.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn, index.value, mode)
     )
 }

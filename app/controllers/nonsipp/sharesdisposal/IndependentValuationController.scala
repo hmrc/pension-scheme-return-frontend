@@ -18,6 +18,7 @@ package controllers.nonsipp.sharesdisposal
 
 import services.SaveService
 import viewmodels.implicits._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import pages.nonsipp.sharesdisposal.IndependentValuationPage
 import navigation.Navigator
@@ -52,32 +53,48 @@ class IndependentValuationController @Inject()(
 
   private val form = IndependentValuationController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
-        request.userAnswers.get(IndependentValuationPage(srn, index, disposalIndex)).fold(form)(form.fill)
-      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { companyName =>
-        Ok(view(preparedForm, viewModel(srn, companyName, index, disposalIndex, mode)))
+        request.userAnswers
+          .get(IndependentValuationPage(srn, index.refined, disposalIndex.refined))
+          .fold(form)(form.fill)
+      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index.refined)).getOrRecoverJourney { companyName =>
+        Ok(view(preparedForm, viewModel(srn, companyName, index.refined, disposalIndex.refined, mode)))
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { companyName =>
-              Future
-                .successful(BadRequest(view(formWithErrors, viewModel(srn, companyName, index, disposalIndex, mode))))
+            request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index.refined)).getOrRecoverJourney {
+              companyName =>
+                Future
+                  .successful(
+                    BadRequest(
+                      view(formWithErrors, viewModel(srn, companyName, index.refined, disposalIndex.refined, mode))
+                    )
+                  )
             }
           },
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(IndependentValuationPage(srn, index, disposalIndex), value))
-              nextPage = navigator.nextPage(IndependentValuationPage(srn, index, disposalIndex), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
+                .fromTry(
+                  request.userAnswers.set(IndependentValuationPage(srn, index.refined, disposalIndex.refined), value)
+                )
+              nextPage = navigator
+                .nextPage(IndependentValuationPage(srn, index.refined, disposalIndex.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                index.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

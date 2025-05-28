@@ -31,10 +31,10 @@ class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad =
     controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
-      .onPageLoad(srn, index, disposalIndex, NormalMode)
+      .onPageLoad(srn, index.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
     controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
-      .onSubmit(srn, index, disposalIndex, NormalMode)
+      .onSubmit(srn, index.value, disposalIndex.value, NormalMode)
 
   private val validForm = List(
     "name" -> "name",

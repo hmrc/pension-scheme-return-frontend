@@ -31,8 +31,8 @@ class OtherAssetsCheckAndUpdateControllerSpec extends ControllerBaseSpec {
 
   private val index: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
 
-  private def onPageLoad: Call = routes.OtherAssetsCheckAndUpdateController.onPageLoad(srn, index)
-  private def onSubmit: Call = routes.OtherAssetsCheckAndUpdateController.onSubmit(srn, index)
+  private def onPageLoad: Call = routes.OtherAssetsCheckAndUpdateController.onPageLoad(srn, index.value)
+  private def onSubmit: Call = routes.OtherAssetsCheckAndUpdateController.onSubmit(srn, index.value)
 
   private val completedUserAnswers = defaultUserAnswers
     .unsafeSet(WhatIsOtherAssetPage(srn, index), otherAssetDescription)
@@ -56,7 +56,10 @@ class OtherAssetsCheckAndUpdateControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectToPage(onSubmit, routes.IsAssetTangibleMoveablePropertyController.onPageLoad(srn, index, NormalMode))
+      redirectToPage(
+        onSubmit,
+        routes.IsAssetTangibleMoveablePropertyController.onPageLoad(srn, index.value, NormalMode)
+      )
     )
 
     act.like(

@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsdisposal
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.otherassetsdisposal._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController.OtherAssetsDisposalData
 import navigation.Navigator
@@ -55,39 +56,39 @@ class RemoveAssetDisposalController @Inject()(
 
   private val form = RemoveAssetDisposalController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
           otherAsset <- request.userAnswers
-            .get(WhatIsOtherAssetPage(srn, assetIndex))
+            .get(WhatIsOtherAssetPage(srn, assetIndex.refined))
             .getOrRedirectToTaskList(srn)
           methodOfDisposal <- request.userAnswers
-            .get(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex))
+            .get(HowWasAssetDisposedOfPage(srn, assetIndex.refined, disposalIndex.refined))
             .getOrRedirectToTaskList(srn)
         } yield {
-          Ok(view(form, viewModel(srn, assetIndex, disposalIndex, otherAsset, methodOfDisposal)))
+          Ok(view(form, viewModel(srn, assetIndex.refined, disposalIndex.refined, otherAsset, methodOfDisposal)))
         }
       ).merge
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           errors =>
             request.userAnswers
-              .get(WhatIsOtherAssetPage(srn, assetIndex))
+              .get(WhatIsOtherAssetPage(srn, assetIndex.refined))
               .getOrRecoverJourney { otherAsset =>
                 request.userAnswers
-                  .get(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex))
+                  .get(HowWasAssetDisposedOfPage(srn, assetIndex.refined, disposalIndex.refined))
                   .getOrRecoverJourney { methodOfDisposal =>
                     Future.successful(
                       BadRequest(
                         view(
                           errors,
-                          viewModel(srn, assetIndex, disposalIndex, otherAsset, methodOfDisposal)
+                          viewModel(srn, assetIndex.refined, disposalIndex.refined, otherAsset, methodOfDisposal)
                         )
                       )
                     )
@@ -99,9 +100,9 @@ class RemoveAssetDisposalController @Inject()(
                 removedUserAnswers <- Future
                   .fromTry(
                     request.userAnswers
-                      .remove(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex))
+                      .remove(HowWasAssetDisposedOfPage(srn, assetIndex.refined, disposalIndex.refined))
                       .remove(OtherAssetsDisposalCompleted(srn))
-                      .remove(OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex))
+                      .remove(OtherAssetsDisposalProgress(srn, assetIndex.refined, disposalIndex.refined))
                   )
                 _ <- saveService.save(removedUserAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(

@@ -32,11 +32,11 @@ class AssetCompanyBuyerCrnControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad =
     routes.AssetCompanyBuyerCrnController
-      .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+      .onPageLoad(srn, assetIndex.value, disposalIndex.value, NormalMode)
 
   private lazy val onSubmit =
     routes.AssetCompanyBuyerCrnController
-      .onSubmit(srn, assetIndex, disposalIndex, NormalMode)
+      .onSubmit(srn, assetIndex.value, disposalIndex.value, NormalMode)
 
   val userAnswersCompanyName: UserAnswers =
     defaultUserAnswers

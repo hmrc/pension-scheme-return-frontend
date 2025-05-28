@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.otherassetsdisposal._
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.otherassetsdisposal.IsBuyerConnectedPartyController._
 import navigation.Navigator
@@ -52,12 +53,15 @@ class IsBuyerConnectedPartyController @Inject()(
 
   private val form = IsBuyerConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
-        request.userAnswers.fillForm(IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex), form)
-      getBuyerName(srn, assetIndex, disposalIndex)
-        .map(buyerName => Ok(view(preparedForm, viewModel(srn, assetIndex, disposalIndex, buyerName, mode))))
+        request.userAnswers.fillForm(IsBuyerConnectedPartyPage(srn, assetIndex.refined, disposalIndex.refined), form)
+      getBuyerName(srn, assetIndex.refined, disposalIndex.refined)
+        .map(
+          buyerName =>
+            Ok(view(preparedForm, viewModel(srn, assetIndex.refined, disposalIndex.refined, buyerName, mode)))
+        )
         .merge
     }
 
@@ -89,29 +93,32 @@ class IsBuyerConnectedPartyController @Inject()(
       }
     } yield buyerName
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future.successful(
-              getBuyerName(srn, assetIndex, disposalIndex)
+              getBuyerName(srn, assetIndex.refined, disposalIndex.refined)
                 .map(
                   buyerName =>
-                    BadRequest(view(formWithErrors, viewModel(srn, assetIndex, disposalIndex, buyerName, mode)))
+                    BadRequest(
+                      view(formWithErrors, viewModel(srn, assetIndex.refined, disposalIndex.refined, buyerName, mode))
+                    )
                 )
                 .merge
             ),
           value =>
             for {
               updatedAnswers <- Future.fromTry(
-                request.userAnswers.set(IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex), value)
+                request.userAnswers
+                  .set(IsBuyerConnectedPartyPage(srn, assetIndex.refined, disposalIndex.refined), value)
               )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
               navigator.nextPage(
-                IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex),
+                IsBuyerConnectedPartyPage(srn, assetIndex.refined, disposalIndex.refined),
                 mode,
                 updatedAnswers
               )

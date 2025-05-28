@@ -32,8 +32,10 @@ import java.time.format.DateTimeFormatter
 class ValueOfSchemeAssetsWhenMoneyBorrowedControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
-  private lazy val onPageLoad = routes.ValueOfSchemeAssetsWhenMoneyBorrowedController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.ValueOfSchemeAssetsWhenMoneyBorrowedController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad =
+    routes.ValueOfSchemeAssetsWhenMoneyBorrowedController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit =
+    routes.ValueOfSchemeAssetsWhenMoneyBorrowedController.onSubmit(srn, index.value, NormalMode)
 
   "ValueOfSchemeAssetsWhenMoneyBorrowedController" - {
 

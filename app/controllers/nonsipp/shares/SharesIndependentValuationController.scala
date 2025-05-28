@@ -18,6 +18,7 @@ package controllers.nonsipp.shares
 
 import services.SaveService
 import viewmodels.implicits._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import controllers.nonsipp.shares.SharesIndependentValuationController._
 import navigation.Navigator
@@ -51,30 +52,32 @@ class SharesIndependentValuationController @Inject()(
 
   private val form = SharesIndependentValuationController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val preparedForm = request.userAnswers.get(SharesIndependentValuationPage(srn, index)).fold(form)(form.fill)
-      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { companyName =>
-        Ok(view(preparedForm, viewModel(srn, companyName, index, mode)))
+      val preparedForm =
+        request.userAnswers.get(SharesIndependentValuationPage(srn, index.refined)).fold(form)(form.fill)
+      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index.refined)).getOrRecoverJourney { companyName =>
+        Ok(view(preparedForm, viewModel(srn, companyName, index.refined, mode)))
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { companyName =>
-              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, companyName, index, mode))))
+            request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index.refined)).getOrRecoverJourney {
+              companyName =>
+                Future.successful(BadRequest(view(formWithErrors, viewModel(srn, companyName, index.refined, mode))))
             }
           },
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(SharesIndependentValuationPage(srn, index), value))
-              nextPage = navigator.nextPage(SharesIndependentValuationPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                .fromTry(request.userAnswers.set(SharesIndependentValuationPage(srn, index.refined), value))
+              nextPage = navigator.nextPage(SharesIndependentValuationPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

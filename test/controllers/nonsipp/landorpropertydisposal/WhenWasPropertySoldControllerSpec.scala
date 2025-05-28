@@ -45,8 +45,10 @@ class WhenWasPropertySoldControllerSpec extends ControllerBaseSpec {
   override def beforeEach(): Unit =
     reset(mockSchemeDateService)
 
-  private lazy val onPageLoad = routes.WhenWasPropertySoldController.onPageLoad(srn, index, disposalIndex, NormalMode)
-  private lazy val onSubmit = routes.WhenWasPropertySoldController.onSubmit(srn, index, disposalIndex, NormalMode)
+  private lazy val onPageLoad =
+    routes.WhenWasPropertySoldController.onPageLoad(srn, index.value, disposalIndex.value, NormalMode)
+  private lazy val onSubmit =
+    routes.WhenWasPropertySoldController.onSubmit(srn, index.value, disposalIndex.value, NormalMode)
 
   private val userAnswers = userAnswersWithAddress(srn, index)
 

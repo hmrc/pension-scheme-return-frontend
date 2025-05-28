@@ -19,6 +19,7 @@ package controllers.testonly
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.{Max300, Max50}
 import models.SchemeId.Srn
+import utils.IntUtils.IntOpts
 import cats.implicits._
 import play.api.libs.json.Json
 import models._
@@ -44,34 +45,35 @@ class EmployerContributionsMongoController @Inject()(
 
   private val max: Max50 = refineMV(50)
 
-  def addEmployerContributions(srn: Srn, index: Max300, num: Max50): Action[AnyContent] =
+  def addEmployerContributions(srn: Srn, index: Int, num: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
         removedUserAnswers <- Future.fromTry(removeAllEmployerContributions(srn, index, request.userAnswers))
         updatedUserAnswers <- Future.fromTry(
-          updateUserAnswersWithEmployerContributions(num.value, srn, index, removedUserAnswers)
+          updateUserAnswersWithEmployerContributions(num, srn, index.refined, removedUserAnswers)
         )
         _ <- saveService.save(updatedUserAnswers)
       } yield Ok(
-        s"Added ${num.value} land or property disposals to UserAnswers for land or property index ${index.value}\n${Json
-          .prettyPrint(updatedUserAnswers.data.decryptedValue)}"
+        s"Added $num land or property disposals to UserAnswers for land or property index $index\n" + {
+          Json.prettyPrint(updatedUserAnswers.data.decryptedValue)
+        }
       )
     }
 
   private def buildIndexes(num: Int): Try[List[Max50]] =
     (1 to num).map(i => refineV[Max50.Refined](i).leftMap(new Exception(_)).toTry).toList.sequence
 
-  private def removeAllEmployerContributions(srn: Srn, index: Max300, userAnswers: UserAnswers): Try[UserAnswers] =
+  private def removeAllEmployerContributions(srn: Srn, index: Int, userAnswers: UserAnswers): Try[UserAnswers] =
     for {
       indexes <- buildIndexes(max.value)
       updatedUserAnswers <- indexes.foldLeft(Try(userAnswers)) {
         case (ua, disposalIndex) =>
-          ua.flatMap(_.remove(EmployerNamePage(srn, index, disposalIndex)))
-            .flatMap(_.remove(EmployerTypeOfBusinessPage(srn, index, disposalIndex)))
-            .flatMap(_.remove(TotalEmployerContributionPage(srn, index, disposalIndex)))
-            .flatMap(_.remove(EmployerCompanyCrnPage(srn, index, disposalIndex)))
-            .flatMap(_.remove(PartnershipEmployerUtrPage(srn, index, disposalIndex)))
-            .flatMap(_.remove(OtherEmployeeDescriptionPage(srn, index, disposalIndex)))
+          ua.flatMap(_.remove(EmployerNamePage(srn, index.refined, disposalIndex)))
+            .flatMap(_.remove(EmployerTypeOfBusinessPage(srn, index.refined, disposalIndex)))
+            .flatMap(_.remove(TotalEmployerContributionPage(srn, index.refined, disposalIndex)))
+            .flatMap(_.remove(EmployerCompanyCrnPage(srn, index.refined, disposalIndex)))
+            .flatMap(_.remove(PartnershipEmployerUtrPage(srn, index.refined, disposalIndex)))
+            .flatMap(_.remove(OtherEmployeeDescriptionPage(srn, index.refined, disposalIndex)))
       }
     } yield updatedUserAnswers
 

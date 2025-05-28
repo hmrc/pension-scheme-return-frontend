@@ -45,12 +45,12 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec {
   )
 
   private def onPageLoad(mode: Mode) =
-    routes.EmployerContributionsCYAController.onPageLoad(srn, index, page, mode)
-  private def onSubmit(mode: Mode) = routes.EmployerContributionsCYAController.onSubmit(srn, index, page, mode)
+    routes.EmployerContributionsCYAController.onPageLoad(srn, index.value, page, mode)
+  private def onSubmit(mode: Mode) = routes.EmployerContributionsCYAController.onSubmit(srn, index.value, page, mode)
 
   private lazy val onPageLoadViewOnly = routes.EmployerContributionsCYAController.onPageLoadViewOnly(
     srn,
-    index,
+    index.value,
     page,
     yearString,
     submissionNumberTwo,

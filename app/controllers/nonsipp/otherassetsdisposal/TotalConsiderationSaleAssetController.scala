@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import utils.IntUtils.{toInt, IntOpts}
 import config.Constants.{maxTotalConsiderationAmount, minTotalConsiderationAmount}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -53,15 +54,16 @@ class TotalConsiderationSaleAssetController @Inject()(
 
   private val form = TotalConsiderationSaleAssetController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
-        request.userAnswers.fillForm(TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex), form)
+        request.userAnswers
+          .fillForm(TotalConsiderationSaleAssetPage(srn, assetIndex.refined, disposalIndex.refined), form)
 
-      Ok(view(preparedForm, viewModel(srn, assetIndex, disposalIndex, form, mode)))
+      Ok(view(preparedForm, viewModel(srn, assetIndex.refined, disposalIndex.refined, form, mode)))
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -71,7 +73,7 @@ class TotalConsiderationSaleAssetController @Inject()(
               BadRequest(
                 view(
                   formWithErrors,
-                  viewModel(srn, assetIndex, disposalIndex, form, mode)
+                  viewModel(srn, assetIndex.refined, disposalIndex.refined, form, mode)
                 )
               )
             )
@@ -80,12 +82,17 @@ class TotalConsiderationSaleAssetController @Inject()(
             for {
               updatedAnswers <- Future
                 .fromTry(
-                  request.userAnswers.set(TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex), value)
+                  request.userAnswers
+                    .set(TotalConsiderationSaleAssetPage(srn, assetIndex.refined, disposalIndex.refined), value)
                 )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
               navigator
-                .nextPage(TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex), mode, updatedAnswers)
+                .nextPage(
+                  TotalConsiderationSaleAssetPage(srn, assetIndex.refined, disposalIndex.refined),
+                  mode,
+                  updatedAnswers
+                )
             )
         )
     }

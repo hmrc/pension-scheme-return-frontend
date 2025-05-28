@@ -22,6 +22,7 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import config.RefinedTypes.{Max50, Max5000}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -52,48 +53,58 @@ class AssetCompanyBuyerCrnController @Inject()(
     with I18nSupport {
   val form: Form[Either[String, Crn]] = AssetCompanyBuyerCrnController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.usingAnswer(CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex)).sync { companyName =>
-        val preparedForm =
-          request.userAnswers.fillForm(AssetCompanyBuyerCrnPage(srn, assetIndex, disposalIndex), form)
-        Ok(
-          view(
-            preparedForm,
-            AssetCompanyBuyerCrnController.viewModel(srn, assetIndex, disposalIndex, mode, companyName)
+      request.usingAnswer(CompanyNameOfAssetBuyerPage(srn, assetIndex.refined, disposalIndex.refined)).sync {
+        companyName =>
+          val preparedForm =
+            request.userAnswers.fillForm(AssetCompanyBuyerCrnPage(srn, assetIndex.refined, disposalIndex.refined), form)
+          Ok(
+            view(
+              preparedForm,
+              AssetCompanyBuyerCrnController
+                .viewModel(srn, assetIndex.refined, disposalIndex.refined, mode, companyName)
+            )
           )
-        )
       }
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex)).async { companyName =>
-              Future
-                .successful(
-                  BadRequest(
-                    view(
-                      formWithErrors,
-                      AssetCompanyBuyerCrnController
-                        .viewModel(srn, assetIndex, disposalIndex, mode, companyName)
+            request.usingAnswer(CompanyNameOfAssetBuyerPage(srn, assetIndex.refined, disposalIndex.refined)).async {
+              companyName =>
+                Future
+                  .successful(
+                    BadRequest(
+                      view(
+                        formWithErrors,
+                        AssetCompanyBuyerCrnController
+                          .viewModel(srn, assetIndex.refined, disposalIndex.refined, mode, companyName)
+                      )
                     )
                   )
-                )
             },
           value =>
             for {
               updatedAnswers <- Future
                 .fromTry(
                   request.userAnswers
-                    .set(AssetCompanyBuyerCrnPage(srn, assetIndex, disposalIndex), ConditionalYesNo(value))
+                    .set(
+                      AssetCompanyBuyerCrnPage(srn, assetIndex.refined, disposalIndex.refined),
+                      ConditionalYesNo(value)
+                    )
                 )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
-              navigator.nextPage(AssetCompanyBuyerCrnPage(srn, assetIndex, disposalIndex), mode, updatedAnswers)
+              navigator.nextPage(
+                AssetCompanyBuyerCrnPage(srn, assetIndex.refined, disposalIndex.refined),
+                mode,
+                updatedAnswers
+              )
             )
         )
     }

@@ -22,6 +22,7 @@ import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import utils.IntUtils.{toInt, IntOpts}
 import config.Constants.{maxBonds, minBondsHeld}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -55,15 +56,15 @@ class BondsStillHeldController @Inject()(
 
   private def form: Form[Int] = BondsStillHeldController.form(formProvider)
 
-  def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(BondsStillHeldPage(srn, bondIndex, disposalIndex)),
+          form.fromUserAnswers(BondsStillHeldPage(srn, bondIndex.refined, disposalIndex.refined)),
           viewModel(
             srn,
-            bondIndex,
-            disposalIndex,
+            bondIndex.refined,
+            disposalIndex.refined,
             request.schemeDetails.schemeName,
             mode,
             form
@@ -72,7 +73,7 @@ class BondsStillHeldController @Inject()(
       )
     }
 
-  def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -85,8 +86,8 @@ class BondsStillHeldController @Inject()(
                   BondsStillHeldController
                     .viewModel(
                       srn,
-                      bondIndex,
-                      disposalIndex,
+                      bondIndex.refined,
+                      disposalIndex.refined,
                       request.schemeDetails.schemeName,
                       mode,
                       form
@@ -97,9 +98,18 @@ class BondsStillHeldController @Inject()(
           answer => {
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(BondsStillHeldPage(srn, bondIndex, disposalIndex), answer))
-              nextPage = navigator.nextPage(BondsStillHeldPage(srn, bondIndex, disposalIndex), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, bondIndex, disposalIndex, updatedAnswers, nextPage)
+                .fromTry(
+                  request.userAnswers.set(BondsStillHeldPage(srn, bondIndex.refined, disposalIndex.refined), answer)
+                )
+              nextPage = navigator
+                .nextPage(BondsStillHeldPage(srn, bondIndex.refined, disposalIndex.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                bondIndex.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

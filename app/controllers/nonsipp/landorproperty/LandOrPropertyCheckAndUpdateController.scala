@@ -19,16 +19,17 @@ package controllers.nonsipp.landorproperty
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
-import pages.nonsipp.landorproperty.{
-  LandOrPropertyChosenAddressPage,
-  LandOrPropertyTotalCostPage,
-  WhyDoesSchemeHoldLandPropertyPage
-}
 import controllers.actions._
 import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.ContentTablePageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.{
+  LandOrPropertyChosenAddressPage,
+  LandOrPropertyTotalCostPage,
+  WhyDoesSchemeHoldLandPropertyPage
+}
 import models._
 import controllers.nonsipp.landorproperty.LandOrPropertyCheckAndUpdateController._
 import play.api.i18n.MessagesApi
@@ -43,17 +44,19 @@ class LandOrPropertyCheckAndUpdateController @Inject()(
   view: ContentTablePageView
 ) extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     (
       for {
-        address <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney
-        whyLandIsHeld <- request.userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, index)).getOrRecoverJourney
-        totalCost <- request.userAnswers.get(LandOrPropertyTotalCostPage(srn, index)).getOrRecoverJourney
+        address <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney
+        whyLandIsHeld <- request.userAnswers
+          .get(WhyDoesSchemeHoldLandPropertyPage(srn, index.refined))
+          .getOrRecoverJourney
+        totalCost <- request.userAnswers.get(LandOrPropertyTotalCostPage(srn, index.refined)).getOrRecoverJourney
       } yield Ok(
         view(
           viewModel(
             srn,
-            index,
+            index.refined,
             address,
             whyLandIsHeld,
             totalCost
@@ -63,7 +66,7 @@ class LandOrPropertyCheckAndUpdateController @Inject()(
     ).merge
   }
 
-  def onSubmit(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
+  def onSubmit(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
     Redirect(routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode))
   }
 }

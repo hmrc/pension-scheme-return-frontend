@@ -23,7 +23,6 @@ import viewmodels.implicits._
 import play.api.mvc._
 import forms.mappings.Mappings
 import viewmodels.models.MultipleQuestionsViewModel.{QuintupleQuestion, SextupleQuestion}
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.actions._
 import navigation.Navigator
 import forms.MultipleQuestionFormProvider
@@ -34,6 +33,8 @@ import config.RefinedTypes._
 import controllers.PSRController
 import views.html.MultipleQuestionView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import play.api.i18n.MessagesApi
 import viewmodels.InputWidth
 import models.requests.DataRequest
@@ -55,9 +56,9 @@ class LandPropertyAddressManualController @Inject()(
 
   private val internationalAddressFormWithCountries = internationalAddressForm(Country.countries)
 
-  def onPageLoad(srn: Srn, index: Max5000, isUkAddress: Boolean, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, isUkAddress: Boolean, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val previousAnswer = request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index))
+      val previousAnswer = request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined))
 
       if (isUkAddress) {
         val preparedForm = previousAnswer.fold(ukAddressForm)(
@@ -66,7 +67,7 @@ class LandPropertyAddressManualController @Inject()(
         Ok(
           view(
             preparedForm,
-            viewModel(srn, index, ukPage(preparedForm), isUkAddress, mode)
+            viewModel(srn, index.refined, ukPage(preparedForm), isUkAddress, mode)
           )
         )
       } else {
@@ -81,13 +82,13 @@ class LandPropertyAddressManualController @Inject()(
         Ok(
           view(
             preparedForm,
-            viewModel(srn, index, internationalPage(preparedForm, Country.countries), isUkAddress, mode)
+            viewModel(srn, index.refined, internationalPage(preparedForm, Country.countries), isUkAddress, mode)
           )
         )
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, isUkAddress: Boolean, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, isUkAddress: Boolean, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       if (isUkAddress) {
         onSubmitUKAddress(srn, index, mode)
@@ -96,7 +97,7 @@ class LandPropertyAddressManualController @Inject()(
       }
     }
 
-  private def onSubmitUKAddress(srn: Srn, index: Max5000, mode: Mode)(
+  private def onSubmitUKAddress(srn: Srn, index: Int, mode: Mode)(
     implicit request: DataRequest[_]
   ): Future[Result] =
     ukAddressForm
@@ -107,7 +108,7 @@ class LandPropertyAddressManualController @Inject()(
             BadRequest(
               view(
                 formWithErrors,
-                viewModel(srn, index, ukPage(formWithErrors), isUkAddress = true, mode)
+                viewModel(srn, index.refined, ukPage(formWithErrors), isUkAddress = true, mode)
               )
             )
           )
@@ -117,15 +118,15 @@ class LandPropertyAddressManualController @Inject()(
             updatedAnswers <- Future
               .fromTry(
                 request.userAnswers
-                  .set(LandOrPropertyChosenAddressPage(srn, index), Address.fromManualUKAddress(value))
+                  .set(LandOrPropertyChosenAddressPage(srn, index.refined), Address.fromManualUKAddress(value))
               )
-            nextPage = navigator.nextPage(LandOrPropertyChosenAddressPage(srn, index), mode, updatedAnswers)
-            updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+            nextPage = navigator.nextPage(LandOrPropertyChosenAddressPage(srn, index.refined), mode, updatedAnswers)
+            updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
             _ <- saveService.save(updatedProgressAnswers)
           } yield Redirect(nextPage)
       )
 
-  private def onSubmitInternationalAddress(srn: Srn, index: Max5000, mode: Mode)(
+  private def onSubmitInternationalAddress(srn: Srn, index: Int, mode: Mode)(
     implicit request: DataRequest[_]
   ): Future[Result] =
     internationalAddressFormWithCountries
@@ -136,7 +137,13 @@ class LandPropertyAddressManualController @Inject()(
             BadRequest(
               view(
                 formWithErrors,
-                viewModel(srn, index, internationalPage(formWithErrors, Country.countries), isUkAddress = false, mode)
+                viewModel(
+                  srn,
+                  index.refined,
+                  internationalPage(formWithErrors, Country.countries),
+                  isUkAddress = false,
+                  mode
+                )
               )
             )
           )
@@ -147,12 +154,12 @@ class LandPropertyAddressManualController @Inject()(
               .fromTry(
                 request.userAnswers
                   .set(
-                    LandOrPropertyChosenAddressPage(srn, index),
+                    LandOrPropertyChosenAddressPage(srn, index.refined),
                     Address.fromManualInternationalAddress(value)
                   )
               )
-            nextPage = navigator.nextPage(LandOrPropertyChosenAddressPage(srn, index), mode, updatedAnswers)
-            updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+            nextPage = navigator.nextPage(LandOrPropertyChosenAddressPage(srn, index.refined), mode, updatedAnswers)
+            updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
             _ <- saveService.save(updatedProgressAnswers)
           } yield Redirect(nextPage)
       )

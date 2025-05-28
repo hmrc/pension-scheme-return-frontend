@@ -21,6 +21,7 @@ import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import play.api.mvc._
 import org.slf4j.LoggerFactory
 import controllers.nonsipp.membercontributions.MemberContributionsCYAController._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import models._
 import play.api.i18n.MessagesApi
@@ -57,23 +58,23 @@ class MemberContributionsCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn, index, mode)
+      onPageLoadCommon(srn, index.refined, mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, index, mode)
+      onPageLoadCommon(srn, index.refined, mode)
     }
 
   def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
@@ -102,14 +103,14 @@ class MemberContributionsCYAController @Inject()(
         }
     }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       lazy val memberContributionsChanged =
-        request.userAnswers.changed(_.buildMemberContributions(srn, index))
+        request.userAnswers.changed(_.buildMemberContributions(srn, index.refined))
 
       for {
         updatedAnswers <- request.userAnswers
-          .setWhen(memberContributionsChanged)(MemberStatus(srn, index), MemberState.Changed)
+          .setWhen(memberContributionsChanged)(MemberStatus(srn, index.refined), MemberState.Changed)
           .mapK[Future]
         _ <- saveService.save(updatedAnswers)
         submissionResult <- psrSubmissionService

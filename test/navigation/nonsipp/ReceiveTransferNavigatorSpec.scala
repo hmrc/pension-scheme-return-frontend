@@ -17,8 +17,10 @@
 package navigation.nonsipp
 
 import utils.BaseSpec
+import navigation.nonsipp.RouteFnDoubleModeHelper.refine
 import config.RefinedTypes.{Max300, Max5}
 import models.SchemeId.Srn
+import utils.IntUtils.toInt
 import pages.nonsipp.receivetransfer._
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
@@ -93,7 +95,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           TransferringSchemeNamePage,
           (srn, index: Max300, secondaryIndex: Max5, _) =>
             controllers.nonsipp.receivetransfer.routes.TransferringSchemeTypeController
-              .onPageLoad(srn, index, secondaryIndex, NormalMode)
+              .onPageLoad(srn, index.value, secondaryIndex, NormalMode)
         )
         .withName("go from transferring scheme name page to total value transfer page")
     )
@@ -107,7 +109,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           TotalValueTransferPage,
-          controllers.nonsipp.receivetransfer.routes.WhenWasTransferReceivedController.onPageLoad
+          refine[300, 5](controllers.nonsipp.receivetransfer.routes.WhenWasTransferReceivedController.onPageLoad)
         )
         .withName("go from total value transfer page to when was transfer received page")
     )
@@ -124,7 +126,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           ReportAnotherTransferInPage,
           Gen.const(false),
           (srn, index: Max300, _: Max5, _) =>
-            controllers.nonsipp.receivetransfer.routes.TransfersInCYAController.onPageLoad(srn, index, NormalMode)
+            controllers.nonsipp.receivetransfer.routes.TransfersInCYAController.onPageLoad(srn, index.value, NormalMode)
         )
         .withName("go from report another transfer in page to CYA page")
     )
@@ -155,7 +157,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               ReportAnotherTransferInPage,
               (srn, index: Max300, _: Max5, _) =>
                 controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
-                  .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
+                  .onPageLoad(srn, index.value, expectedRedirectIndex, NormalMode),
               userAnswers
             )
             .withName(
@@ -174,7 +176,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           DidTransferIncludeAssetPage,
           (srn, index: Max300, secondaryIndex: Max5, _) =>
             controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
-              .onPageLoad(srn, index, secondaryIndex, NormalMode),
+              .onPageLoad(srn, index.value, secondaryIndex, NormalMode),
           srn => defaultUserAnswers.unsafeSet(TotalValueTransferPage(srn, index, secondaryIndex), money)
         )
         .withName("go from DidTransferIncludeAssetPage to report another transfer in page")

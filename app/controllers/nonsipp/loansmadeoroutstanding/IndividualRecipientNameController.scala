@@ -20,6 +20,7 @@ import services.SaveService
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.Max5000
+import utils.IntUtils.IntOpts
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -52,30 +53,30 @@ class IndividualRecipientNameController @Inject()(
 
   private def form = IndividualRecipientNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(IndividualRecipientNamePage(srn, index)),
-          IndividualRecipientNameController.viewModel(srn, index, mode)
+          form.fromUserAnswers(IndividualRecipientNamePage(srn, index.refined)),
+          IndividualRecipientNameController.viewModel(srn, index.refined, mode)
         )
       )
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future.successful(
-              BadRequest(view(formWithErrors, IndividualRecipientNameController.viewModel(srn, index, mode)))
+              BadRequest(view(formWithErrors, IndividualRecipientNameController.viewModel(srn, index.refined, mode)))
             ),
           answer => {
             for {
-              updatedAnswers <- request.userAnswers.set(IndividualRecipientNamePage(srn, index), answer).mapK
-              nextPage = navigator.nextPage(IndividualRecipientNamePage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              updatedAnswers <- request.userAnswers.set(IndividualRecipientNamePage(srn, index.refined), answer).mapK
+              nextPage = navigator.nextPage(IndividualRecipientNamePage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }
@@ -95,6 +96,6 @@ object IndividualRecipientNameController {
       Message("individualRecipientName.title"),
       Message("individualRecipientName.heading"),
       TextInputViewModel(true),
-      routes.IndividualRecipientNameController.onSubmit(srn, index, mode)
+      routes.IndividualRecipientNameController.onSubmit(srn, index.value, mode)
     )
 }

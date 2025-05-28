@@ -19,6 +19,7 @@ package navigation.nonsipp
 import pages.nonsipp.memberreceivedpcls._
 import play.api.mvc.Call
 import pages.Page
+import utils.IntUtils.toInt
 import navigation.JourneyNavigator
 import models.{NormalMode, UserAnswers}
 

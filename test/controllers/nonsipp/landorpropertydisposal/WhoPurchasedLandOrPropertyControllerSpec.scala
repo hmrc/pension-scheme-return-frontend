@@ -31,9 +31,9 @@ class WhoPurchasedLandOrPropertyControllerSpec extends ControllerBaseSpec {
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.WhoPurchasedLandOrPropertyController.onPageLoad(srn, index, disposalIndex, NormalMode)
+    routes.WhoPurchasedLandOrPropertyController.onPageLoad(srn, index.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.WhoPurchasedLandOrPropertyController.onSubmit(srn, index, disposalIndex, NormalMode)
+    routes.WhoPurchasedLandOrPropertyController.onSubmit(srn, index.value, disposalIndex.value, NormalMode)
 
   private val userAnswers = userAnswersWithAddress(srn, index)
 

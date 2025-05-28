@@ -19,6 +19,7 @@ package controllers.nonsipp.moneyborrowed
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -50,14 +51,14 @@ class LenderNameController @Inject()(
 
   private val form = LenderNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
-        request.userAnswers.fillForm(LenderNamePage(srn, index), form)
-      Ok(view(preparedForm, LenderNameController.viewModel(srn, index, mode)))
+        request.userAnswers.fillForm(LenderNamePage(srn, index.refined), form)
+      Ok(view(preparedForm, LenderNameController.viewModel(srn, index.refined, mode)))
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -67,15 +68,15 @@ class LenderNameController @Inject()(
               BadRequest(
                 view(
                   formWithErrors,
-                  LenderNameController.viewModel(srn, index, mode)
+                  LenderNameController.viewModel(srn, index.refined, mode)
                 )
               )
             ),
           value =>
             for {
-              updatedAnswers <- request.userAnswers.set(LenderNamePage(srn, index), value).mapK[Future]
-              nextPage = navigator.nextPage(LenderNamePage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              updatedAnswers <- request.userAnswers.set(LenderNamePage(srn, index.refined), value).mapK[Future]
+              nextPage = navigator.nextPage(LenderNamePage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

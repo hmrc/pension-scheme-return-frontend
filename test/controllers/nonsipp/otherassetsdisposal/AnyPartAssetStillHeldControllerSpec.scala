@@ -31,9 +31,9 @@ class AnyPartAssetStillHeldControllerSpec extends ControllerBaseSpec {
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.AnyPartAssetStillHeldController.onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+    routes.AnyPartAssetStillHeldController.onPageLoad(srn, assetIndex.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.AnyPartAssetStillHeldController.onSubmit(srn, assetIndex, disposalIndex, NormalMode)
+    routes.AnyPartAssetStillHeldController.onSubmit(srn, assetIndex.value, disposalIndex.value, NormalMode)
 
   "AnyPartAssetStillHeldController" - {
 

@@ -24,6 +24,7 @@ import play.api.mvc._
 import _root_.config.RefinedTypes._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import controllers.PSRController
+import utils.IntUtils.{toInt, IntOpts}
 import _root_.config.Constants
 import navigation.Navigator
 import forms.MoneyFormProvider
@@ -55,21 +56,21 @@ class TotalAmountPensionPaymentsController @Inject()(
 
   private val form = TotalAmountPensionPaymentsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
+      request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney { memberName =>
         val preparedForm =
           request.userAnswers
-            .get(TotalAmountPensionPaymentsPage(srn, index))
+            .get(TotalAmountPensionPaymentsPage(srn, index.refined))
             .fold(form)(value => if (value.isZero) form else form.fill(value))
 
-        Ok(view(preparedForm, viewModel(srn, index, memberName.fullName, form, mode)))
+        Ok(view(preparedForm, viewModel(srn, index.refined, memberName.fullName, form, mode)))
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
+      request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney { memberName =>
         form
           .bindFromRequest()
           .fold(
@@ -78,7 +79,7 @@ class TotalAmountPensionPaymentsController @Inject()(
                 BadRequest(
                   view(
                     formWithErrors,
-                    viewModel(srn, index, memberName.fullName, form, mode)
+                    viewModel(srn, index.refined, memberName.fullName, form, mode)
                   )
                 )
               )
@@ -87,11 +88,11 @@ class TotalAmountPensionPaymentsController @Inject()(
               for {
                 updatedAnswers <- Future
                   .fromTry(
-                    request.userAnswers.transformAndSet(TotalAmountPensionPaymentsPage(srn, index), value)
+                    request.userAnswers.transformAndSet(TotalAmountPensionPaymentsPage(srn, index.refined), value)
                   )
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(
-                navigator.nextPage(TotalAmountPensionPaymentsPage(srn, index), mode, updatedAnswers)
+                navigator.nextPage(TotalAmountPensionPaymentsPage(srn, index.refined), mode, updatedAnswers)
               )
           )
       }

@@ -33,9 +33,9 @@ class IndividualNameOfAssetBuyerControllerSpec extends ControllerBaseSpec {
   "IndividualNameOfAssetBuyerController" - {
 
     lazy val onPageLoad =
-      routes.IndividualNameOfAssetBuyerController.onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+      routes.IndividualNameOfAssetBuyerController.onPageLoad(srn, assetIndex.value, disposalIndex.value, NormalMode)
     lazy val onSubmit =
-      routes.IndividualNameOfAssetBuyerController.onSubmit(srn, assetIndex, disposalIndex, NormalMode)
+      routes.IndividualNameOfAssetBuyerController.onSubmit(srn, assetIndex.value, disposalIndex.value, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[TextInputView]

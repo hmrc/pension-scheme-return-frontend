@@ -47,9 +47,9 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
   }
 
   private def onPageLoad(mode: Mode) =
-    routes.AssetDisposalCYAController.onPageLoad(srn, assetIndex, disposalIndex, mode)
+    routes.AssetDisposalCYAController.onPageLoad(srn, assetIndex.value, disposalIndex.value, mode)
   private def onSubmit(mode: Mode) =
-    routes.AssetDisposalCYAController.onSubmit(srn, assetIndex, disposalIndex, mode)
+    routes.AssetDisposalCYAController.onSubmit(srn, assetIndex.value, disposalIndex.value, mode)
 
   private lazy val onSubmitViewOnly = routes.AssetDisposalCYAController.onSubmitViewOnly(
     srn,
@@ -61,8 +61,8 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoadViewOnly = routes.AssetDisposalCYAController.onPageLoadViewOnly(
     srn,
-    assetIndex,
-    disposalIndex,
+    assetIndex.value,
+    disposalIndex.value,
     yearString,
     submissionNumberTwo,
     submissionNumberOne

@@ -55,8 +55,8 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
     val dateRangeData = rangeGen.sample.value
     val otherDateRangeData = rangeGen.sample.value
 
-    lazy val onPageLoad = routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
-    lazy val onSubmit = routes.AccountingPeriodController.onSubmit(srn, refineMV(1), NormalMode)
+    lazy val onPageLoad = routes.AccountingPeriodController.onPageLoad(srn, 1, NormalMode)
+    lazy val onSubmit = routes.AccountingPeriodController.onSubmit(srn, 1, NormalMode)
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[DateRangeView]

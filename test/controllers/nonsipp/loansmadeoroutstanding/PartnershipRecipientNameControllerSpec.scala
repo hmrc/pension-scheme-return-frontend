@@ -32,8 +32,8 @@ class PartnershipRecipientNameControllerSpec extends ControllerBaseSpec {
   "PartnershipRecipientNameController" - {
 
     val populatedUserAnswers = defaultUserAnswers.set(PartnershipRecipientNamePage(srn, index), partnershipName).get
-    lazy val onPageLoad = routes.PartnershipRecipientNameController.onPageLoad(srn, index, NormalMode)
-    lazy val onSubmit = routes.PartnershipRecipientNameController.onSubmit(srn, index, NormalMode)
+    lazy val onPageLoad = routes.PartnershipRecipientNameController.onPageLoad(srn, index.value, NormalMode)
+    lazy val onSubmit = routes.PartnershipRecipientNameController.onSubmit(srn, index.value, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[TextInputView].apply(form(injected[TextFormProvider]), viewModel(srn, index, NormalMode))

@@ -28,8 +28,8 @@ import controllers.ControllerBaseSpec
 class IsLandOrPropertyResidentialControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
-  private lazy val onPageLoad = routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.IsLandOrPropertyResidentialController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.IsLandOrPropertyResidentialController.onSubmit(srn, index.value, NormalMode)
 
   "IsLandOrPropertyResidentialController" - {
 

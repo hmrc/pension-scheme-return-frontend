@@ -23,6 +23,7 @@ import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import controllers.nonsipp.bonds.IncomeFromBondsController._
 import navigation.Navigator
@@ -55,18 +56,18 @@ class IncomeFromBondsController @Inject()(
 
   private def form: Form[Money] = IncomeFromBondsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(IncomeFromBondsPage(srn, index)),
-          viewModel(srn, index, form, mode)
+          form.fromUserAnswers(IncomeFromBondsPage(srn, index.refined)),
+          viewModel(srn, index.refined, form, mode)
         )
       )
 
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -76,7 +77,7 @@ class IncomeFromBondsController @Inject()(
               BadRequest(
                 view(
                   formWithErrors,
-                  IncomeFromBondsController.viewModel(srn, index, form, mode)
+                  IncomeFromBondsController.viewModel(srn, index.refined, form, mode)
                 )
               )
             ),
@@ -85,11 +86,11 @@ class IncomeFromBondsController @Inject()(
               updatedAnswers <- Future
                 .fromTry(
                   request.userAnswers
-                    .set(IncomeFromBondsPage(srn, index), answer)
-                    .set(BondsCompleted(srn, index), SectionCompleted)
+                    .set(IncomeFromBondsPage(srn, index.refined), answer)
+                    .set(BondsCompleted(srn, index.refined), SectionCompleted)
                 )
-              nextPage = navigator.nextPage(IncomeFromBondsPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              nextPage = navigator.nextPage(IncomeFromBondsPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

@@ -17,6 +17,7 @@
 package controllers.nonsipp.bondsdisposal
 
 import play.api.mvc._
+import utils.IntUtils.{toInt, IntOpts}
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -59,22 +60,22 @@ class WhenWereBondsSoldController @Inject()(
   private def form(date: DateRange)(implicit messages: Messages): Form[LocalDate] =
     WhenWereBondsSoldController.form(formProvider, date)
 
-  def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       usingSchemeDate[Id](srn) { date =>
         val preparedForm = request.userAnswers
-          .get(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex))
+          .get(WhenWereBondsSoldPage(srn, bondIndex.refined, disposalIndex.refined))
           .fold(form(date))(form(date).fill)
         Ok(
           view(
             preparedForm,
-            viewModel(srn, bondIndex, disposalIndex, mode)
+            viewModel(srn, bondIndex.refined, disposalIndex.refined, mode)
           )
         )
       }
     }
 
-  def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       usingSchemeDate(srn) { date =>
         form(date)
@@ -85,17 +86,25 @@ class WhenWereBondsSoldController @Inject()(
                 BadRequest(
                   view(
                     formWithErrors,
-                    viewModel(srn, bondIndex, disposalIndex, mode)
+                    viewModel(srn, bondIndex.refined, disposalIndex.refined, mode)
                   )
                 )
               ),
             value =>
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.set(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex), value))
+                  .fromTry(
+                    request.userAnswers.set(WhenWereBondsSoldPage(srn, bondIndex.refined, disposalIndex.refined), value)
+                  )
                 nextPage = navigator
-                  .nextPage(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex), mode, updatedAnswers)
-                updatedProgressAnswers <- saveProgress(srn, bondIndex, disposalIndex, updatedAnswers, nextPage)
+                  .nextPage(WhenWereBondsSoldPage(srn, bondIndex.refined, disposalIndex.refined), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(
+                  srn,
+                  bondIndex.refined,
+                  disposalIndex.refined,
+                  updatedAnswers,
+                  nextPage
+                )
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
           )

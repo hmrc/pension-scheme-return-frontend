@@ -28,8 +28,8 @@ import controllers.ControllerBaseSpec
 class LandOrPropertyTotalIncomeControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
-  private lazy val onPageLoad = routes.LandOrPropertyTotalIncomeController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.LandOrPropertyTotalIncomeController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.LandOrPropertyTotalIncomeController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.LandOrPropertyTotalIncomeController.onSubmit(srn, index.value, NormalMode)
 
   private val userAnswers = userAnswersWithAddress(srn, index)
 

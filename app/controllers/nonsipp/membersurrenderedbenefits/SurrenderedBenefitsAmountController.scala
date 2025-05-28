@@ -21,6 +21,7 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import utils.IntUtils.{toInt, IntOpts}
 import config.Constants.{maxSurrenderedBenefitAmount, minPosMoneyValue}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -56,18 +57,18 @@ class SurrenderedBenefitsAmountController @Inject()(
 
   private val form = SurrenderedBenefitsAmountController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
-        val preparedForm = request.userAnswers.fillForm(SurrenderedBenefitsAmountPage(srn, memberIndex), form)
+      request.userAnswers.get(MemberDetailsPage(srn, memberIndex.refined)).getOrRecoverJourney { memberName =>
+        val preparedForm = request.userAnswers.fillForm(SurrenderedBenefitsAmountPage(srn, memberIndex.refined), form)
 
-        Ok(view(preparedForm, viewModel(srn, memberName.fullName, memberIndex, form, mode)))
+        Ok(view(preparedForm, viewModel(srn, memberName.fullName, memberIndex.refined, form, mode)))
       }
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
+      request.userAnswers.get(MemberDetailsPage(srn, memberIndex.refined)).getOrRecoverJourney { memberName =>
         form
           .bindFromRequest()
           .fold(
@@ -76,7 +77,7 @@ class SurrenderedBenefitsAmountController @Inject()(
                 BadRequest(
                   view(
                     formWithErrors,
-                    viewModel(srn, memberName.fullName, memberIndex, form, mode)
+                    viewModel(srn, memberName.fullName, memberIndex.refined, form, mode)
                   )
                 )
               )
@@ -84,11 +85,11 @@ class SurrenderedBenefitsAmountController @Inject()(
             value =>
               for {
                 updatedAnswers <- request.userAnswers
-                  .set(SurrenderedBenefitsAmountPage(srn, memberIndex), value)
+                  .set(SurrenderedBenefitsAmountPage(srn, memberIndex.refined), value)
                   .mapK[Future]
                 nextPage = navigator
-                  .nextPage(SurrenderedBenefitsAmountPage(srn, memberIndex), mode, updatedAnswers)
-                updatedProgressAnswers <- saveProgress(srn, memberIndex, updatedAnswers, nextPage)
+                  .nextPage(SurrenderedBenefitsAmountPage(srn, memberIndex.refined), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, memberIndex.refined, updatedAnswers, nextPage)
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
           )

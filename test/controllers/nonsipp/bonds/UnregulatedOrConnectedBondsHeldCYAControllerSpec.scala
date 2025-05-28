@@ -47,13 +47,14 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
   private val page = 1
 
   private def onPageLoad(mode: Mode) =
-    routes.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn, index, mode)
+    routes.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn, index.value, mode)
 
-  private def onSubmit(mode: Mode) = routes.UnregulatedOrConnectedBondsHeldCYAController.onSubmit(srn, index, mode)
+  private def onSubmit(mode: Mode) =
+    routes.UnregulatedOrConnectedBondsHeldCYAController.onSubmit(srn, index.value, mode)
 
   private lazy val onPageLoadViewOnly = routes.UnregulatedOrConnectedBondsHeldCYAController.onPageLoadViewOnly(
     srn,
-    index,
+    index.value,
     yearString,
     submissionNumberTwo,
     submissionNumberOne

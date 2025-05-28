@@ -21,6 +21,7 @@ import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc._
 import controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController._
+import utils.IntUtils.{toInt, IntOpts}
 import models._
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
@@ -57,23 +58,23 @@ class MemberPensionPaymentsCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)
+      onPageLoadCommon(srn: Srn, index.refined, mode: Mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)
+      onPageLoadCommon(srn: Srn, index.refined, mode: Mode)
     }
 
   def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
@@ -101,14 +102,14 @@ class MemberPensionPaymentsCYAController @Inject()(
       }
     ).merge
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       lazy val memberPensionPaymentsChanged: Boolean =
-        request.userAnswers.changed(_.buildMemberPensionPayments(srn, index))
+        request.userAnswers.changed(_.buildMemberPensionPayments(srn, index.refined))
 
       for {
         updatedAnswers <- request.userAnswers
-          .setWhen(memberPensionPaymentsChanged)(MemberStatus(srn, index), {
+          .setWhen(memberPensionPaymentsChanged)(MemberStatus(srn, index.refined), {
             logger.info(s"Pension payments has changed for member $index. Setting MemberStatus to Changed")
             MemberState.Changed
           })

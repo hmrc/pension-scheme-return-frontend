@@ -37,8 +37,9 @@ class WhenWasTransferMadeControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[Max300.Refined](1)
   private val secondaryIndex = refineMV[Max5.Refined](1)
   private lazy val onPageLoad =
-    routes.WhenWasTransferMadeController.onPageLoad(srn, index, secondaryIndex, NormalMode)
-  private lazy val onSubmit = routes.WhenWasTransferMadeController.onSubmit(srn, index, secondaryIndex, NormalMode)
+    routes.WhenWasTransferMadeController.onPageLoad(srn, index.value, secondaryIndex.value, NormalMode)
+  private lazy val onSubmit =
+    routes.WhenWasTransferMadeController.onSubmit(srn, index.value, secondaryIndex.value, NormalMode)
 
   val schemeDatePeriod: DateRange = DateRange(LocalDate.parse("2020-04-06"), LocalDate.parse("2021-04-05"))
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]

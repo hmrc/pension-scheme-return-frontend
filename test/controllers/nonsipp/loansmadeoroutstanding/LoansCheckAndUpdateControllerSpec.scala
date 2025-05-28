@@ -30,8 +30,8 @@ class LoansCheckAndUpdateControllerSpec extends ControllerBaseSpec {
 
   private val conditionalYesSecurity: ConditionalYes[Security] = ConditionalYesNo.yes(security)
 
-  private def onPageLoad: Call = routes.LoansCheckAndUpdateController.onPageLoad(srn, index1of5000)
-  private def onSubmit: Call = routes.LoansCheckAndUpdateController.onSubmit(srn, index1of5000)
+  private def onPageLoad: Call = routes.LoansCheckAndUpdateController.onPageLoad(srn, index1of5000.value)
+  private def onSubmit: Call = routes.LoansCheckAndUpdateController.onSubmit(srn, index1of5000.value)
 
   private val prePopUserAnswers = defaultUserAnswers
     .unsafeSet(IdentityTypePage(srn, index1of5000, LoanRecipient), Individual)
@@ -61,7 +61,7 @@ class LoansCheckAndUpdateControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectToPage(onSubmit, routes.AmountOfTheLoanController.onPageLoad(srn, index1of5000, NormalMode))
+      redirectToPage(onSubmit, routes.AmountOfTheLoanController.onPageLoad(srn, index1of5000.value, NormalMode))
     )
 
     act.like(

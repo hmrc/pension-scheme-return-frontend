@@ -21,6 +21,7 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.slf4j.LoggerFactory
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.MoneyFormProvider
@@ -58,32 +59,32 @@ class TotalMemberContributionController @Inject()(
 
   private val form = TotalMemberContributionController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(MemberDetailsPage(srn, index)) match {
+      request.userAnswers.get(MemberDetailsPage(srn, index.refined)) match {
         case None =>
           logger.warn(s"Member details for member index $index not found")
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         case Some(memberDetails) =>
           val preparedForm =
             request.userAnswers
-              .get(TotalMemberContributionPage(srn, index))
+              .get(TotalMemberContributionPage(srn, index.refined))
               .fold(form)(value => if (value.isZero) form else form.fill(value))
 
-          Ok(view(preparedForm, viewModel(srn, index, memberDetails.fullName, form, mode)))
+          Ok(view(preparedForm, viewModel(srn, index.refined, memberDetails.fullName, form, mode)))
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
+      request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney { memberName =>
         form
           .bindFromRequest()
           .fold(
             formWithErrors => {
               Future.successful(
                 BadRequest(
-                  view(formWithErrors, viewModel(srn, index, memberName.fullName, form, mode))
+                  view(formWithErrors, viewModel(srn, index.refined, memberName.fullName, form, mode))
                 )
               )
             },
@@ -91,11 +92,11 @@ class TotalMemberContributionController @Inject()(
               for {
                 updatedAnswers <- Future
                   .fromTry(
-                    request.userAnswers.transformAndSet(TotalMemberContributionPage(srn, index), value)
+                    request.userAnswers.transformAndSet(TotalMemberContributionPage(srn, index.refined), value)
                   )
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(
-                navigator.nextPage(TotalMemberContributionPage(srn, index), mode, updatedAnswers)
+                navigator.nextPage(TotalMemberContributionPage(srn, index.refined), mode, updatedAnswers)
               )
           )
       }

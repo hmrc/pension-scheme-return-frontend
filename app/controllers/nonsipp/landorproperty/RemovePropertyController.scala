@@ -19,7 +19,6 @@ package controllers.nonsipp.landorproperty
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.landorproperty._
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -29,6 +28,8 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import models.requests.DataRequest
@@ -52,39 +53,42 @@ class RemovePropertyController @Inject()(
 
   private val form = RemovePropertyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      if (request.userAnswers.get(LandOrPropertyPrePopulated(srn, index)).isDefined)
+      if (request.userAnswers.get(LandOrPropertyPrePopulated(srn, index.refined)).isDefined)
         Redirect(controllers.routes.UnauthorisedController.onPageLoad())
       else
         (
           for {
-            address <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRedirectToTaskList(srn)
+            address <- request.userAnswers
+              .get(LandOrPropertyChosenAddressPage(srn, index.refined))
+              .getOrRedirectToTaskList(srn)
           } yield {
-            val preparedForm = request.userAnswers.fillForm(RemovePropertyPage(srn, index), form)
-            Ok(view(preparedForm, RemovePropertyController.viewModel(srn, index, mode, address.addressLine1)))
+            val preparedForm = request.userAnswers.fillForm(RemovePropertyPage(srn, index.refined), form)
+            Ok(view(preparedForm, RemovePropertyController.viewModel(srn, index.refined, mode, address.addressLine1)))
           }
         ).merge
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           errors =>
-            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-              Future.successful(
-                BadRequest(
-                  view(errors, RemovePropertyController.viewModel(srn, index, mode, address.addressLine1))
+            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney {
+              address =>
+                Future.successful(
+                  BadRequest(
+                    view(errors, RemovePropertyController.viewModel(srn, index.refined, mode, address.addressLine1))
+                  )
                 )
-              )
             },
           value =>
             if (value) {
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.remove(LandPropertyInUKPage(srn, index)))
+                  .fromTry(request.userAnswers.remove(LandPropertyInUKPage(srn, index.refined)))
                 _ <- saveService.save(updatedAnswers)
                 redirectTo <- psrSubmissionService
                   .submitPsrDetailsWithUA(
@@ -95,12 +99,15 @@ class RemovePropertyController @Inject()(
                   )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
                   .map {
                     case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                    case Some(_) => Redirect(navigator.nextPage(RemovePropertyPage(srn, index), mode, updatedAnswers))
+                    case Some(_) =>
+                      Redirect(navigator.nextPage(RemovePropertyPage(srn, index.refined), mode, updatedAnswers))
                   }
               } yield redirectTo
             } else {
               Future
-                .successful(Redirect(navigator.nextPage(RemovePropertyPage(srn, index), mode, request.userAnswers)))
+                .successful(
+                  Redirect(navigator.nextPage(RemovePropertyPage(srn, index.refined), mode, request.userAnswers))
+                )
             }
         )
   }

@@ -48,13 +48,12 @@ class LoanDetailsMongoController @Inject()(
 
   private val max: Max5000 = refineMV(5000)
 
-  def addLoanDetails(srn: Srn, num: Max5000): Action[AnyContent] = identifyAndRequireData(srn).async {
-    implicit request =>
-      for {
-        removedUserAnswers <- Future.fromTry(removeAllLoanDetails(srn, request.userAnswers))
-        updatedUserAnswers <- Future.fromTry(updateUserAnswersWithLoanDetails(num.value, srn, removedUserAnswers))
-        _ <- sessionRepository.set(updatedUserAnswers)
-      } yield Ok(s"Added ${num.value} loan details to UserAnswers")
+  def addLoanDetails(srn: Srn, num: Int): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    for {
+      removedUserAnswers <- Future.fromTry(removeAllLoanDetails(srn, request.userAnswers))
+      updatedUserAnswers <- Future.fromTry(updateUserAnswersWithLoanDetails(num, srn, removedUserAnswers))
+      _ <- sessionRepository.set(updatedUserAnswers)
+    } yield Ok(s"Added $num loan details to UserAnswers")
   }
 
   private def buildIndexes(num: Int): Try[List[Max5000]] =

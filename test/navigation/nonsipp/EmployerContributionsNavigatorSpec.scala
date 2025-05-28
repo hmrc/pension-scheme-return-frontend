@@ -18,8 +18,10 @@ package navigation.nonsipp
 
 import pages.nonsipp.employercontributions._
 import utils.BaseSpec
+import navigation.nonsipp.RouteFnDoubleModeHelper.refine
 import config.RefinedTypes.{Max300, Max50}
 import models.SchemeId.Srn
+import utils.IntUtils.toInt
 import eu.timepit.refined.{refineMV, refineV}
 import navigation.{Navigator, NavigatorBehaviours}
 import models._
@@ -95,7 +97,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           EmployerNamePage,
           (srn, index: Max300, secondaryIndex: Max50, _) =>
             controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
-              .onPageLoad(srn, index, secondaryIndex, NormalMode)
+              .onPageLoad(srn, index.value, secondaryIndex, NormalMode)
         )
         .withName("go from employer name page to employer type of business page")
     )
@@ -128,7 +130,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
               EmployerNamePage,
               (srn, index: Max300, _: Max50, _) =>
                 controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                  .onPageLoad(srn, index, expectedPage, NormalMode),
+                  .onPageLoad(srn, index.value, expectedPage, NormalMode),
               userAnswers
             )
             .withName(
@@ -189,7 +191,9 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           OtherEmployeeDescriptionPage,
-          controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController.onPageLoad
+          refine[300, 50](
+            controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController.onPageLoad
+          )
         )
         .withName("go from OtherEmployeeDescriptionPage to TotalEmployerContribution page")
     )
@@ -205,7 +209,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           PartnershipEmployerUtrPage,
           (srn, index: Max300, secondaryIndex: Max50, _) =>
             controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
-              .onPageLoad(srn, index, secondaryIndex, NormalMode)
+              .onPageLoad(srn, index.value, secondaryIndex, NormalMode)
         )
         .withName("go from partnership employer utr page to unauthorised page")
     )
@@ -220,7 +224,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           TotalEmployerContributionPage,
           (srn, index: Max300, _: Max50, _) =>
             controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
-              .onPageLoad(srn, index, secondaryIndex, NormalMode)
+              .onPageLoad(srn, index.value, secondaryIndex, NormalMode)
         )
         .withName("go from TotalEmployerContributionPage to contribution from another employer page")
     )
@@ -235,7 +239,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           EmployerCompanyCrnPage,
           (srn, index: Max300, secondaryIndex: Max50, _) =>
             controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
-              .onPageLoad(srn, index, secondaryIndex, NormalMode)
+              .onPageLoad(srn, index.value, secondaryIndex, NormalMode)
         )
         .withName("go from employer company crn page to total employer contribution page")
     )
@@ -251,7 +255,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           ContributionsFromAnotherEmployerPage,
           (srn, index: Max300, _: Max50, _) =>
             controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-              .onPageLoad(srn, index, page = 1, NormalMode)
+              .onPageLoad(srn, index.value, page = 1, NormalMode)
         )
         .withName("go from contribution from another employer page to unauthorised page")
     )
@@ -282,7 +286,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
               ContributionsFromAnotherEmployerPage,
               (srn, index: Max300, _: Max50, _) =>
                 controllers.nonsipp.employercontributions.routes.EmployerNameController
-                  .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
+                  .onPageLoad(srn, index.value, expectedRedirectIndex, NormalMode),
               userAnswers
             )
             .withName(

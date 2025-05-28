@@ -46,8 +46,8 @@ class WhenDidSchemeAcquireControllerSpec extends ControllerBaseSpec {
 
   val populatedUserAnswers: UserAnswers =
     defaultUserAnswers.set(LandOrPropertyChosenAddressPage(srn, index), address).get
-  private lazy val onPageLoad = routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.WhenDidSchemeAcquireController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.WhenDidSchemeAcquireController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.WhenDidSchemeAcquireController.onSubmit(srn, index.value, NormalMode)
 
   private val dateTooEarlyForm = List(
     "value.day" -> "31",

@@ -34,6 +34,7 @@ import utils.nonsipp.TaskListStatusUtils.{
 import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
+import utils.IntUtils.toInt
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController._
 import pages.nonsipp.landorproperty.{
   LandOrPropertyAddressLookupPages,

@@ -29,8 +29,8 @@ class PartnershipNameOfSharesSellerControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
 
-  private lazy val onPageLoad = routes.PartnershipNameOfSharesSellerController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.PartnershipNameOfSharesSellerController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.PartnershipNameOfSharesSellerController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.PartnershipNameOfSharesSellerController.onSubmit(srn, index.value, NormalMode)
 
   "PartnershipNameOfSharesSellerController" - {
 

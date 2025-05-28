@@ -29,8 +29,8 @@ class IsLesseeConnectedPartyControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  private lazy val onPageLoad = routes.IsLesseeConnectedPartyController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.IsLesseeConnectedPartyController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.IsLesseeConnectedPartyController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.IsLesseeConnectedPartyController.onSubmit(srn, index.value, NormalMode)
 
   val userAnswersWithLeaseName: UserAnswers =
     defaultUserAnswers.unsafeSet(LandOrPropertyLeaseDetailsPage(srn, index), (leaseName, money, localDate))

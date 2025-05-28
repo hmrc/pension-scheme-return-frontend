@@ -21,6 +21,7 @@ import pages.nonsipp.otherassetsdisposal._
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
+import utils.IntUtils.{toInt, IntOpts}
 import cats.implicits.toShow
 import config.Constants.maxDisposalPerOtherAsset
 import controllers.actions._
@@ -60,25 +61,25 @@ class AssetDisposalCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max5000,
-    disposalIndex: Max50,
+    index: Int,
+    disposalIndex: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      onPageLoadCommon(srn, index, disposalIndex, mode)
+      onPageLoadCommon(srn, index.refined, disposalIndex.refined, mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max5000,
-    disposalIndex: Max50,
+    index: Int,
+    disposalIndex: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous).async { implicit request =>
-      onPageLoadCommon(srn, index, disposalIndex, mode)
+      onPageLoadCommon(srn, index.refined, disposalIndex.refined, mode)
     }
 
   def onPageLoadCommon(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode)(
@@ -202,11 +203,11 @@ class AssetDisposalCYAController @Inject()(
       )
     ).merge
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
         updatedUserAnswers <- request.userAnswers
-          .set(OtherAssetsDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
+          .set(OtherAssetsDisposalProgress(srn, index.refined, disposalIndex.refined), SectionJourneyStatus.Completed)
           .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(

@@ -28,8 +28,9 @@ import controllers.ControllerBaseSpec
 class LandPropertyIndividualSellersNameControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
-  private lazy val onPageLoad = routes.LandPropertyIndividualSellersNameController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.LandPropertyIndividualSellersNameController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad =
+    routes.LandPropertyIndividualSellersNameController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.LandPropertyIndividualSellersNameController.onSubmit(srn, index.value, NormalMode)
 
   "IndividualSellersNameController" - {
 

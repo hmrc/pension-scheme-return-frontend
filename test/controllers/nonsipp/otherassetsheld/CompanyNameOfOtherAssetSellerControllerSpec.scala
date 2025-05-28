@@ -29,8 +29,8 @@ class CompanyNameOfOtherAssetSellerControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
 
-  private lazy val onPageLoad = routes.CompanyNameOfOtherAssetSellerController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.CompanyNameOfOtherAssetSellerController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.CompanyNameOfOtherAssetSellerController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.CompanyNameOfOtherAssetSellerController.onSubmit(srn, index.value, NormalMode)
 
   "CompanyNameOfOtherAssetSellerController" - {
 

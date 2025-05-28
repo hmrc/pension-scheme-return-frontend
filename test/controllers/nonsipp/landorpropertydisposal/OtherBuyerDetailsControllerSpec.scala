@@ -32,10 +32,10 @@ class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad =
     controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
-      .onPageLoad(srn, index, disposalIndex, NormalMode)
+      .onPageLoad(srn, index.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
     controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
-      .onSubmit(srn, index, disposalIndex, NormalMode)
+      .onSubmit(srn, index.value, disposalIndex.value, NormalMode)
 
   val updatedUserAnswers: UserAnswers =
     defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)

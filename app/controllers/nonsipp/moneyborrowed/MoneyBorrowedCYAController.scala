@@ -19,6 +19,7 @@ package controllers.nonsipp.moneyborrowed
 import services.PsrSubmissionService
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, IntOpts}
 import cats.implicits.toShow
 import controllers.actions._
 import models.requests.DataRequest
@@ -52,21 +53,21 @@ class MoneyBorrowedCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      onPageLoadCommon(srn, index, mode)
+      onPageLoadCommon(srn, index.refined, mode)
   }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, index, mode)
+      onPageLoadCommon(srn, index.refined, mode)
     }
 
   def onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
@@ -113,7 +114,7 @@ class MoneyBorrowedCYAController @Inject()(
         ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       psrSubmissionService
         .submitPsrDetails(

@@ -21,6 +21,7 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.nonsipp.membertransferout.ReportAnotherTransferOutController._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -52,25 +53,25 @@ class ReportAnotherTransferOutController @Inject()(
 
   private val form = ReportAnotherTransferOutController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
+      request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney { memberName =>
         val preparedForm =
-          request.userAnswers.fillForm(ReportAnotherTransferOutPage(srn, index, secondaryIndex), form)
-        Ok(view(preparedForm, viewModel(srn, index, secondaryIndex, mode, memberName.fullName)))
+          request.userAnswers.fillForm(ReportAnotherTransferOutPage(srn, index.refined, secondaryIndex.refined), form)
+        Ok(view(preparedForm, viewModel(srn, index.refined, secondaryIndex.refined, mode, memberName.fullName)))
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
+            request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney { memberName =>
               Future.successful(
                 BadRequest(
-                  view(formWithErrors, viewModel(srn, index, secondaryIndex, mode, memberName.fullName))
+                  view(formWithErrors, viewModel(srn, index.refined, secondaryIndex.refined, mode, memberName.fullName))
                 )
               )
             },
@@ -78,12 +79,16 @@ class ReportAnotherTransferOutController @Inject()(
             for {
               updatedAnswers <- Future.fromTry(
                 request.userAnswers
-                  .set(ReportAnotherTransferOutPage(srn, index, secondaryIndex), value)
+                  .set(ReportAnotherTransferOutPage(srn, index.refined, secondaryIndex.refined), value)
               )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
               navigator
-                .nextPage(ReportAnotherTransferOutPage(srn, index, secondaryIndex), mode, updatedAnswers)
+                .nextPage(
+                  ReportAnotherTransferOutPage(srn, index.refined, secondaryIndex.refined),
+                  mode,
+                  updatedAnswers
+                )
             )
         )
     }

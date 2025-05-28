@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
 import config.Constants
+import utils.IntUtils.{toInt, IntOpts}
 import cats.implicits.{catsSyntaxApplicativeId, toTraverseOps}
 import controllers.actions._
 import models._
@@ -57,14 +58,14 @@ class EmployerContributionsCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max300, page: Int, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, page: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max300, page: Int, mode: Mode)
+      onPageLoadCommon(srn: Srn, index.refined, page: Int, mode: Mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max300,
+    index: Int,
     page: Int,
     mode: Mode,
     year: String,
@@ -72,7 +73,7 @@ class EmployerContributionsCYAController @Inject()(
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max300, page: Int, mode: Mode)
+      onPageLoadCommon(srn: Srn, index.refined, page: Int, mode: Mode)
     }
 
   def onPageLoadCommon(srn: Srn, index: Max300, page: Int, mode: Mode)(
@@ -111,13 +112,13 @@ class EmployerContributionsCYAController @Inject()(
       )
     ).merge
 
-  def onSubmit(srn: Srn, index: Max300, page: Int, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, page: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       // Set EmployerContributionsCompleted for each journey that's no longer In Progress:
-      val userAnswersWithJourneysCompleted = buildCompletedSecondaryIndexes(srn, index).map(
+      val userAnswersWithJourneysCompleted = buildCompletedSecondaryIndexes(srn, index.refined).map(
         _.foldLeft(Try(request.userAnswers))(
           (userAnswers, secondaryIndex) =>
-            userAnswers.set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
+            userAnswers.set(EmployerContributionsCompleted(srn, index.refined, secondaryIndex), SectionCompleted)
         )
       )
 
@@ -125,10 +126,10 @@ class EmployerContributionsCYAController @Inject()(
         for {
           userAnswers <- EitherT(userAnswersWithJourneysCompleted.pure[Future])
           employerContributionsChanged = userAnswers.toOption.exists(
-            _.changedList(_.buildEmployerContributions(srn, index))
+            _.changedList(_.buildEmployerContributions(srn, index.refined))
           )
           updatedAnswers <- userAnswers
-            .setWhen(employerContributionsChanged)(MemberStatus(srn, index), MemberState.Changed)
+            .setWhen(employerContributionsChanged)(MemberStatus(srn, index.refined), MemberState.Changed)
             .mapK[Future]
             .liftF
           _ <- saveService.save(updatedAnswers).liftF

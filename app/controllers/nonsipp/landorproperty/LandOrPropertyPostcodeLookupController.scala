@@ -19,7 +19,6 @@ package controllers.nonsipp.landorproperty
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc._
-import pages.nonsipp.landorproperty.{AddressLookupResultsPage, LandOrPropertyPostcodeLookupPage}
 import controllers.actions._
 import navigation.Navigator
 import forms.AddressLookupFormProvider
@@ -33,6 +32,8 @@ import controllers.PSRController
 import cats.data.EitherT
 import views.html.PostcodeLookupView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.{AddressLookupResultsPage, LandOrPropertyPostcodeLookupPage}
 import viewmodels.DisplayMessage.{LinkMessage, ParagraphMessage}
 import viewmodels.models.{FormPageViewModel, PostcodeLookupViewModel}
 import models.requests.DataRequest
@@ -56,35 +57,36 @@ class LandOrPropertyPostcodeLookupController @Inject()(
 
   private val form = LandOrPropertyPostcodeLookupController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val preparedForm = request.userAnswers.fillForm(LandOrPropertyPostcodeLookupPage(srn, index), form)
-      Ok(view(preparedForm, viewModel(srn, index, mode)))
+      val preparedForm = request.userAnswers.fillForm(LandOrPropertyPostcodeLookupPage(srn, index.refined), form)
+      Ok(view(preparedForm, viewModel(srn, index.refined, mode)))
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .uniqueFormErrors
         .fold(
-          errs => Future.successful(BadRequest(view(errs, viewModel(srn, index, mode)))),
+          errs => Future.successful(BadRequest(view(errs, viewModel(srn, index.refined, mode)))),
           value =>
             (
               for {
                 addresses <- addressService.postcodeLookup(value.postcode, value.filter).liftF
-                _ <- EitherT.fromEither[Future](renderErrorOnEmptyAddress(srn, index, mode, value, addresses))
+                _ <- EitherT.fromEither[Future](renderErrorOnEmptyAddress(srn, index.refined, mode, value, addresses))
                 updatedUserAnswers <- Future
-                  .fromTry(request.userAnswers.set(LandOrPropertyPostcodeLookupPage(srn, index), value))
+                  .fromTry(request.userAnswers.set(LandOrPropertyPostcodeLookupPage(srn, index.refined), value))
                   .liftF
                 updatedUserAnswersWithAddresses <- Future
                   .fromTry(
-                    updatedUserAnswers.set(AddressLookupResultsPage(srn, index), addresses)
+                    updatedUserAnswers.set(AddressLookupResultsPage(srn, index.refined), addresses)
                   )
                   .liftF
                 _ <- saveService.save(updatedUserAnswersWithAddresses).liftF
               } yield Redirect(
-                navigator.nextPage(LandOrPropertyPostcodeLookupPage(srn, index), mode, updatedUserAnswersWithAddresses)
+                navigator
+                  .nextPage(LandOrPropertyPostcodeLookupPage(srn, index.refined), mode, updatedUserAnswersWithAddresses)
               )
             ).merge
         )

@@ -30,9 +30,9 @@ class AssetSaleIndependentValuationControllerSpec extends ControllerBaseSpec {
   private val assetIndex = refineMV[Max5000.Refined](1)
   private val disposalIndex = refineMV[Max50.Refined](1)
   private lazy val onPageLoad =
-    routes.AssetSaleIndependentValuationController.onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+    routes.AssetSaleIndependentValuationController.onPageLoad(srn, assetIndex.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.AssetSaleIndependentValuationController.onSubmit(srn, assetIndex, disposalIndex, NormalMode)
+    routes.AssetSaleIndependentValuationController.onSubmit(srn, assetIndex.value, disposalIndex.value, NormalMode)
 
   "AssetSaleIndependentValuationController" - {
 

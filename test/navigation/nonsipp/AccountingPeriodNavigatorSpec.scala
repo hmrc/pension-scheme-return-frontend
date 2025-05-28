@@ -17,6 +17,7 @@
 package navigation.nonsipp
 
 import utils.BaseSpec
+import navigation.nonsipp.RouteFnModeHelper.refine
 import config.RefinedTypes.OneToThree
 import generators.IndexGen
 import controllers.nonsipp.schemedesignatory
@@ -36,7 +37,7 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateTo(
           AccountingPeriodPage(_, refineMV(1), NormalMode),
-          (srn, _) => routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, refineMV(1), NormalMode)
+          (srn, _) => routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, 1, NormalMode)
         )
         .withName("go from accounting period page to check answers page")
     )
@@ -57,7 +58,7 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           AccountingPeriodPage(_, _, NormalMode),
           dateRangeGen,
           IndexGen[OneToThree](1, 3),
-          routes.AccountingPeriodController.onPageLoad,
+          refine[3](routes.AccountingPeriodController.onPageLoad),
           schemedesignatory.routes.ActiveBankAccountController.onPageLoad
         )
         .withName("go from list page")

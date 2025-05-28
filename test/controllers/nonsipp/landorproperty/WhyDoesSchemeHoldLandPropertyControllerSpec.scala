@@ -30,8 +30,8 @@ class WhyDoesSchemeHoldLandPropertyControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  lazy val onPageLoad: Call = routes.WhyDoesSchemeHoldLandPropertyController.onPageLoad(srn, index, NormalMode)
-  lazy val onSubmit: Call = routes.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn, index, NormalMode)
+  lazy val onPageLoad: Call = routes.WhyDoesSchemeHoldLandPropertyController.onPageLoad(srn, index.value, NormalMode)
+  lazy val onSubmit: Call = routes.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn, index.value, NormalMode)
 
   private val userAnswersWithLookUpPage =
     defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)

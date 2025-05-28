@@ -29,8 +29,10 @@ class TransferringSchemeNameControllerSpec extends ControllerBaseSpec {
 
   private val memberIndex = refineMV[Max300.Refined](1)
   private val index = refineMV[Max5.Refined](1)
-  private lazy val onPageLoad = routes.TransferringSchemeNameController.onPageLoad(srn, memberIndex, index, NormalMode)
-  private lazy val onSubmit = routes.TransferringSchemeNameController.onSubmit(srn, memberIndex, index, NormalMode)
+  private lazy val onPageLoad =
+    routes.TransferringSchemeNameController.onPageLoad(srn, memberIndex.value, index.value, NormalMode)
+  private lazy val onSubmit =
+    routes.TransferringSchemeNameController.onSubmit(srn, memberIndex.value, index.value, NormalMode)
 
   "TransferringSchemeNameController" - {
 

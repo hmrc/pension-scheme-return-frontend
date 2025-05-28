@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, IntOpts}
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.membersurrenderedbenefits._
@@ -55,21 +56,21 @@ class SurrenderedBenefitsCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn, index, mode)
+      onPageLoadCommon(srn, index.refined, mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, index, mode)
+      onPageLoadCommon(srn, index.refined, mode)
     }
 
   def onPageLoadCommon(srn: SchemeId.Srn, index: Max300, mode: Mode)(
@@ -109,15 +110,15 @@ class SurrenderedBenefitsCYAController @Inject()(
       )
     ).merge
 
-  def onSubmit(srn: Srn, memberIndex: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       lazy val surrenderedBenefitsChanged =
-        request.userAnswers.changed(_.buildSurrenderedBenefits(srn, memberIndex))
+        request.userAnswers.changed(_.buildSurrenderedBenefits(srn, memberIndex.refined))
 
       for {
         updatedUserAnswers <- request.userAnswers
-          .set(SurrenderedBenefitsCompletedPage(srn, memberIndex), SectionCompleted)
-          .setWhen(surrenderedBenefitsChanged)(MemberStatus(srn, memberIndex), MemberState.Changed)
+          .set(SurrenderedBenefitsCompletedPage(srn, memberIndex.refined), SectionCompleted)
+          .setWhen(surrenderedBenefitsChanged)(MemberStatus(srn, memberIndex.refined), MemberState.Changed)
           .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
@@ -129,7 +130,7 @@ class SurrenderedBenefitsCYAController @Inject()(
       } yield submissionResult.getOrRecoverJourney(
         _ =>
           Redirect(
-            navigator.nextPage(SurrenderedBenefitsCYAPage(srn, memberIndex), mode, request.userAnswers)
+            navigator.nextPage(SurrenderedBenefitsCYAPage(srn, memberIndex.refined), mode, request.userAnswers)
           )
       )
     }

@@ -35,10 +35,10 @@ class TotalMemberContributionControllerSpec extends ControllerBaseSpec {
     .unsafeSet(MemberDetailsCompletedPage(srn, refineMV(1)), SectionCompleted)
 
   private lazy val onPageLoad =
-    routes.TotalMemberContributionController.onPageLoad(srn, index, NormalMode)
+    routes.TotalMemberContributionController.onPageLoad(srn, index.value, NormalMode)
 
   private lazy val onSubmit =
-    routes.TotalMemberContributionController.onSubmit(srn, index, NormalMode)
+    routes.TotalMemberContributionController.onSubmit(srn, index.value, NormalMode)
 
   "TotalMemberContributionController" - {
 

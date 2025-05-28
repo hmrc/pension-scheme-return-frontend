@@ -31,9 +31,19 @@ class LandOrPropertyDisposalBuyerConnectedPartyControllerSpec extends Controller
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.LandOrPropertyDisposalBuyerConnectedPartyController.onPageLoad(srn, index, disposalIndex, NormalMode)
+    routes.LandOrPropertyDisposalBuyerConnectedPartyController.onPageLoad(
+      srn,
+      index.value,
+      disposalIndex.value,
+      NormalMode
+    )
   private lazy val onSubmit =
-    routes.LandOrPropertyDisposalBuyerConnectedPartyController.onSubmit(srn, index, disposalIndex, NormalMode)
+    routes.LandOrPropertyDisposalBuyerConnectedPartyController.onSubmit(
+      srn,
+      index.value,
+      disposalIndex.value,
+      NormalMode
+    )
 
   "LandOrPropertyDisposalSellerConnectedPartyController" - {
 

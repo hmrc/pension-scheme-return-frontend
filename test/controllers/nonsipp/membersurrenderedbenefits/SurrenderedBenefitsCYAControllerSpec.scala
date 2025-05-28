@@ -50,12 +50,12 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
   private val whenSurrenderedBenefits = localDate
 
   private def onPageLoad(mode: Mode) =
-    routes.SurrenderedBenefitsCYAController.onPageLoad(srn, memberIndex, mode)
+    routes.SurrenderedBenefitsCYAController.onPageLoad(srn, memberIndex.value, mode)
   private def onSubmit(mode: Mode) =
-    routes.SurrenderedBenefitsCYAController.onSubmit(srn, memberIndex, mode)
+    routes.SurrenderedBenefitsCYAController.onSubmit(srn, memberIndex.value, mode)
   private lazy val onPageLoadViewOnly = routes.SurrenderedBenefitsCYAController.onPageLoadViewOnly(
     srn,
-    memberIndex,
+    memberIndex.value,
     yearString,
     submissionNumberTwo,
     submissionNumberOne

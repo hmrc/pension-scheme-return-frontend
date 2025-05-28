@@ -35,8 +35,8 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
   private val page = 1
-  private lazy val onPageLoad = routes.PclsCYAController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.PclsCYAController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.PclsCYAController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.PclsCYAController.onSubmit(srn, index.value, NormalMode)
   private lazy val onSubmitViewOnly = routes.PclsCYAController.onSubmitViewOnly(
     srn,
     page,
@@ -47,7 +47,7 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoadViewOnly = routes.PclsCYAController.onPageLoadViewOnly(
     srn,
-    index,
+    index.value,
     yearString,
     submissionNumberTwo,
     submissionNumberOne

@@ -35,9 +35,9 @@ class WhenWereSharesSoldControllerSpec extends ControllerBaseSpec {
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.WhenWereSharesSoldController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+    routes.WhenWereSharesSoldController.onPageLoad(srn, shareIndex.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.WhenWereSharesSoldController.onSubmit(srn, shareIndex, disposalIndex, NormalMode)
+    routes.WhenWereSharesSoldController.onSubmit(srn, shareIndex.value, disposalIndex.value, NormalMode)
 
   private val userAnswers = defaultUserAnswers.unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndex), companyName)
 

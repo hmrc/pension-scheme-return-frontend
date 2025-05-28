@@ -19,7 +19,6 @@ package controllers.nonsipp.landorproperty
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.landorproperty.{IsLesseeConnectedPartyPage, LandOrPropertyLeaseDetailsPage}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -29,6 +28,8 @@ import config.RefinedTypes.Max5000
 import controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController._
 import views.html.YesNoPageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.{IsLesseeConnectedPartyPage, LandOrPropertyLeaseDetailsPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
@@ -52,30 +53,30 @@ class IsLesseeConnectedPartyController @Inject()(
 
   private val form = IsLesseeConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.usingAnswer(LandOrPropertyLeaseDetailsPage(srn, index)).sync { leaseName =>
-        val preparedForm = request.userAnswers.fillForm(IsLesseeConnectedPartyPage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, leaseName._1, mode)))
+      request.usingAnswer(LandOrPropertyLeaseDetailsPage(srn, index.refined)).sync { leaseName =>
+        val preparedForm = request.userAnswers.fillForm(IsLesseeConnectedPartyPage(srn, index.refined), form)
+        Ok(view(preparedForm, viewModel(srn, index.refined, leaseName._1, mode)))
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(LandOrPropertyLeaseDetailsPage(srn, index)).async { leaseName =>
+            request.usingAnswer(LandOrPropertyLeaseDetailsPage(srn, index.refined)).async { leaseName =>
               Future
-                .successful(BadRequest(view(formWithErrors, viewModel(srn, index, leaseName._1, mode))))
+                .successful(BadRequest(view(formWithErrors, viewModel(srn, index.refined, leaseName._1, mode))))
             },
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(IsLesseeConnectedPartyPage(srn, index), value))
-              nextPage = navigator.nextPage(IsLesseeConnectedPartyPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                .fromTry(request.userAnswers.set(IsLesseeConnectedPartyPage(srn, index.refined), value))
+              nextPage = navigator.nextPage(IsLesseeConnectedPartyPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

@@ -57,8 +57,8 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
   private val page = 1
   private val subject = IdentitySubject.OtherAssetSeller
 
-  private def onPageLoad(mode: Mode) = routes.OtherAssetsCYAController.onPageLoad(srn, index, mode)
-  private def onSubmit(mode: Mode) = routes.OtherAssetsCYAController.onSubmit(srn, index, mode)
+  private def onPageLoad(mode: Mode) = routes.OtherAssetsCYAController.onPageLoad(srn, index.value, mode)
+  private def onSubmit(mode: Mode) = routes.OtherAssetsCYAController.onSubmit(srn, index.value, mode)
 
   private lazy val onSubmitViewOnly = routes.OtherAssetsCYAController.onSubmitViewOnly(
     srn,
@@ -70,7 +70,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoadViewOnly = routes.OtherAssetsCYAController.onPageLoadViewOnly(
     srn,
-    index,
+    index.value,
     yearString,
     submissionNumberTwo,
     submissionNumberOne
@@ -95,7 +95,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
       OtherAssetsProgress(srn, index),
       SectionJourneyStatus.InProgress(
         controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
-          .onPageLoad(srn, refineMV(1), NormalMode)
+          .onPageLoad(srn, 1, NormalMode)
           .url
       )
     )

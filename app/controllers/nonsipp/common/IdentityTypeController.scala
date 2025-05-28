@@ -21,7 +21,6 @@ import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import models.IdentityType._
 import config.RefinedTypes.Max5000
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -33,6 +32,8 @@ import pages.nonsipp.otherassetsheld.OtherAssetsCYAPointOfEntry
 import models.PointOfEntry.{NoPointOfEntry, WhoWasAssetAcquiredFromPointOfEntry}
 import views.html.RadioListView
 import models.SchemeId.Srn
+import utils.IntUtils.IntOpts
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.nonsipp.common.IdentityTypeController._
 import pages.nonsipp.common.IdentityTypePage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -59,7 +60,7 @@ class IdentityTypeController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode,
     subject: IdentitySubject
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
@@ -68,12 +69,12 @@ class IdentityTypeController @Inject()(
       case _ =>
         // If this page is reached in CheckMode, in Other Assets Journey, and there is no PointOfEntry set
         if (mode == CheckMode && subject == IdentitySubject.OtherAssetSeller && request.userAnswers
-            .get(OtherAssetsCYAPointOfEntry(srn, index))
+            .get(OtherAssetsCYAPointOfEntry(srn, index.refined))
             .contains(NoPointOfEntry)) {
           // Set this page as the PointOfEntry
           saveService.save(
             request.userAnswers
-              .set(OtherAssetsCYAPointOfEntry(srn, index), WhoWasAssetAcquiredFromPointOfEntry)
+              .set(OtherAssetsCYAPointOfEntry(srn, index.refined), WhoWasAssetAcquiredFromPointOfEntry)
               .getOrElse(request.userAnswers)
           )
         }
@@ -81,8 +82,8 @@ class IdentityTypeController @Inject()(
         val form = IdentityTypeController.form(formProvider, subject)
         Ok(
           view(
-            form.fromUserAnswers(IdentityTypePage(srn, index, subject)),
-            viewModel(srn, index, mode, subject, request.userAnswers)
+            form.fromUserAnswers(IdentityTypePage(srn, index.refined, subject)),
+            viewModel(srn, index.refined, mode, subject, request.userAnswers)
           )
         )
     }
@@ -90,7 +91,7 @@ class IdentityTypeController @Inject()(
 
   def onSubmit(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode,
     subject: IdentitySubject
   ): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
@@ -100,12 +101,14 @@ class IdentityTypeController @Inject()(
       .fold(
         formWithErrors =>
           Future
-            .successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, subject, request.userAnswers)))),
+            .successful(
+              BadRequest(view(formWithErrors, viewModel(srn, index.refined, mode, subject, request.userAnswers)))
+            ),
         answer => {
           for {
-            updatedAnswers <- request.userAnswers.set(IdentityTypePage(srn, index, subject), answer).mapK
-            nextPage = navigator.nextPage(IdentityTypePage(srn, index, subject), mode, updatedAnswers)
-            updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage, subject)
+            updatedAnswers <- request.userAnswers.set(IdentityTypePage(srn, index.refined, subject), answer).mapK
+            nextPage = navigator.nextPage(IdentityTypePage(srn, index.refined, subject), mode, updatedAnswers)
+            updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage, subject)
             _ <- saveService.save(updatedProgressAnswers)
           } yield Redirect(nextPage)
         }
@@ -156,7 +159,7 @@ object IdentityTypeController {
         radioListItems(subject)
       ),
       controllers.nonsipp.common.routes.IdentityTypeController
-        .onSubmit(srn, index, mode, subject)
+        .onSubmit(srn, index.value, mode, subject)
     )
   }
 }

@@ -40,22 +40,23 @@ object MemberDetailsNavigator extends JourneyNavigator {
         controllers.nonsipp.memberdetails.routes.HowToUploadController.onPageLoad(srn)
       }
 
-    case MemberDetailsPage(srn, index) => routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, NormalMode)
+    case MemberDetailsPage(srn, index) =>
+      routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index.value, NormalMode)
 
     case page @ DoesMemberHaveNinoPage(srn, index) =>
       if (userAnswers.get(page).contains(true)) {
-        routes.MemberDetailsNinoController.onPageLoad(srn, index, NormalMode)
+        routes.MemberDetailsNinoController.onPageLoad(srn, index.value, NormalMode)
       } else {
-        routes.NoNINOController.onPageLoad(srn, index, NormalMode)
+        routes.NoNINOController.onPageLoad(srn, index.value, NormalMode)
       }
 
     case MemberDetailsNinoPage(srn, index) =>
-      routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, NormalMode)
+      routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index.value, NormalMode)
 
     case SchemeMemberDetailsAnswersPage(srn) => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
 
     case NoNINOPage(srn, index) =>
-      routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, NormalMode)
+      routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index.value, NormalMode)
 
     case SchemeMembersListPage(srn, false, _) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
@@ -129,11 +130,15 @@ object MemberDetailsNavigator extends JourneyNavigator {
 
     incompleteIndex match {
       case Some(index) =>
-        routes.MemberDetailsController.onPageLoad(srn, refineV[OneTo300](index.toInt + 1).toOption.get, NormalMode)
+        routes.MemberDetailsController.onPageLoad(
+          srn,
+          refineV[OneTo300](index.toInt + 1).toOption.get.value,
+          NormalMode
+        )
       case None =>
         findNextOpenIndex[Max300.Refined](userAnswers.membersDetails(srn).keys.toList.map(_.toInt)) match {
           case None => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
-          case Some(nextIndex) => routes.MemberDetailsController.onPageLoad(srn, nextIndex, NormalMode)
+          case Some(nextIndex) => routes.MemberDetailsController.onPageLoad(srn, nextIndex.value, NormalMode)
         }
     }
   }
@@ -142,21 +147,22 @@ object MemberDetailsNavigator extends JourneyNavigator {
     _ =>
       userAnswers => {
         case MemberDetailsPage(srn, index) =>
-          routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckMode)
+          routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index.value, CheckMode)
         case page @ DoesMemberHaveNinoPage(srn, index) =>
           userAnswers.get(page) match {
             case Some(true) if userAnswers.get(MemberDetailsNinoPage(srn, index)).isEmpty =>
-              routes.MemberDetailsNinoController.onPageLoad(srn, index, CheckMode)
+              routes.MemberDetailsNinoController.onPageLoad(srn, index.value, CheckMode)
             case Some(false) if userAnswers.get(NoNINOPage(srn, index)).isEmpty =>
-              routes.NoNINOController.onPageLoad(srn, index, CheckMode)
+              routes.NoNINOController.onPageLoad(srn, index.value, CheckMode)
             case Some(_) =>
-              routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckMode)
+              routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index.value, CheckMode)
             case None =>
-              routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, CheckMode)
+              routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index.value, CheckMode)
           }
         case MemberDetailsNinoPage(srn, index) =>
-          routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckMode)
-        case NoNINOPage(srn, index) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckMode)
+          routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index.value, CheckMode)
+        case NoNINOPage(srn, index) =>
+          routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index.value, CheckMode)
         case UploadMemberDetailsPage(srn) => routes.CheckMemberDetailsFileController.onPageLoad(srn, CheckMode)
         case page @ CheckMemberDetailsFilePage(srn) =>
           if (userAnswers.get(page).contains(true)) {

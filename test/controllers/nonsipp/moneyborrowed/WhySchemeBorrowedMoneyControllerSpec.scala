@@ -29,8 +29,8 @@ class WhySchemeBorrowedMoneyControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  private lazy val onPageLoad = routes.WhySchemeBorrowedMoneyController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.WhySchemeBorrowedMoneyController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.WhySchemeBorrowedMoneyController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.WhySchemeBorrowedMoneyController.onSubmit(srn, index.value, NormalMode)
 
   val populatedUserAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(LenderNamePage(srn, index), lenderName)

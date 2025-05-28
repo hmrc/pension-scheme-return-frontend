@@ -21,6 +21,7 @@ import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
+import utils.IntUtils.{toInt, IntOpts}
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.common._
@@ -58,29 +59,29 @@ class OtherAssetsCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      if (request.userAnswers.get(OtherAssetsProgress(srn, index)).contains(Completed)) {
+      if (request.userAnswers.get(OtherAssetsProgress(srn, index.refined)).contains(Completed)) {
         //Clear any PointOfEntry
         saveService.save(
           request.userAnswers
-            .set(OtherAssetsCYAPointOfEntry(srn, index), NoPointOfEntry)
+            .set(OtherAssetsCYAPointOfEntry(srn, index.refined), NoPointOfEntry)
             .getOrElse(request.userAnswers)
         )
       }
-      onPageLoadCommon(srn, index, mode)
+      onPageLoadCommon(srn, index.refined, mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, index, mode)
+      onPageLoadCommon(srn, index.refined, mode)
     }
 
   def onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicit request: DataRequest[AnyContent]): Result = {
@@ -212,15 +213,15 @@ class OtherAssetsCYAController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val prePopulated = request.userAnswers.get(OtherAssetsPrePopulated(srn, index))
+      val prePopulated = request.userAnswers.get(OtherAssetsPrePopulated(srn, index.refined))
       for {
         updatedUserAnswers <- Future.fromTry(
           request.userAnswers
             .set(OtherAssetsHeldPage(srn), true)
-            .setWhen(prePopulated.isDefined)(OtherAssetsPrePopulated(srn, index), true)
-            .set(OtherAssetsCompleted(srn, index), SectionCompleted)
+            .setWhen(prePopulated.isDefined)(OtherAssetsPrePopulated(srn, index.refined), true)
+            .set(OtherAssetsCompleted(srn, index.refined), SectionCompleted)
         )
         _ <- saveService.save(updatedUserAnswers)
         redirectTo <- psrSubmissionService
@@ -498,7 +499,7 @@ object OtherAssetsCYAController {
           .url
       case IdentityType.Other =>
         controllers.nonsipp.common.routes.OtherRecipientDetailsController
-          .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller)
+          .onPageLoad(srn, index.value, CheckMode, IdentitySubject.OtherAssetSeller)
           .url + "#sellerName"
     }
 
@@ -509,15 +510,15 @@ object OtherAssetsCYAController {
           .url
       case IdentityType.UKCompany =>
         controllers.nonsipp.common.routes.CompanyRecipientCrnController
-          .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller)
+          .onPageLoad(srn, index.value, CheckMode, IdentitySubject.OtherAssetSeller)
           .url
       case IdentityType.UKPartnership =>
         controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-          .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller)
+          .onPageLoad(srn, index.value, CheckMode, IdentitySubject.OtherAssetSeller)
           .url
       case IdentityType.Other =>
         controllers.nonsipp.common.routes.OtherRecipientDetailsController
-          .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller)
+          .onPageLoad(srn, index.value, CheckMode, IdentitySubject.OtherAssetSeller)
           .url + "#sellerDetails"
     }
 
@@ -544,7 +545,7 @@ object OtherAssetsCYAController {
             SummaryAction(
               "site.change",
               controllers.nonsipp.common.routes.IdentityTypeController
-                .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller)
+                .onPageLoad(srn, index.value, CheckMode, IdentitySubject.OtherAssetSeller)
                 .url
             ).withVisuallyHiddenContent("otherAssets.cya.section2.baseRow1.hidden")
           ),

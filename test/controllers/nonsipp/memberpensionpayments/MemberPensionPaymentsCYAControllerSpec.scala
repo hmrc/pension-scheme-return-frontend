@@ -46,14 +46,14 @@ class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec {
     reset(mockPsrSubmissionService)
 
   private def onPageLoad(mode: Mode) =
-    routes.MemberPensionPaymentsCYAController.onPageLoad(srn, index, mode)
+    routes.MemberPensionPaymentsCYAController.onPageLoad(srn, index.value, mode)
 
   private def onSubmit(mode: Mode) =
-    routes.MemberPensionPaymentsCYAController.onSubmit(srn, index, mode)
+    routes.MemberPensionPaymentsCYAController.onSubmit(srn, index.value, mode)
 
   private lazy val onPageLoadViewOnly = routes.MemberPensionPaymentsCYAController.onPageLoadViewOnly(
     srn,
-    index,
+    index.value,
     yearString,
     submissionNumberTwo,
     submissionNumberOne

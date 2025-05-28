@@ -43,14 +43,14 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   private def onPageLoad(mode: Mode) =
-    routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, mode)
+    routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index.value, mode)
 
   private def onSubmit(mode: Mode) =
-    routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index, mode)
+    routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index.value, mode)
 
   private lazy val onPageLoadViewOnly = routes.SchemeMemberDetailsAnswersController.onPageLoadViewOnly(
     srn,
-    index,
+    index.value,
     yearString,
     submissionNumberTwo,
     submissionNumberOne

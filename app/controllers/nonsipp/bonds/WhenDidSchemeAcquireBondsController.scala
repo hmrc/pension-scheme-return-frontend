@@ -21,6 +21,7 @@ import pages.nonsipp.bonds.WhenDidSchemeAcquireBondsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Constants
+import utils.IntUtils.{toInt, IntOpts}
 import cats.implicits.toShow
 import controllers.actions._
 import navigation.Navigator
@@ -62,18 +63,18 @@ class WhenDidSchemeAcquireBondsController @Inject()(
     (date: LocalDate, request: DataRequest[AnyContent]) =>
       WhenDidSchemeAcquireBondsController.form(formProvider)(date, request.messages(messagesApi))
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         val preparedForm = {
-          request.userAnswers.fillForm(WhenDidSchemeAcquireBondsPage(srn, index), form(date.to, request))
+          request.userAnswers.fillForm(WhenDidSchemeAcquireBondsPage(srn, index.refined), form(date.to, request))
         }
-        Ok(view(preparedForm, viewModel(srn, index, mode, request.schemeDetails.schemeName)))
+        Ok(view(preparedForm, viewModel(srn, index.refined, mode, request.schemeDetails.schemeName)))
 
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         form(date.to, request)
@@ -84,16 +85,16 @@ class WhenDidSchemeAcquireBondsController @Inject()(
                 BadRequest(
                   view(
                     formWithErrors,
-                    viewModel(srn, index, mode, request.schemeDetails.schemeName)
+                    viewModel(srn, index.refined, mode, request.schemeDetails.schemeName)
                   )
                 )
               ),
             value =>
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.set(WhenDidSchemeAcquireBondsPage(srn, index), value))
-                nextPage = navigator.nextPage(WhenDidSchemeAcquireBondsPage(srn, index), mode, updatedAnswers)
-                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                  .fromTry(request.userAnswers.set(WhenDidSchemeAcquireBondsPage(srn, index.refined), value))
+                nextPage = navigator.nextPage(WhenDidSchemeAcquireBondsPage(srn, index.refined), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(
                 nextPage

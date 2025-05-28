@@ -20,6 +20,7 @@ import services.{SaveService, SchemeDateService}
 import pages.nonsipp.otherassetsdisposal.WhenWasAssetSoldPage
 import play.api.mvc._
 import controllers.nonsipp.otherassetsdisposal.WhenWasAssetSoldController._
+import utils.IntUtils.{toInt, IntOpts}
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -59,22 +60,22 @@ class WhenWasAssetSoldController @Inject()(
   private def form(date: DateRange)(implicit messages: Messages): Form[LocalDate] =
     WhenWasAssetSoldController.form(formProvider, date)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       usingSchemeDate[Id](srn) { date =>
         val preparedForm = request.userAnswers
-          .get(WhenWasAssetSoldPage(srn, assetIndex, disposalIndex))
+          .get(WhenWasAssetSoldPage(srn, assetIndex.refined, disposalIndex.refined))
           .fold(form(date))(form(date).fill)
         Ok(
           view(
             preparedForm,
-            viewModel(srn, assetIndex, disposalIndex, mode)
+            viewModel(srn, assetIndex.refined, disposalIndex.refined, mode)
           )
         )
       }
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       usingSchemeDate(srn) { date =>
         form(date)
@@ -85,17 +86,20 @@ class WhenWasAssetSoldController @Inject()(
                 BadRequest(
                   view(
                     formWithErrors,
-                    viewModel(srn, assetIndex, disposalIndex, mode)
+                    viewModel(srn, assetIndex.refined, disposalIndex.refined, mode)
                   )
                 )
               ),
             value =>
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.set(WhenWasAssetSoldPage(srn, assetIndex, disposalIndex), value))
+                  .fromTry(
+                    request.userAnswers.set(WhenWasAssetSoldPage(srn, assetIndex.refined, disposalIndex.refined), value)
+                  )
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(
-                navigator.nextPage(WhenWasAssetSoldPage(srn, assetIndex, disposalIndex), mode, updatedAnswers)
+                navigator
+                  .nextPage(WhenWasAssetSoldPage(srn, assetIndex.refined, disposalIndex.refined), mode, updatedAnswers)
               )
           )
       }

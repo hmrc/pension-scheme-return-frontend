@@ -48,10 +48,10 @@ class OtherRecipientDetailsControllerSpec extends ControllerBaseSpec {
       s"for $identitySubject" - {
         lazy val onPageLoad =
           controllers.nonsipp.common.routes.OtherRecipientDetailsController
-            .onPageLoad(srn, index, NormalMode, identitySubject)
+            .onPageLoad(srn, index.value, NormalMode, identitySubject)
         lazy val onSubmit =
           controllers.nonsipp.common.routes.OtherRecipientDetailsController
-            .onSubmit(srn, index, NormalMode, identitySubject)
+            .onSubmit(srn, index.value, NormalMode, identitySubject)
 
         act.like(renderView(onPageLoad) { implicit app => implicit request =>
           injected[RecipientDetailsView].apply(
@@ -91,7 +91,7 @@ class OtherRecipientDetailsControllerSpec extends ControllerBaseSpec {
     "Unknown" - {
       lazy val onPageLoad =
         controllers.nonsipp.common.routes.OtherRecipientDetailsController
-          .onPageLoad(srn, index, NormalMode, IdentitySubject.Unknown)
+          .onPageLoad(srn, index.value, NormalMode, IdentitySubject.Unknown)
 
       act.like(
         unauthorisedPage(onPageLoad, Some(defaultUserAnswers))

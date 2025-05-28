@@ -19,6 +19,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 import services.SaveService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.Max5000
+import utils.IntUtils.IntOpts
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import models.Mode
@@ -52,23 +53,23 @@ class AreRepaymentsInstalmentsController @Inject()(
 
   private val form = AreRepaymentsInstalmentsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val preparedForm = request.userAnswers.fillForm(AreRepaymentsInstalmentsPage(srn, index), form)
-      Ok(view(preparedForm, viewModel(srn, index, mode)))
+      val preparedForm = request.userAnswers.fillForm(AreRepaymentsInstalmentsPage(srn, index.refined), form)
+      Ok(view(preparedForm, viewModel(srn, index.refined, mode)))
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index.refined, mode)))),
           value =>
             for {
-              updatedAnswers <- request.userAnswers.set(AreRepaymentsInstalmentsPage(srn, index), value).mapK
-              nextPage = navigator.nextPage(AreRepaymentsInstalmentsPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              updatedAnswers <- request.userAnswers.set(AreRepaymentsInstalmentsPage(srn, index.refined), value).mapK
+              nextPage = navigator.nextPage(AreRepaymentsInstalmentsPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )
@@ -84,6 +85,6 @@ object AreRepaymentsInstalmentsController {
     YesNoPageViewModel(
       Message("areRepaymentsInstalments.equalInstallments.title"),
       Message("areRepaymentsInstalments.equalInstallments.heading"),
-      routes.AreRepaymentsInstalmentsController.onSubmit(srn, index, mode)
+      routes.AreRepaymentsInstalmentsController.onSubmit(srn, index.value, mode)
     )
 }

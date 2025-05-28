@@ -21,6 +21,7 @@ import pages.nonsipp.otherassetsdisposal.IndividualNameOfAssetBuyerPage
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.{Max50, Max5000}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -51,17 +52,17 @@ class IndividualNameOfAssetBuyerController @Inject()(
 
   private def form = IndividualNameOfAssetBuyerController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex)),
-          IndividualNameOfAssetBuyerController.viewModel(srn, assetIndex, disposalIndex, mode)
+          form.fromUserAnswers(IndividualNameOfAssetBuyerPage(srn, assetIndex.refined, disposalIndex.refined)),
+          IndividualNameOfAssetBuyerController.viewModel(srn, assetIndex.refined, disposalIndex.refined, mode)
         )
       )
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -71,7 +72,7 @@ class IndividualNameOfAssetBuyerController @Inject()(
               BadRequest(
                 view(
                   formWithErrors,
-                  IndividualNameOfAssetBuyerController.viewModel(srn, assetIndex, disposalIndex, mode)
+                  IndividualNameOfAssetBuyerController.viewModel(srn, assetIndex.refined, disposalIndex.refined, mode)
                 )
               )
             ),
@@ -79,12 +80,12 @@ class IndividualNameOfAssetBuyerController @Inject()(
             for {
               updatedAnswers <- Future.fromTry(
                 request.userAnswers
-                  .set(IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex), answer)
+                  .set(IndividualNameOfAssetBuyerPage(srn, assetIndex.refined, disposalIndex.refined), answer)
               )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
               navigator.nextPage(
-                IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex),
+                IndividualNameOfAssetBuyerPage(srn, assetIndex.refined, disposalIndex.refined),
                 mode,
                 updatedAnswers
               )

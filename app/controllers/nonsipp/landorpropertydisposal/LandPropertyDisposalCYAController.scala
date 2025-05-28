@@ -21,13 +21,14 @@ import viewmodels.implicits._
 import play.api.mvc._
 import models.HowDisposed._
 import utils.ListUtils.ListOps
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.actions._
 import models.requests.DataRequest
 import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import cats.implicits.toShow
 import controllers.nonsipp.landorpropertydisposal.LandPropertyDisposalCYAController._
 import config.Constants.maxLandOrPropertyDisposals
@@ -59,25 +60,25 @@ class LandPropertyDisposalCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max5000,
-    disposalIndex: Max50,
+    index: Int,
+    disposalIndex: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      onPageLoadCommon(srn, index, disposalIndex, mode)
+      onPageLoadCommon(srn, index.refined, disposalIndex.refined, mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    landOrPropertyIndex: Max5000,
-    disposalIndex: Max50,
+    landOrPropertyIndex: Int,
+    disposalIndex: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous).async { implicit request =>
-      onPageLoadCommon(srn, landOrPropertyIndex, disposalIndex, mode)
+      onPageLoadCommon(srn, landOrPropertyIndex.refined, disposalIndex.refined, mode)
     }
 
   def onPageLoadCommon(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode)(
@@ -216,11 +217,12 @@ class LandPropertyDisposalCYAController @Inject()(
         }
       ).merge
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
         updatedUserAnswers <- Future.fromTry(
-          request.userAnswers.set(LandPropertyDisposalCompletedPage(srn, index, disposalIndex), SectionCompleted)
+          request.userAnswers
+            .set(LandPropertyDisposalCompletedPage(srn, index.refined, disposalIndex.refined), SectionCompleted)
         )
         _ <- saveService.save(updatedUserAnswers)
         redirectTo <- psrSubmissionService
@@ -236,7 +238,7 @@ class LandPropertyDisposalCYAController @Inject()(
               Redirect(
                 navigator
                   .nextPage(
-                    LandPropertyDisposalCompletedPage(srn, index, disposalIndex),
+                    LandPropertyDisposalCompletedPage(srn, index.refined, disposalIndex.refined),
                     NormalMode,
                     updatedUserAnswers
                   )

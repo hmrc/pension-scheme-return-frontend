@@ -22,6 +22,7 @@ import models.PointOfEntry.NoPointOfEntry
 import utils.ListUtils.ListOps
 import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
 import models.SchemeHoldShare.Transfer
+import utils.IntUtils.{toInt, IntOpts}
 import cats.implicits.toShow
 import config.Constants.maxDisposalsPerShare
 import controllers.actions.IdentifyAndRequireData
@@ -61,31 +62,33 @@ class SharesDisposalCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      if (request.userAnswers.get(SharesDisposalProgress(srn, shareIndex, disposalIndex)).contains(Completed)) {
+      if (request.userAnswers
+          .get(SharesDisposalProgress(srn, shareIndex.refined, disposalIndex.refined))
+          .contains(Completed)) {
         // Clear any PointOfEntry
         saveService
           .save(
             request.userAnswers
-              .set(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex), NoPointOfEntry)
+              .set(SharesDisposalCYAPointOfEntry(srn, shareIndex.refined, disposalIndex.refined), NoPointOfEntry)
               .getOrElse(request.userAnswers)
           )
       }
-      onPageLoadCommon(srn, shareIndex, disposalIndex, mode)
+      onPageLoadCommon(srn, shareIndex.refined, disposalIndex.refined, mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    shareIndex: Max5000,
-    disposalIndex: Max50,
+    shareIndex: Int,
+    disposalIndex: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous).async { implicit request =>
-      onPageLoadCommon(srn, shareIndex, disposalIndex, mode)
+      onPageLoadCommon(srn, shareIndex.refined, disposalIndex.refined, mode)
     }
 
   def onPageLoadCommon(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode)(
@@ -239,11 +242,11 @@ class SharesDisposalCYAController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
         updatedUserAnswers <- request.userAnswers
-          .set(SharesDisposalProgress(srn, shareIndex, disposalIndex), SectionJourneyStatus.Completed)
+          .set(SharesDisposalProgress(srn, shareIndex.refined, disposalIndex.refined), SectionJourneyStatus.Completed)
           .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(

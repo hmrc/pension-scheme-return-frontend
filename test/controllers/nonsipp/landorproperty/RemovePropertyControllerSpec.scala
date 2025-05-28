@@ -36,8 +36,8 @@ class RemovePropertyControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  private lazy val onPageLoad = routes.RemovePropertyController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.RemovePropertyController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.RemovePropertyController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.RemovePropertyController.onSubmit(srn, index.value, NormalMode)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(LandPropertyInUKPage(srn, index), true)

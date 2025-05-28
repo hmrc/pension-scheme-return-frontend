@@ -46,9 +46,9 @@ class RemoveLandPropertyDisposalControllerSpec extends ControllerBaseSpec {
   private val methodOfDisposal = HowDisposed.Other(otherDetails)
 
   private lazy val onPageLoad =
-    routes.RemoveLandPropertyDisposalController.onPageLoad(srn, index, disposalIndex, NormalMode)
+    routes.RemoveLandPropertyDisposalController.onPageLoad(srn, index.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.RemoveLandPropertyDisposalController.onSubmit(srn, index, disposalIndex, NormalMode)
+    routes.RemoveLandPropertyDisposalController.onSubmit(srn, index.value, disposalIndex.value, NormalMode)
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 

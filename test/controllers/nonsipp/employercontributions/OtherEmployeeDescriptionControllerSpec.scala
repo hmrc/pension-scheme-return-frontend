@@ -30,8 +30,9 @@ class OtherEmployeeDescriptionControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[Max300.Refined](1)
   private val secondaryIndex = refineMV[Max50.Refined](1)
   private lazy val onPageLoad =
-    routes.OtherEmployeeDescriptionController.onPageLoad(srn, index, secondaryIndex, NormalMode)
-  private lazy val onSubmit = routes.OtherEmployeeDescriptionController.onSubmit(srn, index, secondaryIndex, NormalMode)
+    routes.OtherEmployeeDescriptionController.onPageLoad(srn, index.value, secondaryIndex.value, NormalMode)
+  private lazy val onSubmit =
+    routes.OtherEmployeeDescriptionController.onSubmit(srn, index.value, secondaryIndex.value, NormalMode)
 
   private val userAnswers = defaultUserAnswers.unsafeSet(EmployerNamePage(srn, index, secondaryIndex), employerName)
 

@@ -28,8 +28,8 @@ import controllers.ControllerBaseSpec
 class LandRegistryTitleNumberControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
-  private lazy val onPageLoad = routes.LandRegistryTitleNumberController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.LandRegistryTitleNumberController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.LandRegistryTitleNumberController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.LandRegistryTitleNumberController.onSubmit(srn, index.value, NormalMode)
 
   private val userAnswersWithLookUpPage =
     defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)

@@ -20,6 +20,7 @@ import services.SaveService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import config.RefinedTypes.Max5000
+import utils.IntUtils.IntOpts
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, Mode}
@@ -56,30 +57,30 @@ class IndividualRecipientNinoController @Inject()(
 
   private val form: Form[Either[String, Nino]] = IndividualRecipientNinoController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.usingAnswer(IndividualRecipientNamePage(srn, index)).sync { individualName =>
-        val preparedForm = request.userAnswers.fillForm(IndividualRecipientNinoPage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, individualName, mode)))
+      request.usingAnswer(IndividualRecipientNamePage(srn, index.refined)).sync { individualName =>
+        val preparedForm = request.userAnswers.fillForm(IndividualRecipientNinoPage(srn, index.refined), form)
+        Ok(view(preparedForm, viewModel(srn, index.refined, individualName, mode)))
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(IndividualRecipientNamePage(srn, index)).async { individualName =>
-              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, individualName, mode))))
+            request.usingAnswer(IndividualRecipientNamePage(srn, index.refined)).async { individualName =>
+              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index.refined, individualName, mode))))
             },
           value =>
             for {
               updatedAnswers <- request.userAnswers
-                .set(IndividualRecipientNinoPage(srn, index), ConditionalYesNo(value))
+                .set(IndividualRecipientNinoPage(srn, index.refined), ConditionalYesNo(value))
                 .mapK
-              nextPage = navigator.nextPage(IndividualRecipientNinoPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              nextPage = navigator.nextPage(IndividualRecipientNinoPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )
@@ -118,6 +119,6 @@ object IndividualRecipientNinoController {
         no = YesNoViewModel
           .Conditional(Message("individualRecipientNino.no.conditional", individualName), FieldType.Textarea)
       ).withHint("individualRecipientNino.hint"),
-      routes.IndividualRecipientNinoController.onSubmit(srn, index, mode)
+      routes.IndividualRecipientNinoController.onSubmit(srn, index.value, mode)
     )
 }

@@ -25,6 +25,7 @@ import models._
 import pages.nonsipp.common._
 import pages.nonsipp.otherassetsheld._
 import models.PointOfEntry._
+import navigation.nonsipp.RouteFnModeHelper.refine
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
 
@@ -73,7 +74,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhatYouWillNeedOtherAssetsPage,
               (srn, _) =>
                 controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from WhatYouWillNeedOtherAssets page to WhatIsOtherAsset page"
@@ -89,7 +90,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhatIsOtherAssetPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from WhatIsOtherAsset page to IsAssetTangibleMoveableProperty page"
@@ -105,7 +106,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               IsAssetTangibleMoveablePropertyPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.WhyDoesSchemeHoldAssetsController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from IsAssetTangibleMoveablePropertyPage to WhyDoesSchemeHoldAssetsPage"
@@ -121,7 +122,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhyDoesSchemeHoldAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   WhyDoesSchemeHoldAssetsPage(srn, index),
@@ -140,7 +141,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhyDoesSchemeHoldAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   WhyDoesSchemeHoldAssetsPage(srn, index),
@@ -159,7 +160,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhyDoesSchemeHoldAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   WhyDoesSchemeHoldAssetsPage(srn, index),
@@ -180,7 +181,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhenDidSchemeAcquireAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.common.routes.IdentityTypeController
-                  .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller),
+                  .onPageLoad(srn, index.value, NormalMode, IdentitySubject.OtherAssetSeller),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   WhyDoesSchemeHoldAssetsPage(srn, index),
@@ -199,7 +200,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhenDidSchemeAcquireAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   WhyDoesSchemeHoldAssetsPage(srn, index),
@@ -222,7 +223,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               Gen.const(IdentityType.Individual),
               (srn, _: Max5000, _, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IndividualNameOfOtherAssetSellerController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName("go from identity type page to individual seller details page")
         )
@@ -234,7 +235,8 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               subject,
               IdentityTypePage,
               Gen.const(IdentityType.Other),
-              controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
+              RouteFnSubjectModeHelper
+                .refine[5000](controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad)
             )
             .withName("go from identity type page to other seller details page")
         )
@@ -246,7 +248,9 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               subject,
               IdentityTypePage,
               Gen.const(IdentityType.UKCompany),
-              controllers.nonsipp.otherassetsheld.routes.CompanyNameOfOtherAssetSellerController.onPageLoad
+              refine[5000](
+                controllers.nonsipp.otherassetsheld.routes.CompanyNameOfOtherAssetSellerController.onPageLoad
+              )
             )
             .withName("go from identity type page to company seller name page")
         )
@@ -258,7 +262,9 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               subject,
               IdentityTypePage,
               Gen.const(IdentityType.UKPartnership),
-              controllers.nonsipp.otherassetsheld.routes.PartnershipNameOfOtherAssetsSellerController.onPageLoad
+              refine[5000](
+                controllers.nonsipp.otherassetsheld.routes.PartnershipNameOfOtherAssetsSellerController.onPageLoad
+              )
             )
             .withName("go from identity type page to UKPartnership to partnership name of seller name page")
         )
@@ -272,7 +278,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               IndividualNameOfOtherAssetSellerPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetIndividualSellerNINumberController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from IndividualNameOfOtherAssetSellerPage to OtherAssetIndividualSellerNINumberPage"
@@ -288,7 +294,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               CompanyNameOfOtherAssetSellerPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.common.routes.CompanyRecipientCrnController
-                  .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
+                  .onPageLoad(srn, index.value, NormalMode, IdentitySubject.OtherAssetSeller)
             )
             .withName(
               "go from CompanyNameOfOtherAssetSellerPage to CompanyRecipientCrnPage"
@@ -304,7 +310,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               PartnershipOtherAssetSellerNamePage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-                  .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
+                  .onPageLoad(srn, index.value, NormalMode, IdentitySubject.OtherAssetSeller)
             )
             .withName(
               "go from PartnershipOtherAssetSellerNamePage to PartnershipRecipientUtrPage"
@@ -320,7 +326,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               OtherAssetIndividualSellerNINumberPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from OtherAssetIndividualSellerNINumberPage to OtherAssetSellerConnectedPartyPage"
@@ -337,7 +343,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               CompanyRecipientCrnPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from CompanyRecipientCrnPage to OtherAssetSellerConnectedPartyPage"
@@ -354,7 +360,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               PartnershipRecipientUtrPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from PartnershipRecipientUtrPage to OtherAssetSellerConnectedPartyPage"
@@ -371,7 +377,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               OtherRecipientDetailsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from OtherRecipientDetailsPage to OtherAssetSellerConnectedPartyPage"
@@ -387,7 +393,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               OtherAssetSellerConnectedPartyPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from OtherAssetSellerConnectedPartyPage to CostOfOtherAsset page"
@@ -403,7 +409,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               CostOfOtherAssetPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   WhyDoesSchemeHoldAssetsPage(srn, index),
@@ -422,7 +428,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               CostOfOtherAssetPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   WhyDoesSchemeHoldAssetsPage(srn, index),
@@ -441,7 +447,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               CostOfOtherAssetPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IncomeFromAssetController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   WhyDoesSchemeHoldAssetsPage(srn, index),
@@ -462,7 +468,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               IndependentValuationPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IncomeFromAssetController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from IndependentValuationPage to IncomeFromAssetPage"
@@ -478,7 +484,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               IncomeFromAssetPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from IncomeFromAssetPage to OtherAssetsCYA"
@@ -548,7 +554,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhatIsOtherAssetPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from WhatIsOtherAsset to OtherAssetsCYA (POE N/A)"
@@ -564,7 +570,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               IsAssetTangibleMoveablePropertyPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from IsAssetTangibleMoveableProperty to OtherAssetsCYA (POE N/A)"
@@ -580,7 +586,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhyDoesSchemeHoldAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -599,7 +605,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhyDoesSchemeHoldAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -618,7 +624,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhyDoesSchemeHoldAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.common.routes.IdentityTypeController
-                  .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller),
+                  .onPageLoad(srn, index.value, CheckMode, IdentitySubject.OtherAssetSeller),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -637,7 +643,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhyDoesSchemeHoldAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -656,7 +662,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhyDoesSchemeHoldAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
-                  .onPageLoad(srn, index, CheckMode),
+                  .onPageLoad(srn, index.value, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -675,7 +681,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhyDoesSchemeHoldAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
-                  .onPageLoad(srn, index, CheckMode),
+                  .onPageLoad(srn, index.value, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -694,7 +700,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhyDoesSchemeHoldAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
-                  .onPageLoad(srn, index, CheckMode),
+                  .onPageLoad(srn, index.value, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -714,7 +720,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhyDoesSchemeHoldAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -735,7 +741,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhenDidSchemeAcquireAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.common.routes.IdentityTypeController
-                  .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller),
+                  .onPageLoad(srn, index.value, CheckMode, IdentitySubject.OtherAssetSeller),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -754,7 +760,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhenDidSchemeAcquireAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
-                  .onPageLoad(srn, index, CheckMode),
+                  .onPageLoad(srn, index.value, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -773,7 +779,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               WhenDidSchemeAcquireAssetsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -798,7 +804,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               Gen.const(IdentityType.Individual),
               (srn, _: Max5000, _, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IndividualNameOfOtherAssetSellerController
-                  .onPageLoad(srn, index, CheckMode)
+                  .onPageLoad(srn, index.value, CheckMode)
             )
             .withName("go from IdentityType to IndividualNameOfOtherAssetSeller (POE N/A)")
         )
@@ -810,7 +816,9 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               subject,
               IdentityTypePage,
               Gen.const(IdentityType.UKCompany),
-              controllers.nonsipp.otherassetsheld.routes.CompanyNameOfOtherAssetSellerController.onPageLoad
+              refine[5000](
+                controllers.nonsipp.otherassetsheld.routes.CompanyNameOfOtherAssetSellerController.onPageLoad
+              )
             )
             .withName("go from IdentityType to CompanyNameOfOtherAssetSeller (POE N/A)")
         )
@@ -822,7 +830,9 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               subject,
               IdentityTypePage,
               Gen.const(IdentityType.UKPartnership),
-              controllers.nonsipp.otherassetsheld.routes.PartnershipNameOfOtherAssetsSellerController.onPageLoad
+              refine[5000](
+                controllers.nonsipp.otherassetsheld.routes.PartnershipNameOfOtherAssetsSellerController.onPageLoad
+              )
             )
             .withName("go from IdentityType to PartnershipNameOfOtherAssetsSeller (POE N/A)")
         )
@@ -834,7 +844,8 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               subject,
               IdentityTypePage,
               Gen.const(IdentityType.Other),
-              controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
+              RouteFnSubjectModeHelper
+                .refine[5000](controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad)
             )
             .withName("go from IdentityType to OtherRecipientDetails (POE N/A)")
         )
@@ -848,7 +859,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               IndividualNameOfOtherAssetSellerPage,
               (srn, index: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -865,7 +876,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               IndividualNameOfOtherAssetSellerPage,
               (srn, index: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetIndividualSellerNINumberController
-                  .onPageLoad(srn, index, CheckMode),
+                  .onPageLoad(srn, index.value, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -886,7 +897,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               CompanyNameOfOtherAssetSellerPage,
               (srn, index: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -903,7 +914,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               CompanyNameOfOtherAssetSellerPage,
               (srn, index: Max5000, _) =>
                 controllers.nonsipp.common.routes.CompanyRecipientCrnController
-                  .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller),
+                  .onPageLoad(srn, index.value, CheckMode, IdentitySubject.OtherAssetSeller),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -922,7 +933,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               PartnershipOtherAssetSellerNamePage,
               (srn, index: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -939,7 +950,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               PartnershipOtherAssetSellerNamePage,
               (srn, index: Max5000, _) =>
                 controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-                  .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller),
+                  .onPageLoad(srn, index.value, CheckMode, IdentitySubject.OtherAssetSeller),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -958,7 +969,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               OtherAssetIndividualSellerNINumberPage,
               (srn, index: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -975,7 +986,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               OtherAssetIndividualSellerNINumberPage,
               (srn, index: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -992,7 +1003,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               OtherAssetIndividualSellerNINumberPage,
               (srn, index: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-                  .onPageLoad(srn, index, CheckMode),
+                  .onPageLoad(srn, index.value, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1011,7 +1022,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               OtherAssetIndividualSellerNINumberPage,
               (srn, index: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-                  .onPageLoad(srn, index, CheckMode),
+                  .onPageLoad(srn, index.value, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1032,7 +1043,8 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               IdentitySubject.OtherAssetSeller,
               CompanyRecipientCrnPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad(srn, index, NormalMode),
+                controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1049,7 +1061,8 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               IdentitySubject.OtherAssetSeller,
               CompanyRecipientCrnPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad(srn, index, NormalMode),
+                controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1067,7 +1080,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               CompanyRecipientCrnPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-                  .onPageLoad(srn, index, CheckMode),
+                  .onPageLoad(srn, index.value, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1087,7 +1100,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               CompanyRecipientCrnPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-                  .onPageLoad(srn, index, CheckMode),
+                  .onPageLoad(srn, index.value, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1106,7 +1119,8 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               IdentitySubject.OtherAssetSeller,
               PartnershipRecipientUtrPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad(srn, index, NormalMode),
+                controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1123,7 +1137,8 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               IdentitySubject.OtherAssetSeller,
               PartnershipRecipientUtrPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad(srn, index, NormalMode),
+                controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1141,7 +1156,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               PartnershipRecipientUtrPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-                  .onPageLoad(srn, index, CheckMode),
+                  .onPageLoad(srn, index.value, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1161,7 +1176,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               PartnershipRecipientUtrPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-                  .onPageLoad(srn, index, CheckMode),
+                  .onPageLoad(srn, index.value, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1182,7 +1197,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               subject,
               OtherRecipientDetailsPage,
               Gen.const(recipientDetails),
-              controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad,
+              refine[5000](controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1199,7 +1214,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               subject,
               OtherRecipientDetailsPage,
               Gen.const(recipientDetails),
-              controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad,
+              refine[5000](controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController.onPageLoad),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1216,7 +1231,9 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               subject,
               OtherRecipientDetailsPage,
               Gen.const(recipientDetails),
-              controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController.onPageLoad,
+              refine[5000](
+                controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController.onPageLoad
+              ),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1235,7 +1252,9 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               subject,
               OtherRecipientDetailsPage,
               Gen.const(recipientDetails),
-              controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController.onPageLoad,
+              refine[5000](
+                controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController.onPageLoad
+              ),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1254,7 +1273,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               OtherAssetSellerConnectedPartyPage,
               (srn, index: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1271,7 +1290,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               OtherAssetSellerConnectedPartyPage,
               (srn, index: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode),
+                  .onPageLoad(srn, index.value, NormalMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1288,7 +1307,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               OtherAssetSellerConnectedPartyPage,
               (srn, index: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
-                  .onPageLoad(srn, index, CheckMode),
+                  .onPageLoad(srn, index.value, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
                   OtherAssetsCYAPointOfEntry(srn, index),
@@ -1307,7 +1326,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               CostOfOtherAssetPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from CostOfOtherAsset to OtherAssetsCYA (POE N/A)"
@@ -1323,7 +1342,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               IndependentValuationPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from IndependentValuation to OtherAssetsCYA (POE N/A)"
@@ -1339,7 +1358,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               IncomeFromAssetPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                  .onPageLoad(srn, index, NormalMode)
+                  .onPageLoad(srn, index.value, NormalMode)
             )
             .withName(
               "go from IncomeFromAsset to OtherAssetsCYA (POE N/A)"

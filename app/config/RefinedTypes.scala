@@ -24,6 +24,7 @@ import eu.timepit.refined.numeric.{Greater, LessEqual}
 import eu.timepit.refined.api.{Refined, Validate}
 
 object RefinedTypes {
+  type OneTo[N] = And[Greater[0], LessEqual[N]]
 
   type OneToThree = Greater[0] And LessEqual[3]
   type Max3 = Int Refined OneToThree

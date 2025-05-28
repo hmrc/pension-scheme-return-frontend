@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import config.RefinedTypes.{Max50, Max5000}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, Mode}
@@ -55,27 +56,32 @@ class AssetIndividualBuyerNiNumberController @Inject()(
 
   private val form: Form[Either[String, Nino]] = AssetIndividualBuyerNiNumberController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.usingAnswer(IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex)).sync { individualName =>
-        val preparedForm =
-          request.userAnswers.fillForm(AssetIndividualBuyerNiNumberPage(srn, assetIndex, disposalIndex), form)
-        Ok(view(preparedForm, viewModel(srn, assetIndex, disposalIndex, individualName, mode)))
+      request.usingAnswer(IndividualNameOfAssetBuyerPage(srn, assetIndex.refined, disposalIndex.refined)).sync {
+        individualName =>
+          val preparedForm =
+            request.userAnswers
+              .fillForm(AssetIndividualBuyerNiNumberPage(srn, assetIndex.refined, disposalIndex.refined), form)
+          Ok(view(preparedForm, viewModel(srn, assetIndex.refined, disposalIndex.refined, individualName, mode)))
       }
 
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex)).async {
+            request.usingAnswer(IndividualNameOfAssetBuyerPage(srn, assetIndex.refined, disposalIndex.refined)).async {
               individualName =>
                 Future.successful(
                   BadRequest(
-                    view(formWithErrors, viewModel(srn, assetIndex, disposalIndex, individualName, mode))
+                    view(
+                      formWithErrors,
+                      viewModel(srn, assetIndex.refined, disposalIndex.refined, individualName, mode)
+                    )
                   )
                 )
             },
@@ -85,14 +91,18 @@ class AssetIndividualBuyerNiNumberController @Inject()(
                 .fromTry(
                   request.userAnswers
                     .set(
-                      AssetIndividualBuyerNiNumberPage(srn, assetIndex, disposalIndex),
+                      AssetIndividualBuyerNiNumberPage(srn, assetIndex.refined, disposalIndex.refined),
                       ConditionalYesNo(value)
                     )
                 )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
               navigator
-                .nextPage(AssetIndividualBuyerNiNumberPage(srn, assetIndex, disposalIndex), mode, updatedAnswers)
+                .nextPage(
+                  AssetIndividualBuyerNiNumberPage(srn, assetIndex.refined, disposalIndex.refined),
+                  mode,
+                  updatedAnswers
+                )
             )
         )
     }

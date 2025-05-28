@@ -32,9 +32,9 @@ class TotalProceedsSaleLandPropertyControllerSpec extends ControllerBaseSpec {
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.TotalProceedsSaleLandPropertyController.onPageLoad(srn, index, disposalIndex, NormalMode)
+    routes.TotalProceedsSaleLandPropertyController.onPageLoad(srn, index.value, disposalIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.TotalProceedsSaleLandPropertyController.onSubmit(srn, index, disposalIndex, NormalMode)
+    routes.TotalProceedsSaleLandPropertyController.onSubmit(srn, index.value, disposalIndex.value, NormalMode)
 
   "TotalProceedsSaleLandPropertyController" - {
 

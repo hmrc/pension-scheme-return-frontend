@@ -19,6 +19,7 @@ package controllers.nonsipp.sharesdisposal
 import services.SaveService
 import utils.FormUtils._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import utils.IntUtils.{toInt, IntOpts}
 import config.Constants.{maxShares, minSharesHeld}
 import controllers.actions._
 import pages.nonsipp.sharesdisposal.{HowManyDisposalSharesPage, SharesDisposalProgress}
@@ -57,63 +58,77 @@ class HowManySharesController @Inject()(
 
   private def form: Form[Int] = HowManySharesController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { nameOfSharesCompany =>
-        Ok(
-          view(
-            form.fromUserAnswers(HowManyDisposalSharesPage(srn, index, disposalIndex)),
-            viewModel(
-              srn,
-              index,
-              disposalIndex,
-              nameOfSharesCompany,
-              request.schemeDetails.schemeName,
-              mode,
-              form
+      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index.refined)).getOrRecoverJourney {
+        nameOfSharesCompany =>
+          Ok(
+            view(
+              form.fromUserAnswers(HowManyDisposalSharesPage(srn, index.refined, disposalIndex.refined)),
+              viewModel(
+                srn,
+                index.refined,
+                disposalIndex.refined,
+                nameOfSharesCompany,
+                request.schemeDetails.schemeName,
+                mode,
+                form
+              )
             )
           )
-        )
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { nameOfSharesCompany =>
-        form
-          .bindFromRequest()
-          .fold(
-            formWithErrors =>
-              Future.successful(
-                BadRequest(
-                  view(
-                    formWithErrors,
-                    HowManySharesController
-                      .viewModel(
-                        srn,
-                        index,
-                        disposalIndex,
-                        nameOfSharesCompany,
-                        request.schemeDetails.schemeName,
-                        mode,
-                        form
-                      )
+      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index.refined)).getOrRecoverJourney {
+        nameOfSharesCompany =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      HowManySharesController
+                        .viewModel(
+                          srn,
+                          index.refined,
+                          disposalIndex.refined,
+                          nameOfSharesCompany,
+                          request.schemeDetails.schemeName,
+                          mode,
+                          form
+                        )
+                    )
                   )
-                )
-              ),
-            answer => {
-              for {
-                updatedAnswers <- request.userAnswers
-                  .set(HowManyDisposalSharesPage(srn, index, disposalIndex), answer)
-                  .set(SharesDisposalProgress(srn, index, disposalIndex), SectionJourneyStatus.Completed)
-                  .mapK[Future]
-                nextPage = navigator
-                  .nextPage(HowManyDisposalSharesPage(srn, index, disposalIndex), mode, updatedAnswers)
-                updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
-                _ <- saveService.save(updatedProgressAnswers)
-              } yield Redirect(nextPage)
-            }
-          )
+                ),
+              answer => {
+                for {
+                  updatedAnswers <- request.userAnswers
+                    .set(HowManyDisposalSharesPage(srn, index.refined, disposalIndex.refined), answer)
+                    .set(
+                      SharesDisposalProgress(srn, index.refined, disposalIndex.refined),
+                      SectionJourneyStatus.Completed
+                    )
+                    .mapK[Future]
+                  nextPage = navigator.nextPage(
+                    HowManyDisposalSharesPage(srn, index.refined, disposalIndex.refined),
+                    mode,
+                    updatedAnswers
+                  )
+                  updatedProgressAnswers <- saveProgress(
+                    srn,
+                    index.refined,
+                    disposalIndex.refined,
+                    updatedAnswers,
+                    nextPage
+                  )
+                  _ <- saveService.save(updatedProgressAnswers)
+                } yield Redirect(nextPage)
+              }
+            )
       }
     }
 }

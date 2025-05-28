@@ -19,6 +19,7 @@ package controllers.nonsipp.shares
 import controllers.nonsipp.shares.SharesCheckAndUpdateController._
 import viewmodels.implicits._
 import com.google.inject.Inject
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import models._
 import pages.nonsipp.shares.{ClassOfSharesPage, CostOfSharesPage, TypeOfSharesHeldPage}
@@ -40,17 +41,17 @@ class SharesCheckAndUpdateController @Inject()(
   view: ContentTablePageView
 ) extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     (
       for {
-        typeOfShares <- request.userAnswers.get(TypeOfSharesHeldPage(srn, index)).getOrRecoverJourney
-        classOfShares <- request.userAnswers.get(ClassOfSharesPage(srn, index)).getOrRecoverJourney
-        costOfShares <- request.userAnswers.get(CostOfSharesPage(srn, index)).getOrRecoverJourney
+        typeOfShares <- request.userAnswers.get(TypeOfSharesHeldPage(srn, index.refined)).getOrRecoverJourney
+        classOfShares <- request.userAnswers.get(ClassOfSharesPage(srn, index.refined)).getOrRecoverJourney
+        costOfShares <- request.userAnswers.get(CostOfSharesPage(srn, index.refined)).getOrRecoverJourney
       } yield Ok(
         view(
           viewModel(
             srn,
-            index,
+            index.refined,
             typeOfShares,
             classOfShares,
             costOfShares
@@ -60,7 +61,7 @@ class SharesCheckAndUpdateController @Inject()(
     ).merge
   }
 
-  def onSubmit(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
+  def onSubmit(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
     Redirect(routes.SharesTotalIncomeController.onPageLoad(srn, index, NormalMode))
   }
 }

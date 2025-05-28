@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.bonds.{BondPrePopulated, NameOfBondsPage, RemoveBondsPage}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -52,41 +53,41 @@ class RemoveBondsController @Inject()(
 
   private val form = RemoveBondsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      if (request.userAnswers.get(BondPrePopulated(srn, index)).isDefined)
+      if (request.userAnswers.get(BondPrePopulated(srn, index.refined)).isDefined)
         Redirect(controllers.routes.UnauthorisedController.onPageLoad())
       else
         (
           for {
-            nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, index)).getOrRedirectToTaskList(srn)
+            nameOfBonds <- request.userAnswers.get(NameOfBondsPage(srn, index.refined)).getOrRedirectToTaskList(srn)
           } yield {
             val preparedForm =
-              request.userAnswers.fillForm(RemoveBondsPage(srn, index), form)
+              request.userAnswers.fillForm(RemoveBondsPage(srn, index.refined), form)
             Ok(
               view(
                 preparedForm,
                 RemoveBondsController
-                  .viewModel(srn, index, nameOfBonds, mode)
+                  .viewModel(srn, index.refined, nameOfBonds, mode)
               )
             )
           }
         ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           errors =>
-            request.userAnswers.get(NameOfBondsPage(srn, index)).getOrRecoverJourney { nameOfBonds =>
+            request.userAnswers.get(NameOfBondsPage(srn, index.refined)).getOrRecoverJourney { nameOfBonds =>
               Future.successful(
                 BadRequest(
                   view(
                     errors,
                     RemoveBondsController
-                      .viewModel(srn, index, nameOfBonds, mode)
+                      .viewModel(srn, index.refined, nameOfBonds, mode)
                   )
                 )
               )
@@ -97,7 +98,7 @@ class RemoveBondsController @Inject()(
                 removedUserAnswers <- Future
                   .fromTry(
                     // Remove the first page in the journey only
-                    request.userAnswers.remove(NameOfBondsPage(srn, index))
+                    request.userAnswers.remove(NameOfBondsPage(srn, index.refined))
                   )
 
                 _ <- saveService.save(removedUserAnswers)
@@ -116,7 +117,7 @@ class RemoveBondsController @Inject()(
                     case Some(_) =>
                       Redirect(
                         navigator.nextPage(
-                          RemoveBondsPage(srn, index),
+                          RemoveBondsPage(srn, index.refined),
                           mode,
                           removedUserAnswers
                         )
@@ -128,7 +129,7 @@ class RemoveBondsController @Inject()(
                 .successful(
                   Redirect(
                     navigator.nextPage(
-                      RemoveBondsPage(srn, index),
+                      RemoveBondsPage(srn, index.refined),
                       mode,
                       request.userAnswers
                     )

@@ -15,7 +15,7 @@ object AppDependencies {
     "uk.gov.hmrc"        %% "crypto-json-play-30"                    % "8.2.0",
     "uk.gov.hmrc.mongo"  %% "hmrc-mongo-play-30"                     % hmrcMongoVersion,
     "org.typelevel"      %% "cats-core"                              % "2.12.0",
-    "eu.timepit"         %% "refined"                                % "0.11.2",
+    "eu.timepit"         %% "refined"                                % "0.11.3",
     "org.apache.pekko"   %% "pekko-connectors-csv"                   % "1.0.2"
   )
 

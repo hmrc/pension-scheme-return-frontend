@@ -20,6 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import forms.mappings.Mappings
 import config.RefinedTypes.Max5000
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -51,34 +52,34 @@ class SharesCompanyCrnController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
   val form: Form[Either[String, Crn]] = SharesCompanyCrnController.form(formProvider)
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.usingAnswer(CompanyNameRelatedSharesPage(srn, index)).sync { companyName =>
+      request.usingAnswer(CompanyNameRelatedSharesPage(srn, index.refined)).sync { companyName =>
         val preparedForm =
-          request.userAnswers.fillForm(SharesCompanyCrnPage(srn, index), form)
+          request.userAnswers.fillForm(SharesCompanyCrnPage(srn, index.refined), form)
         Ok(
           view(
             preparedForm,
-            SharesCompanyCrnController.viewModel(srn, index, mode, companyName)
+            SharesCompanyCrnController.viewModel(srn, index.refined, mode, companyName)
           )
         )
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(CompanyNameRelatedSharesPage(srn, index)).async { companyName =>
+            request.usingAnswer(CompanyNameRelatedSharesPage(srn, index.refined)).async { companyName =>
               Future
                 .successful(
                   BadRequest(
                     view(
                       formWithErrors,
                       SharesCompanyCrnController
-                        .viewModel(srn, index, mode, companyName)
+                        .viewModel(srn, index.refined, mode, companyName)
                     )
                   )
                 )
@@ -88,10 +89,10 @@ class SharesCompanyCrnController @Inject()(
               updatedAnswers <- Future
                 .fromTry(
                   request.userAnswers
-                    .set(SharesCompanyCrnPage(srn, index), ConditionalYesNo(value))
+                    .set(SharesCompanyCrnPage(srn, index.refined), ConditionalYesNo(value))
                 )
-              nextPage = navigator.nextPage(SharesCompanyCrnPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              nextPage = navigator.nextPage(SharesCompanyCrnPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

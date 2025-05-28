@@ -29,8 +29,10 @@ class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
   private val disposalIndex = refineMV[Max50.Refined](1)
-  private lazy val onPageLoad = routes.IsBuyerConnectedPartyController.onPageLoad(srn, index, disposalIndex, NormalMode)
-  private lazy val onSubmit = routes.IsBuyerConnectedPartyController.onSubmit(srn, index, disposalIndex, NormalMode)
+  private lazy val onPageLoad =
+    routes.IsBuyerConnectedPartyController.onPageLoad(srn, index.value, disposalIndex.value, NormalMode)
+  private lazy val onSubmit =
+    routes.IsBuyerConnectedPartyController.onSubmit(srn, index.value, disposalIndex.value, NormalMode)
 
   private val userAnswers = defaultUserAnswers.unsafeSet(BuyerNamePage(srn, index, disposalIndex), buyerName)
 

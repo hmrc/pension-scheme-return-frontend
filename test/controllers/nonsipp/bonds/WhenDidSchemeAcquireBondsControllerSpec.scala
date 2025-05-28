@@ -44,9 +44,9 @@ class WhenDidSchemeAcquireBondsControllerSpec extends ControllerBaseSpec {
     reset(mockSchemeDateService)
 
   private lazy val onPageLoad =
-    routes.WhenDidSchemeAcquireBondsController.onPageLoad(srn, index, NormalMode)
+    routes.WhenDidSchemeAcquireBondsController.onPageLoad(srn, index.value, NormalMode)
   private lazy val onSubmit =
-    routes.WhenDidSchemeAcquireBondsController.onSubmit(srn, index, NormalMode)
+    routes.WhenDidSchemeAcquireBondsController.onSubmit(srn, index.value, NormalMode)
 
   private val dateTooEarlyForm = List(
     "value.day" -> "31",

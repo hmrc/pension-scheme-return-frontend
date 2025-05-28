@@ -20,6 +20,7 @@ import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.nonsipp.employercontributions.RemoveEmployerContributionsController._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -54,24 +55,27 @@ class RemoveEmployerContributionsController @Inject()(
 
   private val form = RemoveEmployerContributionsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, index: Max50): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Int, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
           total <- request.userAnswers
-            .get(TotalEmployerContributionPage(srn, memberIndex, index))
+            .get(TotalEmployerContributionPage(srn, memberIndex.refined, index.refined))
             .getOrRedirectToTaskList(srn)
-          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRedirectToTaskList(srn)
+          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex.refined)).getOrRedirectToTaskList(srn)
           employerName <- request.userAnswers
-            .get(EmployerNamePage(srn, memberIndex, index))
+            .get(EmployerNamePage(srn, memberIndex.refined, index.refined))
             .getOrRedirectToTaskList(srn)
         } yield Ok(
-          view(form, viewModel(srn, memberIndex: Max300, index: Max50, total, nameDOB.fullName, employerName))
+          view(
+            form,
+            viewModel(srn, memberIndex.refined: Max300, index.refined: Max50, total, nameDOB.fullName, employerName)
+          )
         )
       ).merge
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, index: Max50): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -80,12 +84,17 @@ class RemoveEmployerContributionsController @Inject()(
             (
               for {
                 total <- request.userAnswers
-                  .get(TotalEmployerContributionPage(srn, memberIndex, index))
+                  .get(TotalEmployerContributionPage(srn, memberIndex.refined, index.refined))
                   .getOrRecoverJourneyT
-                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourneyT
-                employerName <- request.userAnswers.get(EmployerNamePage(srn, memberIndex, index)).getOrRecoverJourneyT
+                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex.refined)).getOrRecoverJourneyT
+                employerName <- request.userAnswers
+                  .get(EmployerNamePage(srn, memberIndex.refined, index.refined))
+                  .getOrRecoverJourneyT
               } yield BadRequest(
-                view(formWithErrors, viewModel(srn, memberIndex, index, total, nameDOB.fullName, employerName))
+                view(
+                  formWithErrors,
+                  viewModel(srn, memberIndex.refined, index.refined, total, nameDOB.fullName, employerName)
+                )
               )
             ).merge
           },
@@ -94,9 +103,9 @@ class RemoveEmployerContributionsController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(
                   request.userAnswers
-                    .remove(EmployerNamePage(srn, memberIndex, index))
-                    .remove(EmployerContributionsProgress(srn, memberIndex, index))
-                    .set(MemberStatus(srn, memberIndex), MemberState.Changed)
+                    .remove(EmployerNamePage(srn, memberIndex.refined, index.refined))
+                    .remove(EmployerContributionsProgress(srn, memberIndex.refined, index.refined))
+                    .set(MemberStatus(srn, memberIndex.refined), MemberState.Changed)
                 )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
@@ -110,7 +119,7 @@ class RemoveEmployerContributionsController @Inject()(
                 _ =>
                   Redirect(
                     navigator
-                      .nextPage(RemoveEmployerContributionsPage(srn, memberIndex), NormalMode, updatedAnswers)
+                      .nextPage(RemoveEmployerContributionsPage(srn, memberIndex.refined), NormalMode, updatedAnswers)
                   )
               )
             } else {
@@ -118,7 +127,11 @@ class RemoveEmployerContributionsController @Inject()(
                 .successful(
                   Redirect(
                     navigator
-                      .nextPage(RemoveEmployerContributionsPage(srn, memberIndex), NormalMode, request.userAnswers)
+                      .nextPage(
+                        RemoveEmployerContributionsPage(srn, memberIndex.refined),
+                        NormalMode,
+                        request.userAnswers
+                      )
                   )
                 )
             }

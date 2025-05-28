@@ -27,8 +27,8 @@ import controllers.ControllerBaseSpec
 
 class NoNINOControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.NoNINOController.onPageLoad(srn, refineMV(1), NormalMode)
-  private lazy val onSubmit = routes.NoNINOController.onSubmit(srn, refineMV(1), NormalMode)
+  private lazy val onPageLoad = routes.NoNINOController.onPageLoad(srn, 1, NormalMode)
+  private lazy val onSubmit = routes.NoNINOController.onSubmit(srn, 1, NormalMode)
 
   private val userAnswersWithMembersDetails = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)

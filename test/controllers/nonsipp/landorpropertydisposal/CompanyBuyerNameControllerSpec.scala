@@ -29,8 +29,10 @@ class CompanyBuyerNameControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
   private val disposalIndex = refineMV[Max50.Refined](1)
-  private lazy val onPageLoad = routes.CompanyBuyerNameController.onPageLoad(srn, index, disposalIndex, NormalMode)
-  private lazy val onSubmit = routes.CompanyBuyerNameController.onSubmit(srn, index, disposalIndex, NormalMode)
+  private lazy val onPageLoad =
+    routes.CompanyBuyerNameController.onPageLoad(srn, index.value, disposalIndex.value, NormalMode)
+  private lazy val onSubmit =
+    routes.CompanyBuyerNameController.onSubmit(srn, index.value, disposalIndex.value, NormalMode)
 
   "CompanyBuyerNameController" - {
 

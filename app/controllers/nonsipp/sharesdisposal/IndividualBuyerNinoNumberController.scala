@@ -21,7 +21,6 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import config.RefinedTypes.{Max50, Max5000}
-import controllers.nonsipp.sharesdisposal.IndividualBuyerNinoNumberController._
 import controllers.actions._
 import pages.nonsipp.sharesdisposal.{IndividualBuyerNinoNumberPage, SharesIndividualBuyerNamePage}
 import forms.YesNoPageFormProvider
@@ -30,6 +29,8 @@ import play.api.data.Form
 import forms.mappings.errors.InputFormErrors
 import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import controllers.nonsipp.sharesdisposal.IndividualBuyerNinoNumberController._
 import navigation.Navigator
 import uk.gov.hmrc.domain.Nino
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -55,28 +56,33 @@ class IndividualBuyerNinoNumberController @Inject()(
 
   private val form: Form[Either[String, Nino]] = IndividualBuyerNinoNumberController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.usingAnswer(SharesIndividualBuyerNamePage(srn, index, disposalIndex)).sync { individualName =>
-        val preparedForm =
-          request.userAnswers.fillForm(IndividualBuyerNinoNumberPage(srn, index, disposalIndex), form)
-        Ok(view(preparedForm, viewModel(srn, index, disposalIndex, individualName, mode)))
+      request.usingAnswer(SharesIndividualBuyerNamePage(srn, index.refined, disposalIndex.refined)).sync {
+        individualName =>
+          val preparedForm =
+            request.userAnswers.fillForm(IndividualBuyerNinoNumberPage(srn, index.refined, disposalIndex.refined), form)
+          Ok(view(preparedForm, viewModel(srn, index.refined, disposalIndex.refined, individualName, mode)))
       }
 
     }
 
-  def onSubmit(srn: Srn, shares: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, sharesIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(SharesIndividualBuyerNamePage(srn, shares, disposalIndex)).async { individualName =>
-              Future.successful(
-                BadRequest(
-                  view(formWithErrors, viewModel(srn, shares, disposalIndex, individualName, mode))
+            request.usingAnswer(SharesIndividualBuyerNamePage(srn, sharesIndex.refined, disposalIndex.refined)).async {
+              individualName =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      viewModel(srn, sharesIndex.refined, disposalIndex.refined, individualName, mode)
+                    )
+                  )
                 )
-              )
             },
           value =>
             for {
@@ -84,13 +90,23 @@ class IndividualBuyerNinoNumberController @Inject()(
                 .fromTry(
                   request.userAnswers
                     .set(
-                      IndividualBuyerNinoNumberPage(srn, shares, disposalIndex),
+                      IndividualBuyerNinoNumberPage(srn, sharesIndex.refined, disposalIndex.refined),
                       ConditionalYesNo(value)
                     )
                 )
               nextPage = navigator
-                .nextPage(IndividualBuyerNinoNumberPage(srn, shares, disposalIndex), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, shares, disposalIndex, updatedAnswers, nextPage)
+                .nextPage(
+                  IndividualBuyerNinoNumberPage(srn, sharesIndex.refined, disposalIndex.refined),
+                  mode,
+                  updatedAnswers
+                )
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                sharesIndex.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )

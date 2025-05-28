@@ -32,9 +32,9 @@ class ReportAnotherTransferOutControllerSpec extends ControllerBaseSpec {
   private val secondaryIndex = refineMV[Max5.Refined](1)
 
   private lazy val onPageLoad =
-    routes.ReportAnotherTransferOutController.onPageLoad(srn, index, secondaryIndex, NormalMode)
+    routes.ReportAnotherTransferOutController.onPageLoad(srn, index.value, secondaryIndex.value, NormalMode)
   private lazy val onSubmit =
-    routes.ReportAnotherTransferOutController.onSubmit(srn, index, secondaryIndex, NormalMode)
+    routes.ReportAnotherTransferOutController.onSubmit(srn, index.value, secondaryIndex.value, NormalMode)
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)

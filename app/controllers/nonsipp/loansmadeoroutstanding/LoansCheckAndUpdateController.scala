@@ -19,7 +19,6 @@ package controllers.nonsipp.loansmadeoroutstanding
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
-import controllers.nonsipp.loansmadeoroutstanding.LoansCheckAndUpdateController._
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.common.OtherRecipientDetailsPage
@@ -28,6 +27,8 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.ContentTablePageView
 import models.SchemeId.Srn
+import utils.IntUtils.IntOpts
+import controllers.nonsipp.loansmadeoroutstanding.LoansCheckAndUpdateController._
 import utils.DateTimeUtils.localDateShow
 import models.{IdentitySubject, Money, NormalMode}
 import play.api.i18n.MessagesApi
@@ -44,22 +45,24 @@ class LoansCheckAndUpdateController @Inject()(
   view: ContentTablePageView
 ) extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     (
       for {
         recipientName <- List(
-          request.userAnswers.get(IndividualRecipientNamePage(srn, index)),
-          request.userAnswers.get(CompanyRecipientNamePage(srn, index)),
-          request.userAnswers.get(PartnershipRecipientNamePage(srn, index)),
-          request.userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient)).map(_.name)
+          request.userAnswers.get(IndividualRecipientNamePage(srn, index.refined)),
+          request.userAnswers.get(CompanyRecipientNamePage(srn, index.refined)),
+          request.userAnswers.get(PartnershipRecipientNamePage(srn, index.refined)),
+          request.userAnswers
+            .get(OtherRecipientDetailsPage(srn, index.refined, IdentitySubject.LoanRecipient))
+            .map(_.name)
         ).flatten.headOption.getOrRecoverJourney
-        datePeriodDetails <- request.userAnswers.get(DatePeriodLoanPage(srn, index)).getOrRecoverJourney
-        amountOfTheLoan <- request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrRecoverJourney
+        datePeriodDetails <- request.userAnswers.get(DatePeriodLoanPage(srn, index.refined)).getOrRecoverJourney
+        amountOfTheLoan <- request.userAnswers.get(AmountOfTheLoanPage(srn, index.refined)).getOrRecoverJourney
       } yield Ok(
         view(
           viewModel(
             srn,
-            index,
+            index.refined,
             recipientName,
             datePeriodDetails._1,
             amountOfTheLoan.loanAmount
@@ -69,7 +72,7 @@ class LoansCheckAndUpdateController @Inject()(
     ).merge
   }
 
-  def onSubmit(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
+  def onSubmit(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
     Redirect(routes.AmountOfTheLoanController.onPageLoad(srn, index, NormalMode))
   }
 }
@@ -110,7 +113,7 @@ object LoansCheckAndUpdateController {
       refresh = None,
       buttonText = "loansCheckAndUpdate.button",
       details = None,
-      onSubmit = routes.LoansCheckAndUpdateController.onSubmit(srn, index),
+      onSubmit = routes.LoansCheckAndUpdateController.onSubmit(srn, index.value),
       optViewOnlyDetails = None
     )
   }

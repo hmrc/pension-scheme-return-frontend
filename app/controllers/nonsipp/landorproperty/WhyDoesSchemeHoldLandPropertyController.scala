@@ -19,7 +19,6 @@ package controllers.nonsipp.landorproperty
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, WhyDoesSchemeHoldLandPropertyPage}
 import controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController._
 import controllers.actions._
 import navigation.Navigator
@@ -31,6 +30,8 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.RadioListView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, WhyDoesSchemeHoldLandPropertyPage}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 
@@ -51,33 +52,42 @@ class WhyDoesSchemeHoldLandPropertyController @Inject()(
 
   val form: Form[SchemeHoldLandProperty] = WhyDoesSchemeHoldLandPropertyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-        val preparedForm = request.userAnswers.fillForm(WhyDoesSchemeHoldLandPropertyPage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, request.schemeDetails.schemeName, address.addressLine1, mode)))
+      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney { address =>
+        val preparedForm = request.userAnswers.fillForm(WhyDoesSchemeHoldLandPropertyPage(srn, index.refined), form)
+        Ok(
+          view(
+            preparedForm,
+            viewModel(srn, index.refined, request.schemeDetails.schemeName, address.addressLine1, mode)
+          )
+        )
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           errors =>
-            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
-              Future.successful(
-                BadRequest(
-                  view(errors, viewModel(srn, index, request.schemeDetails.schemeName, address.addressLine1, mode))
+            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney {
+              address =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      errors,
+                      viewModel(srn, index.refined, request.schemeDetails.schemeName, address.addressLine1, mode)
+                    )
+                  )
                 )
-              )
             },
           success =>
             for {
               userAnswers <- Future
-                .fromTry(request.userAnswers.set(WhyDoesSchemeHoldLandPropertyPage(srn, index), success))
-              nextPage = navigator.nextPage(WhyDoesSchemeHoldLandPropertyPage(srn, index), mode, userAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, userAnswers, nextPage)
+                .fromTry(request.userAnswers.set(WhyDoesSchemeHoldLandPropertyPage(srn, index.refined), success))
+              nextPage = navigator.nextPage(WhyDoesSchemeHoldLandPropertyPage(srn, index.refined), mode, userAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, userAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield { Redirect(nextPage) }
         )

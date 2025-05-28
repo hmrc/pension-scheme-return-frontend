@@ -37,10 +37,10 @@ class TotalValueTransferControllerSpec extends ControllerBaseSpec {
     .unsafeSet(TransferringSchemeNamePage(srn, index, secondaryIndex), transferringSchemeName)
 
   private lazy val onPageLoad =
-    routes.TotalValueTransferController.onPageLoad(srn, index, secondaryIndex, NormalMode)
+    routes.TotalValueTransferController.onPageLoad(srn, index.value, secondaryIndex.value, NormalMode)
 
   private lazy val onSubmit =
-    routes.TotalValueTransferController.onSubmit(srn, index, secondaryIndex, NormalMode)
+    routes.TotalValueTransferController.onSubmit(srn, index.value, secondaryIndex.value, NormalMode)
 
   "TotalValueTransferController" - {
 

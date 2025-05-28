@@ -40,9 +40,9 @@ class RemoveAssetDisposalControllerSpec extends ControllerBaseSpec {
   private val methodOfDisposal = HowDisposed.Sold
 
   private lazy val onPageLoad =
-    routes.RemoveAssetDisposalController.onPageLoad(srn, assetIndex, disposalIndex)
+    routes.RemoveAssetDisposalController.onPageLoad(srn, assetIndex.value, disposalIndex.value)
   private lazy val onSubmit =
-    routes.RemoveAssetDisposalController.onSubmit(srn, assetIndex, disposalIndex)
+    routes.RemoveAssetDisposalController.onSubmit(srn, assetIndex.value, disposalIndex.value)
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 

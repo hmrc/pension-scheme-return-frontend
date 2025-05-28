@@ -20,6 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import config.FrontendAppConfig
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -55,33 +56,33 @@ class SharesFromConnectedPartyController @Inject()(
 
   private val form = SharesFromConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.usingAnswer(WhyDoesSchemeHoldSharesPage(srn, index)).sync { schemeHoldShare =>
+      request.usingAnswer(WhyDoesSchemeHoldSharesPage(srn, index.refined)).sync { schemeHoldShare =>
         if (!schemeHoldShare.name.equals("01")) {
           request
-            .usingAnswer(CompanyNameRelatedSharesPage(srn, index))
+            .usingAnswer(CompanyNameRelatedSharesPage(srn, index.refined))
             .sync { companyName =>
               Ok(
                 view(
-                  form.fromUserAnswers(SharesFromConnectedPartyPage(srn, index)),
+                  form.fromUserAnswers(SharesFromConnectedPartyPage(srn, index.refined)),
                   SharesFromConnectedPartyController
-                    .viewModel(srn, index, "", companyName, schemeHoldShare, config.urls.incomeTaxAct, mode)
+                    .viewModel(srn, index.refined, "", companyName, schemeHoldShare, config.urls.incomeTaxAct, mode)
                 )
               )
             }
 
         } else {
-          request.usingAnswer(WhyDoesSchemeHoldSharesPage(srn, index)).sync { schemeHoldShare =>
-            recipientName(srn, index)
+          request.usingAnswer(WhyDoesSchemeHoldSharesPage(srn, index.refined)).sync { schemeHoldShare =>
+            recipientName(srn, index.refined)
               .map { recipientName =>
                 Ok(
                   view(
-                    form.fromUserAnswers(SharesFromConnectedPartyPage(srn, index)),
+                    form.fromUserAnswers(SharesFromConnectedPartyPage(srn, index.refined)),
                     SharesFromConnectedPartyController
                       .viewModel(
                         srn,
-                        index,
+                        index.refined,
                         recipientName,
                         "",
                         schemeHoldShare,
@@ -98,10 +99,10 @@ class SharesFromConnectedPartyController @Inject()(
 
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      request.usingAnswer(WhyDoesSchemeHoldSharesPage(srn, index)).async { schemeHoldShare =>
-        request.usingAnswer(CompanyNameRelatedSharesPage(srn, index)).async { companyName =>
+      request.usingAnswer(WhyDoesSchemeHoldSharesPage(srn, index.refined)).async { schemeHoldShare =>
+        request.usingAnswer(CompanyNameRelatedSharesPage(srn, index.refined)).async { companyName =>
           form
             .bindFromRequest()
             .fold(
@@ -114,7 +115,7 @@ class SharesFromConnectedPartyController @Inject()(
                         SharesFromConnectedPartyController
                           .viewModel(
                             srn,
-                            index,
+                            index.refined,
                             "",
                             companyName,
                             schemeHoldShare,
@@ -125,7 +126,7 @@ class SharesFromConnectedPartyController @Inject()(
                     )
                   )
                 } else {
-                  recipientName(srn, index)
+                  recipientName(srn, index.refined)
                     .map { recipientName =>
                       Future.successful(
                         BadRequest(
@@ -134,7 +135,7 @@ class SharesFromConnectedPartyController @Inject()(
                             SharesFromConnectedPartyController
                               .viewModel(
                                 srn,
-                                index,
+                                index.refined,
                                 recipientName,
                                 companyName,
                                 schemeHoldShare,
@@ -150,9 +151,9 @@ class SharesFromConnectedPartyController @Inject()(
               value =>
                 for {
                   updatedAnswers <- Future
-                    .fromTry(request.userAnswers.set(SharesFromConnectedPartyPage(srn, index), value))
-                  nextPage = navigator.nextPage(SharesFromConnectedPartyPage(srn, index), mode, updatedAnswers)
-                  updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                    .fromTry(request.userAnswers.set(SharesFromConnectedPartyPage(srn, index.refined), value))
+                  nextPage = navigator.nextPage(SharesFromConnectedPartyPage(srn, index.refined), mode, updatedAnswers)
+                  updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
                   _ <- saveService.save(updatedProgressAnswers)
                 } yield Redirect(nextPage)
             )

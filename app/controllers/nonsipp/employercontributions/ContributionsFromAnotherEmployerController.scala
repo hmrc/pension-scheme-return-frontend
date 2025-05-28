@@ -19,6 +19,7 @@ package controllers.nonsipp.employercontributions
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -52,25 +53,26 @@ class ContributionsFromAnotherEmployerController @Inject()(
 
   private val form = ContributionsFromAnotherEmployerController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
+      request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney { memberName =>
         val preparedForm =
-          request.userAnswers.fillForm(ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex), form)
-        Ok(view(preparedForm, viewModel(srn, index, secondaryIndex, mode, memberName.fullName)))
+          request.userAnswers
+            .fillForm(ContributionsFromAnotherEmployerPage(srn, index.refined, secondaryIndex.refined), form)
+        Ok(view(preparedForm, viewModel(srn, index.refined, secondaryIndex.refined, mode, memberName.fullName)))
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
+            request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney { memberName =>
               Future.successful(
                 BadRequest(
-                  view(formWithErrors, viewModel(srn, index, secondaryIndex, mode, memberName.fullName))
+                  view(formWithErrors, viewModel(srn, index.refined, secondaryIndex.refined, mode, memberName.fullName))
                 )
               )
             },
@@ -78,12 +80,16 @@ class ContributionsFromAnotherEmployerController @Inject()(
             for {
               updatedAnswers <- Future.fromTry(
                 request.userAnswers
-                  .set(ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex), value)
+                  .set(ContributionsFromAnotherEmployerPage(srn, index.refined, secondaryIndex.refined), value)
               )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
               navigator
-                .nextPage(ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex), mode, updatedAnswers)
+                .nextPage(
+                  ContributionsFromAnotherEmployerPage(srn, index.refined, secondaryIndex.refined),
+                  mode,
+                  updatedAnswers
+                )
             )
         )
     }

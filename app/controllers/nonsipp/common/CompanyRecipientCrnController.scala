@@ -18,7 +18,6 @@ package controllers.nonsipp.common
 
 import services.SaveService
 import viewmodels.implicits._
-import pages.nonsipp.landorproperty.CompanySellerNamePage
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -35,6 +34,8 @@ import config.RefinedTypes.Max5000
 import controllers.nonsipp.common.CompanyRecipientCrnController._
 import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
+import utils.IntUtils.IntOpts
+import pages.nonsipp.landorproperty.CompanySellerNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FunctionKUtils._
@@ -57,18 +58,18 @@ class CompanyRecipientCrnController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       subject match {
         case IdentitySubject.Unknown => Redirect(controllers.routes.UnauthorisedController.onPageLoad())
         case _ =>
           val form: Form[Either[String, Crn]] = CompanyRecipientCrnController.form(formProvider, subject)
-          val preparedForm = request.userAnswers.fillForm(CompanyRecipientCrnPage(srn, index, subject), form)
-          Ok(view(preparedForm, viewModel(srn, index, mode, subject, request.userAnswers)))
+          val preparedForm = request.userAnswers.fillForm(CompanyRecipientCrnPage(srn, index.refined, subject), form)
+          Ok(view(preparedForm, viewModel(srn, index.refined, mode, subject, request.userAnswers)))
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val form: Form[Either[String, Crn]] = CompanyRecipientCrnController.form(formProvider, subject)
       form
@@ -76,14 +77,16 @@ class CompanyRecipientCrnController @Inject()(
         .fold(
           formWithErrors =>
             Future
-              .successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, subject, request.userAnswers)))),
+              .successful(
+                BadRequest(view(formWithErrors, viewModel(srn, index.refined, mode, subject, request.userAnswers)))
+              ),
           value =>
             for {
               updatedAnswers <- request.userAnswers
-                .set(CompanyRecipientCrnPage(srn, index, subject), ConditionalYesNo(value))
+                .set(CompanyRecipientCrnPage(srn, index.refined, subject), ConditionalYesNo(value))
                 .mapK
-              nextPage = navigator.nextPage(CompanyRecipientCrnPage(srn, index, subject), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage, subject)
+              nextPage = navigator.nextPage(CompanyRecipientCrnPage(srn, index.refined, subject), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage, subject)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
         )
@@ -152,7 +155,7 @@ object CompanyRecipientCrnController {
         no = YesNoViewModel
           .Conditional(Message(s"${subject.key}.companyRecipientCrn.no.conditional", companyName), FieldType.Textarea)
       ).withHint(s"${subject.key}.companyRecipientCrn.hint"),
-      controllers.nonsipp.common.routes.CompanyRecipientCrnController.onSubmit(srn, index, mode, subject)
+      controllers.nonsipp.common.routes.CompanyRecipientCrnController.onSubmit(srn, index.value, mode, subject)
     )
   }
 }

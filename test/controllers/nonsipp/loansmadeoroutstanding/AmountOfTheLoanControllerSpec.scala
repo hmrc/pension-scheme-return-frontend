@@ -65,8 +65,8 @@ class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
     lazy val viewModel =
       AmountOfTheLoanController.viewModel(srn, index1of5000, NormalMode, schemeName, schemeDatePeriod, _)
 
-    lazy val onPageLoad = routes.AmountOfTheLoanController.onPageLoad(srn, index1of5000, NormalMode)
-    lazy val onSubmit = routes.AmountOfTheLoanController.onSubmit(srn, index1of5000, NormalMode)
+    lazy val onPageLoad = routes.AmountOfTheLoanController.onPageLoad(srn, index1of5000.value, NormalMode)
+    lazy val onSubmit = routes.AmountOfTheLoanController.onSubmit(srn, index1of5000.value, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[MultipleQuestionView]
@@ -104,7 +104,7 @@ class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
       redirectToPageWithPrePopSession(
         call = onSubmit,
         page = controllers.nonsipp.loansmadeoroutstanding.routes.InterestOnLoanController
-          .onPageLoad(srn, index1of5000, NormalMode),
+          .onPageLoad(srn, index1of5000.value, NormalMode),
         userAnswers = prePopUserAnswersMissing,
         previousUserAnswers = defaultUserAnswers,
         mockSaveService = None,
@@ -118,7 +118,7 @@ class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
       redirectToPageWithPrePopSession(
         call = onSubmit,
         page = controllers.nonsipp.loansmadeoroutstanding.routes.InterestOnLoanController
-          .onPageLoad(srn, index1of5000, NormalMode),
+          .onPageLoad(srn, index1of5000.value, NormalMode),
         userAnswers = prePopUserAnswersMissing,
         previousUserAnswers = defaultUserAnswers,
         mockSaveService = None,
@@ -132,7 +132,7 @@ class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
       redirectToPageWithPrePopSession(
         call = onSubmit,
         page = controllers.nonsipp.loansmadeoroutstanding.routes.AreRepaymentsInstalmentsController
-          .onPageLoad(srn, index1of5000, NormalMode),
+          .onPageLoad(srn, index1of5000.value, NormalMode),
         userAnswers = prePopUserAnswersCompleted,
         previousUserAnswers = defaultUserAnswers,
         mockSaveService = None,
@@ -146,7 +146,7 @@ class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
       redirectToPageWithPrePopSession(
         call = onSubmit,
         page = controllers.nonsipp.loansmadeoroutstanding.routes.AreRepaymentsInstalmentsController
-          .onPageLoad(srn, index1of5000, NormalMode),
+          .onPageLoad(srn, index1of5000.value, NormalMode),
         userAnswers = defaultUserAnswers,
         previousUserAnswers = defaultUserAnswers,
         mockSaveService = None,

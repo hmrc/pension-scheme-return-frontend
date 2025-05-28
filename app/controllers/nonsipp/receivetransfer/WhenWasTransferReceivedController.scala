@@ -19,6 +19,7 @@ package controllers.nonsipp.receivetransfer
 import services.{SaveService, SchemeDateService}
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.DatePageFormProvider
@@ -61,23 +62,23 @@ class WhenWasTransferReceivedController @Inject()(
   private def form(date: DateRange)(implicit messages: Messages) =
     WhenWasTransferReceivedController.form(formProvider, date)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       usingSchemeDate[Id](srn) { date =>
         (
           for {
-            member <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
+            member <- request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney
             schemeName <- request.userAnswers
-              .get(TransferringSchemeNamePage(srn, index, secondaryIndex))
+              .get(TransferringSchemeNamePage(srn, index.refined, secondaryIndex.refined))
               .getOrRecoverJourney
           } yield {
             val preparedForm = request.userAnswers
-              .get(WhenWasTransferReceivedPage(srn, index, secondaryIndex))
+              .get(WhenWasTransferReceivedPage(srn, index.refined, secondaryIndex.refined))
               .fold(form(date))(form(date).fill)
             Ok(
               view(
                 preparedForm,
-                viewModel(srn, index, secondaryIndex, schemeName, member.fullName, mode)
+                viewModel(srn, index.refined, secondaryIndex.refined, schemeName, member.fullName, mode)
               )
             )
           }
@@ -85,7 +86,7 @@ class WhenWasTransferReceivedController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       usingSchemeDate(srn) { date =>
         form(date)
@@ -95,15 +96,15 @@ class WhenWasTransferReceivedController @Inject()(
               Future.successful(
                 (
                   for {
-                    member <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
+                    member <- request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney
                     schemeName <- request.userAnswers
-                      .get(TransferringSchemeNamePage(srn, index, secondaryIndex))
+                      .get(TransferringSchemeNamePage(srn, index.refined, secondaryIndex.refined))
                       .getOrRecoverJourney
                   } yield {
                     BadRequest(
                       view(
                         formWithErrors,
-                        viewModel(srn, index, secondaryIndex, schemeName, member.fullName, mode)
+                        viewModel(srn, index.refined, secondaryIndex.refined, schemeName, member.fullName, mode)
                       )
                     )
                   }
@@ -113,14 +114,18 @@ class WhenWasTransferReceivedController @Inject()(
             value =>
               for {
                 updatedAnswers <- request.userAnswers
-                  .set(WhenWasTransferReceivedPage(srn, index, secondaryIndex), value)
+                  .set(WhenWasTransferReceivedPage(srn, index.refined, secondaryIndex.refined), value)
                   .mapK[Future]
                 nextPage = navigator
-                  .nextPage(WhenWasTransferReceivedPage(srn, index, secondaryIndex), mode, updatedAnswers)
+                  .nextPage(
+                    WhenWasTransferReceivedPage(srn, index.refined, secondaryIndex.refined),
+                    mode,
+                    updatedAnswers
+                  )
                 updatedProgressAnswers <- saveProgress(
                   srn,
-                  index,
-                  secondaryIndex,
+                  index.refined,
+                  secondaryIndex.refined,
                   updatedAnswers,
                   nextPage
                 )

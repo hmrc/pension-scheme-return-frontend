@@ -20,7 +20,6 @@ import services.{SaveService, SchemeDateService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Constants
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyWhenDidSchemeAcquirePage}
 import cats.implicits.toShow
 import controllers.actions._
 import navigation.Navigator
@@ -31,6 +30,8 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.DatePageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyWhenDidSchemeAcquirePage}
 import utils.DateTimeUtils.localDateShow
 import models.Mode
 import controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController._
@@ -62,22 +63,28 @@ class WhenDidSchemeAcquireController @Inject()(
     (date: LocalDate, request: DataRequest[AnyContent]) =>
       WhenDidSchemeAcquireController.form(formProvider)(date, request.messages(messagesApi))
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
+        request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney { address =>
           val preparedForm = {
-            request.userAnswers.fillForm(LandOrPropertyWhenDidSchemeAcquirePage(srn, index), form(date.to, request))
+            request.userAnswers
+              .fillForm(LandOrPropertyWhenDidSchemeAcquirePage(srn, index.refined), form(date.to, request))
           }
-          Ok(view(preparedForm, viewModel(srn, index, mode, request.schemeDetails.schemeName, address.addressLine1)))
+          Ok(
+            view(
+              preparedForm,
+              viewModel(srn, index.refined, mode, request.schemeDetails.schemeName, address.addressLine1)
+            )
+          )
         }
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
+        request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined)).getOrRecoverJourney { address =>
           form(date.to, request)
             .bindFromRequest()
             .fold(
@@ -86,17 +93,17 @@ class WhenDidSchemeAcquireController @Inject()(
                   BadRequest(
                     view(
                       formWithErrors,
-                      viewModel(srn, index, mode, request.schemeDetails.schemeName, address.addressLine1)
+                      viewModel(srn, index.refined, mode, request.schemeDetails.schemeName, address.addressLine1)
                     )
                   )
                 ),
               value =>
                 for {
                   updatedAnswers <- Future
-                    .fromTry(request.userAnswers.set(LandOrPropertyWhenDidSchemeAcquirePage(srn, index), value))
+                    .fromTry(request.userAnswers.set(LandOrPropertyWhenDidSchemeAcquirePage(srn, index.refined), value))
                   nextPage = navigator
-                    .nextPage(LandOrPropertyWhenDidSchemeAcquirePage(srn, index), mode, updatedAnswers)
-                  updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                    .nextPage(LandOrPropertyWhenDidSchemeAcquirePage(srn, index.refined), mode, updatedAnswers)
+                  updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
                   _ <- saveService.save(updatedProgressAnswers)
                 } yield Redirect(nextPage)
             )

@@ -28,8 +28,8 @@ import controllers.ControllerBaseSpec
 class LandPropertyAddressResultsControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
-  private lazy val onPageLoad = routes.LandPropertyAddressResultsController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.LandPropertyAddressResultsController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.LandPropertyAddressResultsController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.LandPropertyAddressResultsController.onSubmit(srn, index.value, NormalMode)
 
   private val userAnswers = defaultUserAnswers.unsafeSet(AddressLookupResultsPage(srn, index), List(address))
 

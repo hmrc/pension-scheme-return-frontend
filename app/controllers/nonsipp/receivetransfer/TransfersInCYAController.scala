@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
@@ -56,21 +57,21 @@ class TransfersInCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn, index, mode)
+      onPageLoadCommon(srn, index.refined, mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, index, mode)
+      onPageLoadCommon(srn, index.refined, mode)
     }
 
   def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
@@ -135,14 +136,14 @@ class TransfersInCYAController @Inject()(
       }
     ).merge
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       lazy val transfersInChanged: Boolean =
-        request.userAnswers.changedList(_.buildTransfersIn(srn, index))
+        request.userAnswers.changedList(_.buildTransfersIn(srn, index.refined))
 
       for {
         updatedUserAnswers <- request.userAnswers
-          .setWhen(transfersInChanged)(MemberStatus(srn, index), MemberState.Changed)
+          .setWhen(transfersInChanged)(MemberStatus(srn, index.refined), MemberState.Changed)
           .mapK[Future]
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(

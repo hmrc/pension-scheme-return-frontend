@@ -20,6 +20,7 @@ import services.SaveService
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.{Max50, Max5000}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -51,17 +52,17 @@ class BuyerNameController @Inject()(
 
   private def form = BuyerNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(BuyerNamePage(srn, index, disposalIndex)),
-          BuyerNameController.viewModel(srn, index, disposalIndex, mode)
+          form.fromUserAnswers(BuyerNamePage(srn, index.refined, disposalIndex.refined)),
+          BuyerNameController.viewModel(srn, index.refined, disposalIndex.refined, mode)
         )
       )
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -71,7 +72,7 @@ class BuyerNameController @Inject()(
               BadRequest(
                 view(
                   formWithErrors,
-                  BuyerNameController.viewModel(srn, index, disposalIndex, mode)
+                  BuyerNameController.viewModel(srn, index.refined, disposalIndex.refined, mode)
                 )
               )
             ),
@@ -79,14 +80,20 @@ class BuyerNameController @Inject()(
             for {
               updatedAnswers <- Future.fromTry(
                 request.userAnswers
-                  .set(BuyerNamePage(srn, index, disposalIndex), answer)
+                  .set(BuyerNamePage(srn, index.refined, disposalIndex.refined), answer)
               )
               nextPage = navigator.nextPage(
-                BuyerNamePage(srn, index, disposalIndex),
+                BuyerNamePage(srn, index.refined, disposalIndex.refined),
                 mode,
                 updatedAnswers
               )
-              updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                index.refined,
+                disposalIndex.refined,
+                updatedAnswers,
+                nextPage
+              )
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

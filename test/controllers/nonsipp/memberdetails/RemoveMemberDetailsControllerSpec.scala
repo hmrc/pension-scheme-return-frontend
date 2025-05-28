@@ -34,8 +34,8 @@ import scala.concurrent.Future
 
 class RemoveMemberDetailsControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.RemoveMemberDetailsController.onPageLoad(srn, refineMV(1), NormalMode)
-  private lazy val onSubmit = routes.RemoveMemberDetailsController.onSubmit(srn, refineMV(1), NormalMode)
+  private lazy val onPageLoad = routes.RemoveMemberDetailsController.onPageLoad(srn, 1, NormalMode)
+  private lazy val onSubmit = routes.RemoveMemberDetailsController.onSubmit(srn, 1, NormalMode)
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 

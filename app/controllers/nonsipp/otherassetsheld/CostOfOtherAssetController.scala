@@ -23,6 +23,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.CostOfOtherAssetPage
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.MoneyFormProvider
@@ -55,17 +56,17 @@ class CostOfOtherAssetController @Inject()(
 
   private def form: Form[Money] = CostOfOtherAssetController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(CostOfOtherAssetPage(srn, index)),
-          viewModel(srn, index, form, mode)
+          form.fromUserAnswers(CostOfOtherAssetPage(srn, index.refined)),
+          viewModel(srn, index.refined, form, mode)
         )
       )
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -75,16 +76,16 @@ class CostOfOtherAssetController @Inject()(
               BadRequest(
                 view(
                   formWithErrors,
-                  CostOfOtherAssetController.viewModel(srn, index, form, mode)
+                  CostOfOtherAssetController.viewModel(srn, index.refined, form, mode)
                 )
               )
             ),
           answer => {
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(CostOfOtherAssetPage(srn, index), answer))
-              nextPage = navigator.nextPage(CostOfOtherAssetPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                .fromTry(request.userAnswers.set(CostOfOtherAssetPage(srn, index.refined), answer))
+              nextPage = navigator.nextPage(CostOfOtherAssetPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

@@ -20,6 +20,7 @@ import services.{SaveService, SchemeDateService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Constants
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.DatePageFormProvider
@@ -60,13 +61,13 @@ class WhenBorrowedController @Inject()(
     (date: LocalDate, request: DataRequest[AnyContent]) =>
       WhenBorrowedController.form(formProvider)(date, request.messages(messagesApi))
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>
-          request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
+        request.userAnswers.get(LenderNamePage(srn, index.refined)).getOrRecoverJourney { lenderName =>
+          request.userAnswers.get(BorrowedAmountAndRatePage(srn, index.refined)).getOrRecoverJourney { amountBorrowed =>
             val preparedForm = {
-              request.userAnswers.fillForm(WhenBorrowedPage(srn, index), form(date.to, request))
+              request.userAnswers.fillForm(WhenBorrowedPage(srn, index.refined), form(date.to, request))
             }
             Ok(
               view(
@@ -74,7 +75,7 @@ class WhenBorrowedController @Inject()(
                 WhenBorrowedController
                   .viewModel(
                     srn,
-                    index,
+                    index.refined,
                     mode,
                     request.schemeDetails.schemeName,
                     amountBorrowed._1.displayAs,
@@ -87,11 +88,11 @@ class WhenBorrowedController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>
-          request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
+        request.userAnswers.get(LenderNamePage(srn, index.refined)).getOrRecoverJourney { lenderName =>
+          request.userAnswers.get(BorrowedAmountAndRatePage(srn, index.refined)).getOrRecoverJourney { amountBorrowed =>
             form(date.to, request)
               .bindFromRequest()
               .fold(
@@ -102,7 +103,7 @@ class WhenBorrowedController @Inject()(
                         formWithErrors,
                         WhenBorrowedController.viewModel(
                           srn,
-                          index,
+                          index.refined,
                           mode,
                           request.schemeDetails.schemeName,
                           amountBorrowed._1.displayAs,
@@ -113,9 +114,9 @@ class WhenBorrowedController @Inject()(
                   ),
                 value =>
                   for {
-                    updatedAnswers <- request.userAnswers.set(WhenBorrowedPage(srn, index), value).mapK[Future]
-                    nextPage = navigator.nextPage(WhenBorrowedPage(srn, index), mode, updatedAnswers)
-                    updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                    updatedAnswers <- request.userAnswers.set(WhenBorrowedPage(srn, index.refined), value).mapK[Future]
+                    nextPage = navigator.nextPage(WhenBorrowedPage(srn, index.refined), mode, updatedAnswers)
+                    updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
                     _ <- saveService.save(updatedProgressAnswers)
                   } yield Redirect(
                     nextPage

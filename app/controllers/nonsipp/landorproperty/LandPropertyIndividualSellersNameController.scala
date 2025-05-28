@@ -20,7 +20,6 @@ import services.SaveService
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.Max5000
-import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -28,6 +27,8 @@ import models.Mode
 import play.api.data.Form
 import views.html.TextInputView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
@@ -51,31 +52,34 @@ class LandPropertyIndividualSellersNameController @Inject()(
 
   private def form = LandPropertyIndividualSellersNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(LandPropertyIndividualSellersNamePage(srn, index)),
-          LandPropertyIndividualSellersNameController.viewModel(srn, index, mode)
+          form.fromUserAnswers(LandPropertyIndividualSellersNamePage(srn, index.refined)),
+          LandPropertyIndividualSellersNameController.viewModel(srn, index.refined, mode)
         )
       )
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future.successful(
-              BadRequest(view(formWithErrors, LandPropertyIndividualSellersNameController.viewModel(srn, index, mode)))
+              BadRequest(
+                view(formWithErrors, LandPropertyIndividualSellersNameController.viewModel(srn, index.refined, mode))
+              )
             ),
           answer => {
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(LandPropertyIndividualSellersNamePage(srn, index), answer))
-              nextPage = navigator.nextPage(LandPropertyIndividualSellersNamePage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                .fromTry(request.userAnswers.set(LandPropertyIndividualSellersNamePage(srn, index.refined), answer))
+              nextPage = navigator
+                .nextPage(LandPropertyIndividualSellersNamePage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

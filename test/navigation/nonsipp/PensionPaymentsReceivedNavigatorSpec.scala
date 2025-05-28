@@ -75,7 +75,7 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
           TotalAmountPensionPaymentsPage.apply,
           (srn, index: Max300, _) =>
             controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-              .onPageLoad(srn, index, NormalMode)
+              .onPageLoad(srn, index.value, NormalMode)
         )
         .withName("go from total amount pension payments page to member pension payments CYA page")
     )

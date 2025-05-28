@@ -20,6 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -58,17 +59,17 @@ class WhyDoesSchemeHoldAssetsController @Inject()(
 
   private val form = WhyDoesSchemeHoldAssetsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(WhyDoesSchemeHoldAssetsPage(srn, index)),
-          viewModel(srn, index, request.schemeDetails.schemeName, mode)
+          form.fromUserAnswers(WhyDoesSchemeHoldAssetsPage(srn, index.refined)),
+          viewModel(srn, index.refined, request.schemeDetails.schemeName, mode)
         )
       )
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -79,7 +80,7 @@ class WhyDoesSchemeHoldAssetsController @Inject()(
                 BadRequest(
                   view(
                     formWithErrors,
-                    viewModel(srn, index, request.schemeDetails.schemeName, mode)
+                    viewModel(srn, index.refined, request.schemeDetails.schemeName, mode)
                   )
                 )
               ),
@@ -88,17 +89,18 @@ class WhyDoesSchemeHoldAssetsController @Inject()(
             if (mode == NormalMode) {
               for {
                 updatedAnswers <- Future.fromTry(
-                  request.userAnswers.set(WhyDoesSchemeHoldAssetsPage(srn, index), answer)
+                  request.userAnswers.set(WhyDoesSchemeHoldAssetsPage(srn, index.refined), answer)
                 )
-                nextPage = navigator.nextPage(WhyDoesSchemeHoldAssetsPage(srn, index), mode, updatedAnswers)
-                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                nextPage = navigator.nextPage(WhyDoesSchemeHoldAssetsPage(srn, index.refined), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
             } else {
               // In CheckMode, before saving answers, set PointOfEntry based on the previous answer and new answer
-              val previousAnswer = request.userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index))
-              val previousPointOfEntry = request.userAnswers.get(OtherAssetsCYAPointOfEntry(srn, index))
-              val whenDidSchemeAcquireAssetsPage = request.userAnswers.get(WhenDidSchemeAcquireAssetsPage(srn, index))
+              val previousAnswer = request.userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index.refined))
+              val previousPointOfEntry = request.userAnswers.get(OtherAssetsCYAPointOfEntry(srn, index.refined))
+              val whenDidSchemeAcquireAssetsPage =
+                request.userAnswers.get(WhenDidSchemeAcquireAssetsPage(srn, index.refined))
 
               val pointOfEntry = (previousAnswer, answer, whenDidSchemeAcquireAssetsPage) match {
                 case (Some(Acquisition), Contribution, Some(_)) => Some(AssetAcquisitionToContributionPointOfEntry)
@@ -120,11 +122,11 @@ class WhyDoesSchemeHoldAssetsController @Inject()(
                   for {
                     updatedAnswers <- Future.fromTry(
                       request.userAnswers
-                        .set(WhyDoesSchemeHoldAssetsPage(srn, index), answer)
-                        .set(OtherAssetsCYAPointOfEntry(srn, index), updatedPointOfEntry)
+                        .set(WhyDoesSchemeHoldAssetsPage(srn, index.refined), answer)
+                        .set(OtherAssetsCYAPointOfEntry(srn, index.refined), updatedPointOfEntry)
                     )
-                    nextPage = navigator.nextPage(WhyDoesSchemeHoldAssetsPage(srn, index), mode, updatedAnswers)
-                    updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                    nextPage = navigator.nextPage(WhyDoesSchemeHoldAssetsPage(srn, index.refined), mode, updatedAnswers)
+                    updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
                     _ <- saveService.save(updatedProgressAnswers)
                   } yield Redirect(nextPage)
               }

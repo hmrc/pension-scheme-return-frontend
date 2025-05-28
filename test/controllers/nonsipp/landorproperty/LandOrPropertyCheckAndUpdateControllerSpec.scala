@@ -32,8 +32,8 @@ class LandOrPropertyCheckAndUpdateControllerSpec extends ControllerBaseSpec {
 
   private val index: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
 
-  private def onPageLoad = routes.LandOrPropertyCheckAndUpdateController.onPageLoad(srn, index)
-  private def onSubmit = routes.LandOrPropertyCheckAndUpdateController.onSubmit(srn, index)
+  private def onPageLoad = routes.LandOrPropertyCheckAndUpdateController.onPageLoad(srn, index.value)
+  private def onSubmit = routes.LandOrPropertyCheckAndUpdateController.onSubmit(srn, index.value)
 
   private val schemeHoldLandProperty = schemeHoldLandPropertyGen.sample.value
 
@@ -59,7 +59,7 @@ class LandOrPropertyCheckAndUpdateControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      redirectToPage(onSubmit, routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode))
+      redirectToPage(onSubmit, routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index.value, NormalMode))
     )
 
     act.like(

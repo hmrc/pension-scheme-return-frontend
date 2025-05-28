@@ -21,6 +21,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
 import config.Constants
+import utils.IntUtils.IntOpts
 import cats.implicits.toShow
 import config.Constants._
 import controllers.actions._
@@ -59,15 +60,15 @@ class DatePeriodLoanController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         Ok(
           view(
-            request.userAnswers.fillForm(DatePeriodLoanPage(srn, index), form(date.to)),
+            request.userAnswers.fillForm(DatePeriodLoanPage(srn, index.refined), form(date.to)),
             viewModel(
               srn,
-              index,
+              index.refined,
               request.schemeDetails.schemeName,
               mode,
               form(date.to)
@@ -77,7 +78,7 @@ class DatePeriodLoanController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         form(date.to)
@@ -88,15 +89,17 @@ class DatePeriodLoanController @Inject()(
                 BadRequest(
                   view(
                     formWithErrors,
-                    viewModel(srn, index, request.schemeDetails.schemeName, mode, form(date.to))
+                    viewModel(srn, index.refined, request.schemeDetails.schemeName, mode, form(date.to))
                   )
                 )
               },
             value =>
               for {
-                updatedAnswers <- request.userAnswers.transformAndSet(DatePeriodLoanPage(srn, index), value).mapK
-                nextPage = navigator.nextPage(DatePeriodLoanPage(srn, index), mode, updatedAnswers)
-                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                updatedAnswers <- request.userAnswers
+                  .transformAndSet(DatePeriodLoanPage(srn, index.refined), value)
+                  .mapK
+                nextPage = navigator.nextPage(DatePeriodLoanPage(srn, index.refined), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
           )
@@ -167,6 +170,6 @@ object DatePeriodLoanController {
       QuestionField.numeric("datePeriodLoan.field3", hint = Some("datePeriodLoan.field3.hint"))
     ),
     details = None,
-    routes.DatePeriodLoanController.onSubmit(srn, index, mode)
+    routes.DatePeriodLoanController.onSubmit(srn, index.value, mode)
   )
 }

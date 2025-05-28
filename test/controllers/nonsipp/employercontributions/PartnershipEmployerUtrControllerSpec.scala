@@ -32,10 +32,10 @@ class PartnershipEmployerUtrControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad =
     controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
-      .onPageLoad(srn, index, secondaryIndex, NormalMode)
+      .onPageLoad(srn, index.value, secondaryIndex.value, NormalMode)
   private lazy val onSubmit =
     controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
-      .onSubmit(srn, index, secondaryIndex, NormalMode)
+      .onSubmit(srn, index.value, secondaryIndex.value, NormalMode)
 
   val userAnswersWithEmployerName: UserAnswers =
     defaultUserAnswers.unsafeSet(EmployerNamePage(srn, index, secondaryIndex), employerName)

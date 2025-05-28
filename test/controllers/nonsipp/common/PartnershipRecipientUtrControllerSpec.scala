@@ -36,10 +36,10 @@ class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
     IdentitySubject.values.foreach { identitySubject =>
       lazy val onPageLoad =
         controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-          .onPageLoad(srn, index, NormalMode, identitySubject)
+          .onPageLoad(srn, index.value, NormalMode, identitySubject)
       lazy val onSubmit =
         controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-          .onSubmit(srn, index, NormalMode, identitySubject)
+          .onSubmit(srn, index.value, NormalMode, identitySubject)
 
       act.like(renderView(onPageLoad, defaultUserAnswers) { implicit app => implicit request =>
         injected[ConditionalYesNoPageView]
@@ -100,7 +100,7 @@ class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
     "Unknown" - {
       lazy val onPageLoad =
         controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-          .onPageLoad(srn, index, NormalMode, IdentitySubject.Unknown)
+          .onPageLoad(srn, index.value, NormalMode, IdentitySubject.Unknown)
 
       act.like(
         unauthorisedPage(onPageLoad, Some(defaultUserAnswers))

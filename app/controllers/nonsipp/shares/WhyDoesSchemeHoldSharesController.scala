@@ -19,6 +19,7 @@ package controllers.nonsipp.shares
 import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -53,31 +54,31 @@ class WhyDoesSchemeHoldSharesController @Inject()(
 
   private val form = WhyDoesSchemeHoldSharesController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(TypeOfSharesHeldPage(srn, index)).getOrRecoverJourney { typeOfShares =>
+      request.userAnswers.get(TypeOfSharesHeldPage(srn, index.refined)).getOrRecoverJourney { typeOfShares =>
         Ok(
           view(
-            form.fromUserAnswers(WhyDoesSchemeHoldSharesPage(srn, index)),
-            viewModel(srn, index, request.schemeDetails.schemeName, typeOfShares.name, mode)
+            form.fromUserAnswers(WhyDoesSchemeHoldSharesPage(srn, index.refined)),
+            viewModel(srn, index.refined, request.schemeDetails.schemeName, typeOfShares.name, mode)
           )
         )
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(TypeOfSharesHeldPage(srn, index)).getOrRecoverJourney { typeOfShares =>
+            request.userAnswers.get(TypeOfSharesHeldPage(srn, index.refined)).getOrRecoverJourney { typeOfShares =>
               Future
                 .successful(
                   BadRequest(
                     view(
                       formWithErrors,
-                      viewModel(srn, index, request.schemeDetails.schemeName, typeOfShares.name, mode)
+                      viewModel(srn, index.refined, request.schemeDetails.schemeName, typeOfShares.name, mode)
                     )
                   )
                 )
@@ -85,10 +86,10 @@ class WhyDoesSchemeHoldSharesController @Inject()(
           answer => {
             for {
               updatedAnswers <- Future.fromTry(
-                request.userAnswers.set(WhyDoesSchemeHoldSharesPage(srn, index), answer)
+                request.userAnswers.set(WhyDoesSchemeHoldSharesPage(srn, index.refined), answer)
               )
-              nextPage = navigator.nextPage(WhyDoesSchemeHoldSharesPage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              nextPage = navigator.nextPage(WhyDoesSchemeHoldSharesPage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
           }

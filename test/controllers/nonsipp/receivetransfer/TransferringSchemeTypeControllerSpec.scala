@@ -32,9 +32,9 @@ class TransferringSchemeTypeControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad =
     controllers.nonsipp.receivetransfer.routes.TransferringSchemeTypeController
-      .onPageLoad(srn, index, secondarylIndex, NormalMode)
+      .onPageLoad(srn, index.value, secondarylIndex.value, NormalMode)
   private lazy val onSubmit = controllers.nonsipp.receivetransfer.routes.TransferringSchemeTypeController
-    .onSubmit(srn, index, secondarylIndex, NormalMode)
+    .onSubmit(srn, index.value, secondarylIndex.value, NormalMode)
   private val userAnswers = defaultUserAnswers
 
   "TransferringSchemeTypeController" - {

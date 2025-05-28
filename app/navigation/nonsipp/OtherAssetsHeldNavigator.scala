@@ -19,8 +19,8 @@ package navigation.nonsipp
 import play.api.mvc.Call
 import pages.Page
 import config.RefinedTypes.Max5000
+import utils.IntUtils.toInt
 import cats.implicits.toTraverseOps
-import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
 import pages.nonsipp.common._
 import pages.nonsipp.otherassetsheld._
@@ -39,27 +39,27 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedOtherAssetsPage(srn) =>
-      controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController.onPageLoad(srn, refineMV(1), NormalMode)
+      controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController.onPageLoad(srn, 1, NormalMode)
 
     case WhatIsOtherAssetPage(srn, index) =>
       controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
 
     case IsAssetTangibleMoveablePropertyPage(srn, index) =>
       controllers.nonsipp.otherassetsheld.routes.WhyDoesSchemeHoldAssetsController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
 
     case WhyDoesSchemeHoldAssetsPage(srn, index) =>
       userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index)) match {
         case Some(Acquisition) =>
           controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
-            .onPageLoad(srn, index, NormalMode)
+            .onPageLoad(srn, index.value, NormalMode)
         case Some(Contribution) =>
           controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
-            .onPageLoad(srn, index, NormalMode)
+            .onPageLoad(srn, index.value, NormalMode)
         case Some(Transfer) =>
           controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
-            .onPageLoad(srn, index, NormalMode)
+            .onPageLoad(srn, index.value, NormalMode)
         case _ =>
           controllers.routes.UnauthorisedController.onPageLoad()
       }
@@ -68,79 +68,79 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
       userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index)) match {
         case Some(Acquisition) =>
           controllers.nonsipp.common.routes.IdentityTypeController
-            .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
+            .onPageLoad(srn, index.value, NormalMode, IdentitySubject.OtherAssetSeller)
         case _ =>
           controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
-            .onPageLoad(srn, index, NormalMode)
+            .onPageLoad(srn, index.value, NormalMode)
       }
 
     case IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller) =>
       userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller)) match {
         case Some(IdentityType.Other) =>
           controllers.nonsipp.common.routes.OtherRecipientDetailsController
-            .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
+            .onPageLoad(srn, index.value, NormalMode, IdentitySubject.OtherAssetSeller)
         case Some(IdentityType.Individual) =>
           controllers.nonsipp.otherassetsheld.routes.IndividualNameOfOtherAssetSellerController
-            .onPageLoad(srn, index, NormalMode)
+            .onPageLoad(srn, index.value, NormalMode)
         case Some(IdentityType.UKCompany) =>
           controllers.nonsipp.otherassetsheld.routes.CompanyNameOfOtherAssetSellerController
-            .onPageLoad(srn, index, NormalMode)
+            .onPageLoad(srn, index.value, NormalMode)
         case Some(IdentityType.UKPartnership) =>
           controllers.nonsipp.otherassetsheld.routes.PartnershipNameOfOtherAssetsSellerController
-            .onPageLoad(srn, index, NormalMode)
+            .onPageLoad(srn, index.value, NormalMode)
         case _ =>
           controllers.routes.UnauthorisedController.onPageLoad()
       }
 
     case IndividualNameOfOtherAssetSellerPage(srn, index) =>
       controllers.nonsipp.otherassetsheld.routes.OtherAssetIndividualSellerNINumberController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
 
     case CompanyNameOfOtherAssetSellerPage(srn, index) =>
       controllers.nonsipp.common.routes.CompanyRecipientCrnController
-        .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
+        .onPageLoad(srn, index.value, NormalMode, IdentitySubject.OtherAssetSeller)
 
     case PartnershipOtherAssetSellerNamePage(srn, index) =>
       controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-        .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
+        .onPageLoad(srn, index.value, NormalMode, IdentitySubject.OtherAssetSeller)
 
     case OtherAssetIndividualSellerNINumberPage(srn, index) =>
       controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
 
     case CompanyRecipientCrnPage(srn, index, IdentitySubject.OtherAssetSeller) =>
       controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
 
     case PartnershipRecipientUtrPage(srn, index, IdentitySubject.OtherAssetSeller) =>
       controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
 
     case OtherRecipientDetailsPage(srn, index, IdentitySubject.OtherAssetSeller) =>
       controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
 
     case OtherAssetSellerConnectedPartyPage(srn, index) =>
       controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
 
     case CostOfOtherAssetPage(srn, index) =>
       userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index)) match {
         case Some(Transfer) =>
           controllers.nonsipp.otherassetsheld.routes.IncomeFromAssetController
-            .onPageLoad(srn, index, NormalMode)
+            .onPageLoad(srn, index.value, NormalMode)
         case _ =>
           controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
-            .onPageLoad(srn, index, NormalMode)
+            .onPageLoad(srn, index.value, NormalMode)
       }
 
     case IndependentValuationPage(srn, index) =>
       controllers.nonsipp.otherassetsheld.routes.IncomeFromAssetController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
 
     case IncomeFromAssetPage(srn, index) =>
       controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index.value, NormalMode)
 
     case OtherAssetsCYAPage(srn) =>
       controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
@@ -181,41 +181,41 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
         //30b
         case WhatIsOtherAssetPage(srn, index) =>
           controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-            .onPageLoad(srn, index, NormalMode)
+            .onPageLoad(srn, index.value, NormalMode)
 
         //30c
         case IsAssetTangibleMoveablePropertyPage(srn, index) =>
           controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-            .onPageLoad(srn, index, NormalMode)
+            .onPageLoad(srn, index.value, NormalMode)
 
         //30d
         case WhyDoesSchemeHoldAssetsPage(srn, index) =>
           userAnswers.get(OtherAssetsCYAPointOfEntry(srn, index)) match {
             case Some(AssetAcquisitionToContributionPointOfEntry) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
             case Some(AssetAcquisitionToTransferPointOfEntry) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
             case Some(AssetContributionToAcquisitionPointOfEntry) =>
               controllers.nonsipp.common.routes.IdentityTypeController
-                .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller)
+                .onPageLoad(srn, index.value, CheckMode, IdentitySubject.OtherAssetSeller)
             case Some(AssetContributionToTransferPointOfEntry) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
             case Some(AssetTransferToAcquisitionPointOfEntry) =>
               controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index.value, CheckMode)
             case Some(AssetTransferToContributionPointOfEntry) =>
               controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index.value, CheckMode)
             case Some(WhenDidSchemeAcquireAssetsPointOfEntry) =>
               controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index.value, CheckMode)
             // If answer is unchanged, use NoPointOfEntry to redirect to CYA
             case Some(NoPointOfEntry) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
             case _ =>
               controllers.routes.JourneyRecoveryController.onPageLoad()
           }
@@ -225,13 +225,13 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
           userAnswers.get(OtherAssetsCYAPointOfEntry(srn, index)) match {
             case Some(AssetTransferToAcquisitionPointOfEntry) =>
               controllers.nonsipp.common.routes.IdentityTypeController
-                .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller)
+                .onPageLoad(srn, index.value, CheckMode, IdentitySubject.OtherAssetSeller)
             case Some(AssetTransferToContributionPointOfEntry) =>
               controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index.value, CheckMode)
             case Some(NoPointOfEntry) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
             case _ =>
               controllers.routes.JourneyRecoveryController.onPageLoad()
           }
@@ -242,16 +242,16 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
           userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller)) match {
             case Some(IdentityType.Individual) =>
               controllers.nonsipp.otherassetsheld.routes.IndividualNameOfOtherAssetSellerController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index.value, CheckMode)
             case Some(IdentityType.UKCompany) =>
               controllers.nonsipp.otherassetsheld.routes.CompanyNameOfOtherAssetSellerController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index.value, CheckMode)
             case Some(IdentityType.UKPartnership) =>
               controllers.nonsipp.otherassetsheld.routes.PartnershipNameOfOtherAssetsSellerController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index.value, CheckMode)
             case Some(IdentityType.Other) =>
               controllers.nonsipp.common.routes.OtherRecipientDetailsController
-                .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller)
+                .onPageLoad(srn, index.value, CheckMode, IdentitySubject.OtherAssetSeller)
             case _ =>
               controllers.routes.JourneyRecoveryController.onPageLoad()
           }
@@ -261,13 +261,13 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
           userAnswers.get(OtherAssetsCYAPointOfEntry(srn, index)) match {
             case Some(NoPointOfEntry) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
             case Some(
                 WhoWasAssetAcquiredFromPointOfEntry | AssetContributionToAcquisitionPointOfEntry |
                 AssetTransferToAcquisitionPointOfEntry
                 ) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetIndividualSellerNINumberController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index.value, CheckMode)
             case _ =>
               controllers.routes.JourneyRecoveryController.onPageLoad()
           }
@@ -277,13 +277,13 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
           userAnswers.get(OtherAssetsCYAPointOfEntry(srn, index)) match {
             case Some(NoPointOfEntry) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
             case Some(
                 WhoWasAssetAcquiredFromPointOfEntry | AssetContributionToAcquisitionPointOfEntry |
                 AssetTransferToAcquisitionPointOfEntry
                 ) =>
               controllers.nonsipp.common.routes.CompanyRecipientCrnController
-                .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller)
+                .onPageLoad(srn, index.value, CheckMode, IdentitySubject.OtherAssetSeller)
             case _ =>
               controllers.routes.JourneyRecoveryController.onPageLoad()
           }
@@ -293,13 +293,13 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
           userAnswers.get(OtherAssetsCYAPointOfEntry(srn, index)) match {
             case Some(NoPointOfEntry) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
             case Some(
                 WhoWasAssetAcquiredFromPointOfEntry | AssetContributionToAcquisitionPointOfEntry |
                 AssetTransferToAcquisitionPointOfEntry
                 ) =>
               controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-                .onPageLoad(srn, index, CheckMode, IdentitySubject.OtherAssetSeller)
+                .onPageLoad(srn, index.value, CheckMode, IdentitySubject.OtherAssetSeller)
             case _ =>
               controllers.routes.JourneyRecoveryController.onPageLoad()
           }
@@ -311,12 +311,12 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
                 NoPointOfEntry | WhoWasAssetAcquiredFromPointOfEntry
                 ) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
             case Some(
                 AssetContributionToAcquisitionPointOfEntry | AssetTransferToAcquisitionPointOfEntry
                 ) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index.value, CheckMode)
             case _ =>
               controllers.routes.JourneyRecoveryController.onPageLoad()
           }
@@ -328,12 +328,12 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
                 NoPointOfEntry | WhoWasAssetAcquiredFromPointOfEntry
                 ) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
             case Some(
                 AssetContributionToAcquisitionPointOfEntry | AssetTransferToAcquisitionPointOfEntry
                 ) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index.value, CheckMode)
             case _ =>
               controllers.routes.JourneyRecoveryController.onPageLoad()
           }
@@ -345,12 +345,12 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
                 NoPointOfEntry | WhoWasAssetAcquiredFromPointOfEntry
                 ) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
             case Some(
                 AssetContributionToAcquisitionPointOfEntry | AssetTransferToAcquisitionPointOfEntry
                 ) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index.value, CheckMode)
             case _ =>
               controllers.routes.JourneyRecoveryController.onPageLoad()
           }
@@ -362,12 +362,12 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
                 NoPointOfEntry | WhoWasAssetAcquiredFromPointOfEntry
                 ) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index.value, CheckMode)
             case Some(
                 AssetContributionToAcquisitionPointOfEntry | AssetTransferToAcquisitionPointOfEntry
                 ) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index.value, CheckMode)
             case _ =>
               controllers.routes.JourneyRecoveryController.onPageLoad()
           }
@@ -379,10 +379,10 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
                 NoPointOfEntry | AssetContributionToAcquisitionPointOfEntry
                 ) =>
               controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-                .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index.value, NormalMode)
             case Some(AssetTransferToAcquisitionPointOfEntry) =>
               controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index.value, CheckMode)
             case _ =>
               controllers.routes.JourneyRecoveryController.onPageLoad()
           }
@@ -390,17 +390,17 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
         //30l
         case CostOfOtherAssetPage(srn, index) =>
           controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-            .onPageLoad(srn, index, NormalMode)
+            .onPageLoad(srn, index.value, NormalMode)
 
         //30m
         case IndependentValuationPage(srn, index) =>
           controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-            .onPageLoad(srn, index, NormalMode)
+            .onPageLoad(srn, index.value, NormalMode)
 
         //30n
         case IncomeFromAssetPage(srn, index) =>
           controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
-            .onPageLoad(srn, index, NormalMode)
+            .onPageLoad(srn, index.value, NormalMode)
 
         //30o
         case OtherAssetsCYAPage(srn) =>

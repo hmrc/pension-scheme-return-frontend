@@ -32,11 +32,11 @@ class OtherAssetIndividualSellerNINumberControllerSpec extends ControllerBaseSpe
 
   private lazy val onPageLoad =
     controllers.nonsipp.otherassetsheld.routes.OtherAssetIndividualSellerNINumberController
-      .onPageLoad(srn, index, NormalMode)
+      .onPageLoad(srn, index.value, NormalMode)
 
   private lazy val onSubmit =
     controllers.nonsipp.otherassetsheld.routes.OtherAssetIndividualSellerNINumberController
-      .onSubmit(srn, index, NormalMode)
+      .onSubmit(srn, index.value, NormalMode)
 
   val userAnswersWithIndividualName: UserAnswers =
     defaultUserAnswers.unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, index), individualName)

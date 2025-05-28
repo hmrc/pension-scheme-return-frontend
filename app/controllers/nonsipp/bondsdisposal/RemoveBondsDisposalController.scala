@@ -21,6 +21,7 @@ import pages.nonsipp.bonds.NameOfBondsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import models.HowDisposed.HowDisposed
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions.IdentifyAndRequireData
 import models.{HowDisposed, NormalMode}
 import config.RefinedTypes.{Max50, Max5000}
@@ -56,47 +57,48 @@ class RemoveBondsDisposalController @Inject()(
 
   private val form = RemoveBondsDisposalController.form(formProvider)
 
-  def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50): Action[AnyContent] =
+  def onPageLoad(srn: Srn, bondIndex: Int, disposalIndex: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
           nameOfBonds <- request.userAnswers
-            .get(NameOfBondsPage(srn, bondIndex))
+            .get(NameOfBondsPage(srn, bondIndex.refined))
             .getOrRedirectToTaskList(srn)
           methodOfDisposal <- request.userAnswers
-            .get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex))
+            .get(HowWereBondsDisposedOfPage(srn, bondIndex.refined, disposalIndex.refined))
             .getOrRedirectToTaskList(srn)
         } yield {
           val preparedForm =
-            request.userAnswers.fillForm(RemoveBondsDisposalPage(srn, bondIndex, disposalIndex), form)
+            request.userAnswers.fillForm(RemoveBondsDisposalPage(srn, bondIndex.refined, disposalIndex.refined), form)
           Ok(
             view(
               preparedForm,
-              viewModel(srn, bondIndex, disposalIndex, nameOfBonds, methodOfDisposal)
+              viewModel(srn, bondIndex.refined, disposalIndex.refined, nameOfBonds, methodOfDisposal)
             )
           )
         }
       ).merge
     }
 
-  def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50): Action[AnyContent] =
+  def onSubmit(srn: Srn, bondIndex: Int, disposalIndex: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           errors =>
-            request.userAnswers.get(NameOfBondsPage(srn, bondIndex)).getOrRecoverJourney { nameOfBonds =>
-              request.userAnswers.get(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex)).getOrRecoverJourney {
-                methodOfDisposal =>
+            request.userAnswers.get(NameOfBondsPage(srn, bondIndex.refined)).getOrRecoverJourney { nameOfBonds =>
+              request.userAnswers
+                .get(HowWereBondsDisposedOfPage(srn, bondIndex.refined, disposalIndex.refined))
+                .getOrRecoverJourney { methodOfDisposal =>
                   Future.successful(
                     BadRequest(
                       view(
                         errors,
-                        viewModel(srn, bondIndex, disposalIndex, nameOfBonds, methodOfDisposal)
+                        viewModel(srn, bondIndex.refined, disposalIndex.refined, nameOfBonds, methodOfDisposal)
                       )
                     )
                   )
-              }
+                }
             },
           value =>
             if (value) {
@@ -104,8 +106,8 @@ class RemoveBondsDisposalController @Inject()(
                 removedUserAnswers <- Future
                   .fromTry(
                     request.userAnswers
-                      .remove(HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex))
-                      .remove(BondsDisposalProgress(srn, bondIndex, disposalIndex))
+                      .remove(HowWereBondsDisposedOfPage(srn, bondIndex.refined, disposalIndex.refined))
+                      .remove(BondsDisposalProgress(srn, bondIndex.refined, disposalIndex.refined))
                       .remove(BondsDisposalCompleted(srn))
                   )
 
@@ -126,7 +128,7 @@ class RemoveBondsDisposalController @Inject()(
                     case Some(_) =>
                       Redirect(
                         navigator.nextPage(
-                          RemoveBondsDisposalPage(srn, bondIndex, disposalIndex),
+                          RemoveBondsDisposalPage(srn, bondIndex.refined, disposalIndex.refined),
                           NormalMode,
                           removedUserAnswers
                         )
@@ -138,7 +140,7 @@ class RemoveBondsDisposalController @Inject()(
                 .successful(
                   Redirect(
                     navigator.nextPage(
-                      RemoveBondsDisposalPage(srn, bondIndex, disposalIndex),
+                      RemoveBondsDisposalPage(srn, bondIndex.refined, disposalIndex.refined),
                       NormalMode,
                       request.userAnswers
                     )

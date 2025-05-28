@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsdisposal
 import services.SaveService
 import pages.nonsipp.otherassetsdisposal.AssetSaleIndependentValuationPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -51,32 +52,41 @@ class AssetSaleIndependentValuationController @Inject()(
 
   private val form = AssetSaleIndependentValuationController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
-        request.userAnswers.get(AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex)).fold(form)(form.fill)
-      Ok(view(preparedForm, viewModel(srn, assetIndex, disposalIndex, mode)))
+        request.userAnswers
+          .get(AssetSaleIndependentValuationPage(srn, assetIndex.refined, disposalIndex.refined))
+          .fold(form)(form.fill)
+      Ok(view(preparedForm, viewModel(srn, assetIndex.refined, disposalIndex.refined, mode)))
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors => {
             Future
-              .successful(BadRequest(view(formWithErrors, viewModel(srn, assetIndex, disposalIndex, mode))))
+              .successful(
+                BadRequest(view(formWithErrors, viewModel(srn, assetIndex.refined, disposalIndex.refined, mode)))
+              )
           },
           value =>
             for {
               updatedAnswers <- Future
                 .fromTry(
-                  request.userAnswers.set(AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex), value)
+                  request.userAnswers
+                    .set(AssetSaleIndependentValuationPage(srn, assetIndex.refined, disposalIndex.refined), value)
                 )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
               navigator
-                .nextPage(AssetSaleIndependentValuationPage(srn, assetIndex, disposalIndex), mode, updatedAnswers)
+                .nextPage(
+                  AssetSaleIndependentValuationPage(srn, assetIndex.refined, disposalIndex.refined),
+                  mode,
+                  updatedAnswers
+                )
             )
         )
     }

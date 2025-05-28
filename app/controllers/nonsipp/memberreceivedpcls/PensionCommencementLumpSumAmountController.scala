@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import com.google.inject.Inject
 import viewmodels.models.MultipleQuestionsViewModel.DoubleQuestion
+import utils.IntUtils.{toInt, IntOpts}
 import config.Constants.{maxPCLSAmount, minPosMoneyValue}
 import controllers.actions._
 import navigation.Navigator
@@ -59,21 +60,21 @@ class PensionCommencementLumpSumAmountController @Inject()(
   private def form: Form[(Money, Money)] =
     PensionCommencementLumpSumAmountController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
+      request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney { memberName =>
         val preparedForm =
           request.userAnswers
-            .get(PensionCommencementLumpSumAmountPage(srn, index))
+            .get(PensionCommencementLumpSumAmountPage(srn, index.refined))
             .fold(form)(value => if (value.isZero) form else form.fill(value.tuple))
 
-        Ok(view(preparedForm, viewModel(srn, index, memberName.fullName, mode, form)))
+        Ok(view(preparedForm, viewModel(srn, index.refined, memberName.fullName, mode, form)))
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
+      request.userAnswers.get(MemberDetailsPage(srn, index.refined)).getOrRecoverJourney { memberName =>
         form
           .bindFromRequest()
           .fold(
@@ -82,7 +83,7 @@ class PensionCommencementLumpSumAmountController @Inject()(
                 BadRequest(
                   view(
                     formWithErrors,
-                    viewModel(srn, index, memberName.fullName, mode, form)
+                    viewModel(srn, index.refined, memberName.fullName, mode, form)
                   )
                 )
               ),
@@ -90,11 +91,11 @@ class PensionCommencementLumpSumAmountController @Inject()(
               for {
                 updatedAnswers <- Future
                   .fromTry(
-                    request.userAnswers.transformAndSet(PensionCommencementLumpSumAmountPage(srn, index), value)
+                    request.userAnswers.transformAndSet(PensionCommencementLumpSumAmountPage(srn, index.refined), value)
                   )
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(
-                navigator.nextPage(PensionCommencementLumpSumAmountPage(srn, index), mode, updatedAnswers)
+                navigator.nextPage(PensionCommencementLumpSumAmountPage(srn, index.refined), mode, updatedAnswers)
               )
           )
       }

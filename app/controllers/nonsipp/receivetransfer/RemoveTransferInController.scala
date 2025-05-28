@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, IntOpts}
 import pages.nonsipp.receivetransfer._
 import controllers.actions._
 import navigation.Navigator
@@ -54,21 +55,21 @@ class RemoveTransferInController @Inject()(
 
   private val form = RemoveTransferInController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, index: Max5): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Int, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRedirectToTaskList(srn)
+          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex.refined)).getOrRedirectToTaskList(srn)
           transferringSchemeName <- request.userAnswers
-            .get(TransferringSchemeNamePage(srn, memberIndex, index))
+            .get(TransferringSchemeNamePage(srn, memberIndex.refined, index.refined))
             .getOrRedirectToTaskList(srn)
         } yield Ok(
-          view(form, viewModel(srn, memberIndex: Max300, index: Max5, nameDOB.fullName, transferringSchemeName))
+          view(form, viewModel(srn, memberIndex.refined, index.refined, nameDOB.fullName, transferringSchemeName))
         )
       ).merge
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, index: Max5): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -76,12 +77,15 @@ class RemoveTransferInController @Inject()(
           formWithErrors => {
             (
               for {
-                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourneyT
+                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex.refined)).getOrRecoverJourneyT
                 transferringSchemeName <- request.userAnswers
-                  .get(TransferringSchemeNamePage(srn, memberIndex, index))
+                  .get(TransferringSchemeNamePage(srn, memberIndex.refined, index.refined))
                   .getOrRecoverJourneyT
               } yield BadRequest(
-                view(formWithErrors, viewModel(srn, memberIndex, index, nameDOB.fullName, transferringSchemeName))
+                view(
+                  formWithErrors,
+                  viewModel(srn, memberIndex.refined, index.refined, nameDOB.fullName, transferringSchemeName)
+                )
               )
             ).merge
           },
@@ -92,9 +96,9 @@ class RemoveTransferInController @Inject()(
                   .fromTry(
                     request.userAnswers
                       .removeOnlyMultiplePages(
-                        transferInPages(srn, memberIndex, index)
+                        transferInPages(srn, memberIndex.refined, index.refined)
                       )
-                      .set(MemberStatus(srn, memberIndex), MemberState.Changed)
+                      .set(MemberStatus(srn, memberIndex.refined), MemberState.Changed)
                   )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
@@ -107,7 +111,7 @@ class RemoveTransferInController @Inject()(
                 _ =>
                   Redirect(
                     navigator
-                      .nextPage(RemoveTransferInPage(srn, memberIndex), NormalMode, updatedAnswers)
+                      .nextPage(RemoveTransferInPage(srn, memberIndex.refined), NormalMode, updatedAnswers)
                   )
               )
             } else {
@@ -115,7 +119,7 @@ class RemoveTransferInController @Inject()(
                 .successful(
                   Redirect(
                     navigator
-                      .nextPage(RemoveTransferInPage(srn, memberIndex), NormalMode, request.userAnswers)
+                      .nextPage(RemoveTransferInPage(srn, memberIndex.refined), NormalMode, request.userAnswers)
                   )
                 )
             }

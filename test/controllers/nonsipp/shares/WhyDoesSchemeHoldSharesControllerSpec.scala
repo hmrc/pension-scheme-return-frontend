@@ -33,9 +33,9 @@ class WhyDoesSchemeHoldSharesControllerSpec extends ControllerBaseSpec {
   private val schemeHoldShares = schemeHoldSharesGen.sample.value
 
   private lazy val onPageLoad =
-    routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, NormalMode)
+    routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index.value, NormalMode)
   private lazy val onSubmit =
-    routes.WhyDoesSchemeHoldSharesController.onSubmit(srn, index, NormalMode)
+    routes.WhyDoesSchemeHoldSharesController.onSubmit(srn, index.value, NormalMode)
 
   private val userAnswers =
     defaultUserAnswers.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty)

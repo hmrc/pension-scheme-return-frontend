@@ -19,7 +19,6 @@ package controllers.nonsipp.landorproperty
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.landorproperty.{AddressLookupResultsPage, LandOrPropertyChosenAddressPage}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -29,6 +28,8 @@ import config.RefinedTypes._
 import controllers.PSRController
 import views.html.RadioListView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, IntOpts}
+import pages.nonsipp.landorproperty.{AddressLookupResultsPage, LandOrPropertyChosenAddressPage}
 import play.api.i18n.MessagesApi
 import controllers.nonsipp.landorproperty.LandPropertyAddressResultsController._
 import viewmodels.DisplayMessage.{LinkMessage, ParagraphMessage}
@@ -51,37 +52,37 @@ class LandPropertyAddressResultsController @Inject()(
 
   private val form = LandPropertyAddressResultsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       (
         for {
-          addresses <- request.userAnswers.get(AddressLookupResultsPage(srn, index)).getOrRecoverJourney
-          previouslySelectedAddress = request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index))
+          addresses <- request.userAnswers.get(AddressLookupResultsPage(srn, index.refined)).getOrRecoverJourney
+          previouslySelectedAddress = request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index.refined))
           foundAddress = addresses.find(address => previouslySelectedAddress.exists(_.id == address.id))
           preparedForm = foundAddress.fold(form)(address => form.fill(address.id))
-        } yield Ok(view(preparedForm, viewModel(srn, index, addresses, mode)))
+        } yield Ok(view(preparedForm, viewModel(srn, index.refined, addresses, mode)))
       ).merge
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(AddressLookupResultsPage(srn, index)).getOrRecoverJourney { addresses =>
-              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, addresses, mode))))
+            request.userAnswers.get(AddressLookupResultsPage(srn, index.refined)).getOrRecoverJourney { addresses =>
+              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index.refined, addresses, mode))))
             },
           value =>
             (
               for {
-                addresses <- request.userAnswers.get(AddressLookupResultsPage(srn, index)).getOrRecoverJourneyT
+                addresses <- request.userAnswers.get(AddressLookupResultsPage(srn, index.refined)).getOrRecoverJourneyT
                 foundAddress <- addresses.find(_.id == value).getOrRecoverJourneyT
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.set(LandOrPropertyChosenAddressPage(srn, index), foundAddress))
+                  .fromTry(request.userAnswers.set(LandOrPropertyChosenAddressPage(srn, index.refined), foundAddress))
                   .liftF
-                nextPage = navigator.nextPage(LandOrPropertyChosenAddressPage(srn, index), mode, updatedAnswers)
-                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage).liftF
+                nextPage = navigator.nextPage(LandOrPropertyChosenAddressPage(srn, index.refined), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage).liftF
                 _ <- saveService.save(updatedProgressAnswers).liftF
               } yield Redirect(nextPage)
             ).merge

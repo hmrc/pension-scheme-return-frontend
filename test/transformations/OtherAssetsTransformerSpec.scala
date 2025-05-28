@@ -401,7 +401,7 @@ class OtherAssetsTransformerSpec
             OtherAssetsProgress(srn, refineMV(1)),
             SectionJourneyStatus.InProgress(
               controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
-                .onPageLoad(srn, index1of5000, NormalMode)
+                .onPageLoad(srn, index1of5000.value, NormalMode)
                 .url
             )
           )

@@ -20,6 +20,7 @@ import services.SaveService
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.Max5000
+import utils.IntUtils.IntOpts
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -52,32 +53,32 @@ class CompanyRecipientNameController @Inject()(
 
   private def form = CompanyRecipientNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(CompanyRecipientNamePage(srn, index)),
-          CompanyRecipientNameController.viewModel(srn, index, mode)
+          form.fromUserAnswers(CompanyRecipientNamePage(srn, index.refined)),
+          CompanyRecipientNameController.viewModel(srn, index.refined, mode)
         )
       )
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future.successful(
-              BadRequest(view(formWithErrors, CompanyRecipientNameController.viewModel(srn, index, mode)))
+              BadRequest(view(formWithErrors, CompanyRecipientNameController.viewModel(srn, index.refined, mode)))
             ),
           answer => {
             for {
-              updatedAnswers <- request.userAnswers.set(CompanyRecipientNamePage(srn, index), answer).mapK
-              nextPage = navigator.nextPage(CompanyRecipientNamePage(srn, index), mode, updatedAnswers)
-              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              updatedAnswers <- request.userAnswers.set(CompanyRecipientNamePage(srn, index.refined), answer).mapK
+              nextPage = navigator.nextPage(CompanyRecipientNamePage(srn, index.refined), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index.refined, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
-            } yield Redirect(navigator.nextPage(CompanyRecipientNamePage(srn, index), mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(CompanyRecipientNamePage(srn, index.refined), mode, updatedAnswers))
           }
         )
   }
@@ -95,6 +96,6 @@ object CompanyRecipientNameController {
       Message("companyRecipientName.title"),
       Message("companyRecipientName.heading"),
       TextInputViewModel(true),
-      routes.CompanyRecipientNameController.onSubmit(srn, index, mode)
+      routes.CompanyRecipientNameController.onSubmit(srn, index.value, mode)
     )
 }

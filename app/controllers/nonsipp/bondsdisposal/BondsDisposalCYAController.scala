@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.bonds._
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, IntOpts}
 import cats.implicits.toShow
 import config.Constants.maxDisposalPerBond
 import controllers.actions.IdentifyAndRequireData
@@ -58,29 +59,31 @@ class BondsDisposalCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      if (request.userAnswers.get(BondsDisposalProgress(srn, bondIndex, disposalIndex)).contains(Completed)) {
+      if (request.userAnswers
+          .get(BondsDisposalProgress(srn, bondIndex.refined, disposalIndex.refined))
+          .contains(Completed)) {
         saveService.save(
           request.userAnswers
-            .set(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex), NoPointOfEntry)
+            .set(BondsDisposalCYAPointOfEntry(srn, bondIndex.refined, disposalIndex.refined), NoPointOfEntry)
             .getOrElse(request.userAnswers)
         )
       }
-      onPageLoadCommon(srn, bondIndex, disposalIndex, mode)
+      onPageLoadCommon(srn, bondIndex.refined, disposalIndex.refined, mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    bondIndex: Max5000,
-    disposalIndex: Max50,
+    bondIndex: Int,
+    disposalIndex: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous).async { implicit request =>
-      onPageLoadCommon(srn, bondIndex, disposalIndex, mode)
+      onPageLoadCommon(srn, bondIndex.refined, disposalIndex.refined, mode)
     }
 
   def onPageLoadCommon(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode)(
@@ -165,7 +168,7 @@ class BondsDisposalCYAController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
         _ <- saveService.save(request.userAnswers)

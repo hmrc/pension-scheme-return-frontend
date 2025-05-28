@@ -34,8 +34,8 @@ class RemoveOtherAssetControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
 
-  private lazy val onPageLoad = routes.RemoveOtherAssetController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.RemoveOtherAssetController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.RemoveOtherAssetController.onPageLoad(srn, index.value, NormalMode)
+  private lazy val onSubmit = routes.RemoveOtherAssetController.onSubmit(srn, index.value, NormalMode)
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 

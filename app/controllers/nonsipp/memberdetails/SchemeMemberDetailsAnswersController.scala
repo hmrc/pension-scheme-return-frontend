@@ -22,6 +22,7 @@ import pages.nonsipp.memberdetails._
 import play.api.mvc._
 import com.google.inject.Inject
 import models.ManualOrUpload.Manual
+import utils.IntUtils.IntOpts
 import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
 import play.api.i18n.MessagesApi
@@ -62,22 +63,22 @@ class SchemeMemberDetailsAnswersController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)
+      onPageLoadCommon(srn: Srn, index.refined, mode: Mode)
     }
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn, index, mode)
+      onPageLoadCommon(srn, index.refined, mode)
     }
 
   def onPageLoadCommon(srn: Srn, index: Max300, mode: Mode)(
@@ -116,17 +117,17 @@ class SchemeMemberDetailsAnswersController @Inject()(
         ).getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val memberDetailsChanged: Boolean = (for {
         initial <- request.pureUserAnswers
-        initialMemberPayments <- initial.buildMemberDetails(srn, index)
-        currentMemberPayments <- request.userAnswers.buildMemberDetails(srn, index)
+        initialMemberPayments <- initial.buildMemberDetails(srn, index.refined)
+        currentMemberPayments <- request.userAnswers.buildMemberDetails(srn, index.refined)
       } yield initialMemberPayments != currentMemberPayments).getOrElse(false)
 
-      lazy val justAdded = mode.isNormalMode && request.userAnswers.get(MemberStatus(srn, index)).isEmpty
+      lazy val justAdded = mode.isNormalMode && request.userAnswers.get(MemberStatus(srn, index.refined)).isEmpty
 
-      lazy val addedThisVersion = request.userAnswers.get(MemberPsrVersionPage(srn, index)).isEmpty
+      lazy val addedThisVersion = request.userAnswers.get(MemberPsrVersionPage(srn, index.refined)).isEmpty
 
       for {
         updatedUserAnswers <- request.userAnswers
@@ -136,22 +137,22 @@ class SchemeMemberDetailsAnswersController @Inject()(
           .setWhen(
             mode.isCheckMode && memberDetailsChanged && !addedThisVersion
           )(
-            MemberStatus(srn, index), {
+            MemberStatus(srn, index.refined), {
               logger.info(s"Something has changed in member payments for member index $index, setting state to CHANGED")
               MemberState.Changed
             }
           )
           // If member is already CHANGED, do not override with NEW if user goes back to CYA page on check mode
-          .setWhen(justAdded)(MemberStatus(srn, index), MemberState.New)
-          .setWhen(mode.isCheckMode && request.userAnswers.get(MemberDetailsCompletedPage(srn, index)).isEmpty)(
-            MemberStatus(srn, index),
+          .setWhen(justAdded)(MemberStatus(srn, index.refined), MemberState.New)
+          .setWhen(mode.isCheckMode && request.userAnswers.get(MemberDetailsCompletedPage(srn, index.refined)).isEmpty)(
+            MemberStatus(srn, index.refined),
             MemberState.New
           )
-          .setWhen(justAdded)(SafeToHardDelete(srn, index), Flag)
-          .set(MemberDetailsCompletedPage(srn, index), SectionCompleted)
+          .setWhen(justAdded)(SafeToHardDelete(srn, index.refined), Flag)
+          .set(MemberDetailsCompletedPage(srn, index.refined), SectionCompleted)
           .mapK[Future]
         nextPage = navigator.nextPage(SchemeMemberDetailsAnswersPage(srn), NormalMode, request.userAnswers)
-        updatedProgressAnswers <- saveProgress(srn, index, updatedUserAnswers, nextPage, alwaysCompleted = true)
+        updatedProgressAnswers <- saveProgress(srn, index.refined, updatedUserAnswers, nextPage, alwaysCompleted = true)
         _ <- saveService.save(updatedProgressAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetailsWithUA(
           srn,
@@ -188,29 +189,31 @@ object SchemeMemberDetailsAnswersController {
         .withAction(
           SummaryAction(
             "site.change",
-            routes.MemberDetailsController.onPageLoad(srn, index, CheckMode).url + "#firstName"
+            routes.MemberDetailsController.onPageLoad(srn, index.value, CheckMode).url + "#firstName"
           ).withVisuallyHiddenContent("memberDetails.firstName")
         ),
       CheckYourAnswersRowViewModel("memberDetails.lastName", memberDetails.lastName)
         .withAction(
           SummaryAction(
             "site.change",
-            routes.MemberDetailsController.onPageLoad(srn, index, CheckMode).url + "#lastName"
+            routes.MemberDetailsController.onPageLoad(srn, index.value, CheckMode).url + "#lastName"
           ).withVisuallyHiddenContent("memberDetails.lastName")
         ),
       CheckYourAnswersRowViewModel("memberDetails.dateOfBirth", memberDetails.dob.show)
         .withAction(
           SummaryAction(
             "site.change",
-            routes.MemberDetailsController.onPageLoad(srn, index, CheckMode).url + "#dateOfBirth"
+            routes.MemberDetailsController.onPageLoad(srn, index.value, CheckMode).url + "#dateOfBirth"
           ).withVisuallyHiddenContent("memberDetails.dateOfBirth")
         ),
       CheckYourAnswersRowViewModel(
         Message("nationalInsuranceNumber.heading", memberDetails.fullName),
         booleanToMessage(hasNINO)
       ).withAction(
-        SummaryAction("site.change", routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, CheckMode).url)
-          .withVisuallyHiddenContent(("memberDetailsCYA.nationalInsuranceNumber.hidden", memberDetails.fullName))
+        SummaryAction(
+          "site.change",
+          routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index.value, CheckMode).url
+        ).withVisuallyHiddenContent(("memberDetailsCYA.nationalInsuranceNumber.hidden", memberDetails.fullName))
       )
     ) ++
       ninoRow(maybeNino, memberDetails.fullName, srn, index) ++
@@ -227,8 +230,10 @@ object SchemeMemberDetailsAnswersController {
         List(
           CheckYourAnswersRowViewModel(Message("memberDetailsNino.heading", memberName), nino.value)
             .withAction(
-              SummaryAction("site.change", routes.MemberDetailsNinoController.onPageLoad(srn, index, CheckMode).url)
-                .withVisuallyHiddenContent(("memberDetailsCYA.nino.hidden", memberName))
+              SummaryAction(
+                "site.change",
+                routes.MemberDetailsNinoController.onPageLoad(srn, index.value, CheckMode).url
+              ).withVisuallyHiddenContent(("memberDetailsCYA.nino.hidden", memberName))
             )
         )
     )
@@ -244,7 +249,7 @@ object SchemeMemberDetailsAnswersController {
         List(
           CheckYourAnswersRowViewModel(Message("noNINO.heading", memberName), noNinoReason)
             .withAction(
-              SummaryAction("site.change", routes.NoNINOController.onPageLoad(srn, index, CheckMode).url)
+              SummaryAction("site.change", routes.NoNINOController.onPageLoad(srn, index.value, CheckMode).url)
                 .withVisuallyHiddenContent(("memberDetailsCYA.noNINO.hidden", memberName))
             )
         )
@@ -282,7 +287,7 @@ object SchemeMemberDetailsAnswersController {
       ),
       refresh = None,
       buttonText = mode.fold(normal = "site.saveAndContinue", check = "site.continue", viewOnly = "site.continue"),
-      onSubmit = routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index, mode),
+      onSubmit = routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index.value, mode),
       optViewOnlyDetails = if (mode == ViewOnlyMode) {
         Some(
           ViewOnlyDetailsViewModel(
@@ -299,7 +304,7 @@ object SchemeMemberDetailsAnswersController {
                   .onSubmitViewOnly(srn, 1, year, currentVersion, previousVersion)
               case _ =>
                 routes.SchemeMemberDetailsAnswersController
-                  .onSubmit(srn, index, mode)
+                  .onSubmit(srn, index.value, mode)
             }
           )
         )
