@@ -43,16 +43,12 @@ object SharesCheckStatusUtils {
     didSchemeHoldAnyShares match {
       case Some(false) => false
       case _ =>
-        journeysStartedList
-          .map(
-            index => {
-              refineV[OneTo5000](index.toInt + 1).fold(
-                _ => List.empty,
-                refinedIndex => checkSharesRecord(userAnswers, srn, refinedIndex)
-              )
-            }
+        journeysStartedList.exists(index => {
+          refineV[OneTo5000](index.toInt + 1).fold(
+            _ => false,
+            refinedIndex => checkSharesRecord(userAnswers, srn, refinedIndex)
           )
-          .contains(true)
+        })
     }
   }
 

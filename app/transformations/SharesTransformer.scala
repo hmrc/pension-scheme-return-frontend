@@ -698,7 +698,7 @@ class SharesTransformer @Inject() extends Transformer {
                   case HowSharesDisposed.Sold.name => HowSharesDisposed.Sold
                   case HowSharesDisposed.Redeemed.name => HowSharesDisposed.Redeemed
                   case HowSharesDisposed.Transferred.name => HowSharesDisposed.Transferred
-                  case HowSharesDisposed.Other.name =>
+                  case _ =>
                     HowSharesDisposed.Other(disposedSharesTransaction.optOtherMethod.get)
                 }
 

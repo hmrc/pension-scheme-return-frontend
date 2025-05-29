@@ -95,6 +95,8 @@ class HowMuchCashController @Inject()(
                   Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
                 case NormalMode =>
                   Redirect(navigator.nextPage(HowMuchCashPage(srn, mode), mode, updatedAnswers))
+                case ViewOnlyMode =>
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
               }
             }
         )

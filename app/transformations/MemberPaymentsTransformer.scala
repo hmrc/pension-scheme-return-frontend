@@ -452,6 +452,7 @@ class MemberPaymentsTransformer @Inject()(
             currentMemberDetails.toList.partitionMap {
               case (index, memberDetails) if memberDetails.memberPSRVersion.isEmpty => Left(index)
               case (index, MemberDetails(None, _, Some(version), _, _, _, _, _, _, _, _)) => Right(index -> version)
+              case _ => throw new NoSuchElementException("Unexpected memberDetails structure encountered")
             }
 
           val versionedMembersWithETMPStatus = membersWithVersions.map {

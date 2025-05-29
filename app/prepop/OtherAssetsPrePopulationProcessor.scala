@@ -45,8 +45,6 @@ class OtherAssetsPrePopulationProcessor @Inject()() {
       (baseUaJson \ "assets" \ "otherAssets" \ "otherAssetTransactions" \ "assetsDisposed" \ "anyPartAssetStillHeld")
         .asOpt[Map[String, Map[String, Boolean]]]
 
-    val isOtherAssetsEmpty = !baseUA.get(WhatIsOtherAssetPages(srn)).exists(_.nonEmpty)
-
     val transformedResult: Try[UserAnswers] = baseUaJson
       .transform(otherAssets.json.pickBranch)
       .prune(OtherAssetsRecordVersionPage(srn).path)

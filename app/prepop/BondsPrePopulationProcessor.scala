@@ -45,8 +45,6 @@ class BondsPrePopulationProcessor @Inject()() {
       (baseUaJson \ "assets" \ "bonds" \ "bondTransactions" \ "bondsDisposed" \ "totalNowHeld")
         .asOpt[Map[String, Map[String, Int]]]
 
-    val isBondsEmpty = !baseUA.get(NameOfBondsPages(srn)).exists(_.nonEmpty)
-
     val transformedResult: Try[UserAnswers] = baseUaJson
       .transform(bonds.json.pickBranch)
       .prune(BondsRecordVersionPage(srn).path)

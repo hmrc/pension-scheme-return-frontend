@@ -245,6 +245,8 @@ object LandOrPropertyNavigator extends JourneyNavigator {
             case (_, Some(false)) =>
               controllers.nonsipp.landorproperty.routes.LandPropertyAddressManualController
                 .onPageLoad(srn, index, isUkAddress = false, CheckMode)
+
+            case _ => controllers.routes.UnauthorisedController.onPageLoad()
           }
 
         case LandOrPropertyPostcodeLookupPage(srn, index) =>

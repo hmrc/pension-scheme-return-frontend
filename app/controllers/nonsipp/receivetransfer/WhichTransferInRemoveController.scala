@@ -38,8 +38,6 @@ import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
 import models.requests.DataRequest
 import play.api.data.Form
 
-import scala.collection.immutable.SortedMap
-
 class WhichTransferInRemoveController @Inject()(
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -97,21 +95,6 @@ class WhichTransferInRemoveController @Inject()(
               .onPageLoad(srn, memberIndex, answer)
           )
       )
-  }
-
-  private def withIndexedValues(totalValue: Map[String, Money], transferringSchemeName: Map[String, String])(
-    f: Map[Int, (Money, String)] => Result
-  ): Result = {
-    val values = (totalValue, transferringSchemeName).tupled
-    val maybeIndexedValues: Option[List[(Int, (Money, String))]] = values.toList
-      .traverse { case (key, value) => key.toIntOption.map(_ -> value) }
-
-    maybeIndexedValues match {
-      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case Some(indexedValues) =>
-        val sortedMap = SortedMap.from(indexedValues)
-        f(sortedMap)
-    }
   }
 
   private def getJourneyValues(srn: Srn, memberIndex: Max300)(

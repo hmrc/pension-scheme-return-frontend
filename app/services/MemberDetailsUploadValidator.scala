@@ -242,6 +242,8 @@ class MemberDetailsUploadValidator @Inject()(
           case `dobDayKey` => ValidationErrorType.DateOfBirth
           case `dobMonthKey` => ValidationErrorType.DateOfBirth
           case `dobYearKey` => ValidationErrorType.DateOfBirth
+          case key =>
+            throw new IllegalArgumentException(s"Unexpected input form error key: $key")
         }
 
         val cellMapping: FormError => Option[String] = {

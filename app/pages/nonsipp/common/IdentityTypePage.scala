@@ -44,6 +44,8 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
       pages.nonsipp.shares.Paths.heldSharesTransaction \ "acquiredFromType" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
     case IdentitySubject.OtherAssetSeller =>
       pages.nonsipp.otherassetsheld.Paths.otherAssetsTransactions \ "acquiredFromType" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
+    case IdentitySubject.Unknown =>
+      throw new IllegalArgumentException("Unknown identity subject not supported in path resolution.")
   }
 
   override def toString: String = "identityTypes"

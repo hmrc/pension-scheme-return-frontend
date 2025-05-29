@@ -23,11 +23,10 @@ import models.SchemeId.Srn
 import eu.timepit.refined.refineV
 import pages.nonsipp.shares.Paths.shares
 import pages.nonsipp.sharesdisposal.SharesDisposalPage
+import play.api.libs.json._
 import models.UserAnswers
 import pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction
 import utils.JsonUtils.JsResultOps
-import play.api.Logger
-import play.api.libs.json._
 
 import scala.util.{Success, Try}
 
@@ -35,8 +34,6 @@ import javax.inject.{Inject, Singleton}
 
 @Singleton
 class SharesPrePopulationProcessor @Inject()() {
-
-  private val logger = Logger(getClass)
 
   def clean(baseUA: UserAnswers, currentUA: UserAnswers)(srn: Srn): Try[UserAnswers] = {
 
@@ -47,7 +44,6 @@ class SharesPrePopulationProcessor @Inject()() {
         .asOpt[Map[String, Map[String, Int]]]
 
     val sharesJson: JsResult[JsObject] = baseUaJson.transform(shares.json.pickBranch)
-    val isSharesEmpty = !baseUA.get(TypeOfSharesHeldPages(srn)).exists(_.nonEmpty)
 
     val transformedResult: Try[UserAnswers] = sharesJson
       .prune(SharesRecordVersionPage(srn).path)

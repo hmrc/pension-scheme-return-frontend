@@ -822,6 +822,8 @@ object SharesCYAController {
                   )
                 )
               )
+
+            case SchemeHoldShare.Contribution | SchemeHoldShare.Transfer => None
           }
         }
       )

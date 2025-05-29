@@ -121,6 +121,9 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClientV2) {
         )
       case (_, _, Some(fbNumber)) =>
         Seq("fbNumber" -> fbNumber)
+
+      case _ =>
+        throw new IllegalArgumentException("Invalid input: expected either psrVersion or fbNumber")
     }
     http
       .get(url"${getStandardUrl(pstr)}?$queryParams")

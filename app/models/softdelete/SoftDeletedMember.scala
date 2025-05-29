@@ -36,6 +36,5 @@ object SoftDeletedMember {
   private implicit val formatMemberLumpSumReceived: Format[MemberLumpSumReceived] = Json.format[MemberLumpSumReceived]
   private implicit val formatEmployerContributions: Format[EmployerContributions] = Json.format[EmployerContributions]
   private implicit val formatMemberPersonalDetails: Format[MemberPersonalDetails] = Json.format[MemberPersonalDetails]
-  private implicit val formatMemberDetails: Format[MemberDetails] = Json.format[MemberDetails]
   implicit val format: Format[SoftDeletedMember] = Json.format[SoftDeletedMember]
 }

@@ -416,7 +416,7 @@ class LandOrPropertyTransformer @Inject() extends Transformer {
                 val methodOfDisposal = disposedPropertyTransaction.methodOfDisposal match {
                   case HowDisposed.Sold.name => HowDisposed.Sold
                   case HowDisposed.Transferred.name => HowDisposed.Transferred
-                  case HowDisposed.Other.name =>
+                  case _ =>
                     HowDisposed.Other(disposedPropertyTransaction.optOtherMethod.get)
                 }
 

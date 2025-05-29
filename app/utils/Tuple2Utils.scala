@@ -18,10 +18,20 @@ package utils
 
 object Tuple2Utils {
 
+//  implicit class Tuple2OptionOps[A, B](tup: (Option[A], Option[B])) {
+//    def toEither: Either[A, B] = tup match {
+//      case (Some(a), _) => Left(a)
+//      case (_, Some(b)) => Right(b)
+//    }
+//  }
+
   implicit class Tuple2OptionOps[A, B](tup: (Option[A], Option[B])) {
     def toEither: Either[A, B] = tup match {
       case (Some(a), _) => Left(a)
-      case (_, Some(b)) => Right(b)
+      case (None, Some(b)) => Right(b)
+      case (None, None) =>
+        throw new NoSuchElementException("Neither Left nor Right value present in tuple")
     }
   }
+
 }

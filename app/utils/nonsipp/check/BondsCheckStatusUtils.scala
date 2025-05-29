@@ -41,16 +41,13 @@ object BondsCheckStatusUtils {
     bondsHeld match {
       case Some(false) => false
       case _ =>
-        journeysStartedList
-          .map(
-            index => {
-              refineV[OneTo5000](index.toInt + 1).fold(
-                _ => List.empty,
-                refinedIndex => checkBondsRecord(userAnswers, srn, refinedIndex)
-              )
-            }
+        journeysStartedList.exists(index => {
+          refineV[OneTo5000](index.toInt + 1).fold(
+            _ => false,
+            refinedIndex => checkBondsRecord(userAnswers, srn, refinedIndex)
           )
-          .contains(true)
+        })
+
     }
   }
 

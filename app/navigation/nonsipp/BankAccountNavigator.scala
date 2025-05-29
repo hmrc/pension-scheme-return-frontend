@@ -51,6 +51,8 @@ object BankAccountNavigator extends JourneyNavigator {
               controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode)
             case (Some(true), Some(false)) =>
               nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, CheckMode)
+
+            case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case WhyNoBankAccountPage(srn) =>

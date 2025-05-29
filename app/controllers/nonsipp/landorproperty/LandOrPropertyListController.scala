@@ -58,7 +58,7 @@ class LandOrPropertyListController @Inject()(
   formProvider: YesNoPageFormProvider
 ) extends PSRController {
 
-  private implicit val logger = Logger(getClass)
+  private implicit val logger: Logger = Logger(getClass)
 
   val form: Form[Boolean] = LandOrPropertyListController.form(formProvider)
 
