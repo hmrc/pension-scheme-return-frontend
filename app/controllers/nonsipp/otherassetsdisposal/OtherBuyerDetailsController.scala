@@ -91,10 +91,11 @@ class OtherBuyerDetailsController @Inject()(
             for {
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(OtherBuyerDetailsPage(srn, index, disposalIndex), answer))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(OtherBuyerDetailsPage(srn, index, disposalIndex), mode, updatedAnswers)
-            )
+              nextPage = navigator
+                .nextPage(OtherBuyerDetailsPage(srn, index, disposalIndex), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

@@ -82,14 +82,11 @@ class TypeOfAssetBuyerController @Inject()(
               updatedAnswers <- Future.fromTry(
                 request.userAnswers.set(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex), answer)
               )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
-                TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex),
-                mode,
-                updatedAnswers
-              )
-            )
+              nextPage = navigator
+                .nextPage(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, assetIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
     }

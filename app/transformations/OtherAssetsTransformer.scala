@@ -269,8 +269,9 @@ class OtherAssetsTransformer @Inject() extends Transformer {
   ): Seq[OtherAssetDisposed] =
     request.userAnswers
       .map(
-        HowWasAssetDisposedOfPagesForEachAsset(srn, otherAssetIndex)
+        OtherAssetsDisposalProgress.all(srn, otherAssetIndex)
       )
+      .filter(_._2.completed)
       .keys
       .toList
       .flatMap { key =>

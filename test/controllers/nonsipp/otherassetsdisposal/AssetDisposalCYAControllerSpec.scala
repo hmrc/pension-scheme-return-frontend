@@ -23,6 +23,7 @@ import play.api.inject.bind
 import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
 import models._
+import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
@@ -87,6 +88,7 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(PartnershipBuyerNamePage(srn, assetIndex, disposalIndex), recipientName)
     .unsafeSet(WhenWasAssetSoldPage(srn, assetIndex, disposalIndex), dateAssetSold.get)
     .unsafeSet(IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex), isBuyerConnectedParty.get)
+    .unsafeSet(OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex), SectionJourneyStatus.Completed)
 
   "AssetDisposalCYAController" - {
 
@@ -139,6 +141,19 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
       )
 
       act.like(
+        redirectToPage(
+          call = onPageLoad(mode),
+          page = routes.ReportedOtherAssetsDisposalListController.onPageLoad(srn, 1),
+          userAnswers = userAnswers
+            .unsafeSet(
+              OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex),
+              SectionJourneyStatus.InProgress("any")
+            ),
+          previousUserAnswers = emptyUserAnswers
+        ).withName(s"Redirect to shares list when incomplete when in $mode mode")
+      )
+
+      act.like(
         journeyRecoveryPage(onSubmit(mode))
           .updateName("onSubmit" + _)
           .withName(s"redirect to journey recovery page on submit when in $mode mode")
@@ -159,6 +174,7 @@ class AssetDisposalCYAControllerSpec extends ControllerBaseSpec {
       .unsafeSet(PartnershipBuyerNamePage(srn, assetIndex, disposalIndex), recipientName)
       .unsafeSet(WhenWasAssetSoldPage(srn, assetIndex, disposalIndex), dateAssetSold.get)
       .unsafeSet(IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex), isBuyerConnectedParty.get)
+      .unsafeSet(OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex), SectionJourneyStatus.Completed)
 
     val previousUserAnswers = currentUserAnswers
       .unsafeSet(FbVersionPage(srn), "001")

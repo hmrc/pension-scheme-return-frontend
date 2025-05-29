@@ -84,12 +84,8 @@ class HowWasAssetDisposedOfController @Inject()(
               updatedAnswers <- request.userAnswers
                 .set(page, value)
                 .mapK[Future]
-              hasAnswerChanged = request.userAnswers.exists(page)(_ == value)
-              nextPage = navigator.nextPage(
-                HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex, hasAnswerChanged),
-                mode,
-                updatedAnswers
-              )
+              nextPage = navigator
+                .nextPage(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex), mode, updatedAnswers)
               updatedProgressAnswers <- saveProgress(srn, assetIndex, disposalIndex, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)

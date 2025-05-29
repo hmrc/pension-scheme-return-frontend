@@ -17,16 +17,12 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import services.SaveService
-import pages.nonsipp.otherassetsdisposal.{
-  AnyPartAssetStillHeldPage,
-  HowWasAssetDisposedOfPage,
-  OtherAssetsDisposalProgress
-}
+import pages.nonsipp.otherassetsdisposal.{AnyPartAssetStillHeldPage, OtherAssetsDisposalProgress}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
-import models.{HowDisposed, Mode}
+import models.Mode
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import viewmodels.implicits._
@@ -100,41 +96,15 @@ class AnyPartAssetStillHeldController @Inject()(
                 .set(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex), answer)
                 .set(OtherAssetsDisposalProgress(srn, assetIndex, disposalIndex), SectionJourneyStatus.Completed)
                 .mapK[Future]
-              _ <- saveService.save(updatedAnswers)
-            } yield {
-              updatedAnswers.get(HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex)) match {
-                case Some(HowDisposed.Transferred) =>
-                  Redirect(
-                    navigator
-                      .nextPage(
-                        AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex),
-                        mode,
-                        updatedAnswers
-                      )
-                  )
-
-                case Some(HowDisposed.Sold) =>
-                  Redirect(
-                    navigator
-                      .nextPage(
-                        AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex),
-                        mode,
-                        updatedAnswers
-                      )
-                  )
-
-                case _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(
-                        AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex),
-                        mode,
-                        updatedAnswers
-                      )
-                  )
-              }
-
-            }
+              nextPage = navigator
+                .nextPage(
+                  AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex),
+                  mode,
+                  updatedAnswers
+                )
+              updatedProgressAnswers <- saveProgress(srn, assetIndex, disposalIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

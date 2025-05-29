@@ -256,6 +256,7 @@ class OtherAssetsTransformerSpec
           .unsafeSet(AssetSaleIndependentValuationPage(srn, refineMV(1), refineMV(1)), false)
           .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(1), refineMV(1)), true)
           .unsafeSet(OtherAssetsProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
 
           //index-2
           .unsafeSet(OtherAssetsCompleted(srn, refineMV(2)), SectionCompleted)
@@ -269,6 +270,7 @@ class OtherAssetsTransformerSpec
           .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(2), refineMV(1)), Transferred)
           .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(2), refineMV(1)), false)
           .unsafeSet(OtherAssetsProgress(srn, refineMV(2)), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(2), refineMV(1)), SectionJourneyStatus.Completed)
           //index-3
           .unsafeSet(OtherAssetsCompleted(srn, refineMV(3)), SectionCompleted)
           .unsafeSet(WhatIsOtherAssetPage(srn, refineMV(3)), "assetDescription")
@@ -279,6 +281,7 @@ class OtherAssetsTransformerSpec
           .unsafeSet(HowWasAssetDisposedOfPage(srn, refineMV(3), refineMV(1)), Other("OtherMethod"))
           .unsafeSet(AnyPartAssetStillHeldPage(srn, refineMV(3), refineMV(1)), true)
           .unsafeSet(OtherAssetsProgress(srn, refineMV(3)), SectionJourneyStatus.Completed)
+          .unsafeSet(OtherAssetsDisposalProgress(srn, refineMV(3), refineMV(1)), SectionJourneyStatus.Completed)
 
         val request = DataRequest(allowedAccessRequest, userAnswers)
 
