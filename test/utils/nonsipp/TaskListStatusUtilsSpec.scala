@@ -16,52 +16,52 @@
 
 package utils.nonsipp
 
+import config.RefinedTypes._
+import controllers.TestValues
+import controllers.nonsipp.bonds.routes
+import eu.timepit.refined.refineMV
+import models.ConditionalYesNo._
+import models.HowSharesDisposed.Sold
+import models.IdentitySubject._
+import models.IdentityType.{Individual, UKCompany, UKPartnership}
+import models.ManualOrUpload.Manual
+import models.PensionSchemeType.RegisteredPS
+import models.SchemeHoldShare.Acquisition
+import models._
+import org.scalatest.OptionValues
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
+import pages.nonsipp.bonds._
+import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsStillHeldPage, HowWereBondsDisposedOfPage}
+import pages.nonsipp.common._
 import pages.nonsipp.employercontributions._
-import pages.nonsipp.shares._
-import pages.nonsipp.otherassetsheld._
 import pages.nonsipp.landorproperty._
-import pages.nonsipp.receivetransfer._
 import pages.nonsipp.landorpropertydisposal.{
   HowWasPropertyDisposedOfPage,
   LandOrPropertyDisposalPage,
   LandOrPropertyStillHeldPage
 }
-import pages.nonsipp.sharesdisposal._
-import utils.UserAnswersUtils.UserAnswersOps
-import pages.nonsipp.membersurrenderedbenefits._
-import models._
-import pages.nonsipp.otherassetsdisposal.{AnyPartAssetStillHeldPage, HowWasAssetDisposedOfPage, OtherAssetsDisposalPage}
-import pages.nonsipp.schemedesignatory._
-import pages.nonsipp.bonds._
-import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import pages.nonsipp.memberdetails._
-import org.scalatest.freespec.AnyFreeSpec
-import pages.nonsipp.membercontributions.{MemberContributionsPage, TotalMemberContributionPage}
-import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
-import org.scalatest.matchers.must.Matchers
-import models.ConditionalYesNo._
-import models.ManualOrUpload.Manual
-import models.PensionSchemeType.RegisteredPS
-import models.IdentityType.{Individual, UKCompany, UKPartnership}
-import config.RefinedTypes._
-import controllers.TestValues
-import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
-import models.SchemeHoldShare.Acquisition
-import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
-import controllers.nonsipp.bonds.routes
-import eu.timepit.refined.refineMV
-import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
-import org.scalatest.OptionValues
-import uk.gov.hmrc.domain.Nino
-import models.HowSharesDisposed.Sold
-import viewmodels.models.TaskListStatus._
-import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
-import models.IdentitySubject._
+import pages.nonsipp.membercontributions.{MemberContributionsPage, TotalMemberContributionPage}
+import pages.nonsipp.memberdetails._
+import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
+import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
+import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
+import pages.nonsipp.membersurrenderedbenefits._
 import pages.nonsipp.membertransferout._
 import pages.nonsipp.moneyborrowed._
-import pages.nonsipp.bondsdisposal.{BondsDisposalPage, BondsStillHeldPage, HowWereBondsDisposedOfPage}
-import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
+import pages.nonsipp.otherassetsdisposal.{AnyPartAssetStillHeldPage, HowWasAssetDisposedOfPage, OtherAssetsDisposalPage}
+import pages.nonsipp.otherassetsheld._
+import pages.nonsipp.receivetransfer._
+import pages.nonsipp.schemedesignatory._
+import pages.nonsipp.shares._
+import pages.nonsipp.sharesdisposal._
+import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
+import uk.gov.hmrc.domain.Nino
+import utils.UserAnswersUtils.UserAnswersOps
+import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
+import viewmodels.models.TaskListStatus._
 import viewmodels.models.{MemberState, SectionCompleted, SectionJourneyStatus}
 
 class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
@@ -319,11 +319,12 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
           // First loan:
           .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+          .unsafeSet(LoansProgress(srn, index1of5000), SectionJourneyStatus.Completed)
           .unsafeSet(LoanCompleted(srn, index1of5000), SectionCompleted)
           // Second loan:
           .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
           .unsafeSet(LoanCompleted(srn, index2of5000), SectionCompleted)
-          .unsafeSet(LoansProgress(srn, refineMV(1)), SectionJourneyStatus.Completed)
+          .unsafeSet(LoansProgress(srn, index2of5000), SectionJourneyStatus.Completed)
 
         val (status, link) =
           TaskListStatusUtils.getLoansTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
@@ -913,7 +914,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when employer contributions true is present with 1 contribution recorded" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(EmployerContributionsPage(srn), true)
-          .unsafeSet(EmployerContributionsCompleted(srn, index1of300, index1of50), SectionCompleted)
+          .unsafeSet(EmployerContributionsProgress(srn, index1of300, index1of50), SectionJourneyStatus.Completed)
         val result = TaskListStatusUtils.getEmployerContributionStatusAndLink(customUserAnswers, srn)
         result mustBe (Recorded(1, "contributions"), listPageUrl)
       }
@@ -1024,7 +1025,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when did scheme received transfer true is present with 1 transfer recorded" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeReceiveTransferPage(srn), true)
-          .unsafeSet(TransfersInSectionCompleted(srn, index1of300, index1of5), SectionCompleted)
+          .unsafeSet(ReceiveTransferProgress(srn, index1of300, index1of5), SectionJourneyStatus.Completed)
         val result = TaskListStatusUtils.getTransferInStatusAndLink(customUserAnswers, srn)
         result mustBe (Recorded(1, "transfers"), listPageUrl)
       }
@@ -1076,7 +1077,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when SchemeTransferOutPage is true and Transfer Out has been reported" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(SchemeTransferOutPage(srn), true)
-          .unsafeSet(TransfersOutSectionCompleted(srn, index1of300, index1of5), SectionCompleted)
+          .unsafeSet(MemberTransferOutProgress(srn, index1of300, index1of5), SectionJourneyStatus.Completed)
         val result = TaskListStatusUtils.getTransferOutStatusAndLink(customUserAnswers, srn)
         result mustBe (Recorded(1, "transfers"), selectMember)
       }
@@ -1129,7 +1130,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when SurrenderedBenefitsPage is true and Surrendered Benefit has been reported" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(SurrenderedBenefitsPage(srn), true)
-          .unsafeSet(SurrenderedBenefitsCompletedPage(srn, index1of300), SectionCompleted)
+          .unsafeSet(MemberSurrenderedBenefitsProgress(srn, index1of300), SectionJourneyStatus.Completed)
         val result = TaskListStatusUtils.getSurrenderedBenefitsStatusAndLink(customUserAnswers, srn)
         result mustBe (Recorded(1, "surrenders"), selectMember)
       }
