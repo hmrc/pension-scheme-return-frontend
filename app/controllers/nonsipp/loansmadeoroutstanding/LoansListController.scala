@@ -110,7 +110,7 @@ class LoansListController @Inject()(
     implicit request: DataRequest[AnyContent]
   ): Result = {
     val indexes: List[Max5000] =
-      request.userAnswers.map(LoanCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+      request.userAnswers.map(LoansProgress.all(srn)).keys.toList.refine[Max5000.Refined]
 
     if (indexes.nonEmpty || mode.isViewOnlyMode) {
       loansToTraverse(srn).map {
