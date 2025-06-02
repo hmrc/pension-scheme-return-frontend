@@ -20,6 +20,7 @@ import play.api.mvc.Call
 import pages.Page
 import config.RefinedTypes.{Max300, Max5}
 import models.SchemeId.Srn
+import utils.IntUtils.toInt
 import navigation.JourneyNavigator
 import models.{CheckMode, NormalMode, UserAnswers}
 import cats.implicits.toTraverseOps

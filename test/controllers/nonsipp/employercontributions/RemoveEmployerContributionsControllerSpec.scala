@@ -34,8 +34,8 @@ import scala.concurrent.Future
 
 class RemoveEmployerContributionsControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.RemoveEmployerContributionsController.onPageLoad(srn, refineMV(1), refineMV(1))
-  private lazy val onSubmit = routes.RemoveEmployerContributionsController.onSubmit(srn, refineMV(1), refineMV(1))
+  private lazy val onPageLoad = routes.RemoveEmployerContributionsController.onPageLoad(srn, 1, 1)
+  private lazy val onSubmit = routes.RemoveEmployerContributionsController.onSubmit(srn, 1, 1)
 
   override val memberDetails: NameDOB = nameDobGen.sample.value
 

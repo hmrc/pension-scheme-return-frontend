@@ -17,6 +17,7 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider

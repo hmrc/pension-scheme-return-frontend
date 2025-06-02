@@ -22,7 +22,9 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import utils.ListUtils._
+import utils.IntUtils.{toInt, toRefined5000}
 import cats.implicits.{catsSyntaxApplicativeId, toShow, toTraverseOps}
+import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
 import viewmodels.models.TaskListStatus.Updated
 import config.RefinedTypes.Max5000
@@ -33,8 +35,6 @@ import views.html.ListView
 import models.SchemeId.Srn
 import _root_.config.Constants
 import config.Constants.maxBondsTransactions
-import controllers.actions.IdentifyAndRequireData
-import eu.timepit.refined.refineMV
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import play.api.Logger
 import navigation.Navigator
@@ -115,7 +115,7 @@ class BondsListController @Inject()(
 
     if (status == TaskListStatus.NotStarted) {
       logger.info("Bonds journey not started, redirecting to NameOfBonds page")
-      Redirect(routes.NameOfBondsController.onPageLoad(srn, refineMV(1), NormalMode))
+      Redirect(routes.NameOfBondsController.onPageLoad(srn, 1, NormalMode))
     } else if (status == TaskListStatus.InProgress) {
       Redirect(incompleteBondsUrl)
     } else {
@@ -503,7 +503,7 @@ object BondsListController {
   }
 
   case class BondsData(
-    index: Max5000,
+    index: Int,
     nameOfBonds: String,
     acquisitionType: SchemeHoldBond,
     costOfBonds: Money,

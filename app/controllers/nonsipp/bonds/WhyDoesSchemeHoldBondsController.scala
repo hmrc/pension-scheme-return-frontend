@@ -21,13 +21,13 @@ import pages.nonsipp.bonds.WhyDoesSchemeHoldBondsPage
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.toRefined5000
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
 import models.{Mode, SchemeHoldBond}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
-import config.RefinedTypes.Max5000
 import controllers.PSRController
 import models.SchemeHoldBond._
 import views.html.RadioListView
@@ -53,7 +53,7 @@ class WhyDoesSchemeHoldBondsController @Inject()(
 
   private val form = WhyDoesSchemeHoldBondsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       Ok(
         view(
@@ -64,7 +64,7 @@ class WhyDoesSchemeHoldBondsController @Inject()(
 
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -118,7 +118,7 @@ object WhyDoesSchemeHoldBondsController {
 
   def viewModel(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     schemeName: String,
     mode: Mode
   ): FormPageViewModel[RadioListViewModel] =

@@ -18,12 +18,13 @@ package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.CompanyNameOfAssetBuyerPage
 import views.html.TextInputView
-import controllers.nonsipp.otherassetsdisposal.CompanyNameOfAssetBuyerController._
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import config.RefinedTypes.{Max50, Max5000}
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import controllers.nonsipp.otherassetsdisposal.CompanyNameOfAssetBuyerController._
 
 class CompanyNameOfAssetBuyerControllerSpec extends ControllerBaseSpec {
 

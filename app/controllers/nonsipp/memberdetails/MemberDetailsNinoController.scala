@@ -23,6 +23,7 @@ import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.Max300
+import utils.IntUtils.{toInt, toRefined300}
 import controllers.actions._
 import forms.TextFormProvider
 import models.{Mode, NameDOB}
@@ -58,7 +59,7 @@ class MemberDetailsNinoController @Inject()(
   private def form(details: NameDOB, duplicates: List[Nino] = List()) =
     MemberDetailsNinoController.form(formProvider, details.fullName, duplicates)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       request.usingAnswer(MemberDetailsPage(srn, index)).sync { details =>
         Ok(
@@ -70,7 +71,7 @@ class MemberDetailsNinoController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       request.usingAnswer(MemberDetailsPage(srn, index)).async { details =>
         val duplicates = duplicateNinos(srn, index)

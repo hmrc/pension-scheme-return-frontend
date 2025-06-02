@@ -20,6 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import forms.mappings.Mappings
 import models.PensionSchemeType._
+import utils.IntUtils.{toInt, toRefined300, toRefined5}
 import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, TransferringSchemeTypePage}
 import config.Constants.{inputRegexPSTR, inputRegexQROPS, maxNotRelevant}
 import controllers.actions.IdentifyAndRequireData
@@ -58,8 +59,8 @@ class TransferringSchemeTypeController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max300,
-    secondaryIndex: Max5,
+    index: Int,
+    secondaryIndex: Int,
     mode: Mode
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val maybeAnswer = request.userAnswers.get(TransferringSchemeTypePage(srn, index, secondaryIndex))
@@ -77,8 +78,8 @@ class TransferringSchemeTypeController @Inject()(
 
   def onSubmit(
     srn: Srn,
-    index: Max300,
-    secondaryIndex: Max5,
+    index: Int,
+    secondaryIndex: Int,
     mode: Mode
   ): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val schemeName = request.schemeDetails.schemeName

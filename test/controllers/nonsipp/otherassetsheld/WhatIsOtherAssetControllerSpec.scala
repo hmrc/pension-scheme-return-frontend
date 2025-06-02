@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsheld
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import controllers.ControllerBaseSpec
 import views.html.TextAreaView
+import utils.IntUtils.toRefined5000
 import controllers.nonsipp.otherassetsheld.WhatIsOtherAssetController._
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
@@ -26,8 +27,8 @@ import models.NormalMode
 
 class WhatIsOtherAssetControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.WhatIsOtherAssetController.onPageLoad(srn, refineMV(1), NormalMode)
-  private lazy val onSubmit = routes.WhatIsOtherAssetController.onSubmit(srn, refineMV(1), NormalMode)
+  private lazy val onPageLoad = routes.WhatIsOtherAssetController.onPageLoad(srn, 1, NormalMode)
+  private lazy val onSubmit = routes.WhatIsOtherAssetController.onSubmit(srn, 1, NormalMode)
 
   "WhatIsOtherAssetController" - {
 
@@ -38,7 +39,7 @@ class WhatIsOtherAssetControllerSpec extends ControllerBaseSpec {
       )
     })
 
-    act.like(renderPrePopView(onPageLoad, WhatIsOtherAssetPage(srn, refineMV(1)), "test text", defaultUserAnswers) {
+    act.like(renderPrePopView(onPageLoad, WhatIsOtherAssetPage(srn, 1), "test text", defaultUserAnswers) {
       implicit app => implicit request =>
         injected[TextAreaView].apply(
           form(injected[TextFormProvider]).fill("test text"),

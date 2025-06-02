@@ -17,6 +17,7 @@
 package controllers.nonsipp.employercontributions
 
 import play.api.inject.bind
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models._

@@ -33,8 +33,8 @@ import scala.concurrent.Future
 
 class RemovePclsControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.RemovePclsController.onPageLoad(srn, refineMV(1))
-  private lazy val onSubmit = routes.RemovePclsController.onSubmit(srn, refineMV(1))
+  private lazy val onPageLoad = routes.RemovePclsController.onPageLoad(srn, 1)
+  private lazy val onSubmit = routes.RemovePclsController.onSubmit(srn, 1)
 
   override val memberDetails: NameDOB = nameDobGen.sample.value
 

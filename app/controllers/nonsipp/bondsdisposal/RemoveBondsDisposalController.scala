@@ -21,6 +21,7 @@ import pages.nonsipp.bonds.NameOfBondsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import models.HowDisposed.HowDisposed
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions.IdentifyAndRequireData
 import models.{HowDisposed, NormalMode}
 import config.RefinedTypes.{Max50, Max5000}
@@ -56,7 +57,7 @@ class RemoveBondsDisposalController @Inject()(
 
   private val form = RemoveBondsDisposalController.form(formProvider)
 
-  def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50): Action[AnyContent] =
+  def onPageLoad(srn: Srn, bondIndex: Int, disposalIndex: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
@@ -79,7 +80,7 @@ class RemoveBondsDisposalController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50): Action[AnyContent] =
+  def onSubmit(srn: Srn, bondIndex: Int, disposalIndex: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

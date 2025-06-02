@@ -64,7 +64,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           LandOrPropertyStillHeldPage,
-          (srn, index: Max5000, disposalIndex: Max50, mode) =>
+          (srn, index: Int, disposalIndex: Int, mode) =>
             controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
               .onPageLoad(srn, index, disposalIndex, mode)
         )
@@ -79,7 +79,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           WhenWasPropertySoldPage,
-          (srn, index: Max5000, disposalIndex: Max50, _) =>
+          (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.TotalProceedsSaleLandPropertyController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
@@ -94,7 +94,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           TotalProceedsSaleLandPropertyPage,
-          (srn, index: Max5000, disposalIndex: Max50, _) =>
+          (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.WhoPurchasedLandOrPropertyController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
@@ -122,7 +122,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           LandOrPropertyIndividualBuyerNamePage,
-          (srn, index: Max5000, disposalIndex: Max50, _) =>
+          (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.IndividualBuyerNinoNumberController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
@@ -163,7 +163,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           OtherBuyerDetailsPage,
-          (srn, index: Max5000, disposalIndex: Max50, _) =>
+          (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalBuyerConnectedPartyController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
@@ -180,7 +180,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           disposalIndex,
           WhoPurchasedLandOrPropertyPage,
           Gen.const(IdentityType.Individual),
-          (srn, index: Max5000, disposalIndex: Max50, _) =>
+          (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyIndividualBuyerNameController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
@@ -194,7 +194,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           disposalIndex,
           WhoPurchasedLandOrPropertyPage,
           Gen.const(IdentityType.UKCompany),
-          (srn, index: Max5000, disposalIndex: Max50, _) =>
+          (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerNameController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
@@ -208,7 +208,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           disposalIndex,
           WhoPurchasedLandOrPropertyPage,
           Gen.const(IdentityType.UKPartnership),
-          (srn, index: Max5000, disposalIndex: Max50, _) =>
+          (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerNameController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
@@ -222,7 +222,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           disposalIndex,
           WhoPurchasedLandOrPropertyPage,
           Gen.const(IdentityType.Other),
-          (srn, index: Max5000, disposalIndex: Max50, _) =>
+          (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
@@ -238,7 +238,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           LandOrPropertyDisposalBuyerConnectedPartyPage,
-          (srn, index: Max5000, disposalIndex: Max50, _) =>
+          (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
@@ -256,7 +256,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           DisposalIndependentValuationPage,
-          (srn, index: Max5000, disposalIndex: Max50, _) =>
+          (srn, index: Int, disposalIndex: Int, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyStillHeldController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
@@ -272,7 +272,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
             srn => LandOrPropertyDisposalAddressListPage(srn, refineMV(1)),
             (srn, mode) =>
               controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
-                .onPageLoad(srn, refineMV(1), refineMV(2), mode),
+                .onPageLoad(srn, 1, 2, mode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1)), SectionCompleted)
@@ -288,7 +288,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
             srn => LandOrPropertyDisposalAddressListPage(srn, refineMV(1)),
             (srn, mode) =>
               controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
-                .onPageLoad(srn, refineMV(1), refineMV(1), mode),
+                .onPageLoad(srn, 1, 1, mode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(2)), SectionCompleted)
@@ -304,7 +304,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
             srn => LandOrPropertyDisposalAddressListPage(srn, refineMV(1)),
             (srn, mode) =>
               controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
-                .onPageLoad(srn, refineMV(1), refineMV(1), mode)
+                .onPageLoad(srn, 1, 1, mode)
           )
           .withName("Add Land or property disposal with no records")
       )

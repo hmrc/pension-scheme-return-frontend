@@ -18,6 +18,7 @@ package controllers.nonsipp.landorpropertydisposal
 
 import controllers.nonsipp.landorpropertydisposal.IndividualBuyerNinoNumberController._
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.toInt
 import pages.nonsipp.landorpropertydisposal.{IndividualBuyerNinoNumberPage, LandOrPropertyIndividualBuyerNamePage}
 import eu.timepit.refined.refineMV
 import uk.gov.hmrc.domain.Nino

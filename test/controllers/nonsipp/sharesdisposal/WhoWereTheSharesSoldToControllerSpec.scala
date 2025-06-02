@@ -19,6 +19,7 @@ package controllers.nonsipp.sharesdisposal
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import models.IdentityType._
 import views.html.RadioListView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.sharesdisposal.WhoWereTheSharesSoldToController._
 import forms.RadioListFormProvider

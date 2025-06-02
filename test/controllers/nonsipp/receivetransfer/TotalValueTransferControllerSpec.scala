@@ -19,6 +19,7 @@ package controllers.nonsipp.receivetransfer
 import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPage}
 import controllers.nonsipp.receivetransfer.TotalValueTransferController._
 import views.html.MoneyView
+import utils.IntUtils.toInt
 import pages.nonsipp.receivetransfer.{TotalValueTransferPage, TransferringSchemeNamePage}
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider

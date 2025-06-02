@@ -18,6 +18,7 @@ package controllers.nonsipp.receivetransfer
 
 import services.SchemeDateService
 import views.html.DatePageView
+import utils.IntUtils.toInt
 import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, WhenWasTransferReceivedPage}
 import eu.timepit.refined.refineMV
 import play.api.inject

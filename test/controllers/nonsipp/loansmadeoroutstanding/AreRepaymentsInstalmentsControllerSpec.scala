@@ -17,6 +17,7 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import views.html.YesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.viewModel
 import forms.YesNoPageFormProvider

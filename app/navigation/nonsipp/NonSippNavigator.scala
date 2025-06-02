@@ -22,7 +22,6 @@ import com.google.inject.Singleton
 import pages.Page
 import controllers.nonsipp
 import controllers.nonsipp.routes
-import eu.timepit.refined.refineMV
 import models.PensionSchemeId.{PsaId, PspId}
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import models.{CheckMode, NormalMode, UserAnswers}
@@ -43,7 +42,7 @@ class NonSippNavigator @Inject()() extends Navigator {
         if (userAnswers.get(page).contains(true)) {
           nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
         } else {
-          nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
+          nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, 1, NormalMode)
         }
 
       case HowMuchCashPage(srn, mode) => nonsipp.schemedesignatory.routes.ValueOfAssetsController.onPageLoad(srn, mode)
@@ -69,7 +68,7 @@ class NonSippNavigator @Inject()() extends Navigator {
               if (userAnswers.list(AccountingPeriods(srn)).nonEmpty) {
                 nonsipp.accountingperiod.routes.AccountingPeriodListController.onPageLoad(srn, CheckMode)
               } else {
-                nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), CheckMode)
+                nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, 1, CheckMode)
               }
             }
 

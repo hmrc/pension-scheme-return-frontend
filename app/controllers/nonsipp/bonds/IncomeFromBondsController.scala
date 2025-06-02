@@ -22,7 +22,9 @@ import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import controllers.PSRController
 import config.Constants
+import utils.IntUtils.toRefined5000
 import controllers.actions._
 import controllers.nonsipp.bonds.IncomeFromBondsController._
 import navigation.Navigator
@@ -31,8 +33,6 @@ import models.{Mode, Money}
 import play.api.i18n.MessagesApi
 import play.api.data.Form
 import forms.mappings.errors.MoneyFormErrors
-import config.RefinedTypes.Max5000
-import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.{Empty, Message}
@@ -55,7 +55,7 @@ class IncomeFromBondsController @Inject()(
 
   private def form: Form[Money] = IncomeFromBondsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
@@ -66,7 +66,7 @@ class IncomeFromBondsController @Inject()(
 
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -109,7 +109,7 @@ object IncomeFromBondsController {
 
   def viewModel(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     form: Form[Money],
     mode: Mode
   ): FormPageViewModel[SingleQuestion[Money]] =

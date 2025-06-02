@@ -18,6 +18,7 @@ package controllers.nonsipp.landorpropertydisposal
 
 import controllers.nonsipp.landorpropertydisposal.CompanyBuyerCrnController._
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.toInt
 import pages.nonsipp.landorpropertydisposal.{CompanyBuyerCrnPage, CompanyBuyerNamePage}
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider

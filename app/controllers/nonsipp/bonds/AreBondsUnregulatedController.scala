@@ -20,13 +20,13 @@ import services.SaveService
 import pages.nonsipp.bonds.AreBondsUnregulatedPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.PSRController
+import utils.IntUtils.toRefined5000
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
 import play.api.data.Form
-import config.RefinedTypes._
-import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import play.api.i18n.MessagesApi
@@ -51,7 +51,7 @@ class AreBondsUnregulatedController @Inject()(
 
   private val form = AreBondsUnregulatedController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.get(AreBondsUnregulatedPage(srn, index)).fold(form)(form.fill)
@@ -59,7 +59,7 @@ class AreBondsUnregulatedController @Inject()(
 
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -89,7 +89,7 @@ object AreBondsUnregulatedController {
 
   def viewModel(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode
   ): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(

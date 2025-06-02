@@ -21,7 +21,6 @@ import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import models.IdentityType._
 import config.RefinedTypes.Max5000
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.actions._
 import navigation.Navigator
 import forms.RadioListFormProvider
@@ -33,6 +32,8 @@ import pages.nonsipp.otherassetsheld.OtherAssetsCYAPointOfEntry
 import models.PointOfEntry.{NoPointOfEntry, WhoWasAssetAcquiredFromPointOfEntry}
 import views.html.RadioListView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined5000}
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.nonsipp.common.IdentityTypeController._
 import pages.nonsipp.common.IdentityTypePage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -59,7 +60,7 @@ class IdentityTypeController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode,
     subject: IdentitySubject
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
@@ -90,7 +91,7 @@ class IdentityTypeController @Inject()(
 
   def onSubmit(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode,
     subject: IdentitySubject
   ): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>

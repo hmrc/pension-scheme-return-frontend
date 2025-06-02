@@ -20,6 +20,7 @@ import services.SchemeDateService
 import models.ConditionalYesNo._
 import controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController._
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import play.api.inject
 import forms.YesNoPageFormProvider

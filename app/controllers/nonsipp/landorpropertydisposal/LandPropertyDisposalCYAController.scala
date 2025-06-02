@@ -21,13 +21,14 @@ import viewmodels.implicits._
 import play.api.mvc._
 import models.HowDisposed._
 import utils.ListUtils.ListOps
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.actions._
 import models.requests.DataRequest
 import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
 import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import cats.implicits.toShow
 import controllers.nonsipp.landorpropertydisposal.LandPropertyDisposalCYAController._
 import config.Constants.maxLandOrPropertyDisposals
@@ -59,8 +60,8 @@ class LandPropertyDisposalCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max5000,
-    disposalIndex: Max50,
+    index: Int,
+    disposalIndex: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -69,8 +70,8 @@ class LandPropertyDisposalCYAController @Inject()(
 
   def onPageLoadViewOnly(
     srn: Srn,
-    landOrPropertyIndex: Max5000,
-    disposalIndex: Max50,
+    landOrPropertyIndex: Int,
+    disposalIndex: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -216,7 +217,7 @@ class LandPropertyDisposalCYAController @Inject()(
         }
       ).merge
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
         updatedUserAnswers <- Future.fromTry(

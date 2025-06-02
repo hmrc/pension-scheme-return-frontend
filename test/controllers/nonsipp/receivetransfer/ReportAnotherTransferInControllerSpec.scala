@@ -20,6 +20,7 @@ import services.PsrSubmissionService
 import controllers.nonsipp.receivetransfer.ReportAnotherTransferInController.{form, viewModel}
 import play.api.inject.bind
 import views.html.YesNoPageView
+import utils.IntUtils.toInt
 import pages.nonsipp.receivetransfer.ReportAnotherTransferInPage
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider

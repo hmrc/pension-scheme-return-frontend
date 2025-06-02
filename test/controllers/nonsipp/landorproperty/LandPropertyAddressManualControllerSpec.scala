@@ -18,11 +18,12 @@ package controllers.nonsipp.landorproperty
 
 import controllers.nonsipp.landorproperty.LandPropertyAddressManualController._
 import views.html.MultipleQuestionView
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import eu.timepit.refined.refineMV
 import models.NormalMode
 import config.RefinedTypes.Max5000
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 
 class LandPropertyAddressManualControllerSpec extends ControllerBaseSpec {
 

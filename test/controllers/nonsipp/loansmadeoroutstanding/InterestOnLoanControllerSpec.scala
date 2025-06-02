@@ -19,6 +19,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 import models.ConditionalYesNo._
 import controllers.ControllerBaseSpec
 import views.html.MultipleQuestionView
+import utils.IntUtils.toInt
 import config.Constants.maxCurrencyValue
 import models._
 import controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.partialAnswersForm

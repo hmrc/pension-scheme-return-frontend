@@ -21,6 +21,7 @@ import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc._
 import controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController._
+import utils.IntUtils.{toInt, toRefined300}
 import models._
 import play.api.i18n.MessagesApi
 import models.requests.DataRequest
@@ -57,7 +58,7 @@ class MemberPensionPaymentsCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
@@ -66,7 +67,7 @@ class MemberPensionPaymentsCYAController @Inject()(
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -101,7 +102,7 @@ class MemberPensionPaymentsCYAController @Inject()(
       }
     ).merge
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       lazy val memberPensionPaymentsChanged: Boolean =
         request.userAnswers.changed(_.buildMemberPensionPayments(srn, index))

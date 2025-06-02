@@ -19,8 +19,8 @@ package navigation.nonsipp
 import play.api.mvc.Call
 import pages.Page
 import config.RefinedTypes.Max5000
+import utils.IntUtils.toInt
 import cats.implicits.toTraverseOps
-import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
 import models.{NormalMode, UserAnswers}
 import pages.nonsipp.moneyborrowed._
@@ -36,7 +36,7 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedMoneyBorrowedPage(srn) =>
-      controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, refineMV(1), NormalMode)
+      controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, 1, NormalMode)
 
     case LenderNamePage(srn, index) =>
       controllers.nonsipp.moneyborrowed.routes.IsLenderConnectedPartyController.onPageLoad(srn, index, NormalMode)

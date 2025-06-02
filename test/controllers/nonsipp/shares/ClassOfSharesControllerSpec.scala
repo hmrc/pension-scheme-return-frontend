@@ -19,6 +19,7 @@ package controllers.nonsipp.shares
 import controllers.nonsipp.shares.ClassOfSharesController._
 import pages.nonsipp.shares.{ClassOfSharesPage, CompanyNameRelatedSharesPage}
 import views.html.TextInputView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode

@@ -22,6 +22,7 @@ import models.PointOfEntry.NoPointOfEntry
 import utils.ListUtils.ListOps
 import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
 import models.SchemeHoldShare.Transfer
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import cats.implicits.toShow
 import config.Constants.maxDisposalsPerShare
 import controllers.actions.IdentifyAndRequireData
@@ -61,7 +62,7 @@ class SharesDisposalCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       if (request.userAnswers.get(SharesDisposalProgress(srn, shareIndex, disposalIndex)).contains(Completed)) {
         // Clear any PointOfEntry
@@ -77,8 +78,8 @@ class SharesDisposalCYAController @Inject()(
 
   def onPageLoadViewOnly(
     srn: Srn,
-    shareIndex: Max5000,
-    disposalIndex: Max50,
+    shareIndex: Int,
+    disposalIndex: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -239,7 +240,7 @@ class SharesDisposalCYAController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
         updatedUserAnswers <- request.userAnswers

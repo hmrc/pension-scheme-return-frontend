@@ -21,7 +21,6 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import config.RefinedTypes.Max5000
-import pages.nonsipp.landorproperty.{IndividualSellerNiPage, LandPropertyIndividualSellersNamePage}
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import controllers.nonsipp.landorproperty.IndividualSellerNiController._
@@ -30,6 +29,8 @@ import play.api.data.Form
 import forms.mappings.errors.InputFormErrors
 import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined5000}
+import pages.nonsipp.landorproperty.{IndividualSellerNiPage, LandPropertyIndividualSellersNamePage}
 import navigation.Navigator
 import uk.gov.hmrc.domain.Nino
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -55,7 +56,7 @@ class IndividualSellerNiController @Inject()(
 
   private val form: Form[Either[String, Nino]] = IndividualSellerNiController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.usingAnswer(LandPropertyIndividualSellersNamePage(srn, index)).sync { individualName =>
         val preparedForm = request.userAnswers.fillForm(IndividualSellerNiPage(srn, index), form)
@@ -63,7 +64,7 @@ class IndividualSellerNiController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

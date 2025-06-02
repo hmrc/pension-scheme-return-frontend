@@ -21,6 +21,7 @@ import pages.nonsipp.otherassetsheld.{OtherAssetsPrePopulated, WhatIsOtherAssetP
 import controllers.nonsipp.otherassetsheld.RemoveOtherAssetController._
 import play.api.inject.bind
 import views.html.YesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NormalMode, UserAnswers}

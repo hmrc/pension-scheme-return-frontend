@@ -20,7 +20,6 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import controllers.nonsipp.landorproperty.LandOrPropertyListController._
-import pages.nonsipp.landorproperty._
 import cats.implicits.toShow
 import config.Constants.maxLandOrProperties
 import controllers.actions._
@@ -32,6 +31,8 @@ import utils.nonsipp.TaskListStatusUtils.{getCompletedOrUpdatedTaskListStatus, g
 import config.Constants
 import views.html.ListView
 import models.SchemeId.Srn
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty._
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import play.api.Logger
 import navigation.Navigator

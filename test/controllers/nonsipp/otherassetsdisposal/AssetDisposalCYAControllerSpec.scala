@@ -21,6 +21,7 @@ import pages.nonsipp.otherassetsdisposal._
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import models._
 import org.mockito.ArgumentMatchers.any

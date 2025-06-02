@@ -18,6 +18,7 @@ package controllers.nonsipp.sharesdisposal
 
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions._
 import pages.nonsipp.sharesdisposal._
 import navigation.Navigator
@@ -53,7 +54,7 @@ class RemoveShareDisposalController @Inject()(
 
   private val form = RemoveShareDisposalController.form(formProvider)
 
-  def onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
@@ -69,7 +70,7 @@ class RemoveShareDisposalController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

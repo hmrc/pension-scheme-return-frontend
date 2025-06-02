@@ -23,6 +23,7 @@ import models.NormalMode
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.IsLandPropertyLeasedController._
+import utils.IntUtils.toInt
 import pages.nonsipp.landorproperty.{IsLandPropertyLeasedPage, LandOrPropertyChosenAddressPage, LandPropertyInUKPage}
 
 class IsLandPropertyLeasedControllerSpec extends ControllerBaseSpec {

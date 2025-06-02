@@ -19,6 +19,7 @@ package controllers.nonsipp.memberdetails
 import controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController._
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage}
 import views.html.YesNoPageView
+import utils.IntUtils.toRefined300
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
@@ -27,8 +28,8 @@ import controllers.ControllerBaseSpec
 
 class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, refineMV(1), NormalMode)
-  private lazy val onSubmit = routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, refineMV(1), NormalMode)
+  private lazy val onPageLoad = routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, 1, NormalMode)
+  private lazy val onSubmit = routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, 1, NormalMode)
 
   private val userAnswersWithMemberDetails =
     defaultUserAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).success.value
@@ -41,7 +42,7 @@ class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
     })
 
     act.like(
-      renderPrePopView(onPageLoad, DoesMemberHaveNinoPage(srn, refineMV(1)), true, userAnswersWithMemberDetails) {
+      renderPrePopView(onPageLoad, DoesMemberHaveNinoPage(srn, 1), true, userAnswersWithMemberDetails) {
         implicit app => implicit request =>
           val preparedForm = form(injected[YesNoPageFormProvider], memberDetails.fullName).fill(true)
           injected[YesNoPageView].apply(preparedForm, viewModel(refineMV(1), memberDetails.fullName, srn, NormalMode))

@@ -18,6 +18,7 @@ package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.PartnershipBuyerNamePage
 import views.html.TextInputView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import config.RefinedTypes.{Max50, Max5000}

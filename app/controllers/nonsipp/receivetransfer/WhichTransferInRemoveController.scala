@@ -22,6 +22,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import utils.ListUtils.ListOps
+import utils.IntUtils.{toInt, toRefined300}
 import controllers.actions._
 import controllers.nonsipp.receivetransfer.WhichTransferInRemoveController._
 import forms.RadioListFormProvider
@@ -50,7 +51,7 @@ class WhichTransferInRemoveController @Inject()(
 
   val form: Form[Max5] = WhichTransferInRemoveController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn, memberIndex: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val completed: List[Max5] = request.userAnswers
       .map(ReceiveTransferProgress.all(srn, memberIndex))
       .filter {
@@ -80,7 +81,7 @@ class WhichTransferInRemoveController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onSubmit(srn: Srn, memberIndex: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     form
       .bindFromRequest()
       .fold(
