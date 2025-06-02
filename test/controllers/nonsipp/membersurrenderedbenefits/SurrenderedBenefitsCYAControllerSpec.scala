@@ -19,6 +19,7 @@ package controllers.nonsipp.membersurrenderedbenefits
 import services.PsrSubmissionService
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import pages.nonsipp.membersurrenderedbenefits._

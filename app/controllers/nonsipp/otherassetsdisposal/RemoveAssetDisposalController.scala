@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsdisposal
 import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.otherassetsdisposal._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions._
 import controllers.nonsipp.otherassetsdisposal.ReportedOtherAssetsDisposalListController.OtherAssetsDisposalData
 import navigation.Navigator
@@ -55,7 +56,7 @@ class RemoveAssetDisposalController @Inject()(
 
   private val form = RemoveAssetDisposalController.form(formProvider)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
@@ -71,7 +72,7 @@ class RemoveAssetDisposalController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

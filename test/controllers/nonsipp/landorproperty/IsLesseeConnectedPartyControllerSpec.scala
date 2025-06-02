@@ -17,13 +17,14 @@
 package controllers.nonsipp.landorproperty
 
 import views.html.YesNoPageView
-import pages.nonsipp.landorproperty.{IsLesseeConnectedPartyPage, LandOrPropertyLeaseDetailsPage}
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NormalMode, UserAnswers}
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController._
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty.{IsLesseeConnectedPartyPage, LandOrPropertyLeaseDetailsPage}
 
 class IsLesseeConnectedPartyControllerSpec extends ControllerBaseSpec {
 

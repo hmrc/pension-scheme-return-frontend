@@ -21,6 +21,7 @@ import play.api.mvc.Call
 import models.IdentityType.Individual
 import controllers.ControllerBaseSpec
 import views.html.ContentTablePageView
+import utils.IntUtils.toInt
 import models.{ConditionalYesNo, NormalMode, Security}
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._

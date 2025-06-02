@@ -17,13 +17,14 @@
 package controllers.nonsipp.landorproperty
 
 import views.html.RadioListView
-import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import controllers.nonsipp.landorproperty.LandPropertyAddressResultsController._
 import config.RefinedTypes._
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty._
 
 class LandPropertyAddressResultsControllerSpec extends ControllerBaseSpec {
 

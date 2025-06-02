@@ -18,6 +18,7 @@ package controllers.nonsipp.shares
 
 import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import models.ConditionalYesNo._
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.shares.SharesCYAController._
 import pages.nonsipp.FbVersionPage
@@ -100,7 +101,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
       SharesProgress(srn, index),
       SectionJourneyStatus.InProgress(
         controllers.nonsipp.shares.routes.CostOfSharesController
-          .onPageLoad(srn, refineMV(1), NormalMode)
+          .onPageLoad(srn, 1, NormalMode)
           .url
       )
     )

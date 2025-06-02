@@ -18,6 +18,7 @@ package controllers.nonsipp.bonds
 
 import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
 import views.html.ContentTablePageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import models.NormalMode
 import controllers.nonsipp.bonds.BondsCheckAndUpdateController._

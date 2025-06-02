@@ -20,6 +20,7 @@ import utils.RefinedUtils.RefinedIntOps
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
 import views.html.MultipleQuestionView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import utils.Transform.TransformOps
 import play.api.libs.json.JsPath

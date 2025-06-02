@@ -15,7 +15,6 @@
  */
 
 package controllers.nonsipp
-
 import pages.nonsipp.bonds.BondsProgress
 import play.api.mvc.Call
 import config.RefinedTypes.Max5000

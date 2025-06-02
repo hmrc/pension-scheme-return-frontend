@@ -18,6 +18,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import play.api.inject.bind
 import views.html.MultipleQuestionView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.{CompanyRecipientNamePage, DatePeriodLoanPage}

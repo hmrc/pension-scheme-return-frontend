@@ -18,6 +18,7 @@ package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.IndividualNameOfOtherAssetSellerPage
 import views.html.TextInputView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.otherassetsheld.IndividualNameOfOtherAssetSellerController._
 import forms.TextFormProvider

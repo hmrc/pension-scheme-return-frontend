@@ -20,6 +20,7 @@ import services.PsrSubmissionService
 import controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController._
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
+import utils.IntUtils.toInt
 import pages.nonsipp.FbVersionPage
 import models._
 import viewmodels.models.SectionCompleted

@@ -20,7 +20,6 @@ import services.SaveService
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.nonsipp.landorpropertydisposal.OtherBuyerDetailsController._
 import pages.nonsipp.landorpropertydisposal.OtherBuyerDetailsPage
 import controllers.actions.IdentifyAndRequireData
@@ -33,6 +32,8 @@ import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
 import views.html.RecipientDetailsView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, RecipientDetailsViewModel}
 
@@ -54,8 +55,8 @@ class OtherBuyerDetailsController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    landOrPropertyIndex: Max5000,
-    disposalIndex: Max50,
+    landOrPropertyIndex: Int,
+    disposalIndex: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
@@ -70,7 +71,7 @@ class OtherBuyerDetailsController @Inject()(
       )
     }
 
-  def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val address: String =
         request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).get.addressLine1

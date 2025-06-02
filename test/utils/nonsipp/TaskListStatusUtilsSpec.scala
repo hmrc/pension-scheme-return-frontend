@@ -19,7 +19,6 @@ package utils.nonsipp
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.shares._
 import pages.nonsipp.otherassetsheld._
-import pages.nonsipp.landorproperty._
 import pages.nonsipp.receivetransfer._
 import pages.nonsipp.landorpropertydisposal.{
   HowWasPropertyDisposedOfPage,
@@ -47,6 +46,8 @@ import config.RefinedTypes._
 import controllers.TestValues
 import utils.nonsipp.TaskListStatusUtils.userAnswersUnchangedAllSections
 import models.SchemeHoldShare.Acquisition
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty._
 import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import controllers.nonsipp.bonds.routes
 import eu.timepit.refined.refineMV
@@ -701,7 +702,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(
             BondsProgress(srn, refineMV(1)),
             SectionJourneyStatus.InProgress(
-              routes.NameOfBondsController.onPageLoad(srn, refineMV(1), NormalMode)
+              routes.NameOfBondsController.onPageLoad(srn, 1, NormalMode)
             )
           )
           // second bond:
@@ -724,7 +725,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(
             BondsProgress(srn, refineMV(2)),
             SectionJourneyStatus.InProgress(
-              routes.NameOfBondsController.onPageLoad(srn, refineMV(2), NormalMode)
+              routes.NameOfBondsController.onPageLoad(srn, 2, NormalMode)
             )
           )
         val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
@@ -747,7 +748,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(
             BondsProgress(srn, index1of5000),
             SectionJourneyStatus.InProgress(
-              routes.NameOfBondsController.onPageLoad(srn, index1of5000, NormalMode)
+              routes.NameOfBondsController.onPageLoad(srn, 1, NormalMode)
             )
           )
         val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn, isPrePop = false)
@@ -763,7 +764,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(
             BondsProgress(srn, refineMV(2)),
             SectionJourneyStatus.InProgress(
-              routes.NameOfBondsController.onPageLoad(srn, refineMV(2), NormalMode)
+              routes.NameOfBondsController.onPageLoad(srn, 2, NormalMode)
             )
           )
 

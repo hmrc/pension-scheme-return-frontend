@@ -17,7 +17,6 @@
 package controllers.nonsipp.sharesdisposal
 
 import views.html.ConditionalYesNoPageView
-import controllers.nonsipp.sharesdisposal.IndividualBuyerNinoNumberController._
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.{IndividualBuyerNinoNumberPage, SharesIndividualBuyerNamePage}
 import uk.gov.hmrc.domain.Nino
@@ -25,6 +24,8 @@ import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode}
 import config.RefinedTypes.{Max50, Max5000}
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import controllers.nonsipp.sharesdisposal.IndividualBuyerNinoNumberController._
 
 class IndividualBuyerNinoNumberControllerSpec extends ControllerBaseSpec {
 

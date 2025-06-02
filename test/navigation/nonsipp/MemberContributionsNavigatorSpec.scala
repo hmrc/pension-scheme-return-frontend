@@ -72,7 +72,7 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
         .navigateToWithIndex(
           index,
           TotalMemberContributionPage,
-          (srn, index: Max300, _) =>
+          (srn, index: Int, _) =>
             controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
               .onPageLoad(srn, index, NormalMode)
         )
@@ -86,7 +86,7 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
         .navigateToWithIndex(
           index,
           RemoveMemberContributionPage,
-          (srn, _: Max300, _) =>
+          (srn, _: Int, _) =>
             controllers.nonsipp.membercontributions.routes.MemberContributionListController
               .onPageLoad(srn, 1, NormalMode)
         )

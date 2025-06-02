@@ -20,6 +20,7 @@ import pages.nonsipp.employercontributions.EmployerNamePage
 import controllers.nonsipp.employercontributions.EmployerTypeOfBusinessController._
 import models.IdentityType.{Other, UKCompany, UKPartnership}
 import views.html.RadioListView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.NormalMode

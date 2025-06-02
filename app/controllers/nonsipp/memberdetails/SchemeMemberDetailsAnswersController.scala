@@ -22,6 +22,7 @@ import pages.nonsipp.memberdetails._
 import play.api.mvc._
 import com.google.inject.Inject
 import models.ManualOrUpload.Manual
+import utils.IntUtils.{toInt, toRefined300}
 import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
 import play.api.i18n.MessagesApi
@@ -62,7 +63,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
@@ -70,7 +71,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
     }
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -116,7 +117,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
         ).getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val memberDetailsChanged: Boolean = (for {
         initial <- request.pureUserAnswers

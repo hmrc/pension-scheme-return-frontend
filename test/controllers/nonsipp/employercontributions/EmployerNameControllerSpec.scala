@@ -19,6 +19,7 @@ package controllers.nonsipp.employercontributions
 import pages.nonsipp.employercontributions.EmployerNamePage
 import controllers.nonsipp.employercontributions.EmployerNameController._
 import views.html.TextInputView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode

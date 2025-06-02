@@ -21,6 +21,7 @@ import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import pages.nonsipp.otherassetsheld._
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import models._
 import pages.nonsipp.common.IdentityTypePage
@@ -95,7 +96,7 @@ class OtherAssetsCYAControllerSpec extends ControllerBaseSpec {
       OtherAssetsProgress(srn, index),
       SectionJourneyStatus.InProgress(
         controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
-          .onPageLoad(srn, refineMV(1), NormalMode)
+          .onPageLoad(srn, 1, NormalMode)
           .url
       )
     )

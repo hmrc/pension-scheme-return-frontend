@@ -17,6 +17,7 @@
 package controllers.nonsipp.sharesdisposal
 
 import views.html.TextInputView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.PartnershipBuyerNamePage
 import forms.TextFormProvider

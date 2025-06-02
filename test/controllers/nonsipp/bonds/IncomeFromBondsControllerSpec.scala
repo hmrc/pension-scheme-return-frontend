@@ -18,6 +18,7 @@ package controllers.nonsipp.bonds
 
 import pages.nonsipp.bonds.IncomeFromBondsPage
 import views.html.MoneyView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.bonds.IncomeFromBondsController._
 import forms.MoneyFormProvider

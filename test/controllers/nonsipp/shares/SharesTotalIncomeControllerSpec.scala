@@ -18,6 +18,7 @@ package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesTotalIncomePage}
 import views.html.MoneyView
+import utils.IntUtils.toInt
 import controllers.nonsipp.shares.SharesTotalIncomeController._
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider

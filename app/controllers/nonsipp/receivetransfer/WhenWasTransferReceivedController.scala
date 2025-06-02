@@ -19,6 +19,7 @@ package controllers.nonsipp.receivetransfer
 import services.{SaveService, SchemeDateService}
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, toRefined300, toRefined5}
 import controllers.actions._
 import navigation.Navigator
 import forms.DatePageFormProvider
@@ -61,7 +62,7 @@ class WhenWasTransferReceivedController @Inject()(
   private def form(date: DateRange)(implicit messages: Messages) =
     WhenWasTransferReceivedController.form(formProvider, date)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       usingSchemeDate[Id](srn) { date =>
         (
@@ -85,7 +86,7 @@ class WhenWasTransferReceivedController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       usingSchemeDate(srn) { date =>
         form(date)

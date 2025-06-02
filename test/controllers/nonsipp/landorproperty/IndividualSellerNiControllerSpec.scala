@@ -17,7 +17,6 @@
 package controllers.nonsipp.landorproperty
 
 import views.html.ConditionalYesNoPageView
-import pages.nonsipp.landorproperty.{IndividualSellerNiPage, LandPropertyIndividualSellersNamePage}
 import eu.timepit.refined.refineMV
 import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider
@@ -25,6 +24,8 @@ import controllers.nonsipp.landorproperty.IndividualSellerNiController._
 import models.{ConditionalYesNo, NormalMode, UserAnswers}
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty.{IndividualSellerNiPage, LandPropertyIndividualSellersNamePage}
 
 class IndividualSellerNiControllerSpec extends ControllerBaseSpec {
 

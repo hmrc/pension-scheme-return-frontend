@@ -18,12 +18,13 @@ package controllers.nonsipp.landorproperty
 
 import controllers.nonsipp.landorproperty.LandOrPropertyTotalIncomeController._
 import views.html.MoneyView
-import pages.nonsipp.landorproperty.LandOrPropertyTotalIncomePage
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
 import config.RefinedTypes.Max5000
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty.LandOrPropertyTotalIncomePage
 
 class LandOrPropertyTotalIncomeControllerSpec extends ControllerBaseSpec {
 

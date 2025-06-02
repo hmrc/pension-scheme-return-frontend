@@ -17,6 +17,7 @@
 package controllers.nonsipp.membertransferout
 
 import views.html.TextInputViewWidth40
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode

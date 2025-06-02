@@ -18,6 +18,7 @@ package controllers.nonsipp.employercontributions
 
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, toRefined300, toRefined50}
 import config.Constants.maxInputLength
 import controllers.actions._
 import navigation.Navigator
@@ -53,7 +54,7 @@ class OtherEmployeeDescriptionController @Inject()(
 
   private val form = OtherEmployeeDescriptionController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.get(OtherEmployeeDescriptionPage(srn, index, secondaryIndex)).fold(form)(form.fill)
@@ -62,7 +63,7 @@ class OtherEmployeeDescriptionController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

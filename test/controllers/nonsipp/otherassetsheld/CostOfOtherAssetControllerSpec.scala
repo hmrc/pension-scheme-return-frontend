@@ -18,6 +18,7 @@ package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.CostOfOtherAssetPage
 import views.html.MoneyView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode

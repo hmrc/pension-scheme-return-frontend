@@ -20,6 +20,7 @@ import models.ConditionalYesNo._
 import play.api.mvc.Call
 import pages.Page
 import config.RefinedTypes.Max5000
+import utils.IntUtils.toInt
 import cats.implicits.toTraverseOps
 import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
@@ -44,7 +45,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
           controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
         case None =>
           controllers.nonsipp.common.routes.IdentityTypeController
-            .onPageLoad(srn, refineMV(1), NormalMode, IdentitySubject.LoanRecipient)
+            .onPageLoad(srn, 1, NormalMode, IdentitySubject.LoanRecipient)
       }
     case IdentityTypePage(srn, index, IdentitySubject.LoanRecipient) =>
       userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)) match {

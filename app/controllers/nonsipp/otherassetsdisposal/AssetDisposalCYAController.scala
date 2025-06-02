@@ -21,6 +21,7 @@ import pages.nonsipp.otherassetsdisposal._
 import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import cats.implicits.toShow
 import config.Constants.maxDisposalPerOtherAsset
 import controllers.actions._
@@ -60,8 +61,8 @@ class AssetDisposalCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max5000,
-    disposalIndex: Max50,
+    index: Int,
+    disposalIndex: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
@@ -70,8 +71,8 @@ class AssetDisposalCYAController @Inject()(
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max5000,
-    disposalIndex: Max50,
+    index: Int,
+    disposalIndex: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -208,7 +209,7 @@ class AssetDisposalCYAController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
         updatedUserAnswers <- request.userAnswers

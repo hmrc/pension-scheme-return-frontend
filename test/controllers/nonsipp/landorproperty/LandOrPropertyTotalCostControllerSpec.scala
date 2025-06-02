@@ -17,11 +17,12 @@
 package controllers.nonsipp.landorproperty
 
 import views.html.MoneyView
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyTotalCostPage}
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyTotalCostPage}
 import models.NormalMode
 import controllers.nonsipp.landorproperty.LandOrPropertyTotalCostController._
 

@@ -19,6 +19,7 @@ package controllers.testonly
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.RefinedTypes.{Max300, Max50}
 import models.SchemeId.Srn
+import utils.IntUtils.toRefined300
 import cats.implicits._
 import play.api.libs.json.Json
 import models._
@@ -44,16 +45,16 @@ class EmployerContributionsMongoController @Inject()(
 
   private val max: Max50 = refineMV(50)
 
-  def addEmployerContributions(srn: Srn, index: Max300, num: Max50): Action[AnyContent] =
+  def addEmployerContributions(srn: Srn, index: Int, num: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
         removedUserAnswers <- Future.fromTry(removeAllEmployerContributions(srn, index, request.userAnswers))
         updatedUserAnswers <- Future.fromTry(
-          updateUserAnswersWithEmployerContributions(num.value, srn, index, removedUserAnswers)
+          updateUserAnswersWithEmployerContributions(num, srn, index, removedUserAnswers)
         )
         _ <- saveService.save(updatedUserAnswers)
       } yield Ok(
-        s"Added ${num.value} land or property disposals to UserAnswers for land or property index ${index.value}\n${Json
+        s"Added ${num} land or property disposals to UserAnswers for land or property index ${index}\n${Json
           .prettyPrint(updatedUserAnswers.data.decryptedValue)}"
       )
     }

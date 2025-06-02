@@ -20,6 +20,7 @@ import pages.nonsipp.employercontributions._
 import utils.BaseSpec
 import config.RefinedTypes.{Max300, Max50}
 import models.SchemeId.Srn
+import utils.IntUtils.toInt
 import eu.timepit.refined.{refineMV, refineV}
 import navigation.{Navigator, NavigatorBehaviours}
 import models._
@@ -93,7 +94,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           EmployerNamePage,
-          (srn, index: Max300, secondaryIndex: Max50, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
@@ -126,7 +127,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
               index,
               secondaryIndex,
               EmployerNamePage,
-              (srn, index: Max300, _: Max50, _) =>
+              (srn, index: Int, _: Int, _) =>
                 controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
                   .onPageLoad(srn, index, expectedPage, NormalMode),
               userAnswers
@@ -146,7 +147,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           secondaryIndex,
           EmployerTypeOfBusinessPage,
           Gen.const(IdentityType.UKCompany),
-          (srn, memberIndex: Max300, index: Max50, _) =>
+          (srn, memberIndex: Int, index: Int, _) =>
             controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
               .onPageLoad(srn, memberIndex, index, NormalMode)
         )
@@ -160,7 +161,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           secondaryIndex,
           EmployerTypeOfBusinessPage,
           Gen.const(IdentityType.UKPartnership),
-          (srn, memberIndex: Max300, index: Max50, _) =>
+          (srn, memberIndex: Int, index: Int, _) =>
             controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
               .onPageLoad(srn, memberIndex, index, NormalMode)
         )
@@ -174,7 +175,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           secondaryIndex,
           EmployerTypeOfBusinessPage,
           Gen.const(IdentityType.Other),
-          (srn, memberIndex: Max300, index: Max50, _) =>
+          (srn, memberIndex: Int, index: Int, _) =>
             controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
               .onPageLoad(srn, memberIndex, index, NormalMode)
         )
@@ -203,7 +204,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           PartnershipEmployerUtrPage,
-          (srn, index: Max300, secondaryIndex: Max50, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
@@ -218,7 +219,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           TotalEmployerContributionPage,
-          (srn, index: Max300, _: Max50, _) =>
+          (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
@@ -233,7 +234,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           EmployerCompanyCrnPage,
-          (srn, index: Max300, secondaryIndex: Max50, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
@@ -249,7 +250,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           ContributionsFromAnotherEmployerPage,
-          (srn, index: Max300, _: Max50, _) =>
+          (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
               .onPageLoad(srn, index, page = 1, NormalMode)
         )
@@ -280,7 +281,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
               index,
               secondaryIndex,
               ContributionsFromAnotherEmployerPage,
-              (srn, index: Max300, _: Max50, _) =>
+              (srn, index: Int, _: Int, _) =>
                 controllers.nonsipp.employercontributions.routes.EmployerNameController
                   .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
               userAnswers
@@ -299,7 +300,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           .navigateToWithIndex(
             index,
             RemoveEmployerContributionsPage,
-            (srn, _: Max300, _) =>
+            (srn, _: Int, _) =>
               controllers.nonsipp.employercontributions.routes.EmployerContributionsController
                 .onPageLoad(srn, NormalMode)
           )
@@ -312,7 +313,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           .navigateToWithIndex(
             index,
             RemoveEmployerContributionsPage,
-            (srn, _: Max300, _) =>
+            (srn, _: Int, _) =>
               controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
                 .onPageLoad(srn, 1, NormalMode),
             srn => defaultUserAnswers.unsafeSet(EmployerNamePage(srn, refineMV(1), refineMV(1)), employerName)

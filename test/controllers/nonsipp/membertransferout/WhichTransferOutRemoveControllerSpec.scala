@@ -31,8 +31,8 @@ import java.time.LocalDate
 
 class WhichTransferOutRemoveControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.WhichTransferOutRemoveController.onPageLoad(srn, refineMV(1))
-  private lazy val onSubmit = routes.WhichTransferOutRemoveController.onSubmit(srn, refineMV(1))
+  private lazy val onPageLoad = routes.WhichTransferOutRemoveController.onPageLoad(srn, 1)
+  private lazy val onSubmit = routes.WhichTransferOutRemoveController.onSubmit(srn, 1)
 
   private val memberDetail1: NameDOB = nameDobGen.sample.value
   private val memberDetail2: NameDOB = nameDobGen.sample.value
@@ -69,7 +69,7 @@ class WhichTransferOutRemoveControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onPageLoad,
-        routes.RemoveTransferOutController.onPageLoad(srn, refineMV(1), refineMV(1)),
+        routes.RemoveTransferOutController.onPageLoad(srn, 1, 1),
         userAnswersWithOneContributionOnly
       ).withName("should redirect to RemoveTransferOut page when only one contribution")
     )
@@ -79,7 +79,7 @@ class WhichTransferOutRemoveControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmit,
-        routes.RemoveTransferOutController.onPageLoad(srn, refineMV(1), refineMV(1)),
+        routes.RemoveTransferOutController.onPageLoad(srn, 1, 1),
         userAnswers,
         "value" -> "1"
       )

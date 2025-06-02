@@ -19,8 +19,8 @@ package navigation.nonsipp
 import pages.Page
 import config.RefinedTypes.Max5000
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
+import utils.IntUtils.toInt
 import cats.implicits.toTraverseOps
-import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
 import models._
 import pages.nonsipp.common._
@@ -42,7 +42,7 @@ object SharesNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedSharesPage(srn) =>
-      controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, refineMV(1), NormalMode)
+      controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, 1, NormalMode)
 
     case TypeOfSharesHeldPage(srn, index) =>
       controllers.nonsipp.shares.routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, NormalMode)

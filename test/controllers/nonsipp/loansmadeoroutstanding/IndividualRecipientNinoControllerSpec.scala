@@ -18,6 +18,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController._
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider

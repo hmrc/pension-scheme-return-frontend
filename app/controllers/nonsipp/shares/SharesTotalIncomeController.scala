@@ -20,6 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.nonsipp.shares.SharesTotalIncomeController._
 import controllers.actions._
 import navigation.Navigator
@@ -54,7 +55,7 @@ class SharesTotalIncomeController @Inject()(
 
   private val form = SharesTotalIncomeController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { companyName =>
         val preparedForm = request.userAnswers.fillForm(SharesTotalIncomePage(srn, index), form)
@@ -62,7 +63,7 @@ class SharesTotalIncomeController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()

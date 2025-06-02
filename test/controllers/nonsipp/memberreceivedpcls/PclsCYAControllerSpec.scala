@@ -19,6 +19,7 @@ package controllers.nonsipp.memberreceivedpcls
 import services.PsrSubmissionService
 import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
 import views.html.CheckYourAnswersView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models.{NormalMode, ViewOnlyMode}

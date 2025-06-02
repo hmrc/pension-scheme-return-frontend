@@ -22,6 +22,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
+import utils.IntUtils.toInt
 import cats.implicits.{catsSyntaxApplicativeId, toShow}
 import config.Constants.maxSchemeMembers
 import forms.YesNoPageFormProvider

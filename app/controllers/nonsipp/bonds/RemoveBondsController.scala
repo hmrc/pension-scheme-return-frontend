@@ -20,13 +20,13 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.bonds.{BondPrePopulated, NameOfBondsPage, RemoveBondsPage}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.PSRController
+import utils.IntUtils.toRefined5000
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
 import play.api.i18n.MessagesApi
-import config.RefinedTypes.Max5000
-import controllers.PSRController
 import views.html.YesNoPageView
 import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
@@ -52,7 +52,7 @@ class RemoveBondsController @Inject()(
 
   private val form = RemoveBondsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       if (request.userAnswers.get(BondPrePopulated(srn, index)).isDefined)
         Redirect(controllers.routes.UnauthorisedController.onPageLoad())
@@ -74,7 +74,7 @@ class RemoveBondsController @Inject()(
         ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -147,7 +147,7 @@ object RemoveBondsController {
 
   def viewModel(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     nameOfBonds: String,
     mode: Mode
   ): FormPageViewModel[YesNoPageViewModel] =

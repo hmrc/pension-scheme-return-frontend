@@ -19,6 +19,7 @@ package controllers.nonsipp.shares
 import controllers.nonsipp.shares.SharesCompanyCrnController._
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompanyCrnPage}
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._

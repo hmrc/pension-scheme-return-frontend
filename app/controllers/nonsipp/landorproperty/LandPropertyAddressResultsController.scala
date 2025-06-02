@@ -19,7 +19,6 @@ package controllers.nonsipp.landorproperty
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.landorproperty.{AddressLookupResultsPage, LandOrPropertyChosenAddressPage}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -29,6 +28,8 @@ import config.RefinedTypes._
 import controllers.PSRController
 import views.html.RadioListView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined5000}
+import pages.nonsipp.landorproperty.{AddressLookupResultsPage, LandOrPropertyChosenAddressPage}
 import play.api.i18n.MessagesApi
 import controllers.nonsipp.landorproperty.LandPropertyAddressResultsController._
 import viewmodels.DisplayMessage.{LinkMessage, ParagraphMessage}
@@ -51,7 +52,7 @@ class LandPropertyAddressResultsController @Inject()(
 
   private val form = LandPropertyAddressResultsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       (
         for {
@@ -63,7 +64,7 @@ class LandPropertyAddressResultsController @Inject()(
       ).merge
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()

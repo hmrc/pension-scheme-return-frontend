@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined300}
 import config.Constants.maxInputLength
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -58,7 +59,7 @@ class WhyDidMemberSurrenderBenefitsController @Inject()(
 
   private val form = WhyDidMemberSurrenderBenefitsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, memberIndex: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
         request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, memberIndex)).getOrRecoverJourney { amount =>
@@ -84,7 +85,7 @@ class WhyDidMemberSurrenderBenefitsController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, memberIndex: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
         request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, memberIndex)).getOrRecoverJourney { amount =>

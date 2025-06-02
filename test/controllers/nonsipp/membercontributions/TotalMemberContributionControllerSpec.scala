@@ -20,6 +20,7 @@ import pages.nonsipp.memberdetails.{MemberDetailsCompletedPage, MemberDetailsPag
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
 import controllers.nonsipp.membercontributions.TotalMemberContributionController._
 import views.html.MoneyView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode

@@ -20,6 +20,7 @@ import services.{SaveService, SchemeDateService}
 import pages.nonsipp.otherassetsdisposal.WhenWasAssetSoldPage
 import play.api.mvc._
 import controllers.nonsipp.otherassetsdisposal.WhenWasAssetSoldController._
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -59,7 +60,7 @@ class WhenWasAssetSoldController @Inject()(
   private def form(date: DateRange)(implicit messages: Messages): Form[LocalDate] =
     WhenWasAssetSoldController.form(formProvider, date)
 
-  def onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       usingSchemeDate[Id](srn) { date =>
         val preparedForm = request.userAnswers
@@ -74,7 +75,7 @@ class WhenWasAssetSoldController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, assetIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       usingSchemeDate(srn) { date =>
         form(date)

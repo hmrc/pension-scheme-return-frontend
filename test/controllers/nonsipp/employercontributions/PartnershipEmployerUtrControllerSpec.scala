@@ -18,12 +18,13 @@ package controllers.nonsipp.employercontributions
 
 import pages.nonsipp.employercontributions.{EmployerNamePage, PartnershipEmployerUtrPage}
 import views.html.ConditionalYesNoPageView
-import controllers.nonsipp.employercontributions.PartnershipEmployerUtrController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
 import config.RefinedTypes.{Max300, Max50}
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.employercontributions.PartnershipEmployerUtrController._
+import utils.IntUtils.toInt
 
 class PartnershipEmployerUtrControllerSpec extends ControllerBaseSpec {
 

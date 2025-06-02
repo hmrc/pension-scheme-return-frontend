@@ -18,6 +18,7 @@ package controllers.nonsipp.landorpropertydisposal
 
 import controllers.nonsipp.landorpropertydisposal.CompanyBuyerNameController.{form, viewModel}
 import views.html.TextInputView
+import utils.IntUtils.toInt
 import pages.nonsipp.landorpropertydisposal.CompanyBuyerNamePage
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider

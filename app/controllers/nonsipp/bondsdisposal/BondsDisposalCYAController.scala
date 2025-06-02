@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.bonds._
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import cats.implicits.toShow
 import config.Constants.maxDisposalPerBond
 import controllers.actions.IdentifyAndRequireData
@@ -58,7 +59,7 @@ class BondsDisposalCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       if (request.userAnswers.get(BondsDisposalProgress(srn, bondIndex, disposalIndex)).contains(Completed)) {
         saveService.save(
@@ -72,8 +73,8 @@ class BondsDisposalCYAController @Inject()(
 
   def onPageLoadViewOnly(
     srn: Srn,
-    bondIndex: Max5000,
-    disposalIndex: Max50,
+    bondIndex: Int,
+    disposalIndex: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -165,7 +166,7 @@ class BondsDisposalCYAController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, bondIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       for {
         _ <- saveService.save(request.userAnswers)

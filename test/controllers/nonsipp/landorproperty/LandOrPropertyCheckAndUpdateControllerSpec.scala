@@ -17,16 +17,17 @@
 package controllers.nonsipp.landorproperty
 
 import views.html.ContentTablePageView
-import pages.nonsipp.landorproperty.{
-  LandOrPropertyChosenAddressPage,
-  LandOrPropertyTotalCostPage,
-  WhyDoesSchemeHoldLandPropertyPage
-}
 import eu.timepit.refined.refineMV
 import models.NormalMode
 import eu.timepit.refined.api.Refined
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty.{
+  LandOrPropertyChosenAddressPage,
+  LandOrPropertyTotalCostPage,
+  WhyDoesSchemeHoldLandPropertyPage
+}
 
 class LandOrPropertyCheckAndUpdateControllerSpec extends ControllerBaseSpec {
 

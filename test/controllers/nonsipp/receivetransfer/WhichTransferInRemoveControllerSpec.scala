@@ -29,8 +29,8 @@ import controllers.ControllerBaseSpec
 
 class WhichTransferInRemoveControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.WhichTransferInRemoveController.onPageLoad(srn, refineMV(1))
-  private lazy val onSubmit = routes.WhichTransferInRemoveController.onSubmit(srn, refineMV(1))
+  private lazy val onPageLoad = routes.WhichTransferInRemoveController.onPageLoad(srn, 1)
+  private lazy val onSubmit = routes.WhichTransferInRemoveController.onSubmit(srn, 1)
 
   private val memberDetail1: NameDOB = nameDobGen.sample.value
   private val memberDetail2: NameDOB = nameDobGen.sample.value
@@ -66,7 +66,7 @@ class WhichTransferInRemoveControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onPageLoad,
-        routes.RemoveTransferInController.onPageLoad(srn, refineMV(1), refineMV(1)),
+        routes.RemoveTransferInController.onPageLoad(srn, 1, 1),
         userAnswersWithOneContributionOnly
       ).withName("should redirect to RemoveTransferIn page when only one contribution")
     )
@@ -76,7 +76,7 @@ class WhichTransferInRemoveControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmit,
-        routes.RemoveTransferInController.onPageLoad(srn, refineMV(1), refineMV(1)),
+        routes.RemoveTransferInController.onPageLoad(srn, 1, 1),
         userAnswers,
         "value" -> "1"
       )

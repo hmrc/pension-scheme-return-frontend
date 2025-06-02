@@ -19,6 +19,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import models._
@@ -54,7 +55,7 @@ class RemoveLoanController @Inject()(
 
   private val form = RemoveLoanController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       if (request.userAnswers.get(LoanPrePopulated(srn, index)).isDefined)
         Redirect(controllers.routes.UnauthorisedController.onPageLoad())
@@ -104,7 +105,7 @@ class RemoveLoanController @Inject()(
       }
     ).merge
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()

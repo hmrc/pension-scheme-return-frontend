@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.DoubleDifferentQuestion
 import config.RefinedTypes.Max5000
+import utils.IntUtils.{toInt, toRefined5000}
 import config.Constants.{borrowMaxPercentage, borrowMinPercentage, maxCurrencyValue}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -54,7 +55,7 @@ class BorrowedAmountAndRateController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       {
         val form = BorrowedAmountAndRateController.form()
@@ -70,7 +71,7 @@ class BorrowedAmountAndRateController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val form = BorrowedAmountAndRateController.form()
 

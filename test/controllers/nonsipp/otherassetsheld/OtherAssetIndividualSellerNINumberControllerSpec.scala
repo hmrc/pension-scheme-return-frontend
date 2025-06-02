@@ -18,6 +18,7 @@ package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.{IndividualNameOfOtherAssetSellerPage, OtherAssetIndividualSellerNINumberPage}
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider

@@ -19,7 +19,6 @@ package controllers.nonsipp.landorpropertydisposal
 import services.PsrSubmissionService
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.nonsipp.landorpropertydisposal.LandPropertyDisposalCYAController._
 import pages.nonsipp.landorpropertydisposal._
 import eu.timepit.refined.refineMV
@@ -31,6 +30,8 @@ import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import config.RefinedTypes.{OneTo50, OneTo5000}
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 
 import scala.concurrent.Future
 

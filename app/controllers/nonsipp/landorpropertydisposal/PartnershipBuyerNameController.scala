@@ -18,6 +18,7 @@ package controllers.nonsipp.landorpropertydisposal
 
 import services.SaveService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import pages.nonsipp.landorpropertydisposal.PartnershipBuyerNamePage
 import controllers.actions._
 import navigation.Navigator
@@ -50,13 +51,13 @@ class PartnershipBuyerNameController @Inject()(
 
   private val form = PartnershipBuyerNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.fillForm(PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex), form)
       Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, mode)))
     }
-  def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

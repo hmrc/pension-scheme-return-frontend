@@ -17,6 +17,7 @@
 package controllers.nonsipp.sharesdisposal
 
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.{PartnershipBuyerNamePage, PartnershipBuyerUtrPage}
 import forms.YesNoPageFormProvider

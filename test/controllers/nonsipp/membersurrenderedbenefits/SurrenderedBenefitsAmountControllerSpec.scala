@@ -18,6 +18,7 @@ package controllers.nonsipp.membersurrenderedbenefits
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import views.html.MoneyView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage

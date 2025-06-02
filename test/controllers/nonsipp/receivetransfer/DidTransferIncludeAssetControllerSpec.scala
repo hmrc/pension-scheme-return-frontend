@@ -18,6 +18,7 @@ package controllers.nonsipp.receivetransfer
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import views.html.YesNoPageView
+import utils.IntUtils.toInt
 import pages.nonsipp.receivetransfer.{DidTransferIncludeAssetPage, TransferringSchemeNamePage}
 import forms.YesNoPageFormProvider
 import models.NormalMode
