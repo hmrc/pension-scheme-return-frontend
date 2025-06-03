@@ -18,6 +18,7 @@ package controllers.nonsipp.sharesdisposal
 
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import views.html.MoneyView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.{HowManySharesSoldPage, TotalConsiderationSharesSoldPage}
 import forms.MoneyFormProvider

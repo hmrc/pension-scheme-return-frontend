@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import forms.mappings.Mappings
 import models.PensionSchemeType.PensionSchemeType
 import config.RefinedTypes.{Max300, Max5}
+import utils.IntUtils.{toInt, toRefined300, toRefined5}
 import config.Constants.{inputRegexPSTR, inputRegexQROPS, maxNotRelevant}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -57,8 +58,8 @@ class ReceivingSchemeTypeController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max300,
-    secondaryIndex: Max5,
+    index: Int,
+    secondaryIndex: Int,
     mode: Mode
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val maybeAnswer = request.userAnswers.get(ReceivingSchemeTypePage(srn, index, secondaryIndex))
@@ -78,8 +79,8 @@ class ReceivingSchemeTypeController @Inject()(
 
   def onSubmit(
     srn: Srn,
-    index: Max300,
-    secondaryIndex: Max5,
+    index: Int,
+    secondaryIndex: Int,
     mode: Mode
   ): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val schemeName = request.schemeDetails.schemeName

@@ -24,7 +24,6 @@ import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
 import models._
-import eu.timepit.refined.api.Refined
 import utils.BaseSpec
 import pages.nonsipp.memberdetails._
 import config.RefinedTypes.OneTo300
@@ -45,7 +44,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithData(
             PensionSchemeMembersPage.apply,
             Gen.const(ManualOrUpload.Manual),
-            routes.MemberDetailsController.onPageLoad(_, refineMV(1), _)
+            routes.MemberDetailsController.onPageLoad(_, 1, _)
           )
           .withName("go from manual or upload to details page when manual is chosen")
       )
@@ -64,7 +63,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             MemberDetailsPage(_, refineMV(1)),
-            routes.DoesSchemeMemberHaveNINOController.onPageLoad(_, refineMV(1), _)
+            routes.DoesSchemeMemberHaveNINOController.onPageLoad(_, 1, _)
           )
           .withName("go from details to have a nino page")
       )
@@ -73,7 +72,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             MemberDetailsPage(_, refineMV(1)),
-            routes.DoesSchemeMemberHaveNINOController.onPageLoad(_, refineMV(1), _)
+            routes.DoesSchemeMemberHaveNINOController.onPageLoad(_, 1, _)
           )
           .withName("go from member details page to does member have nino page")
       )
@@ -83,7 +82,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithData(
             DoesMemberHaveNinoPage(_, refineMV(1)),
             Gen.const(true),
-            routes.MemberDetailsNinoController.onPageLoad(_, refineMV(1), _)
+            routes.MemberDetailsNinoController.onPageLoad(_, 1, _)
           )
           .withName("go from does member have nino Page to member details nino page when yes selected")
       )
@@ -93,7 +92,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithData(
             DoesMemberHaveNinoPage(_, refineMV(1)),
             Gen.const(false),
-            routes.NoNINOController.onPageLoad(_, refineMV(1), _)
+            routes.NoNINOController.onPageLoad(_, 1, _)
           )
           .withName("go from does member have nino Page to no nino page when no selected")
       )
@@ -102,7 +101,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             MemberDetailsNinoPage(_, refineMV(1)),
-            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), NormalMode)
+            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, 1, NormalMode)
           )
           .withName("go from nino page to check answers page")
       )
@@ -111,7 +110,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             NoNINOPage(_, refineMV(1)),
-            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), NormalMode)
+            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, 1, NormalMode)
           )
           .withName("go from no nino page to scheme member details answers page")
       )
@@ -132,7 +131,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             MemberDetailsPage,
             nameDobGen,
             IndexGen[OneTo300](min = 1, max = 300),
-            (srn, _: Refined[Int, OneTo300], _) => routes.PensionSchemeMembersController.onPageLoad(srn),
+            (srn, _, _) => routes.PensionSchemeMembersController.onPageLoad(srn),
             (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
           )
           .withName(
@@ -147,7 +146,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             MemberDetailsPage,
             nameDobGen,
             IndexGen[OneTo300](min = 1, max = 300),
-            (srn, _: Refined[Int, OneTo300], _) => routes.PensionSchemeMembersController.onPageLoad(srn),
+            (srn, _, _) => routes.PensionSchemeMembersController.onPageLoad(srn),
             (srn, _) => routes.PensionSchemeMembersController.onPageLoad(srn)
           )
           .withName(
@@ -294,7 +293,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         checkmode
           .navigateTo(
             MemberDetailsPage(_, refineMV(1)),
-            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckMode)
+            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, 1, CheckMode)
           )
           .withName("go from member details page to check answers page")
       )
@@ -303,7 +302,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         checkmode
           .navigateTo(
             MemberDetailsNinoPage(_, refineMV(1)),
-            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckMode)
+            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, 1, CheckMode)
           )
           .withName("go from member details nino page to check your answers page")
       )
@@ -312,7 +311,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         checkmode
           .navigateTo(
             NoNINOPage(_, refineMV(1)),
-            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckMode)
+            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, 1, CheckMode)
           )
           .withName("go from no nino page to check your answers page")
       )
@@ -329,7 +328,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithData(
               DoesMemberHaveNinoPage(_, refineMV(1)),
               Gen.const(true),
-              routes.MemberDetailsNinoController.onPageLoad(_, refineMV(1), _)
+              routes.MemberDetailsNinoController.onPageLoad(_, 1, _)
             )
             .withName("nino page when yes selected and no data")
         )
@@ -339,7 +338,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithData(
               DoesMemberHaveNinoPage(_, refineMV(1)),
               Gen.const(false),
-              routes.NoNINOController.onPageLoad(_, refineMV(1), _)
+              routes.NoNINOController.onPageLoad(_, 1, _)
             )
             .withName("no nino page when no selected and no data")
         )
@@ -349,7 +348,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithData(
               DoesMemberHaveNinoPage(_, refineMV(1)),
               Gen.const(true),
-              (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckMode),
+              (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, 1, CheckMode),
               userAnswersWithNino
             )
             .withName("check answers page when yes selected and nino exists")
@@ -360,7 +359,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithData(
               DoesMemberHaveNinoPage(_, refineMV(1)),
               Gen.const(false),
-              (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckMode),
+              (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, 1, CheckMode),
               userAnswersWithNoNinoReason
             )
             .withName("check answers page when no selected and no nino reason exists")

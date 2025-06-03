@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined300}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -53,7 +54,7 @@ class RemoveSurrenderedBenefitsController @Inject()(
 
   private val form = RemoveSurrenderedBenefitsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
@@ -77,7 +78,7 @@ class RemoveSurrenderedBenefitsController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max300): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

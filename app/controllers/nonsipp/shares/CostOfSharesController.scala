@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import utils.FormUtils._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
+import utils.IntUtils.{toInt, toRefined5000}
 import navigation.Navigator
 import forms.MoneyFormProvider
 import models.{Mode, Money}
@@ -55,7 +56,7 @@ class CostOfSharesController @Inject()(
 
   private def form: Form[Money] = CostOfSharesController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { nameOfSharesCompany =>
         Ok(
@@ -67,7 +68,7 @@ class CostOfSharesController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { nameOfSharesCompany =>
         form

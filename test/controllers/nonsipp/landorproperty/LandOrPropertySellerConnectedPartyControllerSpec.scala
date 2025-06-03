@@ -17,7 +17,6 @@
 package controllers.nonsipp.landorproperty
 
 import views.html.YesNoPageView
-import pages.nonsipp.landorproperty.{LandOrPropertySellerConnectedPartyPage, LandPropertyIndividualSellersNamePage}
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController._
 import forms.YesNoPageFormProvider
@@ -25,6 +24,8 @@ import models._
 import pages.nonsipp.common.IdentityTypePage
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty.{LandOrPropertySellerConnectedPartyPage, LandPropertyIndividualSellersNamePage}
 
 class LandOrPropertySellerConnectedPartyControllerSpec extends ControllerBaseSpec {
 

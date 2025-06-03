@@ -22,7 +22,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.nonsipp.landorpropertydisposal.TotalProceedsSaleLandPropertyController._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.TotalProceedsSaleLandPropertyPage
 import controllers.actions._
 import navigation.Navigator
@@ -35,6 +34,8 @@ import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
 import views.html.MoneyView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import viewmodels.DisplayMessage._
 import viewmodels.models.{FormPageViewModel, QuestionField}
 
@@ -55,7 +56,7 @@ class TotalProceedsSaleLandPropertyController @Inject()(
 
   private val form = TotalProceedsSaleLandPropertyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
         address =>
@@ -65,7 +66,7 @@ class TotalProceedsSaleLandPropertyController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

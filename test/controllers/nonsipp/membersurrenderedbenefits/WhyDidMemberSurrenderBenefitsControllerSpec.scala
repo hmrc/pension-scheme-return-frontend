@@ -18,6 +18,7 @@ package controllers.nonsipp.membersurrenderedbenefits
 
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import views.html.TextAreaView
+import utils.IntUtils.toInt
 import forms.TextFormProvider
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, WhyDidMemberSurrenderBenefitsPage}
 import models.{NormalMode, UserAnswers}

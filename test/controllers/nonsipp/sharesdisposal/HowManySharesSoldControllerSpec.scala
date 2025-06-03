@@ -19,6 +19,7 @@ package controllers.nonsipp.sharesdisposal
 import controllers.nonsipp.sharesdisposal.HowManySharesSoldController._
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import views.html.IntView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.HowManySharesSoldPage
 import forms.IntFormProvider

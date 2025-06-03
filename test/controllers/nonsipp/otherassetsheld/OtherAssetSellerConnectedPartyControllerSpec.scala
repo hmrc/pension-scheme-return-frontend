@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsheld
 import controllers.nonsipp.otherassetsheld.OtherAssetSellerConnectedPartyController._
 import pages.nonsipp.otherassetsheld.{IndividualNameOfOtherAssetSellerPage, OtherAssetSellerConnectedPartyPage}
 import views.html.YesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._

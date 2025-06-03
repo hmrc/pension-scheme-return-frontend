@@ -17,6 +17,7 @@
 package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.CompanyNameOfSharesSellerPage
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode

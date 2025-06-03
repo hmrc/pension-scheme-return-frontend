@@ -18,12 +18,13 @@ package controllers.nonsipp.landorproperty
 
 import controllers.nonsipp.landorproperty.LandRegistryTitleNumberController._
 import views.html._
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandRegistryTitleNumberPage}
 import eu.timepit.refined.refineMV
 import forms._
 import models.{ConditionalYesNo, NormalMode}
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandRegistryTitleNumberPage}
 
 class LandRegistryTitleNumberControllerSpec extends ControllerBaseSpec {
 

@@ -20,6 +20,7 @@ import services.TaxYearService
 import org.mockito.Mockito.reset
 import controllers.ControllerBaseSpec
 import views.html.DateRangeView
+import utils.IntUtils.toRefined3
 import eu.timepit.refined.refineMV
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, Paths}
 import pages.nonsipp.WhichTaxYearPage
@@ -55,8 +56,8 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
     val dateRangeData = rangeGen.sample.value
     val otherDateRangeData = rangeGen.sample.value
 
-    lazy val onPageLoad = routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
-    lazy val onSubmit = routes.AccountingPeriodController.onSubmit(srn, refineMV(1), NormalMode)
+    lazy val onPageLoad = routes.AccountingPeriodController.onPageLoad(srn, 1, NormalMode)
+    lazy val onSubmit = routes.AccountingPeriodController.onSubmit(srn, 1, NormalMode)
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[DateRangeView]
@@ -64,7 +65,7 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
     })
 
     act.like(
-      renderPrePopView(onPageLoad, AccountingPeriodPage(srn, refineMV(1), NormalMode), dateRangeData, userAnswers) {
+      renderPrePopView(onPageLoad, AccountingPeriodPage(srn, 1, NormalMode), dateRangeData, userAnswers) {
         implicit app => implicit request =>
           val view = injected[DateRangeView]
           view(form.fill(dateRangeData), viewModel)

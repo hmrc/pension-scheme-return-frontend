@@ -20,6 +20,7 @@ import play.api.test.FakeRequest
 import play.api.mvc.AnyContentAsEmpty
 import models.IdentityType._
 import views.html.RadioListView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{IdentitySubject, NormalMode}

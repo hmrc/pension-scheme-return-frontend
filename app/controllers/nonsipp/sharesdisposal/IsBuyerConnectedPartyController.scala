@@ -19,6 +19,7 @@ package controllers.nonsipp.sharesdisposal
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal._
 import navigation.Navigator
@@ -52,7 +53,7 @@ class IsBuyerConnectedPartyController @Inject()(
 
   private val form = IsBuyerConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.fillForm(IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex), form)
@@ -89,7 +90,7 @@ class IsBuyerConnectedPartyController @Inject()(
       }
     } yield buyerName
 
-  def onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

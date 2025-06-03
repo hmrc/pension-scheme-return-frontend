@@ -20,6 +20,7 @@ import controllers.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsContr
 import services.PsrSubmissionService
 import play.api.inject.bind
 import views.html.MoneyView
+import utils.IntUtils.toInt
 import forms.MoneyFormProvider
 import models.NormalMode
 import viewmodels.models.SectionCompleted

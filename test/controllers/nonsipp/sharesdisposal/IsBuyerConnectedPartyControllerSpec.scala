@@ -17,6 +17,7 @@
 package controllers.nonsipp.sharesdisposal
 
 import views.html.YesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal._
 import forms.YesNoPageFormProvider

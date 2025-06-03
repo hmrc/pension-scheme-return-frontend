@@ -17,11 +17,12 @@
 package controllers.nonsipp.landorproperty
 
 import views.html.TextInputView
-import pages.nonsipp.landorproperty.CompanySellerNamePage
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty.CompanySellerNamePage
 import models.NormalMode
 import controllers.nonsipp.landorproperty.CompanySellerNameController.{form, viewModel}
 

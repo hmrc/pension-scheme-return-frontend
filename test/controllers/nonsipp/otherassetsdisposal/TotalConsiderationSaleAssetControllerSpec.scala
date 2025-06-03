@@ -18,6 +18,7 @@ package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetPage
 import views.html.MoneyView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import models.NormalMode
 import config.RefinedTypes.{Max50, Max5000}

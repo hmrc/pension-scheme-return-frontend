@@ -22,6 +22,7 @@ import models.ConditionalYesNo._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
 import config.RefinedTypes.Max5000
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.MultipleQuestionFormProvider
@@ -57,7 +58,7 @@ class InterestOnLoanController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       val previousAnswer = request.userAnswers.get(InterestOnLoanPage(srn, index))
       val form = InterestOnLoanController.form()
@@ -81,7 +82,7 @@ class InterestOnLoanController @Inject()(
       Ok(view(preparedForm, viewModel))
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val form = InterestOnLoanController.form()
 

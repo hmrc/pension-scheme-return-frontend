@@ -20,6 +20,7 @@ import services.{SaveService, SchemeDateService}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, toRefined300, toRefined5}
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -60,7 +61,7 @@ class WhenWasTransferMadeController @Inject()(
   private def form(date: DateRange)(implicit messages: Messages) =
     WhenWasTransferMadeController.form(formProvider, date)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       usingSchemeDate[Id](srn) { date =>
         (
@@ -84,7 +85,7 @@ class WhenWasTransferMadeController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       usingSchemeDate(srn) { date =>
         form(date)

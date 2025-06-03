@@ -17,6 +17,7 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.toInt
 import pages.nonsipp.landorpropertydisposal.{PartnershipBuyerNamePage, PartnershipBuyerUtrPage}
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider

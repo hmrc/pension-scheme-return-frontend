@@ -19,7 +19,6 @@ package controllers.nonsipp.landorproperty
 import viewmodels.implicits._
 import utils.FormUtils.FormOps
 import play.api.mvc._
-import pages.nonsipp.landorproperty.{AddressLookupResultsPage, LandOrPropertyPostcodeLookupPage}
 import controllers.actions._
 import navigation.Navigator
 import forms.AddressLookupFormProvider
@@ -33,6 +32,8 @@ import controllers.PSRController
 import cats.data.EitherT
 import views.html.PostcodeLookupView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined5000}
+import pages.nonsipp.landorproperty.{AddressLookupResultsPage, LandOrPropertyPostcodeLookupPage}
 import viewmodels.DisplayMessage.{LinkMessage, ParagraphMessage}
 import viewmodels.models.{FormPageViewModel, PostcodeLookupViewModel}
 import models.requests.DataRequest
@@ -56,13 +57,13 @@ class LandOrPropertyPostcodeLookupController @Inject()(
 
   private val form = LandOrPropertyPostcodeLookupController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       val preparedForm = request.userAnswers.fillForm(LandOrPropertyPostcodeLookupPage(srn, index), form)
       Ok(view(preparedForm, viewModel(srn, index, mode)))
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()

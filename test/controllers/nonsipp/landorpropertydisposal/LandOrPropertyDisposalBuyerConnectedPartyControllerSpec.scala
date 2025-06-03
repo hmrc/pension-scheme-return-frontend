@@ -18,6 +18,7 @@ package controllers.nonsipp.landorpropertydisposal
 
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalBuyerConnectedPartyController._
 import views.html.YesNoPageView
+import utils.IntUtils.toInt
 import pages.nonsipp.landorpropertydisposal._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider

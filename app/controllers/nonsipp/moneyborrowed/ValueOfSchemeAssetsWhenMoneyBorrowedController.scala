@@ -22,6 +22,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.nonsipp.moneyborrowed.ValueOfSchemeAssetsWhenMoneyBorrowedController._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.MoneyFormProvider
@@ -58,7 +59,7 @@ class ValueOfSchemeAssetsWhenMoneyBorrowedController @Inject()(
 
   private val form = ValueOfSchemeAssetsWhenMoneyBorrowedController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       request.usingAnswer(WhenBorrowedPage(srn, index)).sync { date =>
         val preparedForm = request.userAnswers.fillForm(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index), form)
@@ -77,7 +78,7 @@ class ValueOfSchemeAssetsWhenMoneyBorrowedController @Inject()(
 
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()

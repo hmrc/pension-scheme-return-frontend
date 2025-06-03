@@ -19,12 +19,12 @@ package navigation.nonsipp
 import play.api.mvc.Call
 import pages.Page
 import config.RefinedTypes.Max5000
-import pages.nonsipp.landorproperty._
 import cats.implicits.toTraverseOps
-import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
 import models._
 import pages.nonsipp.common._
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty._
 
 object LandOrPropertyNavigator extends JourneyNavigator {
 
@@ -38,7 +38,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedLandOrPropertyPage(srn) =>
-      controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, refineMV(1), NormalMode)
+      controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, 1, NormalMode)
 
     case page @ LandPropertyInUKPage(srn, index) =>
       if (userAnswers.get(page).contains(true)) {

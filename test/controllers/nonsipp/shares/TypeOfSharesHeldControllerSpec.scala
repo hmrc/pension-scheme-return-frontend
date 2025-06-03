@@ -17,6 +17,7 @@
 package controllers.nonsipp.shares
 
 import controllers.nonsipp.shares.TypeOfSharesHeldController._
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.NormalMode

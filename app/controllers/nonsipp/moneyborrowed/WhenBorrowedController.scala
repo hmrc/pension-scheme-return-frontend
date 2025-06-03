@@ -20,6 +20,7 @@ import services.{SaveService, SchemeDateService}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Constants
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.DatePageFormProvider
@@ -60,7 +61,7 @@ class WhenBorrowedController @Inject()(
     (date: LocalDate, request: DataRequest[AnyContent]) =>
       WhenBorrowedController.form(formProvider)(date, request.messages(messagesApi))
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>
@@ -87,7 +88,7 @@ class WhenBorrowedController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>

@@ -19,6 +19,7 @@ package navigation.nonsipp
 import utils.BaseSpec
 import config.RefinedTypes.{Max300, Max5}
 import models.SchemeId.Srn
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import models.NormalMode
@@ -91,7 +92,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           ReceivingSchemeNamePage,
-          (srn, index: Max300, secondaryIndex: Max5, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.membertransferout.routes.ReceivingSchemeTypeController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
@@ -107,7 +108,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           WhenWasTransferMadePage,
-          (srn, index: Max300, secondaryIndex: Max5, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.membertransferout.routes.ReportAnotherTransferOutController
               .onPageLoad(srn, index, secondaryIndex, NormalMode),
           srn => defaultUserAnswers.unsafeSet(WhenWasTransferMadePage(srn, index, secondaryIndex), localDate)
@@ -125,7 +126,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           secondaryIndex,
           ReportAnotherTransferOutPage,
           Gen.const(false),
-          (srn, index: Max300, _: Max5, _) =>
+          (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.membertransferout.routes.TransfersOutCYAController.onPageLoad(srn, index, NormalMode)
         )
         .withName("go from report another transfer in page to CYA page")
@@ -155,7 +156,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               index,
               secondaryIndex,
               ReportAnotherTransferOutPage,
-              (srn, index: Max300, _: Max5, _) =>
+              (srn, index: Int, _: Int, _) =>
                 controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
                   .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
               userAnswers
@@ -175,7 +176,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           ReceivingSchemeNamePage,
-          (srn, index: Max300, secondaryIndex: Max5, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
               .onPageLoad(srn, index, NormalMode)
         )
@@ -191,7 +192,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           WhenWasTransferMadePage,
-          (srn, index: Max300, secondaryIndex: Max5, _) =>
+          (srn, index: Int, secondaryIndex: Int, _) =>
             controllers.nonsipp.membertransferout.routes.ReportAnotherTransferOutController
               .onPageLoad(srn, index, secondaryIndex, NormalMode),
           srn => defaultUserAnswers.unsafeSet(WhenWasTransferMadePage(srn, index, secondaryIndex), localDate)
@@ -209,7 +210,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           secondaryIndex,
           ReportAnotherTransferOutPage,
           Gen.const(false),
-          (srn, index: Max300, _: Max5, _) =>
+          (srn, index: Int, _: Int, _) =>
             controllers.nonsipp.membertransferout.routes.TransfersOutCYAController.onPageLoad(srn, index, NormalMode)
         )
         .withName("go from report another transfer in page to CYA page")
@@ -239,7 +240,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               index,
               secondaryIndex,
               ReportAnotherTransferOutPage,
-              (srn, index: Max300, _: Max5, _) =>
+              (srn, index: Int, _: Int, _) =>
                 controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
                   .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
               userAnswers
@@ -258,7 +259,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           RemoveTransferOutPage,
-          (srn, _: Max300, _) =>
+          (srn, _: Int, _) =>
             controllers.nonsipp.membertransferout.routes.TransferOutMemberListController.onPageLoad(srn, 1, NormalMode)
         )
         .withName("go from remove transfer out page to transfer out member list page")

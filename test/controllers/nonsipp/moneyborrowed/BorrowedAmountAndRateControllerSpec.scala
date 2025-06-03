@@ -17,6 +17,7 @@
 package controllers.nonsipp.moneyborrowed
 
 import views.html.MultipleQuestionView
+import utils.IntUtils.toInt
 import controllers.nonsipp.moneyborrowed.{routes, BorrowedAmountAndRateController}
 import eu.timepit.refined.refineMV
 import models.NormalMode

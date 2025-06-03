@@ -20,6 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc._
 import controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController._
+import utils.IntUtils.{toInt, toRefined3}
 import cats.implicits.toShow
 import controllers.actions._
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, RemoveAccountingPeriodPage}
@@ -55,14 +56,14 @@ class RemoveAccountingPeriodController @Inject()(
 
   private val form = RemoveAccountingPeriodController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       withAccountingPeriodAtIndex(srn, index, mode) { period =>
         Ok(view(form, viewModel(srn, index, period, mode)))
       }
   }
 
-  def onSubmit(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()

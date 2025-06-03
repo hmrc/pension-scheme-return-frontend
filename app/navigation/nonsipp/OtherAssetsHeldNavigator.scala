@@ -19,8 +19,8 @@ package navigation.nonsipp
 import play.api.mvc.Call
 import pages.Page
 import config.RefinedTypes.Max5000
+import utils.IntUtils.toInt
 import cats.implicits.toTraverseOps
-import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
 import pages.nonsipp.common._
 import pages.nonsipp.otherassetsheld._
@@ -39,7 +39,7 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedOtherAssetsPage(srn) =>
-      controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController.onPageLoad(srn, refineMV(1), NormalMode)
+      controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController.onPageLoad(srn, 1, NormalMode)
 
     case WhatIsOtherAssetPage(srn, index) =>
       controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController

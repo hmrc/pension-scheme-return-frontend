@@ -19,6 +19,7 @@ package controllers.nonsipp.sharesdisposal
 import pages.nonsipp.shares._
 import controllers.nonsipp.sharesdisposal.SharesDisposalListController.{SharesDisposalData, _}
 import views.html.ListRadiosView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.{HowManySharesSoldPage, SharesDisposalProgress}
 import forms.RadioListFormProvider

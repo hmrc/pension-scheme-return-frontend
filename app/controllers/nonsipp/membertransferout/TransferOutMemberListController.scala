@@ -23,7 +23,9 @@ import play.api.mvc._
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
+import utils.IntUtils.toInt
 import cats.implicits.toShow
+import controllers.actions._
 import viewmodels.models.TaskListStatus.Updated
 import models.requests.DataRequest
 import config.RefinedTypes.{Max300, Max5}
@@ -32,8 +34,6 @@ import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
 import config.Constants
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
-import controllers.actions._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
@@ -190,7 +190,7 @@ object TransferOutMemberListController {
                   case Some(TransferOut(_, InProgress(url))) => url
                   case _ =>
                     controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
-                      .onSubmit(srn, membersWithTransfers.memberIndex, refineMV(1), mode)
+                      .onSubmit(srn, membersWithTransfers.memberIndex, 1, mode)
                       .url
                 },
                 Message(

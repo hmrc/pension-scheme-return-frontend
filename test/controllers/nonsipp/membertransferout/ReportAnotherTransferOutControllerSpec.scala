@@ -19,6 +19,7 @@ package controllers.nonsipp.membertransferout
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import controllers.nonsipp.membertransferout.ReportAnotherTransferOutController._
 import views.html.YesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode

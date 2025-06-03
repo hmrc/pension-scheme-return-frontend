@@ -17,6 +17,7 @@
 package controllers.nonsipp.sharesdisposal
 
 import viewmodels.implicits._
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.sharesdisposal.WhenWereSharesSoldPage
@@ -59,7 +60,7 @@ class WhenWereSharesSoldController @Inject()(
   private def form(date: DateRange)(implicit messages: Messages): Form[LocalDate] =
     WhenWereSharesSoldController.form(formProvider, date)
 
-  def onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).getOrRecoverJourney { companyName =>
@@ -76,7 +77,7 @@ class WhenWereSharesSoldController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, shareIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         request.userAnswers.get(CompanyNameRelatedSharesPage(srn, shareIndex)).getOrRecoverJourney { companyName =>

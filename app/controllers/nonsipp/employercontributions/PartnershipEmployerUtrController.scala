@@ -20,7 +20,6 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import config.RefinedTypes.{Max300, Max50}
-import controllers.nonsipp.employercontributions.PartnershipEmployerUtrController._
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -31,6 +30,8 @@ import pages.nonsipp.employercontributions.{EmployerNamePage, PartnershipEmploye
 import services.SaveService
 import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
+import controllers.nonsipp.employercontributions.PartnershipEmployerUtrController._
+import utils.IntUtils.{toInt, toRefined300, toRefined50}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FunctionKUtils._
@@ -55,7 +56,7 @@ class PartnershipEmployerUtrController @Inject()(
 
   private val form: Form[Either[String, Utr]] = PartnershipEmployerUtrController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.usingAnswer(EmployerNamePage(srn: Srn, index, secondaryIndex)).sync { employerName =>
         val preparedForm =
@@ -65,7 +66,7 @@ class PartnershipEmployerUtrController @Inject()(
 
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

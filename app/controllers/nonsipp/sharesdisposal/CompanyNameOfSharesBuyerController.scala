@@ -19,6 +19,7 @@ package controllers.nonsipp.sharesdisposal
 import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions._
 import pages.nonsipp.sharesdisposal.CompanyBuyerNamePage
 import navigation.Navigator
@@ -50,14 +51,14 @@ class CompanyNameOfSharesBuyerController @Inject()(
 
   private val form = CompanyNameOfSharesBuyerController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.get(CompanyBuyerNamePage(srn, index, secondaryIndex)).fold(form)(form.fill)
       Ok(view(preparedForm, viewModel(srn, index, secondaryIndex, mode)))
     }
 
-  def onSubmit(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

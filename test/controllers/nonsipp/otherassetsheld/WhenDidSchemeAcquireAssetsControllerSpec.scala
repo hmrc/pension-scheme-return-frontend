@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsheld
 import pages.nonsipp.otherassetsheld.WhenDidSchemeAcquireAssetsPage
 import play.api.inject.bind
 import views.html.DatePageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
 import models.NormalMode

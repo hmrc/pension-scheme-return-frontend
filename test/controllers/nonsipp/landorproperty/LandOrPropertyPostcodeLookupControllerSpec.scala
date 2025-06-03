@@ -18,6 +18,7 @@ package controllers.nonsipp.landorproperty
 
 import play.api.inject.bind
 import views.html.PostcodeLookupView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.AddressLookupFormProvider
 import models.NormalMode

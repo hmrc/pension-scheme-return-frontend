@@ -19,6 +19,7 @@ package controllers.nonsipp.sharesdisposal
 import services.SchemeDateService
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import views.html.DatePageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.WhenWereSharesRedeemedPage
 import play.api.inject

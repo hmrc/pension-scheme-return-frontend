@@ -21,6 +21,7 @@ import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted}
 import pages.nonsipp.otherassetsheld._
 import controllers.ControllerBaseSpec
 import views.html.TaskListView
+import utils.IntUtils.toInt
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import eu.timepit.refined.refineMV
 import models.backend.responses.{PsrVersionsResponse, ReportStatus}
@@ -587,7 +588,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
               MemberDetailsManualProgress(srn, refineMV(1)),
               SectionJourneyStatus.InProgress(
                 controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
-                  .onPageLoad(srn, refineMV(1), NormalMode)
+                  .onPageLoad(srn, 1, NormalMode)
                   .url
               )
             )
@@ -600,7 +601,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
             expectedTitleKey = "nonsipp.tasklist.members.title",
             expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
             expectedLinkUrl = controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
-              .onPageLoad(srn, refineMV(1), NormalMode)
+              .onPageLoad(srn, 1, NormalMode)
               .url
           )
         }
@@ -613,7 +614,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
               MemberDetailsManualProgress(srn, refineMV(1)),
               SectionJourneyStatus.InProgress(
                 controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
-                  .onPageLoad(srn, refineMV(1), NormalMode)
+                  .onPageLoad(srn, 1, NormalMode)
                   .url
               )
             )
@@ -626,7 +627,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
             expectedTitleKey = "nonsipp.tasklist.members.title",
             expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
             expectedLinkUrl = controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
-              .onPageLoad(srn, refineMV(1), NormalMode)
+              .onPageLoad(srn, 1, NormalMode)
               .url
           )
         }
@@ -639,7 +640,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
               MemberDetailsManualProgress(srn, refineMV(1)),
               SectionJourneyStatus.InProgress(
                 controllers.nonsipp.memberdetails.routes.NoNINOController
-                  .onPageLoad(srn, refineMV(1), NormalMode)
+                  .onPageLoad(srn, 1, NormalMode)
                   .url
               )
             )
@@ -652,7 +653,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
             expectedTitleKey = "nonsipp.tasklist.members.title",
             expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
             expectedLinkUrl = controllers.nonsipp.memberdetails.routes.NoNINOController
-              .onPageLoad(srn, refineMV(1), NormalMode)
+              .onPageLoad(srn, 1, NormalMode)
               .url
           )
         }
@@ -714,7 +715,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
               MemberDetailsManualProgress(srn, refineMV(2)),
               SectionJourneyStatus.InProgress(
                 controllers.nonsipp.memberdetails.routes.NoNINOController
-                  .onPageLoad(srn, refineMV(2), NormalMode)
+                  .onPageLoad(srn, 2, NormalMode)
                   .url
               )
             )
@@ -727,7 +728,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
             expectedTitleKey = "nonsipp.tasklist.members.title",
             expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
             expectedLinkUrl = controllers.nonsipp.memberdetails.routes.NoNINOController
-              .onPageLoad(srn, refineMV(2), NormalMode)
+              .onPageLoad(srn, 2, NormalMode)
               .url
           )
         }
@@ -787,7 +788,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
               LoansProgress(srn, index1of5000),
               SectionJourneyStatus.InProgress(
                 controllers.nonsipp.common.routes.IdentityTypeController
-                  .onPageLoad(srn, refineMV(1), NormalMode, IdentitySubject.LoanRecipient)
+                  .onPageLoad(srn, 1, NormalMode, IdentitySubject.LoanRecipient)
                   .url
               )
             )
@@ -800,7 +801,7 @@ class TaskListControllerSpec extends ControllerBaseSpec with CommonTestValues {
           expectedTitleKey = "nonsipp.tasklist.loans.title",
           expectedLinkContentKey = "nonsipp.tasklist.loans.change.loansmade.title",
           expectedLinkUrl = controllers.nonsipp.common.routes.IdentityTypeController
-            .onPageLoad(srn, refineMV(1), NormalMode, IdentitySubject.LoanRecipient)
+            .onPageLoad(srn, 1, NormalMode, IdentitySubject.LoanRecipient)
             .url
         )
       }

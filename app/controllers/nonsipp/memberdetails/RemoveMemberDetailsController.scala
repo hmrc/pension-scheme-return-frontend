@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails._
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, toRefined300}
 import controllers.actions._
 import navigation.Navigator
 import models._
@@ -54,14 +55,14 @@ class RemoveMemberDetailsController @Inject()(
     extends PSRController
     with SoftDelete {
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       withMemberDetails(srn, index)(
         nameDOB => Ok(view(form(formProvider, nameDOB), viewModel(srn, index, nameDOB, mode)))
       )
     }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form(formProvider, request.userAnswers.get(MemberDetailsPage(srn, index)).get)
         .bindFromRequest()

@@ -17,6 +17,7 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import views.html.TextInputView
+import utils.IntUtils.toInt
 import pages.nonsipp.landorpropertydisposal.PartnershipBuyerNamePage
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider

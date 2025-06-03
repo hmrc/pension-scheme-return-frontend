@@ -19,6 +19,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 import play.api.mvc.Call
 import controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController._
 import views.html.YesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NormalMode, UserAnswers}

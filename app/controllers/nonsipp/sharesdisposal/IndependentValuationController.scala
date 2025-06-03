@@ -18,6 +18,7 @@ package controllers.nonsipp.sharesdisposal
 
 import services.SaveService
 import viewmodels.implicits._
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import controllers.actions._
 import pages.nonsipp.sharesdisposal.IndependentValuationPage
 import navigation.Navigator
@@ -52,7 +53,7 @@ class IndependentValuationController @Inject()(
 
   private val form = IndependentValuationController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.get(IndependentValuationPage(srn, index, disposalIndex)).fold(form)(form.fill)
@@ -61,7 +62,7 @@ class IndependentValuationController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

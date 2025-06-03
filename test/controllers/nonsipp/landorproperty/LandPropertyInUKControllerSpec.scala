@@ -18,12 +18,13 @@ package controllers.nonsipp.landorproperty
 
 import controllers.nonsipp.landorproperty.LandPropertyInUKController._
 import views.html.YesNoPageView
-import pages.nonsipp.landorproperty.LandPropertyInUKPage
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty.LandPropertyInUKPage
 
 class LandPropertyInUKControllerSpec extends ControllerBaseSpec {
 

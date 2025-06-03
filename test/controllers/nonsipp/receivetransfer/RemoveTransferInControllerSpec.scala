@@ -34,8 +34,8 @@ import scala.concurrent.Future
 
 class RemoveTransferInControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.RemoveTransferInController.onPageLoad(srn, refineMV(1), refineMV(1))
-  private lazy val onSubmit = routes.RemoveTransferInController.onSubmit(srn, refineMV(1), refineMV(1))
+  private lazy val onPageLoad = routes.RemoveTransferInController.onPageLoad(srn, 1, 1)
+  private lazy val onSubmit = routes.RemoveTransferInController.onSubmit(srn, 1, 1)
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 

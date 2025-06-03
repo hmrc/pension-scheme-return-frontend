@@ -18,6 +18,7 @@ package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.PartnershipShareSellerNamePage
 import views.html.TextInputView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import controllers.nonsipp.shares.PartnershipNameOfSharesSellerController._

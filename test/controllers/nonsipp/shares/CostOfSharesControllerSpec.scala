@@ -18,6 +18,7 @@ package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, CostOfSharesPage}
 import views.html.MoneyView
+import utils.IntUtils.toInt
 import forms.MoneyFormProvider
 import models.NormalMode
 import config.RefinedTypes._

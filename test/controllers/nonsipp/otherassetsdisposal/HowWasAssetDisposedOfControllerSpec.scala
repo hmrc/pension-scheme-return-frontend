@@ -17,6 +17,7 @@
 package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfPage
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{HowDisposed, NormalMode}

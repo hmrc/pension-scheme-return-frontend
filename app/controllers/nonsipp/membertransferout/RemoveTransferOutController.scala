@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined300, toRefined5}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -53,7 +54,7 @@ class RemoveTransferOutController @Inject()(
 
   private val form = RemoveTransferOutController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, index: Max5): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Int, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
@@ -73,7 +74,7 @@ class RemoveTransferOutController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, index: Max5): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

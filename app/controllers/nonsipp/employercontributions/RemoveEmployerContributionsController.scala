@@ -20,6 +20,7 @@ import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.nonsipp.employercontributions.RemoveEmployerContributionsController._
+import utils.IntUtils.{toInt, toRefined300, toRefined50}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -54,7 +55,7 @@ class RemoveEmployerContributionsController @Inject()(
 
   private val form = RemoveEmployerContributionsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, index: Max50): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Int, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
@@ -71,7 +72,7 @@ class RemoveEmployerContributionsController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, index: Max50): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int, index: Int): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

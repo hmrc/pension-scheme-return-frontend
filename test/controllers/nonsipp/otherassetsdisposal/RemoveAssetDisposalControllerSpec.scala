@@ -22,6 +22,7 @@ import controllers.nonsipp.otherassetsdisposal.RemoveAssetDisposalController._
 import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import play.api.inject.bind
 import views.html.YesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.HowDisposed

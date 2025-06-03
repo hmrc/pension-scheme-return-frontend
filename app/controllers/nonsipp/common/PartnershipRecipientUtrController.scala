@@ -33,6 +33,7 @@ import forms.mappings.Mappings
 import pages.nonsipp.otherassetsheld.PartnershipOtherAssetSellerNamePage
 import views.html.ConditionalYesNoPageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.nonsipp.common.PartnershipRecipientUtrController._
 import pages.nonsipp.landorproperty.PartnershipSellerNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -57,7 +58,7 @@ class PartnershipRecipientUtrController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       subject match {
         case IdentitySubject.Unknown => Redirect(controllers.routes.UnauthorisedController.onPageLoad())
@@ -68,7 +69,7 @@ class PartnershipRecipientUtrController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val form: Form[Either[String, Utr]] = PartnershipRecipientUtrController.form(formProvider, subject)
       form

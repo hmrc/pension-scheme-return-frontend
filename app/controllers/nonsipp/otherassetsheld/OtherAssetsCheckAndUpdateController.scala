@@ -18,6 +18,7 @@ package controllers.nonsipp.otherassetsheld
 
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.otherassetsheld.OtherAssetsCheckAndUpdateController._
 import pages.nonsipp.otherassetsheld.{CostOfOtherAssetPage, WhatIsOtherAssetPage, WhyDoesSchemeHoldAssetsPage}
@@ -40,7 +41,7 @@ class OtherAssetsCheckAndUpdateController @Inject()(
   view: ContentTablePageView
 ) extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     (
       for {
         descriptionOfAsset <- request.userAnswers.get(WhatIsOtherAssetPage(srn, index)).getOrRecoverJourney
@@ -60,7 +61,7 @@ class OtherAssetsCheckAndUpdateController @Inject()(
     ).merge
   }
 
-  def onSubmit(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
+  def onSubmit(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
     Redirect(routes.IsAssetTangibleMoveablePropertyController.onPageLoad(srn, index, NormalMode))
   }
 }

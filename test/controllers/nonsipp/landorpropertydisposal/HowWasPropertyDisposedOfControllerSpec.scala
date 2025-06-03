@@ -18,6 +18,7 @@ package controllers.nonsipp.landorpropertydisposal
 
 import controllers.nonsipp.landorpropertydisposal.HowWasPropertyDisposedOfController._
 import views.html.RadioListView
+import utils.IntUtils.toInt
 import pages.nonsipp.landorpropertydisposal.HowWasPropertyDisposedOfPage
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider

@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc._
 import utils.ListUtils.ListOps
 import config.Constants
+import utils.IntUtils.{toInt, toRefined300}
 import cats.implicits.{catsSyntaxApplicativeId, toTraverseOps}
 import controllers.actions._
 import models._
@@ -57,14 +58,14 @@ class EmployerContributionsCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max300, page: Int, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, page: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       onPageLoadCommon(srn: Srn, index: Max300, page: Int, mode: Mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max300,
+    index: Int,
     page: Int,
     mode: Mode,
     year: String,
@@ -111,7 +112,7 @@ class EmployerContributionsCYAController @Inject()(
       )
     ).merge
 
-  def onSubmit(srn: Srn, index: Max300, page: Int, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, page: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       // Set EmployerContributionsCompleted for each journey that's no longer In Progress:
       val userAnswersWithJourneysCompleted = buildCompletedSecondaryIndexes(srn, index).map(

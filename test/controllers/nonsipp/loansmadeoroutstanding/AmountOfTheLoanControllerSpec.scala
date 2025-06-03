@@ -21,6 +21,7 @@ import controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.part
 import controllers.ControllerBaseSpec
 import play.api.inject.bind
 import views.html.MultipleQuestionView
+import utils.IntUtils.toInt
 import config.Constants.maxCurrencyValue
 import forms.MoneyFormProvider
 import models._

@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import models.ConditionalYesNo._
 import play.api.mvc._
 import utils.ListUtils.ListOps
+import utils.IntUtils.{toInt, toRefined5000}
 import cats.implicits.toShow
 import controllers.actions._
 import pages.nonsipp.common._
@@ -58,7 +59,7 @@ class LoansCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
@@ -67,7 +68,7 @@ class LoansCYAController @Inject()(
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -167,7 +168,7 @@ class LoansCYAController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val prePopulated = request.userAnswers.get(LoanPrePopulated(srn, index))
 

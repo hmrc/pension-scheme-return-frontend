@@ -20,7 +20,6 @@ import services.PsrSubmissionService
 import controllers.nonsipp.landorpropertydisposal.RemoveLandPropertyDisposalController._
 import play.api.inject.bind
 import views.html.YesNoPageView
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.{
   HowWasPropertyDisposedOfPage,
   LandOrPropertyDisposalProgress,
@@ -35,6 +34,8 @@ import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito.{when, _}
 import config.RefinedTypes.{Max50, Max5000}
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 
 import scala.concurrent.Future
 

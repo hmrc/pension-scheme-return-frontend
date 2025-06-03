@@ -19,12 +19,13 @@ package navigation.nonsipp
 import utils.BaseSpec
 import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
 import config.RefinedTypes.{Max5000, OneTo5000}
-import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import models._
 import pages.nonsipp.common._
 import viewmodels.models.SectionCompleted
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty._
 import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
 
@@ -74,7 +75,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           LandPropertyInUKPage,
           Gen.const(false),
-          (srn, index: Max5000, mode) =>
+          (srn, index: Int, mode) =>
             controllers.nonsipp.landorproperty.routes.LandPropertyAddressManualController
               .onPageLoad(srn, index, isUkAddress = false, mode)
         )
@@ -122,9 +123,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             LandOrPropertyTotalCostPage,
             Gen.const(money),
-            (srn, index: Max5000, _) =>
-              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, NormalMode),
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad,
             srn => defaultUserAnswers.unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
           )
           .withName(
@@ -493,8 +492,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             srn => LandOrPropertyListPage(srn, addLandOrProperty = true),
-            (srn, mode) =>
-              controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, refineMV(2), mode),
+            (srn, mode) => controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, 2, mode),
             srn => defaultUserAnswers.unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
           )
           .withName("Add Land or property with a record at index 1")
@@ -506,8 +504,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             srn => LandOrPropertyListPage(srn, addLandOrProperty = true),
-            (srn, mode) =>
-              controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, refineMV(1), mode),
+            (srn, mode) => controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, 1, mode),
             srn => defaultUserAnswers.unsafeSet(LandOrPropertyCompleted(srn, refineMV(2)), SectionCompleted)
           )
           .withName("Add Land or property with a record at index 2")
@@ -519,8 +516,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             srn => LandOrPropertyListPage(srn, addLandOrProperty = true),
-            (srn, mode) =>
-              controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, refineMV(1), mode)
+            (srn, mode) => controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, 1, mode)
           )
           .withName("Add Land or property with no records")
       )

@@ -22,6 +22,7 @@ import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld._
 import config.FrontendAppConfig
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -55,7 +56,7 @@ class OtherAssetSellerConnectedPartyController @Inject()(
 
   private val form = OtherAssetSellerConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       recipientName(srn, index)
         .map { recipientName =>
@@ -70,7 +71,7 @@ class OtherAssetSellerConnectedPartyController @Inject()(
         .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()

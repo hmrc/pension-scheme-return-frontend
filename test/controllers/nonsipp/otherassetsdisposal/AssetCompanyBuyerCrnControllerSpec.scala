@@ -18,6 +18,7 @@ package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.{AssetCompanyBuyerCrnPage, CompanyNameOfAssetBuyerPage}
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.toInt
 import controllers.nonsipp.otherassetsdisposal.AssetCompanyBuyerCrnController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider

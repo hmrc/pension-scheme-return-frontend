@@ -20,10 +20,10 @@ import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldB
 import viewmodels.implicits._
 import play.api.mvc._
 import com.google.inject.Inject
+import controllers.PSRController
+import utils.IntUtils.toRefined5000
 import controllers.actions._
 import models._
-import config.RefinedTypes.Max5000
-import controllers.PSRController
 import views.html.ContentTablePageView
 import models.SchemeId.Srn
 import play.api.i18n.MessagesApi
@@ -39,7 +39,7 @@ class BondsCheckAndUpdateController @Inject()(
   view: ContentTablePageView
 ) extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     (
       for {
         nameOfBonds <- requiredPage(NameOfBondsPage(srn, index))
@@ -59,7 +59,7 @@ class BondsCheckAndUpdateController @Inject()(
     ).merge
   }
 
-  def onSubmit(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
+  def onSubmit(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
     Redirect(routes.IncomeFromBondsController.onPageLoad(srn, index, NormalMode))
   }
 }
@@ -68,7 +68,7 @@ object BondsCheckAndUpdateController {
 
   def viewModel(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     nameOfBonds: String,
     acquisitionType: SchemeHoldBond,
     costOfBonds: Money

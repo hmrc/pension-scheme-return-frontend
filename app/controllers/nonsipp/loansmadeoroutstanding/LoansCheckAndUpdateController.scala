@@ -19,7 +19,6 @@ package controllers.nonsipp.loansmadeoroutstanding
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
-import controllers.nonsipp.loansmadeoroutstanding.LoansCheckAndUpdateController._
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.common.OtherRecipientDetailsPage
@@ -28,6 +27,8 @@ import config.RefinedTypes.Max5000
 import controllers.PSRController
 import views.html.ContentTablePageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined5000}
+import controllers.nonsipp.loansmadeoroutstanding.LoansCheckAndUpdateController._
 import utils.DateTimeUtils.localDateShow
 import models.{IdentitySubject, Money, NormalMode}
 import play.api.i18n.MessagesApi
@@ -44,7 +45,7 @@ class LoansCheckAndUpdateController @Inject()(
   view: ContentTablePageView
 ) extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     (
       for {
         recipientName <- List(
@@ -69,7 +70,7 @@ class LoansCheckAndUpdateController @Inject()(
     ).merge
   }
 
-  def onSubmit(srn: Srn, index: Max5000): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
+  def onSubmit(srn: Srn, index: Int): Action[AnyContent] = identifyAndRequireData(srn) { _ =>
     Redirect(routes.AmountOfTheLoanController.onPageLoad(srn, index, NormalMode))
   }
 }

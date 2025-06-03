@@ -20,6 +20,7 @@ import play.api.test.FakeRequest
 import models.ConditionalYesNo._
 import org.jsoup.Jsoup
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode, Security}

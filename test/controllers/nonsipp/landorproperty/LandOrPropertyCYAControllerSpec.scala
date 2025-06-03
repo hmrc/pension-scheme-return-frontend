@@ -22,7 +22,6 @@ import play.api.mvc.Call
 import models.SchemeHoldLandProperty.Transfer
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
-import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage
 import models._
@@ -33,6 +32,8 @@ import play.api.inject.guice.GuiceableModule
 import org.mockito.Mockito._
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty._
 
 class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
 
@@ -90,7 +91,7 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
       LandOrPropertyProgress(srn, index),
       SectionJourneyStatus.InProgress(
         controllers.nonsipp.landorproperty.routes.LandRegistryTitleNumberController
-          .onPageLoad(srn, refineMV(1), NormalMode)
+          .onPageLoad(srn, 1, NormalMode)
           .url
       )
     )

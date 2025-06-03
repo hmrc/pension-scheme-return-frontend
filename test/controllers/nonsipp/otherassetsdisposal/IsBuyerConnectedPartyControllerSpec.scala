@@ -18,6 +18,7 @@ package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal._
 import views.html.YesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.otherassetsdisposal.IsBuyerConnectedPartyController._
 import forms.YesNoPageFormProvider

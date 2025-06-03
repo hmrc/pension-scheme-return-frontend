@@ -23,6 +23,7 @@ import viewmodels.implicits._
 import utils.FormUtils._
 import play.api.mvc._
 import config.RefinedTypes.Max300
+import utils.IntUtils.{toInt, toRefined300}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -56,7 +57,7 @@ class DoesSchemeMemberHaveNINOController @Inject()(
   private def form(memberName: String): Form[Boolean] =
     DoesSchemeMemberHaveNINOController.form(formProvider, memberName)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       withMemberDetails(srn, index)(
         memberDetails =>
@@ -71,7 +72,7 @@ class DoesSchemeMemberHaveNINOController @Inject()(
       )
   }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       withMemberDetails(srn, index)(
         memberDetails =>

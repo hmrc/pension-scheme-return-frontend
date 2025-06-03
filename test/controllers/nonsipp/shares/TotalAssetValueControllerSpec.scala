@@ -18,6 +18,7 @@ package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.TotalAssetValuePage
 import views.html.MoneyView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import controllers.nonsipp.shares.TotalAssetValueController._
 import forms.MoneyFormProvider

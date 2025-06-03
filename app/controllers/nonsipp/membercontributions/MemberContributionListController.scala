@@ -21,7 +21,6 @@ import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
 import utils.nonsipp.TaskListStatusUtils.getCompletedOrUpdatedTaskListStatus
-import controllers.nonsipp.membercontributions.MemberContributionListController._
 import cats.implicits.toShow
 import _root_.config.Constants
 import controllers.actions.IdentifyAndRequireData
@@ -38,6 +37,8 @@ import config.RefinedTypes.Max300
 import controllers.PSRController
 import views.html.TwoColumnsTripleAction
 import models.SchemeId.Srn
+import utils.IntUtils.toInt
+import controllers.nonsipp.membercontributions.MemberContributionListController._
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow

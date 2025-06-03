@@ -25,6 +25,7 @@ import models._
 import viewmodels.models.{SectionCompleted, SectionJourneyStatus}
 import config.RefinedTypes.{Max50, Max5000}
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toRefined5000
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController._
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyCompleted, LandOrPropertyProgress}
 
@@ -102,7 +103,7 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
     })
 
     act.like(
-      renderView(onPageLoad, userAnswers.unsafeRemove(LandOrPropertyDisposalProgress(srn, refineMV(1), refineMV(2)))) {
+      renderView(onPageLoad, userAnswers.unsafeRemove(LandOrPropertyDisposalProgress(srn, 1, refineMV(2)))) {
         implicit app => implicit request =>
           injected[ListView]
             .apply(

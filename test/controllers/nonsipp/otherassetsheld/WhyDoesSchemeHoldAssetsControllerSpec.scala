@@ -18,6 +18,7 @@ package controllers.nonsipp.otherassetsheld
 
 import pages.nonsipp.otherassetsheld.{WhenDidSchemeAcquireAssetsPage, WhyDoesSchemeHoldAssetsPage}
 import views.html.RadioListView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.IdentitySubject.OtherAssetSeller

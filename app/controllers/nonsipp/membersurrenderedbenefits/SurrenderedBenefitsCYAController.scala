@@ -20,6 +20,7 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.{toInt, toRefined300}
 import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
 import pages.nonsipp.membersurrenderedbenefits._
@@ -55,14 +56,14 @@ class SurrenderedBenefitsCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       onPageLoadCommon(srn, index, mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max300,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
@@ -109,7 +110,7 @@ class SurrenderedBenefitsCYAController @Inject()(
       )
     ).merge
 
-  def onSubmit(srn: Srn, memberIndex: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       lazy val surrenderedBenefitsChanged =
         request.userAnswers.changed(_.buildSurrenderedBenefits(srn, memberIndex))

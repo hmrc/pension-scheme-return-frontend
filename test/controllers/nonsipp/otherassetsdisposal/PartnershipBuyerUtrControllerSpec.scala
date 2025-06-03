@@ -18,6 +18,7 @@ package controllers.nonsipp.otherassetsdisposal
 
 import pages.nonsipp.otherassetsdisposal.{PartnershipBuyerNamePage, PartnershipBuyerUtrPage}
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.toInt
 import controllers.nonsipp.otherassetsdisposal.PartnershipBuyerUtrController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider

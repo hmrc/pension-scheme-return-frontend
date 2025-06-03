@@ -21,6 +21,7 @@ import play.api.mvc._
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 import pages.nonsipp.memberdetails.MembersDetailsPage.MembersDetailsOps
+import utils.IntUtils.toInt
 import pages.nonsipp.receivetransfer.ReceiveTransferProgress.TransfersInSectionCompletedUserAnswersOps
 import viewmodels.models.TaskListStatus.Updated
 import play.api.i18n.MessagesApi
@@ -35,7 +36,6 @@ import cats.implicits.toShow
 import pages.nonsipp.receivetransfer._
 import controllers.nonsipp.receivetransfer.TransferReceivedMemberListController._
 import controllers.actions._
-import eu.timepit.refined.refineMV
 import pages.nonsipp.CompilationOrSubmissionDatePage
 import navigation.Navigator
 import utils.DateTimeUtils.localDateTimeShow
@@ -182,7 +182,7 @@ object TransferReceivedMemberListController {
                   case Some(ReceiveTransfer(_, InProgress(url))) => url
                   case _ =>
                     controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
-                      .onSubmit(srn, membersWithTransfers.memberIndex, refineMV(1), mode)
+                      .onSubmit(srn, membersWithTransfers.memberIndex, 1, mode)
                       .url
                 },
                 Message(

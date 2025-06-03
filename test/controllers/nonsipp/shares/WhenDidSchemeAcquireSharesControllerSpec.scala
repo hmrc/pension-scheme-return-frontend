@@ -19,6 +19,7 @@ package controllers.nonsipp.shares
 import services.SchemeDateService
 import pages.nonsipp.shares.{TypeOfSharesHeldPage, WhenDidSchemeAcquireSharesPage}
 import play.api.inject.bind
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
 import models.{NormalMode, TypeOfShares}

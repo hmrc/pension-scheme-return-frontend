@@ -18,6 +18,7 @@ package controllers.nonsipp.memberdetails
 
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsPage}
 import views.html.TextInputView
+import utils.IntUtils.toRefined300
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
@@ -37,15 +38,15 @@ class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
     val validNino = ninoGen.sample.value
     val otherValidNino = ninoGen.sample.value
 
-    lazy val onPageLoad = routes.MemberDetailsNinoController.onPageLoad(srn, refineMV(1), NormalMode)
-    lazy val onSubmit = routes.MemberDetailsNinoController.onSubmit(srn, refineMV(1), NormalMode)
+    lazy val onPageLoad = routes.MemberDetailsNinoController.onPageLoad(srn, 1, NormalMode)
+    lazy val onSubmit = routes.MemberDetailsNinoController.onSubmit(srn, 1, NormalMode)
 
     act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
       val view = injected[TextInputView]
       view(form, viewModel)
     })
 
-    act.like(renderPrePopView(onPageLoad, MemberDetailsNinoPage(srn, refineMV(1)), validNino, populatedUserAnswers) {
+    act.like(renderPrePopView(onPageLoad, MemberDetailsNinoPage(srn, 1), validNino, populatedUserAnswers) {
       implicit app => implicit request =>
         val view = injected[TextInputView]
         view(form.fill(validNino), viewModel)

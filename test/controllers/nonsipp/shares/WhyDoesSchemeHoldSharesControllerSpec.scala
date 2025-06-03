@@ -18,6 +18,7 @@ package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.{TypeOfSharesHeldPage, WhyDoesSchemeHoldSharesPage}
 import views.html.RadioListView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{NormalMode, TypeOfShares}

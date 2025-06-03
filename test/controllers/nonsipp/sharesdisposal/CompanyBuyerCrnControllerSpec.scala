@@ -17,6 +17,7 @@
 package controllers.nonsipp.sharesdisposal
 
 import views.html.ConditionalYesNoPageView
+import utils.IntUtils.toInt
 import controllers.nonsipp.sharesdisposal.CompanyBuyerCrnController._
 import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal.{CompanyBuyerCrnPage, CompanyBuyerNamePage}

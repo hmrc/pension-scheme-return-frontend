@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsdisposal
 import pages.nonsipp.otherassetsdisposal.AssetSaleIndependentValuationPage
 import controllers.nonsipp.otherassetsdisposal.AssetSaleIndependentValuationController._
 import views.html.YesNoPageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode

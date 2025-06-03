@@ -18,7 +18,6 @@ package controllers.nonsipp.landorpropertydisposal
 
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import cats.implicits.toShow
 import pages.nonsipp.landorpropertydisposal.WhenWasPropertySoldPage
 import controllers.actions._
@@ -32,6 +31,8 @@ import config.RefinedTypes.{Max50, Max5000}
 import controllers.PSRController
 import views.html.DatePageView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import utils.DateTimeUtils.localDateShow
 import models.Mode
 import viewmodels.DisplayMessage.Message
@@ -61,7 +62,7 @@ class WhenWasPropertySoldController @Inject()(
     (date: LocalDate, beforeDate: LocalDate, request: DataRequest[AnyContent]) =>
       WhenWasPropertySoldController.form(formProvider)(date, beforeDate, request.messages(messagesApi))
 
-  def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
@@ -78,7 +79,7 @@ class WhenWasPropertySoldController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         form(date.to, date.from, request)

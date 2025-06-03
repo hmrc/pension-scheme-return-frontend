@@ -20,6 +20,7 @@ import services.PsrSubmissionService
 import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
 import play.api.inject.bind
 import views.html.CheckYourAnswersView
+import utils.IntUtils.toInt
 import cats.implicits.catsSyntaxOptionId
 import eu.timepit.refined.refineMV
 import pages.nonsipp.FbVersionPage

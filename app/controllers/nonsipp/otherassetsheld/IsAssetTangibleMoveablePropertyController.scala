@@ -22,6 +22,7 @@ import utils.FormUtils.FormOps
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld._
 import config.FrontendAppConfig
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -53,7 +54,7 @@ class IsAssetTangibleMoveablePropertyController @Inject()(
 
   private val form = IsAssetTangibleMoveablePropertyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       Ok(
         view(
@@ -64,7 +65,7 @@ class IsAssetTangibleMoveablePropertyController @Inject()(
       )
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()

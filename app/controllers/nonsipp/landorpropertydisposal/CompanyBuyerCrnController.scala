@@ -21,6 +21,7 @@ import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import forms.mappings.Mappings
 import config.RefinedTypes.{Max50, Max5000}
+import utils.IntUtils.{toInt, toRefined50, toRefined5000}
 import pages.nonsipp.landorpropertydisposal.{CompanyBuyerCrnPage, CompanyBuyerNamePage}
 import controllers.actions.IdentifyAndRequireData
 import navigation.Navigator
@@ -51,7 +52,7 @@ class CompanyBuyerCrnController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
   val form: Form[Either[String, Crn]] = CompanyBuyerCrnController.form(formProvider)
-  def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.usingAnswer(CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)).sync { companyName =>
         val preparedForm =
@@ -65,7 +66,7 @@ class CompanyBuyerCrnController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, landOrPropertyIndex: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

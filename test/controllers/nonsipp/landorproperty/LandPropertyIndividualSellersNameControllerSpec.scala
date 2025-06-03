@@ -18,12 +18,13 @@ package controllers.nonsipp.landorproperty
 
 import controllers.nonsipp.landorproperty.LandPropertyIndividualSellersNameController.{form, viewModel}
 import views.html.TextInputView
-import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import config.RefinedTypes.OneTo5000
 import controllers.ControllerBaseSpec
+import utils.IntUtils.toInt
+import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 
 class LandPropertyIndividualSellersNameControllerSpec extends ControllerBaseSpec {
 

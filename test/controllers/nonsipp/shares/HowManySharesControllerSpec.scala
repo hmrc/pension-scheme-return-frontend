@@ -18,6 +18,7 @@ package controllers.nonsipp.shares
 
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, HowManySharesPage}
 import views.html.IntView
+import utils.IntUtils.toInt
 import controllers.nonsipp.shares.HowManySharesController._
 import eu.timepit.refined.refineMV
 import forms.IntFormProvider

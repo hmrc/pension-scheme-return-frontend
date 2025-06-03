@@ -21,6 +21,7 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import org.slf4j.LoggerFactory
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import config.Constants
+import utils.IntUtils.{toInt, toRefined300}
 import controllers.actions._
 import navigation.Navigator
 import forms.MoneyFormProvider
@@ -58,7 +59,7 @@ class TotalMemberContributionController @Inject()(
 
   private val form = TotalMemberContributionController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.userAnswers.get(MemberDetailsPage(srn, index)) match {
         case None =>
@@ -74,7 +75,7 @@ class TotalMemberContributionController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
         form

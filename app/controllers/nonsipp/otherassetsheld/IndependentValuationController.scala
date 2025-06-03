@@ -20,6 +20,7 @@ import services.SaveService
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.IndependentValuationPage
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.YesNoPageFormProvider
@@ -51,7 +52,7 @@ class IndependentValuationController @Inject()(
 
   private val form = IndependentValuationController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.get(IndependentValuationPage(srn, index)).fold(form)(form.fill)
@@ -59,7 +60,7 @@ class IndependentValuationController @Inject()(
 
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

@@ -19,6 +19,7 @@ package controllers.nonsipp.otherassetsheld
 import services.SaveService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import pages.nonsipp.otherassetsheld.PartnershipOtherAssetSellerNamePage
+import utils.IntUtils.{toInt, toRefined5000}
 import controllers.actions._
 import navigation.Navigator
 import forms.TextFormProvider
@@ -50,13 +51,13 @@ class PartnershipNameOfOtherAssetsSellerController @Inject()(
 
   private val form = PartnershipNameOfOtherAssetsSellerController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.fillForm(PartnershipOtherAssetSellerNamePage(srn, index), form)
       Ok(view(preparedForm, viewModel(srn, index, mode)))
     }
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

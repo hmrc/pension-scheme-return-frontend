@@ -16,23 +16,24 @@
 
 package controllers.nonsipp.bondsdisposal
 
-import config.RefinedTypes.{OneTo50, OneTo5000}
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
+import services.{PsrSubmissionService, SaveService}
+import play.api.inject.bind
+import views.html.CheckYourAnswersView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
-import models.PointOfEntry.{HowWereBondsDisposedPointOfEntry, NoPointOfEntry}
+import pages.nonsipp.FbVersionPage
 import models._
+import pages.nonsipp.bondsdisposal._
+import viewmodels.models.SectionJourneyStatus
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
-import pages.nonsipp.FbVersionPage
-import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
-import pages.nonsipp.bondsdisposal._
-import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
-import services.{PsrSubmissionService, SaveService}
-import viewmodels.models.SectionJourneyStatus
-import views.html.CheckYourAnswersView
+import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
+import models.PointOfEntry.{HowWereBondsDisposedPointOfEntry, NoPointOfEntry}
+import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
+import config.RefinedTypes.{OneTo50, OneTo5000}
+import controllers.ControllerBaseSpec
 
 import scala.concurrent.Future
 

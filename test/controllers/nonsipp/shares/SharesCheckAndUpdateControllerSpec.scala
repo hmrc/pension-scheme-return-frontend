@@ -19,6 +19,7 @@ package controllers.nonsipp.shares
 import controllers.nonsipp.shares.SharesCheckAndUpdateController._
 import pages.nonsipp.shares.{ClassOfSharesPage, CostOfSharesPage, TypeOfSharesHeldPage}
 import views.html.ContentTablePageView
+import utils.IntUtils.toInt
 import eu.timepit.refined.refineMV
 import models.NormalMode
 import eu.timepit.refined.api.Refined

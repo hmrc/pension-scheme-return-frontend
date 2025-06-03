@@ -20,12 +20,12 @@ import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.bonds._
 import viewmodels.implicits._
 import play.api.mvc._
+import utils.IntUtils.toRefined5000
 import cats.implicits.toShow
 import controllers.actions._
 import play.api.i18n._
 import models.requests.DataRequest
 import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController._
-import config.RefinedTypes.Max5000
 import controllers.PSRController
 import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 import views.html.CheckYourAnswersView
@@ -57,26 +57,26 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)
+      onPageLoadCommon(srn: Srn, index: Int, mode: Mode)
     }
 
   def onPageLoadViewOnly(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     mode: Mode,
     year: String,
     current: Int,
     previous: Int
   ): Action[AnyContent] =
     identifyAndRequireData(srn, mode, year, current, previous) { implicit request =>
-      onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)
+      onPageLoadCommon(srn: Srn, index: Int, mode: Mode)
     }
 
-  def onPageLoadCommon(srn: Srn, index: Max5000, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
+  def onPageLoadCommon(srn: Srn, index: Int, mode: Mode)(implicit request: DataRequest[AnyContent]): Result =
     request.userAnswers.get(BondsProgress(srn, index)) match {
       case Some(InProgress(_)) => Redirect(routes.BondsListController.onPageLoad(srn, 1, mode))
       case _ =>
@@ -127,7 +127,7 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
         ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val prePopulated = request.userAnswers.get(BondPrePopulated(srn, index))
       for {
@@ -164,7 +164,7 @@ class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
 object UnregulatedOrConnectedBondsHeldCYAController {
   def viewModel(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     schemeName: String,
     nameOfBonds: String,
     whyDoesSchemeHoldBonds: SchemeHoldBond,
@@ -244,7 +244,7 @@ object UnregulatedOrConnectedBondsHeldCYAController {
 
   private def sections(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     schemeName: String,
     nameOfBonds: String,
     whyDoesSchemeHoldBonds: SchemeHoldBond,
@@ -286,7 +286,7 @@ object UnregulatedOrConnectedBondsHeldCYAController {
 
   private def whenDidSchemeAcquireBondsRow(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     schemeName: String,
     whenDidSchemeAcquireBonds: Option[LocalDate],
     mode: Mode
@@ -301,7 +301,7 @@ object UnregulatedOrConnectedBondsHeldCYAController {
 
   private def bondsFromConnectedPartyRow(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     bondsFromConnectedParty: Option[Boolean],
     mode: Mode
   ): CheckYourAnswersRowViewModel =
@@ -315,7 +315,7 @@ object UnregulatedOrConnectedBondsHeldCYAController {
 
   private def unconditionalRowsPart1(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     schemeName: String,
     nameOfBonds: String,
     whyDoesSchemeHoldBonds: SchemeHoldBond,
@@ -340,7 +340,7 @@ object UnregulatedOrConnectedBondsHeldCYAController {
 
   private def unconditionalRowsPart2(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     costOfBonds: Money,
     mode: Mode
   ): List[CheckYourAnswersRowViewModel] = List(
@@ -353,7 +353,7 @@ object UnregulatedOrConnectedBondsHeldCYAController {
 
   private def unconditionalRowsPart3(
     srn: Srn,
-    index: Max5000,
+    index: Int,
     areBondsUnregulated: Boolean,
     incomeFromBonds: Money,
     mode: Mode

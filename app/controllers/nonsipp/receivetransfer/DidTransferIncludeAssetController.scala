@@ -20,6 +20,7 @@ import services.SaveService
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.IntUtils.{toInt, toRefined300, toRefined5}
 import pages.nonsipp.receivetransfer.{
   DidTransferIncludeAssetPage,
   TransferringSchemeNamePage,
@@ -57,7 +58,7 @@ class DidTransferIncludeAssetController @Inject()(
 
   private val form = DidTransferIncludeAssetController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
         request.userAnswers.get(DidTransferIncludeAssetPage(srn, index, secondaryIndex)).fold(form)(form.fill)
@@ -76,7 +77,7 @@ class DidTransferIncludeAssetController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, secondaryIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()

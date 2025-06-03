@@ -33,8 +33,8 @@ import scala.concurrent.Future
 
 class RemoveSurrenderedBenefitsControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.RemoveSurrenderedBenefitsController.onPageLoad(srn, refineMV(1))
-  private lazy val onSubmit = routes.RemoveSurrenderedBenefitsController.onSubmit(srn, refineMV(1))
+  private lazy val onPageLoad = routes.RemoveSurrenderedBenefitsController.onPageLoad(srn, 1)
+  private lazy val onSubmit = routes.RemoveSurrenderedBenefitsController.onSubmit(srn, 1)
 
   override val memberDetails: NameDOB = nameDobGen.sample.value
 

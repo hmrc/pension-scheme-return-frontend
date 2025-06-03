@@ -23,7 +23,6 @@ import viewmodels.implicits._
 import play.api.mvc._
 import forms.mappings.Mappings
 import viewmodels.models.MultipleQuestionsViewModel.{QuintupleQuestion, SextupleQuestion}
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import controllers.actions._
 import navigation.Navigator
 import forms.MultipleQuestionFormProvider
@@ -34,6 +33,8 @@ import config.RefinedTypes._
 import controllers.PSRController
 import views.html.MultipleQuestionView
 import models.SchemeId.Srn
+import utils.IntUtils.{toInt, toRefined5000}
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import play.api.i18n.MessagesApi
 import viewmodels.InputWidth
 import models.requests.DataRequest
@@ -55,7 +56,7 @@ class LandPropertyAddressManualController @Inject()(
 
   private val internationalAddressFormWithCountries = internationalAddressForm(Country.countries)
 
-  def onPageLoad(srn: Srn, index: Max5000, isUkAddress: Boolean, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Int, isUkAddress: Boolean, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val previousAnswer = request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index))
 
@@ -87,7 +88,7 @@ class LandPropertyAddressManualController @Inject()(
       }
     }
 
-  def onSubmit(srn: Srn, index: Max5000, isUkAddress: Boolean, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Int, isUkAddress: Boolean, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       if (isUkAddress) {
         onSubmitUKAddress(srn, index, mode)
