@@ -92,5 +92,8 @@ trait Navigator {
         )
         .lift(page)
         .getOrElse(defaultCheckMode)
+
+    case ViewOnlyMode =>
+      controllers.routes.JourneyRecoveryController.onPageLoad()
   }
 }

@@ -44,11 +44,13 @@ object EstablisherKind {
   case object Partnership extends EstablisherKind("partnership")
   case object Individual extends EstablisherKind("individual")
 
-  implicit val reads: Reads[EstablisherKind] = Reads.StringReads.map {
-    case Company.value => Company
-    case Partnership.value => Partnership
-    case Individual.value => Individual
-  }
+  implicit val reads: Reads[EstablisherKind] =
+    Reads.StringReads.collect(JsonValidationError("Invalid establisher kind")) {
+      case Company.value => Company
+      case Partnership.value => Partnership
+      case Individual.value => Individual
+    }
+
 }
 
 object Establisher {
@@ -75,6 +77,8 @@ object Establisher {
       case EstablisherKind.Company => companyEstablisherReads
       case EstablisherKind.Partnership => partnershipEstablisherReads
       case EstablisherKind.Individual => individualEstablisherReads
+      case unknown =>
+        Reads(_ => JsError(s"Unsupported establisher kind: $unknown"))
     }
 }
 

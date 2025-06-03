@@ -44,8 +44,6 @@ class LandOrPropertyPrePopulationProcessor @Inject()() {
       (baseUaJson \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "disposedPropertyTransaction" \ "portionStillHeld")
         .asOpt[Map[String, Map[String, Boolean]]]
 
-    val isLandOrPropertyEmpty = !baseUA.get(LandOrPropertyAddressLookupPages(srn)).exists(_.nonEmpty)
-
     val transformedResult = baseUaJson
       .transform(landOrProperty.json.pickBranch)
       .prune(LandOrPropertyRecordVersionPage(srn).path)

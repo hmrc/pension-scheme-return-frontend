@@ -64,7 +64,7 @@ class SharesListController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  private implicit val logger = Logger(getClass)
+  private implicit val logger: Logger = Logger(getClass)
 
   val form: Form[Boolean] = SharesListController.form(formProvider)
 

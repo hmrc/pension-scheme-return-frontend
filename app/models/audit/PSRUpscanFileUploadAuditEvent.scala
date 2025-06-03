@@ -59,6 +59,11 @@ case class PSRUpscanFileUploadAuditEvent(
           "fileReference" -> downloadUrl,
           "fileSize" -> size.getOrElse(0L).toString
         )
+
+      case UploadStatus.InProgress =>
+        Map(
+          "fileUploadStatus" -> "InProgress"
+        )
     }
 
     psaOrPspIdDetails(credentialRole, psaOrPspId, schemeAdministratorOrPractitionerName) ++ common ++ outcomeMap

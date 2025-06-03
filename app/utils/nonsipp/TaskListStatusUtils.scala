@@ -101,7 +101,7 @@ object TaskListStatusUtils {
 
     (membersDetailsPages, numRecorded, checked) match {
       case (_, _, Some(false)) => (Check, listPageUrl)
-      case (None, 0, _) => (NotStarted, firstQuestionPageUrl)
+      case (None, _, _) => (NotStarted, firstQuestionPageUrl)
       case (Some(memberDetails), 0, _) if memberDetails.isEmpty =>
         (NotStarted, firstQuestionPageUrl) //Last member removed
       case (Some(_), 0, _) => (InProgress, getInProgressUrl)
@@ -636,51 +636,6 @@ object TaskListStatusUtils {
       case (Some(false), _) => (Recorded(0, ""), firstQuestionPageUrl)
       case (Some(true), 0) => (InProgress, firstQuestionPageUrl)
       case (Some(true), _) => (Recorded(numRecorded, "disposals"), listPageUrl)
-    }
-  }
-
-  private def getIncompleteIndex[A, B](firstPages: Option[Map[String, A]], lastPages: Option[Map[String, B]]): Int =
-    (firstPages, lastPages) match {
-      case (Some(_), None) => 1
-      case (Some(first), Some(last)) =>
-        if (first.isEmpty) {
-          1
-        } else {
-          val firstIndexes = first.map(_._1.toInt)
-          val lastIndexes = last.map(_._1.toInt).toList
-
-          val filtered = firstIndexes.filter(lastIndexes.indexOf(_) < 0)
-          if (filtered.isEmpty) {
-            0
-          } else {
-            filtered.head + 1
-          }
-        }
-      case _ => 0
-    }
-
-  private def getIncompleteMembersIndex(userAnswers: UserAnswers, srn: Srn): Int = {
-    val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
-    val ninoPages = userAnswers.get(MemberDetailsNinoPages(srn))
-    val noNinoPages = userAnswers.get(NoNinoPages(srn))
-    (membersDetailsPages, ninoPages, noNinoPages) match {
-      case (None, _, _) => 1
-      case (Some(_), None, None) => 1
-      case (Some(memberDetails), ninos, noNinos) =>
-        if (memberDetails.isEmpty) {
-          1
-        } else {
-          val memberDetailsIndexes = memberDetails.map(_._1.toInt).toList
-          val ninoIndexes = ninos.getOrElse(List.empty).map(_._1.toInt).toList
-          val noninoIndexes = noNinos.getOrElse(List.empty).map(_._1.toInt).toList
-          val finishedIndexes = ninoIndexes ++ noninoIndexes
-          val filtered = memberDetailsIndexes.filter(finishedIndexes.indexOf(_) < 0)
-          if (filtered.isEmpty) {
-            1
-          } else {
-            filtered.head + 1
-          }
-        }
     }
   }
 

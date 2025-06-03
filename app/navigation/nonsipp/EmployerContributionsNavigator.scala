@@ -62,6 +62,8 @@ object EmployerContributionsNavigator extends JourneyNavigator {
         case Some(IdentityType.Other) =>
           controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
             .onPageLoad(srn, index, secondaryIndex, NormalMode)
+
+        case _ => controllers.routes.UnauthorisedController.onPageLoad()
       }
 
     case EmployerCompanyCrnPage(srn, index, secondaryIndex) =>
@@ -171,6 +173,8 @@ object EmployerContributionsNavigator extends JourneyNavigator {
             case (_, Some(IdentityType.Other)) =>
               controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
                 .onPageLoad(srn, index, secondaryIndex, CheckMode)
+
+            case _ => controllers.routes.UnauthorisedController.onPageLoad()
           }
 
         case EmployerCompanyCrnPage(srn, index, secondaryIndex) =>

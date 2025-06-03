@@ -19,14 +19,13 @@ package prepop
 import pages.nonsipp.loansmadeoroutstanding.Paths.loans
 import config.RefinedTypes.Max5000
 import models.SchemeId.Srn
+import play.api.libs.json._
 import models.UserAnswers
 import pages.nonsipp.common.LoanIdentityTypePages
 import pages.nonsipp.loansmadeoroutstanding._
 import utils.JsonUtils.JsResultOps
 import utils.ListUtils.ListOps
 import models.UserAnswers.SensitiveJsObject
-import play.api.Logger
-import play.api.libs.json._
 
 import scala.util.Try
 
@@ -34,8 +33,6 @@ import javax.inject.{Inject, Singleton}
 
 @Singleton
 class LoansPrePopulationProcessor @Inject()() {
-
-  private val logger = Logger(getClass)
 
   def clean(baseUA: UserAnswers, currentUA: UserAnswers)(srn: Srn): Try[UserAnswers] = {
 
@@ -45,8 +42,6 @@ class LoansPrePopulationProcessor @Inject()() {
       (baseUaJson \ "loans" \ "loanTransactions" \ "recipientIdentityType" \ "identityTypes")
         .asOpt[Map[String, String]]
         .fold(Seq.empty[String])(_.keys.toSeq)
-
-    val isLoansEmpty = !baseUA.get(LoanIdentityTypePages(srn)).exists(_.nonEmpty)
 
     val transformedResult = baseUaJson
       .transform(loans.json.pickBranch)
