@@ -84,7 +84,7 @@ object EmployerType {
   case class UKPartnership(eitherIdOrReason: Either[String, String]) extends EmployerType
   case class Other(description: String) extends EmployerType
 
-  implicit val reads: Reads[EmployerType] = {
+  implicit val reads: Reads[EmployerType] =
     (__ \ "employerType")
       .read[String]
       .and(
@@ -98,7 +98,6 @@ object EmployerType {
         case ("Other", Right(description)) => Reads.pure(EmployerType.Other(description))
         case unknown => Reads.failed(s"Failed to read EmployerType with unknown pattern $unknown")
       }
-  }
 
   implicit val writes: Writes[EmployerType] = {
     case UKCompany(Left(reason)) =>

@@ -43,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
-class MemberPensionPaymentsCYAController @Inject()(
+class MemberPensionPaymentsCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -82,24 +82,22 @@ class MemberPensionPaymentsCYAController @Inject()(
       for {
         memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
         pensionPayment <- request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)).getOrRecoverJourney
-      } yield {
-        Ok(
-          view(
-            viewModel(
-              srn,
-              memberDetails.fullName,
-              index,
-              pensionPayment,
-              mode,
-              viewOnlyUpdated = false,
-              optYear = request.year,
-              optCurrentVersion = request.currentVersion,
-              optPreviousVersion = request.previousVersion,
-              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
-            )
+      } yield Ok(
+        view(
+          viewModel(
+            srn,
+            memberDetails.fullName,
+            index,
+            pensionPayment,
+            mode,
+            viewOnlyUpdated = false,
+            optYear = request.year,
+            optCurrentVersion = request.currentVersion,
+            optPreviousVersion = request.previousVersion,
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
           )
         )
-      }
+      )
     ).merge
 
   def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
@@ -109,10 +107,12 @@ class MemberPensionPaymentsCYAController @Inject()(
 
       for {
         updatedAnswers <- request.userAnswers
-          .setWhen(memberPensionPaymentsChanged)(MemberStatus(srn, index), {
-            logger.info(s"Pension payments has changed for member $index. Setting MemberStatus to Changed")
-            MemberState.Changed
-          })
+          .setWhen(memberPensionPaymentsChanged)(
+            MemberStatus(srn, index), {
+              logger.info(s"Pension payments has changed for member $index. Setting MemberStatus to Changed")
+              MemberState.Changed
+            }
+          )
           .mapK[Future]
         _ <- saveService.save(updatedAnswers)
         submissionResult <- psrSubmissionService
@@ -122,8 +122,8 @@ class MemberPensionPaymentsCYAController @Inject()(
             fallbackCall = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
               .onPageLoad(srn, index, mode)
           )
-      } yield submissionResult.getOrRecoverJourney(
-        _ => Redirect(navigator.nextPage(MemberPensionPaymentsCYAPage(srn), mode, request.userAnswers))
+      } yield submissionResult.getOrRecoverJourney(_ =>
+        Redirect(navigator.nextPage(MemberPensionPaymentsCYAPage(srn), mode, request.userAnswers))
       )
     }
 

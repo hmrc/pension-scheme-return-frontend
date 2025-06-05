@@ -35,7 +35,7 @@ import scala.util.{Success, Try}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class OtherAssetsPrePopulationProcessor @Inject()() {
+class OtherAssetsPrePopulationProcessor @Inject() () {
 
   def clean(baseUA: UserAnswers, currentUA: UserAnswers)(srn: Srn): Try[UserAnswers] = {
 
@@ -60,7 +60,7 @@ class OtherAssetsPrePopulationProcessor @Inject()() {
     }
 
     val cleanedUA = anyPartAssetStillHeldOptMap.fold(transformedResult) { anyPartStillHeldMap =>
-      anyPartStillHeldMap.foldLeft(transformedResult)((uaResult, anyPartStillHeldEntry) => {
+      anyPartStillHeldMap.foldLeft(transformedResult) { (uaResult, anyPartStillHeldEntry) =>
         val isFullyDisposed = anyPartStillHeldEntry._2.exists(!_._2)
         if (isFullyDisposed) {
           anyPartStillHeldEntry._1.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
@@ -70,7 +70,7 @@ class OtherAssetsPrePopulationProcessor @Inject()() {
         } else {
           uaResult
         }
-      })
+      }
     }
 
     cleanedUA.flatMap { ua =>
@@ -79,17 +79,15 @@ class OtherAssetsPrePopulationProcessor @Inject()() {
         .toList
         .flatten
         .refine[Max5000.Refined]
-        .map(
-          index =>
-            (
-              OtherAssetsPrePopulated(srn, index),
-              OtherAssetsProgress(srn, index)
-            )
+        .map(index =>
+          (
+            OtherAssetsPrePopulated(srn, index),
+            OtherAssetsProgress(srn, index)
+          )
         )
-        .foldLeft(Try(ua)) {
-          case (ua, (otherAssetsPrePopulated, otherAssetsProgress)) =>
-            ua.flatMap(_.set(otherAssetsPrePopulated, false))
-              .flatMap(_.set(otherAssetsProgress, SectionJourneyStatus.Completed))
+        .foldLeft(Try(ua)) { case (ua, (otherAssetsPrePopulated, otherAssetsProgress)) =>
+          ua.flatMap(_.set(otherAssetsPrePopulated, false))
+            .flatMap(_.set(otherAssetsProgress, SectionJourneyStatus.Completed))
 
         }
     }

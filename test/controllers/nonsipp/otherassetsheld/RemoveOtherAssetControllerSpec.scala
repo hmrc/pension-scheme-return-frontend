@@ -73,10 +73,10 @@ class RemoveOtherAssetControllerSpec extends ControllerBaseSpec {
     act.like(
       saveAndContinue(onSubmit, userAnswers, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

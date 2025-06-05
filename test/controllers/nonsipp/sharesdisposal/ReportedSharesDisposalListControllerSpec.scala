@@ -83,7 +83,7 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
   private val disposalIndexes = List(disposalIndexTwo, disposalIndexOne)
 
   private val completedUserAnswers = defaultUserAnswers
-  // Shares #1
+    // Shares #1
     .unsafeSet(TypeOfSharesHeldPage(srn, shareIndexOne), sharesTypeOne)
     .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndexOne), companyName)
     .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexOne, disposalIndexOne), howSharesDisposedOne)
@@ -120,9 +120,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
   )
   private val numberOfSharesItems = sharesDisposalsWithIndexes.size
 
-  private val numberOfDisposals = sharesDisposalsWithIndexes.map {
-    case ((_, disposalIndexes), _) =>
-      disposalIndexes.size
+  private val numberOfDisposals = sharesDisposalsWithIndexes.map { case ((_, disposalIndexes), _) =>
+    disposalIndexes.size
   }.sum
 
   private val maxPossibleNumberOfDisposals = maxDisposalsPerShare * numberOfSharesItems
@@ -291,9 +290,8 @@ class ReportedSharesDisposalListControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.routes.ViewOnlyTaskListController
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only taskList")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only taskList")
     )
 
     act.like(

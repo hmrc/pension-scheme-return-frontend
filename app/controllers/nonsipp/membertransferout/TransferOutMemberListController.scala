@@ -49,7 +49,7 @@ import scala.concurrent.Future
 import java.time.LocalDateTime
 import javax.inject.Named
 
-class TransferOutMemberListController @Inject()(
+class TransferOutMemberListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -76,8 +76,8 @@ class TransferOutMemberListController @Inject()(
     onPageLoadCommon(srn, page, mode, showBackLink)
   }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(
-    implicit request: DataRequest[AnyContent]
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     request.userAnswers.completedMembersDetails(srn) match {
       case Left(err) =>
@@ -141,20 +141,18 @@ class TransferOutMemberListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, showBackLink)
     }
 
-  private def buildTransferOut(srn: Srn, memberTransferOutList: List[(Max300, NameDOB)])(
-    implicit request: DataRequest[_]
-  ): List[MemberWithTransferOut] = memberTransferOutList.map {
-    case (index, nameDOB) =>
-      MemberWithTransferOut(
-        memberIndex = index,
-        transferFullName = nameDOB.fullName,
-        transfer = request.userAnswers
-          .memberTransferOutProgress(srn, index)
-          .map {
-            case (secondaryIndex, status) =>
-              TransferOut(secondaryIndex, status)
-          }
-      )
+  private def buildTransferOut(srn: Srn, memberTransferOutList: List[(Max300, NameDOB)])(implicit
+    request: DataRequest[_]
+  ): List[MemberWithTransferOut] = memberTransferOutList.map { case (index, nameDOB) =>
+    MemberWithTransferOut(
+      memberIndex = index,
+      transferFullName = nameDOB.fullName,
+      transfer = request.userAnswers
+        .memberTransferOutProgress(srn, index)
+        .map { case (secondaryIndex, status) =>
+          TransferOut(secondaryIndex, status)
+        }
+    )
   }
 
 }

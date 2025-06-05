@@ -153,7 +153,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             defaultUserAnswers.unsafeSet(
               WhyDoesSchemeHoldLandPropertyPage(srn, index),
               SchemeHoldLandProperty.Contribution
-            ) //Needed to mock the user input from 2 pages "ago"
+            ) // Needed to mock the user input from 2 pages "ago"
         )
         .withName("go from land or property when did scheme acquire page to land property independent valuation page")
     )
@@ -492,7 +492,10 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             srn => LandOrPropertyListPage(srn, addLandOrProperty = true),
-            (srn, mode) => controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, 2, mode),
+            (
+              srn,
+              mode
+            ) => controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, 2, mode),
             srn => defaultUserAnswers.unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
           )
           .withName("Add Land or property with a record at index 1")
@@ -504,7 +507,10 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             srn => LandOrPropertyListPage(srn, addLandOrProperty = true),
-            (srn, mode) => controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, 1, mode),
+            (
+              srn,
+              mode
+            ) => controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, 1, mode),
             srn => defaultUserAnswers.unsafeSet(LandOrPropertyCompleted(srn, refineMV(2)), SectionCompleted)
           )
           .withName("Add Land or property with a record at index 2")
@@ -714,7 +720,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             defaultUserAnswers.unsafeSet(
               WhyDoesSchemeHoldLandPropertyPage(srn, index),
               SchemeHoldLandProperty.Contribution
-            ) //Needed to mock the user input from 2 pages "ago"
+            ) // Needed to mock the user input from 2 pages "ago"
         )
         .withName("go from land or property when did scheme acquire page to Land or property CYA page")
     )

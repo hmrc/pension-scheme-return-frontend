@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemovePclsController @Inject()(
+class RemovePclsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -62,19 +62,17 @@ class RemovePclsController @Inject()(
           total <- request.userAnswers
             .get(PensionCommencementLumpSumAmountPage(srn, memberIndex))
             .getOrRedirectToTaskList(srn)
-        } yield {
-          Ok(
-            view(
-              form,
-              RemovePclsController.viewModel(
-                srn,
-                memberIndex: Max300,
-                total.lumpSumAmount,
-                nameDOB.fullName
-              )
+        } yield Ok(
+          view(
+            form,
+            RemovePclsController.viewModel(
+              srn,
+              memberIndex: Max300,
+              total.lumpSumAmount,
+              nameDOB.fullName
             )
           )
-        }
+        )
       ).merge
     }
 
@@ -83,7 +81,7 @@ class RemovePclsController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             (
               for {
                 total <- request.userAnswers
@@ -96,9 +94,8 @@ class RemovePclsController @Inject()(
                   RemovePclsController.viewModel(srn, memberIndex, total.lumpSumAmount, nameDOB.fullName)
                 )
               )
-            ).merge
-          },
-          removeDetails => {
+            ).merge,
+          removeDetails =>
             if (removeDetails) {
               for {
                 updatedAnswers <- Future.fromTry(
@@ -113,12 +110,11 @@ class RemovePclsController @Inject()(
                   fallbackCall = controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
                     .onPageLoad(srn, 1, NormalMode)
                 )
-              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(RemovePclsPage(srn, memberIndex), NormalMode, updatedAnswers)
-                  )
+              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(_ =>
+                Redirect(
+                  navigator
+                    .nextPage(RemovePclsPage(srn, memberIndex), NormalMode, updatedAnswers)
+                )
               )
             } else {
               Future
@@ -129,7 +125,6 @@ class RemovePclsController @Inject()(
                   )
                 )
             }
-          }
         )
     }
 }

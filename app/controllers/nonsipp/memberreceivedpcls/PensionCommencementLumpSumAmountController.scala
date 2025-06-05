@@ -45,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
 
-class PensionCommencementLumpSumAmountController @Inject()(
+class PensionCommencementLumpSumAmountController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,

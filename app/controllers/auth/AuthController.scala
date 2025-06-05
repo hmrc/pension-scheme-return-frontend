@@ -28,7 +28,7 @@ import scala.concurrent.ExecutionContext
 
 import javax.inject.Inject
 
-class AuthController @Inject()(
+class AuthController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   config: FrontendAppConfig,
   sessionRepository: SessionRepository,

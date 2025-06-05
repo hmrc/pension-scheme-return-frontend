@@ -155,9 +155,8 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to TransferReceivedMemberListController page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to TransferReceivedMemberListController page")
     )
   }
 }

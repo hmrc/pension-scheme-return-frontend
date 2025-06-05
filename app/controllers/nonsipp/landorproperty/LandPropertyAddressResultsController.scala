@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class LandPropertyAddressResultsController @Inject()(
+class LandPropertyAddressResultsController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -112,12 +112,11 @@ object LandPropertyAddressResultsController {
       ),
       page = RadioListViewModel(
         legend = None,
-        items = addresses.map(
-          address =>
-            RadioListRowViewModel(
-              content = address.asString,
-              value = address.id
-            )
+        items = addresses.map(address =>
+          RadioListRowViewModel(
+            content = address.asString,
+            value = address.id
+          )
         )
       ),
       refresh = None,

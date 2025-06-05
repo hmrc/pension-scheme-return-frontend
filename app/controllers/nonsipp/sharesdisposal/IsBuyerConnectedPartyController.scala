@@ -40,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class IsBuyerConnectedPartyController @Inject()(
+class IsBuyerConnectedPartyController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -62,8 +62,8 @@ class IsBuyerConnectedPartyController @Inject()(
         .merge
     }
 
-  private def getBuyerName(srn: Srn, shareIndex: Max5000, disposalIndex: Max50)(
-    implicit request: DataRequest[_]
+  private def getBuyerName(srn: Srn, shareIndex: Max5000, disposalIndex: Max50)(implicit
+    request: DataRequest[_]
   ): Either[Result, String] =
     for {
       buyerType <- request.userAnswers
@@ -98,9 +98,8 @@ class IsBuyerConnectedPartyController @Inject()(
           formWithErrors =>
             Future.successful(
               getBuyerName(srn, shareIndex, disposalIndex)
-                .map(
-                  buyerName =>
-                    BadRequest(view(formWithErrors, viewModel(srn, shareIndex, disposalIndex, buyerName, mode)))
+                .map(buyerName =>
+                  BadRequest(view(formWithErrors, viewModel(srn, shareIndex, disposalIndex, buyerName, mode)))
                 )
                 .merge
             ),

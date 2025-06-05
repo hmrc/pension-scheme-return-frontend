@@ -55,12 +55,11 @@ class YesNoPageFormProvider @Inject() {
         "value" -> Mappings.boolean(requiredKey, args = args.toList),
         "value.yes" -> ConditionalMappings.mandatoryIfTrue("value", mappingYes),
         "value.no" -> ConditionalMappings.mandatoryIfFalse("value", mappingNo)
-      ) {
-        case (bool, yes, no) =>
-          ((bool, yes, no): @unchecked) match {
-            case (false, _, Some(value)) => Left(value)
-            case (true, Some(value), _) => Right(value)
-          }
+      ) { case (bool, yes, no) =>
+        ((bool, yes, no): @unchecked) match {
+          case (false, _, Some(value)) => Left(value)
+          case (true, Some(value), _) => Right(value)
+        }
       } {
         case Left(value) => Some((false, None, Some(value)))
         case Right(value) => Some((true, Some(value), None))
@@ -77,12 +76,11 @@ class YesNoPageFormProvider @Inject() {
         "value" -> Mappings.boolean(requiredKey, args = args.toList),
         "value.yes" -> ConditionalMappings.mandatoryIfTrue("value", mappingYes),
         "value.no" -> Mappings.unit
-      ) {
-        case (bool, yes, _) =>
-          ((bool, yes): @unchecked) match {
-            case (true, Some(value)) => Right(value)
-            case (false, _) => Left(())
-          }
+      ) { case (bool, yes, _) =>
+        ((bool, yes): @unchecked) match {
+          case (true, Some(value)) => Right(value)
+          case (false, _) => Left(())
+        }
       } {
         case Left(_) => Some((false, None, Some(())))
         case Right(value) => Some((true, Some(value), None))

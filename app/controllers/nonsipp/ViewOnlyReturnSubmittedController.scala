@@ -38,7 +38,7 @@ import scala.concurrent.ExecutionContext
 
 import javax.inject.Inject
 
-class ViewOnlyReturnSubmittedController @Inject()(
+class ViewOnlyReturnSubmittedController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
@@ -110,20 +110,19 @@ object ViewOnlyReturnSubmittedController {
       scheme = Message(schemeName),
       periodOfReturn = periodOfReturn,
       dateSubmitted = dateSubmitted,
-      whatHappensNextContent =
-        ParagraphMessage("returnSubmitted.whatHappensNext.paragraph1") ++
-          ParagraphMessage(
-            "returnSubmitted.whatHappensNext.paragraph2",
-            LinkMessage(
-              Message("returnSubmitted.whatHappensNext.paragraph2.link", schemeName),
-              managePensionSchemeDashboardUrl
-            ),
-            "returnSubmitted.whatHappensNext.paragraph2.linkMessage"
-          ) ++
-          ParagraphMessage(
-            "returnSubmitted.whatHappensNext.paragraph3",
-            LinkMessage("returnSubmitted.whatHappensNext.list2", "#print")
-          )
+      whatHappensNextContent = ParagraphMessage("returnSubmitted.whatHappensNext.paragraph1") ++
+        ParagraphMessage(
+          "returnSubmitted.whatHappensNext.paragraph2",
+          LinkMessage(
+            Message("returnSubmitted.whatHappensNext.paragraph2.link", schemeName),
+            managePensionSchemeDashboardUrl
+          ),
+          "returnSubmitted.whatHappensNext.paragraph2.linkMessage"
+        ) ++
+        ParagraphMessage(
+          "returnSubmitted.whatHappensNext.paragraph3",
+          LinkMessage("returnSubmitted.whatHappensNext.list2", "#print")
+        )
     )
   }
 }

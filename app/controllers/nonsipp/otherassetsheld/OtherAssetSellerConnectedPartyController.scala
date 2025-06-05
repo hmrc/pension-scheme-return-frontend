@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class OtherAssetSellerConnectedPartyController @Inject()(
+class OtherAssetSellerConnectedPartyController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,

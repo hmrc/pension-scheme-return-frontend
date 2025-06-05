@@ -46,7 +46,7 @@ import java.util.Locale
 import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Named}
 
-class ValueOfSchemeAssetsWhenMoneyBorrowedController @Inject()(
+class ValueOfSchemeAssetsWhenMoneyBorrowedController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -83,7 +83,7 @@ class ValueOfSchemeAssetsWhenMoneyBorrowedController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             request.usingAnswer(WhenBorrowedPage(srn, index)).async { date =>
               Future.successful(
                 BadRequest(
@@ -93,8 +93,7 @@ class ValueOfSchemeAssetsWhenMoneyBorrowedController @Inject()(
                   )
                 )
               )
-            }
-          },
+            },
           value =>
             for {
               updatedAnswers <- request.userAnswers

@@ -47,7 +47,7 @@ import scala.concurrent.Future
 import java.time.LocalDateTime
 import javax.inject.Named
 
-class MemberPensionPaymentsListController @Inject()(
+class MemberPensionPaymentsListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -73,8 +73,8 @@ class MemberPensionPaymentsListController @Inject()(
     onPageLoadCommon(srn, page, mode, showBackLink = true)
   }
 
-  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(
-    implicit request: DataRequest[AnyContent]
+  private def onPageLoadCommon(srn: Srn, page: Int, mode: Mode, showBackLink: Boolean)(implicit
+    request: DataRequest[AnyContent]
   ): Result = {
     val userAnswers = request.userAnswers
     request.userAnswers.completedMembersDetails(srn) match {
@@ -86,9 +86,8 @@ class MemberPensionPaymentsListController @Inject()(
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       case Right(completedMemberDetails) =>
         val noPageEnabled = !userAnswers.get(PensionPaymentsReceivedPage(srn)).getOrElse(false)
-        val memberDetails = completedMemberDetails.map {
-          case (index, memberDetails) =>
-            (index, memberDetails, userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)))
+        val memberDetails = completedMemberDetails.map { case (index, memberDetails) =>
+          (index, memberDetails, userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)))
         }
         val viewModel = MemberPensionPaymentsListController
           .viewModel(
@@ -181,34 +180,39 @@ object MemberPensionPaymentsListController {
             TableElem(
               "memberPensionPayments.memberList.pensionPaymentsReported"
             ),
-            TableElemDoubleLink(((mode, optYear, optCurrentVersion, optPreviousVersion) match {
-              case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
-                TableElem.view(
-                  controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-                    .onPageLoadViewOnly(
-                      srn,
-                      index,
-                      year = year,
-                      current = currentVersion,
-                      previous = previousVersion
-                    ),
-                  Message("memberPensionPayments.memberList.remove.hidden.text", memberName.fullName)
-                )
-              case _ =>
-                TableElem.change(
-                  controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-                    .onPageLoad(srn, index, CheckMode),
-                  Message("memberPensionPayments.memberList.change.hidden.text", memberName.fullName)
-                )
-            }, if (mode == ViewOnlyMode) {
-              TableElem.empty
-            } else {
-              TableElem.remove(
-                controllers.nonsipp.memberpensionpayments.routes.RemovePensionPaymentsController
-                  .onPageLoad(srn, index),
-                Message("memberPensionPayments.memberList.remove.hidden.text", memberName.fullName)
+            TableElemDoubleLink(
+              (
+                (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+                  case (ViewOnlyMode, Some(year), Some(currentVersion), Some(previousVersion)) =>
+                    TableElem.view(
+                      controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
+                        .onPageLoadViewOnly(
+                          srn,
+                          index,
+                          year = year,
+                          current = currentVersion,
+                          previous = previousVersion
+                        ),
+                      Message("memberPensionPayments.memberList.remove.hidden.text", memberName.fullName)
+                    )
+                  case _ =>
+                    TableElem.change(
+                      controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
+                        .onPageLoad(srn, index, CheckMode),
+                      Message("memberPensionPayments.memberList.change.hidden.text", memberName.fullName)
+                    )
+                },
+                if (mode == ViewOnlyMode) {
+                  TableElem.empty
+                } else {
+                  TableElem.remove(
+                    controllers.nonsipp.memberpensionpayments.routes.RemovePensionPaymentsController
+                      .onPageLoad(srn, index),
+                    Message("memberPensionPayments.memberList.remove.hidden.text", memberName.fullName)
+                  )
+                }
               )
-            }))
+            )
           )
       }
       .sortBy(_.headOption.map(_.asInstanceOf[TableElem].text.toString))
@@ -237,10 +241,9 @@ object MemberPensionPaymentsListController {
         ("memberPensionPayments.memberList.title.plural", "memberPensionPayments.memberList.heading.plural")
       }
 
-    val sumPensionPayments: Int = memberList.zipWithIndex.count {
-      case (_, index) =>
-        refineV[OneTo300](index + 1).toOption
-          .exists(nextIndex => userAnswers.get(TotalAmountPensionPaymentsPage(srn, nextIndex)).isDefined)
+    val sumPensionPayments: Int = memberList.zipWithIndex.count { case (_, index) =>
+      refineV[OneTo300](index + 1).toOption
+        .exists(nextIndex => userAnswers.get(TotalAmountPensionPaymentsPage(srn, nextIndex)).isDefined)
     }
 
     // in view-only mode or with direct url edit page value can be higher than needed

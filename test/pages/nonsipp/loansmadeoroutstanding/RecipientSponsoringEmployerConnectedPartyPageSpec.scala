@@ -34,7 +34,10 @@ class RecipientSponsoringEmployerConnectedPartyPageSpec extends PageBehaviours {
 
     beRemovable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnSample, index))
 
-    RecipientSponsoringEmployerConnectedPartyPage(srnSample, refineMV(1)).toString mustBe "recipientSponsoringEmployerConnectedParty"
+    RecipientSponsoringEmployerConnectedPartyPage(
+      srnSample,
+      refineMV(1)
+    ).toString mustBe "recipientSponsoringEmployerConnectedParty"
 
   }
 }

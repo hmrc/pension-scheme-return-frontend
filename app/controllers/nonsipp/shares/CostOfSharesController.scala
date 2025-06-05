@@ -43,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class CostOfSharesController @Inject()(
+class CostOfSharesController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -83,7 +83,7 @@ class CostOfSharesController @Inject()(
                   )
                 )
               ),
-            answer => {
+            answer =>
               for {
                 updatedAnswers <- Future
                   .fromTry(request.userAnswers.set(CostOfSharesPage(srn, index), answer))
@@ -91,7 +91,6 @@ class CostOfSharesController @Inject()(
                 updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
-            }
           )
       }
   }

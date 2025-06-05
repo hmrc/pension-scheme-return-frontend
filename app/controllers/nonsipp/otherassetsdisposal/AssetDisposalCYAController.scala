@@ -48,7 +48,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
-class AssetDisposalCYAController @Inject()(
+class AssetDisposalCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -82,8 +82,8 @@ class AssetDisposalCYAController @Inject()(
       onPageLoadCommon(srn, index, disposalIndex, mode)
     }
 
-  def onPageLoadCommon(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode)(
-    implicit request: DataRequest[AnyContent]
+  def onPageLoadCommon(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode)(implicit
+    request: DataRequest[AnyContent]
   ): Future[Result] =
     if (!request.userAnswers
         .get(OtherAssetsDisposalProgress(srn, index, disposalIndex))
@@ -222,11 +222,10 @@ class AssetDisposalCYAController @Inject()(
           fallbackCall = controllers.nonsipp.otherassetsdisposal.routes.AssetDisposalCYAController
             .onPageLoad(srn, index, disposalIndex, mode)
         )
-      } yield submissionResult.getOrRecoverJourney(
-        _ =>
-          Redirect(
-            navigator.nextPage(OtherAssetsDisposalCYAPage(srn), mode, request.userAnswers)
-          )
+      } yield submissionResult.getOrRecoverJourney(_ =>
+        Redirect(
+          navigator.nextPage(OtherAssetsDisposalCYAPage(srn), mode, request.userAnswers)
+        )
       )
     }
 
@@ -578,20 +577,18 @@ object AssetDisposalCYAController {
           SummaryAction("site.change", recipientNameUrl)
             .withVisuallyHiddenContent("assetDisposalCYA.section1.recipientName.hidden")
         )
-    ) :?+ recipientDetails.map(
-      reason =>
-        CheckYourAnswersRowViewModel(recipientDetailsKey, reason)
-          .withAction(
-            SummaryAction("site.change", recipientDetailsUrl)
-              .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
-          )
-    ) :?+ recipientReasonNoDetails.map(
-      noreason =>
-        CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, noreason)
-          .withAction(
-            SummaryAction("site.change", recipientNoDetailsUrl)
-              .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
-          )
+    ) :?+ recipientDetails.map(reason =>
+      CheckYourAnswersRowViewModel(recipientDetailsKey, reason)
+        .withAction(
+          SummaryAction("site.change", recipientDetailsUrl)
+            .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
+        )
+    ) :?+ recipientReasonNoDetails.map(noreason =>
+      CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, noreason)
+        .withAction(
+          SummaryAction("site.change", recipientNoDetailsUrl)
+            .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
+        )
     ) :+
       CheckYourAnswersRowViewModel(
         Message("assetDisposalCYA.section1.assetDisposalBuyerConnectedParty", recipientName),

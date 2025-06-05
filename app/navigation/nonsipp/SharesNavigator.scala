@@ -189,8 +189,9 @@ object SharesNavigator extends JourneyNavigator {
             for {
               map <- userAnswers.get(SharesCompleted.all(srn)).getOrRecoverJourney
               indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
-              _ <- if (indexes.size >= 5000) Left(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
-              else Right(())
+              _ <-
+                if (indexes.size >= 5000) Left(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
+                else Right(())
               nextIndex <- findNextOpenIndex[Max5000.Refined](indexes).getOrRecoverJourney
             } yield controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, nextIndex, NormalMode)
           ).merge
@@ -220,8 +221,10 @@ object SharesNavigator extends JourneyNavigator {
             }
           // if unchanged answer is SponsoringEmployer and shares held type is Acquisition, make sure total asset value is complete, otherwise go to CYA
           case (Some(SponsoringEmployer), Some(SponsoringEmployer)) =>
-            if (userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)).contains(Acquisition) &&
-              userAnswers.get(TotalAssetValuePage(srn, index)).isEmpty) {
+            if (
+              userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)).contains(Acquisition) &&
+              userAnswers.get(TotalAssetValuePage(srn, index)).isEmpty
+            ) {
               controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode)
             } else {
               controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
@@ -327,8 +330,10 @@ object SharesNavigator extends JourneyNavigator {
         userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)) match {
           case Some(Acquisition) =>
             if (atLeastOneShareSellerComplete(srn, index, userAnswers)) {
-              if (userAnswers.get(TypeOfSharesHeldPage(srn, index)).contains(SponsoringEmployer) &&
-                userAnswers.get(TotalAssetValuePage(srn, index)).isEmpty) {
+              if (
+                userAnswers.get(TypeOfSharesHeldPage(srn, index)).contains(SponsoringEmployer) &&
+                userAnswers.get(TotalAssetValuePage(srn, index)).isEmpty
+              ) {
                 controllers.nonsipp.shares.routes.TotalAssetValueController
                   .onPageLoad(srn, index, CheckMode)
               } else {

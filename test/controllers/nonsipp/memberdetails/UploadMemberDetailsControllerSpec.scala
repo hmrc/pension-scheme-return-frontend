@@ -107,15 +107,13 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
             "1MB"
           )
         )
-      }.before({
-          mockTaxYear(dateRange)
-          mockInitiateUpscan()
-        })
-        .after({
-          verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
-          reset(mockAuditService)
-        })
-        .updateName(_ + " with error EntityTooLarge")
+      }.before {
+        mockTaxYear(dateRange)
+        mockInitiateUpscan()
+      }.after {
+        verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+        reset(mockAuditService)
+      }.updateName(_ + " with error EntityTooLarge")
     )
 
     act.like(
@@ -124,10 +122,10 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
           viewModel(postTarget, formFields, Some(FormError("file-input", "uploadMemberDetails.error.required")), "1MB")
         )
       }.updateName(_ + " with error InvalidArgument")
-        .before({
+        .before {
           mockTaxYear(dateRange)
           mockInitiateUpscan()
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))

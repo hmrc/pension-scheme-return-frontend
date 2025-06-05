@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class LoansMadeOrOutstandingController @Inject()(
+class LoansMadeOrOutstandingController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -69,21 +69,22 @@ class LoansMadeOrOutstandingController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(LoansMadeOrOutstandingPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-            redirectTo <- if (value) {
-              Future.successful(Redirect(navigator.nextPage(LoansMadeOrOutstandingPage(srn), mode, updatedAnswers)))
-            } else {
-              psrSubmissionService
-                .submitPsrDetailsWithUA(
-                  srn,
-                  updatedAnswers,
-                  fallbackCall = controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
-                    .onPageLoad(srn, mode)
-                )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
-                .map {
-                  case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                  case Some(_) => Redirect(navigator.nextPage(LoansMadeOrOutstandingPage(srn), mode, updatedAnswers))
-                }
-            }
+            redirectTo <-
+              if (value) {
+                Future.successful(Redirect(navigator.nextPage(LoansMadeOrOutstandingPage(srn), mode, updatedAnswers)))
+              } else {
+                psrSubmissionService
+                  .submitPsrDetailsWithUA(
+                    srn,
+                    updatedAnswers,
+                    fallbackCall = controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
+                      .onPageLoad(srn, mode)
+                  )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                  .map {
+                    case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                    case Some(_) => Redirect(navigator.nextPage(LoansMadeOrOutstandingPage(srn), mode, updatedAnswers))
+                  }
+              }
           } yield redirectTo
       )
   }

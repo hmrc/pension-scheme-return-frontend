@@ -29,9 +29,8 @@ import controllers.ControllerBaseSpec
 class ClassOfSharesControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
-  private val populatedUserAnswers = {
+  private val populatedUserAnswers =
     defaultUserAnswers.unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
-  }
 
   "ClassOfSharesController" - {
 

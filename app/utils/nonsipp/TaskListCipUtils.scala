@@ -36,62 +36,59 @@ object TaskListCipUtils {
     messagesApi: MessagesApi
   ): ListTaskListLevel1 =
     ListTaskListLevel1(
-      taskList.map(
-        level1 =>
-          TaskListCipViewModel(
-            messagesApi(
-              getCipLabel(level1.title.key)
-            )(Lang.defaultLang),
-            level1.items.fold(
-              fa =>
-                if (fa.isInstanceOf[LinkMessage]) {
-                  ListTaskListLevel2(
-                    List(
-                      TaskListLevel2(
-                        messagesApi(
-                          getCipLabel(fa.asInstanceOf[LinkMessage].content.key)
-                        )(Lang.defaultLang()),
-                        "Enabled"
-                      )
-                    )
-                  )
-                } else if (fa.isInstanceOf[Message]) {
-                  ListTaskListLevel2(
-                    List(
-                      TaskListLevel2(
-                        messagesApi(
-                          getCipLabel(fa.asInstanceOf[Message].key)
-                        )(Lang.defaultLang()),
-                        "Disabled"
-                      )
-                    )
-                  )
-                } else {
-                  ListTaskListLevel2(List(TaskListLevel2(fa.toString, ""))) //fallback
-                },
-              level2 =>
+      taskList.map(level1 =>
+        TaskListCipViewModel(
+          messagesApi(
+            getCipLabel(level1.title.key)
+          )(Lang.defaultLang),
+          level1.items.fold(
+            fa =>
+              if (fa.isInstanceOf[LinkMessage]) {
                 ListTaskListLevel2(
-                  level2.toList
-                    .map(
-                      item => {
-                        val argsTranslated = messagesApi
-                          .translate(
-                            item.status.description.key,
-                            item.status.description.args.map(a => messagesApi(a.key)(Lang.defaultLang))
-                          )(Lang.defaultLang())
-                          .getOrElse(item.status.description.key)
-
-                        TaskListLevel2(
-                          messagesApi(
-                            getCipLabel(item.link.content.key)
-                          )(Lang.defaultLang),
-                          argsTranslated
-                        )
-                      }
+                  List(
+                    TaskListLevel2(
+                      messagesApi(
+                        getCipLabel(fa.asInstanceOf[LinkMessage].content.key)
+                      )(Lang.defaultLang()),
+                      "Enabled"
                     )
+                  )
                 )
-            )
+              } else if (fa.isInstanceOf[Message]) {
+                ListTaskListLevel2(
+                  List(
+                    TaskListLevel2(
+                      messagesApi(
+                        getCipLabel(fa.asInstanceOf[Message].key)
+                      )(Lang.defaultLang()),
+                      "Disabled"
+                    )
+                  )
+                )
+              } else {
+                ListTaskListLevel2(List(TaskListLevel2(fa.toString, ""))) // fallback
+              },
+            level2 =>
+              ListTaskListLevel2(
+                level2.toList
+                  .map { item =>
+                    val argsTranslated = messagesApi
+                      .translate(
+                        item.status.description.key,
+                        item.status.description.args.map(a => messagesApi(a.key)(Lang.defaultLang))
+                      )(Lang.defaultLang())
+                      .getOrElse(item.status.description.key)
+
+                    TaskListLevel2(
+                      messagesApi(
+                        getCipLabel(item.link.content.key)
+                      )(Lang.defaultLang),
+                      argsTranslated
+                    )
+                  }
+              )
           )
+        )
       )
     )
 }

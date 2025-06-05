@@ -29,9 +29,12 @@ object SharesCheckStatusUtils {
    * This method determines whether or not the Shares section needs to be checked. A section needs to be checked if 1 or
    * more records in that section need to be checked.
    *
-   * @param userAnswers the answers provided by the user, from which we get each Shares record
-   * @param srn         the Scheme Reference Number, used for the .get calls
-   * @return true if any record requires checking, else false
+   * @param userAnswers
+   *   the answers provided by the user, from which we get each Shares record
+   * @param srn
+   *   the Scheme Reference Number, used for the .get calls
+   * @return
+   *   true if any record requires checking, else false
    */
   def checkSharesSection(
     userAnswers: UserAnswers,
@@ -56,10 +59,14 @@ object SharesCheckStatusUtils {
    * This method determines whether or not a Shares record needs to be checked. A record needs checking only if the
    * sharesPrePopulated flag is set to Some(false)
    *
-   * @param userAnswers the answers provided by the user, from which we get the Shares record
-   * @param srn         the Scheme Reference Number, used for the .get calls
-   * @param recordIndex the index of the record being checked
-   * @return true if the record requires checking, else false
+   * @param userAnswers
+   *   the answers provided by the user, from which we get the Shares record
+   * @param srn
+   *   the Scheme Reference Number, used for the .get calls
+   * @param recordIndex
+   *   the index of the record being checked
+   * @return
+   *   true if the record requires checking, else false
    */
   def checkSharesRecord(
     userAnswers: UserAnswers,

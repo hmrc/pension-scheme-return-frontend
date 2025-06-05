@@ -24,7 +24,8 @@ import play.api.libs.json.JsPath
 import viewmodels.models.Flag
 
 /**
- * Used to show when a member has been added in the current submission (have never been through an ETMP declaration) and is safe to hard delete
+ * Used to show when a member has been added in the current submission (have never been through an ETMP declaration) and
+ * is safe to hard delete
  */
 case class SafeToHardDelete(srn: Srn, index: Max300) extends QuestionPage[Flag] {
 

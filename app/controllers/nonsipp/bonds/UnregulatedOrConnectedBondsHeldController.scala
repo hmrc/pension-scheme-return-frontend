@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class UnregulatedOrConnectedBondsHeldController @Inject()(
+class UnregulatedOrConnectedBondsHeldController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -74,24 +74,25 @@ class UnregulatedOrConnectedBondsHeldController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(UnregulatedOrConnectedBondsHeldPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-            redirectTo <- if (value) {
-              Future.successful(
-                Redirect(navigator.nextPage(UnregulatedOrConnectedBondsHeldPage(srn), mode, updatedAnswers))
-              )
-            } else {
-              psrSubmissionService
-                .submitPsrDetailsWithUA(
-                  srn,
-                  updatedAnswers,
-                  fallbackCall =
-                    controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController.onPageLoad(srn, mode)
-                )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
-                .map {
-                  case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                  case Some(_) =>
-                    Redirect(navigator.nextPage(UnregulatedOrConnectedBondsHeldPage(srn), mode, updatedAnswers))
-                }
-            }
+            redirectTo <-
+              if (value) {
+                Future.successful(
+                  Redirect(navigator.nextPage(UnregulatedOrConnectedBondsHeldPage(srn), mode, updatedAnswers))
+                )
+              } else {
+                psrSubmissionService
+                  .submitPsrDetailsWithUA(
+                    srn,
+                    updatedAnswers,
+                    fallbackCall =
+                      controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController.onPageLoad(srn, mode)
+                  )(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                  .map {
+                    case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                    case Some(_) =>
+                      Redirect(navigator.nextPage(UnregulatedOrConnectedBondsHeldPage(srn), mode, updatedAnswers))
+                  }
+              }
           } yield redirectTo
       )
   }

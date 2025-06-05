@@ -25,7 +25,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 
-class PrintsUserAnswersController @Inject()(
+class PrintsUserAnswersController @Inject() (
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents
 ) extends FrontendBaseController
@@ -37,8 +37,8 @@ class PrintsUserAnswersController @Inject()(
         case Some(k) =>
           request.userAnswers.data.decryptedValue.fields
             .find { case (key, _) => key == k }
-            .fold(BadRequest(s"key $k does not exist in user answers"))(
-              field => Ok(Json.prettyPrint(JsObject(Seq(field))))
+            .fold(BadRequest(s"key $k does not exist in user answers"))(field =>
+              Ok(Json.prettyPrint(JsObject(Seq(field))))
             )
         case None => Ok(Json.prettyPrint(request.userAnswers.data.decryptedValue))
       }

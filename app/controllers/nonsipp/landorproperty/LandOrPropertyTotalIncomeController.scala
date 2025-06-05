@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class LandOrPropertyTotalIncomeController @Inject()(
+class LandOrPropertyTotalIncomeController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -68,15 +68,14 @@ class LandOrPropertyTotalIncomeController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
               Future.successful(
                 BadRequest(
                   view(formWithErrors, viewModel(srn, index, form, address.addressLine1, mode))
                 )
               )
-            }
-          },
+            },
           value =>
             for {
               updatedAnswers <- Future

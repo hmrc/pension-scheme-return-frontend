@@ -140,16 +140,16 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
       )
       act.like(
         redirectNextPage(onSubmit(mode))
-          .before({
+          .before {
             when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
             MockPsrSubmissionService.submitPsrDetailsWithUA()
-          })
-          .after({
+          }
+          .after {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
             verify(mockSaveService, times(1)).save(any())(any(), any())
             reset(mockPsrSubmissionService)
             reset(mockSaveService)
-          })
+          }
           .withName(s"redirect to next page when in $mode mode")
       )
       act.like(
@@ -219,9 +219,8 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.shares.routes.SharesListController
           .onPageLoadViewOnly(srn, 1, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only SharesListController page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only SharesListController page")
     )
   }
 }

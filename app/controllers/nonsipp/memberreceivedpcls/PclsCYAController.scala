@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
-class PclsCYAController @Inject()(
+class PclsCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -77,24 +77,22 @@ class PclsCYAController @Inject()(
         amounts <- request.userAnswers
           .get(PensionCommencementLumpSumAmountPage(srn, index))
           .getOrRecoverJourney
-      } yield {
-        Ok(
-          view(
-            viewModel(
-              srn,
-              memberDetails.fullName,
-              index,
-              amounts,
-              mode,
-              viewOnlyUpdated = false, // flag is not displayed on this tier
-              optYear = request.year,
-              optCurrentVersion = request.currentVersion,
-              optPreviousVersion = request.previousVersion,
-              compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
-            )
+      } yield Ok(
+        view(
+          viewModel(
+            srn,
+            memberDetails.fullName,
+            index,
+            amounts,
+            mode,
+            viewOnlyUpdated = false, // flag is not displayed on this tier
+            optYear = request.year,
+            optCurrentVersion = request.currentVersion,
+            optPreviousVersion = request.previousVersion,
+            compilationOrSubmissionDate = request.userAnswers.get(CompilationOrSubmissionDatePage(srn))
           )
         )
-      }
+      )
     ).merge
 
   def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
@@ -113,8 +111,8 @@ class PclsCYAController @Inject()(
             updatedAnswers,
             fallbackCall = controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController.onPageLoad(srn, index, mode)
           )
-      } yield submissionResult.getOrRecoverJourney(
-        _ => Redirect(navigator.nextPage(PclsCYAPage(srn, index), mode, request.userAnswers))
+      } yield submissionResult.getOrRecoverJourney(_ =>
+        Redirect(navigator.nextPage(PclsCYAPage(srn, index), mode, request.userAnswers))
       )
     }
 

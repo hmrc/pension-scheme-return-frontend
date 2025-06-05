@@ -290,51 +290,51 @@ class OverviewControllerSpec extends ControllerBaseSpec with CommonTestValues {
 
     "onSelectViewAndChange redirects to the BasicDetailsCYA page " +
       "when members over threshold and no previous userAnswers and no previous psr return with memberDetails" in {
-      when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
-        Future.successful(versionsResponse)
-      )
-      when(
-        mockPsrRetrievalService
-          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
-      ).thenReturn(Future.successful(emptyUserAnswers))
-      val currentUA = emptyUserAnswers
-        .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
-        .unsafeSet(WhichTaxYearPage(srn), dateRange)
+        when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
+          Future.successful(versionsResponse)
+        )
+        when(
+          mockPsrRetrievalService
+            .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+        ).thenReturn(Future.successful(emptyUserAnswers))
+        val currentUA = emptyUserAnswers
+          .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
+          .unsafeSet(WhichTaxYearPage(srn), dateRange)
 
-      running(_ => applicationBuilder(userAnswers = Some(currentUA))) { app =>
-        val request = FakeRequest(GET, onSelectViewAndChange)
+        running(_ => applicationBuilder(userAnswers = Some(currentUA))) { app =>
+          val request = FakeRequest(GET, onSelectViewAndChange)
 
-        val result = route(app, request).value
+          val result = route(app, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
-          .onPageLoad(srn, CheckMode)
-          .url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
+            .onPageLoad(srn, CheckMode)
+            .url
+        }
       }
-    }
 
     "onSelectViewAndChange redirects to the task list page " +
       "when members over threshold and no previous userAnswers and previous psr return with memberDetails" in {
-      val currentUA = emptyUserAnswers
-        .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
-        .unsafeSet(WhichTaxYearPage(srn), dateRange)
-      when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
-        Future.successful(versionsResponse)
-      )
-      when(
-        mockPsrRetrievalService
-          .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
-      ).thenReturn(Future.successful(currentUA))
-      running(_ => applicationBuilder(userAnswers = Some(currentUA))) { app =>
-        val request = FakeRequest(GET, onSelectViewAndChange)
+        val currentUA = emptyUserAnswers
+          .unsafeSet(HowManyMembersPage(srn, psaId), memberNumbersOverThreshold)
+          .unsafeSet(WhichTaxYearPage(srn), dateRange)
+        when(mockPsrVersionsService.getVersions(any(), any(), any())(any(), any(), any())).thenReturn(
+          Future.successful(versionsResponse)
+        )
+        when(
+          mockPsrRetrievalService
+            .getAndTransformStandardPsrDetails(any(), any(), any(), any(), any())(any(), any(), any())
+        ).thenReturn(Future.successful(currentUA))
+        running(_ => applicationBuilder(userAnswers = Some(currentUA))) { app =>
+          val request = FakeRequest(GET, onSelectViewAndChange)
 
-        val result = route(app, request).value
+          val result = route(app, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
-          .onPageLoad(srn, CheckMode)
-          .url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
+            .onPageLoad(srn, CheckMode)
+            .url
+        }
       }
-    }
   }
 }

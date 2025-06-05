@@ -47,7 +47,7 @@ import java.time.LocalDate
 import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Named}
 
-class LandOrPropertyLeaseDetailsController @Inject()(
+class LandOrPropertyLeaseDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -79,29 +79,27 @@ class LandOrPropertyLeaseDetailsController @Inject()(
       val result = for {
         endDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourneyT
         address <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourneyT
-      } yield {
-        form(endDate.to)
-          .bindFromRequest()
-          .fold(
-            formWithErrors =>
-              Future.successful(
-                BadRequest(
-                  view(
-                    formWithErrors,
-                    viewModel(srn, index, address.addressLine1, form(endDate.to), mode)
-                  )
+      } yield form(endDate.to)
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(
+              BadRequest(
+                view(
+                  formWithErrors,
+                  viewModel(srn, index, address.addressLine1, form(endDate.to), mode)
                 )
-              ),
-            value =>
-              for {
-                updatedAnswers <- Future
-                  .fromTry(request.userAnswers.set(LandOrPropertyLeaseDetailsPage(srn, index), value))
-                nextPage = navigator.nextPage(LandOrPropertyLeaseDetailsPage(srn, index), mode, updatedAnswers)
-                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
-                _ <- saveService.save(updatedProgressAnswers)
-              } yield Redirect(nextPage)
-          )
-      }
+              )
+            ),
+          value =>
+            for {
+              updatedAnswers <- Future
+                .fromTry(request.userAnswers.set(LandOrPropertyLeaseDetailsPage(srn, index), value))
+              nextPage = navigator.nextPage(LandOrPropertyLeaseDetailsPage(srn, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
+        )
 
       result.leftMap(_.pure[Future]).merge.flatten
   }

@@ -72,29 +72,28 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
     List(
       ("windows", "\r\n"),
       ("*nix", "\n")
-    ).foreach {
-      case (name, lineEndings) =>
-        s"$name line endings: successfully validates and saves the correct user answers" in {
+    ).foreach { case (name, lineEndings) =>
+      s"$name line endings: successfully validates and saves the correct user answers" in {
 
-          val csv =
-            s"$validHeaders$lineEndings" +
-              s"Help,Sample-Name,Sample-Surname,Sample-Nino,Sample-Reason,Sample-Date$lineEndings" +
-              s",Jason,Lawrence,AB123456A,,6/10/1989$lineEndings" +
-              s",Pearl,Parsons,,reason,12/4/1990$lineEndings" +
-              s",Katherine,Kennedy,,reason,30/01/1985$lineEndings"
+        val csv =
+          s"$validHeaders$lineEndings" +
+            s"Help,Sample-Name,Sample-Surname,Sample-Nino,Sample-Reason,Sample-Date$lineEndings" +
+            s",Jason,Lawrence,AB123456A,,6/10/1989$lineEndings" +
+            s",Pearl,Parsons,,reason,12/4/1990$lineEndings" +
+            s",Katherine,Kennedy,,reason,30/01/1985$lineEndings"
 
-          val source = Source.single(ByteString(csv))
+        val source = Source.single(ByteString(csv))
 
-          val actual = validator.validateCSV(source, None).futureValue
-          actual._1 mustBe UploadSuccess(
-            List(
-              UploadMemberDetails(1, NameDOB("Jason", "Lawrence", LocalDate.of(1989, 10, 6)), Right(Nino("AB123456A"))),
-              UploadMemberDetails(2, NameDOB("Pearl", "Parsons", LocalDate.of(1990, 4, 12)), Left("reason")),
-              UploadMemberDetails(3, NameDOB("Katherine", "Kennedy", LocalDate.of(1985, 1, 30)), Left("reason"))
-            )
+        val actual = validator.validateCSV(source, None).futureValue
+        actual._1 mustBe UploadSuccess(
+          List(
+            UploadMemberDetails(1, NameDOB("Jason", "Lawrence", LocalDate.of(1989, 10, 6)), Right(Nino("AB123456A"))),
+            UploadMemberDetails(2, NameDOB("Pearl", "Parsons", LocalDate.of(1990, 4, 12)), Left("reason")),
+            UploadMemberDetails(3, NameDOB("Katherine", "Kennedy", LocalDate.of(1985, 1, 30)), Left("reason"))
           )
-          actual._2 mustBe 3
-        }
+        )
+        actual._2 mustBe 3
+      }
     }
 
     "successfully collect date errors" in {

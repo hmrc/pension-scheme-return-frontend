@@ -29,9 +29,12 @@ object LoansCheckStatusUtils {
   /**
    * This method determines whether or not the Loans section needs to be checked. A section needs to be checked if 1 or
    * more records in that section need to be checked.
-   * @param userAnswers the answers provided by the user, from which we get each Loans record
-   * @param srn the Scheme Reference Number, used for the .get calls
-   * @return true if any record requires checking, else false
+   * @param userAnswers
+   *   the answers provided by the user, from which we get each Loans record
+   * @param srn
+   *   the Scheme Reference Number, used for the .get calls
+   * @return
+   *   true if any record requires checking, else false
    */
   def checkLoansSection(
     userAnswers: UserAnswers,
@@ -56,10 +59,14 @@ object LoansCheckStatusUtils {
   /**
    * This method determines whether or not a Loans record needs to be checked. A record only needs to be checked if its
    * LoanPrePopulated field is false.
-   * @param userAnswers the answers provided by the user, from which we get the Loans record
-   * @param srn the Scheme Reference Number, used for the .get calls
-   * @param recordIndex the index of the record being checked
-   * @return true if the record requires checking, else false
+   * @param userAnswers
+   *   the answers provided by the user, from which we get the Loans record
+   * @param srn
+   *   the Scheme Reference Number, used for the .get calls
+   * @param recordIndex
+   *   the index of the record being checked
+   * @return
+   *   true if the record requires checking, else false
    */
   def checkLoansRecord(
     userAnswers: UserAnswers,

@@ -49,7 +49,7 @@ import java.time.LocalDate
 import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Named}
 
-class DatePeriodLoanController @Inject()(
+class DatePeriodLoanController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,

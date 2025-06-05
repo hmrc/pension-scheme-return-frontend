@@ -35,7 +35,7 @@ import scala.util.{Failure, Success}
 import javax.inject.Singleton
 
 @Singleton
-class AuditService @Inject()(
+class AuditService @Inject() (
   config: FrontendAppConfig,
   connector: AuditConnector
 ) {

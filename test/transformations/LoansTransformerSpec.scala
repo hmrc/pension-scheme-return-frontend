@@ -169,7 +169,8 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
             loanTransactions = List(
               LoanTransactions(
                 prePopulated = None,
-                recipientIdentityType = RecipientIdentityType(IdentityType.Individual, None, Some("noNinoReason"), None),
+                recipientIdentityType =
+                  RecipientIdentityType(IdentityType.Individual, None, Some("noNinoReason"), None),
                 loanRecipientName = "IndividualRecipientName",
                 connectedPartyStatus = false,
                 optRecipientSponsoringEmployer = None,
@@ -818,9 +819,7 @@ class LoansTransformerSpec extends AnyFreeSpec with Matchers with OptionValues w
 
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(LoansProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
-        }
+        userAnswers => userAnswers.get(LoansProgress(srn, refineMV(1))) mustBe Some(SectionJourneyStatus.Completed)
       )
     }
 

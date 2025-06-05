@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class WhySchemeBorrowedMoneyController @Inject()(
+class WhySchemeBorrowedMoneyController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -57,9 +57,8 @@ class WhySchemeBorrowedMoneyController @Inject()(
     implicit request =>
       request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>
         request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
-          val preparedForm = {
+          val preparedForm =
             request.userAnswers.fillForm(WhySchemeBorrowedMoneyPage(srn, index), form)
-          }
           Ok(
             view(
               preparedForm,

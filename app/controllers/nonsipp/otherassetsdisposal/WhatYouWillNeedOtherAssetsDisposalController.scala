@@ -31,7 +31,7 @@ import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 
 import javax.inject.{Inject, Named}
 
-class WhatYouWillNeedOtherAssetsDisposalController @Inject()(
+class WhatYouWillNeedOtherAssetsDisposalController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identify: IdentifierAction,

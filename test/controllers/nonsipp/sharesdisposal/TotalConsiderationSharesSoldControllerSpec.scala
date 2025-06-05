@@ -63,20 +63,24 @@ class TotalConsiderationSharesSoldControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      renderPrePopView(onPageLoad, TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex), money, userAnswers) {
-        implicit app => implicit request =>
-          injected[MoneyView].apply(
-            form(injected[MoneyFormProvider]).fill(money),
-            viewModel(
-              srn,
-              shareIndex,
-              disposalIndex,
-              totalShares,
-              companyName,
-              form(injected[MoneyFormProvider]),
-              NormalMode
-            )
+      renderPrePopView(
+        onPageLoad,
+        TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex),
+        money,
+        userAnswers
+      ) { implicit app => implicit request =>
+        injected[MoneyView].apply(
+          form(injected[MoneyFormProvider]).fill(money),
+          viewModel(
+            srn,
+            shareIndex,
+            disposalIndex,
+            totalShares,
+            companyName,
+            form(injected[MoneyFormProvider]),
+            NormalMode
           )
+        )
       }
     )
 

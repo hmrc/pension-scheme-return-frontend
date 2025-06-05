@@ -45,7 +45,7 @@ import java.time.LocalDate
 import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Named}
 
-class WhenDidSchemeAcquireBondsController @Inject()(
+class WhenDidSchemeAcquireBondsController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -65,9 +65,8 @@ class WhenDidSchemeAcquireBondsController @Inject()(
   def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        val preparedForm = {
+        val preparedForm =
           request.userAnswers.fillForm(WhenDidSchemeAcquireBondsPage(srn, index), form(date.to, request))
-        }
         Ok(view(preparedForm, viewModel(srn, index, mode, request.schemeDetails.schemeName)))
 
       }

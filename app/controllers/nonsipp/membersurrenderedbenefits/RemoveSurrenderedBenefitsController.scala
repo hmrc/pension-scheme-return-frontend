@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveSurrenderedBenefitsController @Inject()(
+class RemoveSurrenderedBenefitsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -62,19 +62,17 @@ class RemoveSurrenderedBenefitsController @Inject()(
           surrenderedBenefitsAmount <- request.userAnswers
             .get(SurrenderedBenefitsAmountPage(srn, index))
             .getOrRedirectToTaskList(srn)
-        } yield {
-          Ok(
-            view(
-              form,
-              RemoveSurrenderedBenefitsController.viewModel(
-                srn,
-                index: Max300,
-                surrenderedBenefitsAmount,
-                nameDOB.fullName
-              )
+        } yield Ok(
+          view(
+            form,
+            RemoveSurrenderedBenefitsController.viewModel(
+              srn,
+              index: Max300,
+              surrenderedBenefitsAmount,
+              nameDOB.fullName
             )
           )
-        }
+        )
       ).merge
     }
 
@@ -83,7 +81,7 @@ class RemoveSurrenderedBenefitsController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             (
               for {
                 total <- request.userAnswers
@@ -96,9 +94,8 @@ class RemoveSurrenderedBenefitsController @Inject()(
                   RemoveSurrenderedBenefitsController.viewModel(srn, index, total, nameDOB.fullName)
                 )
               )
-            ).merge
-          },
-          removeDetails => {
+            ).merge,
+          removeDetails =>
             if (removeDetails) {
               for {
                 updatedAnswers <- Future
@@ -117,12 +114,11 @@ class RemoveSurrenderedBenefitsController @Inject()(
                     controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
                       .onPageLoad(srn, 1, NormalMode)
                 )
-              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(RemoveSurrenderedBenefitsPage(srn, index), NormalMode, updatedAnswers)
-                  )
+              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(_ =>
+                Redirect(
+                  navigator
+                    .nextPage(RemoveSurrenderedBenefitsPage(srn, index), NormalMode, updatedAnswers)
+                )
               )
             } else {
               Future
@@ -133,7 +129,6 @@ class RemoveSurrenderedBenefitsController @Inject()(
                   )
                 )
             }
-          }
         )
     }
 }

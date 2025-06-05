@@ -95,9 +95,11 @@ object BondsDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
     case RemoveBondsDisposalPage(srn, bondIndex, disposalIndex) =>
-      if (!userAnswers
+      if (
+        !userAnswers
           .map(HowWereBondsDisposedOfPages(srn))
-          .exists(_._2.nonEmpty)) {
+          .exists(_._2.nonEmpty)
+      ) {
         controllers.nonsipp.bondsdisposal.routes.BondsDisposalController.onPageLoad(srn, NormalMode)
       } else {
         controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController.onPageLoad(srn, page = 1)

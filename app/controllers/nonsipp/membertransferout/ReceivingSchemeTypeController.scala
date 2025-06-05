@@ -44,7 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class ReceivingSchemeTypeController @Inject()(
+class ReceivingSchemeTypeController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -63,8 +63,8 @@ class ReceivingSchemeTypeController @Inject()(
     mode: Mode
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val maybeAnswer = request.userAnswers.get(ReceivingSchemeTypePage(srn, index, secondaryIndex))
-    val builtForm = maybeAnswer.fold(ReceivingSchemeTypeController.form(formProvider))(
-      answer => ReceivingSchemeTypeController.form(formProvider, Some(answer.name))
+    val builtForm = maybeAnswer.fold(ReceivingSchemeTypeController.form(formProvider))(answer =>
+      ReceivingSchemeTypeController.form(formProvider, Some(answer.name))
     )
     val schemeName = request.userAnswers.get(ReceivingSchemeNamePage(srn, index, secondaryIndex)).get
     val filledForm = maybeAnswer.fold(builtForm)(builtForm.fill)

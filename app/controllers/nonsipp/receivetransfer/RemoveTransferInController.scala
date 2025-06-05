@@ -40,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveTransferInController @Inject()(
+class RemoveTransferInController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -74,7 +74,7 @@ class RemoveTransferInController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             (
               for {
                 nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourneyT
@@ -84,9 +84,8 @@ class RemoveTransferInController @Inject()(
               } yield BadRequest(
                 view(formWithErrors, viewModel(srn, memberIndex, index, nameDOB.fullName, transferringSchemeName))
               )
-            ).merge
-          },
-          removeDetails => {
+            ).merge,
+          removeDetails =>
             if (removeDetails) {
               for {
                 updatedAnswers <- Future
@@ -104,12 +103,11 @@ class RemoveTransferInController @Inject()(
                   fallbackCall = controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
                     .onPageLoad(srn, 1, NormalMode)
                 )
-              } yield submissionResult.getOrRecoverJourney(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(RemoveTransferInPage(srn, memberIndex), NormalMode, updatedAnswers)
-                  )
+              } yield submissionResult.getOrRecoverJourney(_ =>
+                Redirect(
+                  navigator
+                    .nextPage(RemoveTransferInPage(srn, memberIndex), NormalMode, updatedAnswers)
+                )
               )
             } else {
               Future
@@ -120,7 +118,6 @@ class RemoveTransferInController @Inject()(
                   )
                 )
             }
-          }
         )
     }
 }

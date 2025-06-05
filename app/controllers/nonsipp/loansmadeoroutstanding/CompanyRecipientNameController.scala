@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class CompanyRecipientNameController @Inject()(
+class CompanyRecipientNameController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -72,14 +72,13 @@ class CompanyRecipientNameController @Inject()(
             Future.successful(
               BadRequest(view(formWithErrors, CompanyRecipientNameController.viewModel(srn, index, mode)))
             ),
-          answer => {
+          answer =>
             for {
               updatedAnswers <- request.userAnswers.set(CompanyRecipientNamePage(srn, index), answer).mapK
               nextPage = navigator.nextPage(CompanyRecipientNamePage(srn, index), mode, updatedAnswers)
               updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(navigator.nextPage(CompanyRecipientNamePage(srn, index), mode, updatedAnswers))
-          }
         )
   }
 }

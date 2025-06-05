@@ -186,23 +186,26 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec with Member
       }
 
       act.like(
-        renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-          implicit app => implicit request =>
-            injected[TwoColumnsTripleAction].apply(
-              viewModel(
-                srn,
-                page,
-                mode = ViewOnlyMode,
-                testMemberList,
-                viewOnlyUpdated = false,
-                optYear = Some(yearString),
-                optCurrentVersion = Some(submissionNumberTwo),
-                optPreviousVersion = Some(submissionNumberOne),
-                compilationOrSubmissionDate = Some(submissionDateTwo),
-                schemeName = schemeName,
-                noPageEnabled = false
-              )
+        renderView(
+          onPageLoadViewOnly,
+          userAnswers = currentUserAnswers,
+          optPreviousAnswers = Some(previousUserAnswers)
+        ) { implicit app => implicit request =>
+          injected[TwoColumnsTripleAction].apply(
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              testMemberList,
+              viewOnlyUpdated = false,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              schemeName = schemeName,
+              noPageEnabled = false
             )
+          )
         }.withName("OnPageLoadViewOnly renders ok with no changed flag")
       )
 
@@ -210,23 +213,26 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec with Member
         .unsafeSet(WhenWasTransferMadePage(srn, index, refineMV[Max5.Refined](1)), localDate)
 
       act.like(
-        renderView(onPageLoadViewOnly, userAnswers = updatedUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-          implicit app => implicit request =>
-            injected[TwoColumnsTripleAction].apply(
-              viewModel(
-                srn,
-                page,
-                mode = ViewOnlyMode,
-                testMemberList,
-                viewOnlyUpdated = true,
-                optYear = Some(yearString),
-                optCurrentVersion = Some(submissionNumberTwo),
-                optPreviousVersion = Some(submissionNumberOne),
-                compilationOrSubmissionDate = Some(submissionDateTwo),
-                schemeName = schemeName,
-                noPageEnabled = false
-              )
+        renderView(
+          onPageLoadViewOnly,
+          userAnswers = updatedUserAnswers,
+          optPreviousAnswers = Some(previousUserAnswers)
+        ) { implicit app => implicit request =>
+          injected[TwoColumnsTripleAction].apply(
+            viewModel(
+              srn,
+              page,
+              mode = ViewOnlyMode,
+              testMemberList,
+              viewOnlyUpdated = true,
+              optYear = Some(yearString),
+              optCurrentVersion = Some(submissionNumberTwo),
+              optPreviousVersion = Some(submissionNumberOne),
+              compilationOrSubmissionDate = Some(submissionDateTwo),
+              schemeName = schemeName,
+              noPageEnabled = false
             )
+          )
         }.withName("OnPageLoadViewOnly renders ok with changed flag")
       )
 

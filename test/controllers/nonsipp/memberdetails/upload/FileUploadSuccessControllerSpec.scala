@@ -225,10 +225,10 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
 
       act.like(
         redirectNextPage(onSubmit, emptyUserAnswers)
-          .before({
+          .before {
             when(mockSaveService.save(captor.capture())(any(), any())).thenReturn(Future.successful(()))
             mockGetUploadResult(Some(upload))
-          })
+          }
           .after {
             val userAnswers = captor.getValue
             userAnswers.get(MemberDetailsPage(srn, refineMV(1))) mustBe Some(NameDOB("A", "A", localDate))

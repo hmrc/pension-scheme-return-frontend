@@ -386,9 +386,8 @@ class SharesListControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.routes.ViewOnlyTaskListController
           .onPageLoad(srn, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only taskList")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only taskList")
     )
 
     act.like(

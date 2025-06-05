@@ -107,16 +107,14 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues wit
               Gen.listOfN(i.value, data).map((i, _))
             }
 
-            forAll(srnGen, dataGen) {
-              case (srn, (index, data)) =>
-                val nextIndex = refineV(index.value + 1).value
-                val ua =
-                  data.zipWithIndex.foldLeft(userAnswers(srn)) {
-                    case (acc, (curr, index)) =>
-                      acc.unsafeSet(dataPage(srn, refineV(index + 1).value), curr)
-                  }
+            forAll(srnGen, dataGen) { case (srn, (index, data)) =>
+              val nextIndex = refineV(index.value + 1).value
+              val ua =
+                data.zipWithIndex.foldLeft(userAnswers(srn)) { case (acc, (curr, index)) =>
+                  acc.unsafeSet(dataPage(srn, refineV(index + 1).value), curr)
+                }
 
-                navigator.nextPage(listPage(srn), mode, ua) mustBe nextPage(srn, nextIndex.value, mode)
+              navigator.nextPage(listPage(srn), mode, ua) mustBe nextPage(srn, nextIndex.value, mode)
             }
           },
           "when maximum amount of data has been added".hasBehaviour {
@@ -125,15 +123,13 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues wit
               Gen.listOfN(i.value, data)
             }
 
-            forAll(srnGen, dataGen) {
-              case (srn, data) =>
-                val ua =
-                  data.zipWithIndex.foldLeft(userAnswers(srn)) {
-                    case (acc, (curr, index)) =>
-                      acc.unsafeSet(dataPage(srn, refineV(index + 1).value), curr)
-                  }
+            forAll(srnGen, dataGen) { case (srn, data) =>
+              val ua =
+                data.zipWithIndex.foldLeft(userAnswers(srn)) { case (acc, (curr, index)) =>
+                  acc.unsafeSet(dataPage(srn, refineV(index + 1).value), curr)
+                }
 
-                navigator.nextPage(listPage(srn), mode, ua) mustBe maxDataNextPage(srn, mode)
+              navigator.nextPage(listPage(srn), mode, ua) mustBe maxDataNextPage(srn, mode)
             }
           }
         )

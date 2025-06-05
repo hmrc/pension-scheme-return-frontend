@@ -37,7 +37,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class CompanyNameOfOtherAssetSellerController @Inject()(
+class CompanyNameOfOtherAssetSellerController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,

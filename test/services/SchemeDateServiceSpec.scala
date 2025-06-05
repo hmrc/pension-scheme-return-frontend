@@ -39,8 +39,9 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
   val defaultUserAnswers: UserAnswers = UserAnswers("id")
   val srn = srnGen.sample.value
-  val allowedAccessRequest
-    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+  ).sample.value
 
   val oldestDateRange: Gen[DateRange] =
     dateRangeWithinRangeGen(

@@ -88,10 +88,10 @@ class RemoveShareDisposalControllerSpec extends ControllerBaseSpec {
 
     act.like(
       saveAndContinue(onSubmit, userAnswers, "value" -> "true")
-        .after({
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

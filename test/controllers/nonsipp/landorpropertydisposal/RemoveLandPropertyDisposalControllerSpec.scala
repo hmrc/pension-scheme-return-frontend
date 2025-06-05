@@ -92,13 +92,13 @@ class RemoveLandPropertyDisposalControllerSpec extends ControllerBaseSpec {
 
     act.like(
       saveAndContinue(onSubmit, userAnswers, "value" -> "true")
-        .before({
+        .before {
           when(mockPsrSubmissionService.submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(())))
-        })
-        .after({
+        }
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

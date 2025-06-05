@@ -52,7 +52,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDateTime
 import javax.inject.Named
 
-class SchemeMembersListController @Inject()(
+class SchemeMembersListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -98,8 +98,8 @@ class SchemeMembersListController @Inject()(
       onPageLoadCommon(srn, page, ManualOrUpload.Manual, ViewOnlyMode, showBackLink)
     }
 
-  def onPageLoadCommon(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode, showBackLink: Boolean)(
-    implicit request: DataRequest[_]
+  def onPageLoadCommon(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode, showBackLink: Boolean)(implicit
+    request: DataRequest[_]
   ): Result = {
     val completedMembers = request.userAnswers.get(MembersDetailsCompletedPages(srn)).getOrElse(Map.empty)
     val membersDetails = request.userAnswers.membersDetails(srn)
@@ -162,7 +162,7 @@ class SchemeMembersListController @Inject()(
       form(manualOrUpload, lengthOfMembersDetails >= maxSchemeMembers)
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             membersDetails.view
               .mapValues(_.fullName)
               .toList
@@ -185,7 +185,8 @@ class SchemeMembersListController @Inject()(
                   )
                 )
               }
-          }.merge.pure[Future],
+              .merge
+              .pure[Future],
           value => {
             val notChecked = isPrePopulation && request.userAnswers.get(MembersDetailsChecked(srn)).contains(false)
 
@@ -260,34 +261,33 @@ object SchemeMembersListController {
 
     val rows: List[ListRow] = filteredMembers
       .sortBy { case (_, (_, name)) => name }
-      .flatMap {
-        case (_, (unrefinedIndex, memberFullName)) =>
-          val index = refineV[Max300.Refined](unrefinedIndex.toInt + 1).toOption.get
-          if (mode.isViewOnlyMode) {
-            (mode, optYear, optCurrentVersion, optPreviousVersion) match {
-              case (ViewOnlyMode, Some(year), Some(current), Some(previous)) =>
-                List(
-                  ListRow.view(
-                    memberFullName,
-                    routes.SchemeMemberDetailsAnswersController
-                      .onPageLoadViewOnly(srn, index, year, current, previous)
-                      .url,
-                    Message("site.view.param", memberFullName)
-                  )
+      .flatMap { case (_, (unrefinedIndex, memberFullName)) =>
+        val index = refineV[Max300.Refined](unrefinedIndex.toInt + 1).toOption.get
+        if (mode.isViewOnlyMode) {
+          (mode, optYear, optCurrentVersion, optPreviousVersion) match {
+            case (ViewOnlyMode, Some(year), Some(current), Some(previous)) =>
+              List(
+                ListRow.view(
+                  memberFullName,
+                  routes.SchemeMemberDetailsAnswersController
+                    .onPageLoadViewOnly(srn, index, year, current, previous)
+                    .url,
+                  Message("site.view.param", memberFullName)
                 )
-              case _ => Nil
-            }
-          } else {
-            List(
-              ListRow(
-                memberFullName,
-                changeUrl = routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckMode).url,
-                changeHiddenText = Message("schemeMembersList.change.hidden", memberFullName),
-                removeUrl = routes.RemoveMemberDetailsController.onPageLoad(srn, index, mode).url,
-                removeHiddenText = Message("schemeMembersList.remove.hidden", memberFullName)
               )
-            )
+            case _ => Nil
           }
+        } else {
+          List(
+            ListRow(
+              memberFullName,
+              changeUrl = routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckMode).url,
+              changeHiddenText = Message("schemeMembersList.change.hidden", memberFullName),
+              removeUrl = routes.RemoveMemberDetailsController.onPageLoad(srn, index, mode).url,
+              removeHiddenText = Message("schemeMembersList.remove.hidden", memberFullName)
+            )
+          )
+        }
       }
 
     val (title, heading) = ((mode, lengthOfFilteredMembers) match {

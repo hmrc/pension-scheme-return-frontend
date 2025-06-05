@@ -8,11 +8,12 @@ import complete.DefaultParsers.*
 import uk.gov.hmrc.DefaultBuildSettings
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.16"
+ThisBuild / scalaVersion := "3.3.6"
+// logLevel := Level.Error
 
 lazy val appName: String = "pension-scheme-return-frontend"
 
-addCompilerPlugin(("org.typelevel" % "kind-projector" % "0.13.3").cross(CrossVersion.full))
+//addCompilerPlugin(("org.typelevel" % "kind-projector" % "0.13.3").cross(CrossVersion.full))
 
 lazy val root = Project(appName, file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
@@ -23,30 +24,29 @@ lazy val root = Project(appName, file("."))
     semanticdbEnabled := true,
     semanticdbVersion := scalafixSemanticdb.revision,
     RoutesKeys.routesImport ++= Seq(
-      "models._",
-      "models.ManualOrUpload._",
-      "models.SchemeId._",
+      "models.*",
+      "models.ManualOrUpload.*",
+      "models.SchemeId.*",
       "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl",
-      "config.Binders._",
-      "config.RefinedTypes._",
-      "eu.timepit.refined.refineMV",
-      "eu.timepit.refined.auto._"
+      "config.Binders.*",
+      "config.RefinedTypes.*",
+      "eu.timepit.refined.auto.*"
     ),
     TwirlKeys.templateImports ++= Seq(
       "play.twirl.api.HtmlFormat",
-      "play.twirl.api.HtmlFormat._",
-      "uk.gov.hmrc.govukfrontend.views.html.components._",
-      "uk.gov.hmrc.hmrcfrontend.views.html.components._",
-      "uk.gov.hmrc.hmrcfrontend.views.html.helpers._",
-      "uk.gov.hmrc.hmrcfrontend.views.config._",
-      "views.ViewUtils._",
+      "play.twirl.api.HtmlFormat.*",
+      "uk.gov.hmrc.govukfrontend.views.html.components.*",
+      "uk.gov.hmrc.hmrcfrontend.views.html.components.*",
+      "uk.gov.hmrc.hmrcfrontend.views.html.helpers.*",
+      "uk.gov.hmrc.hmrcfrontend.views.config.*",
+      "views.ViewUtils.*",
       "models.Mode",
-      "controllers.routes._",
-      "viewmodels.govuk.all._",
-      "viewmodels._",
-      "viewmodels.models._",
-      "views.components.Components._",
-      "utils.ListUtils._"
+      "controllers.routes.*",
+      "viewmodels.govuk.all.*",
+      "viewmodels.*",
+      "viewmodels.models.*",
+      "views.components.Components.*",
+      "utils.ListUtils.*"
     ),
     PlayKeys.playDefaultPort := 10701,
     scalacOptions ++= Seq(

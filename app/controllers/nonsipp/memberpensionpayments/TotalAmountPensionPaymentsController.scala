@@ -43,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class TotalAmountPensionPaymentsController @Inject()(
+class TotalAmountPensionPaymentsController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -74,7 +74,7 @@ class TotalAmountPensionPaymentsController @Inject()(
         form
           .bindFromRequest()
           .fold(
-            formWithErrors => {
+            formWithErrors =>
               Future.successful(
                 BadRequest(
                   view(
@@ -82,8 +82,7 @@ class TotalAmountPensionPaymentsController @Inject()(
                     viewModel(srn, index, memberName.fullName, form, mode)
                   )
                 )
-              )
-            },
+              ),
             value =>
               for {
                 updatedAnswers <- Future

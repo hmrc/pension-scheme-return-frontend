@@ -27,9 +27,12 @@ object OtherAssetsCheckStatusUtils {
   /**
    * This method determines whether or not the Other Assets section needs to be checked. A section needs to be checked
    * if 1 or more records in that section need to be checked.
-   * @param userAnswers the answers provided by the user, from which we get each Other Assets record
-   * @param srn the Scheme Reference Number, used for the .get calls
-   * @return true if any record requires checking, else false
+   * @param userAnswers
+   *   the answers provided by the user, from which we get each Other Assets record
+   * @param srn
+   *   the Scheme Reference Number, used for the .get calls
+   * @return
+   *   true if any record requires checking, else false
    */
   def checkOtherAssetsSection(
     userAnswers: UserAnswers,
@@ -53,10 +56,14 @@ object OtherAssetsCheckStatusUtils {
   /**
    * This method determines whether or not a Other Assets record needs to be checked. A record only needs to be checked
    * if its OtherAssetsPrePopulated field is false.
-   * @param userAnswers the answers provided by the user, from which we get the Other Assets record
-   * @param srn the Scheme Reference Number, used for the .get calls
-   * @param recordIndex the index of the record being checked
-   * @return true if the record requires checking, else false
+   * @param userAnswers
+   *   the answers provided by the user, from which we get the Other Assets record
+   * @param srn
+   *   the Scheme Reference Number, used for the .get calls
+   * @param recordIndex
+   *   the index of the record being checked
+   * @return
+   *   true if the record requires checking, else false
    */
   def checkOtherAssetsRecord(
     userAnswers: UserAnswers,

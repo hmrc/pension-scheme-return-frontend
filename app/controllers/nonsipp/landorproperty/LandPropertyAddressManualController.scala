@@ -44,7 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class LandPropertyAddressManualController @Inject()(
+class LandPropertyAddressManualController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -61,8 +61,8 @@ class LandPropertyAddressManualController @Inject()(
       val previousAnswer = request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index))
 
       if (isUkAddress) {
-        val preparedForm = previousAnswer.fold(ukAddressForm)(
-          address => if (address.isManualAddress) ukAddressForm.fill(address.asUKAddressTuple) else ukAddressForm
+        val preparedForm = previousAnswer.fold(ukAddressForm)(address =>
+          if (address.isManualAddress) ukAddressForm.fill(address.asUKAddressTuple) else ukAddressForm
         )
         Ok(
           view(
@@ -71,13 +71,12 @@ class LandPropertyAddressManualController @Inject()(
           )
         )
       } else {
-        val preparedForm = previousAnswer.fold(internationalAddressFormWithCountries)(
-          address =>
-            if (address.isManualAddress) {
-              internationalAddressFormWithCountries.fill(address.asInternationalAddressTuple)
-            } else {
-              internationalAddressFormWithCountries
-            }
+        val preparedForm = previousAnswer.fold(internationalAddressFormWithCountries)(address =>
+          if (address.isManualAddress) {
+            internationalAddressFormWithCountries.fill(address.asInternationalAddressTuple)
+          } else {
+            internationalAddressFormWithCountries
+          }
         )
         Ok(
           view(
@@ -97,13 +96,13 @@ class LandPropertyAddressManualController @Inject()(
       }
     }
 
-  private def onSubmitUKAddress(srn: Srn, index: Max5000, mode: Mode)(
-    implicit request: DataRequest[_]
+  private def onSubmitUKAddress(srn: Srn, index: Max5000, mode: Mode)(implicit
+    request: DataRequest[_]
   ): Future[Result] =
     ukAddressForm
       .bindFromRequest()
       .fold(
-        formWithErrors => {
+        formWithErrors =>
           Future.successful(
             BadRequest(
               view(
@@ -111,8 +110,7 @@ class LandPropertyAddressManualController @Inject()(
                 viewModel(srn, index, ukPage(formWithErrors), isUkAddress = true, mode)
               )
             )
-          )
-        },
+          ),
         value =>
           for {
             updatedAnswers <- Future
@@ -126,13 +124,13 @@ class LandPropertyAddressManualController @Inject()(
           } yield Redirect(nextPage)
       )
 
-  private def onSubmitInternationalAddress(srn: Srn, index: Max5000, mode: Mode)(
-    implicit request: DataRequest[_]
+  private def onSubmitInternationalAddress(srn: Srn, index: Max5000, mode: Mode)(implicit
+    request: DataRequest[_]
   ): Future[Result] =
     internationalAddressFormWithCountries
       .bindFromRequest()
       .fold(
-        formWithErrors => {
+        formWithErrors =>
           Future.successful(
             BadRequest(
               view(
@@ -140,8 +138,7 @@ class LandPropertyAddressManualController @Inject()(
                 viewModel(srn, index, internationalPage(formWithErrors, Country.countries), isUkAddress = false, mode)
               )
             )
-          )
-        },
+          ),
         value =>
           for {
             updatedAnswers <- Future

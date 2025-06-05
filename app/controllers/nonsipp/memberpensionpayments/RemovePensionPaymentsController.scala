@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemovePensionPaymentsController @Inject()(
+class RemovePensionPaymentsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -62,19 +62,17 @@ class RemovePensionPaymentsController @Inject()(
           totalAmountPensionPayment <- request.userAnswers
             .get(TotalAmountPensionPaymentsPage(srn, index))
             .getOrRedirectToTaskList(srn)
-        } yield {
-          Ok(
-            view(
-              form,
-              RemovePensionPaymentsController.viewModel(
-                srn,
-                index: Max300,
-                totalAmountPensionPayment,
-                nameDOB.fullName
-              )
+        } yield Ok(
+          view(
+            form,
+            RemovePensionPaymentsController.viewModel(
+              srn,
+              index: Max300,
+              totalAmountPensionPayment,
+              nameDOB.fullName
             )
           )
-        }
+        )
       ).merge
     }
 
@@ -83,7 +81,7 @@ class RemovePensionPaymentsController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             (
               for {
                 total <- request.userAnswers
@@ -96,9 +94,8 @@ class RemovePensionPaymentsController @Inject()(
                   RemovePensionPaymentsController.viewModel(srn, index, total, nameDOB.fullName)
                 )
               )
-            ).merge
-          },
-          removeDetails => {
+            ).merge,
+          removeDetails =>
             if (removeDetails) {
               for {
                 updatedAnswers <- Future
@@ -114,12 +111,11 @@ class RemovePensionPaymentsController @Inject()(
                   fallbackCall = controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
                     .onPageLoad(srn, 1, NormalMode)
                 )
-              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(RemovePensionPaymentsPage(srn, index), NormalMode, updatedAnswers)
-                  )
+              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(_ =>
+                Redirect(
+                  navigator
+                    .nextPage(RemovePensionPaymentsPage(srn, index), NormalMode, updatedAnswers)
+                )
               )
             } else {
               Future
@@ -130,7 +126,6 @@ class RemovePensionPaymentsController @Inject()(
                   )
                 )
             }
-          }
         )
     }
 }

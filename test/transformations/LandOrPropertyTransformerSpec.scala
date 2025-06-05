@@ -766,9 +766,7 @@ class LandOrPropertyTransformerSpec extends AnyFreeSpec with Matchers with Optio
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(LandOrPropertyTotalIncomePage(srn, refineMV(1))) mustBe None
-        }
+        userAnswers => userAnswers.get(LandOrPropertyTotalIncomePage(srn, refineMV(1))) mustBe None
       )
     }
 

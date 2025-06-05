@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class IsBuyerConnectedPartyController @Inject()(
+class IsBuyerConnectedPartyController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -66,12 +66,11 @@ class IsBuyerConnectedPartyController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             request.userAnswers.get(BuyerNamePage(srn, index, disposalIndex)).getOrRecoverJourney { buyerName =>
               Future
                 .successful(BadRequest(view(formWithErrors, viewModel(srn, index, disposalIndex, buyerName, mode))))
-            }
-          },
+            },
           value =>
             for {
               updatedAnswers <- Future

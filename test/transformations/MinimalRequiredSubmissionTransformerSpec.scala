@@ -52,8 +52,9 @@ class MinimalRequiredSubmissionTransformerSpec
   override def beforeEach(): Unit =
     Mockito.reset(mockSchemeDateService)
 
-  val allowedAccessRequest
-    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+  ).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
   private val mockSchemeDateService = mock[SchemeDateService]

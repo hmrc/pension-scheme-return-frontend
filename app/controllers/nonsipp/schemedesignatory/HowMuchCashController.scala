@@ -44,7 +44,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
 
-class HowMuchCashController @Inject()(
+class HowMuchCashController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,

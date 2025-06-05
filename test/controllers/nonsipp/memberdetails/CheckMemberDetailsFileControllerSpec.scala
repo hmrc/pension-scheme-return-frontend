@@ -104,20 +104,18 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec with Guice
         saveAndContinue(
           onSubmit,
           "value" -> "true"
-        ).before({
-            mockGetUploadStatus(Some(uploadedSuccessfully))
-            mockStream()
-            mockValidateCSV((UploadSuccess(List()), 0, 0L))
-            mockSaveValidatedUpload()
+        ).before {
+          mockGetUploadStatus(Some(uploadedSuccessfully))
+          mockStream()
+          mockValidateCSV((UploadSuccess(List()), 0, 0L))
+          mockSaveValidatedUpload()
 
-            val dateRange = DateRange(LocalDate.of(2023, 4, 6), LocalDate.of(2024, 4, 5))
-            mockTaxYear(dateRange)
-          })
-          .after({
-            verify(mockAuditService, times(2)).sendEvent(any())(any(), any())
-            reset(mockAuditService)
-          })
-          .withName("should redirect to the next page when the form submission is valid and upload is successful")
+          val dateRange = DateRange(LocalDate.of(2023, 4, 6), LocalDate.of(2024, 4, 5))
+          mockTaxYear(dateRange)
+        }.after {
+          verify(mockAuditService, times(2)).sendEvent(any())(any(), any())
+          reset(mockAuditService)
+        }.withName("should redirect to the next page when the form submission is valid and upload is successful")
       )
 
       act.like(
@@ -126,16 +124,14 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec with Guice
           routes.UploadMemberDetailsController.onPageLoad(srn),
           defaultUserAnswers.unsafeSet(UploadStatusPage(srn), UploadSubmitted),
           "value" -> "true"
-        ).before({
-            mockGetUploadStatus(Some(UploadStatus.Failed(ErrorDetails("errorCode", "errorMessage"))))
-            val dateRange = DateRange(LocalDate.of(2023, 4, 6), LocalDate.of(2024, 4, 5))
-            mockTaxYear(dateRange)
-          })
-          .after({
-            verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
-            reset(mockAuditService)
-          })
-          .withName("should redirect to the error page when upload status is failed during onSubmit")
+        ).before {
+          mockGetUploadStatus(Some(UploadStatus.Failed(ErrorDetails("errorCode", "errorMessage"))))
+          val dateRange = DateRange(LocalDate.of(2023, 4, 6), LocalDate.of(2024, 4, 5))
+          mockTaxYear(dateRange)
+        }.after {
+          verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+          reset(mockAuditService)
+        }.withName("should redirect to the error page when upload status is failed during onSubmit")
       )
 
       act.like(
@@ -144,10 +140,9 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec with Guice
           routes.CheckMemberDetailsFileController.onPageLoad(srn, NormalMode),
           defaultUserAnswers.unsafeSet(UploadStatusPage(srn), UploadSubmitted),
           "value" -> "true"
-        ).before({
-            mockGetUploadStatus(Some(UploadStatus.InProgress))
-          })
-          .withName("should redirect to onPageLoad when upload status is InProgress during onSubmit")
+        ).before {
+          mockGetUploadStatus(Some(UploadStatus.InProgress))
+        }.withName("should redirect to onPageLoad when upload status is InProgress during onSubmit")
       )
 
       act.like(
@@ -156,10 +151,9 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec with Guice
           controllers.routes.JourneyRecoveryController.onPageLoad(),
           defaultUserAnswers.unsafeSet(UploadStatusPage(srn), UploadSubmitted),
           "value" -> "true"
-        ).before({
-            mockGetUploadStatus(None)
-          })
-          .withName("should redirect to JourneyRecoveryController when getUploadedFile returns None during onSubmit")
+        ).before {
+          mockGetUploadStatus(None)
+        }.withName("should redirect to JourneyRecoveryController when getUploadedFile returns None during onSubmit")
       )
 
       "CheckMemberDetailsFileController onPageLoad" - {
@@ -172,14 +166,12 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec with Guice
             injected[YesNoPageView]
               .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, Some(fileName), NormalMode))
           }.before {
-              mockTaxYear(dateRange)
-              mockGetUploadStatus(Some(uploadedSuccessfully))
-            }
-            .after {
-              verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
-              reset(mockAuditService)
-            }
-            .withName("should render the view when upload status is Success")
+            mockTaxYear(dateRange)
+            mockGetUploadStatus(Some(uploadedSuccessfully))
+          }.after {
+            verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+            reset(mockAuditService)
+          }.withName("should render the view when upload status is Success")
         )
 
         act.like(
@@ -188,11 +180,10 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec with Guice
             routes.UploadMemberDetailsController.onPageLoad(srn),
             defaultUserAnswers.unsafeSet(UploadStatusPage(srn), UploadSubmitted)
           ).before {
-              val dateRange = DateRange(LocalDate.of(2023, 4, 6), LocalDate.of(2024, 4, 5))
-              mockTaxYear(dateRange)
-              mockGetUploadStatus(Some(UploadStatus.Failed(ErrorDetails("errorCode", "errorMessage"))))
-            }
-            .withName("should redirect to the error page when upload status is failed during onPageLoad")
+            val dateRange = DateRange(LocalDate.of(2023, 4, 6), LocalDate.of(2024, 4, 5))
+            mockTaxYear(dateRange)
+            mockGetUploadStatus(Some(UploadStatus.Failed(ErrorDetails("errorCode", "errorMessage"))))
+          }.withName("should redirect to the error page when upload status is failed during onPageLoad")
         )
 
         act.like(
@@ -203,10 +194,9 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec with Guice
             injected[YesNoPageView]
               .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, None, NormalMode))
           }.before {
-              mockTaxYear(dateRange)
-              mockGetUploadStatus(Some(UploadStatus.InProgress))
-            }
-            .withName("should render the view when upload status is InProgress")
+            mockTaxYear(dateRange)
+            mockGetUploadStatus(Some(UploadStatus.InProgress))
+          }.withName("should render the view when upload status is InProgress")
         )
 
         act.like(
@@ -215,10 +205,9 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec with Guice
             controllers.routes.JourneyRecoveryController.onPageLoad(),
             defaultUserAnswers.unsafeSet(UploadStatusPage(srn), UploadSubmitted)
           ).before {
-              mockTaxYear(dateRange)
-              mockGetUploadStatus(None)
-            }
-            .withName("should redirect to JourneyRecoveryController when getUploadStatus returns None")
+            mockTaxYear(dateRange)
+            mockGetUploadStatus(None)
+          }.withName("should redirect to JourneyRecoveryController when getUploadStatus returns None")
         )
 
         act.like(
@@ -234,14 +223,13 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec with Guice
             implicit app => implicit request =>
               injected[YesNoPageView]
                 .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, Some(fileName), NormalMode))
-          }.before({
-              mockTaxYear(dateRange)
-              mockGetUploadStatus(Some(uploadedSuccessfully))
-            })
-            .after({
-              verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
-              reset(mockAuditService)
-            })
+          }.before {
+            mockTaxYear(dateRange)
+            mockGetUploadStatus(Some(uploadedSuccessfully))
+          }.after {
+            verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+            reset(mockAuditService)
+          }
         )
 
         act.like(
@@ -253,24 +241,24 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec with Guice
           ) { implicit app => implicit request =>
             injected[YesNoPageView]
               .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, Some(fileName), NormalMode))
-          }.before({
+          }.before {
             mockTaxYear(dateRange)
             mockGetUploadStatus(Some(uploadedSuccessfully))
-          })
+          }
         )
 
         act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
         act.like(
           saveAndContinue(onSubmit, "value" -> "true")
-            .before({
+            .before {
               mockTaxYear(dateRange)
               mockGetUploadStatus(Some(uploadedSuccessfully))
-            })
-            .after({
+            }
+            .after {
               verify(mockAuditService, times(2)).sendEvent(any())(any(), any())
               reset(mockAuditService)
-            })
+            }
         )
 
         act.like(invalidForm(onSubmit, "invalid" -> "form").before(mockGetUploadStatus(Some(uploadedSuccessfully))))

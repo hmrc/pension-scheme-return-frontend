@@ -45,7 +45,7 @@ import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class MemberDetailsUploadValidator @Inject()(
+class MemberDetailsUploadValidator @Inject() (
   nameDOBFormProvider: NameDOBFormProvider,
   textFormProvider: TextFormProvider,
   schemeDateService: SchemeDateService
@@ -70,9 +70,8 @@ class MemberDetailsUploadValidator @Inject()(
   private val firstRowSink: Sink[List[ByteString], Future[List[String]]] =
     Sink.head[List[ByteString]].mapMaterializedValue(_.map(_.map(_.utf8String)))
 
-  private val csvFrame: Flow[ByteString, List[ByteString], NotUsed] = {
+  private val csvFrame: Flow[ByteString, List[ByteString], NotUsed] =
     CsvParsing.lineScanner()
-  }
 
   private val aToZ: List[Char] = ('a' to 'z').toList.map(_.toUpper)
 
@@ -119,10 +118,13 @@ class MemberDetailsUploadValidator @Inject()(
           },
           _ => None
         )
-        .takeWhile({
-          case UploadFormatError | UploadMaxRowsError => false
-          case _ => true
-        }, inclusive = true)
+        .takeWhile(
+          {
+            case UploadFormatError | UploadMaxRowsError => false
+            case _ => true
+          },
+          inclusive = true
+        )
         .runReduce[Upload] {
           // format and max row errors
           case (_, UploadFormatError) => UploadFormatError
@@ -139,8 +141,8 @@ class MemberDetailsUploadValidator @Inject()(
           case (_, memberDetails: UploadSuccess) => memberDetails
         }
     } yield (validated, counter.get(), System.currentTimeMillis - startTime))
-      .recover {
-        case _: NoSuchElementException => (UploadFormatError, 0, System.currentTimeMillis - startTime)
+      .recover { case _: NoSuchElementException =>
+        (UploadFormatError, 0, System.currentTimeMillis - startTime)
       }
   }
 
@@ -162,8 +164,8 @@ class MemberDetailsUploadValidator @Inject()(
       maybeValidatedNino = maybeNino.value.flatMap { nino =>
         validateNino(maybeNino.as(nino), memberFullName, previousNinos, row)
       }
-      maybeValidatedNoNinoReason = maybeNoNinoReason.value.flatMap(
-        reason => validateNoNino(maybeNoNinoReason.as(reason), memberFullName, row)
+      maybeValidatedNoNinoReason = maybeNoNinoReason.value.flatMap(reason =>
+        validateNoNino(maybeNoNinoReason.as(reason), memberFullName, row)
       )
       validatedNinoOrNoNinoReason <- (maybeValidatedNino, maybeValidatedNoNinoReason) match {
         case (Some(validatedNino), None) => Some(Right(validatedNino))
@@ -331,8 +333,8 @@ class MemberDetailsUploadValidator @Inject()(
   ): Option[CsvValue[Option[String]]] =
     headerKeys
       .find(_.key.toLowerCase() == key.toLowerCase())
-      .map(
-        foundKey => CsvValue(foundKey, csvData.get(foundKey.index - 1).flatMap(s => if (s.isEmpty) None else Some(s)))
+      .map(foundKey =>
+        CsvValue(foundKey, csvData.get(foundKey.index - 1).flatMap(s => if (s.isEmpty) None else Some(s)))
       )
 
   private def formToResult[A](
@@ -348,9 +350,8 @@ class MemberDetailsUploadValidator @Inject()(
           case head :: rest =>
             NonEmptyList
               .of[FormError](head, rest: _*)
-              .map(
-                err =>
-                  cellMapping(err).map(cell => ValidationError.fromCell(cell, row, errorTypeMapping(err), err.message))
+              .map(err =>
+                cellMapping(err).map(cell => ValidationError.fromCell(cell, row, errorTypeMapping(err), err.message))
               )
               .sequence
               .map(_.invalid)

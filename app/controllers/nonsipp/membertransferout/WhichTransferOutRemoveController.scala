@@ -42,7 +42,7 @@ import play.api.data.Form
 
 import java.time.LocalDate
 
-class WhichTransferOutRemoveController @Inject()(
+class WhichTransferOutRemoveController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
@@ -55,8 +55,8 @@ class WhichTransferOutRemoveController @Inject()(
   def onPageLoad(srn: Srn, memberIndex: Int): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val completed: List[Max5] = request.userAnswers
       .map(MemberTransferOutProgress.all(srn, memberIndex))
-      .filter {
-        case (_, status) => status.completed
+      .filter { case (_, status) =>
+        status.completed
       }
       .keys
       .toList
@@ -102,13 +102,13 @@ class WhichTransferOutRemoveController @Inject()(
       )
   }
 
-  private def getJourneyValues(srn: Srn, memberIndex: Max300)(
-    implicit request: DataRequest[_]
+  private def getJourneyValues(srn: Srn, memberIndex: Max300)(implicit
+    request: DataRequest[_]
   ) =
     request.userAnswers
       .map(MemberTransferOutProgress.all(srn, memberIndex))
-      .filter {
-        case (_, status) => status.completed
+      .filter { case (_, status) =>
+        status.completed
       }
       .keys
       .toList
@@ -134,14 +134,13 @@ object WhichTransferOutRemoveController {
     )
 
   private def buildRows(values: List[(Max5, String, LocalDate)]): List[ListRadiosRow] =
-    values.flatMap {
-      case (index, receivingSchemeName, value) =>
-        List(
-          ListRadiosRow(
-            index.value,
-            Message("transferOut.whichTransferOutRemove.radio.label", receivingSchemeName, value.show)
-          )
+    values.flatMap { case (index, receivingSchemeName, value) =>
+      List(
+        ListRadiosRow(
+          index.value,
+          Message("transferOut.whichTransferOutRemove.radio.label", receivingSchemeName, value.show)
         )
+      )
     }.toList
 
   def viewModel(

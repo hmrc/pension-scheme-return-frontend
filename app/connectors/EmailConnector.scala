@@ -24,6 +24,7 @@ import config.FrontendAppConfig
 import models.SendEmailRequest
 import uk.gov.hmrc.http.client.HttpClientV2
 import play.api.Logger
+import play.api.libs.ws.JsonBodyWritables.given
 import play.api.libs.json.Json
 import play.api.http.Status._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
@@ -41,7 +42,7 @@ case object EmailSent extends WithName("EmailSent") with EmailStatus
 case object EmailNotSent extends WithName("EmailNotSent") with EmailStatus
 
 @Singleton
-class EmailConnector @Inject()(
+class EmailConnector @Inject() (
   appConfig: FrontendAppConfig,
   http: HttpClientV2,
   crypto: ApplicationCrypto
@@ -81,7 +82,7 @@ class EmailConnector @Inject()(
       StandardCharsets.UTF_8.toString
     )
 
-  //scalastyle:off parameter.number
+  // scalastyle:off parameter.number
   def sendEmail(
     psaOrPsp: String,
     requestId: String,

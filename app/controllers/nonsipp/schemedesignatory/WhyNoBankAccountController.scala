@@ -37,7 +37,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class WhyNoBankAccountController @Inject()(
+class WhyNoBankAccountController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -66,9 +66,7 @@ class WhyNoBankAccountController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(WhyNoBankAccountPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-          } yield {
-            Redirect(navigator.nextPage(WhyNoBankAccountPage(srn), mode, request.userAnswers))
-          }
+          } yield Redirect(navigator.nextPage(WhyNoBankAccountPage(srn), mode, request.userAnswers))
       )
   }
 }

@@ -98,10 +98,10 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
 
       act.like(
         redirectNextPage(onSubmit(mode))
-          .after({
+          .after {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
-          })
+          }
           .withName(s"redirect to next page when in $mode mode")
       )
 
@@ -157,9 +157,8 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to view only tasklist")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to view only tasklist")
     )
   }
 }

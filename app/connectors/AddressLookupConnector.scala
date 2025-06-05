@@ -18,19 +18,20 @@ package connectors
 
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import config.FrontendAppConfig
-import play.api.libs.json._
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import models._
 import uk.gov.hmrc.http.client.HttpClientV2
 import utils.JsonUtils._
+import play.api.libs.ws.JsonBodyWritables.given
+import play.api.libs.json._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class AddressLookupConnector @Inject()(http: HttpClientV2, appConfig: FrontendAppConfig)(
-  implicit ec: ExecutionContext
+class AddressLookupConnector @Inject() (http: HttpClientV2, appConfig: FrontendAppConfig)(implicit
+  ec: ExecutionContext
 ) {
 
   private val addressLookupUrl = appConfig.addressLookup.baseUrl + "/lookup"

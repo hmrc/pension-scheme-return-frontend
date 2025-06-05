@@ -45,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
-class SurrenderedBenefitsCYAController @Inject()(
+class SurrenderedBenefitsCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -73,8 +73,8 @@ class SurrenderedBenefitsCYAController @Inject()(
       onPageLoadCommon(srn, index, mode)
     }
 
-  def onPageLoadCommon(srn: SchemeId.Srn, index: Max300, mode: Mode)(
-    implicit request: DataRequest[AnyContent]
+  def onPageLoadCommon(srn: SchemeId.Srn, index: Max300, mode: Mode)(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     (
       for {
@@ -127,11 +127,10 @@ class SurrenderedBenefitsCYAController @Inject()(
           fallbackCall = controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
             .onPageLoad(srn, memberIndex, mode)
         )
-      } yield submissionResult.getOrRecoverJourney(
-        _ =>
-          Redirect(
-            navigator.nextPage(SurrenderedBenefitsCYAPage(srn, memberIndex), mode, request.userAnswers)
-          )
+      } yield submissionResult.getOrRecoverJourney(_ =>
+        Redirect(
+          navigator.nextPage(SurrenderedBenefitsCYAPage(srn, memberIndex), mode, request.userAnswers)
+        )
       )
     }
 

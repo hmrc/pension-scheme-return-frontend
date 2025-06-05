@@ -43,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class WhoWereTheSharesSoldToController @Inject()(
+class WhoWereTheSharesSoldToController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -59,9 +59,11 @@ class WhoWereTheSharesSoldToController @Inject()(
   def onPageLoad(srn: Srn, index: Int, disposalIndex: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       // If this page is reached in CheckMode and there is no PointOfEntry set
-      if (mode == CheckMode && request.userAnswers
+      if (
+        mode == CheckMode && request.userAnswers
           .get(SharesDisposalCYAPointOfEntry(srn, index, disposalIndex))
-          .contains(NoPointOfEntry)) {
+          .contains(NoPointOfEntry)
+      ) {
         // Set this page as the PointOfEntry
         saveService.save(
           request.userAnswers
@@ -97,7 +99,7 @@ class WhoWereTheSharesSoldToController @Inject()(
                   )
                 )
             },
-          answer => {
+          answer =>
             for {
               updatedAnswers <- Future.fromTry(
                 request.userAnswers.set(WhoWereTheSharesSoldToPage(srn, index, disposalIndex), answer)
@@ -110,7 +112,6 @@ class WhoWereTheSharesSoldToController @Inject()(
               updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
-          }
         )
     }
 }

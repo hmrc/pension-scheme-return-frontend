@@ -45,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class WhyDidMemberSurrenderBenefitsController @Inject()(
+class WhyDidMemberSurrenderBenefitsController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -63,9 +63,8 @@ class WhyDidMemberSurrenderBenefitsController @Inject()(
     implicit request =>
       request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
         request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, memberIndex)).getOrRecoverJourney { amount =>
-          val preparedForm = {
+          val preparedForm =
             request.userAnswers.fillForm(WhyDidMemberSurrenderBenefitsPage(srn, memberIndex), form)
-          }
           Ok(
             view(
               preparedForm,

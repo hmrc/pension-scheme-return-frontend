@@ -40,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class TypeOfSharesHeldController @Inject()(
+class TypeOfSharesHeldController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -78,7 +78,7 @@ class TypeOfSharesHeldController @Inject()(
                   )
                 )
               ),
-          answer => {
+          answer =>
             for {
               updatedAnswers <- Future.fromTry(
                 request.userAnswers.set(TypeOfSharesHeldPage(srn, index), answer)
@@ -87,7 +87,6 @@ class TypeOfSharesHeldController @Inject()(
               updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
-          }
         )
     }
 }

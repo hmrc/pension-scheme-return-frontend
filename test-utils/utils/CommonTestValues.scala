@@ -102,7 +102,7 @@ trait CommonTestValues {
       |  "checkReturnDates": true
       |}""".stripMargin
   )
-  val versionsResponse: Seq[PsrVersionsResponse] = {
+  val versionsResponse: Seq[PsrVersionsResponse] =
     Seq(
       PsrVersionsResponse(
         startDate = None,
@@ -157,7 +157,6 @@ trait CommonTestValues {
         )
       )
     )
-  }
   val compiledVersionsResponse: PsrVersionsResponse = PsrVersionsResponse(
     startDate = None,
     reportFormBundleNumber = commonFbNumber.replace('1', '3'),
@@ -168,29 +167,26 @@ trait CommonTestValues {
     psaDetails = None
   )
 
-  val versionsResponseInProgress: Seq[PsrVersionsResponse] = {
+  val versionsResponseInProgress: Seq[PsrVersionsResponse] =
     Seq(compiledVersionsResponse) ++ versionsResponse
-  }
 
-  val versionsForYearsResponse: Seq[PsrVersionsForYearsResponse] = {
+  val versionsForYearsResponse: Seq[PsrVersionsForYearsResponse] =
     Seq(
       PsrVersionsForYearsResponse(
         startDate = "2020-04-06",
         data = versionsResponse
       )
     )
-  }
 
-  val versionsForYearsInProgressResponse: Seq[PsrVersionsForYearsResponse] = {
+  val versionsForYearsInProgressResponse: Seq[PsrVersionsForYearsResponse] =
     Seq(
       PsrVersionsForYearsResponse(
         startDate = "2020-04-06",
         data = versionsResponseInProgress
       )
     )
-  }
 
-  val overviewResponse: Seq[OverviewResponse] = {
+  val overviewResponse: Seq[OverviewResponse] =
     Seq(
       OverviewResponse(
         periodStartDate = LocalDate.parse("2022-04-06"),
@@ -215,7 +211,6 @@ trait CommonTestValues {
         tpssReportPresent = None
       )
     )
-  }
   val overview400Json: JsValue = Json.parse(
     """
       |{

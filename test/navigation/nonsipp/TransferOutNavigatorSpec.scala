@@ -139,32 +139,31 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       (List("0", "1", "3"), refineMV[Max5.Refined](3)), // deleted one entry in the middle
       (List("0", "1", "2", "5", "6"), refineMV[Max5.Refined](4)), // deleted two entry in the middle
       (List("0", "1", "3", "5", "6"), refineMV[Max5.Refined](3)) // deleted entry in the middle of two sections
-    ).foreach {
-      case (existingIndexes, expectedRedirectIndex) =>
-        def userAnswers(srn: Srn) =
-          defaultUserAnswers
-            .unsafeSet(ReportAnotherTransferOutPage(srn, index, secondaryIndex), true)
-            .unsafeSet(WhenWasTransferMadePages(srn, index), existingIndexes.map(_ -> localDate).toMap)
-            .unsafeSet(
-              MemberTransferOutProgress.all(srn, index),
-              existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
-            )
+    ).foreach { case (existingIndexes, expectedRedirectIndex) =>
+      def userAnswers(srn: Srn) =
+        defaultUserAnswers
+          .unsafeSet(ReportAnotherTransferOutPage(srn, index, secondaryIndex), true)
+          .unsafeSet(WhenWasTransferMadePages(srn, index), existingIndexes.map(_ -> localDate).toMap)
+          .unsafeSet(
+            MemberTransferOutProgress.all(srn, index),
+            existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
+          )
 
-        act.like(
-          normalmode
-            .navigateToWithDoubleIndex(
-              index,
-              secondaryIndex,
-              ReportAnotherTransferOutPage,
-              (srn, index: Int, _: Int, _) =>
-                controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
-                  .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
-              userAnswers
-            )
-            .withName(
-              s"go from report another transfer out  page to receiving scheme name page with index ${expectedRedirectIndex.value} when indexes $existingIndexes already exist"
-            )
-        )
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            index,
+            secondaryIndex,
+            ReportAnotherTransferOutPage,
+            (srn, index: Int, _: Int, _) =>
+              controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
+                .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
+            userAnswers
+          )
+          .withName(
+            s"go from report another transfer out  page to receiving scheme name page with index ${expectedRedirectIndex.value} when indexes $existingIndexes already exist"
+          )
+      )
     }
   }
 
@@ -223,32 +222,31 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       (List("0", "1", "3"), refineMV[Max5.Refined](3)), // deleted one entry in the middle
       (List("0", "1", "2", "5", "6"), refineMV[Max5.Refined](4)), // deleted two entry in the middle
       (List("0", "1", "3", "5", "6"), refineMV[Max5.Refined](3)) // deleted entry in the middle of two sections
-    ).foreach {
-      case (existingIndexes, expectedRedirectIndex) =>
-        def userAnswers(srn: Srn) =
-          defaultUserAnswers
-            .unsafeSet(ReportAnotherTransferOutPage(srn, index, secondaryIndex), true)
-            .unsafeSet(WhenWasTransferMadePages(srn, index), existingIndexes.map(_ -> localDate).toMap)
-            .unsafeSet(
-              MemberTransferOutProgress.all(srn, index),
-              existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
-            )
+    ).foreach { case (existingIndexes, expectedRedirectIndex) =>
+      def userAnswers(srn: Srn) =
+        defaultUserAnswers
+          .unsafeSet(ReportAnotherTransferOutPage(srn, index, secondaryIndex), true)
+          .unsafeSet(WhenWasTransferMadePages(srn, index), existingIndexes.map(_ -> localDate).toMap)
+          .unsafeSet(
+            MemberTransferOutProgress.all(srn, index),
+            existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
+          )
 
-        act.like(
-          checkmode
-            .navigateToWithDoubleIndex(
-              index,
-              secondaryIndex,
-              ReportAnotherTransferOutPage,
-              (srn, index: Int, _: Int, _) =>
-                controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
-                  .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
-              userAnswers
-            )
-            .withName(
-              s"go from report another transfer out  page to receiving scheme name page with index ${expectedRedirectIndex.value} when indexes $existingIndexes already exist"
-            )
-        )
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            index,
+            secondaryIndex,
+            ReportAnotherTransferOutPage,
+            (srn, index: Int, _: Int, _) =>
+              controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
+                .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
+            userAnswers
+          )
+          .withName(
+            s"go from report another transfer out  page to receiving scheme name page with index ${expectedRedirectIndex.value} when indexes $existingIndexes already exist"
+          )
+      )
     }
   }
 

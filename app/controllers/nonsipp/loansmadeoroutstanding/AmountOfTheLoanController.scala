@@ -50,7 +50,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
 
-class AmountOfTheLoanController @Inject()(
+class AmountOfTheLoanController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -70,9 +70,7 @@ class AmountOfTheLoanController @Inject()(
         val form = AmountOfTheLoanController.form(formProvider, period)
 
         val preparedForm = if (isPrePopulation) {
-          previousAnswer.fold(partialAnswersForm)(
-            amountOfTheLoan => partialAnswersForm.fill(amountOfTheLoan.asTuple)
-          )
+          previousAnswer.fold(partialAnswersForm)(amountOfTheLoan => partialAnswersForm.fill(amountOfTheLoan.asTuple))
         } else {
           request.userAnswers.fillForm(AmountOfTheLoanPage(srn, index), form)
         }

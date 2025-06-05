@@ -48,7 +48,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDate
 import javax.inject.Named
 
-class AccountingPeriodController @Inject()(
+class AccountingPeriodController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identify: IdentifierAction,

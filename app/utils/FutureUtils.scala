@@ -26,8 +26,8 @@ object FutureUtils {
       future.flatMap(a => f(a).as(a).recover(_ => a))
 
     def tapError[B](f: Throwable => Future[B])(implicit ec: ExecutionContext): Future[A] =
-      future.recoverWith {
-        case t => f(t).flatMap(_ => Future.failed(t)).recoverWith(_ => Future.failed(t))
+      future.recoverWith { case t =>
+        f(t).flatMap(_ => Future.failed(t)).recoverWith(_ => Future.failed(t))
       }
 
     def as[B](b: B)(implicit ec: ExecutionContext): Future[B] =

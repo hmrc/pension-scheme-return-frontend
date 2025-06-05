@@ -72,7 +72,7 @@
 
             @defining(viewModel.page.paginatedViewModel.fold(viewModel.page.rows)(paginatedViewModel =>
                 viewModel.page.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
-            ){ rows: List[List[TableElemBase]] =>
+            ){ (rows: List[List[TableElemBase]]) =>
 
                 @govukTable(
                     TableViewModel(

@@ -41,7 +41,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveLoanController @Inject()(
+class RemoveLoanController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -63,8 +63,8 @@ class RemoveLoanController @Inject()(
         getResult(srn, index, mode, request.userAnswers.fillForm(RemoveLoanPage(srn, index), form))
   }
 
-  private def getResult(srn: Srn, index: Max5000, mode: Mode, form: Form[Boolean], error: Boolean = false)(
-    implicit request: DataRequest[_]
+  private def getResult(srn: Srn, index: Max5000, mode: Mode, form: Form[Boolean], error: Boolean = false)(implicit
+    request: DataRequest[_]
   ) =
     (
       for {

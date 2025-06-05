@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class DoesSchemeMemberHaveNINOController @Inject()(
+class DoesSchemeMemberHaveNINOController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -59,40 +59,38 @@ class DoesSchemeMemberHaveNINOController @Inject()(
 
   def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      withMemberDetails(srn, index)(
-        memberDetails =>
-          Future.successful(
-            Ok(
-              view(
-                form(memberDetails.fullName).fromUserAnswers(DoesMemberHaveNinoPage(srn, index)),
-                viewModel(index, memberDetails.fullName, srn, mode)
-              )
+      withMemberDetails(srn, index)(memberDetails =>
+        Future.successful(
+          Ok(
+            view(
+              form(memberDetails.fullName).fromUserAnswers(DoesMemberHaveNinoPage(srn, index)),
+              viewModel(index, memberDetails.fullName, srn, mode)
             )
           )
+        )
       )
   }
 
   def onSubmit(srn: Srn, index: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      withMemberDetails(srn, index)(
-        memberDetails =>
-          form(memberDetails.fullName)
-            .bindFromRequest()
-            .fold(
-              formWithErrors =>
-                Future.successful(
-                  BadRequest(view(formWithErrors, viewModel(index, memberDetails.fullName, srn, mode)))
-                ),
-              value =>
-                for {
-                  updatedAnswers <- request.userAnswers
-                    .set(DoesMemberHaveNinoPage(srn, index), value)
-                    .mapK
-                  nextPage = navigator.nextPage(DoesMemberHaveNinoPage(srn, index), mode, updatedAnswers)
-                  updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
-                  _ <- saveService.save(updatedProgressAnswers)
-                } yield Redirect(nextPage)
-            )
+      withMemberDetails(srn, index)(memberDetails =>
+        form(memberDetails.fullName)
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              Future.successful(
+                BadRequest(view(formWithErrors, viewModel(index, memberDetails.fullName, srn, mode)))
+              ),
+            value =>
+              for {
+                updatedAnswers <- request.userAnswers
+                  .set(DoesMemberHaveNinoPage(srn, index), value)
+                  .mapK
+                nextPage = navigator.nextPage(DoesMemberHaveNinoPage(srn, index), mode, updatedAnswers)
+                updatedProgressAnswers <- saveProgress(srn, index, updatedAnswers, nextPage)
+                _ <- saveService.save(updatedProgressAnswers)
+              } yield Redirect(nextPage)
+          )
       )
 
   }

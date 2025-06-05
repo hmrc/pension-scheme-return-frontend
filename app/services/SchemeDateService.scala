@@ -70,8 +70,8 @@ class SchemeDateServiceImpl @Inject() extends SchemeDateService {
         NonEmptyList
           .of(head, rest: _*)
           .zipWithIndex
-          .traverse {
-            case (date, index) => refineV[OneToThree](index + 1).toOption.map(refined => date -> refined)
+          .traverse { case (date, index) =>
+            refineV[OneToThree](index + 1).toOption.map(refined => date -> refined)
           }
           .map(Right(_))
     }

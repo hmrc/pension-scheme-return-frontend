@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class SharesIndividualSellerNINumberController @Inject()(
+class SharesIndividualSellerNINumberController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,

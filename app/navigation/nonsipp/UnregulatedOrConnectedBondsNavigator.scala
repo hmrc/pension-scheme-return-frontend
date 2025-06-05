@@ -95,8 +95,9 @@ object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
             for {
               map <- userAnswers.get(BondsCompleted.all(srn)).getOrRecoverJourney
               indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
-              _ <- if (indexes.size >= 5000) Left(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
-              else Right(())
+              _ <-
+                if (indexes.size >= 5000) Left(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
+                else Right(())
               nextIndex <- findNextOpenIndex[Max5000.Refined](indexes).getOrRecoverJourney
             } yield controllers.nonsipp.bonds.routes.NameOfBondsController
               .onPageLoad(srn, nextIndex, NormalMode)
@@ -105,9 +106,11 @@ object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
       }
 
     case RemoveBondsPage(srn, index) =>
-      if (userAnswers
+      if (
+        userAnswers
           .map(NameOfBondsPages(srn))
-          .isEmpty) {
+          .isEmpty
+      ) {
         controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
           .onPageLoad(srn, NormalMode)
       } else {

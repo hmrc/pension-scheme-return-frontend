@@ -45,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class HowManySharesController @Inject()(
+class HowManySharesController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -102,7 +102,7 @@ class HowManySharesController @Inject()(
                   )
                 )
               ),
-            answer => {
+            answer =>
               for {
                 updatedAnswers <- request.userAnswers
                   .set(HowManyDisposalSharesPage(srn, index, disposalIndex), answer)
@@ -113,7 +113,6 @@ class HowManySharesController @Inject()(
                 updatedProgressAnswers <- saveProgress(srn, index, disposalIndex, updatedAnswers, nextPage)
                 _ <- saveService.save(updatedProgressAnswers)
               } yield Redirect(nextPage)
-            }
           )
       }
     }

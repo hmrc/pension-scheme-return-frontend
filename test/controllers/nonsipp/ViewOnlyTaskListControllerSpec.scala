@@ -1536,9 +1536,7 @@ class ViewOnlyTaskListControllerSpec extends ControllerBaseSpec with CommonTestV
         }
       )
     } else {
-      val section: List[TaskListItemViewModel] = sections(sectionIndex).items.fold(_ => List(), list => {
-        list.toList
-      })
+      val section: List[TaskListItemViewModel] = sections(sectionIndex).items.fold(_ => List(), list => list.toList)
       section.map(_.link.content.key) must not contain expectedLinkContentKey
     }
   }

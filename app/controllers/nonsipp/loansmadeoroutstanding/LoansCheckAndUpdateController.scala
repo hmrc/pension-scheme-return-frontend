@@ -38,7 +38,7 @@ import viewmodels.models.{ContentTablePageViewModel, FormPageViewModel}
 
 import java.time.LocalDate
 
-class LoansCheckAndUpdateController @Inject()(
+class LoansCheckAndUpdateController @Inject() (
   override val messagesApi: MessagesApi,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,

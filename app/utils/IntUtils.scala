@@ -22,20 +22,24 @@ import eu.timepit.refined.refineV
 import eu.timepit.refined.api.{Refined, Validate}
 
 object IntUtils {
-  implicit class IntOpts(x: Int) {
+  extension (x: Int) {
     def refined[N](implicit v: Validate[Int, OneTo[N]]): Int Refined OneTo[N] =
       refineV[OneTo[N]](x).getOrElse(throw new UnrefinableIntException(s"Failed to refine number: $x"))
     def refined2[Max](implicit v: Validate[Int, Max]): Int Refined Max =
       refineV[Max](x).getOrElse(throw new UnrefinableIntException(s"Failed to refine number: $x"))
   }
 
-  implicit def toInt[N]: Int Refined OneTo[N] => Int = _.value
-//  implicit def toRefined[N](implicit v: Validate[Int, OneTo[N]]): Int => Int Refined OneTo[N] = _.refined
+  given toRefined5000: Conversion[Int, Int Refined OneTo5000] with
+    def apply(x: Int): Int Refined OneTo5000 = x.refined
+  given toRefined50: Conversion[Int, Int Refined OneTo50] with
+    def apply(x: Int): Int Refined OneTo50 = x.refined
+  given toRefined300: Conversion[Int, Int Refined OneTo300] with
+    def apply(x: Int): Int Refined OneTo300 = x.refined
+  given toRefined3: Conversion[Int, Int Refined OneToThree] with
+    def apply(x: Int): Int Refined OneToThree = x.refined
+  given toRefined5: Conversion[Int, Int Refined OneTo5] with
+    def apply(x: Int): Int Refined OneTo5 = x.refined
 
-  implicit val toRefined5000: Int => Int Refined OneTo5000 = _.refined
-  implicit val toRefined50: Int => Int Refined OneTo50 = _.refined
-  implicit val toRefined300: Int => Int Refined OneTo300 = _.refined
-  implicit val toRefined3: Int => Int Refined OneToThree = _.refined
-  implicit val toRefined5: Int => Int Refined OneTo5 = _.refined
-
+  given toInt[N]: Conversion[Int Refined OneTo[N], Int] with
+    def apply(x: Refined[Int, OneTo[N]]): Int = x.value
 }

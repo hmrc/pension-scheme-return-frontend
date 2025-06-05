@@ -54,7 +54,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDate
 import javax.inject.Named
 
-class SharesListController @Inject()(
+class SharesListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -65,7 +65,7 @@ class SharesListController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  private implicit val logger: Logger = Logger(getClass)
+  given logger: Logger = Logger(getClass)
 
   val form: Form[Boolean] = SharesListController.form(formProvider)
 
@@ -106,32 +106,31 @@ class SharesListController @Inject()(
     mode: Mode,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean
-  )(
-    implicit request: DataRequest[AnyContent]
+  )(implicit
+    request: DataRequest[AnyContent]
   ): Result = {
     val indexes: List[Max5000] = request.userAnswers.map(SharesCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
 
     if (indexes.nonEmpty || mode.isViewOnlyMode) {
-      shares(srn).map {
-        case (sharesToCheck, shares) =>
-          val filledForm =
-            request.userAnswers.get(SharesListPage(srn)).fold(form)(form.fill)
-          Ok(
-            view(
-              filledForm,
-              viewModel(
-                srn,
-                page,
-                mode,
-                shares,
-                sharesToCheck,
-                request.schemeDetails.schemeName,
-                viewOnlyViewModel,
-                showBackLink = showBackLink,
-                isPrePopulation
-              )
+      shares(srn).map { case (sharesToCheck, shares) =>
+        val filledForm =
+          request.userAnswers.get(SharesListPage(srn)).fold(form)(form.fill)
+        Ok(
+          view(
+            filledForm,
+            viewModel(
+              srn,
+              page,
+              mode,
+              shares,
+              sharesToCheck,
+              request.schemeDetails.schemeName,
+              viewOnlyViewModel,
+              showBackLink = showBackLink,
+              isPrePopulation
             )
           )
+        )
       }.merge
     } else {
       Redirect(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
@@ -140,55 +139,51 @@ class SharesListController @Inject()(
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      {
-        val inProgressAnswers = request.userAnswers.map(SharesProgress.all(srn))
-        val inProgressUrl = inProgressAnswers.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
+      val inProgressAnswers = request.userAnswers.map(SharesProgress.all(srn))
+      val inProgressUrl = inProgressAnswers.collectFirst { case (_, SectionJourneyStatus.InProgress(url)) => url }
 
-        shares(srn).traverse {
-          case (sharesToCheck, shares) =>
-            if (sharesToCheck.size + shares.size >= Constants.maxSharesTransactions) {
-              Future.successful(
-                Redirect(
-                  navigator.nextPage(SharesListPage(srn), mode, request.userAnswers)
-                )
-              )
-            } else {
-              form
-                .bindFromRequest()
-                .fold(
-                  errors => {
-                    BadRequest(
-                      view(
-                        errors,
-                        viewModel(
-                          srn,
-                          page,
-                          mode,
-                          shares,
-                          sharesToCheck,
-                          request.schemeDetails.schemeName,
-                          None,
-                          showBackLink = true,
-                          isPrePopulation
-                        )
-                      )
-                    ).pure[Future]
-                  },
-                  addAnother =>
-                    for {
-                      updatedUserAnswers <- Future.fromTry(request.userAnswers.set(SharesListPage(srn), addAnother))
-                      _ <- saveService.save(updatedUserAnswers)
-                    } yield (addAnother, inProgressUrl) match {
-                      case (true, Some(url)) => Redirect(url)
-                      case _ =>
-                        Redirect(
-                          navigator.nextPage(SharesListPage(srn), mode, updatedUserAnswers)
-                        )
-                    }
-                )
-            }
-        }.merge
-      }
+      shares(srn).traverse { case (sharesToCheck, shares) =>
+        if (sharesToCheck.size + shares.size >= Constants.maxSharesTransactions) {
+          Future.successful(
+            Redirect(
+              navigator.nextPage(SharesListPage(srn), mode, request.userAnswers)
+            )
+          )
+        } else {
+          form
+            .bindFromRequest()
+            .fold(
+              errors =>
+                BadRequest(
+                  view(
+                    errors,
+                    viewModel(
+                      srn,
+                      page,
+                      mode,
+                      shares,
+                      sharesToCheck,
+                      request.schemeDetails.schemeName,
+                      None,
+                      showBackLink = true,
+                      isPrePopulation
+                    )
+                  )
+                ).pure[Future],
+              addAnother =>
+                for {
+                  updatedUserAnswers <- Future.fromTry(request.userAnswers.set(SharesListPage(srn), addAnother))
+                  _ <- saveService.save(updatedUserAnswers)
+                } yield (addAnother, inProgressUrl) match {
+                  case (true, Some(url)) => Redirect(url)
+                  case _ =>
+                    Redirect(
+                      navigator.nextPage(SharesListPage(srn), mode, updatedUserAnswers)
+                    )
+                }
+            )
+        }
+      }.merge
   }
 
   def onSubmitViewOnly(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
@@ -225,8 +220,8 @@ class SharesListController @Inject()(
       onPageLoadCommon(srn, page, ViewOnlyMode, Some(viewOnlyViewModel), showBackLink)
   }
 
-  private def shares(srn: Srn)(
-    implicit request: DataRequest[_],
+  private def shares(srn: Srn)(implicit
+    request: DataRequest[_],
     logger: Logger
   ): Either[Result, (List[SharesData], List[SharesData])] = {
     // if return has been pre-populated, partition shares by those that need to be checked
@@ -249,8 +244,8 @@ class SharesListController @Inject()(
           .map(_.keys.toList)
           .getOrRecoverJourney
         shares <- indexes.traverse(buildShares)
-      } yield shares.partition(
-        shares => SharesCheckStatusUtils.checkSharesRecord(request.userAnswers, srn, shares.index)
+      } yield shares.partition(shares =>
+        SharesCheckStatusUtils.checkSharesRecord(request.userAnswers, srn, shares.index)
       )
     } else {
       val noSharesToCheck = List.empty[SharesData]
@@ -292,53 +287,52 @@ object SharesListController {
       case (Nil, mode) if !mode.isViewOnlyMode =>
         List()
       case (list, _) =>
-        list.map {
-          case SharesData(index, typeOfShares, companyName, acquisition, acquisitionDate, canRemove) =>
-            val sharesType = typeOfShares match {
-              case TypeOfShares.SponsoringEmployer => "sharesList.sharesType.sponsoringEmployer"
-              case TypeOfShares.Unquoted => "sharesList.sharesType.unquoted"
-              case TypeOfShares.ConnectedParty => "sharesList.sharesType.connectedParty"
-            }
-            val acquisitionType = acquisition match {
-              case SchemeHoldShare.Acquisition => "sharesList.acquisition.acquired"
-              case SchemeHoldShare.Contribution => "sharesList.acquisition.contributed"
-              case SchemeHoldShare.Transfer => "sharesList.acquisition.transferred"
-            }
-            val sharesMessage = acquisitionDate match {
-              case Some(date) => Message("sharesList.row.withDate", sharesType, companyName, acquisitionType, date.show)
-              case None => Message("sharesList.row", sharesType, companyName, acquisitionType)
-            }
+        list.map { case SharesData(index, typeOfShares, companyName, acquisition, acquisitionDate, canRemove) =>
+          val sharesType = typeOfShares match {
+            case TypeOfShares.SponsoringEmployer => "sharesList.sharesType.sponsoringEmployer"
+            case TypeOfShares.Unquoted => "sharesList.sharesType.unquoted"
+            case TypeOfShares.ConnectedParty => "sharesList.sharesType.connectedParty"
+          }
+          val acquisitionType = acquisition match {
+            case SchemeHoldShare.Acquisition => "sharesList.acquisition.acquired"
+            case SchemeHoldShare.Contribution => "sharesList.acquisition.contributed"
+            case SchemeHoldShare.Transfer => "sharesList.acquisition.transferred"
+          }
+          val sharesMessage = acquisitionDate match {
+            case Some(date) => Message("sharesList.row.withDate", sharesType, companyName, acquisitionType, date.show)
+            case None => Message("sharesList.row", sharesType, companyName, acquisitionType)
+          }
 
-            (mode, viewOnlyViewModel) match {
-              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
-                ListRow.view(
-                  sharesMessage,
-                  routes.SharesCYAController
-                    .onPageLoadViewOnly(srn, index, year, current, previous)
-                    .url,
-                  Message("site.view.param", sharesMessage)
-                )
-              case _ if check =>
-                ListRow.check(
-                  sharesMessage,
-                  routes.SharesCheckAndUpdateController.onPageLoad(srn, index).url,
-                  Message("site.check.param", sharesMessage)
-                )
-              case _ if canRemove =>
-                ListRow(
-                  sharesMessage,
-                  changeUrl = routes.SharesCYAController.onPageLoad(srn, index, CheckMode).url,
-                  changeHiddenText = Message("site.change.param", sharesMessage),
-                  removeUrl = routes.RemoveSharesController.onPageLoad(srn, index, mode).url,
-                  removeHiddenText = Message("site.remove.param", sharesMessage)
-                )
-              case _ =>
-                ListRow(
-                  sharesMessage,
-                  changeUrl = routes.SharesCYAController.onPageLoad(srn, index, CheckMode).url,
-                  changeHiddenText = Message("site.change.param", sharesMessage)
-                )
-            }
+          (mode, viewOnlyViewModel) match {
+            case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, current, previous, _))) =>
+              ListRow.view(
+                sharesMessage,
+                routes.SharesCYAController
+                  .onPageLoadViewOnly(srn, index, year, current, previous)
+                  .url,
+                Message("site.view.param", sharesMessage)
+              )
+            case _ if check =>
+              ListRow.check(
+                sharesMessage,
+                routes.SharesCheckAndUpdateController.onPageLoad(srn, index).url,
+                Message("site.check.param", sharesMessage)
+              )
+            case _ if canRemove =>
+              ListRow(
+                sharesMessage,
+                changeUrl = routes.SharesCYAController.onPageLoad(srn, index, CheckMode).url,
+                changeHiddenText = Message("site.change.param", sharesMessage),
+                removeUrl = routes.RemoveSharesController.onPageLoad(srn, index, mode).url,
+                removeHiddenText = Message("site.remove.param", sharesMessage)
+              )
+            case _ =>
+              ListRow(
+                sharesMessage,
+                changeUrl = routes.SharesCYAController.onPageLoad(srn, index, CheckMode).url,
+                changeHiddenText = Message("site.change.param", sharesMessage)
+              )
+          }
         }
     }
 
@@ -407,15 +401,14 @@ object SharesListController {
       }
     }
 
-    val conditionalInsetText: DisplayMessage = {
+    val conditionalInsetText: DisplayMessage =
       if (sharesSize >= Constants.maxSharesTransactions) {
         ParagraphMessage("sharesList.inset")
       } else {
         Message("")
       }
-    }
 
-    val sections = {
+    val sections =
       if (isPrePop) {
         Option
           .when(sharesToCheck.nonEmpty)(
@@ -438,7 +431,6 @@ object SharesListController {
           ListSection(rows(srn, mode, shares, viewOnlyViewModel, schemeName))
         )
       }
-    }
 
     FormPageViewModel(
       mode = mode,

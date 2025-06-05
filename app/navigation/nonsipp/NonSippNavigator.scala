@@ -31,7 +31,7 @@ import navigation.{JourneyNavigator, Navigator}
 import javax.inject.Inject
 
 @Singleton
-class NonSippNavigator @Inject()() extends Navigator {
+class NonSippNavigator @Inject() () extends Navigator {
 
   val nonSippNavigator: JourneyNavigator = new JourneyNavigator {
     override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {

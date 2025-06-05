@@ -115,27 +115,26 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
       (10, 2),
       (12, 3),
       (49, 10)
-    ).foreach {
-      case (navigatingFromIndex, expectedPage) =>
-        val userAnswers = userAnswersWithEmployerNames(50) _
-        val secondaryIndex =
-          refineV[Max50.Refined](navigatingFromIndex)
-            .getOrElse(throw new RuntimeException(s"$index was not in between 1 and 50"))
-        act.like(
-          checkmode
-            .navigateToWithDoubleIndex(
-              index,
-              secondaryIndex,
-              EmployerNamePage,
-              (srn, index: Int, _: Int, _) =>
-                controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                  .onPageLoad(srn, index, expectedPage, NormalMode),
-              userAnswers
-            )
-            .withName(
-              s"go from employer name page to employer contributions CYA page $expectedPage when navigating from page with index $navigatingFromIndex"
-            )
-        )
+    ).foreach { case (navigatingFromIndex, expectedPage) =>
+      val userAnswers = userAnswersWithEmployerNames(50) _
+      val secondaryIndex =
+        refineV[Max50.Refined](navigatingFromIndex)
+          .getOrElse(throw new RuntimeException(s"$index was not in between 1 and 50"))
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            index,
+            secondaryIndex,
+            EmployerNamePage,
+            (srn, index: Int, _: Int, _) =>
+              controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                .onPageLoad(srn, index, expectedPage, NormalMode),
+            userAnswers
+          )
+          .withName(
+            s"go from employer name page to employer contributions CYA page $expectedPage when navigating from page with index $navigatingFromIndex"
+          )
+      )
     }
   }
 
@@ -264,32 +263,31 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
       (List("0", "1", "3"), refineMV[Max50.Refined](3)), // deleted one entry in the middle
       (List("0", "1", "2", "5", "6"), refineMV[Max50.Refined](4)), // deleted two entry in the middle
       (List("0", "1", "3", "5", "6"), refineMV[Max50.Refined](3)) // deleted entry in the middle of two sections
-    ).foreach {
-      case (existingIndexes, expectedRedirectIndex) =>
-        def userAnswers(srn: Srn) =
-          defaultUserAnswers
-            .unsafeSet(ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex), true)
-            .unsafeSet(TotalEmployerContributionPages(srn, index), existingIndexes.map(_ -> money).toMap)
-            .unsafeSet(
-              EmployerContributionsProgress.all(srn, index),
-              existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
-            )
+    ).foreach { case (existingIndexes, expectedRedirectIndex) =>
+      def userAnswers(srn: Srn) =
+        defaultUserAnswers
+          .unsafeSet(ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex), true)
+          .unsafeSet(TotalEmployerContributionPages(srn, index), existingIndexes.map(_ -> money).toMap)
+          .unsafeSet(
+            EmployerContributionsProgress.all(srn, index),
+            existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
+          )
 
-        act.like(
-          normalmode
-            .navigateToWithDoubleIndex(
-              index,
-              secondaryIndex,
-              ContributionsFromAnotherEmployerPage,
-              (srn, index: Int, _: Int, _) =>
-                controllers.nonsipp.employercontributions.routes.EmployerNameController
-                  .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
-              userAnswers
-            )
-            .withName(
-              s"go from contribution from another employer page to employer name page with index ${expectedRedirectIndex.value} when indexes $existingIndexes already exist"
-            )
-        )
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            index,
+            secondaryIndex,
+            ContributionsFromAnotherEmployerPage,
+            (srn, index: Int, _: Int, _) =>
+              controllers.nonsipp.employercontributions.routes.EmployerNameController
+                .onPageLoad(srn, index, expectedRedirectIndex, NormalMode),
+            userAnswers
+          )
+          .withName(
+            s"go from contribution from another employer page to employer name page with index ${expectedRedirectIndex.value} when indexes $existingIndexes already exist"
+          )
+      )
     }
   }
 

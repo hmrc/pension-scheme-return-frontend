@@ -32,8 +32,9 @@ import controllers.ControllerBaseSpec
 class IdentityTypeControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
-  val allowedAccessRequest
-    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+  ).sample.value
 
   "IdentityTypeController" - {
     IdentitySubject.values.foreach { identitySubject =>

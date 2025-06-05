@@ -43,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class EmployerCompanyCrnController @Inject()(
+class EmployerCompanyCrnController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -73,8 +73,8 @@ class EmployerCompanyCrnController @Inject()(
           formWithErrors =>
             request.userAnswers
               .get(EmployerNamePage(srn, memberIndex, index))
-              .getOrRecoverJourney(
-                companyName => BadRequest(view(formWithErrors, viewModel(srn, memberIndex, index, mode, companyName)))
+              .getOrRecoverJourney(companyName =>
+                BadRequest(view(formWithErrors, viewModel(srn, memberIndex, index, mode, companyName)))
               )
               .pure[Future],
           value =>

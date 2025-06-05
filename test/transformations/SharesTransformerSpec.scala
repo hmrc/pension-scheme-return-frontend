@@ -41,8 +41,9 @@ import models.HowSharesDisposed._
 
 class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
-  val allowedAccessRequest
-    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequest: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
+    FakeRequest()
+  ).sample.value
   val allowedAccessRequestPrePopulation: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(
     FakeRequest()
       .withSession((PREPOPULATION_FLAG, "true"))
@@ -750,9 +751,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe None
-        }
+        userAnswers => userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe None
       )
     }
 
@@ -764,9 +763,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe Some(Money(0))
-        }
+        userAnswers => userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe Some(Money(0))
       )
     }
 
@@ -778,9 +775,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
       )
       result.fold(
         ex => fail(ex.getMessage),
-        userAnswers => {
-          userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe Some(Money(0))
-        }
+        userAnswers => userAnswers.get(SharesTotalIncomePage(srn, refineMV(1))) mustBe Some(Money(0))
       )
     }
   }

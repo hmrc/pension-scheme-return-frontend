@@ -46,7 +46,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
-class WhenWasTransferMadeController @Inject()(
+class WhenWasTransferMadeController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -91,7 +91,7 @@ class WhenWasTransferMadeController @Inject()(
         form(date)
           .bindFromRequest()
           .fold(
-            formWithErrors => {
+            formWithErrors =>
               Future.successful(
                 (
                   for {
@@ -99,18 +99,15 @@ class WhenWasTransferMadeController @Inject()(
                     schemeName <- request.userAnswers
                       .get(ReceivingSchemeNamePage(srn, index, secondaryIndex))
                       .getOrRecoverJourney
-                  } yield {
-                    BadRequest(
-                      view(
-                        formWithErrors,
-                        WhenWasTransferMadeController
-                          .viewModel(srn, index, secondaryIndex, schemeName, member.fullName, mode)
-                      )
+                  } yield BadRequest(
+                    view(
+                      formWithErrors,
+                      WhenWasTransferMadeController
+                        .viewModel(srn, index, secondaryIndex, schemeName, member.fullName, mode)
                     )
-                  }
+                  )
                 ).merge
-              )
-            },
+              ),
             value =>
               for {
                 updatedAnswers <- request.userAnswers

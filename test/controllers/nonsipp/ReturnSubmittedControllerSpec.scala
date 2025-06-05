@@ -74,23 +74,22 @@ class ReturnSubmittedControllerSpec extends ControllerBaseSpec {
       ("tax year return period", NonEmptyList.one(returnPeriod1)),
       ("single accounting period", NonEmptyList.one(returnPeriod1)),
       ("multiple accounting periods", NonEmptyList.of(returnPeriod1, returnPeriod2, returnPeriod3))
-    ).foreach {
-      case (testName, returnPeriods) =>
-        s"on arriving to page for the first time - $testName" in runningApplication { implicit app =>
-          val view = injected[SubmissionView]
-          val request = FakeRequest(GET, onPageLoad)
-            .withSession((RETURN_PERIODS, Json.prettyPrint(Json.toJson(returnPeriods))))
-            .withSession((SUBMISSION_DATE, submissionDateTime.format(DateTimeFormatter.ISO_DATE_TIME)))
+    ).foreach { case (testName, returnPeriods) =>
+      s"on arriving to page for the first time - $testName" in runningApplication { implicit app =>
+        val view = injected[SubmissionView]
+        val request = FakeRequest(GET, onPageLoad)
+          .withSession((RETURN_PERIODS, Json.prettyPrint(Json.toJson(returnPeriods))))
+          .withSession((SUBMISSION_DATE, submissionDateTime.format(DateTimeFormatter.ISO_DATE_TIME)))
 
-          val result = route(app, request).value
-          val expectedView = view(buildViewModel(returnPeriods, submissionDateTime))(
-            request,
-            createMessages(app)
-          )
+        val result = route(app, request).value
+        val expectedView = view(buildViewModel(returnPeriods, submissionDateTime))(
+          request,
+          createMessages(app)
+        )
 
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual expectedView.toString
-        }
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual expectedView.toString
+      }
     }
 
     act.like(journeyRecoveryPage(routes.ReturnSubmittedController.onPageLoad(srn)).updateName("onPageLoad" + _))

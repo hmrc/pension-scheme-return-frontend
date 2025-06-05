@@ -45,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class TotalValueQuotedSharesController @Inject()(
+class TotalValueQuotedSharesController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -105,7 +105,7 @@ class TotalValueQuotedSharesController @Inject()(
 object TotalValueQuotedSharesController {
   def form(formProvider: MoneyFormProvider, period: DateRange): Form[Money] = formProvider(
     MoneyFormErrors(
-      ("totalValueQuotedShares.error.required"),
+      "totalValueQuotedShares.error.required",
       "totalValueQuotedShares.error.invalid",
       (maxMoneyValue, "totalValueQuotedShares.error.tooLarge"),
       (Constants.minPosMoneyValue, "totalValueQuotedShares.error.tooSmall")

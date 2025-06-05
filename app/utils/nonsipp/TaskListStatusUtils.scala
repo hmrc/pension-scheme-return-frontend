@@ -103,7 +103,7 @@ object TaskListStatusUtils {
       case (_, _, Some(false)) => (Check, listPageUrl)
       case (None, _, _) => (NotStarted, firstQuestionPageUrl)
       case (Some(memberDetails), 0, _) if memberDetails.isEmpty =>
-        (NotStarted, firstQuestionPageUrl) //Last member removed
+        (NotStarted, firstQuestionPageUrl) // Last member removed
       case (Some(_), 0, _) => (InProgress, getInProgressUrl)
       case (Some(_), _, _) => (Recorded(numRecorded, "members"), getInProgressOrListPageUrl)
     }
@@ -159,7 +159,7 @@ object TaskListStatusUtils {
     val numRecorded = userAnswers
       .get(AllTotalMemberContributionPages(srn))
       .getOrElse(Map.empty)
-      .count({ case (memberIndex, amount) => !amount.isZero })
+      .count { case (memberIndex, amount) => !amount.isZero }
 
     val firstQuestionPageUrl =
       controllers.nonsipp.membercontributions.routes.MemberContributionsController
@@ -230,7 +230,7 @@ object TaskListStatusUtils {
     val numRecorded = userAnswers
       .get(PensionCommencementLumpSumAmountPage.all(srn))
       .getOrElse(Map.empty)
-      .count({ case (memberIndex, amount) => !amount.isZero })
+      .count { case (memberIndex, amount) => !amount.isZero }
 
     val firstQuestionPageUrl =
       controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
@@ -255,7 +255,7 @@ object TaskListStatusUtils {
     val numRecorded = userAnswers
       .get(TotalAmountPensionPaymentsPage.all(srn))
       .getOrElse(Map.empty)
-      .count({ case (memberIndex, amount) => !amount.isZero })
+      .count { case (memberIndex, amount) => !amount.isZero }
 
     val firstQuestionPageUrl =
       controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
@@ -688,14 +688,16 @@ object TaskListStatusUtils {
   }
 
   def getFinancialDetailsCompletedOrUpdated(currentUA: UserAnswers, previousUA: UserAnswers): TaskListStatus =
-    if (currentUA.get(schemeDesignatory \ "totalAssetValue") ==
+    if (
+      currentUA.get(schemeDesignatory \ "totalAssetValue") ==
         previousUA.get(schemeDesignatory \ "totalAssetValue")
-      &&
-      currentUA.get(schemeDesignatory \ "totalPayments") ==
+        &&
+        currentUA.get(schemeDesignatory \ "totalPayments") ==
         previousUA.get(schemeDesignatory \ "totalPayments")
-      &&
-      currentUA.get(schemeDesignatory \ "totalCash") ==
-        previousUA.get(schemeDesignatory \ "totalCash")) {
+        &&
+        currentUA.get(schemeDesignatory \ "totalCash") ==
+        previousUA.get(schemeDesignatory \ "totalCash")
+    ) {
       Completed
     } else {
       Updated

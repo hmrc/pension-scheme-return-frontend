@@ -45,7 +45,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDateTime
 import javax.inject.{Inject, Named}
 
-class PsaDeclarationController @Inject()(
+class PsaDeclarationController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -72,40 +72,40 @@ class PsaDeclarationController @Inject()(
         request.session
           .get(SUBMISSION_VIEWED_FLAG)
           .fold(
-            isJourneyBypassed(srn).map(
-              eitherJourneyNavigationResultOrRecovery =>
-                eitherJourneyNavigationResultOrRecovery.fold(
-                  _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()),
-                  isBypassed =>
-                    Ok(
-                      view(
-                        PsaDeclarationController
-                          .viewModel(
+            isJourneyBypassed(srn).map(eitherJourneyNavigationResultOrRecovery =>
+              eitherJourneyNavigationResultOrRecovery.fold(
+                _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()),
+                isBypassed =>
+                  Ok(
+                    view(
+                      PsaDeclarationController
+                        .viewModel(
+                          srn,
+                          isBypassed && hasMemberNumbersChangedToOver99(
+                            request.userAnswers,
                             srn,
-                            isBypassed && hasMemberNumbersChangedToOver99(
-                              request.userAnswers,
-                              srn,
-                              request.pensionSchemeId,
-                              isPrePopulation
-                            )
+                            request.pensionSchemeId,
+                            isPrePopulation
                           )
-                      )
+                        )
                     )
-                )
-            )
-          )(
-            _ =>
-              Future.successful(
-                Redirect(controllers.routes.OverviewController.onPageLoad(srn))
-                  .removingFromSession(SUBMISSION_VIEWED_FLAG)
+                  )
               )
+            )
+          )(_ =>
+            Future.successful(
+              Redirect(controllers.routes.OverviewController.onPageLoad(srn))
+                .removingFromSession(SUBMISSION_VIEWED_FLAG)
+            )
           )
       }
     }
 
   def onSubmit(srn: Srn): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val fbVersion = request.userAnswers.get(FbVersionPage(srn)).getOrElse(defaultFbVersion) // 000 as no versions yet - initial submission
+      val fbVersion = request.userAnswers
+        .get(FbVersionPage(srn))
+        .getOrElse(defaultFbVersion) // 000 as no versions yet - initial submission
       schemeDateService.schemeDate(srn) match {
         case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         case Some(dates) =>
@@ -114,23 +114,26 @@ class PsaDeclarationController @Inject()(
           for {
             journeyByPassed <- isJourneyBypassed(srn)
             bypassed = journeyByPassed.getOrElse(false)
-            _ <- if (bypassed && hasMemberNumbersChangedToOver99(
-                request.userAnswers,
-                srn,
-                request.pensionSchemeId,
-                isPrePopulation
-              )) {
-              psrSubmissionService.submitPsrDetailsBypassed(
-                srn = srn,
-                fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
-              )
-            } else {
-              psrSubmissionService.submitPsrDetails(
-                srn = srn,
-                isSubmitted = true,
-                fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
-              )
-            }
+            _ <-
+              if (
+                bypassed && hasMemberNumbersChangedToOver99(
+                  request.userAnswers,
+                  srn,
+                  request.pensionSchemeId,
+                  isPrePopulation
+                )
+              ) {
+                psrSubmissionService.submitPsrDetailsBypassed(
+                  srn = srn,
+                  fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
+                )
+              } else {
+                psrSubmissionService.submitPsrDetails(
+                  srn = srn,
+                  isSubmitted = true,
+                  fallbackCall = controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
+                )
+              }
             _ <- sendEmail(
               loggedInUserNameOrBlank,
               request.minimalDetails.email,
@@ -140,11 +143,9 @@ class PsaDeclarationController @Inject()(
               fbVersion
             )
             _ <- saveService.save(UserAnswers(request.userAnswers.id))
-          } yield {
-            Redirect(navigator.nextPage(PsaDeclarationPage(srn), NormalMode, request.userAnswers))
-              .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
-              .addingToSession((SUBMISSION_DATE, schemeDateService.submissionDateAsString(now)))
-          }
+          } yield Redirect(navigator.nextPage(PsaDeclarationPage(srn), NormalMode, request.userAnswers))
+            .addingToSession((RETURN_PERIODS, schemeDateService.returnPeriodsAsJsonString(srn)))
+            .addingToSession((SUBMISSION_DATE, schemeDateService.submissionDateAsString(now)))
       }
     }
 
@@ -155,8 +156,8 @@ class PsaDeclarationController @Inject()(
     schemeName: String,
     submittedDate: LocalDateTime,
     reportVersion: String
-  )(
-    implicit request: DataRequest[_],
+  )(implicit
+    request: DataRequest[_],
     hc: HeaderCarrier
   ): Future[EmailStatus] = {
 

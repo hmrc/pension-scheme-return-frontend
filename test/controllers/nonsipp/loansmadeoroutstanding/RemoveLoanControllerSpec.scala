@@ -74,21 +74,21 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
           defaultUserAnswers.get(LoansProgress(srn, index)) mustBe None
-        })
+        }
     )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, never).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
           filledUserAnswers.get(LoansProgress(srn, index)) mustBe Some(SectionJourneyStatus.Completed)
-        })
+        }
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
@@ -98,11 +98,11 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
     act.like(
       saveAndContinue(onSubmit, "value" -> "true")
         .before(MockPsrSubmissionService.submitPsrDetailsWithUA())
-        .after({
+        .after {
           verify(mockPsrSubmissionService, times(1)).submitPsrDetailsWithUA(any(), any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
           defaultUserAnswers.get(LoansProgress(srn, index)) mustBe None
-        })
+        }
     )
 
     act.like(invalidForm(onSubmit, filledUserAnswers))

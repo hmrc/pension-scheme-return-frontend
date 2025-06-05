@@ -26,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class SaveServiceImpl @Inject()(sessionRepository: SessionRepository) extends SaveService {
+class SaveServiceImpl @Inject() (sessionRepository: SessionRepository) extends SaveService {
   override def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     sessionRepository.set(userAnswers)
 }

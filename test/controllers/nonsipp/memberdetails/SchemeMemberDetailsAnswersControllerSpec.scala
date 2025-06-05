@@ -95,40 +95,38 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
     List(NormalMode, CheckMode).foreach { mode =>
       act.like(
-        renderView(onPageLoad(mode), userAnswersWithNino)(
-          implicit app =>
-            implicit request =>
-              injected[CheckYourAnswersView].apply(
-                viewModel(
-                  index,
-                  srn,
-                  mode,
-                  memberDetails,
-                  hasNINO = true,
-                  Some(nino),
-                  None,
-                  viewOnlyUpdated = true
-                )
+        renderView(onPageLoad(mode), userAnswersWithNino)(implicit app =>
+          implicit request =>
+            injected[CheckYourAnswersView].apply(
+              viewModel(
+                index,
+                srn,
+                mode,
+                memberDetails,
+                hasNINO = true,
+                Some(nino),
+                None,
+                viewOnlyUpdated = true
               )
+            )
         ).withName(s"render correct $mode view when nino provided")
       )
 
       act.like(
-        renderView(onPageLoad(mode), userAnswersWithoutNino)(
-          implicit app =>
-            implicit request =>
-              injected[CheckYourAnswersView].apply(
-                viewModel(
-                  index,
-                  srn,
-                  mode,
-                  memberDetails,
-                  hasNINO = false,
-                  None,
-                  Some(noNinoReason),
-                  viewOnlyUpdated = true
-                )
+        renderView(onPageLoad(mode), userAnswersWithoutNino)(implicit app =>
+          implicit request =>
+            injected[CheckYourAnswersView].apply(
+              viewModel(
+                index,
+                srn,
+                mode,
+                memberDetails,
+                hasNINO = false,
+                None,
+                Some(noNinoReason),
+                viewOnlyUpdated = true
               )
+            )
         ).withName(s"render the correct $mode view when no nino provided")
       )
 
@@ -374,9 +372,8 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
           controllers.nonsipp.memberdetails.routes.SchemeMembersListController
             .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
         ).after(
-            verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-          )
-          .withName("Submit redirects to view only tasklist")
+          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+        ).withName("Submit redirects to view only tasklist")
       )
   }
 }

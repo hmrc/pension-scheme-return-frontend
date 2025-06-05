@@ -32,7 +32,7 @@ import scala.util.Try
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class LoansPrePopulationProcessor @Inject()() {
+class LoansPrePopulationProcessor @Inject() () {
 
   def clean(baseUA: UserAnswers, currentUA: UserAnswers)(srn: Srn): Try[UserAnswers] = {
 
@@ -61,10 +61,8 @@ class LoansPrePopulationProcessor @Inject()() {
           .flatten
           .refine[Max5000.Refined]
           .map(index => LoanPrePopulated(srn, index))
-          .foldLeft(Try(uaWithLoansData)) {
-            case (ua, loanPrePopulated) => {
-              ua.flatMap(_.set(loanPrePopulated, false))
-            }
+          .foldLeft(Try(uaWithLoansData)) { case (ua, loanPrePopulated) =>
+            ua.flatMap(_.set(loanPrePopulated, false))
           }
 
         updatedUA
@@ -76,11 +74,10 @@ class LoansPrePopulationProcessor @Inject()() {
     initialJsResult: JsResult[JsObject],
     indexesToDelete: Seq[String]
   ): JsResult[JsObject] =
-    indexesToDelete.foldLeft(initialJsResult)(
-      (accJsResult, index) =>
-        accJsResult
-          .flatMap(_.transform((Paths.loanTransactions \ "loanAmountPage" \ index \ "optCapRepaymentCY").prune(_)))
-          .flatMap(_.transform((Paths.loanTransactions \ "loanAmountPage" \ index \ "optAmountOutstanding").prune(_)))
-          .flatMap(_.transform((Paths.loanTransactions \ "loanInterestPage" \ index \ "optIntReceivedCY").prune(_)))
+    indexesToDelete.foldLeft(initialJsResult)((accJsResult, index) =>
+      accJsResult
+        .flatMap(_.transform((Paths.loanTransactions \ "loanAmountPage" \ index \ "optCapRepaymentCY").prune(_)))
+        .flatMap(_.transform((Paths.loanTransactions \ "loanAmountPage" \ index \ "optAmountOutstanding").prune(_)))
+        .flatMap(_.transform((Paths.loanTransactions \ "loanInterestPage" \ index \ "optIntReceivedCY").prune(_)))
     )
 }

@@ -30,7 +30,7 @@ import scala.util.Try
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class PsrRetrievalService @Inject()(
+class PsrRetrievalService @Inject() (
   psrConnector: PSRConnector,
   minimalRequiredSubmissionTransformer: MinimalRequiredSubmissionTransformer,
   loansTransformer: LoansTransformer,
@@ -46,8 +46,8 @@ class PsrRetrievalService @Inject()(
     optPsrVersion: Option[String] = None,
     fallBackCall: Call,
     fetchingPreviousVersion: Boolean = false
-  )(
-    implicit request: DataRequest[_],
+  )(implicit
+    request: DataRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[UserAnswers] = {
@@ -72,8 +72,8 @@ class PsrRetrievalService @Inject()(
     optPeriodStartDate: Option[String] = None,
     optPsrVersion: Option[String] = None,
     fallBackCall: Call
-  )(
-    implicit request: DataRequest[_],
+  )(implicit
+    request: DataRequest[_],
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[PsrSubmission]] =
@@ -92,8 +92,8 @@ class PsrRetrievalService @Inject()(
   def transformPsrDetails(
     psrDetails: PsrSubmission,
     fetchingPreviousVersion: Boolean = false
-  )(
-    implicit request: DataRequest[_]
+  )(implicit
+    request: DataRequest[_]
   ): Future[UserAnswers] =
     Future.fromTry {
       val srn = request.srn
@@ -109,14 +109,13 @@ class PsrRetrievalService @Inject()(
           )
 
         transformedLoansUa <- psrDetails.loans
-          .map(
-            loans =>
-              loansTransformer
-                .transformFromEtmp(
-                  transformedMinimalUa,
-                  srn,
-                  loans
-                )
+          .map(loans =>
+            loansTransformer
+              .transformFromEtmp(
+                transformedMinimalUa,
+                srn,
+                loans
+              )
           )
           .getOrElse(Try(transformedMinimalUa))
 
@@ -127,16 +126,15 @@ class PsrRetrievalService @Inject()(
           .getOrElse(Try(transformedLoansUa))
 
         transformedMemberDetailsUa <- psrDetails.membersPayments
-          .map(
-            memberPayments =>
-              memberPaymentsTransformer
-                .transformFromEtmp(
-                  transformedAssetsUa,
-                  request.previousUserAnswers,
-                  srn,
-                  memberPayments,
-                  fetchingPreviousVersion
-                )
+          .map(memberPayments =>
+            memberPaymentsTransformer
+              .transformFromEtmp(
+                transformedAssetsUa,
+                request.previousUserAnswers,
+                srn,
+                memberPayments,
+                fetchingPreviousVersion
+              )
           )
           .getOrElse(Try(transformedAssetsUa))
 
@@ -147,8 +145,6 @@ class PsrRetrievalService @Inject()(
         transformedPsrDeclarationUa <- psrDetails.psrDeclaration
           .map(pd => declarationTransformer.transformFromEtmp(transformedSharesUa, srn, pd))
           .getOrElse(Try(transformedSharesUa))
-      } yield {
-        transformedPsrDeclarationUa
-      }
+      } yield transformedPsrDeclarationUa
     }
 }

@@ -152,25 +152,28 @@ class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
       )
 
       act.like(
-        renderView(onPageLoadViewOnly, userAnswers = currentUserAnswers, optPreviousAnswers = Some(previousUserAnswers)) {
-          implicit app => implicit request =>
-            injected[ListView].apply(
-              form(injected[YesNoPageFormProvider]),
-              viewModel(
-                srn,
-                ViewOnlyMode,
-                page = 1,
-                addressesWithIndexes,
-                numberOfDisposals = 2,
-                maxPossibleNumberOfDisposals = 50,
-                userAnswers,
-                schemeName,
-                viewOnlyViewModel = Some(viewOnlyViewModel),
-                showBackLink = true,
-                maximumDisposalsReached = false,
-                allPropertiesFullyDisposed = false
-              )
+        renderView(
+          onPageLoadViewOnly,
+          userAnswers = currentUserAnswers,
+          optPreviousAnswers = Some(previousUserAnswers)
+        ) { implicit app => implicit request =>
+          injected[ListView].apply(
+            form(injected[YesNoPageFormProvider]),
+            viewModel(
+              srn,
+              ViewOnlyMode,
+              page = 1,
+              addressesWithIndexes,
+              numberOfDisposals = 2,
+              maxPossibleNumberOfDisposals = 50,
+              userAnswers,
+              schemeName,
+              viewOnlyViewModel = Some(viewOnlyViewModel),
+              showBackLink = true,
+              maximumDisposalsReached = false,
+              allPropertiesFullyDisposed = false
             )
+          )
         }.withName("OnPageLoadViewOnly renders ok with viewOnlyUpdated false")
       )
 

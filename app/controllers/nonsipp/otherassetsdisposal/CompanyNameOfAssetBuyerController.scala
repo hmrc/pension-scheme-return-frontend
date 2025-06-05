@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class CompanyNameOfAssetBuyerController @Inject()(
+class CompanyNameOfAssetBuyerController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -63,10 +63,9 @@ class CompanyNameOfAssetBuyerController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             Future
-              .successful(BadRequest(view(formWithErrors, viewModel(srn, assetIndex, disposalIndex, mode))))
-          },
+              .successful(BadRequest(view(formWithErrors, viewModel(srn, assetIndex, disposalIndex, mode)))),
           value =>
             for {
               updatedAnswers <- Future

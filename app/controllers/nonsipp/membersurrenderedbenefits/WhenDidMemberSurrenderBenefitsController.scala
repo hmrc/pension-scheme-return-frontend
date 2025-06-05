@@ -47,7 +47,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
 
-class WhenDidMemberSurrenderBenefitsController @Inject()(
+class WhenDidMemberSurrenderBenefitsController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,

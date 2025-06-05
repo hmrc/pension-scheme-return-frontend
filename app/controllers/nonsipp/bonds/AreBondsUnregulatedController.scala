@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class AreBondsUnregulatedController @Inject()(
+class AreBondsUnregulatedController @Inject() (
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -64,10 +64,9 @@ class AreBondsUnregulatedController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             Future
-              .successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode))))
-          },
+              .successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
           value =>
             for {
               updatedAnswers <- Future

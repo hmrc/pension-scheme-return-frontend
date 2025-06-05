@@ -48,7 +48,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Named}
 
-class BondsDisposalCYAController @Inject()(
+class BondsDisposalCYAController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -84,12 +84,14 @@ class BondsDisposalCYAController @Inject()(
       onPageLoadCommon(srn, bondIndex, disposalIndex, mode)
     }
 
-  def onPageLoadCommon(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode)(
-    implicit request: DataRequest[AnyContent]
+  def onPageLoadCommon(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode)(implicit
+    request: DataRequest[AnyContent]
   ): Future[Result] =
-    if (!request.userAnswers
+    if (
+      !request.userAnswers
         .get(BondsDisposalProgress(srn, bondIndex, disposalIndex))
-        .exists(_.completed)) {
+        .exists(_.completed)
+    ) {
       Future.successful(Redirect(routes.ReportBondsDisposalListController.onPageLoad(srn, 1)))
     } else {
       (
@@ -176,11 +178,10 @@ class BondsDisposalCYAController @Inject()(
           fallbackCall = controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
             .onPageLoad(srn, bondIndex, disposalIndex, mode)
         )
-      } yield submissionResult.getOrRecoverJourney(
-        _ =>
-          Redirect(
-            navigator.nextPage(BondsDisposalCYAPage(srn), mode, request.userAnswers)
-          )
+      } yield submissionResult.getOrRecoverJourney(_ =>
+        Redirect(
+          navigator.nextPage(BondsDisposalCYAPage(srn), mode, request.userAnswers)
+        )
       )
     }
 

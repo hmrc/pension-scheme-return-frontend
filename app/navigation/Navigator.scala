@@ -87,8 +87,8 @@ trait Navigator {
 
     case CheckMode =>
       journeys
-        .foldLeft(PartialFunction.empty[Page, Call])(
-          (acc, curr) => acc.orElse(curr.checkRoutes(req.userAnswers)(userAnswers))
+        .foldLeft(PartialFunction.empty[Page, Call])((acc, curr) =>
+          acc.orElse(curr.checkRoutes(req.userAnswers)(userAnswers))
         )
         .lift(page)
         .getOrElse(defaultCheckMode)

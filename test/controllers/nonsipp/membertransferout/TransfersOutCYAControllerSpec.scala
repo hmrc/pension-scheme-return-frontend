@@ -142,9 +142,8 @@ class TransfersOutCYAControllerSpec extends ControllerBaseSpec {
         controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
           .onPageLoadViewOnly(srn, page, yearString, submissionNumberTwo, submissionNumberOne)
       ).after(
-          verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
-        )
-        .withName("Submit redirects to TransferOutMemberListController page")
+        verify(mockPsrSubmissionService, never()).submitPsrDetails(any(), any(), any())(any(), any(), any())
+      ).withName("Submit redirects to TransferOutMemberListController page")
     )
   }
 

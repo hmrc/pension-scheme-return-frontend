@@ -54,7 +54,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
 
-class ReportedOtherAssetsDisposalListController @Inject()(
+class ReportedOtherAssetsDisposalListController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -105,8 +105,8 @@ class ReportedOtherAssetsDisposalListController @Inject()(
     mode: Mode,
     viewOnlyViewModel: Option[ViewOnlyViewModel] = None,
     showBackLink: Boolean
-  )(
-    implicit request: DataRequest[AnyContent]
+  )(implicit
+    request: DataRequest[AnyContent]
   ): Result =
     getCompletedDisposals(srn).map { completedDisposals =>
       val numberOfDisposals = completedDisposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
@@ -159,11 +159,10 @@ class ReportedOtherAssetsDisposalListController @Inject()(
           val numberOfOtherAssetsItems = request.userAnswers.map(OtherAssetsCompleted.all(srn)).size
           val maxPossibleNumberOfDisposals = maxDisposalPerOtherAsset * numberOfOtherAssetsItems
 
-          val allAssetsFullyDisposed: Boolean = completedDisposals.forall {
-            case (assetIndex, disposalIndexes) =>
-              disposalIndexes.exists { disposalIndex =>
-                request.userAnswers.get(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex)).contains(false)
-              }
+          val allAssetsFullyDisposed: Boolean = completedDisposals.forall { case (assetIndex, disposalIndexes) =>
+            disposalIndexes.exists { disposalIndex =>
+              request.userAnswers.get(AnyPartAssetStillHeldPage(srn, assetIndex, disposalIndex)).contains(false)
+            }
           }
 
           val maximumDisposalsReached = numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset ||
@@ -315,61 +314,59 @@ object ReportedOtherAssetsDisposalListController {
         )
       )
     } else {
-      disposals.flatMap {
-        case (otherAssetsIndex, disposalIndexes) =>
-          disposalIndexes.sortBy(_.value).map { disposalIndex =>
-            val otherAssetsDisposalData = OtherAssetsDisposalData(
-              otherAssetsIndex,
-              disposalIndex,
-              userAnswers.get(WhatIsOtherAssetPage(srn, otherAssetsIndex)).get,
-              userAnswers.get(HowWasAssetDisposedOfPage(srn, otherAssetsIndex, disposalIndex)).get
-            )
+      disposals.flatMap { case (otherAssetsIndex, disposalIndexes) =>
+        disposalIndexes.sortBy(_.value).map { disposalIndex =>
+          val otherAssetsDisposalData = OtherAssetsDisposalData(
+            otherAssetsIndex,
+            disposalIndex,
+            userAnswers.get(WhatIsOtherAssetPage(srn, otherAssetsIndex)).get,
+            userAnswers.get(HowWasAssetDisposedOfPage(srn, otherAssetsIndex, disposalIndex)).get
+          )
 
-            (mode, viewOnlyViewModel) match {
-              case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
-                ListRow.view(
-                  buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
-                  routes.AssetDisposalCYAController
-                    .onPageLoadViewOnly(srn, otherAssetsIndex, disposalIndex, year, currentVersion, previousVersion)
-                    .url,
-                  buildMessage(
-                    "assetDisposal.reportedOtherAssetsDisposalList.row.view.hidden",
-                    otherAssetsDisposalData
-                  )
+          (mode, viewOnlyViewModel) match {
+            case (ViewOnlyMode, Some(ViewOnlyViewModel(_, year, currentVersion, previousVersion, _))) =>
+              ListRow.view(
+                buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
+                routes.AssetDisposalCYAController
+                  .onPageLoadViewOnly(srn, otherAssetsIndex, disposalIndex, year, currentVersion, previousVersion)
+                  .url,
+                buildMessage(
+                  "assetDisposal.reportedOtherAssetsDisposalList.row.view.hidden",
+                  otherAssetsDisposalData
                 )
-              case (_, _) =>
-                ListRow(
-                  buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
-                  changeUrl = routes.AssetDisposalCYAController
-                    .onPageLoad(srn, otherAssetsIndex, disposalIndex, CheckMode)
-                    .url,
-                  changeHiddenText = buildMessage(
-                    "assetDisposal.reportedOtherAssetsDisposalList.row.change.hidden",
-                    otherAssetsDisposalData
-                  ),
-                  removeUrl = routes.RemoveAssetDisposalController
-                    .onPageLoad(srn, otherAssetsIndex, disposalIndex)
-                    .url,
-                  removeHiddenText = buildMessage(
-                    "assetDisposal.reportedOtherAssetsDisposalList.row.remove.hidden",
-                    otherAssetsDisposalData
-                  )
+              )
+            case (_, _) =>
+              ListRow(
+                buildMessage("assetDisposal.reportedOtherAssetsDisposalList.row", otherAssetsDisposalData),
+                changeUrl = routes.AssetDisposalCYAController
+                  .onPageLoad(srn, otherAssetsIndex, disposalIndex, CheckMode)
+                  .url,
+                changeHiddenText = buildMessage(
+                  "assetDisposal.reportedOtherAssetsDisposalList.row.change.hidden",
+                  otherAssetsDisposalData
+                ),
+                removeUrl = routes.RemoveAssetDisposalController
+                  .onPageLoad(srn, otherAssetsIndex, disposalIndex)
+                  .url,
+                removeHiddenText = buildMessage(
+                  "assetDisposal.reportedOtherAssetsDisposalList.row.remove.hidden",
+                  otherAssetsDisposalData
                 )
-            }
+              )
           }
+        }
       }.toList
     }
 
-  private def getOtherAssetsDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(
-    implicit request: DataRequest[_]
+  private def getOtherAssetsDisposalsWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(implicit
+    request: DataRequest[_]
   ): Either[Result, List[((Max5000, List[Max50]), SectionCompleted)]] =
     disposals
-      .map {
-        case indexes @ (index, _) =>
-          index -> request.userAnswers
-            .get(OtherAssetsCompleted(srn, index))
-            .toRight(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            .map(otherAssetCompletionStatus => (indexes, otherAssetCompletionStatus))
+      .map { case indexes @ (index, _) =>
+        index -> request.userAnswers
+          .get(OtherAssetsCompleted(srn, index))
+          .toRight(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          .map(otherAssetCompletionStatus => (indexes, otherAssetCompletionStatus))
       }
       .toList
       .sortBy { case (index, _) => index.value }
@@ -451,7 +448,7 @@ object ReportedOtherAssetsDisposalListController {
       }
     )
 
-    val conditionalInsetText: DisplayMessage = {
+    val conditionalInsetText: DisplayMessage =
       if (numberOfDisposals >= maxOtherAssetsTransactions * maxDisposalPerOtherAsset) {
         Message("assetDisposal.reportedOtherAssetsDisposalList.inset.maximumReached")
       } else if (numberOfDisposals >= maxPossibleNumberOfDisposals || allAssetsFullyDisposed) {
@@ -460,7 +457,6 @@ object ReportedOtherAssetsDisposalListController {
       } else {
         Message("")
       }
-    }
 
     val showRadios = !maximumDisposalsReached && !mode.isViewOnlyMode &&
       numberOfDisposals < maxPossibleNumberOfDisposals && !allAssetsFullyDisposed

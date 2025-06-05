@@ -35,7 +35,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Named
 
-class AccountingPeriodCheckYourAnswersController @Inject()(
+class AccountingPeriodCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identify: IdentifierAction,

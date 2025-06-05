@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class IndividualNameOfAssetBuyerController @Inject()(
+class IndividualNameOfAssetBuyerController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -76,7 +76,7 @@ class IndividualNameOfAssetBuyerController @Inject()(
                 )
               )
             ),
-          answer => {
+          answer =>
             for {
               updatedAnswers <- Future.fromTry(
                 request.userAnswers
@@ -87,7 +87,6 @@ class IndividualNameOfAssetBuyerController @Inject()(
               updatedProgressAnswers <- saveProgress(srn, assetIndex, disposalIndex, updatedAnswers, nextPage)
               _ <- saveService.save(updatedProgressAnswers)
             } yield Redirect(nextPage)
-          }
         )
     }
 }

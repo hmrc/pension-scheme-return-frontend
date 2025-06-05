@@ -42,7 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
 
-class RemoveMemberDetailsController @Inject()(
+class RemoveMemberDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -57,8 +57,8 @@ class RemoveMemberDetailsController @Inject()(
 
   def onPageLoad(srn: Srn, index: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      withMemberDetails(srn, index)(
-        nameDOB => Ok(view(form(formProvider, nameDOB), viewModel(srn, index, nameDOB, mode)))
+      withMemberDetails(srn, index)(nameDOB =>
+        Ok(view(form(formProvider, nameDOB), viewModel(srn, index, nameDOB, mode)))
       )
     }
 
@@ -69,29 +69,27 @@ class RemoveMemberDetailsController @Inject()(
         .fold(
           formWithErrors =>
             Future.successful(
-              withMemberDetails(srn, index)(
-                nameDOB => BadRequest(view(formWithErrors, viewModel(srn, index, nameDOB, mode)))
+              withMemberDetails(srn, index)(nameDOB =>
+                BadRequest(view(formWithErrors, viewModel(srn, index, nameDOB, mode)))
               )
             ),
-          removeMemberDetails => {
+          removeMemberDetails =>
             if (removeMemberDetails) {
               for {
                 updatedAnswers <- softDeleteMember(srn, index).mapK[Future]
                 _ <- saveService.save(updatedAnswers)
                 result <- submissionService
                   .submitPsrDetailsWithUA(srn, updatedAnswers, routes.PensionSchemeMembersController.onPageLoad(srn))
-              } yield result.getOrRecoverJourney(
-                _ =>
-                  Redirect(
-                    navigator
-                      .nextPage(RemoveMemberDetailsPage(srn), mode, updatedAnswers)
-                  )
+              } yield result.getOrRecoverJourney(_ =>
+                Redirect(
+                  navigator
+                    .nextPage(RemoveMemberDetailsPage(srn), mode, updatedAnswers)
+                )
               )
             } else {
               Future
                 .successful(Redirect(navigator.nextPage(RemoveMemberDetailsPage(srn), mode, request.userAnswers)))
             }
-          }
         )
     }
 
@@ -101,9 +99,7 @@ class RemoveMemberDetailsController @Inject()(
     (
       for {
         nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRedirectToTaskList(srn)
-      } yield {
-        f(nameDOB)
-      }
+      } yield f(nameDOB)
     ).merge
 }
 object RemoveMemberDetailsController {
